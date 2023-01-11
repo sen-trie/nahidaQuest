@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+
+    <title>Cunny Clicker</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="stylesheet" href="font.css">
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    </style>
+</head>
+
+<body>
+    <script type="text/javascript">
+    var config = {
+        type: Phaser.AUTO,
+        width: 1920,
+        height: 1080,
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var nahida;
+    var score = 0;
+    var factor = 1;
+    var container;
+    var sprite;
+    var game = new Phaser.Game(config);
+
+    function preload () {   
+        this.load.image('bg1', 'assets/bg1.png');
+        this.load.image('nahida', 'assets/nahida.png')
+        this.load.image('table', 'assets/small-table.png')
+        this.load.image('lvl1', 'assets/lvl1.jpg')
+        this.load.image('lvl2', 'assets/lvl2.jpg')
+        this.load.image('lvl3', 'assets/lvl3.jpg')
+        this.load.image('lvl4', 'assets/lvl4.jpg')
+        this.load.image('bar', 'assets/bar.jpg')
+        this.load.image('black-bg', 'assets/back.png')
+        //loadFont("gi-font", "assets/gi-font.ttf")
+    }
+
+    function create () {
+        this.add.image(500, 400, 'bg1').setScale(0.8);
+        this.add.image(1105, 488, 'black-bg');
+        this.add.image(600, 525, 'bar');
+   //     this.add.image(1085, 400, 'table').setScale(0.8);
+        nahida = this.add.image(280, 400, 'nahida').setInteractive();
+
+        sprite = this.add.sprite(280, 100, 'lvl1');
+        text = this.add.text(280, 98, '', {
+            fontFamily: 'gi-font', 
+            fontSize: '25px', 
+            fill: '#ffffff', 
+            align:'center'
+        });
+        text.setOrigin(0.5);
+
+
+        nahida.on('pointerdown', function (pointer) 
+        {   
+            nahida.setScale(0.955);
+            score += 1 * factor;
+            if (score == 1) {
+                text.setText(' ' + score + ' tap');
+            } else {
+                text.setText(' ' + score + ' taps');
+            }
+            
+        });
+
+        nahida.on('pointerup', function (pointer) 
+        {   
+            nahida.setScale(1.025);
+        });
+
+        nahida.on('pointerover', function (pointer) 
+        {   
+            nahida.setScale(1.025);
+        });
+
+        nahida.on('pointerout', function (pointer) 
+        {   
+            nahida.setScale(1);
+        });
+
+        
+
+        var container = this.add.container(0, 0, [sprite,text])
+        this.timer = 0;
+    }
+
+    
+    
+    function update (time, delta) {
+        this.timer += delta;
+     //   refresh();
+        while (this.timer > 1000) {
+            score += 1;
+            this.timer -= 1000;
+        }
+
+        nahida.rotation += 0.003;
+
+        if (score >= 30)
+        {
+            sprite.setTexture('lvl4')
+        }
+        else if (score >= 20)
+        {
+            sprite.setTexture('lvl3')
+        }
+        else if (score >= 10)
+        {
+            sprite.setTexture('lvl2')
+        }
+    }
+
+    function refresh (...arguments) {
+        text.setText = score + " taps";
+      //  disp.innerHTML = "Energy: " + energy;
+      //  debug.innerHTML = "Free Levels: " + freeLevels;
+
+        if (arguments[0] != undefined){
+            if (arguments[0].includes("but-")){
+                var heroText =  upgradeDict[arguments[2]].Name + ": " + arguments[1] + ", ATK: " + upgradeDict[arguments[2]].Factor;
+                document.getElementById(arguments[0]).innerText = heroText;
+            }
+        } else if (arguments[0] == "hero"){
+            var heroText =  upgradeDict[arguments[1]].Name + ": " +arguments[1] + ", ATK: " + upgradeDict[arguments[1]].Factor;
+            let id="but-" + arguments[1].rowCount + "";
+            document.getElementById(id).innerText = heroText;
+        }
+    }
+
+    </script>
+</body>
+</html>

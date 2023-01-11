@@ -1,0 +1,61 @@
+1. Party Tab 
+>MUST HAVE
+	✔️use score for Levelling System
+	
+
+2. Inventory Tab
+>MUST HAVE
+	✔️Weapons (flat increase to %ATK)
+	✔️artifacts (increase ATK)
+	Food (temp increase to ATK)
+
+3. Expedition Tab ✔️
+>MUST HAVE
+	 ✔️ spend energy to get items	(lvl 1: World Quests  (0% chance of failure) -> 1-3 Food, 1-3 Weapons, 1-3 Arifacts, Extremely Low Primogems
+				 	lvl 2: Daily Commissions (5% chance of failure) -> 2-3 Food, 1-2 LevelXP, 2-4 Artifacts, Low Primogems
+				 	lvl 3: Challenge Domains (10% chance of failure) -> 2-4 Weapons, 1-3 LevelXP, 3-4 Artifacts, Medium Primogems
+					lvl 4: Boss Hunting (20% chance of failure) -> 2-3 LevelXP, 3-4 Artifacts, 3-4 Weapons, Medium Primogems
+					lvl 5: Abyss Diving (30% chance of failure) -> 3 LevelXP, 4-5 Artifacts, 4-5 Weapons, High Primogems
+
+4. Wish Tab
+>MUST HAVE
+	✔️ Wish for new character cards - Roll using Primogems
+
+
+5. Achievements
+>MUST HAVE
+	Get primogems (by doing challenges or at certain levels)
+
+------------------------------------------------------------
+MUST HAVE:
+Get Primogems
+	after set levels
+	getting achievements
+
+✔️ Get Energy
+	every 8-12 taps
+------------------------------------------------------------
+NICE TO HAVE:
+Random events
+	Gold Rush - Gold x2
+	Score Rush - Score x2
+	Cashback - Prices x0.5
+	Crit Chance - x5 Score
+
+Crafting system
+	craft talents with items
+
+Shop:
+	Buy chests to get items
+	Cosmetic changes
+
+Inventory:
+	sorting
+	%ATK/%Ele Artifacts
+
+Party:
+	x5 x10 purchase
+
+Talent System at lvl 10, 25, 50, 100, 150, 200, 250, 300, 400, 500
+	unlock Skill at lvl 100
+	unlock Burst at lvl 250

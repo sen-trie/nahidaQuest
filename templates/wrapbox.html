@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        .container {
+        max-width: 400px;
+        margin: auto;
+        display: flex;
+        overflow: auto;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flex-container .item:first-child {
+            margin-left: auto;
+        }
+
+        .flex-container .item:last-child {
+            margin-right: auto;
+        }
+
+        .expedition {
+            width:227px;
+            height:589px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="flex-container">
+            <button class="expedition" onclick="" style="background:url(./assets/exped1.png);"></button>
+            <button class="expedition" onclick="" style="background:url(./assets/exped2.png);"></button>
+            <button class="expedition" onclick="" style="background:url(./assets/exped3.png);"></button>
+            <button class="expedition" id="2" onclick="hide(2)" style="background:url(./assets/exped4.png);"></button>
+            <button class="expedition" id="1" onclick="hide(1)" style="background:url(./assets/exped5.png);"></button>
+        </div>
+    </div>
+</body>
+
+
+<div id="table3" class="container">
+    <div class="flex-container">
+            <button class="expedition" onclick="" style="background:url(./assets/exped1.png);"></button>
+            <button class="expedition" onclick="" style="background:url(./assets/exped2.png);"></button>
+            <button class="expedition" onclick="" style="background:url(./assets/exped3.png);"></button>
+            <button class="expedition" onclick="" style="background:url(./assets/exped4.png);"></button>
+            <button class="expedition" onclick="" style="background:url(./assets/exped5.png);"></button>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+</script>
+</html>

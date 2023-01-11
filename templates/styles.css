@@ -1,0 +1,221 @@
+@font-face {
+    font-family: gi-font;
+    src: url(./assets/gi-font.ttf);
+}
+
+tbody {
+    width: 700px;
+    height: 775px;
+    
+    overflow-y: auto;    /* Trigger vertical scroll    */
+    overflow-x: hidden;  /* Hide the horizontal scroll */
+}
+
+button:hover {
+    background-color: burlywood;
+  }
+
+img {
+    height: 48px;
+    width: 48px;
+}
+
+.tab-button {
+    width:64px;
+    height:64px;
+}
+
+.flex-container-INVENTORY {
+    overflow-y: auto;
+    gap: 10px;
+    width: 700px;
+    height: 775px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: flex-start;
+}
+
+.flex-container-INVENTORY button:hover{
+    box-shadow: 5px 5px;
+}
+
+.flex-container-TAB {
+    position: absolute;
+    left:800px; 
+    top:5px; 
+    width: 730px;
+    gap: 10px;
+    display: flex;
+    flex-wrap: no-wrap;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.flex-container-TAB button:hover{
+    filter: drop-shadow(0px 0px 3px #ffffff);
+}
+
+.container {
+    max-width: 700px;
+    height: 700px;
+    display: flex;
+    overflow-y: hidden;
+    }
+
+.flex-container-EXPEDITION button{
+    opacity: 0.3;
+}
+
+.flex-container-EXPEDITION button:hover{
+    opacity: 1;
+}
+
+.flex-container-EXPEDITION .item:first-child {
+    margin-left: auto;
+}
+
+.flex-container-EXPEDITION .item:last-child {
+    margin-right: auto;
+}
+
+.flex-container-EXPEDITION {
+    height:1150px;
+    display: flex;
+    gap: 5px;
+    flex-wrap: no-wrap;
+    align-items: flex-end;
+    transform: rotate(90deg);
+    
+    
+}
+
+.inventoryButton {
+    width: 131px;
+    height: 144px;
+}
+
+.uiTab {
+    margin-top:50px;
+    margin-left:690px;
+}
+
+
+.expedition {
+    width: 227px;
+    height: 589px;
+}
+
+.item-button {
+    border: 0px;
+    width: 131px;
+    height: 158px;
+}
+
+.upgrade {
+    font-family: 'gi-font';
+    background-size: 95%;
+    background-position: 3px center;
+    background-repeat: no-repeat;
+    width:662px;
+    height:115px;
+}
+
+.wish-upgrade {
+    font-family: 'gi-font';
+    width:662px;
+    height:115px;
+}
+
+.hero-glow:hover {
+    background-color: yellow;
+}
+
+.achieve {
+    position: absolute; 
+    top:750px; 
+    left: 500px; 
+    width:700px;
+    height:98px;
+    background:url(./assets/achievement.png);
+}
+
+
+.achieve:hover {
+    background-color: yellow;
+}
+
+
+
+.wrap-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row-reverse
+}
+
+.wish {
+    width:430px;
+    height:430px;
+    transition: .5s ease;
+}
+
+.wish:hover{
+    box-shadow: 0 0 0 10px #000000;
+    transition: .5s ease;
+}
+
+
+#display {
+    padding-left: 10%;
+}
+
+#demo-container {
+    position: absolute;
+    top: 200px;
+    left: 50px;
+    width:508px;
+    height:508px;
+}
+
+#demo {
+    width: 95%;
+    height: 95%;
+    margin-top: 2.5%;
+    margin-left: 2.5%;
+    position: absolute;
+    background-position: center center;
+    background: url(./assets/empty.png);
+    
+    background-size: cover;
+    
+    content: '';
+    animation: rotation 18s infinite linear;
+}
+
+
+@keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    } to {
+      transform: rotate(359deg);
+    }
+}
+  
+
+#table1 {
+    width: 653px;
+}
+
+#table-tab {
+    position: absolute;
+    top: 10px;
+    right:140px;
+    width: 100px;
+    height: 10px;
+}
+
+#table3 {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    transform: rotate(-90deg);
+}
