@@ -4,9 +4,6 @@
 }
 
 tbody {
-    width: 700px;
-    height: 775px;
-    
     overflow-y: auto;    /* Trigger vertical scroll    */
     overflow-x: hidden;  /* Hide the horizontal scroll */
 }
@@ -20,6 +17,26 @@ img {
     width: 48px;
 }
 
+.tooltipEXPED {
+    z-index:2;
+    background: url("./assets/tooltipEXPED.png");
+    position: absolute; 
+    left: 745px; 
+    top: 595px; 
+    width: 850px;
+    height: 238px;
+}
+
+.tooltipTABLEEXPED {
+    display:flex;
+    justify-content: space-around;
+    align-items: center;
+    border:10px 1px #000000;
+    width: inherit;
+    height: inherit;
+    
+}
+
 .tab-button {
     width:64px;
     height:64px;
@@ -27,7 +44,6 @@ img {
 
 .flex-container-INVENTORY {
     overflow-y: auto;
-    gap: 10px;
     width: 700px;
     height: 775px;
     display: flex;
@@ -57,8 +73,10 @@ img {
 }
 
 .container {
-    max-width: 700px;
-    height: 700px;
+    max-width: 1000px;
+    top: 100px;
+    left: 10px;
+    height: 955px;
     display: flex;
     overflow-y: hidden;
     }
@@ -71,24 +89,20 @@ img {
     opacity: 1;
 }
 
-.flex-container-EXPEDITION .item:first-child {
-    margin-left: auto;
-}
-
-.flex-container-EXPEDITION .item:last-child {
-    margin-right: auto;
-}
-
 .flex-container-EXPEDITION {
-    height:1150px;
     display: flex;
     gap: 5px;
     flex-wrap: no-wrap;
-    align-items: flex-end;
-    transform: rotate(90deg);
-    
-    
+    align-items: center;
 }
+
+.sideImg {
+    position: absolute;
+    left: 1279px;
+    width: 382px;
+    height: 869px;
+}
+
 
 .inventoryButton {
     width: 131px;
@@ -102,8 +116,18 @@ img {
 
 
 .expedition {
-    width: 227px;
-    height: 589px;
+    margin: auto;
+    width: 188px;
+    height: 489px;
+    
+}
+
+.expedition-container {
+    display:flex;
+    justify-content: center;
+    width: 188px;
+    height: 489px; 
+    padding: 0px 0px;
 }
 
 .item-button {
@@ -183,11 +207,10 @@ img {
     margin-top: 2.5%;
     margin-left: 2.5%;
     position: absolute;
+    
     background-position: center center;
-    background: url(./assets/empty.png);
-    
+    background: url(./assets/tooltips/nahida.png);
     background-size: cover;
-    
     content: '';
     animation: rotation 18s infinite linear;
 }
@@ -214,8 +237,22 @@ img {
     height: 10px;
 }
 
-#table3 {
-    overflow-y: scroll;
+/* #table3 {
+    /* top: 100px;
+    width: 650px;
+    height: 1000px; */
+    /* overflow-y: scroll;
     overflow-x: hidden;
-    transform: rotate(-90deg);
+    transform: rotate(-90deg); */
+
+
+.table6 {
+    background: url(./assets/side-bar.png);
+    top: 90px; 
+    left: 1350px;
+    width:315px;
+    height:765px;
+    display: block;
+    position: absolute;
+    
 }

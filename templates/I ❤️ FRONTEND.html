@@ -13,11 +13,9 @@
         }
 
         body {
-            position: relative; 
+            position: relative;
             font-family: 'gi-font';
             padding-top: 10px #000000;
-            background:url(./assets/bg1\(3\).png);
-            background-repeat: no-repeat;
         }
 
         *:hover {
@@ -37,7 +35,7 @@
 
 </head>
 <body id="bodyID">
-    <p>
+    <p id="para">
         <span id="display">0</span>
         <span id="score">0</span>
         <span id="debug">0</span>
@@ -54,19 +52,11 @@
     </p>
 
     <table>
-        <table id="table1" class="uiTab" style="position: absolute; top:52px;">
+        <table id="table1" class="uiTab" style="position: absolute; left: 10px; top:45px; width: 650px; height: 760px;">
             <tr></tr>
         </table>
         <div id="table2" class="uiTab flex-container-INVENTORY" style="position: absolute; top:40px;"></div>
-        <div id="table3" class="uiTab container" style="position: absolute; top:67px; left:-25px; width: 1000px;height: 650px;">
-            <div id="container-2-ID" class="flex-container-EXPEDITION">
-                    <button class="fade expedition" onclick="adventure(1)" style="background:url(./assets/exped1.png);"></button>
-                    <button class="fade expedition" onclick="adventure(2)" style="background:url(./assets/exped2.png);"></button>
-                    <button class="fade expedition" onclick="adventure(3)" style="background:url(./assets/exped3.png);"></button>
-                    <button class="fade expedition" onclick="adventure(4)" style="background:url(./assets/exped4.png);"></button>
-                    <button class="fade expedition" onclick="adventure(5)" style="background:url(./assets/exped5.png);"></button>
-            </div>
-        </div>
+        <div id="table3" class="uiTab flex-container-EXPEDITION" style="position: absolute; top:55px; left: 12px; width:950px;"></div>
         <table id="table4" class="uiTab" style="position: absolute; top:40px;">
             <tr>
                 <td><button class="wish" onclick="wish()" style="background:url(./assets/dtYuX7OUH42y-wPmk6TgAg.jpg);"></button</td>
@@ -87,7 +77,7 @@
     var rowCount = 0;
     var itemCount = 0;
 
-    var energyChance = 100;
+    var energyChance = 100000;
     var upperEnergyRate = 15;
     var lowerEnergyRate = 7;
     var clickDelay = 10;
@@ -235,7 +225,119 @@
     var mainBody = document.getElementById("bodyID");
     table6 = document.createElement("table");
     mainBody.appendChild(table6);
-    table6.style = "position: absolute; top:100px; left: 1350px; width:300px; height:500px;";
+    table6.classList += "table6";
+    
+    
+    // MAIN BODY GUI
+    var para1 = document.getElementById("para")
+    var leftImg =  document.createElement("img");
+    leftImg.src = "./assets/bg-1.png";
+    leftImg.style = "position: absolute; left:-30px; top: -17px; width: 630px; height: 870px;";
+    para1.appendChild(leftImg);
+
+    var barImg =  document.createElement("img");
+    barImg.src = "./assets/bar.jpg";
+    barImg.style = "position: absolute; left: 600px; top: -16px; width: 95px; height: 870px;";
+    para1.appendChild(barImg);
+
+    var topImg =  document.createElement("img");
+    topImg.src = "./assets/top-bar.png";
+    topImg.style = "position: absolute; left: 695px; top: -16px; width: 969px; height: 106px;";
+    para1.appendChild(topImg);
+
+    var mainImg =  document.createElement("img");
+    mainImg.src = "./assets/main-bar.png";
+    mainImg.style = "position: absolute; left: 695px; top: 90px; width: 970px; height: 765px;";
+    para1.appendChild(mainImg);
+
+    var expedDiv = document.createElement("div");
+    expedDiv.classList = "tooltipEXPED";
+    expedDiv.id = "expedDivID";
+
+    var expedTable = document.createElement("table");
+    expedTable.classList = "tooltipTABLEEXPED";
+    var expedRow = expedTable.insertRow(0)
+    expedRow.style.height = "120px";
+    var expedCell2 = expedRow.insertCell(0)
+    var expedCell1 = (expedTable.insertRow(0)).insertCell(0);
+    expedDiv.appendChild(expedTable);
+    para1.appendChild(expedDiv);
+
+    var expedContainer = document.getElementById("table3");
+    expedDiv.style.display = "none";
+    var ButtonCount = 1;
+
+    createButton()
+    createButton()
+    createButton()
+    createButton()
+    createButton()
+  
+
+    function createButton() {
+        let expedButton = document.createElement("div");
+        expedButton.classList += "expedition-container"
+        expedButton.innerHTML += '<button onclick="adventure('+ButtonCount+')" onmouseover="expedInfo('+ButtonCount+')" onmouseout="expedInfo(0)" class="fade expedition" style="background:url(./assets/exped' + ButtonCount + '.png);background-repeat: no-repeat;background-size: 93%;"></button>'
+      //  heroButtonContainer.innerHTML += '<button onclick="upgrade(this.id)" onmouseover="changeTooltip('+toolName+')" onmouseout="clearTooltip()" class="upgrade" id="but-'+rowCount+'"" style='+ heroFront +'>'+heroText+'</button>'
+             
+        expedContainer.appendChild(expedButton);
+        ButtonCount++;
+    }
+
+    function expedInfo(i){
+
+    var expeditionText = ["World Quests","Visit the Adventurers' Guild","Challenge Domains","Hunt Boss Enemies","Abyss Diving"]
+    var expeditionLoreText = ["The best way to understand the world is to explore all that is around you, leaving no stone unturned. Solving the enigmas of old, helping hapless travelers, and following the trails of long-lost treasure will all become invaluable knowledge and experience...",
+                              "They boldly venture up to the stars, down to the abyss, or so their motto would have you believe. In truth, they take on jobs ranging from finding kittens to exploring domains.",
+                              "Domains hide precious treasures. Be sure to explore the domains scattered all over the world to find the treasures hidden within.",
+                              "Bosses are strong Enemies that are scattered across the world. They are much stronger than elite enemies, but also provide luxurious rewards for defeating them.",
+                              "Monsters and humans alike flock to the tower in search of the secrets and treasures it contains. Challenge different floors of the tower and defeat the enemies within to win Abyssal Stars...with the help of an ally."]
+
+        if (i==0) {
+            expedCell1.innerHTML = ""
+            expedCell2.innerHTML = ""
+        } else {
+            expedCell1.innerHTML = expeditionText[i - 1];
+            expedCell2.innerHTML = expeditionLoreText[i - 1];
+        }
+    }
+
+
+    mainImg.src = "./assets/main-bar.png";
+    mainImg.style = "position: absolute; left: 695px; top: 90px; width: 970px; height: 765px;";
+    para1.appendChild(mainImg);
+
+
+
+ //   <div id="container-2-ID" class="flex-container-EXPEDITION">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // TOOLTIPS
     var tooltipTop = (table6.insertRow(0)).insertCell(0);
@@ -285,7 +387,7 @@
 
 
     // INITIAL LOADING
-    tabChange(1)
+    tabChange(3)
     refresh();
 
     realScore++;
@@ -297,7 +399,20 @@
         for (tab in TABS){
             TABS[tab].style.display = "none";
         }
-        TABS[x - 1].style.display = "flex";
+        TABS[x-1].style.display = "flex";
+
+         if (x-1 == 0 || x-1 == 1) {
+            table6.style.display = "block";
+         } else {
+            table6.style.display = "none"; 
+         }
+
+         if (x-1 == 2) {
+            expedDiv.style.display = "block";
+         } else {
+            expedDiv.style.display = "none";
+         }
+
     }
 
     // BIG BUTTON FUNCTIONS
