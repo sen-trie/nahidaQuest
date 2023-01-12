@@ -36,9 +36,12 @@
 </head>
 <body id="bodyID">
     <p id="para">
-        <span id="display">0</span>
-        <span id="score">0</span>
-        <span id="debug">0</span>
+        <div class="score-container">
+            <span id="display">0</span>
+            <span id="score">0</span>
+            <span id="debug">0</span>
+        </div>
+        
         
         <div class="flex-container-TAB">
             <button onclick="tabChange(1)"  class="tab-button" style="background:url(./assets/tab1.png);">
@@ -62,7 +65,7 @@
                 <td><button class="wish" onclick="wish()" style="background:url(./assets/dtYuX7OUH42y-wPmk6TgAg.jpg);"></button</td>
             </tr>
         </table>
-        <table id="table5" class="uiTab" style="position: absolute; top:40px;">
+        <table id="table5" class="uiTab flex-container-ACHIEVEMENT">
             <tr></tr>
         </table>
     </table>
@@ -254,12 +257,24 @@
     expedDiv.classList = "tooltipEXPED";
     expedDiv.id = "expedDivID";
 
+    mainImg.src = "./assets/main-bar.png";
+    mainImg.style = "position: absolute; left: 695px; top: 90px; width: 970px; height: 765px;";
+    para1.appendChild(mainImg);
+
+    // TOOLTIPS FOR EXPEDITION
     var expedTable = document.createElement("table");
     expedTable.classList = "tooltipTABLEEXPED";
-    var expedRow = expedTable.insertRow(0)
-    expedRow.style.height = "120px";
-    var expedCell2 = expedRow.insertCell(0)
-    var expedCell1 = (expedTable.insertRow(0)).insertCell(0);
+
+    let expedRow = expedTable.insertRow(0);
+    expedRow.style.height = "110px";
+    var expedCell2 = expedRow.insertCell(0);
+    expedCell2.classList += "exped-cell-two"
+
+    let expedRow2 = expedTable.insertRow(0);
+    expedRow2.style.height = "80px";
+    var expedCell1 = expedRow2.insertCell(0);
+    expedCell1.classList += "exped-cell-one"
+
     expedDiv.appendChild(expedTable);
     para1.appendChild(expedDiv);
 
@@ -267,79 +282,68 @@
     expedDiv.style.display = "none";
     var ButtonCount = 1;
 
-    createButton()
-    createButton()
-    createButton()
-    createButton()
-    createButton()
-  
+    // CREATING EXPEDITION UI
+    createExpedition()
+    function createExpedition() {
+        let i = 0;
+        do {
+            let expedButton = document.createElement("div");
+            expedButton.classList += "expedition-container"
+            
+            if (i > 1){
+                var backgroundImg = "background:url(./assets/exped6.png)";
+            } else {
+                var backgroundImg = "background:url(./assets/exped" + ButtonCount + ".png)";
+            }
 
-    function createButton() {
-        let expedButton = document.createElement("div");
-        expedButton.classList += "expedition-container"
-        expedButton.innerHTML += '<button onclick="adventure('+ButtonCount+')" onmouseover="expedInfo('+ButtonCount+')" onmouseout="expedInfo(0)" class="fade expedition" style="background:url(./assets/exped' + ButtonCount + '.png);background-repeat: no-repeat;background-size: 93%;"></button>'
-      //  heroButtonContainer.innerHTML += '<button onclick="upgrade(this.id)" onmouseover="changeTooltip('+toolName+')" onmouseout="clearTooltip()" class="upgrade" id="but-'+rowCount+'"" style='+ heroFront +'>'+heroText+'</button>'
-             
-        expedContainer.appendChild(expedButton);
-        ButtonCount++;
+            let buttonId = "exped-" + ButtonCount;
+            expedButton.innerHTML += '<button id='+buttonId+' onclick="adventure('+ButtonCount+')" onmouseover=expedInfo(this.id) onmouseout="expedInfo(7)" class="fade expedition" style="'+backgroundImg+';background-repeat: no-repeat;background-size: 93%;"></button>'        
+            
+            expedContainer.appendChild(expedButton);
+            ButtonCount++;
+            i++;
+        }
+        while (i < 5);
     }
 
-    function expedInfo(i){
+    var expeditionDict = {
+        1:{Text:"Explore Teyvat"                  ,Lore:"The best way to understand the world is to explore all that is around you, leaving no stone unturned. Solving the enigmas of old, helping hapless travelers, and following the trails of long-lost treasure will all become invaluable knowledge and experience.", Locked: 0},
+        2:{Text:"Visit the Adventurers' Guild"    ,Lore:"They boldly venture up to the stars, down to the abyss, or so their motto would have you believe. In truth, they take on jobs ranging from finding kittens to exploring domains.",Locked: 0},
+        3:{Text:"Challenge Domains"               ,Lore:"Domains hide precious treasures. Be sure to explore the domains scattered all over the world to find the treasures hidden within.", Locked: 1},
+        4:{Text:"Hunt Boss Enemies"               ,Lore:"Bosses are strong Enemies that are scattered across the world. They are much stronger than elite enemies, but also provide luxurious rewards for defeating them.", Locked: 1},
+        5:{Text:"Abyss Diving"                    ,Lore:"Monsters and humans alike flock to the tower in search of the secrets and treasures it contains. Challenge different floors of the tower and defeat the enemies within to win Abyssal Stars...with the help of an ally.", Locked: 1},
+        6:{Text:"Locked"                             ,Lore:"Perhaps this path will open after some time..."            ,Locked: 0},
+        7:{Text:""                             ,Lore:""            ,Locked: 0},
+    }
 
-    var expeditionText = ["World Quests","Visit the Adventurers' Guild","Challenge Domains","Hunt Boss Enemies","Abyss Diving"]
-    var expeditionLoreText = ["The best way to understand the world is to explore all that is around you, leaving no stone unturned. Solving the enigmas of old, helping hapless travelers, and following the trails of long-lost treasure will all become invaluable knowledge and experience...",
-                              "They boldly venture up to the stars, down to the abyss, or so their motto would have you believe. In truth, they take on jobs ranging from finding kittens to exploring domains.",
-                              "Domains hide precious treasures. Be sure to explore the domains scattered all over the world to find the treasures hidden within.",
-                              "Bosses are strong Enemies that are scattered across the world. They are much stronger than elite enemies, but also provide luxurious rewards for defeating them.",
-                              "Monsters and humans alike flock to the tower in search of the secrets and treasures it contains. Challenge different floors of the tower and defeat the enemies within to win Abyssal Stars...with the help of an ally."]
-
-        if (i==0) {
-            expedCell1.innerHTML = ""
-            expedCell2.innerHTML = ""
+    function expedInfo(butId){
+        let i = 0;
+        if (butId == 7) {
+            i = 7;
         } else {
-            expedCell1.innerHTML = expeditionText[i - 1];
-            expedCell2.innerHTML = expeditionLoreText[i - 1];
+            i = butId.split("-")[1];
+        }
+
+        if (expeditionDict[i]["Locked"] == 0 || i == 7) {
+            expedCell1.innerHTML = expeditionDict[i]["Text"];
+            expedCell2.innerHTML = expeditionDict[i]["Lore"];
+        } else {
+            expedCell1.innerHTML = expeditionDict[6]["Text"];
+            expedCell2.innerHTML = expeditionDict[6]["Lore"];
         }
     }
+    function unlockExpedition(i) {
+        let expedID = "exped-" + i;
+        let unlockButton = document.getElementById(expedID);
+        let backgroundImage = "url(./assets/exped" + i + ".png)";
 
-
-    mainImg.src = "./assets/main-bar.png";
-    mainImg.style = "position: absolute; left: 695px; top: 90px; width: 970px; height: 765px;";
-    para1.appendChild(mainImg);
-
-
-
- //   <div id="container-2-ID" class="flex-container-EXPEDITION">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // TOOLTIPS
+        expeditionDict[i].Locked = 0;
+        unlockButton.style.background = backgroundImage;
+        unlockButton.style["background-repeat"] = "no-repeat";
+        unlockButton.style["background-size"]= "93%";
+    }
+    
+    // TOOLTIPS FOR HEROES/ITEMS
     var tooltipTop = (table6.insertRow(0)).insertCell(0);
     tooltipTop.align = "center"
     tooltipTop.style = "height:300px"
@@ -363,31 +367,112 @@
         toolImg.src = "./assets/tooltips/empty.png";
     }
 
-    // ACHIEVEMENTS
-    function createAchievement() {
-        achievementPopUp = document.createElement("button");
-        mainBody.appendChild(achievementPopUp);
-        achievementPopUp.classList += "achieve"
-        achievementPopUp.onclick = achievementPopUp.remove;
+    var achievementTypeRawScore = [10,1e3,1e4,1e6,1e8,1e10,1e12,1e14,1e16,1e18,1e20,1e22];
+    var achievementTypeRawDPS = "";
+    var achievementTypeRawCollection = "";
+    var achievementTypeRawClicking = "";
+    var achievementList = {
+        1: {Name:"Nut Collector", Description:"Collect 10 nuts"},
+        2: {Name:"Nut Fan", Description:"Collect 1000 nuts"},
+        3: {Name:"Nut Gatherer", Description:"Collect 10,000 nuts"},
+        4: {Name:"Nut Accumulator", Description:"Collect 1 million nuts"},
+        5: {Name:"Nut Hobbyist", Description:"Collect 100 million nuts"},
+        6: {Name:"Nut Addict", Description:"Collect 1 billion nuts"},
+        7: {Name:"Nut Fancier", Description:"Collect 100 billion nuts"},
+        8: {Name:"Nut Lover", Description:"Collect 1 trillion nuts"},
+        9: {Name:"Nut Savant", Description:"Collect 100 trillion nuts"},
+        10: {Name:"Nut Connoisseur", Description:"Collect 1 quadrillion nuts"},
+        11: {Name:"Nut Devotee", Description:"Collect 100 quadrillion nuts"},
+        12: {Name:"Nut Aficionado", Description:"Collect 1 quintillion nuts"},
+        13: {Name:"Nut Pundit", Description:"Collect 100 quintillion nuts"},
+        14: {Name:"Nut Antiquarian", Description:"Collect 1 sextillion nuts"},
+        15: {Name:"Nut Authority", Description:"Collect 100 sextillion nuts"},
+        16: {Name:"", Description:""},
+        17: {Name:"", Description:""},
+        18: {Name:"", Description:""},
+        19: {Name:"", Description:""},
+        20: {Name:"", Description:""},
+        21: {Name:"", Description:""},
+        22: {Name:"", Description:""},
+        23: {Name:"", Description:""},
+        24: {Name:"", Description:""},
+        25: {Name:"", Description:""},
+        26: {Name:"", Description:""},
+        27: {Name:"", Description:""},
+        28: {Name:"", Description:""},
+        29: {Name:"", Description:""},
+        30: {Name:"", Description:""},
+        31: {Name:"", Description:""},
+        32: {Name:"", Description:""},
+        33: {Name:"", Description:""},
+        34: {Name:"", Description:""},
+        35: {Name:"", Description:""},
+        36: {Name:"", Description:""},
+        37: {Name:"", Description:""},
+        38: {Name:"", Description:""},
+        39: {Name:"", Description:""},
+        40: {Name:"", Description:""},
+        41: {Name:"", Description:""},
+        42: {Name:"", Description:""},
+        43: {Name:"", Description:""},
+        44: {Name:"", Description:""},
+        45: {Name:"", Description:""},
+        46: {Name:"", Description:""},
+        47: {Name:"", Description:""},
+        48: {Name:"", Description:""},
+        49: {Name:"", Description:""},
+        50: {Name:"", Description:""},
     }
 
-    var goal1 = true;
+    var scoreAchievement = 0;
+
+    // ACHIEVEMENTS
+    function createAchievement(idNum) {
+        var itemUniqueID = "item-" + idNum + "-" + itemCount;
+        table5.innerHTML += 0;
+    }
+
+
+    function popAchievement(achievement) {
+        var oldAchievement = document.getElementById("tempAchievement");
+        if (oldAchievement != null) {
+            mainBody.removeChild(oldAchievement);
+        }
+
+        if (achievement == "score") {
+            var achievementText = achievementList[scoreAchievement + 1].Name;
+            var achievementDesc = achievementList[scoreAchievement + 1].Description;
+            scoreAchievement++;
+        }
+
+        var achievementPopUp = document.createElement("p");
+
+        let achievementH1 = document.createElement("h2");
+        achievementH1.innerText = achievementText;
+        achievementH1.classList += "achieveH1"
+        let achievementH2 = document.createElement("h3");
+        achievementH2.innerText = achievementDesc;
+        achievementH2.classList += "achieveH2"
+
+        achievementPopUp.appendChild(achievementH1);
+        achievementPopUp.appendChild(achievementH2);
+        achievementPopUp.classList += "achieve"
+        achievementPopUp.id = "tempAchievement"
+        achievementPopUp.onclick = achievementPopUp.remove;
+        mainBody.appendChild(achievementPopUp);
+    }
 
     function checkAchievement() {
-        if (goal1) {
-            if (realScore >= 300) {
-                createAchievement();
-                goal1 = false;
-            }
+        if (realScore >= achievementTypeRawScore[0]) {
+            popAchievement("score");
+            achievementTypeRawScore.shift();
         }
-            
     }
 
     var timer = setInterval(checkAchievement,1000);
 
-
     // INITIAL LOADING
-    tabChange(3)
+    tabChange(5)
     refresh();
 
     realScore++;
@@ -576,47 +661,51 @@
     // EXPEDITION UI
     // RMB THERES A CHANCE OF FAILURE, IT IS NOT A BUG IF NOTHING HAPPENS
     function adventure(type) {
-        if (energy >= ADVENTURECOSTS[type]){
-            energy -= ADVENTURECOSTS[type];
-            refresh();
 
-            let randInt = randomInteger(0, 99);
-            if (randInt < ADVENTUREFAILURE[type]){
-                return;
-            } else {
-                if (type == 1){
-                inventoryDraw("artifact", 1, 4);
-                inventoryDraw("weapon", 1, 2);
-                inventoryDraw("xp", 2, 2);
-                inventoryDraw("food", 1, 3);
-                }
-                if (type == 2){
+        if (expeditionDict[type].Locked == 1){
+            alert("ITS LOCKED CANT YOU SEE!!!!!!!")
+            return                                //// <------------------------ ADD THE POPUP FOR LOCKED
+        } else {                                                     
+            if (energy >= ADVENTURECOSTS[type]){
+                energy -= ADVENTURECOSTS[type];
+                refresh();
+
+                let randInt = randomInteger(0, 99);
+                if (randInt < ADVENTUREFAILURE[type]){
+                    return;
+                } else {
+                    if (type == 1){
+                    inventoryDraw("artifact", 1, 4);
+                    inventoryDraw("weapon", 1, 2);
                     inventoryDraw("xp", 2, 2);
-                    inventoryDraw("food", 2, 3);
-                    inventoryDraw("artifact", 2, 4);
-                    
-                }
-                if (type == 3){
-                    inventoryDraw("xp", 2, 3);
-                    inventoryDraw("artifact", 3, 4);
-                    inventoryDraw("food", 2, 4);
-                    inventoryDraw("weapon", 2, 4);
-                    
-                }
-                if (type == 4){
-                    inventoryDraw("weapon", 3, 4);
-                    inventoryDraw("artifact", 3, 4);
-                    inventoryDraw("xp", 3, 4);
-                    inventoryDraw("food", 2, 4);
+                    inventoryDraw("food", 1, 3);
                     }
-                if (type == 5){
-                    inventoryDraw("artifact", 4, 5);
-                    inventoryDraw("weapon", 4, 5);
-                    inventoryDraw("food", 2, 5);
-                    inventoryDraw("xp", 4, 4);
+                    if (type == 2){
+                        inventoryDraw("xp", 2, 2);
+                        inventoryDraw("food", 2, 3);
+                        inventoryDraw("artifact", 2, 4);
+                    }
+                    if (type == 3){
+                        inventoryDraw("xp", 2, 3);
+                        inventoryDraw("artifact", 3, 4);
+                        inventoryDraw("food", 2, 4);
+                        inventoryDraw("weapon", 2, 4);
+                    }
+                    if (type == 4){
+                        inventoryDraw("weapon", 3, 4);
+                        inventoryDraw("artifact", 3, 4);
+                        inventoryDraw("xp", 3, 4);
+                        inventoryDraw("food", 2, 4);
+                    }
+                    if (type == 5){
+                        inventoryDraw("artifact", 4, 5);
+                        inventoryDraw("weapon", 4, 5);
+                        inventoryDraw("food", 2, 5);
+                        inventoryDraw("xp", 4, 4);
+                    }
                 }
-            }
-        }  
+            }  
+        }   
     }
 
     // DRAWS FOR RANDOM INVENTORY LOOT 

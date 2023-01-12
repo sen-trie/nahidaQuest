@@ -8,6 +8,7 @@ tbody {
     overflow-x: hidden;  /* Hide the horizontal scroll */
 }
 
+
 button:hover {
     background-color: burlywood;
   }
@@ -17,7 +18,14 @@ img {
     width: 48px;
 }
 
+.score-container {
+    position: absolute;
+    left:100px; 
+    top:5px; 
+}
+
 .tooltipEXPED {
+    text-align: center;
     z-index:2;
     background: url("./assets/tooltipEXPED.png");
     position: absolute; 
@@ -28,14 +36,28 @@ img {
 }
 
 .tooltipTABLEEXPED {
+    color: #DEDEDE;
     display:flex;
     justify-content: space-around;
     align-items: center;
     border:10px 1px #000000;
     width: inherit;
     height: inherit;
+}
+
+.exped-cell-one {
+    width: 780px;
+    top: -210px;
+    font-size: xx-large;
+}
+
+.exped-cell-two {
+    width: 780px;
+    font-size: 20px;
+    text-justify: inter-word;
     
 }
+
 
 .tab-button {
     width:64px;
@@ -94,6 +116,20 @@ img {
     gap: 5px;
     flex-wrap: no-wrap;
     align-items: center;
+}
+
+.flex-container-ACHIEVEMENT {
+    background-color: aqua;
+    position: absolute; 
+    top:45px; 
+    left:5px; 
+    width:969px;
+    height:759px;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: flex-start;
 }
 
 .sideImg {
@@ -157,7 +193,7 @@ img {
 
 .achieve {
     position: absolute; 
-    top:750px; 
+    top:670px; 
     left: 500px; 
     width:700px;
     height:98px;
@@ -209,7 +245,7 @@ img {
     position: absolute;
     
     background-position: center center;
-    background: url(./assets/tooltips/nahida.png);
+    background: url(./assets/nahida.png);
     background-size: cover;
     content: '';
     animation: rotation 18s infinite linear;
