@@ -191,12 +191,14 @@ img {
     background-color: yellow;
 }
 
-.achieve {
+.achieve {                                                  /* ADJUST IT TO THE LEFT, BELOW BUTTON */
+    z-index:2;
     position: absolute; 
     top:670px; 
     left: 500px; 
     width:700px;
     height:98px;
+    text-align: center;
     background:url(./assets/achievement.png);
 }
 
@@ -204,8 +206,6 @@ img {
 .achieve:hover {
     background-color: yellow;
 }
-
-
 
 .wrap-container {
     display: flex;
