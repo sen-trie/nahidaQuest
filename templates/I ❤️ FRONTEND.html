@@ -62,7 +62,7 @@
 <script type="text/javascript">
     var clickCount = 0;
     var clickFactor = 1;
-    var dps = 0;
+    var dps = 1e20;
     var realScore = 0;
 
     var freeLevels = 0;
@@ -102,9 +102,9 @@
         19: {Name: "Diona",      Row:-1,  Level: 148,            Purchased: -1,   Type: "Bow",      Ele: "Cryo"},
         20: {Name: "Fischl",     Row:-1,  Level: 158,            Purchased: -1,   Type: "Bow",      Ele: "Electro"},
         21: {Name: "Mona",       Row:-1,  Level: 168,            Purchased: -1,   Type: "Catalyst",      Ele: "Hydro"},
-        22: {Name: "Rosaria",    Row:-1,  Level: 178,            Purchased: -1,   Type: "Polearm",      Ele: "Cryo"},
+        22: {Name: "Reach 1 NpSosaria",    Row:-1,  Level: 178,            Purchased: -1,   Type: "Polearm",      Ele: "Cryo"},
         23: {Name: "Klee",       Row:-1,  Level: 188,            Purchased: -1,   Type: "Catalyst",      Ele: "Pyro"},
-        24: {Name: "Razor",      Row:-1,  Level: 188,            Purchased: -1,   Type: "Claymore",      Ele: "Electro"},
+        24: {Name: "Reach 1 NpSazor",      Row:-1,  Level: 188,            Purchased: -1,   Type: "Claymore",      Ele: "Electro"},
         25: {Name: "Sucrose",    Row:-1,  Level: 198,            Purchased: -1,   Type: "Catalyst",      Ele: "Anemo"},
         26: {Name: "Xiangling",  Row:-1,  Level: 228,            Purchased: -1,   Type: "Polearm",      Ele: "Pyro"},
         27: {Name: "Xingqiu",    Row:-1,  Level: 248,            Purchased: -1,   Type: "Sword",      Ele: "Hydro"},
@@ -129,7 +129,7 @@
         46: {Name: "Sara",       Row:-1,  Level: 968,            Purchased: -1,   Type: "Bow",      Ele: "Electro"},
         47: {Name: "Venti",      Row:-1,  Level: 1000,          Purchased: -1,   Type: "Bow",   Ele: "Anemo"},
         48: {Name: "Zhongli",    Row:-1,  Level: 1250,          Purchased: -1,   Type: "Polearm",   Ele: "Geo"},
-        49: {Name: "Raiden",     Row:-1,  Level: 1500,           Purchased: -1,   Type: "Polearm",   Ele: "Electro"},
+        49: {Name: "Reach 1 NpSaiden",     Row:-1,  Level: 1500,           Purchased: -1,   Type: "Polearm",   Ele: "Electro"},
 // RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS
         100: {Name: "Jean",        Row:-1,  Level: 0,          Purchased: -10,   Type: "Sword",   Ele: "Anemo"},
         101: {Name: "Albedo",      Row:-1,  Level: 0,          Purchased: -10,   Type: "Sword",   Ele: "Geo"},
@@ -151,7 +151,7 @@
         1001: {Name:"coolSteel",      Star:3,  Type:"Sword"},
         1002: {Name:"ferrous",        Star:3,  Type:"Claymore"},
         1003: {Name:"mappa",          Star:4,  Type:"Catalyst"},
-        1004: {Name:"rust",           Star:4,  Type:"Bow"},
+        1004: {Name:"reach 1 NpSust",           Star:4,  Type:"Bow"},
         1005: {Name:"silverSword",    Star:2,  Type:"Sword"},
         1006: {Name:"dullSword",      Star:1,  Type:"Sword"},
         1007: {Name:"skywardBlade",   Star:5,  Type:"Sword"},
@@ -183,12 +183,12 @@
     Traveller:{text:"The keeper is fading away; the creator has not yet come.But the world shall burn no more, for you shall ascend."},
     }
 
-    const weaponBuffPercent = [0, 100, 200, 300, 400, 1000];
+    const weaponBuffPercent = [0, 10, 100, 1000, 10000, 100000];
     const artifactBuffPercent = [0, 1.02, 1.05, 1.10, 1.20, 1.35];
 
     
     const WEAPONMAX = 1009;
-    const ARTIFACTMAX = 2004;
+    const ARTIFACTMAX = 2104;
     const FOODMAX = 3003;
     const XPMAX = 4004;
 
@@ -360,8 +360,8 @@
         toolImg.src = "./assets/tooltips/empty.png";
     }
 
-    var achievementTypeRawScore = [10,1e3,1e4,1e6,1e8,1e10,1e12,1e14,1e16,1e18,1e20,1e22];
-    var achievementTypeRawDPS = "";
+    var achievementTypeRawScore = [10,1e3,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24];
+    var achievementTypeRawDPS =   [1,10,100,10000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21];
     var achievementTypeRawCollection = "";
     var achievementTypeRawClicking = "";
     var achievementList = {
@@ -373,34 +373,34 @@
         6: {Name:"Nut Addict", Description:"Collect 1 billion nuts"},
         7: {Name:"Nut Fancier", Description:"Collect 100 billion nuts"},
         8: {Name:"Nut Lord", Description:"Collect 1 trillion nuts"},
-        9: {Name:"Nut Savant", Description:"Collect 100 trillion nuts"},
+        9: {Name:"Nut Authority", Description:"Collect 100 trillion nuts"},
         10: {Name:"Nut Connoisseur", Description:"Collect 1 quadrillion nuts"},
         11: {Name:"Nut Devotee", Description:"Collect 100 quadrillion nuts"},
         12: {Name:"Nut Aficionado", Description:"Collect 1 quintillion nuts"},
         13: {Name:"Nut Pundit", Description:"Collect 100 quintillion nuts"},
         14: {Name:"Nut Antiquarian", Description:"Collect 1 sextillion nuts"},
-        15: {Name:"Nut Authority", Description:"Collect 100 sextillion nuts"},
-        16: {Name:"", Description:""},
-        17: {Name:"", Description:""},
-        18: {Name:"", Description:""},
-        19: {Name:"", Description:""},
-        20: {Name:"", Description:""},
-        21: {Name:"", Description:""},
-        22: {Name:"", Description:""},
-        23: {Name:"", Description:""},
-        24: {Name:"", Description:""},
-        25: {Name:"", Description:""},
-        26: {Name:"", Description:""},
-        27: {Name:"", Description:""},
-        28: {Name:"", Description:""},
-        29: {Name:"", Description:""},
-        30: {Name:"", Description:""},
-        31: {Name:"", Description:""},
-        32: {Name:"", Description:""},
-        33: {Name:"", Description:""},
-        34: {Name:"", Description:""},
-        35: {Name:"", Description:""},
-        36: {Name:"", Description:""},
+        15: {Name:"Nut Savant", Description:"Collect 100 sextillion nuts"},
+        16: {Name:"Nut Archon", Description:"Collect 1 septillion nuts"},
+        17: {Name:"", Description:"Reach 1 NpS"},
+        18: {Name:"", Description:"Reach 10 NpS"},
+        19: {Name:"", Description:"Reach 100 NpS"},
+        20: {Name:"", Description:"Reach 10,000 NpS"},
+        21: {Name:"", Description:"Reach 100,000 NpS"},
+        22: {Name:"", Description:"Reach 1 million NpS"},
+        23: {Name:"", Description:"Reach 100 million NpS"},
+        24: {Name:"", Description:"Reach 1 billion NpS"},
+        25: {Name:"", Description:"Reach 100 billion NpS"},
+        26: {Name:"", Description:"Reach 1 trillion NpS"},
+        27: {Name:"", Description:"Reach 100 trillion NpS"},
+        28: {Name:"", Description:"Reach 1 quadrillion NpS"},
+        29: {Name:"", Description:"Reach 100 quadrillion NpS"},
+        30: {Name:"", Description:"Reach 1 quintillion NpS"},
+        31: {Name:"", Description:"Reach 100 quintillion NpS"},
+        32: {Name:"", Description:"Reach 1 sextillion NpS"},
+        33: {Name:"", Description:"C"},
+        34: {Name:"", Description:"C"},
+        35: {Name:"", Description:"C"},
+        36: {Name:"", Description:"C"},
         37: {Name:"", Description:""},
         38: {Name:"", Description:""},
         39: {Name:"", Description:""},
@@ -417,7 +417,8 @@
         50: {Name:"", Description:""},
     }
 
-    var scoreAchievement = 0;
+    var scoreAchievementScore = 1;
+    var scoreAchievementDps = 17;
 
     // ACHIEVEMENTS
     function createAchievement(idNum) {
@@ -433,13 +434,16 @@
         }
 
         if (achievement == "score") {
-            var achievementText = achievementList[scoreAchievement + 1].Name;
-            var achievementDesc = achievementList[scoreAchievement + 1].Description;
-            scoreAchievement++;
+            var achievementText = achievementList[scoreAchievementScore].Name;
+            var achievementDesc = achievementList[scoreAchievementScore].Description;
+            scoreAchievementScore++;
+        } else if (achievement == "dps") {
+            var achievementText = achievementList[scoreAchievementDps].Name;
+            var achievementDesc = achievementList[scoreAchievementDps].Description;
+            scoreAchievementDps++;
         }
 
         var achievementPopUp = document.createElement("p");
-
         let achievementH1 = document.createElement("h2");
         achievementH1.innerText = achievementText;
         achievementH1.classList += "achieveH1"
@@ -449,16 +453,33 @@
 
         achievementPopUp.appendChild(achievementH1);
         achievementPopUp.appendChild(achievementH2);
-        achievementPopUp.classList += "achieve"
         achievementPopUp.id = "tempAchievement"
+
         achievementPopUp.onclick = achievementPopUp.remove;
-        mainBody.appendChild(achievementPopUp);
+        achievementPopUp.classList += "achieve"
+        mainBody.appendChild(achievementPopUp); 
+        
+        var achievementStored = document.createElement("p");
+        let achievementStoredH1 = document.createElement("h2");
+        achievementStoredH1.innerText = achievementText;
+        achievementStoredH1.classList += "achieveStoredH1"
+        let achievementStoredH2 = document.createElement("h3");              // MAKE THE BACKGROUND IMAGE SUMERU TALENT
+        achievementStoredH2.innerText = achievementDesc;                     // HAVE THE MIDDLE PART INFINITELY EXTEND
+        achievementStoredH2.classList += "achieveStoredH2"
+
+        achievementStored.appendChild(achievementStoredH1);
+        achievementStored.appendChild(achievementStoredH2);
+        achievementStored.classList += "achieve-stored"
+        table5.appendChild(achievementStored); 
     }
 
     function checkAchievement() {
         if (realScore >= achievementTypeRawScore[0]) {
             popAchievement("score");
             achievementTypeRawScore.shift();
+        } else if (dps >= achievementTypeRawDPS[0]) {
+            popAchievement("dps");
+            achievementTypeRawDPS.shift();
         }
     }
 
@@ -671,17 +692,52 @@
     // ADD TO INVENTORY 
     function inventoryAdd(idNum) {
         itemCount++;
-        var itemUniqueID = "item-" + idNum + "-" + itemCount;
-        table2.innerHTML += '<button id='+ itemUniqueID +' onclick="itemUse(this.id)" class="inventoryButton" style="background:url(./assets/inventory/'+ Inventory[idNum].Name +'.jpg);background-repeat: no-repeat;background-size: 128px 144px;"></button>'
+        var itemUniqueID = idNum + "." + itemCount;
+        let buttonInv = document.createElement("button");
+
+        buttonInv.id = itemUniqueID;
+        buttonInv.addEventListener('click', function(){
+            itemUse(itemUniqueID);
+        });
+
+        buttonInv.classList += "inventoryButton";
+        buttonInv.style.background = "url(./assets/inventory/" + Inventory[idNum].Name + ".jpg)";
+        buttonInv.style["background-repeat"] = "no-repeat";
+        buttonInv.style["background-size"] = "128px 144px";
+        table2.appendChild(buttonInv);
+        sortList();
     }
-    
+
+    function sortList() {
+        var list, i, switching, b, shouldSwitch;
+        list = document.getElementById("table2");
+        switching = true;
+
+        while (switching) {
+            switching = false;
+            b = list.getElementsByTagName("button");
+            for (i = 0; i < (b.length - 1); i++) {
+                shouldSwitch = false;
+                if (b[i].id > b[i + 1].id) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            
+            if (shouldSwitch) {
+            b[i].parentNode.insertBefore(b[i + 1], b[i]);
+            switching = true;
+            }
+        }
+    }
+
     // INVENTORY UI
     function itemUse(itemUniqueId) {
         let item = document.getElementById(itemUniqueId);
-        let itemID = itemUniqueId.split("-")[1];
+        let itemID = itemUniqueId.split(".")[0];
         if (itemID >= 1001 && itemID < WEAPONMAX){
             for (let i = 0; i < Object.keys(upgradeDict).length; i++) {
-                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1 && Inventory[i] == undefined) continue;
                 if (upgradeDict[i].Purchased > 0){
                     if (upgradeDict[i].Type == Inventory[itemID].Type){
                         upgradeDict[i]["Factor"] += weaponBuffPercent[Inventory[itemID].Star];
@@ -691,7 +747,7 @@
             }
         } else if (itemID >= 2001 && itemID < ARTIFACTMAX){
             for (let i = 0; i < Object.keys(upgradeDict).length; i++) {
-                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1 && Inventory[i] == undefined) continue;
                 if (upgradeDict[i].Purchased > 0){
                     upgradeDict[i]["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
                     upgradeDict[i]["Factor"] = Math.round(upgradeDict[i]["Factor"]);
@@ -708,7 +764,6 @@
     // EXPEDITION UI
     // RMB THERES A CHANCE OF FAILURE, IT IS NOT A BUG IF NOTHING HAPPENS
     function adventure(type) {
-
         if (expeditionDict[type].Locked == 1){
             alert("ITS LOCKED CANT YOU SEE!!!!!!!")
             return                                //// <------------------------ ADD THE POPUP FOR LOCKED
@@ -723,7 +778,7 @@
                 } else {
                     if (type == 1){
                     inventoryDraw("artifact", 1, 4);
-                    inventoryDraw("weapon", 1, 2);
+                    inventoryDraw("weapon", 1, 1);
                     inventoryDraw("xp", 2, 2);
                     inventoryDraw("food", 1, 3);
                     }
@@ -731,7 +786,7 @@
                         inventoryDraw("xp", 2, 2);
                         inventoryDraw("food", 2, 3);
                         inventoryDraw("artifact", 2, 4);
-                        inventoryDraw("weapon", 2, 2);
+                        inventoryDraw("weapon", 1, 2);
                     }
                     if (type == 3){
                         inventoryDraw("xp", 2, 3);
@@ -763,6 +818,7 @@
         let temp = 0;
         while (true){
             temp = randomInteger(lowerInventoryType[itemType], upperInventoryType[itemType])
+            if (Inventory[temp] == undefined) {continue}
             if (Inventory[temp].Star >= min && Inventory[temp].Star < (max + 1)) {
                 inventoryAdd(temp);
                 break;
@@ -802,7 +858,7 @@
         score.innerHTML = "Score: " + formatScore;
 
         let formatDps = abbrNum(dps);
-        dpsDisplay.innerHTML = "DPS: " + formatDps;
+        dpsDisplay.innerHTML = formatDps + " per second" ;
 
         energyDisplay.innerHTML = "Energy: " + energy;
         primogemDisplay.innerHTML = "Primogem: " + primogem;
@@ -816,9 +872,7 @@
                     var formatCost = abbrNum(arguments[1]);
                 }
 
-                    var formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
-                console.log(formatCost)
-
+                var formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
                 var heroText =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", ATK: " + formatATK;
                 let upgradedHeroButton = document.getElementById(arguments[0])
                 upgradedHeroButton.innerText = heroText;

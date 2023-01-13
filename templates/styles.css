@@ -202,9 +202,16 @@ img {
     background:url(./assets/achievement.png);
 }
 
-
 .achieve:hover {
     background-color: yellow;
+}
+
+.achieve-stored {
+    z-index:1;
+    width:400px;
+    height:98px;
+    text-align: center;
+    background:url(./assets/achievement.png);
 }
 
 .wrap-container {
