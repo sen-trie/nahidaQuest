@@ -1,5 +1,5 @@
 <!doctype html> 
-<html lang="en"> 
+<html lang="en" > 
 <head> 
     <meta charset="UTF-8" />
     <title>nahidaQuest!</title>
@@ -27,17 +27,12 @@
     <p id="para">
         <div class="score-container">
             <span id="energy">0</span>
-            <span id="score">0</span>              <!------------------------ CHANGE TO P LATER -->
+            <span id="score">0</span>              <!------------------------ CHANGE TO PARAGRAPH LATER -->
             <span id="dps">0</span>
             <span id="primogem">0</span>
         </div>
         
-        <div class="flex-container-TAB">
-            <button onclick="tabChange(1)"  class="tab-button" style="background:url(./assets/tab1.png);">
-            <button onclick="tabChange(2)" class="tab-button" style="background:url(./assets/tab2.png);">
-            <button onclick="tabChange(3)" class="tab-button" style="background:url(./assets/tab3.png);">
-            <button onclick="tabChange(4)" class="tab-button" style="background:url(./assets/tab4.png);">
-            <button onclick="tabChange(5)" class="tab-button" style="background:url(./assets/tab5.png);">
+        <div class="flex-container-TAB" id="flex-container-TAB">
         </div>
 
         <div id="demo-container"></div>
@@ -49,20 +44,16 @@
         </table>
         <div id="table2" class="uiTab flex-container-INVENTORY" style="position: absolute; top:40px;"></div>
         <div id="table3" class="uiTab flex-container-EXPEDITION" style="position: absolute; top:55px; left: 12px; width:950px;"></div>
-        <table id="table4" class="uiTab" style="position: absolute; top:40px;">
-            <tr>
-                <td><button class="wish" onclick="wish()" style="background:url(./assets/dtYuX7OUH42y-wPmk6TgAg.jpg);"></button</td>
-            </tr>
-        </table>
+        <div id="table4" class="uiTab wish-counter"></div>
         <table id="table5" class="uiTab flex-container-ACHIEVEMENT">
             <tr></tr>
         </table>
     </table>
 
-<script type="text/javascript">
+<script type="module">
     var clickCount = 0;
     var clickFactor = 1;
-    var dps = 1e20;
+    var dps = 0;
     var realScore = 0;
 
     var freeLevels = 0;
@@ -80,69 +71,69 @@
     // RMB TO UPDATE CONSTANTS
 
     var upgradeDict = {
-        0: {Name: "Nahida",      Row:-1,  Level: 1,   Cost:20, Factor:1,        Purchased: -1,   Type: "Catalyst",   Ele: "Dendro"},
-        1: {Name: "Traveller",   Row:-1,  Level: 6,            Purchased: -1,   Type: "Sword",      Ele: ""},
-        2: {Name: "Collei",      Row:-1,  Level: 7,            Purchased: -1,   Type: "Bow",        Ele: "Dendro"},
-        3: {Name: "Cyno",        Row:-1,  Level: 9,            Purchased: -1,   Type: "Polearm",   Ele: "Electro"},
-        4: {Name: "Candace",     Row:-1,  Level: 12,           Purchased: -1,   Type: "Polearm",   Ele: "Hydro"},
-        5: {Name: "Dori",        Row:-1,  Level: 15,           Purchased: -10,  Type: "Claymore",   Ele: "Electro"},
-        6: {Name: "Tighnari",    Row:-1,  Level: 20,           Purchased: -1,   Type: "Bow",      Ele: "Dendro"},
-        7: {Name: "Nilou",       Row:-1,  Level: 29,           Purchased: -1,   Type: "Sword",     Ele: "Hydro"},
-        8: {Name: "Layla",       Row:-1,  Level: 39,           Purchased: -1,   Type: "Sword",     Ele: "Cryo"},
-        9: {Name: "Faruzan",     Row:-1,  Level: 49,           Purchased: -1,   Type: "Bow",       Ele: "Anemo"},
-        10: {Name: "Dehya",      Row:-1,  Level: 59,           Purchased: -1,   Type: "Claymore",   Ele: "Pyro"},
-        11: {Name: "Alhaitham",  Row:-1,  Level: 69,           Purchased: -1,   Type: "Sword",    Ele: "Dendro"},
-        12: {Name: "Amber",      Row:-1,  Level: 78,           Purchased: -1,   Type: "Bow",      Ele: "Pyro"},
-        13: {Name: "Bennett",    Row:-1,  Level: 88,           Purchased: -1,   Type: "Sword",      Ele: "Pyro"},
-        14: {Name: "Noelle",     Row:-1,  Level: 98,           Purchased: -1,   Type: "Claymore",      Ele: "Geo"},
-        15: {Name: "Barbara",    Row:-1,  Level: 108,          Purchased: -1,   Type: "Catalyst",      Ele: "Hydro"},
-        16: {Name: "Lisa",       Row:-1,  Level: 118,          Purchased: -1,   Type: "Catalyst",      Ele: "Electro"},
-        17: {Name: "Kaeya",      Row:-1,  Level: 128,          Purchased: -1,   Type: "Sword",      Ele: "Cryo"},
-        18: {Name: "Diluc",      Row:-1,  Level: 138,          Purchased: -1,   Type: "Claymore",      Ele: "Pyro"},
-        19: {Name: "Diona",      Row:-1,  Level: 148,            Purchased: -1,   Type: "Bow",      Ele: "Cryo"},
-        20: {Name: "Fischl",     Row:-1,  Level: 158,            Purchased: -1,   Type: "Bow",      Ele: "Electro"},
-        21: {Name: "Mona",       Row:-1,  Level: 168,            Purchased: -1,   Type: "Catalyst",      Ele: "Hydro"},
-        22: {Name: "Reach 1 NpSosaria",    Row:-1,  Level: 178,            Purchased: -1,   Type: "Polearm",      Ele: "Cryo"},
-        23: {Name: "Klee",       Row:-1,  Level: 188,            Purchased: -1,   Type: "Catalyst",      Ele: "Pyro"},
-        24: {Name: "Reach 1 NpSazor",      Row:-1,  Level: 188,            Purchased: -1,   Type: "Claymore",      Ele: "Electro"},
-        25: {Name: "Sucrose",    Row:-1,  Level: 198,            Purchased: -1,   Type: "Catalyst",      Ele: "Anemo"},
-        26: {Name: "Xiangling",  Row:-1,  Level: 228,            Purchased: -1,   Type: "Polearm",      Ele: "Pyro"},
-        27: {Name: "Xingqiu",    Row:-1,  Level: 248,            Purchased: -1,   Type: "Sword",      Ele: "Hydro"},
-        28: {Name: "Chongyun",   Row:-1,  Level: 268,            Purchased: -1,   Type: "Claymore",      Ele: "Cryo"},
-        29: {Name: "Xinyan",     Row:-1,  Level: 288,            Purchased: -1,   Type: "Claymore",      Ele: "Pyro"},
-        30: {Name: "Yun Jin",    Row:-1,  Level: 348,            Purchased: -1,   Type: "Polearm",      Ele: "Geo"},
-        31: {Name: "Beidou",     Row:-1,  Level: 368,            Purchased: -1,   Type: "Claymore",      Ele: "Electro"},
-        32: {Name: "Ningguang",  Row:-1,  Level: 408,            Purchased: -1,   Type: "Catalyst",      Ele: "Geo"},
-        33: {Name: "Ganyu",      Row:-1,  Level: 438,            Purchased: -1,   Type: "Bow",      Ele: "Cryo"},
-        34: {Name: "Keqing",     Row:-1,  Level: 478,            Purchased: -1,   Type: "Sword",      Ele: "Electro"},
-        35: {Name: "Yanfei",     Row:-1,  Level: 508,            Purchased: -1,   Type: "Catalyst",      Ele: "Pyro"},
-        36: {Name: "Kazuha",     Row:-1,  Level: 558,            Purchased: -1,   Type: "Sword",      Ele: "Anemo"},
-        37: {Name: "Thoma",      Row:-1,  Level: 598,            Purchased: -1,   Type: "Polearm",      Ele: "Pyro"},
-        38: {Name: "Yoimiya",    Row:-1,  Level: 618,            Purchased: -1,   Type: "Bow",      Ele: "Pyro"},
-        39: {Name: "Ayaka",      Row:-1,  Level: 638,            Purchased: -1,   Type: "Sword",      Ele: "Cryo"},
-        40: {Name: "Gorou",      Row:-1,  Level: 678,            Purchased: -1,   Type: "Bow",      Ele: "Geo"},
-        41: {Name: "Kokomi",     Row:-1,  Level: 708,            Purchased: -1,   Type: "Catalyst",      Ele: "Hydro"},
-        42: {Name: "Sayu",       Row:-1,  Level: 758,            Purchased: -1,   Type: "Claymore",      Ele: "Anemo"},
-        43: {Name: "Heizou",     Row:-1,  Level: 808,            Purchased: -1,   Type: "Catalyst",      Ele: "Anemo"},
-        44: {Name: "Shinobu",    Row:-1,  Level: 838,            Purchased: -1,   Type: "Sword",      Ele: "Electro"},
-        45: {Name: "Itto",       Row:-1,  Level: 908,            Purchased: -1,   Type: "Claymore",      Ele: "Geo"},
-        46: {Name: "Sara",       Row:-1,  Level: 968,            Purchased: -1,   Type: "Bow",      Ele: "Electro"},
-        47: {Name: "Venti",      Row:-1,  Level: 1000,          Purchased: -1,   Type: "Bow",   Ele: "Anemo"},
-        48: {Name: "Zhongli",    Row:-1,  Level: 1250,          Purchased: -1,   Type: "Polearm",   Ele: "Geo"},
-        49: {Name: "Reach 1 NpSaiden",     Row:-1,  Level: 1500,           Purchased: -1,   Type: "Polearm",   Ele: "Electro"},
+        0: {Name: "Nahida",      Row:-1,  "Level": 1, "Cost":20, Factor:1,        Purchased: -1,   Type: "Catalyst",   Ele: "Dendro"},
+        1: {Name: "Traveller",   Row:-1,          Purchased: -1,   Type: "Sword",      Ele: ""},
+        2: {Name: "Collei",      Row:-1,          Purchased: -1,   Type: "Bow",        Ele: "Dendro"},
+        3: {Name: "Cyno",        Row:-1,          Purchased: -1,   Type: "Polearm",   Ele: "Electro"},
+        4: {Name: "Candace",     Row:-1,          Purchased: -1,   Type: "Polearm",   Ele: "Hydro"},
+        5: {Name: "Dori",        Row:-1,          Purchased: -1,  Type: "Claymore",   Ele: "Electro"},
+        6: {Name: "Tighnari",    Row:-1,          Purchased: -1,   Type: "Bow",      Ele: "Dendro"},
+        7: {Name: "Nilou",       Row:-1,          Purchased: -1,   Type: "Sword",     Ele: "Hydro"},
+        8: {Name: "Layla",       Row:-1,          Purchased: -1,   Type: "Sword",     Ele: "Cryo"},
+        9: {Name: "Faruzan",     Row:-1,          Purchased: -1,   Type: "Bow",       Ele: "Anemo"},
+        10: {Name: "Dehya",      Row:-1,          Purchased: -1,   Type: "Claymore",   Ele: "Pyro"},
+        11: {Name: "Alhaitham",  Row:-1,          Purchased: -1,   Type: "Sword",    Ele: "Dendro"},
+        12: {Name: "Amber",      Row:-1,          Purchased: -1,   Type: "Bow",      Ele: "Pyro"},
+        13: {Name: "Bennett",    Row:-1,          Purchased: -1,   Type: "Sword",      Ele: "Pyro"},
+        14: {Name: "Noelle",     Row:-1,          Purchased: -1,   Type: "Claymore",      Ele: "Geo"},
+        15: {Name: "Barbara",    Row:-1,          Purchased: -1,   Type: "Catalyst",      Ele: "Hydro"},
+        16: {Name: "Lisa",       Row:-1,          Purchased: -1,   Type: "Catalyst",      Ele: "Electro"},
+        17: {Name: "Kaeya",      Row:-1,          Purchased: -1,   Type: "Sword",      Ele: "Cryo"},
+        18: {Name: "Diluc",      Row:-1,          Purchased: -1,   Type: "Claymore",      Ele: "Pyro"},
+        19: {Name: "Diona",      Row:-1,            Purchased: -1,   Type: "Bow",      Ele: "Cryo"},
+        20: {Name: "Fischl",     Row:-1,            Purchased: -1,   Type: "Bow",      Ele: "Electro"},
+        21: {Name: "Mona",       Row:-1,            Purchased: -1,   Type: "Catalyst",      Ele: "Hydro"},
+        22: {Name: "Rosaria",    Row:-1,            Purchased: -1,   Type: "Polearm",      Ele: "Cryo"},
+        23: {Name: "Klee",       Row:-1,            Purchased: -1,   Type: "Catalyst",      Ele: "Pyro"},
+        24: {Name: "Razor",      Row:-1,            Purchased: -1,   Type: "Claymore",      Ele: "Electro"},
+        25: {Name: "Sucrose",    Row:-1,            Purchased: -1,   Type: "Catalyst",      Ele: "Anemo"},
+        26: {Name: "Xiangling",  Row:-1,            Purchased: -1,   Type: "Polearm",      Ele: "Pyro"},
+        27: {Name: "Xingqiu",    Row:-1,            Purchased: -1,   Type: "Sword",      Ele: "Hydro"},
+        28: {Name: "Chongyun",   Row:-1,            Purchased: -1,   Type: "Claymore",      Ele: "Cryo"},
+        29: {Name: "Xinyan",     Row:-1,            Purchased: -1,   Type: "Claymore",      Ele: "Pyro"},
+        30: {Name: "Yun Jin",    Row:-1,            Purchased: -1,   Type: "Polearm",      Ele: "Geo"},
+        31: {Name: "Beidou",     Row:-1,            Purchased: -1,   Type: "Claymore",      Ele: "Electro"},
+        32: {Name: "Ningguang",  Row:-1,            Purchased: -1,   Type: "Catalyst",      Ele: "Geo"},
+        33: {Name: "Ganyu",      Row:-1,            Purchased: -1,   Type: "Bow",      Ele: "Cryo"},
+        34: {Name: "Keqing",     Row:-1,            Purchased: -1,   Type: "Sword",      Ele: "Electro"},
+        35: {Name: "Yanfei",     Row:-1,            Purchased: -1,   Type: "Catalyst",      Ele: "Pyro"},
+        36: {Name: "Kazuha",     Row:-1,            Purchased: -1,   Type: "Sword",      Ele: "Anemo"},
+        37: {Name: "Thoma",      Row:-1,            Purchased: -1,   Type: "Polearm",      Ele: "Pyro"},
+        38: {Name: "Yoimiya",    Row:-1,            Purchased: -1,   Type: "Bow",      Ele: "Pyro"},
+        39: {Name: "Ayaka",      Row:-1,            Purchased: -1,   Type: "Sword",      Ele: "Cryo"},
+        40: {Name: "Gorou",      Row:-1,            Purchased: -1,   Type: "Bow",      Ele: "Geo"},
+        41: {Name: "Kokomi",     Row:-1,            Purchased: -1,   Type: "Catalyst",      Ele: "Hydro"},
+        42: {Name: "Sayu",       Row:-1,            Purchased: -1,   Type: "Claymore",      Ele: "Anemo"},
+        43: {Name: "Heizou",     Row:-1,            Purchased: -1,   Type: "Catalyst",      Ele: "Anemo"},
+        44: {Name: "Shinobu",    Row:-1,            Purchased: -1,   Type: "Sword",      Ele: "Electro"},
+        45: {Name: "Itto",       Row:-1,            Purchased: -1,   Type: "Claymore",      Ele: "Geo"},
+        46: {Name: "Sara",       Row:-1,            Purchased: -1,   Type: "Bow",      Ele: "Electro"},
+        47: {Name: "Venti",      Row:-1,           Purchased: -1,   Type: "Bow",   Ele: "Anemo"},
+        48: {Name: "Zhongli",    Row:-1,           Purchased: -1,   Type: "Polearm",   Ele: "Geo"},
+        49: {Name: "Raiden",     Row:-1,            Purchased: -1,   Type: "Polearm",   Ele: "Electro"},
 // RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS
-        100: {Name: "Jean",        Row:-1,  Level: 0,          Purchased: -10,   Type: "Sword",   Ele: "Anemo"},
-        101: {Name: "Albedo",      Row:-1,  Level: 0,          Purchased: -10,   Type: "Sword",   Ele: "Geo"},
-        102: {Name: "Qiqi",        Row:-1,  Level: 0,          Purchased: -10,   Type: "Sword",   Ele: "Cryo"},
-        103: {Name: "Yelan",       Row:-1,  Level: 0,          Purchased: -10,   Type: "Bow",   Ele: "Hydro"},
-        104: {Name: "Shenhe",      Row:-1,  Level: 0,          Purchased: -10,   Type: "Polearm",   Ele: "Cryo"},
-        105: {Name: "Ayato",       Row:-1,  Level: 0,          Purchased: -10,   Type: "Sword",   Ele: "Hydro"},
-        106: {Name: "Yae Miko",    Row:-1,  Level: 0,          Purchased: -10,   Type: "Catalyst",   Ele: "Electro"},
-        107: {Name: "Eula",        Row:-1,  Level: 0,          Purchased: -10,   Type: "Claymore",   Ele: "Cryo"},
-        108: {Name: "Hu Tao",      Row:-1,  Level: 0,          Purchased: -10,   Type: "Polearm",   Ele: "Pyro"},
-        109: {Name: "Xiao",        Row:-1,  Level: 0,          Purchased: -10,   Type: "Polearm",   Ele: "Anemo"},
-        110: {Name: "Tartaglia",   Row:-1,  Level: 0,          Purchased: -10,   Type: "Bow",   Ele: "Hydro"},
-        111: {Name: "Scaramouche", Row:-1,  Level: 0,          Purchased: -10,   Type: "Catalyst",   Ele: "Anemo"},
+        100: {Name: "Jean",        Row:-1,        Purchased: -10,   Type: "Sword",   Ele: "Anemo"},
+        101: {Name: "Albedo",      Row:-1,        Purchased: -10,   Type: "Sword",   Ele: "Geo"},
+        102: {Name: "Qiqi",        Row:-1,        Purchased: -10,   Type: "Sword",   Ele: "Cryo"},
+        103: {Name: "Yelan",       Row:-1,        Purchased: -10,   Type: "Bow",   Ele: "Hydro"},
+        104: {Name: "Shenhe",      Row:-1,        Purchased: -10,   Type: "Polearm",   Ele: "Cryo"},
+        105: {Name: "Ayato",       Row:-1,        Purchased: -10,   Type: "Sword",   Ele: "Hydro"},
+        106: {Name: "Yae Miko",    Row:-1,        Purchased: -10,   Type: "Catalyst",   Ele: "Electro"},
+        107: {Name: "Eula",        Row:-1,        Purchased: -10,   Type: "Claymore",   Ele: "Cryo"},
+        108: {Name: "Hu Tao",      Row:-1,        Purchased: -10,   Type: "Polearm",   Ele: "Pyro"},
+        109: {Name: "Xiao",        Row:-1,        Purchased: -10,   Type: "Polearm",   Ele: "Anemo"},
+        110: {Name: "Tartaglia",   Row:-1,        Purchased: -10,   Type: "Bow",   Ele: "Hydro"},
+        111: {Name: "Scaramouche", Row:-1,        Purchased: -10,   Type: "Catalyst",   Ele: "Anemo"},
     }
 
 
@@ -151,7 +142,7 @@
         1001: {Name:"coolSteel",      Star:3,  Type:"Sword"},
         1002: {Name:"ferrous",        Star:3,  Type:"Claymore"},
         1003: {Name:"mappa",          Star:4,  Type:"Catalyst"},
-        1004: {Name:"reach 1 NpSust",           Star:4,  Type:"Bow"},
+        1004: {Name:"rust",           Star:4,  Type:"Bow"},
         1005: {Name:"silverSword",    Star:2,  Type:"Sword"},
         1006: {Name:"dullSword",      Star:1,  Type:"Sword"},
         1007: {Name:"skywardBlade",   Star:5,  Type:"Sword"},
@@ -215,11 +206,13 @@
     var table3 = document.getElementById("table3");
     var table4 = document.getElementById("table4");
     var table5 = document.getElementById("table5");
-    const TABS = [table1,table2, table3, table4, table5]
+    
+    var TABS = [table1,table2, table3, table4, table5];
+    
 
     // MAIN BODY VARIABLES
     var mainBody = document.getElementById("bodyID");
-    table6 = document.createElement("table");
+    let table6 = document.createElement("table");
     mainBody.appendChild(table6);
     table6.classList += "table6";
     
@@ -273,30 +266,30 @@
 
     var expedContainer = document.getElementById("table3");
     expedDiv.style.display = "none";
-    var ButtonCount = 1;
 
     // CREATING EXPEDITION UI
     createExpedition()
     function createExpedition() {
-        let i = 0;
-        do {
-            let expedButton = document.createElement("div");
-            expedButton.classList += "expedition-container"
+        for (let i = 1; i < 6; i++) {
+            let expedButton = document.createElement("button");
             
-            if (i > 1){
-                var backgroundImg = "background:url(./assets/exped6.png)";
+            if (i > 2){
+                var backgroundImg = "url(./assets/exped6.png)";
             } else {
-                var backgroundImg = "background:url(./assets/exped" + ButtonCount + ".png)";
+                var backgroundImg = "url(./assets/exped" + i + ".png)";
             }
 
-            let buttonId = "exped-" + ButtonCount;
-            expedButton.innerHTML += '<button id='+buttonId+' onclick="adventure('+ButtonCount+')" onmouseover=expedInfo(this.id) onmouseout="expedInfo(7)" class="fade expedition" style="'+backgroundImg+';background-repeat: no-repeat;background-size: 93%;"></button>'        
+            expedButton.id = "exped-" + i;
+            expedButton.addEventListener("click", function() {adventure(i)});
+            expedButton.addEventListener("mouseover", function() {expedInfo(this.id)});
+            expedButton.addEventListener("mouseout", function() {expedInfo(7)});
+            expedButton.style.background = backgroundImg;
+            expedButton.style['background-repeat'] = "no-repeat";
+            expedButton.style['background-size'] = "93%"
+            expedButton.classList += "expedition";
             
             expedContainer.appendChild(expedButton);
-            ButtonCount++;
-            i++;
         }
-        while (i < 5);
     }
 
     var expeditionDict = {
@@ -325,6 +318,7 @@
             expedCell2.innerHTML = expeditionDict[6]["Lore"];
         }
     }
+
     function unlockExpedition(i) {
         let expedID = "exped-" + i;
         let unlockButton = document.getElementById(expedID);
@@ -335,6 +329,8 @@
         unlockButton.style["background-repeat"] = "no-repeat";
         unlockButton.style["background-size"]= "93%";
     }
+
+    unlockExpedition(4)
     
     // TOOLTIPS FOR HEROES/ITEMS
     var tooltipTop = (table6.insertRow(0)).insertCell(0);
@@ -350,7 +346,7 @@
     var tooltipText = (table6.insertRow(1)).insertCell(0);
 
     function changeTooltip(name) {
-        tooltipContent = tooltip[name].text;
+        let tooltipContent = tooltip[name].text;
         tooltipText.innerText = tooltipContent;
         toolImg.src = "./assets/tooltips/"+name+".png";
     }
@@ -483,28 +479,47 @@
         }
     }
 
-    // ALL TIME-EVENTS SYNC TO THIS FUNCTION
+    // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH SET TO 0.5 SECONDS)
+    var timer = setInterval(timerEvents,500);
+
     function timerEvents() {
         checkAchievement()
-        realScore += dps;
+        realScore += 0.5 * dps;
         refresh();
+        addNewRow();
     } 
 
-    var timer = setInterval(timerEvents,1000);
+   
 
     // INITIAL LOADING
     generateHeroPrices();
-    tabChange(1)
+    tabChange(4)
     refresh();
 
     realScore++;
     addNewRow();
     realScore--;
 
+    // TAB UI
+    createTabs();
+    function createTabs() {
+        let tabFlex = document.getElementById("flex-container-TAB");
+        for (let i = 0; i < TABS.length; i++){
+            let tabButton = document.createElement("button");
+            tabButton.classList += "tab-button";
+            tabButton.style.background = "url(./assets/tab"+ (i + 1) +".png)";
+            tabButton.addEventListener('click', function(){
+                tabChange(i + 1);
+            })
+            tabFlex.appendChild(tabButton);
+        }
+    }
+
     // CHANGE TABS
     function tabChange(x) {
-        for (tab in TABS){
-            TABS[tab].style.display = "none";
+
+        for (let i = 0; i < TABS.length; i++){
+            TABS[i].style.display = "none";
         }
         TABS[x-1].style.display = "flex";
 
@@ -530,7 +545,6 @@
         realScore += 1 * clickFactor;
         energyRoll();
         refresh();
-        addNewRow();
     }
 
     demo.onmousedown = function() {
@@ -586,7 +600,9 @@
             var initBaseCost = 50
             var multiplierBaseCost = 2.5
             let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** (i-1)));
-            upgradeDict[i]["Cost"] = Number(baseCost.toPrecision(3))
+            let baseLevel = Math.round(0.75 * baseCost);
+            upgradeDict[i]["Cost"] = Number(baseCost.toPrecision(3));
+            upgradeDict[i]["Level"] = baseLevel;
             
             var initATKCost = 1
             var multiplierATKCost = 2.5
@@ -596,7 +612,7 @@
     }
 
     function abbrNum(number) {
-        decPlaces = Math.pow(10, 2);
+        let decPlaces = Math.pow(10, 2);
         var abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion"];
 
         if (number > 1e6) {
@@ -623,14 +639,14 @@
     function addNewRow() {
         for (let i = 0; i < WISHHEROMAX; i++) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
-            if (realScore >= upgradeDict[i].Level && upgradeDict[i].Purchased == -1){
+            if (realScore >= upgradeDict[i]["Level"] && upgradeDict[i].Purchased == -1){
                 let newRow = table1.insertRow(-1);
                 let newCell = newRow.insertCell(0);
 
                 upgradeDict[i].Row = rowCount;
                 upgradeDict[i].Purchased = 0;
                 
-                if (upgradeDict[i].Level == 0) {
+                if (upgradeDict[i]["Level"] == 0) {
                     var heroText = "Summon " + upgradeDict[i].Name + " for help. (" + abbrNum(upgradeDict[i]["Cost"]) + ")";
                 } else if (i == 0) {
                     var heroText = "Level Up Nahida (" + abbrNum(upgradeDict[i]["Cost"]) + ")";
@@ -638,12 +654,18 @@
                     var heroText = "Call for " + upgradeDict[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["Cost"]) + ")";
                 }
                 
-                var heroButtonContainer = document.createElement("div");
-                var heroFront = "background:url(./assets/button-3.png)";
-                let toolName = "'"+upgradeDict[i].Name+"'";
+                let heroButtonContainer = document.createElement("button");
+                let toolName = upgradeDict[i].Name;
+                let heroID = "but-" + rowCount;
+
+                heroButtonContainer.id = heroID;
+                heroButtonContainer.innerText = heroText;
+                heroButtonContainer.style.background = "url(./assets/button-3.png)";
+                heroButtonContainer.classList += "upgrade hero-glow";
                 
-                heroButtonContainer.innerHTML += '<button onclick="upgrade(this.id)" onmouseover="changeTooltip('+toolName+')" onmouseout="clearTooltip()" class="upgrade" id="but-'+rowCount+'"" style='+ heroFront +'>'+heroText+'</button>'
-                heroButtonContainer.classList += 'hero-glow'
+                heroButtonContainer.addEventListener("mouseover", function() {changeTooltip(toolName)});
+                heroButtonContainer.addEventListener("mouseout", function() {clearTooltip()});
+                heroButtonContainer.addEventListener('click', function() {upgrade(heroID)});
 
                 newCell.appendChild(heroButtonContainer);
                 rowCount++;
@@ -657,36 +679,37 @@
         for (let i = 0; i < WISHHEROMAX; i++) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i].Row == butIdArray) {
-                var currentPrice = upgradeDict[i]["Cost"] * (1.15 ** ((upgradeDict[i].Purchased)));
-                currentPrice = Math.round(currentPrice);
-
                 let freePass = false;
                 if (freeLevels > 0){
                     freePass = true;
                 }
-                if (realScore >= currentPrice || freePass == true) {
+
+                console.log(realScore)
+                console.log(upgradeDict[i]["Cost"])
+
+
+                if (realScore >= upgradeDict[i]["Cost"]) {
                     if (freePass == true) {
-                        realScore += currentPrice;
+                        realScore += upgradeDict[i]["Cost"];
                         freeLevels--;
                     }
-                    realScore -= currentPrice;
 
+                    realScore -= upgradeDict[i]["Cost"];
                     if (i == 0) {
                         clickFactor += upgradeDict[i]["Factor"];
-                        var nextPrice = upgradeDict[i]["Cost"] * (1.5 ** ((upgradeDict[i].Purchased)))
+                        var nextPrice =  Math.round(upgradeDict[i]["Cost"] * (1.3));
+                        upgradeDict[i]["Cost"] = nextPrice;
                     } else {
                         dps += upgradeDict[i]["Factor"];
-                        var nextPrice = upgradeDict[i]["Cost"] * (1.15 ** ((upgradeDict[i].Purchased)))
+                        var nextPrice =  Math.round(upgradeDict[i]["Cost"] * (1.15));
+                        upgradeDict[i]["Cost"] = nextPrice;
                     }
       
                     upgradeDict[i].Purchased += 1;
-
-                    nextPrice = Math.round(nextPrice);
                     refresh(clicked_id, nextPrice, i);
                 }
-                freePass == false;
             }
-        }
+        } 
     }
 
     // ADD TO INVENTORY 
@@ -705,7 +728,6 @@
         buttonInv.style["background-repeat"] = "no-repeat";
         buttonInv.style["background-size"] = "128px 144px";
         table2.appendChild(buttonInv);
-        sortList();
     }
 
     function sortList() {
@@ -761,10 +783,11 @@
         item.remove();
     }
 
-    // EXPEDITION UI
+    // EXPEDITION MECHANICS
     // RMB THERES A CHANCE OF FAILURE, IT IS NOT A BUG IF NOTHING HAPPENS
     function adventure(type) {
-        if (expeditionDict[type].Locked == 1){
+        console.log(expeditionDict[type].Locked)
+        if (expeditionDict[type].Locked == '1'){
             alert("ITS LOCKED CANT YOU SEE!!!!!!!")
             return                                //// <------------------------ ADD THE POPUP FOR LOCKED
         } else {                                                     
@@ -806,6 +829,7 @@
                         inventoryDraw("food", 2, 5);
                         inventoryDraw("xp", 4, 4);
                     }
+                    sortList();
                 }
             }  
         }   
@@ -828,7 +852,16 @@
         }
     }
 
+    drawWish()
+
     // DRAWS FOR SPECIAL HEROS
+    function drawWish() {
+        let wishButton = document.createElement("button");
+        wishButton.classList += "wish-button";
+        wishButton.addEventListener("click",function() {});
+        table4.appendChild(wishButton);
+    }
+
     function wish() {
         if (energy > WISHCOST) {
             energy -= WISHCOST;
@@ -845,7 +878,6 @@
 
                     wishMultiplier += 5;
                     wishCounter--;
-                    addNewRow();
                     break;
                 }
             }
@@ -853,7 +885,7 @@
     }
 
     // REFRESH SCORES & ENERGY
-    function refresh(...arguments) {
+    function refresh() {
         let formatScore = abbrNum(realScore);
         score.innerHTML = "Score: " + formatScore;
 
@@ -866,8 +898,7 @@
         if (arguments[0] != undefined){
             if (arguments[0].includes("but-")){
                 if (arguments[2] == 0) {
-                    upgradeDict[arguments[2]]["Cost"] = abbrNum(upgradeDict[arguments[2]]["Cost"] * 1.2);
-                    var formatCost = upgradeDict[arguments[2]]["Cost"];
+                    var formatCost = abbrNum(arguments[1]);
                 } else {
                     var formatCost = abbrNum(arguments[1]);
                 }

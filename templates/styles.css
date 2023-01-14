@@ -112,11 +112,18 @@ img {
 }
 
 .flex-container-EXPEDITION {
-    display: flex;
     gap: 5px;
-    flex-wrap: no-wrap;
+    justify-content: center;
     align-items: center;
 }
+
+.expedition {
+    margin: auto;
+    width:188px;
+    height: 489px;
+    
+}
+
 
 .flex-container-ACHIEVEMENT {
     background-color: aqua;
@@ -150,21 +157,21 @@ img {
     margin-left:690px;
 }
 
-
-.expedition {
-    margin: auto;
-    width: 188px;
-    height: 489px;
+.wish-counter {
+    z-index: 1;
+    position: absolute; 
+    top:40px; 
+    left:5px; 
     
+    background:url(./assets/wishBG.png);
+    background-size: 105%;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    width:969px; 
+    height:764px;
 }
 
-.expedition-container {
-    display:flex;
-    justify-content: center;
-    width: 188px;
-    height: 489px; 
-    padding: 0px 0px;
-}
 
 .item-button {
     border: 0px;
@@ -220,13 +227,17 @@ img {
     flex-direction: row-reverse
 }
 
-.wish {
-    width:430px;
-    height:430px;
+.wish-button {
+    position: absolute;
+    top: 615px;
+    left: 270px;
+    width:412px;
+    height:96px;
     transition: .5s ease;
+    background:url(./assets/wishButton.png)
 }
 
-.wish:hover{
+.wish-button:hover{
     box-shadow: 0 0 0 10px #000000;
     transition: .5s ease;
 }
