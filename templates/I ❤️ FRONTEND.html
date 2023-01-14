@@ -858,9 +858,20 @@
     function drawWish() {
         let wishButton = document.createElement("button");
         wishButton.classList += "wish-button";
-        wishButton.addEventListener("click",function() {});
+        wishButton.innerText = "Write for help"
+        wishButton.addEventListener("click",function() {
+            let mailImage = document.getElementById("mailImage")
+            mailImage.src = "./assets/closed.png"
+        });
         table4.appendChild(wishButton);
+
+        let mailImage = document.createElement("img");
+        mailImage.src = "./assets/open.png";
+        mailImage.id = "mailImage"
+        mailImage.classList += "wish-mail";
+        table4.appendChild(mailImage);
     }
+
 
     function wish() {
         if (energy > WISHCOST) {

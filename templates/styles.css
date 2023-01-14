@@ -201,12 +201,15 @@ img {
 .achieve {                                                  /* ADJUST IT TO THE LEFT, BELOW BUTTON */
     z-index:2;
     position: absolute; 
-    top:670px; 
-    left: 500px; 
-    width:700px;
+    top:685px; 
+    width:593px;
     height:98px;
     text-align: center;
     background:url(./assets/achievement.png);
+    background-size: 100%;
+    background-position: 5px center;
+    background-repeat: no-repeat;
+    
 }
 
 .achieve:hover {
@@ -228,6 +231,7 @@ img {
 }
 
 .wish-button {
+    font-family: gi-font;
     position: absolute;
     top: 615px;
     left: 270px;
@@ -235,6 +239,14 @@ img {
     height:96px;
     transition: .5s ease;
     background:url(./assets/wishButton.png)
+}
+
+.wish-mail {
+    position: absolute;
+    top: 0px;
+    left: 140px;
+    width: 634px;
+    height: 528px;
 }
 
 .wish-button:hover{
