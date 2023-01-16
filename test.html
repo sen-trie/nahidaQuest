@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p>Saved name is:</p>
+    <p id="demo"></p>
+    <button id="add"  style="height:100px;width:100px">add</button>
+    <button id="save"  style="height:100px;width:100px">save</button>
+    <button id="clear"  style="height:100px;width:100px">clear</button>
+
+
+
+    <script type="module">
+    import { upgradeDictDefault } from "./test_script.js"
+    var demoBut = document.getElementById("demo");
+    var addBut = document.getElementById("add");
+    var saveBut = document.getElementById("save");
+    var clearBut = document.getElementById("clear");
+    var upgradeDict = "";
+
+    addBut.addEventListener("click",function() {add()})
+    saveBut.addEventListener("click",function() {save()})
+    clearBut.addEventListener("click",function() {clear()})
+
+    if (localStorage.getItem("upgradeDictSave") === null) {
+        alert("save not found")
+        upgradeDict = upgradeDictDefault;
+        demoBut.innerHTML = upgradeDict[0]["Level"];
+    } else {
+        alert("save found")
+        let upgradeDictTemp = window.localStorage.getItem("upgradeDictSave");
+        upgradeDict = JSON.parse(upgradeDictTemp)
+        demoBut.innerHTML = upgradeDict[0]["Level"];
+    }
+
+    function add() {
+        upgradeDict[0]["Level"]++;
+        console.log(upgradeDict[0]["Level"])
+        demoBut.innerHTML = upgradeDict[0]["Level"];
+    }
+
+    function save() {
+         localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
+         console.log(JSON.stringify(upgradeDict))
+  }
+
+    function clear() {
+        localStorage.clear();
+    }
+        
+        
+        
+    </script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -3,12 +3,6 @@
     src: url(./assets/gi-font.ttf);
 }
 
-tbody {
-    overflow-y: auto;    /* Trigger vertical scroll    */
-    overflow-x: hidden;  /* Hide the horizontal scroll */
-}
-
-
 button:hover {
     background-color: burlywood;
   }
@@ -16,6 +10,10 @@ button:hover {
 img {
     height: 48px;
     width: 48px;
+}
+
+table  {
+    cursor: url(./assets/cursor.png), auto;
 }
 
 .score-container {
@@ -261,7 +259,7 @@ img {
 
 #demo-container {
     position: absolute;
-    top: 200px;
+    top: 160px;
     left: 50px;
     width:508px;
     height:508px;
@@ -292,6 +290,8 @@ img {
   
 
 #table1 {
+    overflow-y: auto;  
+    overflow-x: hidden;
     width: 653px;
 }
 
