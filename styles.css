@@ -17,8 +17,29 @@ table  {
 }
 
 .score-container {
+    display: flex;
+    text-align: center;
+    flex-direction: column;
     position: absolute;
-    left:100px; 
+    left:-8px; 
+    top:90px;
+    width:609px;
+    height:90px;
+    background-color: rgba(0,0,0,0.4);
+    z-index: 2;
+}
+
+#score {
+    font-size: 40px;
+}
+
+#dps {
+    font-size: 25px;
+}
+
+.energy-primo-container {
+    position: absolute;
+    left:450px; 
     top:5px; 
 }
 
@@ -55,7 +76,6 @@ table  {
     text-justify: inter-word;
     
 }
-
 
 .tab-button {
     width:64px;
@@ -170,7 +190,6 @@ table  {
     height:764px;
 }
 
-
 .item-button {
     border: 0px;
     width: 131px;
@@ -252,14 +271,13 @@ table  {
     transition: .5s ease;
 }
 
-
 #display {
     padding-left: 10%;
 }
 
 #demo-container {
     position: absolute;
-    top: 160px;
+    top: 180px;
     left: 50px;
     width:508px;
     height:508px;

@@ -22,24 +22,24 @@
             min-height: 100%;
             cursor: url(./assets/cursor.png), auto;          /* ------------------- FIX CURSOR NOT WORKING ON TABLE */
         }
-
     </style>
 
 </head>
 <body id="bodyID">
     <p id="para">
-        <div class="score-container">
+        <div class="energy-primo-container">
             <span id="energy">0</span>
-            <span id="score">0</span>              <!------------------------ CHANGE TO PARAGRAPH LATER -->
-            <span id="dps">0</span>
             <span id="primogem">0</span>
         </div>
-        
+        <div class="score-container">
+            <span id="score">0</span>              <!------------------------ CHANGE TO PARAGRAPH LATER -->
+            <span id="dps">0</span>
+        </div>
         <div class="flex-container-TAB" id="flex-container-TAB">
         </div>
 
         <div id="demo-container">
-            <span id='demo'></span>"
+            <span id='demo'></span>
         </div>
     </p>
 
@@ -58,14 +58,14 @@
     </table>
 
 <script type="module">
-    import { upgradeDict,Inventory,tooltip,expeditionDict,achievementList } from "./defaultData.js"
-    import { abbrNum } from "./functions.js"
+    import { upgradeDictDefault,Inventory,tooltip,expeditionDict,achievementList } from "./defaultData.js"
+    import { abbrNum,randomInteger,sortList,generateHeroPrices, unlockExpedition } from "./functions.js"
     import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable } from "./drawUI.js"
 
     var clickCount = 0;
     var clickFactor = 1;
-    var dps = 0;
-    var realScore = 1e4 - 2;
+    var dps = 1e23;
+    var realScore = 1.23e24 - 2;
 
     var freeLevels = 0;
     var primogem = 0;
@@ -123,18 +123,13 @@
     var para1 = document.getElementById("para");
     var expedDiv = document.getElementById("expedDiv");
     drawMainBody();
-    
-    
 
     // TOOLTIPS FOR EXPEDITION
-   
-    
-
     var expedContainer = document.getElementById("table3");
     expedDiv.style.display = "none";
 
     // INITIAL LOADING
-    generateHeroPrices();
+    var upgradeDict = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX);
     tabChange(3)
     refresh();
 
@@ -146,58 +141,18 @@
     createExpedTable(expedDiv);
     para1.appendChild(expedDiv);
 
-    // CREATING EXPEDITION UI
-    function createExpedition() {
-        for (let i = 1; i < 6; i++) {
-            let expedButton = document.createElement("button");
-            
-            if (i > 2){
-                var backgroundImg = "url(./assets/exped6.png)";
-            } else {
-                var backgroundImg = "url(./assets/exped" + i + ".png)";
-            }
+    drawWish()
+   // unlockExpedition(3,expeditionDict)
 
-            expedButton.id = "exped-" + i;
-            expedButton.addEventListener("click", function() {adventure(i)});
-            expedButton.addEventListener("mouseover", function() {expedInfo(this.id)});
-            expedButton.addEventListener("mouseout", function() {expedInfo(7)});
-            expedButton.style.background = backgroundImg;
-            expedButton.style['background-repeat'] = "no-repeat";
-            expedButton.style['background-size'] = "93%"
-            expedButton.classList += "expedition";
-            
-            expedContainer.appendChild(expedButton);
-        }
-    }
+    var timer = setInterval(timerEvents,500);
 
-    function expedInfo(butId){
-        let expedTableTemp = document.getElementById("expedTableID")
-        let i = 0;
-        if (butId == 7) {
-            i = 7;
-        } else {
-            i = butId.split("-")[1];
-        }
-
-        if (expeditionDict[i]["Locked"] == 0 || i == 7) {
-            expedTableTemp.rows[0].cells[0].innerText = expeditionDict[i]["Text"];
-            expedTableTemp.rows[1].cells[0].innerText = expeditionDict[i]["Lore"];
-        } else {
-            expedTableTemp.rows[0].cells[0].innerText = expeditionDict[6]["Text"];
-            expedTableTemp.rows[1].cells[0].innerText = expeditionDict[6]["Lore"];
-        }
-    }
-
-    function unlockExpedition(i) {
-        let expedID = "exped-" + i;
-        let unlockButton = document.getElementById(expedID);
-        let backgroundImage = "url(./assets/exped" + i + ".png)";
-
-        expeditionDict[i].Locked = 0;
-        unlockButton.style.background = backgroundImage;
-        unlockButton.style["background-repeat"] = "no-repeat";
-        unlockButton.style["background-size"]= "93%";
-    }
+    // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH SET TO 0.5 SECONDS)
+    function timerEvents() {
+        checkAchievement();
+        realScore += 0.5 * dps;
+        refresh();
+        addNewRow();
+    } 
     
     // TOOLTIPS FOR HEROES/ITEMS
     var tooltipTop = (table6.insertRow(0)).insertCell(0);
@@ -223,6 +178,7 @@
         toolImg.src = "./assets/tooltips/empty.png";
     }
 
+    // ACHIEVEMENTS
     var achievementTypeRawScore = [10,1e3,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24];
     var achievementTypeRawDPS =   [1,10,100,10000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21];
     var achievementTypeRawCollection = "";
@@ -231,7 +187,6 @@
     var scoreAchievementScore = 1;
     var scoreAchievementDps = 17;
 
-    // ACHIEVEMENTS
     function popAchievement(achievement) {
         var oldAchievement = document.getElementById("tempAchievement");
         var achievementID = 10000;
@@ -282,31 +237,18 @@
         achievementStored.classList += "achieve-stored"
         achievementStored.id = achievementID;
         table5.appendChild(achievementStored); 
-        sortList("table5")
-        console.log(achievementStored.id)
+        sortList("table5");
     }
 
     function checkAchievement() {
-        if (realScore >= achievementTypeRawScore[0]) {
+        if (realScore >= achievementTypeRawScore[0] && achievementTypeRawScore.length != 0) {
             popAchievement("score");
             achievementTypeRawScore.shift();
-        } else if (dps >= achievementTypeRawDPS[0]) {
+        } else if (dps >= achievementTypeRawDPS[0] && achievementTypeRawDPS.length != 0) {
             popAchievement("dps");
             achievementTypeRawDPS.shift();
         }
     }
-
-    // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH SET TO 0.5 SECONDS)
-    var timer = setInterval(timerEvents,500);
-
-    function timerEvents() {
-        checkAchievement()
-        realScore += 0.5 * dps;
-        refresh();
-        addNewRow();
-    } 
-
-   
 
     // TAB UI
     createTabs();
@@ -352,14 +294,7 @@
         refresh();
     });
     demoFunction();
-
     
-
-   // RANDOM NUMBER GENERATOR
-    function randomInteger(min, max) {
-        return Math.floor(Math.random() * (max - min) ) + min;
-    }
-
     // ROLL FOR ENERGY
     function energyRoll() {
         let randInt = Math.floor(Math.random() * 1000);
@@ -372,24 +307,6 @@
             }
         }
     }
-
-    // GENERATE BASE ATK AND COSTS OF NON-WISH HEROES
-    function generateHeroPrices() {
-         for (let i = 1; i < NONWISHHEROMAX + 1; i++) {
-            var initBaseCost = 50
-            var multiplierBaseCost = 2.5
-            let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** (i-1)));
-            let baseLevel = Math.round(0.75 * baseCost);
-            upgradeDict[i]["Cost"] = Number(baseCost.toPrecision(3));
-            upgradeDict[i]["Level"] = baseLevel;
-            
-            var initATKCost = 1
-            var multiplierATKCost = 2.5
-            let baseATK = Math.round(initATKCost * (multiplierATKCost ** (i-1)));
-            upgradeDict[i]["Factor"] = Number(baseATK.toPrecision(3));
-        }
-    }
-
     
     // SPAWN NEW HEROES IN LIST
     function addNewRow() {
@@ -416,7 +333,7 @@
                 
                 heroButtonContainer.addEventListener("mouseover", function() {changeTooltip(toolName)});
                 heroButtonContainer.addEventListener("mouseout", function() {clearTooltip()});
-                heroButtonContainer.addEventListener('click', function() {upgrade(heroID)});
+                heroButtonContainer.addEventListener("click", function() {upgrade(heroID)});
 
                 newCell.appendChild(heroButtonContainer);
                 rowCount++;
@@ -477,29 +394,6 @@
         table2.appendChild(buttonInv);
     }
 
-    function sortList(table) {
-        var list, i, switching, b, shouldSwitch;
-        list = document.getElementById(table);
-        switching = true;
-
-        while (switching) {
-            switching = false;
-            b = list.getElementsByTagName("button");
-            for (i = 0; i < (b.length - 1); i++) {
-                shouldSwitch = false;
-                if (b[i].id > b[i + 1].id) {
-                    shouldSwitch = true;
-                    break;
-                }
-            }
-            
-            if (shouldSwitch) {
-            b[i].parentNode.insertBefore(b[i + 1], b[i]);
-            switching = true;
-            }
-        }
-    }
-
     // INVENTORY UI
     function itemUse(itemUniqueId) {
         let item = document.getElementById(itemUniqueId);
@@ -533,7 +427,6 @@
     // EXPEDITION MECHANICS
     // RMB THERES A CHANCE OF FAILURE, IT IS NOT A BUG IF NOTHING HAPPENS
     function adventure(type) {
-        console.log(expeditionDict[type].Locked)
         if (expeditionDict[type].Locked == '1'){
             alert("ITS LOCKED CANT YOU SEE!!!!!!!")
             return                                //// <------------------------ ADD THE POPUP FOR LOCKED
@@ -598,10 +491,51 @@
             }
         }
     }
+    
+    // CREATING EXPEDITION UI
+    function createExpedition() {
+        for (let i = 1; i < 6; i++) {
+            let expedButton = document.createElement("button");
+            
+            if (expeditionDict[i]["Locked"] == 1){
+                var backgroundImg = "url(./assets/exped6.png)";
+            } else {
+                var backgroundImg = "url(./assets/exped" + i + ".png)";
+            }
 
-    drawWish()
+            expedButton.id = "exped-" + i;
+            expedButton.addEventListener("click", function() {adventure(i)});
+            expedButton.addEventListener("mouseover", function() {expedInfo(this.id)});
+            expedButton.addEventListener("mouseout", function() {expedInfo(7)});
 
-    // DRAWS FOR SPECIAL HEROS
+            expedButton.style.background = backgroundImg;
+            expedButton.style['background-repeat'] = "no-repeat";
+            expedButton.style['background-size'] = "93%"
+            expedButton.classList += "expedition";
+            
+            expedContainer.appendChild(expedButton);
+        }
+    }
+
+    function expedInfo(butId){
+        let expedTableTemp = document.getElementById("expedTableID")
+        let i = 0;
+        if (butId == 7) {
+            i = 7;
+        } else {
+            i = butId.split("-")[1];
+        }
+
+        if (expeditionDict[i]["Locked"] == 0 || i == 7) {
+            expedTableTemp.rows[0].cells[0].innerText = expeditionDict[i]["Text"];
+            expedTableTemp.rows[1].cells[0].innerText = expeditionDict[i]["Lore"];
+        } else {
+            expedTableTemp.rows[0].cells[0].innerText = expeditionDict[6]["Text"];
+            expedTableTemp.rows[1].cells[0].innerText = expeditionDict[6]["Lore"];
+        }
+    }
+
+    // DRAWS/WISH FOR SPECIAL HEROS
     function drawWish() {
         let wishButton = document.createElement("button");
         wishButton.classList += "wish-button";
@@ -618,7 +552,6 @@
         mailImage.classList += "wish-mail";
         table4.appendChild(mailImage);
     }
-
 
     function wish() {
         if (energy > WISHCOST) {
@@ -645,13 +578,18 @@
     // REFRESH SCORES & ENERGY
     function refresh() {
         let formatScore = abbrNum(realScore);
-        score.innerHTML = "Score: " + formatScore;
+        if (realScore == 1) {
+            score.innerText = formatScore + " Nut";
+        } else {
+            score.innerText = formatScore + " Nuts";
+        }
+        
 
         let formatDps = abbrNum(dps);
-        dpsDisplay.innerHTML = formatDps + " per second" ;
+        dpsDisplay.innerText = formatDps + " per second" ;
 
-        energyDisplay.innerHTML = "Energy: " + energy;
-        primogemDisplay.innerHTML = "Primogem: " + primogem;
+        energyDisplay.innerText = "Energy: " + energy;
+        primogemDisplay.innerText = "Primogem: " + primogem;
         
         if (arguments[0] != undefined){
             if (arguments[0].includes("but-")){
@@ -666,7 +604,6 @@
                 let upgradedHeroButton = document.getElementById(arguments[0])
                 upgradedHeroButton.innerText = heroText;
                 upgradedHeroButton.style = "background:url(./assets/nahida.webp);  background-size: 90%; background-position: 25% center; background-repeat: no-repeat;";
-                
             }
         } else if (arguments[0] == "hero"){
             let formatATK = abbrNum(upgradeDict[arguments[1]]["Factor"]);

@@ -1,5 +1,4 @@
-
-var upgradeDict = {
+var upgradeDictDefault = {
     0: {Name: "Nahida",      Row:-1,  "Level": 1, "Cost":20, Factor:1,        Purchased: -1,   Type: "Catalyst",   Ele: "Dendro"                                             },
     1: {Name: "Traveller",   Row:-1,          Purchased: -1,   Type: "Sword",      Ele: ""                                             },
     2: {Name: "Collei",      Row:-1,          Purchased: -1,   Type: "Bow",        Ele: "Dendro"                                             },
@@ -133,7 +132,7 @@ var achievementList = {
     19: {Name:"",                   Description:"Reach 100 NpS"                     ,"Done": false            },
     20: {Name:"",                   Description:"Reach 10,000 NpS"                  ,"Done": false            },
     21: {Name:"",                   Description:"Reach 100,000 NpS"                 ,"Done": false            },
-    23: {Name:"",                   Description:"Reach 1 million NpS"               ,"Done": false            },
+    22: {Name:"",                   Description:"Reach 1 million NpS"               ,"Done": false            },
     23: {Name:"",                   Description:"Reach 100 million NpS"             ,"Done": false            },
     24: {Name:"",                   Description:"Reach 1 billion NpS"               ,"Done": false            },
     25: {Name:"",                   Description:"Reach 100 billion NpS"             ,"Done": false            },
@@ -164,4 +163,4 @@ var achievementList = {
     50: {Name:"",                   Description:""                                  ,"Done": false            },
 }
 
-export { upgradeDict,tooltip,Inventory,expeditionDict,achievementList };
+export { upgradeDictDefault,tooltip,Inventory,expeditionDict,achievementList };
