@@ -2,34 +2,65 @@
 <html lang="en" > 
 <head> 
     <meta charset="UTF-8" />
-    <meta name = "viewport" content = "height=device-height, width=device-width, minimum-scale=1.0, maximum-scale = 1.0, user-scalable = no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <title>nahidaQuest!</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <style type="text/css">
-        button {
-            border: 0px;
+        html {
+            height: 100%;
+            cursor: url(./assets/cursor.png), auto;  
+            display:flex; 
+            flex-direction:column; 
+            justify-content:center;
+            align-items: center;
+            /* min-height:100vh; */
         }
 
         body {
+            width: 1640px;
+            height: 850px;
             position: relative;
             font-family: 'gi-font';
-            padding-top: 10px #000000;
         }
 
-        html {
-            min-height: 100%;
-            cursor: url(./assets/cursor.png), auto;          /* ------------------- FIX CURSOR NOT WORKING ON TABLE */
+        /* Small devices (portrait tablets and large phones, 600px and up) */
+        @media only screen and (min-width: 600px) {
+            body {scale: 0.40;}
+        }
+
+        /* Medium devices (landscape tablets, 768px and up) */
+        @media only screen and (min-width: 768px) {
+            body {transform: scale(1.2);transform-origin: top;};
+        } 
+
+        /* Large devices (laptops/desktops, 992px and up) */
+        @media only screen and (min-width: 992px) {
+            body {transform: scale(1.2);transform-origin: top;};
+        } 
+
+        /* Extra large devices (large laptops and desktops, 1200px and up) */
+        @media only screen and (min-width: 1200px) {
+        body {scale: 0.75;}
+        }
+
+        @media only screen and (min-width: 1600px) {
+        body {scale: 0.9;}
         }
     </style>
 
 </head>
 <body id="bodyID">
+    <audio id="bgm" autoplay>
+        <source src="horse.ogg" type="audio/ogg">
+    </audio>
+
     <p id="para">
         <div class="energy-primo-container">
-            <span id="energy">0</span>
-            <span id="primogem">0</span>
+            <div class="pill-value"><span id="energy" style="padding-right:10px">0</span></div>
+            <div class="pill-value"><span id="primogem" style="padding-right:10px">0</span></div>
+            
         </div>
         <div class="score-container">
             <span id="score">0</span>              <!------------------------ CHANGE TO PARAGRAPH LATER -->
@@ -44,7 +75,7 @@
     </p>
 
     <table>
-        <table id="table1" class="uiTab" style="position: absolute; left: 10px; top:45px; width: 650px; height: 760px;">
+        <table id="table1" class="uiTab" style="position: absolute; left: 10px; top:45px; width: 650px; height: 760px; display:flex">
             <tr></tr>
         </table>
         <div id="table2" class="uiTab flex-container-INVENTORY" style="position: absolute; top:40px;"></div>
@@ -57,26 +88,40 @@
         </table>
     </table>
 
+    <div id="body-border"></div>
+
 <script type="module">
     import { upgradeDictDefault,Inventory,tooltip,expeditionDict,achievementList } from "./defaultData.js"
     import { abbrNum,randomInteger,sortList,generateHeroPrices, unlockExpedition } from "./functions.js"
     import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable } from "./drawUI.js"
 
-    var clickCount = 0;
-    var clickFactor = 1;
-    var dps = 1e23;
-    var realScore = 1.23e24 - 2;
+    var saveValues = {
+        clickCountDef:0,
+        clickFactorDef:1,
+        dpsDef:0,
+        realScoreDef:0,
+        freeLevelsDef:0,
+        primogemDef:1000,
+        energyDef:1000,
+        rowCountDef:0,
+        itemCountDef:0,
+    }
 
-    var freeLevels = 0;
-    var primogem = 0;
-    var energy = 100000;
+    var clickCount = saveValues["clickCountDef"];
+    var clickFactor = saveValues["clickFactorDef"];
+    var dps = saveValues["dpsDef"];
+    var realScore = saveValues["realScoreDef"];
 
-    var rowCount = 0;
-    var itemCount = 0;
+    var freeLevels = saveValues["freeLevelsDef"];
+    var primogem = saveValues["primogemDef"];
+    var energy = saveValues["energyDef"];
 
-    var energyChance = 100000;
-    var upperEnergyRate = 15;
-    var lowerEnergyRate = 7;
+    var rowCount = saveValues["rowCountDef"];
+    var itemCount = saveValues["itemCountDef"];
+
+    const ENERGYCHANCE = 500;
+    const upperEnergyRate = 15;
+    const lowerEnergyRate = 7;
     var clickDelay = 10;
     
     // RMB TO UPDATE CONSTANTS
@@ -91,14 +136,11 @@
     const NONWISHHEROMAX = 49
     const WISHHEROMIN = 100;
     const WISHHEROMAX = 112;
-    const WISHCOST = 10;
+    const WISHCOST = 160;
     const STARTINGWISHFACTOR = 50;
 
     var wishMultiplier = 0;
     var wishCounter = WISHHEROMAX - WISHHEROMIN;
-
-    const ADVENTURECOSTS = [0, 100, 200, 300, 400, 500];
-    const ADVENTUREFAILURE = [0, 0, 5, 10, 20, 30];
 
     var demoContainer = document.getElementById("demo-container");
     var score = document.getElementById("score");
@@ -111,7 +153,6 @@
     var table3 = document.getElementById("table3");
     var table4 = document.getElementById("table4");
     var table5 = document.getElementById("table5");
-    
     var TABS = [table1,table2, table3, table4, table5];
 
     // MAIN BODY VARIABLES
@@ -129,8 +170,9 @@
     expedDiv.style.display = "none";
 
     // INITIAL LOADING
+    loading();
     var upgradeDict = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX);
-    tabChange(3)
+    tabChange(1);
     refresh();
 
     realScore++;
@@ -142,9 +184,7 @@
     para1.appendChild(expedDiv);
 
     drawWish()
-   // unlockExpedition(3,expeditionDict)
-
-    var timer = setInterval(timerEvents,500);
+    var timer = setInterval(timerEvents,1000000);
 
     // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH SET TO 0.5 SECONDS)
     function timerEvents() {
@@ -153,11 +193,30 @@
         refresh();
         addNewRow();
     } 
+
+    function loading() {
+        var overlay = document.getElementById("body-border");
+        overlay.classList += "overlay";
+        let loadGif = document.createElement("img")
+        loadGif.src = "./assets/loading.gif"
+        loadGif.style = "width:1000px;height:563px;"
+        overlay.appendChild(loadGif);
+        setTimeout(removeLoading, 4800);
+
+        function removeLoading() {
+            setTimeout(function() {
+                overlay.removeChild(overlay.firstElementChild);
+                overlay.classList -= "overlay";
+                timer = setInterval(timerEvents,500);
+            }, 200);
+            
+        }
+    } 
     
     // TOOLTIPS FOR HEROES/ITEMS
     var tooltipTop = (table6.insertRow(0)).insertCell(0);
-    tooltipTop.align = "center"
-    tooltipTop.style = "height:300px"
+    tooltipTop.align = "center;"
+    tooltipTop.style = "height:300px;"
 
     var toolImg = document.createElement("img");
     toolImg.src = "./assets/tooltips/empty.png";
@@ -185,13 +244,13 @@
     var achievementTypeRawClicking = "";
 
     var scoreAchievementScore = 1;
-    var scoreAchievementDps = 17;
+    var scoreAchievementDps = 101;
 
     function popAchievement(achievement) {
         var oldAchievement = document.getElementById("tempAchievement");
         var achievementID = 10000;
         if (oldAchievement != null) {
-            mainBody.removeChild(oldAchievement);
+            mainBody.removeChild(oldAchievement); 
         }
 
         if (achievement == "score") {
@@ -200,12 +259,14 @@
             achievementList[scoreAchievementScore]["Done"] = true;
             achievementID += scoreAchievementScore;
             scoreAchievementScore++;
+            primogem += 20;
         } else if (achievement == "dps") {
             var achievementText = achievementList[scoreAchievementDps].Name;
             var achievementDesc = achievementList[scoreAchievementDps].Description;
             achievementList[scoreAchievementDps]["Done"] = true;
             achievementID += scoreAchievementDps;
             scoreAchievementDps++;
+            primogem += 20;
         }
 
         var achievementPopUp = document.createElement("p");
@@ -268,9 +329,9 @@
     // CHANGE TABS
     function tabChange(x) {
         for (let i = 0; i < TABS.length; i++){
-            TABS[i].style.display = "none";
+            TABS[i].style["z-index"] = -1;
         }
-        TABS[x-1].style.display = "flex";
+        TABS[x-1].style["z-index"] = 1;
 
          if (x-1 == 0 || x-1 == 1) {
             table6.style.display = "block";
@@ -298,12 +359,13 @@
     // ROLL FOR ENERGY
     function energyRoll() {
         let randInt = Math.floor(Math.random() * 1000);
+        console.log(randInt)
         clickDelay--;
 
         if (clickDelay < 1){
-            if (randInt < energyChance){
+            if (randInt < ENERGYCHANCE){
                 energy += randomInteger(lowerEnergyRate, upperEnergyRate);
-                clickDelay = 10;
+                clickDelay = 20;
             }
         }
     }
@@ -426,6 +488,9 @@
 
     // EXPEDITION MECHANICS
     // RMB THERES A CHANCE OF FAILURE, IT IS NOT A BUG IF NOTHING HAPPENS
+    const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
+    const ADVENTUREFAILURE = [0, 0, 5, 10, 20, 30];
+
     function adventure(type) {
         if (expeditionDict[type].Locked == '1'){
             alert("ITS LOCKED CANT YOU SEE!!!!!!!")
@@ -446,6 +511,7 @@
                     inventoryDraw("food", 1, 3);
                     }
                     if (type == 2){
+                        inventoryDraw("xp", 2, 2);
                         inventoryDraw("xp", 2, 2);
                         inventoryDraw("food", 2, 3);
                         inventoryDraw("artifact", 2, 4);
@@ -543,6 +609,7 @@
         wishButton.addEventListener("click",function() {
             let mailImage = document.getElementById("mailImage")
             mailImage.src = "./assets/closed.png"
+            wish();
         });
         table4.appendChild(wishButton);
 
@@ -554,21 +621,23 @@
     }
 
     function wish() {
-        if (energy > WISHCOST) {
-            energy -= WISHCOST;
-            refresh();
+        if (primogem > WISHCOST) {
+            primogem -= WISHCOST;
             
             while (wishCounter) {
                 let i = randomInteger(WISHHEROMIN, WISHHEROMAX)
                 if (upgradeDict[i].Purchased >= -1) {
                     continue;
                 } else {
+                    
                     upgradeDict[i].Purchased = -1;
                     upgradeDict[i]["Factor"] = Math.round(dps * (STARTINGWISHFACTOR + wishMultiplier)/30);
                     upgradeDict[i]["Cost"] = Math.round(dps * (20));
+                    console.log(upgradeDict[i])
 
                     wishMultiplier += 5;
                     wishCounter--;
+                    refresh();
                     break;
                 }
             }
@@ -583,13 +652,12 @@
         } else {
             score.innerText = formatScore + " Nuts";
         }
-        
 
         let formatDps = abbrNum(dps);
         dpsDisplay.innerText = formatDps + " per second" ;
 
-        energyDisplay.innerText = "Energy: " + energy;
-        primogemDisplay.innerText = "Primogem: " + primogem;
+        energyDisplay.innerText = energy;
+        primogemDisplay.innerText = primogem;
         
         if (arguments[0] != undefined){
             if (arguments[0].includes("but-")){

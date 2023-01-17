@@ -4,7 +4,7 @@ function drawMainBody() {
 
     var leftImg =  document.createElement("img");
     leftImg.src = "./assets/bg-1.png";
-    leftImg.style = "position: absolute; left:-30px; top: -17px; width: 630px; height: 870px;";
+    leftImg.style = "position: absolute; left:-8px; top: -17px; width: 630px; height: 870px;";
     para1.appendChild(leftImg);
 
     var barImg =  document.createElement("img");
@@ -91,9 +91,4 @@ function createExpedTable(expedDiv) {
     expedDiv.appendChild(expedTable);
 }
                 
-
-
-
-
-
 export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable }
