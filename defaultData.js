@@ -96,8 +96,8 @@ var Inventory = {
 };
 
 var tooltip = {
-Nahida:{text:"A caged bird secluded within the confines of the Sanctuary of Surasthana who can only see the world in her dreams."                                             },
-Traveller:{text:"The keeper is fading away; the creator has not yet come.But the world shall burn no more, for you shall ascend."                                             },
+Nahida:{name:"Lesser Lord Kusanali", lore:"A caged bird secluded within the confines of the Sanctuary of Surasthana who can only see the world in her dreams."},
+Traveller:{text:"The keeper is fading away; the creator has not yet come.But the world shall burn no more, for you shall ascend."},
 };
 
 var expeditionDict = {

@@ -52,14 +52,20 @@
 
 </head>
 <body id="bodyID">
-    <audio id="bgm" autoplay>
-        <source src="horse.ogg" type="audio/ogg">
+    <audio autoplay loop> 
+        <source src="./assets/sfx/bgm1.mp3" type="audio/mpeg">
     </audio>
-
     <p id="para">
         <div class="energy-primo-container">
-            <div class="pill-value"><span id="energy" style="padding-right:10px">0</span></div>
-            <div class="pill-value"><span id="primogem" style="padding-right:10px">0</span></div>
+            <div class="pill-value">
+                <img class="icon" src="./assets/energyIcon.png">
+                <span id="energy" style="padding-right:10px">0</span>
+            </div>
+
+            <div class="pill-value">
+                <img class="primogem icon" src="./assets/primogemIcon.png">
+                <span id="primogem" style="padding-right:10px">0</span>
+            </div>
             
         </div>
         <div class="score-container">
@@ -157,7 +163,7 @@
 
     // MAIN BODY VARIABLES
     var mainBody = document.getElementById("bodyID");
-    let table6 = document.createElement("table");
+    let table6 = document.createElement("div");
     mainBody.appendChild(table6);
     table6.classList += "table6";
     
@@ -201,7 +207,7 @@
         loadGif.src = "./assets/loading.gif"
         loadGif.style = "width:1000px;height:563px;"
         overlay.appendChild(loadGif);
-        setTimeout(removeLoading, 4800);
+        setTimeout(removeLoading, 800);
 
         function removeLoading() {
             setTimeout(function() {
@@ -213,27 +219,33 @@
         }
     } 
     
-    // TOOLTIPS FOR HEROES/ITEMS
-    var tooltipTop = (table6.insertRow(0)).insertCell(0);
-    tooltipTop.align = "center;"
-    tooltipTop.style = "height:300px;"
+    // TOOLTIP UI
+    var tooltipName = document.createElement("div");
 
     var toolImg = document.createElement("img");
     toolImg.src = "./assets/tooltips/empty.png";
-    toolImg.style ="width:250px;height:250px;";
+    toolImg.style = "width:250px;height:250px;";
     
-    // TOOLTIP UI
-    tooltipTop.appendChild(toolImg);
-    var tooltipText = (table6.insertRow(1)).insertCell(0);
+    var tooltipLore= document.createElement("div");
+    var tooltipText = document.createElement("div");
+    var tooltipLore= document.createElement("div");
+    table6.append(tooltipName,toolImg,tooltipLore,tooltipText,tooltipLore);
 
-    function changeTooltip(name) {
-        let tooltipContent = tooltip[name].text;
-        tooltipText.innerText = tooltipContent;
+    function changeTooltip(name, type, ID) {
+        tooltipName.innerText = tooltip[name].name;
+        tooltipLore.innerText = tooltip[name].lore;
         toolImg.src = "./assets/tooltips/"+name+".png";
+
+        if (type == "hero") {
+            tooltipText.innerText = "Times upgraded: " + upgradeDict[ID]["Purchased"];
+            
+        }
     }
 
     function clearTooltip() {
+        tooltipName.innerText = "";
         tooltipText.innerText = "";
+        tooltipLore.innerText = "";
         toolImg.src = "./assets/tooltips/empty.png";
     }
 
@@ -334,9 +346,9 @@
         TABS[x-1].style["z-index"] = 1;
 
          if (x-1 == 0 || x-1 == 1) {
-            table6.style.display = "block";
+            table6.style["z-index"] = 1;
          } else {
-            table6.style.display = "none"; 
+            table6.style["z-index"] = -1; 
          }
 
          if (x-1 == 2) {
@@ -359,7 +371,6 @@
     // ROLL FOR ENERGY
     function energyRoll() {
         let randInt = Math.floor(Math.random() * 1000);
-        console.log(randInt)
         clickDelay--;
 
         if (clickDelay < 1){
@@ -393,7 +404,7 @@
                 let heroButtonContainer = createHeroButtonContainer(heroID,heroText);
                 let toolName = upgradeDict[i].Name;
                 
-                heroButtonContainer.addEventListener("mouseover", function() {changeTooltip(toolName)});
+                heroButtonContainer.addEventListener("mouseover", function() {changeTooltip(toolName, "hero", i)});
                 heroButtonContainer.addEventListener("mouseout", function() {clearTooltip()});
                 heroButtonContainer.addEventListener("click", function() {upgrade(heroID)});
 
@@ -433,6 +444,8 @@
       
                     upgradeDict[i].Purchased += 1;
                     refresh(clicked_id, nextPrice, i);
+                    clearTooltip();
+                    changeTooltip(upgradeDict[i]["Name"],"hero",i);
                 }
             }
         } 
@@ -452,7 +465,7 @@
         buttonInv.classList += "inventoryButton";
         buttonInv.style.background = "url(./assets/inventory/" + Inventory[idNum].Name + ".jpg)";
         buttonInv.style["background-repeat"] = "no-repeat";
-        buttonInv.style["background-size"] = "128px 144px";
+        buttonInv.style["background-size"] = "118px 144px";
         table2.appendChild(buttonInv);
     }
 
@@ -633,7 +646,6 @@
                     upgradeDict[i].Purchased = -1;
                     upgradeDict[i]["Factor"] = Math.round(dps * (STARTINGWISHFACTOR + wishMultiplier)/30);
                     upgradeDict[i]["Cost"] = Math.round(dps * (20));
-                    console.log(upgradeDict[i])
 
                     wishMultiplier += 5;
                     wishCounter--;
