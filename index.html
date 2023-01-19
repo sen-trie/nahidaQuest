@@ -105,7 +105,7 @@
         clickCountDef:0,
         clickFactorDef:1,
         dpsDef:0,
-        realScoreDef:0,
+        realScoreDef:1000,
         freeLevelsDef:0,
         primogemDef:1000,
         energyDef:1000,
@@ -234,7 +234,7 @@
     function changeTooltip(name, type, ID) {
         tooltipName.innerText = tooltip[name].name;
         tooltipLore.innerText = tooltip[name].lore;
-        toolImg.src = "./assets/tooltips/"+name+".png";
+        toolImg.src = "./assets/tooltips/"+name+".webp";
 
         if (type == "hero") {
             tooltipText.innerText = "Times upgraded: " + upgradeDict[ID]["Purchased"];
@@ -673,22 +673,26 @@
         
         if (arguments[0] != undefined){
             if (arguments[0].includes("but-")){
+                var heroTextFirst = "";
+                var formatATK = "";
                 if (arguments[2] == 0) {
                     var formatCost = abbrNum(arguments[1]);
+                    formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
+                    heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", " + formatATK + " Nuts per Click";
                 } else {
                     var formatCost = abbrNum(arguments[1]);
+                    formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
+                    heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", Adds: " + formatATK + " NpS";
                 }
-
-                var formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
-                var heroText =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", ATK: " + formatATK;
+                
                 let upgradedHeroButton = document.getElementById(arguments[0])
-                upgradedHeroButton.innerText = heroText;
-                upgradedHeroButton.style = "background:url(./assets/nahida.webp);  background-size: 90%; background-position: 25% center; background-repeat: no-repeat;";
+                upgradedHeroButton.innerText = heroTextFirst;
+                upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeDict[arguments[2]].Name+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
             }
         } else if (arguments[0] == "hero"){
             let formatATK = abbrNum(upgradeDict[arguments[1]]["Factor"]);
             let formatCost = abbrNum(arguments[1]);
-            var heroText =  upgradeDict[arguments[1]].Name + ": " + formatCost + ", ATK: " + formatATK;
+            var heroText =  upgradeDict[arguments[1]].Name + ": " + formatCost + ", Adds: " + formatATK + " NpS";
             let id="but-" + arguments[1].rowCount + "";
             document.getElementById(id).innerText = heroText;
         }
