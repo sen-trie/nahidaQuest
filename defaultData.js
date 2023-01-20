@@ -97,9 +97,7 @@ var Inventory = {
 
 var tooltip = {
     Nahida:{name:"Lesser Lord Kusanali", lore:"A caged bird secluded within the confines of the Sanctuary of Surasthana who can only see the world in her dreams."},
-    Traveller:{text:"The keeper is fading away; the creator has not yet come.But the world shall burn no more, for you shall ascend."},
-    Nahida:{name:"", lore:""            },
-    Traveller:{name:"", lore:""      },
+    Traveller:{name:"The Traveller", lore:"The keeper is fading away; the creator has not yet come.But the world shall burn no more, for you shall ascend."},
     Collei:{name:"", lore:""               },
     Cyno:{name:"", lore:""                 },
     Candace:{name:"", lore:""            },

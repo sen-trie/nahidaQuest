@@ -25,6 +25,12 @@
             font-family: 'gi-font';
         }
 
+        .prevent-select {
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+        }
+
         /* Small devices (portrait tablets and large phones, 600px and up) */
         @media only screen and (min-width: 600px) {
             body {scale: 0.40;}
@@ -51,7 +57,7 @@
     </style>
 
 </head>
-<body id="bodyID">
+<body id="bodyID" class="prevent-select">
     <audio autoplay loop> 
         <source src="./assets/sfx/bgm1.mp3" type="audio/mpeg">
     </audio>
@@ -81,9 +87,7 @@
     </p>
 
     <table>
-        <table id="table1" class="uiTab" style="position: absolute; left: 10px; top:45px; width: 650px; height: 760px; display:flex">
-            <tr></tr>
-        </table>
+        <div id="table1" class="uiTab flex-container-HERO"></div>
         <div id="table2" class="uiTab flex-container-INVENTORY" style="position: absolute; top:40px;"></div>
         <div id="table3" class="uiTab flex-container-EXPEDITION" style="position: absolute; top:55px; left: 12px; width:950px;">
             <div id="expedDiv"></div>
@@ -105,7 +109,7 @@
         clickCountDef:0,
         clickFactorDef:1,
         dpsDef:0,
-        realScoreDef:1000,
+        realScoreDef:1000000,
         freeLevelsDef:0,
         primogemDef:1000,
         energyDef:1000,
@@ -223,17 +227,18 @@
     var tooltipName = document.createElement("div");
 
     var toolImg = document.createElement("img");
-    toolImg.src = "./assets/tooltips/empty.png";
+    toolImg.src = "./assets/tooltips/Empty.webp";
     toolImg.style = "width:250px;height:250px;";
     
-    var tooltipLore= document.createElement("div");
+    // var tooltipLore= document.createElement("div");
     var tooltipText = document.createElement("div");
     var tooltipLore= document.createElement("div");
-    table6.append(tooltipName,toolImg,tooltipLore,tooltipText,tooltipLore);
+    table6.append(tooltipName,toolImg,tooltipText,tooltipLore);
 
     function changeTooltip(name, type, ID) {
-        tooltipName.innerText = tooltip[name].name;
-        tooltipLore.innerText = tooltip[name].lore;
+        console.log(tooltip[name])
+        tooltipName.innerText = tooltip[name]["name"];
+        tooltipLore.innerText = tooltip[name]["lore"];
         toolImg.src = "./assets/tooltips/"+name+".webp";
 
         if (type == "hero") {
@@ -246,7 +251,7 @@
         tooltipName.innerText = "";
         tooltipText.innerText = "";
         tooltipLore.innerText = "";
-        toolImg.src = "./assets/tooltips/empty.png";
+        toolImg.src = "./assets/tooltips/Empty.webp";
     }
 
     // ACHIEVEMENTS
@@ -386,9 +391,6 @@
         for (let i = 0; i < WISHHEROMAX; i++) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (realScore >= upgradeDict[i]["Level"] && upgradeDict[i].Purchased == -1){
-                let newRow = table1.insertRow(-1);
-                let newCell = newRow.insertCell(0);
-
                 upgradeDict[i].Row = rowCount;
                 upgradeDict[i].Purchased = 0;
                 
@@ -408,7 +410,7 @@
                 heroButtonContainer.addEventListener("mouseout", function() {clearTooltip()});
                 heroButtonContainer.addEventListener("click", function() {upgrade(heroID)});
 
-                newCell.appendChild(heroButtonContainer);
+                table1.appendChild(heroButtonContainer);
                 rowCount++;
             }
         }

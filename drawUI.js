@@ -63,12 +63,12 @@ function demoFunction() {
 }
 
 function createHeroButtonContainer(heroID,heroText) {
-    let heroButtonContainer = document.createElement("button");
+    let heroButtonContainer = document.createElement("div");
     
     heroButtonContainer.id = heroID;
     heroButtonContainer.innerText = heroText;
     heroButtonContainer.style.background = "url(./assets/button-3.png)";
-    heroButtonContainer.classList += "upgrade hero-glow";
+    heroButtonContainer.classList += "upgrade";
 
     return heroButtonContainer;
 }

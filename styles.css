@@ -7,11 +7,6 @@ button:hover {
     background-color: burlywood;
   }
 
-img {
-    height: 48px;
-    width: 48px;
-}
-
 .overlay {
     display: flex;
     background: url(./assets/wood.jpg);
@@ -20,6 +15,7 @@ img {
     align-items: center;
 }
 
+/* MAIN BODY CSS */
 table {
     cursor: url(./assets/cursor.png), auto;
 }
@@ -96,6 +92,145 @@ button {
     height: 29px;
 }
 
+/* BUTTON CSS */
+#demo {
+    width: 95%;
+    height: 95%;
+    margin-top: 2.5%;
+    margin-left: 2.5%;
+    position: absolute;
+    
+    background-position: center center;
+    background: url(./assets/nahida.png);
+    background-size: cover;
+    content: '';
+    animation: rotation 18s infinite linear;
+}
+
+@keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    } to {
+      transform: rotate(359deg);
+    }
+}
+
+#demo-container {
+    position: absolute;
+    top: 180px;
+    left: 50px;
+    width:508px;
+    height:508px;
+}
+
+/* TAB BODY CSS */
+.tab-button {
+    width:64px;
+    height:64px;
+}
+
+img {
+    height: 48px;
+    width: 48px;
+}
+
+.uiTab {
+    margin-top:56px;
+    margin-left:697px;
+}
+
+.flex-container-TAB {
+    position: absolute;
+    left:800px; 
+    top:5px; 
+    width: 730px;
+    gap: 10px;
+    display: flex;
+    flex-wrap: no-wrap;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.flex-container-TAB button:hover{
+    filter: drop-shadow(0px 0px 3px #ffffff);
+}
+
+/* HERO UPGRADES (TABLE1) CSS */
+.flex-container-HERO {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: absolute;
+    left: -5px; 
+    top: 45px;
+    width: 657px;
+    height: 760px;
+    overflow-y: scroll;  
+    overflow-x: hidden;
+}
+
+.upgrade {
+    display: flex;
+    font-family: 'gi-font';
+    justify-content: center;
+    align-items: center;
+    width:622px;
+    min-height:115px;
+}
+
+.upgrade:hover {
+    background-color: yellow;
+}
+
+/* INVENTORY (TABLE2) CSS */
+.item-button {
+    border: 0px;
+    width: 131px;
+    height: 158px;
+}
+
+.flex-container-INVENTORY {
+    overflow-y: auto;
+    width: 652px;
+    height: 775px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: flex-start;
+    gap: 10px 10px;
+}
+
+.flex-container-INVENTORY button:hover{
+    box-shadow: 5px 5px;
+}
+
+.inventoryButton {
+    width: 118px;
+    height: 144px;
+}
+
+/* EXPEDITION (TABLE3) CSS */
+.flex-container-EXPEDITION button{
+    opacity: 0.3;
+}
+
+.flex-container-EXPEDITION button:hover{
+    opacity: 1;
+}
+
+.flex-container-EXPEDITION {
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.expedition {
+    margin: auto;
+    width:188px;
+    height: 489px;
+}
+
+/* EXPEDITION TOOLTIP CSS */
 .tooltipEXPED {
     text-align: center;
     z-index:2;
@@ -129,167 +264,18 @@ button {
     text-justify: inter-word;
 }
 
-.tab-button {
-    width:64px;
-    height:64px;
-}
-
-.flex-container-INVENTORY {
-    overflow-y: auto;
-    width: 652px;
-    height: 775px;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    align-content: flex-start;
-    gap: 10px 10px;
-}
-
-.flex-container-INVENTORY button:hover{
-    box-shadow: 5px 5px;
-}
-
-.flex-container-TAB {
-    position: absolute;
-    left:800px; 
-    top:5px; 
-    width: 730px;
-    gap: 10px;
-    display: flex;
-    flex-wrap: no-wrap;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.flex-container-TAB button:hover{
-    filter: drop-shadow(0px 0px 3px #ffffff);
-}
-
-.container {
-    max-width: 1000px;
-    top: 100px;
-    left: 10px;
-    height: 955px;
-    display: flex;
-    overflow-y: hidden;
-    }
-
-.flex-container-EXPEDITION button{
-    opacity: 0.3;
-}
-
-.flex-container-EXPEDITION button:hover{
-    opacity: 1;
-}
-
-.flex-container-EXPEDITION {
-    gap: 5px;
-    justify-content: center;
-    align-items: center;
-}
-
-.expedition {
-    margin: auto;
-    width:188px;
-    height: 489px;
-}
-
-.flex-container-ACHIEVEMENT {
-    background-color: aqua;
-    position: absolute; 
-    top:45px; 
-    left:5px; 
-    width:969px;
-    height:759px;
-    overflow-y: auto;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    align-content: flex-start;
-}
-
-.sideImg {
-    position: absolute;
-    left: 1279px;
-    width: 382px;
-    height: 869px;
-}
-
-
-.inventoryButton {
-    width: 118px;
-    height: 144px;
-}
-
-.uiTab {
-    margin-top:56px;
-    margin-left:697px;
-}
-
+/* WISH (TABLE4) CSS */
 .wish-counter {
     z-index: 1;
     position: absolute; 
     top:40px; 
     left:5px; 
-    
     background:url(./assets/wishBG.png);
     background-size: 105%;
     background-position: center center;
     background-repeat: no-repeat;
-
     width:969px; 
     height:764px;
-}
-
-.item-button {
-    border: 0px;
-    width: 131px;
-    height: 158px;
-}
-
-.upgrade {
-    font-family: 'gi-font';
-    background-size: 80%;
-    background-position: 3px center;
-    background-repeat: no-repeat;
-    width:622px;
-    height:115px;
-}
-
-.upgrade:hover {
-    background-color: yellow;
-}
-
-.achieve {                                                  /* ADJUST IT TO THE LEFT, BELOW BUTTON */
-    z-index:2;
-    position: absolute; 
-    top:685px; 
-    width:593px;
-    height:98px;
-    text-align: center;
-    background:url(./assets/achievement.png);
-    background-size: 100%;
-    background-position: 5px center;
-    background-repeat: no-repeat;
-    
-}
-
-.achieve:hover {
-    background-color: yellow;
-}
-
-.achieve-stored {
-    z-index:1;
-    width:400px;
-    height:98px;
-    text-align: center;
-    background:url(./assets/achievement.png);
-}
-
-.wrap-container {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row-reverse
 }
 
 .wish-button {
@@ -316,45 +302,52 @@ button {
     transition: .5s ease;
 }
 
-#display {
-    padding-left: 10%;
+/* ACHIEVEMENT (TABLE5) CSS */
+.flex-container-ACHIEVEMENT {
+    background-color: aqua;
+    position: absolute; 
+    top:45px; 
+    left:5px; 
+    width:969px;
+    height:759px;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: flex-start;
 }
 
-#demo-container {
+.achieve {                                                  /* ADJUST IT TO THE LEFT, BELOW BUTTON */
+    z-index:2;
+    position: absolute; 
+    top:685px; 
+    width:593px;
+    height:98px;
+    text-align: center;
+    background:url(./assets/achievement.png);
+    background-size: 100%;
+    background-position: 5px center;
+    background-repeat: no-repeat;
+}
+
+.achieve:hover {
+    background-color: yellow;
+}
+
+.achieve-stored {
+    z-index:1;
+    width:400px;
+    height:98px;
+    text-align: center;
+    background:url(./assets/achievement.png);
+}
+
+/* TOOLTIP UI (TABLE6) CSS */
+.sideImg {
     position: absolute;
-    top: 180px;
-    left: 50px;
-    width:508px;
-    height:508px;
-}
-
-#demo {
-    width: 95%;
-    height: 95%;
-    margin-top: 2.5%;
-    margin-left: 2.5%;
-    position: absolute;
-    
-    background-position: center center;
-    background: url(./assets/nahida.png);
-    background-size: cover;
-    content: '';
-    animation: rotation 18s infinite linear;
-}
-
-@keyframes rotation {
-    from {
-      transform: rotate(0deg);
-    } to {
-      transform: rotate(359deg);
-    }
-}
-  
-
-#table1 {
-    overflow-y: auto;  
-    overflow-x: hidden;
-    width: 653px;
+    left: 1279px;
+    width: 382px;
+    height: 869px;
 }
 
 #table-tab {
