@@ -23,6 +23,8 @@ table {
 .score-container {
     display: flex;
     text-align: center;
+    color:white;
+    text-shadow: 3px 3px 5px black;
     flex-direction: column;
     position: absolute;
     left:-8px; 
@@ -86,7 +88,7 @@ button {
     align-items: center;
     text-align: right;
     color:white;
-    background: url("./assets/pill.png");
+    background: url(./assets/pill.png);
     background-size: 100%;
     width:96px;
     height: 29px;
@@ -155,6 +157,18 @@ img {
     filter: drop-shadow(0px 0px 3px #ffffff);
 }
 
+.pop-new {
+    position: absolute;
+    z-index: 3;
+    width: 43px;
+    height: 24px;
+}
+
+.pop-new-one {
+    left: 848px;
+    top: -0px;
+}
+
 /* HERO UPGRADES (TABLE1) CSS */
 .flex-container-HERO {
     display: flex;
@@ -176,10 +190,34 @@ img {
     align-items: center;
     width:622px;
     min-height:115px;
+    color: white;
+    font-size: 19px;
+    text-shadow: #3C3C3C 3px 0px 0px, #3C3C3C 2.83487px 0.981584px 0px, #3C3C3C 2.35766px 1.85511px 0px, #3C3C3C 1.62091px 2.52441px 0px, #3C3C3C 0.705713px 2.91581px 0px, #3C3C3C -0.287171px 2.98622px 0px, #3C3C3C -1.24844px 2.72789px 0px, #3C3C3C -2.07227px 2.16926px 0px, #3C3C3C -2.66798px 1.37182px 0px, #3C3C3C -2.96998px 0.42336px 0px, #3C3C3C -2.94502px -0.571704px 0px, #3C3C3C -2.59586px -1.50383px 0px, #3C3C3C -1.96093px -2.27041px 0px, #3C3C3C -1.11013px -2.78704px 0px, #3C3C3C -0.137119px -2.99686px 0px, #3C3C3C 0.850987px -2.87677px 0px, #3C3C3C 1.74541px -2.43999px 0px, #3C3C3C 2.44769px -1.73459px 0px, #3C3C3C 2.88051px -0.838247px 0px;
+
 }
 
-.upgrade:hover {
-    background-color: yellow;
+:root {
+    --brightness:100%;
+    --dropshadow:0px 0px 0px black;
+    --grayscale:0%;
+}
+
+.upgrade {
+    filter: brightness(var(--brightness)) 
+            grayscale(var(--grayscale)); 
+}
+
+.upgrade:active {
+    filter: drop-shadow(var(--dropshadow)) 
+}
+
+.not-dim {
+    --dropshadow:0px 0px 5px #000000;
+}
+
+.dim {
+    --grayscale:50%;
+    --brightness:60%;
 }
 
 /* INVENTORY (TABLE2) CSS */
@@ -234,7 +272,7 @@ img {
 .tooltipEXPED {
     text-align: center;
     z-index:2;
-    background: url("./assets/tooltipEXPED.png");
+    background: url(./assets/tooltipEXPED.png);
     position: absolute; 
     left: 745px; 
     top: 595px; 

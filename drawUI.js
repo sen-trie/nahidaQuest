@@ -63,12 +63,14 @@ function demoFunction() {
 }
 
 function createHeroButtonContainer(heroID,heroText) {
-    let heroButtonContainer = document.createElement("div");
+    let heroButtonContainer = document.createElement("button");
     
     heroButtonContainer.id = heroID;
     heroButtonContainer.innerText = heroText;
-    heroButtonContainer.style.background = "url(./assets/button-3.png)";
     heroButtonContainer.classList += "upgrade";
+    heroButtonContainer.style.background = "url(./assets/button.webp)";
+    heroButtonContainer.style["background-position"] = "center";
+    heroButtonContainer.style["background-size"] = "cover";
 
     return heroButtonContainer;
 }
@@ -90,5 +92,40 @@ function createExpedTable(expedDiv) {
 
     expedDiv.appendChild(expedTable);
 }
-                
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable }
+
+function createAchievement(achievementText,achievementDesc) {
+    let achievementPopUpTemp = document.createElement("p");
+
+    let achievementH1 = document.createElement("h2");
+    achievementH1.innerText = achievementText;
+    achievementH1.classList += "achieveH1"
+    let achievementH2 = document.createElement("h3");
+    achievementH2.innerText = achievementDesc;
+    achievementH2.classList += "achieveH2"
+
+    achievementPopUpTemp.appendChild(achievementH1);
+    achievementPopUpTemp.appendChild(achievementH2);
+    achievementPopUpTemp.id = "tempAchievement"
+    achievementPopUpTemp.classList += "achieve"
+
+    return achievementPopUpTemp;
+}
+
+function storeAchievement(achievementText,achievementDesc,achievementID) {
+    let achievementStored = document.createElement("button");
+    let achievementStoredH1 = document.createElement("h2");
+    achievementStoredH1.innerText = achievementText;
+    achievementStoredH1.classList += "achieveStoredH1"
+    let achievementStoredH2 = document.createElement("h3");              // MAKE THE BACKGROUND IMAGE SUMERU TALENT
+    achievementStoredH2.innerText = achievementDesc;                     // HAVE THE MIDDLE PART INFINITELY EXTEND
+    achievementStoredH2.classList += "achieveStoredH2"
+
+    achievementStored.appendChild(achievementStoredH1);
+    achievementStored.appendChild(achievementStoredH2);
+    achievementStored.classList += "achieve-stored"
+    achievementStored.id = achievementID;
+
+    return achievementStored;
+}
+
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement }

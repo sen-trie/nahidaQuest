@@ -2,58 +2,54 @@
 <html lang="en" > 
 <head> 
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=0, initial-scale=1, user-scalable=no">
     <title>nahidaQuest!</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <style type="text/css">
-        html {
-            height: 100%;
-            cursor: url(./assets/cursor.png), auto;  
-            display:flex; 
-            flex-direction:column; 
-            justify-content:center;
-            align-items: center;
-            /* min-height:100vh; */
-        }
-
-        body {
-            width: 1640px;
-            height: 850px;
-            position: relative;
-            font-family: 'gi-font';
-        }
-
         .prevent-select {
             -webkit-user-select: none; /* Safari */
             -ms-user-select: none; /* IE 10 and IE 11 */
             user-select: none; /* Standard syntax */
         }
 
-        /* Small devices (portrait tablets and large phones, 600px and up) */
-        @media only screen and (min-width: 600px) {
-            body {scale: 0.40;}
+        /* @media only screen and (min-width: 600px) {
+            body {transform: scale(0.38);transform-origin: top;};
         }
 
-        /* Medium devices (landscape tablets, 768px and up) */
         @media only screen and (min-width: 768px) {
-            body {transform: scale(1.2);transform-origin: top;};
+            body {transform: scale(0.45);transform-origin: top;};
         } 
 
-        /* Large devices (laptops/desktops, 992px and up) */
         @media only screen and (min-width: 992px) {
-            body {transform: scale(1.2);transform-origin: top;};
+            body {transform: scale(0.57);transform-origin: top;};
         } 
 
-        /* Extra large devices (large laptops and desktops, 1200px and up) */
         @media only screen and (min-width: 1200px) {
-        body {scale: 0.75;}
+            body {transform: scale(0.7);transform-origin: top;};
         }
 
         @media only screen and (min-width: 1600px) {
-        body {scale: 0.9;}
+            body {transform: scale(0.95);transform-origin: top;};
+        } */
+
+         html {
+            height: 100%;
+            width:100%;
+            background: black;
+            /* cursor: url(./assets/cursor.png), auto;  
+            display:flex; 
+            flex-direction:column-reverse; 
+            justify-content:center;
+            align-items: center; */
         }
+
+        body {
+            position: relative;
+            font-family: 'gi-font';
+        }
+
     </style>
 
 </head>
@@ -75,7 +71,7 @@
             
         </div>
         <div class="score-container">
-            <span id="score">0</span>              <!------------------------ CHANGE TO PARAGRAPH LATER -->
+            <span id="score">0</span>      
             <span id="dps">0</span>
         </div>
         <div class="flex-container-TAB" id="flex-container-TAB">
@@ -103,13 +99,13 @@
 <script type="module">
     import { upgradeDictDefault,Inventory,tooltip,expeditionDict,achievementList } from "./defaultData.js"
     import { abbrNum,randomInteger,sortList,generateHeroPrices, unlockExpedition } from "./functions.js"
-    import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable } from "./drawUI.js"
+    import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement } from "./drawUI.js"
 
     var saveValues = {
         clickCountDef:0,
         clickFactorDef:1,
         dpsDef:0,
-        realScoreDef:1000000,
+        realScoreDef:1e20,
         freeLevelsDef:0,
         primogemDef:1000,
         energyDef:1000,
@@ -145,7 +141,7 @@
 
     const NONWISHHEROMAX = 49
     const WISHHEROMIN = 100;
-    const WISHHEROMAX = 112;
+    const WISHHEROMAX = 113;
     const WISHCOST = 160;
     const STARTINGWISHFACTOR = 50;
 
@@ -185,6 +181,12 @@
     tabChange(1);
     refresh();
 
+    var siteWidth = 1880;
+    var scale = screen.height / (siteWidth);
+    console.log(scale)
+
+    document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale+'', 'user-scalable=no');
+
     realScore++;
     addNewRow();
     realScore--;
@@ -202,6 +204,7 @@
         realScore += 0.5 * dps;
         refresh();
         addNewRow();
+        dimHeroButton();
     } 
 
     function loading() {
@@ -236,7 +239,6 @@
     table6.append(tooltipName,toolImg,tooltipText,tooltipLore);
 
     function changeTooltip(name, type, ID) {
-        console.log(tooltip[name])
         tooltipName.innerText = tooltip[name]["name"];
         tooltipLore.innerText = tooltip[name]["lore"];
         toolImg.src = "./assets/tooltips/"+name+".webp";
@@ -254,80 +256,6 @@
         toolImg.src = "./assets/tooltips/Empty.webp";
     }
 
-    // ACHIEVEMENTS
-    var achievementTypeRawScore = [10,1e3,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24];
-    var achievementTypeRawDPS =   [1,10,100,10000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21];
-    var achievementTypeRawCollection = "";
-    var achievementTypeRawClicking = "";
-
-    var scoreAchievementScore = 1;
-    var scoreAchievementDps = 101;
-
-    function popAchievement(achievement) {
-        var oldAchievement = document.getElementById("tempAchievement");
-        var achievementID = 10000;
-        if (oldAchievement != null) {
-            mainBody.removeChild(oldAchievement); 
-        }
-
-        if (achievement == "score") {
-            var achievementText = achievementList[scoreAchievementScore].Name;
-            var achievementDesc = achievementList[scoreAchievementScore].Description;
-            achievementList[scoreAchievementScore]["Done"] = true;
-            achievementID += scoreAchievementScore;
-            scoreAchievementScore++;
-            primogem += 20;
-        } else if (achievement == "dps") {
-            var achievementText = achievementList[scoreAchievementDps].Name;
-            var achievementDesc = achievementList[scoreAchievementDps].Description;
-            achievementList[scoreAchievementDps]["Done"] = true;
-            achievementID += scoreAchievementDps;
-            scoreAchievementDps++;
-            primogem += 20;
-        }
-
-        var achievementPopUp = document.createElement("p");
-        let achievementH1 = document.createElement("h2");
-        achievementH1.innerText = achievementText;
-        achievementH1.classList += "achieveH1"
-        let achievementH2 = document.createElement("h3");
-        achievementH2.innerText = achievementDesc;
-        achievementH2.classList += "achieveH2"
-
-        achievementPopUp.appendChild(achievementH1);
-        achievementPopUp.appendChild(achievementH2);
-        achievementPopUp.id = "tempAchievement"
-
-        achievementPopUp.onclick = achievementPopUp.remove;
-        achievementPopUp.classList += "achieve"
-        mainBody.appendChild(achievementPopUp); 
-        
-        let achievementStored = document.createElement("button");
-        let achievementStoredH1 = document.createElement("h2");
-        achievementStoredH1.innerText = achievementText;
-        achievementStoredH1.classList += "achieveStoredH1"
-        let achievementStoredH2 = document.createElement("h3");              // MAKE THE BACKGROUND IMAGE SUMERU TALENT
-        achievementStoredH2.innerText = achievementDesc;                     // HAVE THE MIDDLE PART INFINITELY EXTEND
-        achievementStoredH2.classList += "achieveStoredH2"
-
-        achievementStored.appendChild(achievementStoredH1);
-        achievementStored.appendChild(achievementStoredH2);
-        achievementStored.classList += "achieve-stored"
-        achievementStored.id = achievementID;
-        table5.appendChild(achievementStored); 
-        sortList("table5");
-    }
-
-    function checkAchievement() {
-        if (realScore >= achievementTypeRawScore[0] && achievementTypeRawScore.length != 0) {
-            popAchievement("score");
-            achievementTypeRawScore.shift();
-        } else if (dps >= achievementTypeRawDPS[0] && achievementTypeRawDPS.length != 0) {
-            popAchievement("dps");
-            achievementTypeRawDPS.shift();
-        }
-    }
-
     // TAB UI
     createTabs();
     function createTabs() {
@@ -336,6 +264,7 @@
             let tabButton = document.createElement("button");
             tabButton.classList += "tab-button";
             tabButton.style.background = "url(./assets/tab"+ (i + 1) +".png)";
+            tabButton.id = "tab-" + i;
             tabButton.addEventListener('click', function(){
                 tabChange(i + 1);
             })
@@ -440,15 +369,34 @@
                         upgradeDict[i]["Cost"] = nextPrice;
                     } else {
                         dps += upgradeDict[i]["Factor"];
-                        var nextPrice =  Math.round(upgradeDict[i]["Cost"] * (1.15));
+                        var nextPrice =  Math.round(upgradeDict[i]["Cost"] * (1.2));
                         upgradeDict[i]["Cost"] = nextPrice;
                     }
       
                     upgradeDict[i].Purchased += 1;
                     refresh(clicked_id, nextPrice, i);
+                    dimHeroButton();
                     clearTooltip();
                     changeTooltip(upgradeDict[i]["Name"],"hero",i);
                 }
+            }
+        } 
+    }
+
+    // CHECK IF PRICE IS LOWER THAN CURRENT SCORE
+    function dimHeroButton() {
+        for (let i = 0; i < WISHHEROMAX; i++) {
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
+            if (upgradeDict[i]["Purchased"] < 0) continue;
+
+            let heroID = "but-" + upgradeDict[i].Row;
+            if (upgradeDict[i]["Cost"] > realScore) {
+                document.getElementById(heroID).classList.add("dim");
+                document.getElementById(heroID).classList.remove("not-dim");
+            } 
+            else if (upgradeDict[i]["Cost"] < realScore) {
+                document.getElementById(heroID).classList.add("not-dim");
+                document.getElementById(heroID).classList.remove("dim");
             }
         } 
     }
@@ -652,9 +600,84 @@
                     wishMultiplier += 5;
                     wishCounter--;
                     refresh();
+                    newPop(1);
                     break;
                 }
             }
+        }
+    }
+
+    var newPopUpOne = "";
+    function newPop(type) {
+        if (type == 1) {
+            if (newPopUpOne != "") {return}
+            else {
+            newPopUpOne = document.createElement("img")
+            newPopUpOne.src = "./assets/new.webp";
+            newPopUpOne.classList += ("pop-new pop-new-one");
+
+            let tab = document.getElementById("tab-0");
+            tab.addEventListener("click", function() {newPopUpOne.remove()})
+
+            para1.appendChild(newPopUpOne);
+            }
+        }
+    }
+    
+    // ACHIEVEMENTS
+    var achievementData = {
+    achievementTypeRawScore: [10,1e3,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24],
+    achievementTypeRawDPS:   [1,10,100,10000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21],
+    achievementTypeRawClick: [1e2,1e3,1e4,1e5,1e6],
+    achievementTypeRawCollection: [1,1e2,1e3,1e4,1e4,1e5,1e6,1e7,1e8,1e9],
+}
+
+    var scoreAchievementScore = 1;
+    var scoreAchievementDps = 101;
+    var scoreAchievementClick = 201;
+    var scoreAchievementCollection = 301;
+
+    function popAchievement(achievement) {
+        var oldAchievement = document.getElementById("tempAchievement");
+        var achievementID = 10000;
+        let achievementType = "";
+
+        if (oldAchievement != null) {
+            mainBody.removeChild(oldAchievement); 
+        }
+
+        if (achievement == "score") {
+            achievementType = scoreAchievementScore;
+            scoreAchievementScore++;
+        } else if (achievement == "dps") {
+            achievementType = scoreAchievementDps;
+            scoreAchievementDps++;
+        } 
+
+        var achievementText = achievementList[achievementType].Name;
+        var achievementDesc = achievementList[achievementType].Description;
+        achievementList[achievementType]["Done"] = true;
+        achievementID += achievementType;
+        primogem += 20;
+
+        var achievementPopUp = createAchievement(achievementText,achievementDesc);
+        achievementPopUp.addEventListener("click", function() {achievementPopUp.remove()});
+        mainBody.appendChild(achievementPopUp); 
+
+        //  ^^^ TEMP ACHIEVEMENT | PERMANENT ACHIEVEMENT vvv
+        
+        let achievementStored = storeAchievement(achievementText,achievementDesc,achievementID);
+        table5.appendChild(achievementStored); 
+        sortList("table5");
+    }
+
+    function checkAchievement() {
+        if (realScore >= achievementData["achievementTypeRawScore"][0] && achievementData["achievementTypeRawScore"].length != 0) {
+            popAchievement("score");
+            achievementData["achievementTypeRawScore"].shift();
+        } else if (dps >= achievementData["achievementTypeRawDPS"][0] && achievementData["achievementTypeRawDPS"].length != 0) {
+            popAchievement("dps");
+            achievementData["achievementTypeRawDPS"].shift();
         }
     }
 
@@ -673,7 +696,7 @@
         energyDisplay.innerText = energy;
         primogemDisplay.innerText = primogem;
         
-        if (arguments[0] != undefined){
+        if (arguments[0] != undefined) {
             if (arguments[0].includes("but-")){
                 var heroTextFirst = "";
                 var formatATK = "";
@@ -689,9 +712,9 @@
                 
                 let upgradedHeroButton = document.getElementById(arguments[0])
                 upgradedHeroButton.innerText = heroTextFirst;
-                upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeDict[arguments[2]].Name+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
+                upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeDict[arguments[2]].Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
             }
-        } else if (arguments[0] == "hero"){
+        } else if (arguments[0] == "hero") {
             let formatATK = abbrNum(upgradeDict[arguments[1]]["Factor"]);
             let formatCost = abbrNum(arguments[1]);
             var heroText =  upgradeDict[arguments[1]].Name + ": " + formatCost + ", Adds: " + formatATK + " NpS";
