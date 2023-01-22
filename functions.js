@@ -1,7 +1,7 @@
 // ABBREVIATES NUMBERS TO SHORTER FORM
 function abbrNum(number) {
    let decPlaces = Math.pow(10, 2);
-   var abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion"];
+   var abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion"];
 
    if (number > 1e6) {
        for (var i = abbrev.length - 1; i >= 0; i--) {
@@ -83,7 +83,5 @@ function unlockExpedition(i,expeditionDict) {
     unlockButton.style["background-repeat"] = "no-repeat";
     unlockButton.style["background-size"]= "93%";
 }
-
-
 
 export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition };

@@ -24,13 +24,12 @@
 
 5. Achievements
 >MUST HAVE
-	Get primogems (by doing challenges or at certain levels)
+	✔️Get primogems (by doing challenges or at certain levels)
 
 ------------------------------------------------------------
 MUST HAVE:
 Get Primogems
-	after set levels
-	getting achievements
+✔️	getting achievements
 
 ✔️ Get Energy
 	every 8-12 taps
@@ -50,7 +49,7 @@ Shop:
 	Cosmetic changes
 
 Inventory:
-	sorting
+	✔️sorting
 	%ATK/%Ele Artifacts
 
 Party:

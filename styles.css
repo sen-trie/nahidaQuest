@@ -3,10 +3,6 @@
     src: url(./assets/gi-font.ttf);
 }
 
-button:hover {
-    background-color: burlywood;
-  }
-
 .overlay {
     display: flex;
     background: url(./assets/wood.jpg);
@@ -47,7 +43,7 @@ button {
     height: 867px;
     z-index: 3;
     border: 14px ridge #ACC35B;
-    border-radius: 25px;
+    border-radius: 20px;
     pointer-events: none;
 }
 
@@ -101,6 +97,7 @@ button {
     margin-top: 2.5%;
     margin-left: 2.5%;
     position: absolute;
+    transition: 0.05s ease;
     
     background-position: center center;
     background: url(./assets/nahida.png);
@@ -157,16 +154,62 @@ img {
     filter: drop-shadow(0px 0px 3px #ffffff);
 }
 
+/* ALL POP UP CSS (New/Tut) */
 .pop-new {
     position: absolute;
     z-index: 3;
     width: 43px;
     height: 24px;
+    content: url(./assets/new.webp);
 }
 
 .pop-new-one {
     left: 848px;
-    top: -0px;
+    top: 0px;
+}
+
+.pop-new-two {
+    left: 1018px;
+    top: 0px;
+}
+
+.pop-new-three {
+    left: 1175px;
+    top: 0px;
+}
+
+/* TUTORIAL CSS */
+.tutorial-dark {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    top:-14px;
+    left: -20px;
+    width: 1684px;
+    height: 867px;
+    z-index: 3;
+    background-color: rgba(0,0,0,0.90);
+}
+
+.tutorial-screen {
+    width: 1233px;
+    height: 738px;
+    z-index: 3;
+    background: url(./assets/tutorial/tutorialFrame.webp);
+}
+
+.tutorial-img {
+    position: absolute;
+    left: 329px;
+    top: 199px;
+    width: 1019px;
+    height: 532px;
+}
+
+.tutorial-button:hover {
+    filter: drop-shadow(0px 0px 7px #57783b);
 }
 
 /* HERO UPGRADES (TABLE1) CSS */
@@ -193,7 +236,6 @@ img {
     color: white;
     font-size: 19px;
     text-shadow: #3C3C3C 3px 0px 0px, #3C3C3C 2.83487px 0.981584px 0px, #3C3C3C 2.35766px 1.85511px 0px, #3C3C3C 1.62091px 2.52441px 0px, #3C3C3C 0.705713px 2.91581px 0px, #3C3C3C -0.287171px 2.98622px 0px, #3C3C3C -1.24844px 2.72789px 0px, #3C3C3C -2.07227px 2.16926px 0px, #3C3C3C -2.66798px 1.37182px 0px, #3C3C3C -2.96998px 0.42336px 0px, #3C3C3C -2.94502px -0.571704px 0px, #3C3C3C -2.59586px -1.50383px 0px, #3C3C3C -1.96093px -2.27041px 0px, #3C3C3C -1.11013px -2.78704px 0px, #3C3C3C -0.137119px -2.99686px 0px, #3C3C3C 0.850987px -2.87677px 0px, #3C3C3C 1.74541px -2.43999px 0px, #3C3C3C 2.44769px -1.73459px 0px, #3C3C3C 2.88051px -0.838247px 0px;
-
 }
 
 :root {
@@ -203,20 +245,26 @@ img {
 }
 
 .upgrade {
+    transition: 0.4s ease;
     filter: brightness(var(--brightness)) 
             grayscale(var(--grayscale)); 
 }
 
-.upgrade:active {
+.not-dim {
+    transition: 0.3s ease;
+    --dropshadow:0px 0px 3px #000000;
+}
+
+.not-dim:hover {
+    transform:scale(1.035);
+    transition: 0.4s ease;
     filter: drop-shadow(var(--dropshadow)) 
 }
 
-.not-dim {
-    --dropshadow:0px 0px 5px #000000;
-}
-
 .dim {
-    --grayscale:50%;
+    transition: 0.6s ease;
+    --dropshadow:1px 1px 5px rgb(63, 63, 63);
+    --grayscale:100%;
     --brightness:60%;
 }
 
@@ -230,7 +278,7 @@ img {
 .flex-container-INVENTORY {
     overflow-y: auto;
     width: 652px;
-    height: 775px;
+    height: 757px;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -248,11 +296,14 @@ img {
 }
 
 /* EXPEDITION (TABLE3) CSS */
-.flex-container-EXPEDITION button{
-    opacity: 0.3;
+.flex-container-EXPEDITION button {
+    transition: 0.2s ease;
+    opacity: 0.25;
+    
 }
 
-.flex-container-EXPEDITION button:hover{
+.flex-container-EXPEDITION button:hover {
+    transition: 0.4s ease;
     opacity: 1;
 }
 
@@ -296,6 +347,12 @@ img {
     font-size: xx-large;
 }
 
+.after-icon {
+    content: url(./assets/energyIcon.png);
+    width:23px;
+    height:25px;
+}
+
 .exped-cell-two {
     width: 780px;
     font-size: 20px;
@@ -324,7 +381,14 @@ img {
     width:412px;
     height:96px;
     transition: .5s ease;
-    background:url(./assets/wishButton.png)
+    background:url(./assets/wishButton.webp);
+    font-size: 29px;
+    color: #F8E8C7;
+    text-shadow: #73603D 3px 3px 1px;
+}
+
+.wish-button:after{
+    content: url(./assets/primogemIcon.png);
 }
 
 .wish-mail {
@@ -336,9 +400,15 @@ img {
 }
 
 .wish-button:hover{
-    box-shadow: 0 0 0 10px #000000;
-    transition: .5s ease;
+    filter: drop-shadow(0px 0px 2px #ffffff);
+    transition: .3s ease;
 }
+
+.wish-button:active {
+    transform:scale(0.95);
+    transition: 0.1s ease;
+}
+
 
 /* ACHIEVEMENT (TABLE5) CSS */
 .flex-container-ACHIEVEMENT {
@@ -369,6 +439,7 @@ img {
 }
 
 .achieve:hover {
+    transition: 0.4s ease;
     background-color: yellow;
 }
 
@@ -397,7 +468,7 @@ img {
 }
 
 .table6 {
-    background: url(./assets/side-bar.png);
+    background: yellow;
     position: absolute; 
     top: 90px; 
     left: 1350px;
@@ -413,5 +484,19 @@ img {
 .table6 > div {
     padding-left: 5px;
     padding-right: 5px;
-    text-align: justify;
+}
+
+.tool-tip-name {
+    font-size: 30px;
+    text-align: center;
+}
+
+.tool-tip-text {
+    font-size: 22px;
+    text-align: center;
+}
+
+.tool-tip-lore {
+    font-size: 20px;
+    text-align: left;
 }

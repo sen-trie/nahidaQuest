@@ -14,6 +14,8 @@
             user-select: none; /* Standard syntax */
         }
 
+     
+
         /* @media only screen and (min-width: 600px) {
             body {transform: scale(0.38);transform-origin: top;};
         }
@@ -38,15 +40,26 @@
             height: 100%;
             width:100%;
             background: black;
-            /* cursor: url(./assets/cursor.png), auto;  
+            display: flex;
+            justify-content:center;
+            align-items: center;
+            cursor: url(./assets/cursor.png), auto
+            
+            /* ;  
             display:flex; 
             flex-direction:column-reverse; 
             justify-content:center;
             align-items: center; */
         }
 
+        button {
+            cursor: url(./assets/cursor.png), auto
+        }
+
         body {
             position: relative;
+            width: 1670px;
+            height: 867px;
             font-family: 'gi-font';
         }
 
@@ -54,9 +67,7 @@
 
 </head>
 <body id="bodyID" class="prevent-select">
-    <audio autoplay loop> 
-        <source src="./assets/sfx/bgm1.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="audio" autoplay src="./assets/sfx/bgm1.mp3" type="audio/mpeg"> </audio>
     <p id="para">
         <div class="energy-primo-container">
             <div class="pill-value">
@@ -105,9 +116,9 @@
         clickCountDef:0,
         clickFactorDef:1,
         dpsDef:0,
-        realScoreDef:1e20,
+        realScoreDef:0.99e9,
         freeLevelsDef:0,
-        primogemDef:1000,
+        primogemDef:11000,
         energyDef:1000,
         rowCountDef:0,
         itemCountDef:0,
@@ -129,10 +140,6 @@
     const upperEnergyRate = 15;
     const lowerEnergyRate = 7;
     var clickDelay = 10;
-    
-    // RMB TO UPDATE CONSTANTS
-    const weaponBuffPercent = [0, 10, 100, 1000, 10000, 100000];
-    const artifactBuffPercent = [0, 1.02, 1.05, 1.10, 1.20, 1.35];
     
     const WEAPONMAX = 1009;
     const ARTIFACTMAX = 2104;
@@ -178,14 +185,12 @@
     // INITIAL LOADING
     loading();
     var upgradeDict = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX);
-    tabChange(1);
     refresh();
 
-    var siteWidth = 1880;
-    var scale = screen.height / (siteWidth);
-    console.log(scale)
+    var siteWidth = 1080;
+    var scale = screen.width / (siteWidth);
 
-    document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale+'', 'user-scalable=no');
+    document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
 
     realScore++;
     addNewRow();
@@ -195,7 +200,9 @@
     createExpedTable(expedDiv);
     para1.appendChild(expedDiv);
 
-    drawWish()
+    drawWish();
+    playAudio();
+    tabChange(1);
     var timer = setInterval(timerEvents,1000000);
 
     // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH SET TO 0.5 SECONDS)
@@ -221,21 +228,38 @@
                 overlay.removeChild(overlay.firstElementChild);
                 overlay.classList -= "overlay";
                 timer = setInterval(timerEvents,500);
+                tutorial();
             }, 200);
-            
         }
     } 
-    
+
+    var currentSong = 1;
+    var nextSong = "";
+    function playAudio() {
+        document.getElementById('audio').addEventListener('ended', function() {
+            currentSong++;
+            nextSong = "./assets/sfx/bgm"+currentSong+".mp3";
+            let audioPlayer = document.getElementById('audio');
+            audioPlayer.src = nextSong;
+            audioPlayer.load();
+            audioPlayer.play();
+            if (currentSong == 5) {currentSong = 1;}
+        }, false);
+    }
+
     // TOOLTIP UI
     var tooltipName = document.createElement("div");
+    tooltipName.classList += "tool-tip-name";
 
     var toolImg = document.createElement("img");
     toolImg.src = "./assets/tooltips/Empty.webp";
     toolImg.style = "width:250px;height:250px;";
     
-    // var tooltipLore= document.createElement("div");
     var tooltipText = document.createElement("div");
+    tooltipText.classList += "tool-tip-text";
     var tooltipLore= document.createElement("div");
+    tooltipLore.classList += "tool-tip-lore";
+
     table6.append(tooltipName,toolImg,tooltipText,tooltipLore);
 
     function changeTooltip(name, type, ID) {
@@ -244,8 +268,9 @@
         toolImg.src = "./assets/tooltips/"+name+".webp";
 
         if (type == "hero") {
-            tooltipText.innerText = "Times upgraded: " + upgradeDict[ID]["Purchased"];
-            
+            tooltipText.innerHTML += "Times upgraded: " + upgradeDict[ID]["Purchased"];
+            tooltipText.innerHTML += "\n Weapon: " + upgradeDict[ID]["Type"];
+            tooltipText.innerHTML += "\n Element: " + upgradeDict[ID]["Ele"];
         }
     }
 
@@ -290,7 +315,46 @@
          } else {
             expedDiv.style.display = "none";
          }
+
+         if (x-1 != 3) {
+            let mailImage = document.getElementById("mailImageID");
+            mailImage.src = "./assets/open.png";
+         } else {
+            return;
+         }
     }
+
+    unlockExpedition(3,expeditionDict);
+    unlockExpedition(4,expeditionDict);
+
+    function tutorial() {
+        var currentSlide = 1;
+        var tutorialDark = document.createElement("div");
+        tutorialDark.classList.add("tutorial-dark");
+
+        var tutorialImage = document.createElement("img");
+        tutorialImage.classList.add("tutorial-img");
+        tutorialImage.id = "tutorialImg";
+        tutorialImage.src = "./assets/tutorial/tut-1.jpg"
+        
+        var tutorialScreen = document.createElement("div");
+        tutorialScreen.classList.add("tutorial-screen");
+        tutorialScreen.addEventListener("click", function() {
+            if (currentSlide == 4) {
+                tutorialDark.remove();
+                return;
+            }
+
+            currentSlide++;
+            let currentTutorialImage = document.getElementById("tutorialImg");
+            currentTutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".jpg";
+        })
+
+        tutorialScreen.appendChild(tutorialImage);
+        tutorialDark.appendChild(tutorialScreen);
+        para1.appendChild(tutorialDark)
+    } 
+
 
     // BIG BUTTON FUNCTIONS
     var demo = document.getElementById("demo");
@@ -408,9 +472,9 @@
         let buttonInv = document.createElement("button");
 
         buttonInv.id = itemUniqueID;
-        buttonInv.addEventListener('click', function(){
-            itemUse(itemUniqueID);
-        });
+        buttonInv.addEventListener('click', function() {itemUse(itemUniqueID);});
+        buttonInv.addEventListener('mouseover', function() {changeTooltip(Inventory[idNum].Name, "item", 1)})
+        buttonInv.addEventListener('mouseout', function() {clearTooltip();})
 
         buttonInv.classList += "inventoryButton";
         buttonInv.style.background = "url(./assets/inventory/" + Inventory[idNum].Name + ".jpg)";
@@ -420,15 +484,20 @@
     }
 
     // INVENTORY UI
+    // RMB TO UPDATE CONSTANTS
+    const weaponBuffPercent = [0, 1.1, 1.3, 1.7, 2.3, 3];
+    const artifactBuffPercent = [0, 1.02, 1.05, 1.10, 1.20, 1.35];
+
     function itemUse(itemUniqueId) {
         let item = document.getElementById(itemUniqueId);
         let itemID = itemUniqueId.split(".")[0];
         if (itemID >= 1001 && itemID < WEAPONMAX){
-            for (let i = 0; i < Object.keys(upgradeDict).length; i++) {
+            for (let i = 0; i < WISHHEROMAX; i++) {
                 if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1 && Inventory[i] == undefined) continue;
                 if (upgradeDict[i].Purchased > 0){
                     if (upgradeDict[i].Type == Inventory[itemID].Type){
-                        upgradeDict[i]["Factor"] += weaponBuffPercent[Inventory[itemID].Star];
+                        upgradeDict[i]["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
+                        upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                         refresh("hero", i);
                     }
                 }
@@ -438,7 +507,7 @@
                 if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1 && Inventory[i] == undefined) continue;
                 if (upgradeDict[i].Purchased > 0){
                     upgradeDict[i]["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
-                    upgradeDict[i]["Factor"] = Math.round(upgradeDict[i]["Factor"]);
+                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
                 }
             }
@@ -450,9 +519,7 @@
     }
 
     // EXPEDITION MECHANICS
-    // RMB THERES A CHANCE OF FAILURE, IT IS NOT A BUG IF NOTHING HAPPENS
     const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
-    const ADVENTUREFAILURE = [0, 0, 5, 10, 20, 30];
 
     function adventure(type) {
         if (expeditionDict[type].Locked == '1'){
@@ -462,44 +529,40 @@
             if (energy >= ADVENTURECOSTS[type]){
                 energy -= ADVENTURECOSTS[type];
                 refresh();
-
-                let randInt = randomInteger(0, 99);
-                if (randInt < ADVENTUREFAILURE[type]){
-                    return;
-                } else {
-                    if (type == 1){
-                    inventoryDraw("artifact", 1, 4);
-                    inventoryDraw("weapon", 1, 1);
-                    inventoryDraw("xp", 2, 2);
-                    inventoryDraw("food", 1, 3);
-                    }
-                    if (type == 2){
-                        inventoryDraw("xp", 2, 2);
-                        inventoryDraw("xp", 2, 2);
-                        inventoryDraw("food", 2, 3);
-                        inventoryDraw("artifact", 2, 4);
-                        inventoryDraw("weapon", 1, 2);
-                    }
-                    if (type == 3){
-                        inventoryDraw("xp", 2, 3);
-                        inventoryDraw("artifact", 3, 4);
-                        inventoryDraw("food", 2, 4);
-                        inventoryDraw("weapon", 2, 3);
-                    }
-                    if (type == 4){
-                        inventoryDraw("weapon", 3, 4);
-                        inventoryDraw("artifact", 3, 4);
-                        inventoryDraw("xp", 3, 4);
-                        inventoryDraw("food", 2, 4);
-                    }
-                    if (type == 5){
-                        inventoryDraw("artifact", 4, 5);
-                        inventoryDraw("weapon", 4, 5);
-                        inventoryDraw("food", 2, 5);
-                        inventoryDraw("xp", 4, 4);
-                    }
-                    sortList("table2");
+                
+                if (type == 1){
+                inventoryDraw("artifact", 1, 4);
+                inventoryDraw("weapon", 1, 1);
+                inventoryDraw("xp", 2, 2);
+                inventoryDraw("food", 1, 3);
                 }
+                if (type == 2){
+                    inventoryDraw("xp", 2, 2);
+                    inventoryDraw("xp", 2, 2);
+                    inventoryDraw("food", 2, 3);
+                    inventoryDraw("artifact", 2, 4);
+                    inventoryDraw("weapon", 1, 2);
+                }
+                if (type == 3){
+                    inventoryDraw("xp", 2, 3);
+                    inventoryDraw("artifact", 3, 4);
+                    inventoryDraw("food", 2, 4);
+                    inventoryDraw("weapon", 2, 3);
+                }
+                if (type == 4){
+                    inventoryDraw("weapon", 3, 4);
+                    inventoryDraw("artifact", 3, 4);
+                    inventoryDraw("xp", 3, 4);
+                    inventoryDraw("food", 2, 4);
+                }
+                if (type == 5){
+                    inventoryDraw("artifact", 4, 5);
+                    inventoryDraw("weapon", 4, 5);
+                    inventoryDraw("food", 2, 5);
+                    inventoryDraw("xp", 4, 4);
+                }
+                sortList("table2");
+                newPop(2);
             }  
         }   
     }
@@ -546,9 +609,14 @@
         }
     }
 
-    function expedInfo(butId){
-        let expedTableTemp = document.getElementById("expedTableID")
+    function expedInfo(butId) {
+        let expedTableTemp = document.getElementById("expedTableID");
         let i = 0;
+
+        let afterEnergyIcon = document.createElement("img");
+        afterEnergyIcon.classList += "after-icon";
+        afterEnergyIcon.id = "afterEnergyIcon"
+        
         if (butId == 7) {
             i = 7;
         } else {
@@ -556,11 +624,17 @@
         }
 
         if (expeditionDict[i]["Locked"] == 0 || i == 7) {
-            expedTableTemp.rows[0].cells[0].innerText = expeditionDict[i]["Text"];
+            expedTableTemp.rows[0].cells[0].innerHTML = expeditionDict[i]["Text"];
             expedTableTemp.rows[1].cells[0].innerText = expeditionDict[i]["Lore"];
+            expedTableTemp.rows[0].cells[0].appendChild(afterEnergyIcon);
         } else {
-            expedTableTemp.rows[0].cells[0].innerText = expeditionDict[6]["Text"];
+            expedTableTemp.rows[0].cells[0].innerHTML = expeditionDict[6]["Text"];
             expedTableTemp.rows[1].cells[0].innerText = expeditionDict[6]["Lore"];
+        }
+
+        if (i == 7) {
+            let afterEnergyRemove = document.getElementById("afterEnergyIcon");
+            afterEnergyRemove.remove();
         }
     }
 
@@ -568,17 +642,17 @@
     function drawWish() {
         let wishButton = document.createElement("button");
         wishButton.classList += "wish-button";
-        wishButton.innerText = "Write for help"
+        wishButton.innerText = "Write for help | 160 "
         wishButton.addEventListener("click",function() {
-            let mailImage = document.getElementById("mailImage")
-            mailImage.src = "./assets/closed.png"
+            let mailImageTemp = document.getElementById("mailImageID")
+            mailImageTemp.src = "./assets/closed.png"
             wish();
         });
         table4.appendChild(wishButton);
 
         let mailImage = document.createElement("img");
         mailImage.src = "./assets/open.png";
-        mailImage.id = "mailImage"
+        mailImage.id = "mailImageID"
         mailImage.classList += "wish-mail";
         table4.appendChild(mailImage);
     }
@@ -592,12 +666,11 @@
                 if (upgradeDict[i].Purchased >= -1) {
                     continue;
                 } else {
-                    
                     upgradeDict[i].Purchased = -1;
-                    upgradeDict[i]["Factor"] = Math.round(dps * (STARTINGWISHFACTOR + wishMultiplier)/30);
-                    upgradeDict[i]["Cost"] = Math.round(dps * (20));
+                    upgradeDict[i]["Factor"] = Math.round(dps * (STARTINGWISHFACTOR + wishMultiplier)/50 + 1);
+                    upgradeDict[i]["Cost"] = Math.round(dps * (55) + 1);
 
-                    wishMultiplier += 5;
+                    wishMultiplier += 1.5;
                     wishCounter--;
                     refresh();
                     newPop(1);
@@ -607,35 +680,62 @@
         }
     }
 
+    // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION
     var newPopUpOne = "";
+    var newPopUpTwo = "";
+    var newPopUpThree = "";
     function newPop(type) {
         if (type == 1) {
             if (newPopUpOne != "") {return}
             else {
             newPopUpOne = document.createElement("img")
-            newPopUpOne.src = "./assets/new.webp";
             newPopUpOne.classList += ("pop-new pop-new-one");
 
             let tab = document.getElementById("tab-0");
-            tab.addEventListener("click", function() {newPopUpOne.remove()})
+            tab.addEventListener("click", function() {
+                if (newPopUpOne != "") {newPopUpOne.remove();};
+                newPopUpOne = "";})
 
             para1.appendChild(newPopUpOne);
+            }
+        } else if (type == 2) {
+            if (newPopUpTwo != "") {return}
+            else {
+            newPopUpTwo = document.createElement("img")
+            newPopUpTwo.classList += ("pop-new pop-new-two");
+
+            let tab = document.getElementById("tab-1");
+            tab.addEventListener("click", function() {
+                if (newPopUpTwo != "") {newPopUpTwo.remove();};
+                newPopUpTwo = ""})
+
+            para1.appendChild(newPopUpTwo);
+            }
+        } else if (type == 3) {
+            if (newPopUpThree != "") {return}
+            else {
+            newPopUpThree = document.createElement("img")
+            newPopUpThree.classList += ("pop-new pop-new-three");
+
+            let tab = document.getElementById("tab-2");
+            tab.addEventListener("click", function() {
+                if (newPopUpThree != "") {newPopUpThree.remove();};
+                newPopUpThree = ""})
+
+            para1.appendChild(newPopUpThree);
             }
         }
     }
     
     // ACHIEVEMENTS
     var achievementData = {
-    achievementTypeRawScore: [10,1e3,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24],
-    achievementTypeRawDPS:   [1,10,100,10000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21],
-    achievementTypeRawClick: [1e2,1e3,1e4,1e5,1e6],
-    achievementTypeRawCollection: [1,1e2,1e3,1e4,1e4,1e5,1e6,1e7,1e8,1e9],
-}
+        achievementTypeRawScore: [10,1e3,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24],
+        achievementTypeRawDPS:   [1,10,100,10000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21],
+        achievementTypeRawClick: [1e2,1e3,1e4,1e5,1e6],
+        achievementTypeRawCollection: [1e1,1e2,1e3,1e4,1e5],
+    };
 
-    var scoreAchievementScore = 1;
-    var scoreAchievementDps = 101;
-    var scoreAchievementClick = 201;
-    var scoreAchievementCollection = 301;
+    var scoreAchievement = [1,101,201,301];
 
     function popAchievement(achievement) {
         var oldAchievement = document.getElementById("tempAchievement");
@@ -647,11 +747,11 @@
         }
 
         if (achievement == "score") {
-            achievementType = scoreAchievementScore;
-            scoreAchievementScore++;
+            achievementType = scoreAchievement[0];
+            scoreAchievement[0]++;
         } else if (achievement == "dps") {
-            achievementType = scoreAchievementDps;
-            scoreAchievementDps++;
+            achievementType = scoreAchievement[1];
+            scoreAchievement[1]++;
         } 
 
         var achievementText = achievementList[achievementType].Name;
@@ -672,12 +772,18 @@
     }
 
     function checkAchievement() {
-        if (realScore >= achievementData["achievementTypeRawScore"][0] && achievementData["achievementTypeRawScore"].length != 0) {
-            popAchievement("score");
-            achievementData["achievementTypeRawScore"].shift();
-        } else if (dps >= achievementData["achievementTypeRawDPS"][0] && achievementData["achievementTypeRawDPS"].length != 0) {
-            popAchievement("dps");
-            achievementData["achievementTypeRawDPS"].shift();
+        if (achievementData["achievementTypeRawScore"].length != 0){
+            if (realScore >= achievementData["achievementTypeRawScore"][0]) {
+                popAchievement("score");
+                achievementData["achievementTypeRawScore"].shift();
+            }
+        } 
+        
+        if (achievementData["achievementTypeRawDPS"].length != 0){
+            if (dps >= achievementData["achievementTypeRawDPS"][0]) {
+                popAchievement("dps");
+                achievementData["achievementTypeRawDPS"].shift();
+            }
         }
     }
 
@@ -701,23 +807,30 @@
                 var heroTextFirst = "";
                 var formatATK = "";
                 if (arguments[2] == 0) {
+                    var singular = "";
+                    if (upgradeDict[arguments[2]]["Factor"] == 1) {
+                        singular = " Nut per Click";
+                    } else {
+                        singular = " Nuts per Click";
+                    }
+
                     var formatCost = abbrNum(arguments[1]);
                     formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
-                    heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", " + formatATK + " Nuts per Click";
+                    heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", " + formatATK + singular;
                 } else {
                     var formatCost = abbrNum(arguments[1]);
                     formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
-                    heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", Adds: " + formatATK + " NpS";
+                    heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", +" + formatATK + " NpS";
                 }
                 
-                let upgradedHeroButton = document.getElementById(arguments[0])
+                let upgradedHeroButton = document.getElementById(arguments[0]);
                 upgradedHeroButton.innerText = heroTextFirst;
                 upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeDict[arguments[2]].Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
             }
         } else if (arguments[0] == "hero") {
             let formatATK = abbrNum(upgradeDict[arguments[1]]["Factor"]);
             let formatCost = abbrNum(arguments[1]);
-            var heroText =  upgradeDict[arguments[1]].Name + ": " + formatCost + ", Adds: " + formatATK + " NpS";
+            var heroText =  upgradeDict[arguments[1]].Name + ": " + formatCost + ", " + formatATK + " NpS";
             let id="but-" + arguments[1].rowCount + "";
             document.getElementById(id).innerText = heroText;
         }
