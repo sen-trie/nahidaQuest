@@ -23,6 +23,18 @@ function abbrNum(number) {
    }
 };
 
+// GET HIGHEST KEY IN AN OBJECT
+function getHighestKey(obj) {
+    var highestValue = 0;
+    obj =  Object.keys(obj)
+    for (const key of Object.keys(obj)) {
+        if (parseInt(obj[key]) > highestValue) {
+            highestValue = obj[key];
+        }
+    }
+    return parseInt(highestValue);
+}
+
 // RANDOM NUMBER GENERATOR
 function randomInteger(min, max) {
     return Math.floor(Math.random() * (max - min) ) + min;
@@ -84,4 +96,4 @@ function unlockExpedition(i,expeditionDict) {
     unlockButton.style["background-size"]= "93%";
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition };
+export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey };

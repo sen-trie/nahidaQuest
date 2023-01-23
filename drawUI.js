@@ -38,28 +38,13 @@ function demoFunction() {
         demo.style["margin-top"] = '4%';
         demo.style["margin-left"] = '4%';
     }
-
-    function mouseOver() {
+    
+    demo.onmouseup = function () {
         demo.style.width = "98%";
         demo.style.height = "98%";
         demo.style["margin-top"] = '1%';
         demo.style["margin-left"] = '1%';
-    }
-
-    demo.onmouseover = function () {
-        mouseOver();
     };
-    
-    demo.onmouseup = function () {
-        mouseOver()
-    };
-
-    demo.onmouseout = function() {
-        demo.style.width = "95%";
-        demo.style.height = "95%";
-        demo.style["margin-top"] = '2.5%';
-        demo.style["margin-left"] = '2.5%';
-    }
 }
 
 function createHeroButtonContainer(heroID,heroText) {

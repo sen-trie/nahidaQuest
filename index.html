@@ -9,13 +9,12 @@
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <style type="text/css">
         .prevent-select {
-            -webkit-user-select: none; /* Safari */
-            -ms-user-select: none; /* IE 10 and IE 11 */
-            user-select: none; /* Standard syntax */
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
-     
-
+    
         /* @media only screen and (min-width: 600px) {
             body {transform: scale(0.38);transform-origin: top;};
         }
@@ -42,14 +41,8 @@
             background: black;
             display: flex;
             justify-content:center;
-            align-items: center;
-            cursor: url(./assets/cursor.png), auto
-            
-            /* ;  
-            display:flex; 
-            flex-direction:column-reverse; 
-            justify-content:center;
-            align-items: center; */
+            align-items: flex-end;
+            cursor: url(./assets/cursor.png), auto;
         }
 
         button {
@@ -67,7 +60,6 @@
 
 </head>
 <body id="bodyID" class="prevent-select">
-    <audio id="audio" autoplay src="./assets/sfx/bgm1.mp3" type="audio/mpeg"> </audio>
     <p id="para">
         <div class="energy-primo-container">
             <div class="pill-value">
@@ -108,34 +100,11 @@
     <div id="body-border"></div>
 
 <script type="module">
-    import { upgradeDictDefault,Inventory,tooltip,expeditionDict,achievementList } from "./defaultData.js"
-    import { abbrNum,randomInteger,sortList,generateHeroPrices, unlockExpedition } from "./functions.js"
+    import { upgradeDictDefault,Inventory,tooltip,expeditionDict,achievementList,saveValuesDefault } from "./defaultData.js"
+    import { abbrNum,randomInteger,sortList,generateHeroPrices, unlockExpedition,getHighestKey } from "./functions.js"
     import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement } from "./drawUI.js"
 
-    var saveValues = {
-        clickCountDef:0,
-        clickFactorDef:1,
-        dpsDef:0,
-        realScoreDef:0.99e9,
-        freeLevelsDef:0,
-        primogemDef:11000,
-        energyDef:1000,
-        rowCountDef:0,
-        itemCountDef:0,
-    }
-
-    var clickCount = saveValues["clickCountDef"];
-    var clickFactor = saveValues["clickFactorDef"];
-    var dps = saveValues["dpsDef"];
-    var realScore = saveValues["realScoreDef"];
-
-    var freeLevels = saveValues["freeLevelsDef"];
-    var primogem = saveValues["primogemDef"];
-    var energy = saveValues["energyDef"];
-
-    var rowCount = saveValues["rowCountDef"];
-    var itemCount = saveValues["itemCountDef"];
-
+    var saveValues;
     const ENERGYCHANCE = 500;
     const upperEnergyRate = 15;
     const lowerEnergyRate = 7;
@@ -148,12 +117,10 @@
 
     const NONWISHHEROMAX = 49
     const WISHHEROMIN = 100;
-    const WISHHEROMAX = 113;
+    
     const WISHCOST = 160;
     const STARTINGWISHFACTOR = 50;
-
     var wishMultiplier = 0;
-    var wishCounter = WISHHEROMAX - WISHHEROMIN;
 
     var demoContainer = document.getElementById("demo-container");
     var score = document.getElementById("score");
@@ -183,68 +150,99 @@
     expedDiv.style.display = "none";
 
     // INITIAL LOADING
-    loading();
-    var upgradeDict = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX);
+    loadingAnimation();
+    var upgradeDict = "";
+    loadSaveData();
+
+    var WISHHEROMAX = getHighestKey(upgradeDict) + 1;
     refresh();
 
-    var siteWidth = 1080;
-    var scale = screen.width / (siteWidth);
-
-    document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
-
-    realScore++;
+    saveValues["realScore"]++;
     addNewRow();
-    realScore--;
+    saveValues["realScore"]--;
 
     createExpedition();
     createExpedTable(expedDiv);
     para1.appendChild(expedDiv);
-
+    settings();
+    
     drawWish();
-    playAudio();
     tabChange(1);
     var timer = setInterval(timerEvents,1000000);
+    
 
     // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH SET TO 0.5 SECONDS)
     function timerEvents() {
         checkAchievement();
-        realScore += 0.5 * dps;
+        saveValues["realScore"] += 0.5 * saveValues["dps"];
         refresh();
-        addNewRow();
         dimHeroButton();
+        addNewRow();
     } 
 
-    function loading() {
+    // ALL LOAD FUNCTIONS
+    // LOAD SAVE DATA
+    function loadSaveData() {
+        // LOAD VALUES DATA
+        if (localStorage.getItem("saveValuesSave") == null) {
+            saveValues = saveValuesDefault;
+        } else {
+            let saveValuesTemp = localStorage.getItem("saveValuesSave");
+            saveValues = JSON.parse(saveValuesTemp)
+        }
+        // LOAD HEROES DATA
+        if (localStorage.getItem("upgradeDictSave") == null) {
+            let upgradeDictTemp = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX);
+            upgradeDict = upgradeDictTemp;
+        } else {
+            let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
+            upgradeDict = JSON.parse(upgradeDictTemp);
+            var timer2 = setTimeout(loadRow,1000);
+        }
+    }
+       
+    function loadingAnimation() {
+        var siteWidth = 1080;
+        var scale = screen.width / (siteWidth);
+        document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
+
         var overlay = document.getElementById("body-border");
-        overlay.classList += "overlay";
-        let loadGif = document.createElement("img")
-        loadGif.src = "./assets/loading.gif"
-        loadGif.style = "width:1000px;height:563px;"
+        overlay.classList.add("overlay");
+        let loadGif = document.createElement("img");
+        loadGif.src = "./assets/loading.gif";
+        loadGif.style.cssText = "width:1000px;height:563px;";
         overlay.appendChild(loadGif);
         setTimeout(removeLoading, 800);
+    }
 
-        function removeLoading() {
-            setTimeout(function() {
-                overlay.removeChild(overlay.firstElementChild);
-                overlay.classList -= "overlay";
-                timer = setInterval(timerEvents,500);
-                tutorial();
-            }, 200);
-        }
-    } 
+    function removeLoading() {
+        setTimeout(() => {
+            let overlay = document.getElementById("body-border");
+            overlay.removeChild(overlay.firstElementChild);
+            overlay.classList.remove("overlay");
+            timer = setInterval(timerEvents,500);
+            tutorial();
+        }, 200);
+    }
 
+    // SETUP AUDIO API
     var currentSong = 1;
     var nextSong = "";
     function playAudio() {
-        document.getElementById('audio').addEventListener('ended', function() {
+        var bgmElement = new Audio("./assets/sfx/bgm1.mp3");
+        bgmElement.id = "bgm";
+        bgmElement.play();
+        
+        bgmElement.addEventListener('ended', () => {
             currentSong++;
             nextSong = "./assets/sfx/bgm"+currentSong+".mp3";
-            let audioPlayer = document.getElementById('audio');
-            audioPlayer.src = nextSong;
-            audioPlayer.load();
-            audioPlayer.play();
+            bgmElement.src = nextSong;
+            bgmElement.load();
+            bgmElement.play();
             if (currentSong == 5) {currentSong = 1;}
         }, false);
+
+        return bgmElement;
     }
 
     // TOOLTIP UI
@@ -290,7 +288,7 @@
             tabButton.classList += "tab-button";
             tabButton.style.background = "url(./assets/tab"+ (i + 1) +".png)";
             tabButton.id = "tab-" + i;
-            tabButton.addEventListener('click', function(){
+            tabButton.addEventListener('click', () =>{
                 tabChange(i + 1);
             })
             tabFlex.appendChild(tabButton);
@@ -310,23 +308,15 @@
             table6.style["z-index"] = -1; 
          }
 
-         if (x-1 == 2) {
-            expedDiv.style.display = "block";
-         } else {
-            expedDiv.style.display = "none";
-         }
+         expedDiv.style.display = (x - 1 === 2) ? 'block' : 'none';
 
          if (x-1 != 3) {
-            let mailImage = document.getElementById("mailImageID");
-            mailImage.src = "./assets/open.png";
-         } else {
-            return;
+            let mailImageTemp = document.getElementById("mailImageID")
+             mailImageTemp.style.opacity = 1;
          }
     }
-
-    unlockExpedition(3,expeditionDict);
-    unlockExpedition(4,expeditionDict);
-
+    
+    // TUTORIAL UPON FIRST LOAD
     function tutorial() {
         var currentSlide = 1;
         var tutorialDark = document.createElement("div");
@@ -339,9 +329,11 @@
         
         var tutorialScreen = document.createElement("div");
         tutorialScreen.classList.add("tutorial-screen");
-        tutorialScreen.addEventListener("click", function() {
+        tutorialScreen.addEventListener("click", () => {
             if (currentSlide == 4) {
                 tutorialDark.remove();
+                var currentBGM = playAudio();
+                settingsVolume(currentBGM);
                 return;
             }
 
@@ -352,15 +344,63 @@
 
         tutorialScreen.appendChild(tutorialImage);
         tutorialDark.appendChild(tutorialScreen);
-        para1.appendChild(tutorialDark)
-    } 
+        para1.appendChild(tutorialDark);
+    }
 
+    // SETTINGS MENU
+    var settingsOpen = false;
+    function settings() {
+        var settingsMenu = document.createElement("div");
+        settingsMenu.id = "settings-menu";
+        settingsMenu.classList.add("settings-menu");
+
+        var volumeScroller = document.createElement("input");
+        volumeScroller.type = "range";
+        volumeScroller.min = "0";
+        volumeScroller.max = "100";
+        volumeScroller.value = "50";
+        volumeScroller.id = "volume-scroller";
+
+        var saveSetting = document.createElement("button");
+        saveSetting.classList.add("setting-save");
+        saveSetting.addEventListener("click",() => {
+            localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
+            localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
+        })
+        var clearSetting = document.createElement("button");
+        clearSetting.classList.add("setting-clear");
+        clearSetting.addEventListener("click",() => {localStorage.clear();location.reload()})
+
+        settingsMenu.append(volumeScroller, saveSetting, clearSetting);
+        mainBody.appendChild(settingsMenu);
+
+        let settingButton = document.createElement("button");
+        settingButton.classList.add("settings-button");
+        settingButton.addEventListener("click", () => {
+            if (settingsOpen == false) {
+                settingsMenu.style.zIndex = 4;
+                settingsOpen = true;
+            }
+            else {
+                settingsMenu.style.zIndex = -1;
+                settingsOpen = false;
+            }
+        })
+        para1.appendChild(settingButton);
+    }
+
+    function settingsVolume(bgmElement) {
+        let volumeScroller = document.getElementById('volume-scroller');
+        volumeScroller.addEventListener("change", function() {
+            bgmElement.volume = this.value / 100;
+        });
+    }
 
     // BIG BUTTON FUNCTIONS
     var demo = document.getElementById("demo");
-    demo.addEventListener("click", function() {
-        clickCount += 1;
-        realScore += 1 * clickFactor;
+    demo.addEventListener("click", () => {
+        saveValues["clickCount"] += 1;
+        saveValues["realScore"] += 1 * saveValues["clickFactor"];
         energyRoll();
         refresh();
     });
@@ -373,19 +413,68 @@
 
         if (clickDelay < 1){
             if (randInt < ENERGYCHANCE){
-                energy += randomInteger(lowerEnergyRate, upperEnergyRate);
+                saveValues["energy"] += randomInteger(lowerEnergyRate, upperEnergyRate);
                 clickDelay = 20;
             }
         }
     }
     
-    // SPAWN NEW HEROES IN LIST
+    // LOAD SAVED HEROES IN TABLE1
+    var rowTempDict = {};
+    function loadRow() {
+        for (let i = 0; i < WISHHEROMAX; i++) {
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX || upgradeDict[i] == undefined) continue;
+            if (upgradeDict[i].Row > -1){
+                rowTempDict[[upgradeDict[i].Row]] = i;
+            }
+        }
+        
+        for (let j = 0; j < Object.keys(rowTempDict).length; j++) {
+            let loadedHeroID = rowTempDict[j]
+            var heroTextLoad;
+            var heroPurchasedOnceStyle;
+            var purchased = false;
+            if (upgradeDict[loadedHeroID]["Purchased"] > 0) {
+                let formatCost = abbrNum(upgradeDict[loadedHeroID]["Cost"]);
+                let formatATK = abbrNum(upgradeDict[loadedHeroID]["Factor"]);
+                purchased = true;
+                if (j == 0) {
+                    let singular = ` Nut${upgradeDict[j]["Factor"] !== 1 ? 's' : ''} per click`;
+                    heroTextLoad =  upgradeDict[j].Name + ": " + formatCost + ", " + formatATK + singular;
+                } else {
+                    heroTextLoad =  upgradeDict[loadedHeroID].Name + ": " + formatCost + ", +" + formatATK + " NpS";
+                }
+            } else {
+                if (upgradeDict[loadedHeroID]["Level"] == 0) {
+                    heroTextLoad = "Summon " + upgradeDict[loadedHeroID].Name + " for help. (" + abbrNum(upgradeDict[loadedHeroID]["Cost"]) + ")";
+                } else if (j == 0) {
+                    heroTextLoad = "Level Up Nahida (" + abbrNum(upgradeDict[j]["Cost"]) + ")";
+                } else {
+                    heroTextLoad = "Call for " + upgradeDict[loadedHeroID].Name + "'s help... (" + abbrNum(upgradeDict[loadedHeroID]["Cost"]) + ")";
+                }
+            }
+
+            let heroID = "but-" + j;
+            let heroButtonContainer = createHeroButtonContainer(heroID,heroTextLoad);
+            let toolName = upgradeDict[loadedHeroID].Name;
+            if (purchased == true) {heroButtonContainer.style="background:url(./assets/nameplates/"+upgradeDict[loadedHeroID].Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;"}
+
+            heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", rowTempDict[j])});
+            heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
+            heroButtonContainer.addEventListener("click", () => {upgrade(heroID)});
+            table1.appendChild(heroButtonContainer);
+        }
+    }
+
+    // ADD NEW HEROES TO TABLE1
     function addNewRow() {
         for (let i = 0; i < WISHHEROMAX; i++) {
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
-            if (realScore >= upgradeDict[i]["Level"] && upgradeDict[i].Purchased == -1){
-                upgradeDict[i].Row = rowCount;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX || upgradeDict[i] == undefined) continue;
+            if (upgradeDict[i].Row != -1) continue;
+            if (saveValues["realScore"] >= upgradeDict[i]["Level"] && upgradeDict[i].Purchased == -1){
+                upgradeDict[i].Row = saveValues["rowCount"];
                 upgradeDict[i].Purchased = 0;
+                console.log(upgradeDict[i])
                 
                 if (upgradeDict[i]["Level"] == 0) {
                     var heroText = "Summon " + upgradeDict[i].Name + " for help. (" + abbrNum(upgradeDict[i]["Cost"]) + ")";
@@ -395,16 +484,16 @@
                     var heroText = "Call for " + upgradeDict[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["Cost"]) + ")";
                 }
 
-                let heroID = "but-" + rowCount;
+                let heroID = "but-" + saveValues["rowCount"];
                 let heroButtonContainer = createHeroButtonContainer(heroID,heroText);
                 let toolName = upgradeDict[i].Name;
                 
-                heroButtonContainer.addEventListener("mouseover", function() {changeTooltip(toolName, "hero", i)});
-                heroButtonContainer.addEventListener("mouseout", function() {clearTooltip()});
-                heroButtonContainer.addEventListener("click", function() {upgrade(heroID)});
+                heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", i)});
+                heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
+                heroButtonContainer.addEventListener("click", () => {upgrade(heroID)});
 
                 table1.appendChild(heroButtonContainer);
-                rowCount++;
+                saveValues["rowCount"]++;
             }
         }
     }
@@ -416,23 +505,23 @@
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i].Row == butIdArray) {
                 let freePass = false;
-                if (freeLevels > 0){
+                if (saveValues["freeLevels"] > 0){
                     freePass = true;
                 }
 
-                if (realScore >= upgradeDict[i]["Cost"]) {
+                if (saveValues["realScore"] >= upgradeDict[i]["Cost"]) {
                     if (freePass == true) {
-                        realScore += upgradeDict[i]["Cost"];
-                        freeLevels--;
+                        saveValues["realScore"] += upgradeDict[i]["Cost"];
+                        saveValues["freeLevels"]--;
                     }
 
-                    realScore -= upgradeDict[i]["Cost"];
+                    saveValues["realScore"] -= upgradeDict[i]["Cost"];
                     if (i == 0) {
-                        clickFactor += upgradeDict[i]["Factor"];
+                        saveValues["clickFactor"] += upgradeDict[i]["Factor"];
                         var nextPrice =  Math.round(upgradeDict[i]["Cost"] * (1.3));
                         upgradeDict[i]["Cost"] = nextPrice;
                     } else {
-                        dps += upgradeDict[i]["Factor"];
+                        saveValues["dps"] += upgradeDict[i]["Factor"];
                         var nextPrice =  Math.round(upgradeDict[i]["Cost"] * (1.2));
                         upgradeDict[i]["Cost"] = nextPrice;
                     }
@@ -454,11 +543,10 @@
             if (upgradeDict[i]["Purchased"] < 0) continue;
 
             let heroID = "but-" + upgradeDict[i].Row;
-            if (upgradeDict[i]["Cost"] > realScore) {
+            if (upgradeDict[i]["Cost"] > saveValues["realScore"]) {
                 document.getElementById(heroID).classList.add("dim");
                 document.getElementById(heroID).classList.remove("not-dim");
-            } 
-            else if (upgradeDict[i]["Cost"] < realScore) {
+            } else if (upgradeDict[i]["Cost"] <= saveValues["realScore"]) {
                 document.getElementById(heroID).classList.add("not-dim");
                 document.getElementById(heroID).classList.remove("dim");
             }
@@ -467,14 +555,14 @@
 
     // ADD TO INVENTORY 
     function inventoryAdd(idNum) {
-        itemCount++;
-        var itemUniqueID = idNum + "." + itemCount;
+        saveValues["itemCount"]++;
+        var itemUniqueID = idNum + "." + saveValues["itemCount"];
         let buttonInv = document.createElement("button");
 
         buttonInv.id = itemUniqueID;
-        buttonInv.addEventListener('click', function() {itemUse(itemUniqueID);});
-        buttonInv.addEventListener('mouseover', function() {changeTooltip(Inventory[idNum].Name, "item", 1)})
-        buttonInv.addEventListener('mouseout', function() {clearTooltip();})
+        buttonInv.addEventListener('click', () => {itemUse(itemUniqueID);});
+        buttonInv.addEventListener('mouseover', () => {changeTooltip(Inventory[idNum].Name, "item", 1)})
+        buttonInv.addEventListener('mouseout', () => {clearTooltip();})
 
         buttonInv.classList += "inventoryButton";
         buttonInv.style.background = "url(./assets/inventory/" + Inventory[idNum].Name + ".jpg)";
@@ -512,7 +600,7 @@
                 }
             }
         }  else if (itemID >= 4001 && itemID <  XPMAX){
-            freeLevels += Inventory[itemID].BuffLvl;
+            saveValues["freeLevels"] += Inventory[itemID].BuffLvl;
             refresh();
         }
         item.remove();
@@ -526,40 +614,44 @@
             alert("ITS LOCKED CANT YOU SEE!!!!!!!")
             return                                //// <------------------------ ADD THE POPUP FOR LOCKED
         } else {                                                     
-            if (energy >= ADVENTURECOSTS[type]){
-                energy -= ADVENTURECOSTS[type];
+            if (saveValues["energy"] >= ADVENTURECOSTS[type]){
+                saveValues["energy"] -= ADVENTURECOSTS[type];
                 refresh();
                 
-                if (type == 1){
-                inventoryDraw("artifact", 1, 4);
-                inventoryDraw("weapon", 1, 1);
-                inventoryDraw("xp", 2, 2);
-                inventoryDraw("food", 1, 3);
-                }
-                if (type == 2){
-                    inventoryDraw("xp", 2, 2);
-                    inventoryDraw("xp", 2, 2);
-                    inventoryDraw("food", 2, 3);
-                    inventoryDraw("artifact", 2, 4);
-                    inventoryDraw("weapon", 1, 2);
-                }
-                if (type == 3){
-                    inventoryDraw("xp", 2, 3);
-                    inventoryDraw("artifact", 3, 4);
-                    inventoryDraw("food", 2, 4);
-                    inventoryDraw("weapon", 2, 3);
-                }
-                if (type == 4){
-                    inventoryDraw("weapon", 3, 4);
-                    inventoryDraw("artifact", 3, 4);
-                    inventoryDraw("xp", 3, 4);
-                    inventoryDraw("food", 2, 4);
-                }
-                if (type == 5){
-                    inventoryDraw("artifact", 4, 5);
-                    inventoryDraw("weapon", 4, 5);
-                    inventoryDraw("food", 2, 5);
-                    inventoryDraw("xp", 4, 4);
+                switch (type) {
+                    case 1:
+                        inventoryDraw("artifact", 1, 4);
+                        inventoryDraw("weapon", 1, 1);
+                        inventoryDraw("xp", 2, 2);
+                        inventoryDraw("food", 1, 3);
+                        break;
+                    case 2:
+                        inventoryDraw("xp", 2, 2);
+                        inventoryDraw("food", 2, 3);
+                        inventoryDraw("artifact", 2, 4);
+                        inventoryDraw("weapon", 1, 2);
+                        break;
+                    case 3:
+                        inventoryDraw("xp", 2, 3);
+                        inventoryDraw("artifact", 3, 4);
+                        inventoryDraw("food", 2, 4);
+                        inventoryDraw("weapon", 2, 3);
+                        break;
+                    case 4:
+                        inventoryDraw("weapon", 3, 4);
+                        inventoryDraw("artifact", 3, 4);
+                        inventoryDraw("xp", 3, 4);
+                        inventoryDraw("food", 2, 4);
+                        break;
+                    case 5:
+                        inventoryDraw("artifact", 4, 5);
+                        inventoryDraw("weapon", 4, 5);
+                        inventoryDraw("food", 2, 5);
+                        inventoryDraw("xp", 4, 4);
+                        break;
+                    default:
+                        // handle unexpected type
+                        break;
                 }
                 sortList("table2");
                 newPop(2);
@@ -596,9 +688,9 @@
             }
 
             expedButton.id = "exped-" + i;
-            expedButton.addEventListener("click", function() {adventure(i)});
+            expedButton.addEventListener("click", () => {adventure(i)});
             expedButton.addEventListener("mouseover", function() {expedInfo(this.id)});
-            expedButton.addEventListener("mouseout", function() {expedInfo(7)});
+            expedButton.addEventListener("mouseout", () => {expedInfo(7)});
 
             expedButton.style.background = backgroundImg;
             expedButton.style['background-repeat'] = "no-repeat";
@@ -643,89 +735,95 @@
         let wishButton = document.createElement("button");
         wishButton.classList += "wish-button";
         wishButton.innerText = "Write for help | 160 "
-        wishButton.addEventListener("click",function() {
-            let mailImageTemp = document.getElementById("mailImageID")
-            mailImageTemp.src = "./assets/closed.png"
-            wish();
+        wishButton.addEventListener("click",() => {
+             wish();
         });
-        table4.appendChild(wishButton);
 
-        let mailImage = document.createElement("img");
-        mailImage.src = "./assets/open.png";
-        mailImage.id = "mailImageID"
-        mailImage.classList += "wish-mail";
-        table4.appendChild(mailImage);
+        let mailImageContainer = document.createElement("div");
+        mailImageContainer.classList.add("wish-mail-container");
+        
+        let mailImageBottom = document.createElement("img");
+        mailImageBottom.src = "./assets/closed.png";
+        mailImageBottom.classList.add("wish-mail");
+
+        let mailImageTop = document.createElement("img");
+        mailImageTop.src = "./assets/open.png";
+        mailImageTop.id = "mailImageID";
+        mailImageTop.classList.add("wish-mail");
+
+        mailImageContainer.append(mailImageBottom,mailImageTop);
+        table4.append(mailImageContainer, wishButton);
     }
 
+    var wishCounter = WISHHEROMAX - WISHHEROMIN;
     function wish() {
-        if (primogem > WISHCOST) {
-            primogem -= WISHCOST;
-            
+        if (wishCounter == 0) {
+            return;
+        }
+
+        if (saveValues["primogem"] > WISHCOST) {
+            saveValues["primogem"] -= WISHCOST;
+
             while (wishCounter) {
-                let i = randomInteger(WISHHEROMIN, WISHHEROMAX)
-                if (upgradeDict[i].Purchased >= -1) {
+                let randomWishHero = randomInteger(WISHHEROMIN, WISHHEROMAX)
+                if (upgradeDict[randomWishHero].Purchased >= -1) {
                     continue;
                 } else {
-                    upgradeDict[i].Purchased = -1;
-                    upgradeDict[i]["Factor"] = Math.round(dps * (STARTINGWISHFACTOR + wishMultiplier)/50 + 1);
-                    upgradeDict[i]["Cost"] = Math.round(dps * (55) + 1);
-
+                    upgradeDict[randomWishHero].Purchased = -1;
+                    upgradeDict[randomWishHero]["Factor"] = Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/50 + 1);
+                    upgradeDict[randomWishHero]["Cost"] = Math.round(saveValues["dps"] * (55) + 1);
                     wishMultiplier += 1.5;
                     wishCounter--;
                     refresh();
                     newPop(1);
+
+                    let mailImageTemp = document.getElementById("mailImageID")
+                    mailImageTemp.style.opacity = 0;
                     break;
                 }
             }
-        }
+        } else {return;}
     }
 
     // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION
-    var newPopUpOne = "";
-    var newPopUpTwo = "";
-    var newPopUpThree = "";
+    var currentPopUps = [];
     function newPop(type) {
-        if (type == 1) {
-            if (newPopUpOne != "") {return}
-            else {
-            newPopUpOne = document.createElement("img")
-            newPopUpOne.classList += ("pop-new pop-new-one");
+    var newPopUp;
+    let className;
+    let tabId;
 
-            let tab = document.getElementById("tab-0");
-            tab.addEventListener("click", function() {
-                if (newPopUpOne != "") {newPopUpOne.remove();};
-                newPopUpOne = "";})
-
-            para1.appendChild(newPopUpOne);
-            }
-        } else if (type == 2) {
-            if (newPopUpTwo != "") {return}
-            else {
-            newPopUpTwo = document.createElement("img")
-            newPopUpTwo.classList += ("pop-new pop-new-two");
-
-            let tab = document.getElementById("tab-1");
-            tab.addEventListener("click", function() {
-                if (newPopUpTwo != "") {newPopUpTwo.remove();};
-                newPopUpTwo = ""})
-
-            para1.appendChild(newPopUpTwo);
-            }
-        } else if (type == 3) {
-            if (newPopUpThree != "") {return}
-            else {
-            newPopUpThree = document.createElement("img")
-            newPopUpThree.classList += ("pop-new pop-new-three");
-
-            let tab = document.getElementById("tab-2");
-            tab.addEventListener("click", function() {
-                if (newPopUpThree != "") {newPopUpThree.remove();};
-                newPopUpThree = ""})
-
-            para1.appendChild(newPopUpThree);
-            }
-        }
+    switch (type) {
+        case 1:
+            className = "pop-new-one";
+            tabId = "tab-0";
+            break;
+        case 2:
+            className = "pop-new-two";
+            tabId = "tab-1";
+            break;
+        case 3:
+            className = "pop-new-three";
+            tabId = "tab-2";
+            break;
     }
+    
+    if (newPopUp || currentPopUps.includes(type) == true) {
+        return;
+    }
+
+    newPopUp = document.createElement("img");
+    newPopUp.classList.add("pop-new", className);
+    currentPopUps.push(type);
+
+    let tab = document.getElementById(tabId);
+    tab.addEventListener("click", () => {
+        newPopUp.remove();
+        currentPopUps.splice(currentPopUps.indexOf(type),1)
+        newPopUp = null;
+    });
+
+    para1.appendChild(newPopUp);
+}
     
     // ACHIEVEMENTS
     var achievementData = {
@@ -738,6 +836,7 @@
     var scoreAchievement = [1,101,201,301];
 
     function popAchievement(achievement) {
+        var timerAchievement = "";
         var oldAchievement = document.getElementById("tempAchievement");
         var achievementID = 10000;
         let achievementType = "";
@@ -758,11 +857,12 @@
         var achievementDesc = achievementList[achievementType].Description;
         achievementList[achievementType]["Done"] = true;
         achievementID += achievementType;
-        primogem += 20;
+        saveValues["primogem"] += 20;
 
         var achievementPopUp = createAchievement(achievementText,achievementDesc);
-        achievementPopUp.addEventListener("click", function() {achievementPopUp.remove()});
-        mainBody.appendChild(achievementPopUp); 
+        achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
+        mainBody.appendChild(achievementPopUp);
+        timerAchievement = setInterval(() => achievementPopUp.remove(),5000)
 
         //  ^^^ TEMP ACHIEVEMENT | PERMANENT ACHIEVEMENT vvv
         
@@ -772,15 +872,15 @@
     }
 
     function checkAchievement() {
-        if (achievementData["achievementTypeRawScore"].length != 0){
-            if (realScore >= achievementData["achievementTypeRawScore"][0]) {
+        if (achievementData["achievementTypeRawScore"].length !== 0){
+            if (saveValues["realScore"] >= achievementData["achievementTypeRawScore"][0]) {
                 popAchievement("score");
                 achievementData["achievementTypeRawScore"].shift();
             }
         } 
         
-        if (achievementData["achievementTypeRawDPS"].length != 0){
-            if (dps >= achievementData["achievementTypeRawDPS"][0]) {
+        if (achievementData["achievementTypeRawDPS"].length !== 0){
+            if (saveValues["dps"] >= achievementData["achievementTypeRawDPS"][0]) {
                 popAchievement("dps");
                 achievementData["achievementTypeRawDPS"].shift();
             }
@@ -789,37 +889,24 @@
 
     // REFRESH SCORES & ENERGY
     function refresh() {
-        let formatScore = abbrNum(realScore);
-        if (realScore == 1) {
-            score.innerText = formatScore + " Nut";
-        } else {
-            score.innerText = formatScore + " Nuts";
-        }
+        let formatScore = abbrNum(saveValues["realScore"]);
+        score.innerText = `${formatScore} Nut${saveValues["realScore"] !== 1 ? 's' : ''}`;
 
-        let formatDps = abbrNum(dps);
+        let formatDps = abbrNum(saveValues["dps"]);
         dpsDisplay.innerText = formatDps + " per second" ;
-
-        energyDisplay.innerText = energy;
-        primogemDisplay.innerText = primogem;
+        energyDisplay.innerText = saveValues["energy"];
+        primogemDisplay.innerText = saveValues["primogem"];
         
         if (arguments[0] != undefined) {
             if (arguments[0].includes("but-")){
                 var heroTextFirst = "";
-                var formatATK = "";
-                if (arguments[2] == 0) {
-                    var singular = "";
-                    if (upgradeDict[arguments[2]]["Factor"] == 1) {
-                        singular = " Nut per Click";
-                    } else {
-                        singular = " Nuts per Click";
-                    }
+                let formatCost = abbrNum(arguments[1]);
+                let formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
 
-                    var formatCost = abbrNum(arguments[1]);
-                    formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
+                if (arguments[2] == 0) {
+                    let singular = ` Nut${upgradeDict[arguments[2]]["Factor"] !== 1 ? 's' : ''} per click`;
                     heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", " + formatATK + singular;
                 } else {
-                    var formatCost = abbrNum(arguments[1]);
-                    formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
                     heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", +" + formatATK + " NpS";
                 }
                 

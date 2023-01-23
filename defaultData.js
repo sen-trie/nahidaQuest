@@ -62,7 +62,7 @@ var upgradeDictDefault = {
     109: {Name: "Xiao",        Row:-1,        "Level": 0, Purchased: -10,   Type: "Polearm",   Ele: "Anemo"                                             },
     110: {Name: "Tartaglia",   Row:-1,        "Level": 0, Purchased: -10,   Type: "Bow",   Ele: "Hydro"                                             },
     111: {Name: "Scaramouche", Row:-1,        "Level": 0, Purchased: -10,   Type: "Catalyst",   Ele: "Anemo"                                             },
-    112: {Name: "Dehya",      Row:-1,         "Level": 0, Purchased: -10,  Type: "Claymore",   Ele: "Pyro"                                             },
+    // 112: {Name: "Dehya",      Row:-1,         "Level": 0, Purchased: -10,  Type: "Claymore",   Ele: "Pyro"                                             },
 };
 
 // RMB TO UPDATE MAX CONSTANTS
@@ -249,4 +249,16 @@ var achievementList = {
     408: {Name:"",                     Description:""                                  ,"Done": false            },
 }
 
-export { upgradeDictDefault,tooltip,Inventory,expeditionDict,achievementList };
+var saveValuesDefault = {
+    clickCount:0,
+    clickFactor:1,
+    dps:111333110,
+    realScore:0,
+    freeLevels:0,
+    primogem:1000,
+    energy:1000,
+    rowCount:0,
+    itemCount:0,
+}
+
+export { upgradeDictDefault,tooltip,Inventory,expeditionDict,achievementList,saveValuesDefault };
