@@ -113,4 +113,22 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
     return achievementStored;
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement }
+function drawMailTable(table4) {
+    let mailImageContainer = document.createElement("div");
+    mailImageContainer.classList.add("wish-mail-container");
+    
+    let mailImageBottom = document.createElement("img");
+    mailImageBottom.src = "./assets/closed.png";
+    mailImageBottom.classList.add("wish-mail");
+
+    let mailImageTop = document.createElement("img");
+    mailImageTop.src = "./assets/open.png";
+    mailImageTop.id = "mailImageID";
+    mailImageTop.classList.add("wish-mail");
+
+    mailImageContainer.append(mailImageBottom,mailImageTop);
+    table4.append(mailImageContainer);
+    return table4;
+}
+
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable }

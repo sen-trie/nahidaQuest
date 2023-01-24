@@ -1,10 +1,22 @@
+var saveValuesDefault = {
+    clickCount:0,
+    clickFactor:1,
+    dps:111333110,
+    realScore:0,
+    freeLevels:0,
+    primogem:1000,
+    energy:1000,
+    rowCount:0,
+    heroesPurchased:0,
+}
+
 var upgradeDictDefault = {
     0: {Name: "Nahida",      Row:-1,  "Level": 1, "Cost":20, Factor:1,        Purchased: -1,   Type: "Catalyst",   Ele: "Dendro"          },
     1: {Name: "Traveller",   Row:-1,          Purchased: -1,   Type: "Sword",      Ele: "Any"                                             },
     2: {Name: "Collei",      Row:-1,          Purchased: -1,   Type: "Bow",        Ele: "Dendro"                                             },
     3: {Name: "Tighnari",    Row:-1,          Purchased: -1,   Type: "Bow",      Ele: "Dendro"                                             },
-    4: {Name: "Candace",     Row:-1,          Purchased: -1,   Type: "Polearm",   Ele: "Hydro"                                             },
-    5: {Name: "Dori",        Row:-1,          Purchased: -1,  Type: "Claymore",   Ele: "Electro"                                             },
+    4: {Name: "Dori",        Row:-1,          Purchased: -1,  Type: "Claymore",   Ele: "Electro"                                             },
+    5: {Name: "Candace",     Row:-1,          Purchased: -1,   Type: "Polearm",   Ele: "Hydro"                                             },
     6: {Name: "Cyno",        Row:-1,          Purchased: -1,   Type: "Polearm",   Ele: "Electro"                                             },
     7: {Name: "Nilou",       Row:-1,          Purchased: -1,   Type: "Sword",     Ele: "Hydro"                                             },
     8: {Name: "Layla",       Row:-1,          Purchased: -1,   Type: "Sword",     Ele: "Cryo"                                             },
@@ -46,11 +58,11 @@ var upgradeDictDefault = {
     44: {Name: "Shinobu",    Row:-1,            Purchased: -1,   Type: "Sword",      Ele: "Electro"                                             },
     45: {Name: "Itto",       Row:-1,            Purchased: -1,   Type: "Claymore",      Ele: "Geo"                                             },
     46: {Name: "Sara",       Row:-1,            Purchased: -1,   Type: "Bow",      Ele: "Electro"                                             },
-    47: {Name: "Venti",      Row:-1,           Purchased: -1,   Type: "Bow",   Ele: "Anemo"                                             },
-    48: {Name: "Zhongli",    Row:-1,           Purchased: -1,   Type: "Polearm",   Ele: "Geo"                                             },
-    49: {Name: "Raiden",     Row:-1,            Purchased: -1,   Type: "Polearm",   Ele: "Electro"                                             },
+    47: {Name: "Venti",      Row:-1,            Purchased: -1,   Type: "Bow",   Ele: "Anemo"                                             },
+    48: {Name: "Zhongli",    Row:-1,            Purchased: -1,   Type: "Polearm",   Ele: "Geo"                                             },
+    49: {Name: "Ei",     Row:-1,            Purchased: -1,   Type: "Polearm",   Ele: "Electro"                                             },
 // RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS
-    100: {Name: "Jean",        Row:-1,        "Level": 0, Purchased: -10,   Type: "Sword",   Ele: "Anemo"                                             },
+    100: {Name: "Scaramouche", Row:-1,        "Level": 0, Purchased: -10,   Type: "Catalyst",   Ele: "Anemo"                                             },
     101: {Name: "Albedo",      Row:-1,        "Level": 0, Purchased: -10,   Type: "Sword",   Ele: "Geo"                                             },
     102: {Name: "Qiqi",        Row:-1,        "Level": 0, Purchased: -10,   Type: "Sword",   Ele: "Cryo"                                             },
     103: {Name: "Yelan",       Row:-1,        "Level": 0, Purchased: -10,   Type: "Bow",   Ele: "Hydro"                                             },
@@ -61,39 +73,35 @@ var upgradeDictDefault = {
     108: {Name: "Hu Tao",      Row:-1,        "Level": 0, Purchased: -10,   Type: "Polearm",   Ele: "Pyro"                                             },
     109: {Name: "Xiao",        Row:-1,        "Level": 0, Purchased: -10,   Type: "Polearm",   Ele: "Anemo"                                             },
     110: {Name: "Tartaglia",   Row:-1,        "Level": 0, Purchased: -10,   Type: "Bow",   Ele: "Hydro"                                             },
-    111: {Name: "Scaramouche", Row:-1,        "Level": 0, Purchased: -10,   Type: "Catalyst",   Ele: "Anemo"                                             },
+    111: {Name: "Jean",        Row:-1,        "Level": 0, Purchased: -10,   Type: "Sword",   Ele: "Anemo"                                             },
     // 112: {Name: "Dehya",      Row:-1,         "Level": 0, Purchased: -10,  Type: "Claymore",   Ele: "Pyro"                                             },
 };
 
 // RMB TO UPDATE MAX CONSTANTS
-var Inventory = {
-    1001: {Name:"coolSteel",      Star:3,  Type:"Sword"                                             },
-    1002: {Name:"ferrous",        Star:3,  Type:"Claymore"                                             },
-    1003: {Name:"mappa",          Star:4,  Type:"Catalyst"                                             },
-    1004: {Name:"rust",           Star:4,  Type:"Bow"                                             },
-    1005: {Name:"silverSword",    Star:2,  Type:"Sword"                                             },
-    1006: {Name:"dullSword",      Star:1,  Type:"Sword"                                             },
-    1007: {Name:"skywardBlade",   Star:5,  Type:"Sword"                                             },
-    1008: {Name:"harbingerDawn",  Star:3,  Type:"Sword"                                             },
-    1009: {Name:"travelerHandySword",      Star:3,  Type:"Sword"                                             },
-    1010: {Name:"sacSword",          Star:3,  Type:"Sword"                                             },
-    1011: {Name:"lionsRoar",           Star:3,  Type:"Sword"                                             },
-    1012: {Name:"aquilaFavonia",           Star:5,  Type:"Sword"                                             },
+var InventoryDefault = {
+    1001: {Name:"coolSteel",                     Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1002: {Name:"ferrous",                       Star:3,  Type:"Claymore"       ,itemCount:0                       },
+    1003: {Name:"mappa",                         Star:4,  Type:"Catalyst"       ,itemCount:0                       },
+    1004: {Name:"rust",                          Star:4,  Type:"Bow"            ,itemCount:0                       },
+    1005: {Name:"silverSword",                   Star:2,  Type:"Sword"          ,itemCount:0                       },
+    1006: {Name:"dullSword",                     Star:1,  Type:"Sword"          ,itemCount:0                       },
+    1007: {Name:"skywardBlade",                  Star:5,  Type:"Sword"          ,itemCount:0                       },
+    1008: {Name:"harbingerDawn",                 Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1009: {Name:"travelerHandySword",            Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1010: {Name:"sacSword",                      Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1011: {Name:"lionsRoar",                     Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1012: {Name:"aquilaFavonia",                 Star:5,  Type:"Sword"          ,itemCount:0                       },
 // RMB TO UPDATE MAX CONSTANTS
+    2001: {Name:"gladiator",                     Star:4                         ,itemCount:0                         },
+    2002: {Name:"deepwood",                      Star:5                         ,itemCount:0                         },
+    2003: {Name:"crimWitch",                     Star:5                         ,itemCount:0                         },
 // RMB TO UPDATE MAX CONSTANTS
+    3001: {Name:"masalaCheese",                  Star:2                        ,itemCount:0            ,BuffTemp:10},
+    3002: {Name:"jueyunchili",                   Star:2                        ,itemCount:0            ,BuffTemp:10},
 // RMB TO UPDATE MAX CONSTANTS
-// RMB TO UPDATE MAX CONSTANTS
-// RMB TO UPDATE MAX CONSTANTS
-    2001: {Name:"gladiator",      Star:4},
-    2002: {Name:"deepwood",       Star:5},
-    2003: {Name:"crimWitch",      Star:5},
-// RMB TO UPDATE MAX CONSTANTS
-    3001: {Name:"masalaCheese",   Star:2,                     BuffTemp:10},
-    3002: {Name:"jueyunchili",    Star:2,                     BuffTemp:10},
-
-    4001: {Name:"wandererEXP",    Star:2,                     BuffLvl:1},
-    4002: {Name:"adventureEXP",   Star:3,                     BuffLvl:5},
-    4003: {Name:"heroEXP",        Star:4,                     BuffLvl:10},
+    4001: {Name:"wandererEXP",                   Star:2                        ,itemCount:0            ,BuffLvl:1},
+    4002: {Name:"adventureEXP",                  Star:3                        ,itemCount:0            ,BuffLvl:5},
+    4003: {Name:"heroEXP",                       Star:4                        ,itemCount:0            ,BuffLvl:10},
 };
 
 var tooltip = {
@@ -117,7 +125,7 @@ var tooltip = {
     Kaeya:{name:"              Kaeya               ", lore:""             },
     Diluc:{name:"              Diluc               ", lore:""                },
     Diona:{name:"              Diona               ", lore:""             },
-    Fischl:{name:"             Fischl von Luftschloss Narfidort               ", lore:""               },
+    Fischl:{name:"             Fischl              ", lore:""               },
     Mona:{name:"               Mona               ", lore:""                    },
     Rosaria:{name:"            Rosaria               ", lore:""               },
     Klee:{name:"               Klee               ", lore:""                   },
@@ -186,17 +194,17 @@ var tooltip = {
     heroEXP:{name:"", lore:""},               
 };
 
-var expeditionDict = {
-    1:{Text:"Explore Teyvat | 100 "                 ,Locked:"0" ,Lore:"The best way to understand the world is to explore all that is around you, leaving no stone unturned. Solving the enigmas of old, helping hapless travelers, and following the trails of long-lost treasure will all become invaluable knowledge and experience."},
-    2:{Text:"Visit the Adventurers' Guild | 250 "   ,Locked:"0" ,Lore:"They boldly venture up to the stars, down to the abyss, or so their motto would have you believe. In truth, they take on jobs ranging from finding kittens to exploring domains."},
-    3:{Text:"Challenge Domains | 500 "              ,Locked:"1" ,Lore:"Domains hide precious treasures. Be sure to explore the domains scattered all over the world to find the treasures hidden within."},
-    4:{Text:"Hunt Boss Enemies | 750 "              ,Locked:"1" ,Lore:"Bosses are strong Enemies that are scattered across the world. They are much stronger than elite enemies, but also provide luxurious rewards for defeating them."},
-    5:{Text:"Abyss Diving | 1000 "                   ,Locked:"1" ,Lore:"Monsters and humans alike flock to the tower in search of the secrets and treasures it contains. Challenge different floors of the tower and defeat the enemies within to win Abyssal Stars...with the help of an ally."},
+var expeditionDictDefault = {
+    1:{Text:"Explore Teyvat | 100 "                 ,Locked:"0" ,Lore:"The legend of the Golden Nut is from a bygone era. Some on-the-ground research is certainly needed if you wanted even a slither of a chance to find the mythical fruit."},
+    2:{Text:"Ask the Adventurers' Guild | 250 "   ,Locked:"0" ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
+    3:{Text:"Challenge Domains | 500 "              ,Locked:"1" ,Lore:"Clues about the origin of the Golden Nut are said to have been hidden deep inside some mysterious domain. Exploring it will likely be the next step in unravelling the fruit's location"},
+    4:{Text:"Hunt Boss Enemies | 750 "              ,Locked:"1" ,Lore:"The last confirmed sighting of the Golden Nut was in the heart of the woods, which is currently being guarded by a ferocious beast. It may well be the only stone left unturned."},
+    5:{Text:"Abyss Diving | 1000 "                   ,Locked:"1" ,Lore:"All trails seem to end here. With nowhere else to go, the Abyss is the sole place left where the fruit is likely to be. Search through the floors with the help of an unlikely ally."},
     6:{Text:"Locked"                         ,Locked:"0" ,Lore:"Perhaps this path will open after some time..."            },
     7:{Text:""                               ,Locked:"0" ,Lore:""            },
 }
 
-var achievementList = {
+var achievementListDefault = {
     1: {Name:"Nut Collector",       Description:"Collect 10 nuts"                   ,"Done": false            },
     2: {Name:"Fan of Nuts",             Description:"Collect 1000 nuts"                  ,"Done": false            },
     3: {Name:"Nut Gatherer",        Description:"Collect 10,000 nuts"               ,"Done": false            },
@@ -235,10 +243,15 @@ var achievementList = {
     204: {Name:"",                  Description:"Click 100,000 times"               ,"Done": false            },
     205: {Name:"Master of Cultivation",Description:"Click 1 million times"             ,"Done": false            },
     301: {Name:"",                     Description:"Upgrade characters 1 time"         ,"Done": false            },
-    302: {Name:"",                     Description:"Upgrade characters 10 time"        ,"Done": false            },
-    303: {Name:"",                     Description:"Upgrade characters 100 time"       ,"Done": false            },
-    304: {Name:"",                     Description:"Upgrade characters 1000 time"      ,"Done": false            },
-    305: {Name:"Heart of Dendro ",     Description:"Upgrade characters 10,000 time"    ,"Done": false            },
+    302: {Name:"",                     Description:"Upgrade characters 10 times"        ,"Done": false            },
+    303: {Name:"",                     Description:"Upgrade characters 100 times"       ,"Done": false            },
+    304: {Name:"",                     Description:"Upgrade characters 250 times"      ,"Done": false            },
+    305: {Name:"Heart of Dendro ",     Description:"Upgrade characters 500 times"    ,"Done": false            },
+    306: {Name:"",                     Description:"Upgrade characters 1000 time"         ,"Done": false            }, 
+    307: {Name:"",                     Description:"Upgrade characters 2500 times"        ,"Done": false            },
+    308: {Name:"",                     Description:"Upgrade characters 5000 times"       ,"Done": false            },
+    309: {Name:"",                     Description:"Upgrade characters 7500 times"      ,"Done": false            },
+    310: {Name:"Heart of Dendro ",     Description:"Upgrade characters 10,000 times"    ,"Done": false            },
     401: {Name:"",                     Description:""                                  ,"Done": false            },
     402: {Name:"",                     Description:""                                  ,"Done": false            },
     403: {Name:"",                     Description:""                                  ,"Done": false            },
@@ -249,16 +262,4 @@ var achievementList = {
     408: {Name:"",                     Description:""                                  ,"Done": false            },
 }
 
-var saveValuesDefault = {
-    clickCount:0,
-    clickFactor:1,
-    dps:111333110,
-    realScore:0,
-    freeLevels:0,
-    primogem:1000,
-    energy:1000,
-    rowCount:0,
-    itemCount:0,
-}
-
-export { upgradeDictDefault,tooltip,Inventory,expeditionDict,achievementList,saveValuesDefault };
+export { upgradeDictDefault,tooltip,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault };

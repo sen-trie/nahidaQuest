@@ -14,34 +14,13 @@
             user-select: none;
         }
 
-    
-        /* @media only screen and (min-width: 600px) {
-            body {transform: scale(0.38);transform-origin: top;};
-        }
-
-        @media only screen and (min-width: 768px) {
-            body {transform: scale(0.45);transform-origin: top;};
-        } 
-
-        @media only screen and (min-width: 992px) {
-            body {transform: scale(0.57);transform-origin: top;};
-        } 
-
-        @media only screen and (min-width: 1200px) {
-            body {transform: scale(0.7);transform-origin: top;};
-        }
-
-        @media only screen and (min-width: 1600px) {
-            body {transform: scale(0.95);transform-origin: top;};
-        } */
-
          html {
             height: 100%;
             width:100%;
             background: black;
             display: flex;
             justify-content:center;
-            align-items: flex-end;
+            align-items: center;
             cursor: url(./assets/cursor.png), auto;
         }
 
@@ -60,6 +39,9 @@
 
 </head>
 <body id="bodyID" class="prevent-select">
+    <div id="body-border" class="overlay">
+        <img src="./assets/loading.gif" style="width:1000px;height:563px;">
+    </div>
     <p id="para">
         <div class="energy-primo-container">
             <div class="pill-value">
@@ -71,7 +53,6 @@
                 <img class="primogem icon" src="./assets/primogemIcon.png">
                 <span id="primogem" style="padding-right:10px">0</span>
             </div>
-            
         </div>
         <div class="score-container">
             <span id="score">0</span>      
@@ -97,12 +78,12 @@
         </table>
     </table>
 
-    <div id="body-border"></div>
+    
 
 <script type="module">
-    import { upgradeDictDefault,Inventory,tooltip,expeditionDict,achievementList,saveValuesDefault } from "./defaultData.js"
-    import { abbrNum,randomInteger,sortList,generateHeroPrices, unlockExpedition,getHighestKey } from "./functions.js"
-    import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement } from "./drawUI.js"
+    import { upgradeDictDefault,InventoryDefault,tooltip,expeditionDictDefault,achievementListDefault,saveValuesDefault } from "./defaultData.js"
+    import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey } from "./functions.js"
+    import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 
     var saveValues;
     const ENERGYCHANCE = 500;
@@ -135,6 +116,7 @@
     var table5 = document.getElementById("table5");
     var TABS = [table1,table2, table3, table4, table5];
 
+    //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
     // MAIN BODY VARIABLES
     var mainBody = document.getElementById("bodyID");
     let table6 = document.createElement("div");
@@ -151,7 +133,10 @@
 
     // INITIAL LOADING
     loadingAnimation();
-    var upgradeDict = "";
+    var upgradeDict;
+    var expeditionDict;
+    var Inventory;
+    var achievementList;
     loadSaveData();
 
     var WISHHEROMAX = getHighestKey(upgradeDict) + 1;
@@ -170,7 +155,6 @@
     tabChange(1);
     var timer = setInterval(timerEvents,1000000);
     
-
     // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH SET TO 0.5 SECONDS)
     function timerEvents() {
         checkAchievement();
@@ -180,7 +164,6 @@
         addNewRow();
     } 
 
-    // ALL LOAD FUNCTIONS
     // LOAD SAVE DATA
     function loadSaveData() {
         // LOAD VALUES DATA
@@ -199,19 +182,36 @@
             upgradeDict = JSON.parse(upgradeDictTemp);
             var timer2 = setTimeout(loadRow,1000);
         }
+        // LOAD INVENTORY DATA
+        if (localStorage.getItem("InventorySave") == null) {
+            Inventory = InventoryDefault;
+        } else {
+            let InventoryTemp = localStorage.getItem("InventorySave");
+            Inventory = JSON.parse(InventoryTemp);
+            inventoryload();
+        }
+        // LOAD EXPEDITION DATA
+        if (localStorage.getItem("expeditionDictSave") == null) {
+            expeditionDict = expeditionDictDefault;
+        } else {
+            let expeditionDictTemp = localStorage.getItem("expeditionDictSave");
+            expeditionDict = JSON.parse(expeditionDictTemp)
+        }
+        // LOAD ACHIEVEMENT DATA
+        if (localStorage.getItem("achievementListSave") == null) {
+            achievementList = achievementListDefault;
+        } else {
+            let achievementListTemp = localStorage.getItem("achievementListSave");
+            achievementList = JSON.parse(achievementListTemp);
+            achievementListload();
+        }
     }
-       
+    
+    //--------------------------------------------------------------------------MAIN BODY----------------------------------------------------------------------//
     function loadingAnimation() {
         var siteWidth = 1080;
         var scale = screen.width / (siteWidth);
         document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
-
-        var overlay = document.getElementById("body-border");
-        overlay.classList.add("overlay");
-        let loadGif = document.createElement("img");
-        loadGif.src = "./assets/loading.gif";
-        loadGif.style.cssText = "width:1000px;height:563px;";
-        overlay.appendChild(loadGif);
         setTimeout(removeLoading, 800);
     }
 
@@ -220,7 +220,6 @@
             let overlay = document.getElementById("body-border");
             overlay.removeChild(overlay.firstElementChild);
             overlay.classList.remove("overlay");
-            timer = setInterval(timerEvents,500);
             tutorial();
         }, 200);
     }
@@ -243,40 +242,6 @@
         }, false);
 
         return bgmElement;
-    }
-
-    // TOOLTIP UI
-    var tooltipName = document.createElement("div");
-    tooltipName.classList += "tool-tip-name";
-
-    var toolImg = document.createElement("img");
-    toolImg.src = "./assets/tooltips/Empty.webp";
-    toolImg.style = "width:250px;height:250px;";
-    
-    var tooltipText = document.createElement("div");
-    tooltipText.classList += "tool-tip-text";
-    var tooltipLore= document.createElement("div");
-    tooltipLore.classList += "tool-tip-lore";
-
-    table6.append(tooltipName,toolImg,tooltipText,tooltipLore);
-
-    function changeTooltip(name, type, ID) {
-        tooltipName.innerText = tooltip[name]["name"];
-        tooltipLore.innerText = tooltip[name]["lore"];
-        toolImg.src = "./assets/tooltips/"+name+".webp";
-
-        if (type == "hero") {
-            tooltipText.innerHTML += "Times upgraded: " + upgradeDict[ID]["Purchased"];
-            tooltipText.innerHTML += "\n Weapon: " + upgradeDict[ID]["Type"];
-            tooltipText.innerHTML += "\n Element: " + upgradeDict[ID]["Ele"];
-        }
-    }
-
-    function clearTooltip() {
-        tooltipName.innerText = "";
-        tooltipText.innerText = "";
-        tooltipLore.innerText = "";
-        toolImg.src = "./assets/tooltips/Empty.webp";
     }
 
     // TAB UI
@@ -332,6 +297,7 @@
         tutorialScreen.addEventListener("click", () => {
             if (currentSlide == 4) {
                 tutorialDark.remove();
+                timer = setInterval(timerEvents,500);
                 var currentBGM = playAudio();
                 settingsVolume(currentBGM);
                 return;
@@ -347,7 +313,7 @@
         para1.appendChild(tutorialDark);
     }
 
-    // SETTINGS MENU
+    // SETTINGS MENU - SAVES & VOLUME CONTROL
     var settingsOpen = false;
     function settings() {
         var settingsMenu = document.createElement("div");
@@ -364,8 +330,12 @@
         var saveSetting = document.createElement("button");
         saveSetting.classList.add("setting-save");
         saveSetting.addEventListener("click",() => {
+            // SAVES ALL DATA TO LOCAL STORAGE
             localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
             localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
+            localStorage.setItem("expeditionDictSave", JSON.stringify(expeditionDict));
+            localStorage.setItem("InventorySave", JSON.stringify(Inventory));
+            localStorage.setItem("achievementListSave", JSON.stringify(achievementList));
         })
         var clearSetting = document.createElement("button");
         clearSetting.classList.add("setting-clear");
@@ -419,6 +389,7 @@
         }
     }
     
+    //------------------------------------------------------------------------TABLE 1 (HEROES)------------------------------------------------------------------------//
     // LOAD SAVED HEROES IN TABLE1
     var rowTempDict = {};
     function loadRow() {
@@ -474,7 +445,6 @@
             if (saveValues["realScore"] >= upgradeDict[i]["Level"] && upgradeDict[i].Purchased == -1){
                 upgradeDict[i].Row = saveValues["rowCount"];
                 upgradeDict[i].Purchased = 0;
-                console.log(upgradeDict[i])
                 
                 if (upgradeDict[i]["Level"] == 0) {
                     var heroText = "Summon " + upgradeDict[i].Name + " for help. (" + abbrNum(upgradeDict[i]["Cost"]) + ")";
@@ -553,14 +523,33 @@
         } 
     }
 
-    // ADD TO INVENTORY 
-    function inventoryAdd(idNum) {
-        saveValues["itemCount"]++;
-        var itemUniqueID = idNum + "." + saveValues["itemCount"];
-        let buttonInv = document.createElement("button");
+    //------------------------------------------------------------------------TABLE 2 (INVENTORY)------------------------------------------------------------------------//
+    // LOAD SAVED INVENTORY
+    function inventoryload() {
+        for (let i = 1000; i < getHighestKey(Inventory); i++) {
+            if (Inventory[i] == undefined) continue;
+            if (Inventory[i].itemCount == 0) continue;
+            for (let j = 1; j < Inventory[i].itemCount + 1; j++) {
+                inventoryAdd(i, "load", j)
+            }
+        }
+    }
 
+    // ADD TO INVENTORY 
+    function inventoryAdd(idNum, type, count) {
+        if (type != "load") {
+            Inventory[idNum].itemCount++
+            var itemUniqueID = idNum + "." + Inventory[idNum].itemCount;
+        } else {
+            var itemUniqueID = idNum + "." + count;
+        }
+        let buttonInv = document.createElement("button");
         buttonInv.id = itemUniqueID;
-        buttonInv.addEventListener('click', () => {itemUse(itemUniqueID);});
+        buttonInv.addEventListener('click', () => {
+            itemUse(itemUniqueID);
+            Inventory[idNum].itemCount--
+        });
+
         buttonInv.addEventListener('mouseover', () => {changeTooltip(Inventory[idNum].Name, "item", 1)})
         buttonInv.addEventListener('mouseout', () => {clearTooltip();})
 
@@ -571,7 +560,7 @@
         table2.appendChild(buttonInv);
     }
 
-    // INVENTORY UI
+    // INVENTORY FUNCTIONALITY
     // RMB TO UPDATE CONSTANTS
     const weaponBuffPercent = [0, 1.1, 1.3, 1.7, 2.3, 3];
     const artifactBuffPercent = [0, 1.02, 1.05, 1.10, 1.20, 1.35];
@@ -599,20 +588,20 @@
                     refresh("hero", i);
                 }
             }
-        }  else if (itemID >= 4001 && itemID <  XPMAX){
+        } else if (itemID >= 4001 && itemID <  XPMAX){
             saveValues["freeLevels"] += Inventory[itemID].BuffLvl;
             refresh();
         }
         item.remove();
     }
-
+    
+    //-------------------------------------------------------------TABLE 3 (EXPEDITION + EXPEDITION TOOLTIPS)----------------------------------------------------------//
     // EXPEDITION MECHANICS
     const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
-
     function adventure(type) {
         if (expeditionDict[type].Locked == '1'){
-            alert("ITS LOCKED CANT YOU SEE!!!!!!!")
-            return                                //// <------------------------ ADD THE POPUP FOR LOCKED
+            // alert("ITS LOCKED CANT YOU SEE!!!!!!!")
+            return;                                //// <------------------------ ADD THE POPUP FOR LOCKED
         } else {                                                     
             if (saveValues["energy"] >= ADVENTURECOSTS[type]){
                 saveValues["energy"] -= ADVENTURECOSTS[type];
@@ -650,7 +639,6 @@
                         inventoryDraw("xp", 4, 4);
                         break;
                     default:
-                        // handle unexpected type
                         break;
                 }
                 sortList("table2");
@@ -663,12 +651,12 @@
     function inventoryDraw(itemType, min, max){
         var upperInventoryType = {"weapon": WEAPONMAX, "artifact": ARTIFACTMAX, "food": FOODMAX, "xp": XPMAX};
         var lowerInventoryType = {"weapon": 1001, "artifact": 2001, "food": 3001, "xp": 4001};
-        let temp = 0;
+        let drawnItem = 0;
         while (true){
-            temp = randomInteger(lowerInventoryType[itemType], upperInventoryType[itemType])
-            if (Inventory[temp] == undefined) {continue}
-            if (Inventory[temp].Star >= min && Inventory[temp].Star < (max + 1)) {
-                inventoryAdd(temp);
+            drawnItem = randomInteger(lowerInventoryType[itemType], upperInventoryType[itemType])
+            if (Inventory[drawnItem] == undefined) {continue}
+            if (Inventory[drawnItem].Star >= min && Inventory[drawnItem].Star < (max + 1)) {
+                inventoryAdd(drawnItem);
                 break;
             } else {
                 continue;
@@ -730,29 +718,16 @@
         }
     }
 
+    //------------------------------------------------------------------------TABLE 4 (WISH)------------------------------------------------------------------------//
     // DRAWS/WISH FOR SPECIAL HEROS
     function drawWish() {
-        let wishButton = document.createElement("button");
+        var wishButton = document.createElement("button");
         wishButton.classList += "wish-button";
-        wishButton.innerText = "Write for help | 160 "
-        wishButton.addEventListener("click",() => {
-             wish();
-        });
-
-        let mailImageContainer = document.createElement("div");
-        mailImageContainer.classList.add("wish-mail-container");
-        
-        let mailImageBottom = document.createElement("img");
-        mailImageBottom.src = "./assets/closed.png";
-        mailImageBottom.classList.add("wish-mail");
-
-        let mailImageTop = document.createElement("img");
-        mailImageTop.src = "./assets/open.png";
-        mailImageTop.id = "mailImageID";
-        mailImageTop.classList.add("wish-mail");
-
-        mailImageContainer.append(mailImageBottom,mailImageTop);
-        table4.append(mailImageContainer, wishButton);
+        wishButton.id = "wishButton";
+        wishButton.innerText = "???"
+    
+        table4 = drawMailTable(table4);
+        table4.appendChild(wishButton);
     }
 
     var wishCounter = WISHHEROMAX - WISHHEROMIN;
@@ -764,8 +739,17 @@
         if (saveValues["primogem"] > WISHCOST) {
             saveValues["primogem"] -= WISHCOST;
 
+            // SCARAMOUCHE WILL ALWAYS BE THE FIRST WISH HERO
             while (wishCounter) {
-                let randomWishHero = randomInteger(WISHHEROMIN, WISHHEROMAX)
+                let randomWishHero;
+                if (wishCounter == WISHHEROMAX - WISHHEROMIN) {
+                    randomWishHero = 100;
+                    unlockExpedition(5,expeditionDict);
+                    newPop(3);
+                } else {
+                    randomWishHero = randomInteger(WISHHEROMIN, WISHHEROMAX);
+                }
+            
                 if (upgradeDict[randomWishHero].Purchased >= -1) {
                     continue;
                 } else {
@@ -785,56 +769,27 @@
         } else {return;}
     }
 
-    // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION
-    var currentPopUps = [];
-    function newPop(type) {
-    var newPopUp;
-    let className;
-    let tabId;
-
-    switch (type) {
-        case 1:
-            className = "pop-new-one";
-            tabId = "tab-0";
-            break;
-        case 2:
-            className = "pop-new-two";
-            tabId = "tab-1";
-            break;
-        case 3:
-            className = "pop-new-three";
-            tabId = "tab-2";
-            break;
-    }
-    
-    if (newPopUp || currentPopUps.includes(type) == true) {
-        return;
-    }
-
-    newPopUp = document.createElement("img");
-    newPopUp.classList.add("pop-new", className);
-    currentPopUps.push(type);
-
-    let tab = document.getElementById(tabId);
-    tab.addEventListener("click", () => {
-        newPopUp.remove();
-        currentPopUps.splice(currentPopUps.indexOf(type),1)
-        newPopUp = null;
-    });
-
-    para1.appendChild(newPopUp);
-}
-    
+    //------------------------------------------------------------------------TABLE 5 (ACHIEVEMENTS)------------------------------------------------------------------------//
     // ACHIEVEMENTS
     var achievementData = {
         achievementTypeRawScore: [10,1e3,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24],
         achievementTypeRawDPS:   [1,10,100,10000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21],
         achievementTypeRawClick: [1e2,1e3,1e4,1e5,1e6],
-        achievementTypeRawCollection: [1e1,1e2,1e3,1e4,1e5],
+        achievementTypeRawCollection: [1,10,100,250,500,1000,2500,5000,7500,10000],
     };
 
-    var scoreAchievement = [1,101,201,301];
+    function achievementListload() {
+        for (let i = 1; i < getHighestKey(achievementList); i++) {
+            if (achievementList[i] == undefined) continue;
+            if (achievementList[i]["Done"] == true) {
+                let achievementStored = storeAchievement(achievementList[i].Name,achievementList[i].Description,10000 + i);
+                table5.appendChild(achievementStored); 
+                sortList("table5");
+            }
+        }
+    }
 
+    var scoreAchievement = [1,101,201,301];
     function popAchievement(achievement) {
         var timerAchievement = "";
         var oldAchievement = document.getElementById("tempAchievement");
@@ -851,7 +806,14 @@
         } else if (achievement == "dps") {
             achievementType = scoreAchievement[1];
             scoreAchievement[1]++;
-        } 
+        } else if (achievement == "collection") {
+            achievementType = scoreAchievement[3];
+            scoreAchievement[3]++;
+        }
+
+        if (achievementList[achievementType]["Done"] == true) {
+            return;
+        }
 
         var achievementText = achievementList[achievementType].Name;
         var achievementDesc = achievementList[achievementType].Description;
@@ -862,7 +824,7 @@
         var achievementPopUp = createAchievement(achievementText,achievementDesc);
         achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
         mainBody.appendChild(achievementPopUp);
-        timerAchievement = setInterval(() => achievementPopUp.remove(),5000)
+        timerAchievement = setInterval(() => achievementPopUp.remove(),8000)
 
         //  ^^^ TEMP ACHIEVEMENT | PERMANENT ACHIEVEMENT vvv
         
@@ -885,8 +847,51 @@
                 achievementData["achievementTypeRawDPS"].shift();
             }
         }
+
+        if (achievementData["achievementTypeRawCollection"].length !== 0) {
+            if (saveValues["heroesPurchased"] >= achievementData["achievementTypeRawCollection"][0]) {
+                popAchievement("collection");
+                achievementData["achievementTypeRawCollection"].shift();
+            }
+        }
     }
 
+    //-----------------------------------------------------------------TABLE 6 (TOOLTIPS FOR TABLE 1 & 2)-----------------------------------------------------------//
+    // TOOLTIP UI
+    var tooltipName = document.createElement("div");
+    tooltipName.classList += "tool-tip-name";
+
+    var toolImg = document.createElement("img");
+    toolImg.src = "./assets/tooltips/Empty.webp";
+    toolImg.style = "width:250px;height:250px;";
+    
+    var tooltipText = document.createElement("div");
+    tooltipText.classList += "tool-tip-text";
+    var tooltipLore= document.createElement("div");
+    tooltipLore.classList += "tool-tip-lore";
+
+    table6.append(tooltipName,toolImg,tooltipText,tooltipLore);
+
+    function changeTooltip(name, type, ID) {
+        tooltipName.innerText = tooltip[name]["name"];
+        tooltipLore.innerText = tooltip[name]["lore"];
+        toolImg.src = "./assets/tooltips/"+name+".webp";
+
+        if (type == "hero") {
+            tooltipText.innerHTML += "Times upgraded: " + upgradeDict[ID]["Purchased"];
+            tooltipText.innerHTML += "\n Weapon: " + upgradeDict[ID]["Type"];
+            tooltipText.innerHTML += "\n Element: " + upgradeDict[ID]["Ele"];
+        }
+    }
+
+    function clearTooltip() {
+        tooltipName.innerText = "";
+        tooltipText.innerText = "";
+        tooltipLore.innerText = "";
+        toolImg.src = "./assets/tooltips/Empty.webp";
+    }
+
+    //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
     // REFRESH SCORES & ENERGY
     function refresh() {
         let formatScore = abbrNum(saveValues["realScore"]);
@@ -905,10 +910,13 @@
 
                 if (arguments[2] == 0) {
                     let singular = ` Nut${upgradeDict[arguments[2]]["Factor"] !== 1 ? 's' : ''} per click`;
-                    heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", " + formatATK + singular;
+                    heroTextFirst = upgradeDict[arguments[2]].Name + ": " + formatCost + ", " + formatATK + singular;
                 } else {
-                    heroTextFirst =  upgradeDict[arguments[2]].Name + ": " + formatCost + ", +" + formatATK + " NpS";
+                    heroTextFirst = upgradeDict[arguments[2]].Name + ": " + formatCost + ", +" + formatATK + " NpS";
                 }
+
+                saveValues["heroesPurchased"]++;
+                checkExpeditionUnlock(saveValues["heroesPurchased"])
                 
                 let upgradedHeroButton = document.getElementById(arguments[0]);
                 upgradedHeroButton.innerText = heroTextFirst;
@@ -921,6 +929,85 @@
             let id="but-" + arguments[1].rowCount + "";
             document.getElementById(id).innerText = heroText;
         }
+    }
+
+    // POP UPS FOR EXPEDITIONS UNLOCKS
+    // NUMBER OF UPGRADES NEEDED TO UNLOCK EXPEDITIONS vvvv
+    var heroUnlockLevels = [100,200,500];
+    var expeditionCounter = 0;
+    function checkExpeditionUnlock(heroesPurchasedNumber) {
+        if (heroUnlockLevels.length == 0) {
+            return;
+        } else if (heroesPurchasedNumber >= heroUnlockLevels[0]) {
+            if (expeditionDict[expeditionCounter + 3].Locked == 1) {
+                newPop(expeditionCounter + 4);
+                if (heroUnlockLevels.length != 1) {
+                    unlockExpedition(expeditionCounter + 3,expeditionDict);
+                    newPop(3);
+                } else {
+                    wishButton.innerText = "Write for help | 160 ";
+                    wishButton.classList.add("wish-button-new");
+                    wishButton.addEventListener("click",() => {
+                        wish();
+                    });
+                }
+            }
+            expeditionCounter++;
+            heroUnlockLevels.shift()
+        }
+    }
+
+    // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION
+    var currentPopUps = [];
+    function newPop(type) {
+        var newPopUp;
+        let className;
+        let tabId;
+        let place;
+
+        if (type <=3 && type >=1) {
+            if (newPopUp || currentPopUps.includes(type) == true) {
+                return;
+            }
+            className = "pop-new-" + type;
+            tabId = "tab-" +  (type-1).toString();
+            place = "tab";
+        } else if (type <=6 && type >=4) {
+            className = "pop-new-corner";
+            place = "corner";
+        } else {
+            return;
+        }
+        
+        newPopUp = document.createElement("img");
+        if (place == "tab") {
+            currentPopUps.push(type);
+            newPopUp.classList.add("pop-new", className);
+            let tab = document.getElementById(tabId);
+            
+            tab.addEventListener("click", () => {
+                if (newPopUp != null) {
+                    newPopUp.remove();
+                    currentPopUps.splice(currentPopUps.indexOf(type),1);
+                    newPopUp = null;
+                }
+            });
+            para1.appendChild(newPopUp);
+        } else if (place == "corner"){
+            newPopUp.classList.add(className);
+            type--;
+            newPopUp.src = "./assets/tutorial/unlockExp-"+type+".webp"
+            setTimeout(() => {
+                newPopUp.addEventListener("click", () => {
+                    if (newPopUp != null) {
+                        newPopUp.remove();
+                    }
+                });
+            }, 3000)
+
+            setTimeout(() => newPopUp.remove(), 13000)
+            para1.appendChild(newPopUp);
+        }    
     }
 
 </script>

@@ -9,6 +9,7 @@
     flex-direction:  row;
     justify-content: center;
     align-items: center;
+    z-index: 4;
 }
 
 * {
@@ -225,19 +226,28 @@ img {
     content: url(./assets/new.webp);
 }
 
-.pop-new-one {
+.pop-new-1 {
     left: 848px;
     top: 0px;
 }
 
-.pop-new-two {
+.pop-new-2 {
     left: 1018px;
     top: 0px;
 }
 
-.pop-new-three {
+.pop-new-3 {
     left: 1175px;
     top: 0px;
+}
+
+.pop-new-corner {
+    position: absolute;
+    z-index: 3;
+    width: 867px;
+    height: 233px;
+    left: 810px;
+    top: 620px;
 }
 
 /* TUTORIAL CSS */
@@ -248,8 +258,8 @@ img {
     align-items: center;
     justify-content: center;
     top:-14px;
-    left: -20px;
-    width: 1684px;
+    left: -7px;
+    width: 1670px;
     height: 867px;
     z-index: 3;
     background-color: rgba(0,0,0,0.90);
@@ -264,10 +274,10 @@ img {
 
 .tutorial-img {
     position: absolute;
-    left: 329px;
-    top: 199px;
+    left: 321px;
+    top: 200px;
     width: 1019px;
-    height: 532px;
+    height: 530px;
 }
 
 .tutorial-button:hover {
@@ -361,7 +371,6 @@ img {
 .flex-container-EXPEDITION button {
     transition: 0.2s ease;
     opacity: 0.25;
-    
 }
 
 .flex-container-EXPEDITION button:hover {
@@ -370,14 +379,13 @@ img {
 }
 
 .flex-container-EXPEDITION {
-    gap: 5px;
     justify-content: center;
     align-items: center;
 }
 
 .expedition {
     margin: auto;
-    width:188px;
+    width:190px;
     height: 489px;
 }
 
@@ -417,7 +425,7 @@ img {
 
 .exped-cell-two {
     width: 780px;
-    font-size: 20px;
+    font-size: 23px;
     text-justify: inter-word;
 }
 
@@ -442,16 +450,27 @@ img {
     left: 270px;
     width:412px;
     height:96px;
-    transition: .5s ease;
+    
     background:url(./assets/wishButton.webp);
     font-size: 29px;
     color: #F8E8C7;
     text-shadow: #73603D 3px 3px 1px;
 }
 
-.wish-button:after{
+.wish-button:hover{
+    filter: drop-shadow(0px 0px 2px #ffffff);
+    transition: .3s ease;
+}
+
+.wish-button-new:active {
+    transform:scale(0.95);
+    transition: 0.1s ease;
+}
+
+.wish-button-new:after{
     content: url(./assets/primogemIcon.png);
 }
+
 
 .wish-mail-container {
     position: absolute;
@@ -471,16 +490,6 @@ img {
     -moz-transition: opacity 0.35s ease-in-out;
     -o-transition: opacity 0.35s ease-in-out;
     transition: opacity 0.35s ease-in-out;
-}
-
-.wish-button:hover{
-    filter: drop-shadow(0px 0px 2px #ffffff);
-    transition: .3s ease;
-}
-
-.wish-button:active {
-    transform:scale(0.95);
-    transition: 0.1s ease;
 }
 
 /* ACHIEVEMENT (TABLE5) CSS */
