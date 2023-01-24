@@ -140,6 +140,7 @@
     loadSaveData();
 
     var WISHHEROMAX = getHighestKey(upgradeDict) + 1;
+    console.log(WISHHEROMAX )
     refresh();
 
     saveValues["realScore"]++;
@@ -248,7 +249,7 @@
     createTabs();
     function createTabs() {
         let tabFlex = document.getElementById("flex-container-TAB");
-        for (let i = 0; i < TABS.length; i++){
+        for (let i=TABS.length; i--;){
             let tabButton = document.createElement("button");
             tabButton.classList += "tab-button";
             tabButton.style.background = "url(./assets/tab"+ (i + 1) +".png)";
@@ -262,23 +263,24 @@
 
     // CHANGE TABS
     function tabChange(x) {
-        for (let i = 0; i < TABS.length; i++){
+        for (let i=0, len=TABS.length; i < len; i++){
             TABS[i].style["z-index"] = -1;
         }
-        TABS[x-1].style["z-index"] = 1;
 
-         if (x-1 == 0 || x-1 == 1) {
+        x--;
+        TABS[x].style["z-index"] = 1;
+
+         if (x == 0 || x == 1) {
             table6.style["z-index"] = 1;
          } else {
             table6.style["z-index"] = -1; 
          }
 
-         expedDiv.style.display = (x - 1 === 2) ? 'block' : 'none';
-
-         if (x-1 != 3) {
+         if (x != 3) {
             let mailImageTemp = document.getElementById("mailImageID")
              mailImageTemp.style.opacity = 1;
          }
+         expedDiv.style.display = (x === 2) ? 'block' : 'none';
     }
     
     // TUTORIAL UPON FIRST LOAD
@@ -393,14 +395,27 @@
     // LOAD SAVED HEROES IN TABLE1
     var rowTempDict = {};
     function loadRow() {
-        for (let i = 0; i < WISHHEROMAX; i++) {
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX || upgradeDict[i] == undefined) continue;
+        let i = WISHHEROMAX
+        while (i--) {
+            if (upgradeDict[i] == undefined) continue;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i].Row > -1){
                 rowTempDict[[upgradeDict[i].Row]] = i;
             }
         }
+
+        // 
+        // while (i--) {
+        //     if (upgradeDict[i] == undefined) continue;
+        //     if (i & (i < WISHHEROMIN || i > NONWISHHEROMAX)) {
+        //         if (upgradeDict[i].Row > -1){
+        //             const row = upgradeDict[i].Row;
+        //             if(!rowTempDict.hasOwnProperty(row)) rowTempDict[row] = i;
+        //         }
+        //     }
+        // }
         
-        for (let j = 0; j < Object.keys(rowTempDict).length; j++) {
+        for (let j = 0, len=Object.keys(rowTempDict).length; j < len; j++) {
             let loadedHeroID = rowTempDict[j]
             var heroTextLoad;
             var heroPurchasedOnceStyle;
@@ -439,7 +454,7 @@
 
     // ADD NEW HEROES TO TABLE1
     function addNewRow() {
-        for (let i = 0; i < WISHHEROMAX; i++) {
+        for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX || upgradeDict[i] == undefined) continue;
             if (upgradeDict[i].Row != -1) continue;
             if (saveValues["realScore"] >= upgradeDict[i]["Level"] && upgradeDict[i].Purchased == -1){
@@ -471,7 +486,8 @@
     // UPGRADE HEROES
     function upgrade(clicked_id) {
         var butIdArray = clicked_id.split("-")[1];
-        for (let i = 0; i < WISHHEROMAX; i++) {
+        let i = WISHHEROMAX;
+        while (i--) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i].Row == butIdArray) {
                 let freePass = false;
@@ -508,7 +524,8 @@
 
     // CHECK IF PRICE IS LOWER THAN CURRENT SCORE
     function dimHeroButton() {
-        for (let i = 0; i < WISHHEROMAX; i++) {
+        let i = WISHHEROMAX;
+        while (i--) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i]["Purchased"] < 0) continue;
 
@@ -526,10 +543,10 @@
     //------------------------------------------------------------------------TABLE 2 (INVENTORY)------------------------------------------------------------------------//
     // LOAD SAVED INVENTORY
     function inventoryload() {
-        for (let i = 1000; i < getHighestKey(Inventory); i++) {
+        for (let i = 1000, len=getHighestKey(Inventory); i < len; i++) {
             if (Inventory[i] == undefined) continue;
             if (Inventory[i].itemCount == 0) continue;
-            for (let j = 1; j < Inventory[i].itemCount + 1; j++) {
+            for (let j = 1, len=Inventory[i].itemCount + 1; j < len; j++) {
                 inventoryAdd(i, "load", j)
             }
         }
@@ -569,8 +586,9 @@
         let item = document.getElementById(itemUniqueId);
         let itemID = itemUniqueId.split(".")[0];
         if (itemID >= 1001 && itemID < WEAPONMAX){
-            for (let i = 0; i < WISHHEROMAX; i++) {
-                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1 && Inventory[i] == undefined) continue;
+            for (let i = 0, len=WISHHEROMAX; i < len; i++) {
+                if (upgradeDict[i] == undefined) continue;
+                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
                 if (upgradeDict[i].Purchased > 0){
                     if (upgradeDict[i].Type == Inventory[itemID].Type){
                         upgradeDict[i]["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
@@ -580,9 +598,11 @@
                 }
             }
         } else if (itemID >= 2001 && itemID < ARTIFACTMAX){
-            for (let i = 0; i < Object.keys(upgradeDict).length; i++) {
-                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1 && Inventory[i] == undefined) continue;
+            for (let i = 0, len=WISHHEROMAX; i < len; i++) {
+                if (upgradeDict[i] == undefined) continue;
+                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
                 if (upgradeDict[i].Purchased > 0){
+                    console.log(upgradeDict[i].Purchased)
                     upgradeDict[i]["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
@@ -779,7 +799,7 @@
     };
 
     function achievementListload() {
-        for (let i = 1; i < getHighestKey(achievementList); i++) {
+        for (let i = 1, len=getHighestKey(achievementList); i < len; i++) {
             if (achievementList[i] == undefined) continue;
             if (achievementList[i]["Done"] == true) {
                 let achievementStored = storeAchievement(achievementList[i].Name,achievementList[i].Description,10000 + i);

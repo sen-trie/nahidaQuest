@@ -209,7 +209,7 @@ img {
     gap: 10px;
     display: flex;
     flex-wrap: no-wrap;
-    flex-direction: row;
+    flex-direction: row-reverse;
     justify-content: space-between;
 }
 

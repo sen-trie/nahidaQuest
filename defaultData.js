@@ -197,7 +197,7 @@ var tooltip = {
 var expeditionDictDefault = {
     1:{Text:"Explore Teyvat | 100 "                 ,Locked:"0" ,Lore:"The legend of the Golden Nut is from a bygone era. Some on-the-ground research is certainly needed if you wanted even a slither of a chance to find the mythical fruit."},
     2:{Text:"Ask the Adventurers' Guild | 250 "   ,Locked:"0" ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
-    3:{Text:"Challenge Domains | 500 "              ,Locked:"1" ,Lore:"Clues about the origin of the Golden Nut are said to have been hidden deep inside some mysterious domain. Exploring it will likely be the next step in unravelling the fruit's location"},
+    3:{Text:"Challenge Domains | 500 "              ,Locked:"1" ,Lore:"Clues about the origin of the Golden Nut are said to have been hidden deep inside some mysterious domain. Exploring it will likely be the next step in unravelling the fruit's location."},
     4:{Text:"Hunt Boss Enemies | 750 "              ,Locked:"1" ,Lore:"The last confirmed sighting of the Golden Nut was in the heart of the woods, which is currently being guarded by a ferocious beast. It may well be the only stone left unturned."},
     5:{Text:"Abyss Diving | 1000 "                   ,Locked:"1" ,Lore:"All trails seem to end here. With nowhere else to go, the Abyss is the sole place left where the fruit is likely to be. Search through the floors with the help of an unlikely ally."},
     6:{Text:"Locked"                         ,Locked:"0" ,Lore:"Perhaps this path will open after some time..."            },
