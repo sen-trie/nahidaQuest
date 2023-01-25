@@ -339,11 +339,16 @@
             localStorage.setItem("InventorySave", JSON.stringify(Inventory));
             localStorage.setItem("achievementListSave", JSON.stringify(achievementList));
         })
+
         var clearSetting = document.createElement("button");
         clearSetting.classList.add("setting-clear");
         clearSetting.addEventListener("click",() => {localStorage.clear();location.reload()})
 
-        settingsMenu.append(volumeScroller, saveSetting, clearSetting);
+        var debugSetting = document.createElement("button");
+        debugSetting.classList.add("setting-debug");
+        debugSetting.addEventListener("click",() => {costMultiplier(5)})
+
+        settingsMenu.append(volumeScroller, saveSetting, clearSetting, debugSetting);
         mainBody.appendChild(settingsMenu);
 
         let settingButton = document.createElement("button");
@@ -403,17 +408,6 @@
                 rowTempDict[[upgradeDict[i].Row]] = i;
             }
         }
-
-        // 
-        // while (i--) {
-        //     if (upgradeDict[i] == undefined) continue;
-        //     if (i & (i < WISHHEROMIN || i > NONWISHHEROMAX)) {
-        //         if (upgradeDict[i].Row > -1){
-        //             const row = upgradeDict[i].Row;
-        //             if(!rowTempDict.hasOwnProperty(row)) rowTempDict[row] = i;
-        //         }
-        //     }
-        // }
         
         for (let j = 0, len=Object.keys(rowTempDict).length; j < len; j++) {
             let loadedHeroID = rowTempDict[j]
@@ -461,9 +455,9 @@
                 upgradeDict[i].Row = saveValues["rowCount"];
                 upgradeDict[i].Purchased = 0;
                 
-                if (upgradeDict[i]["Level"] == 0) {
+                if (upgradeDict[i]["Level"] === 0) {
                     var heroText = "Summon " + upgradeDict[i].Name + " for help. (" + abbrNum(upgradeDict[i]["Cost"]) + ")";
-                } else if (i == 0) {
+                } else if (i === 0) {
                     var heroText = "Level Up Nahida (" + abbrNum(upgradeDict[i]["Cost"]) + ")";
                 } else {
                     var heroText = "Call for " + upgradeDict[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["Cost"]) + ")";
@@ -490,36 +484,55 @@
         while (i--) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i].Row == butIdArray) {
-                let freePass = false;
-                if (saveValues["freeLevels"] > 0){
-                    freePass = true;
-                }
+                let realScoreCurrent = saveValues["realScore"];
+                let costCurrent = upgradeDict[i]["Cost"];
 
-                if (saveValues["realScore"] >= upgradeDict[i]["Cost"]) {
-                    if (freePass == true) {
-                        saveValues["realScore"] += upgradeDict[i]["Cost"];
+                if (realScoreCurrent >= costCurrent) {
+                    if (saveValues["freeLevels"] > 0) {
+                        realScoreCurrent += costCurrent;
                         saveValues["freeLevels"]--;
                     }
 
-                    saveValues["realScore"] -= upgradeDict[i]["Cost"];
-                    if (i == 0) {
+                    realScoreCurrent -= costCurrent;
+                    if (i === 0) {
                         saveValues["clickFactor"] += upgradeDict[i]["Factor"];
-                        var nextPrice =  Math.round(upgradeDict[i]["Cost"] * (1.3));
-                        upgradeDict[i]["Cost"] = nextPrice;
                     } else {
                         saveValues["dps"] += upgradeDict[i]["Factor"];
-                        var nextPrice =  Math.round(upgradeDict[i]["Cost"] * (1.2));
-                        upgradeDict[i]["Cost"] = nextPrice;
                     }
-      
+
+                    var nextPrice =  Math.round(costCurrent * (1.2));
+                    upgradeDict[i]["Cost"] = nextPrice;
                     upgradeDict[i].Purchased += 1;
+
                     refresh(clicked_id, nextPrice, i);
                     dimHeroButton();
                     clearTooltip();
                     changeTooltip(upgradeDict[i]["Name"],"hero",i);
+
+                    saveValues["realScore"] = realScoreCurrent;
                 }
+                break;
             }
         } 
+    }
+
+    var currentMultiplier = 1;
+    function costMultiplier(multi) {
+        currentMultiplier = multi;
+        let i = WISHHEROMAX;
+        while (i--) {
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
+            if (upgradeDict[i]["Purchased"] > 0) {
+                let realScoreCurrent = saveValues["realScore"];
+                let costCurrent = upgradeDict[i]["Cost"];
+                let upgradedPrice = Math.round(costCurrent * (1-(1.2**(multi-1)))/-0.2);
+
+                let buttID = "but-" + i;
+                
+                refresh(buttID, upgradedPrice, i, multi);
+            }
+        } 
+        dimHeroButton();
     }
 
     // CHECK IF PRICE IS LOWER THAN CURRENT SCORE
@@ -529,11 +542,18 @@
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i]["Purchased"] < 0) continue;
 
+            let checkPrice;
+            if (currentMultiplier > 1) {
+                    checkPrice = Math.round(upgradeDict[i]["Cost"] * (1-(1.2**(currentMultiplier-1)))/-0.2);
+                } else {
+                    checkPrice = upgradeDict[i]["Cost"];
+                }
+
             let heroID = "but-" + upgradeDict[i].Row;
-            if (upgradeDict[i]["Cost"] > saveValues["realScore"]) {
+            if (checkPrice > saveValues["realScore"]) {
                 document.getElementById(heroID).classList.add("dim");
                 document.getElementById(heroID).classList.remove("not-dim");
-            } else if (upgradeDict[i]["Cost"] <= saveValues["realScore"]) {
+            } else {
                 document.getElementById(heroID).classList.add("not-dim");
                 document.getElementById(heroID).classList.remove("dim");
             }
@@ -547,18 +567,19 @@
             if (Inventory[i] == undefined) continue;
             if (Inventory[i].itemCount == 0) continue;
             for (let j = 1, len=Inventory[i].itemCount + 1; j < len; j++) {
-                inventoryAdd(i, "load", j)
+                inventoryAdd(i, "load", j);
             }
         }
     }
 
     // ADD TO INVENTORY 
     function inventoryAdd(idNum, type, count) {
+        let itemUniqueID;
         if (type != "load") {
             Inventory[idNum].itemCount++
-            var itemUniqueID = idNum + "." + Inventory[idNum].itemCount;
+            itemUniqueID = idNum + "." + Inventory[idNum].itemCount;
         } else {
-            var itemUniqueID = idNum + "." + count;
+            itemUniqueID = idNum + "." + count;
         }
         let buttonInv = document.createElement("button");
         buttonInv.id = itemUniqueID;
@@ -581,7 +602,6 @@
     // RMB TO UPDATE CONSTANTS
     const weaponBuffPercent = [0, 1.1, 1.3, 1.7, 2.3, 3];
     const artifactBuffPercent = [0, 1.02, 1.05, 1.10, 1.20, 1.35];
-
     function itemUse(itemUniqueId) {
         let item = document.getElementById(itemUniqueId);
         let itemID = itemUniqueId.split(".")[0];
@@ -602,7 +622,6 @@
                 if (upgradeDict[i] == undefined) continue;
                 if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
                 if (upgradeDict[i].Purchased > 0){
-                    console.log(upgradeDict[i].Purchased)
                     upgradeDict[i]["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
@@ -620,7 +639,7 @@
     const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
     function adventure(type) {
         if (expeditionDict[type].Locked == '1'){
-            // alert("ITS LOCKED CANT YOU SEE!!!!!!!")
+             alert("ITS LOCKED CANT YOU SEE!!!!!!!")
             return;                                //// <------------------------ ADD THE POPUP FOR LOCKED
         } else {                                                     
             if (saveValues["energy"] >= ADVENTURECOSTS[type]){
@@ -854,22 +873,24 @@
     }
 
     function checkAchievement() {
+        let saveValuesLocal = saveValues;
+
         if (achievementData["achievementTypeRawScore"].length !== 0){
-            if (saveValues["realScore"] >= achievementData["achievementTypeRawScore"][0]) {
+            if (saveValuesLocal["realScore"] >= achievementData["achievementTypeRawScore"][0]) {
                 popAchievement("score");
                 achievementData["achievementTypeRawScore"].shift();
             }
         } 
         
         if (achievementData["achievementTypeRawDPS"].length !== 0){
-            if (saveValues["dps"] >= achievementData["achievementTypeRawDPS"][0]) {
+            if (saveValuesLocal["dps"] >= achievementData["achievementTypeRawDPS"][0]) {
                 popAchievement("dps");
                 achievementData["achievementTypeRawDPS"].shift();
             }
         }
 
         if (achievementData["achievementTypeRawCollection"].length !== 0) {
-            if (saveValues["heroesPurchased"] >= achievementData["achievementTypeRawCollection"][0]) {
+            if (saveValuesLocal["heroesPurchased"] >= achievementData["achievementTypeRawCollection"][0]) {
                 popAchievement("collection");
                 achievementData["achievementTypeRawCollection"].shift();
             }
@@ -898,9 +919,10 @@
         toolImg.src = "./assets/tooltips/"+name+".webp";
 
         if (type == "hero") {
-            tooltipText.innerHTML += "Times upgraded: " + upgradeDict[ID]["Purchased"];
-            tooltipText.innerHTML += "\n Weapon: " + upgradeDict[ID]["Type"];
-            tooltipText.innerHTML += "\n Element: " + upgradeDict[ID]["Ele"];
+            let upgradeDictLocal = upgradeDict;
+            tooltipText.innerHTML += "Times upgraded: " + upgradeDictLocal[ID]["Purchased"];
+            tooltipText.innerHTML += "\n Weapon: " + upgradeDictLocal[ID]["Type"];
+            tooltipText.innerHTML += "\n Element: " + upgradeDictLocal[ID]["Ele"];
         }
     }
 
@@ -922,11 +944,19 @@
         energyDisplay.innerText = saveValues["energy"];
         primogemDisplay.innerText = saveValues["primogem"];
         
-        if (arguments[0] != undefined) {
+        if (arguments[0] != undefined) { // BUYING A HERO FOR THE FIRST TIME
             if (arguments[0].includes("but-")){
-                var heroTextFirst = "";
-                let formatCost = abbrNum(arguments[1]);
-                let formatATK = abbrNum(upgradeDict[arguments[2]]["Factor"]);
+                let heroTextFirst = "";
+                let formatCost = arguments[1];
+                let formatATK = (upgradeDict[arguments[2]]["Factor"]);
+
+                if (currentMultiplier != 1) {
+                    formatCost *= ((1-(1.2**(currentMultiplier-1)))/-0.2);
+                    formatATK *= currentMultiplier;
+                }
+
+                formatCost = abbrNum(formatCost)
+                formatATK = abbrNum(formatATK);
 
                 if (arguments[2] == 0) {
                     let singular = ` Nut${upgradeDict[arguments[2]]["Factor"] !== 1 ? 's' : ''} per click`;
@@ -936,18 +966,19 @@
                 }
 
                 saveValues["heroesPurchased"]++;
-                checkExpeditionUnlock(saveValues["heroesPurchased"])
+                checkExpeditionUnlock(saveValues["heroesPurchased"]);
                 
                 let upgradedHeroButton = document.getElementById(arguments[0]);
                 upgradedHeroButton.innerText = heroTextFirst;
                 upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeDict[arguments[2]].Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
             }
-        } else if (arguments[0] == "hero") {
-            let formatATK = abbrNum(upgradeDict[arguments[1]]["Factor"]);
-            let formatCost = abbrNum(arguments[1]);
-            var heroText =  upgradeDict[arguments[1]].Name + ": " + formatCost + ", " + formatATK + " NpS";
-            let id="but-" + arguments[1].rowCount + "";
-            document.getElementById(id).innerText = heroText;
+            else if (arguments[0] == "hero") { // REFRESH FOR ARTIFACTS
+                let formatATK = abbrNum(upgradeDict[arguments[1]]["Factor"]);
+                let formatCost = abbrNum(arguments[1]);
+                let heroText =  upgradeDict[arguments[1]].Name + ": " + formatCost + ", " + formatATK + " NpS";
+                let id="but-" + arguments[1].rowCount + "";
+                document.getElementById(id).innerText = heroText;
+            }
         }
     }
 
