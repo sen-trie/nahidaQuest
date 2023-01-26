@@ -40,7 +40,7 @@
 </head>
 <body id="bodyID" class="prevent-select">
     <div id="body-border" class="overlay">
-        <img src="./assets/loading.gif" style="width:1000px;height:563px;">
+        <img src="./assets/loading.gif" style="width:1000px;height:563px;z-index: 5;">
     </div>
     <p id="para">
         <div class="energy-primo-container">
@@ -77,8 +77,6 @@
             <tr></tr>
         </table>
     </table>
-
-    
 
 <script type="module">
     import { upgradeDictDefault,InventoryDefault,tooltip,expeditionDictDefault,achievementListDefault,saveValuesDefault } from "./defaultData.js"
@@ -140,13 +138,13 @@
     loadSaveData();
 
     var WISHHEROMAX = getHighestKey(upgradeDict) + 1;
-    console.log(WISHHEROMAX )
     refresh();
 
     saveValues["realScore"]++;
     addNewRow();
     saveValues["realScore"]--;
 
+    createMultiplierButton();
     createExpedition();
     createExpedTable(expedDiv);
     para1.appendChild(expedDiv);
@@ -154,7 +152,9 @@
     
     drawWish();
     tabChange(1);
+    var currentBGM;
     var timer = setInterval(timerEvents,1000000);
+    var timerSeconds = 0;
     
     // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH SET TO 0.5 SECONDS)
     function timerEvents() {
@@ -163,6 +163,14 @@
         refresh();
         dimHeroButton();
         addNewRow();
+
+        // SAVES EVERY 3 MINUTES
+        timerSeconds += 0.5;
+        if (timerSeconds > 180) {
+            saveData();
+            console.log("saved!");
+            timerSeconds = 0;
+        }
     } 
 
     // LOAD SAVE DATA
@@ -207,6 +215,29 @@
             achievementListload();
         }
     }
+
+    // BIG BUTTON FUNCTIONS
+    var demo = document.getElementById("demo");
+    demo.addEventListener("click", () => {
+        saveValues["clickCount"] += 1;
+        saveValues["realScore"] += 1 * saveValues["clickFactor"];
+        energyRoll();
+        refresh();
+    });
+    demoFunction();
+    
+    // ROLL FOR ENERGY
+    function energyRoll() {
+        let randInt = Math.floor(Math.random() * 1000);
+        clickDelay--;
+
+        if (clickDelay < 1){
+            if (randInt < ENERGYCHANCE){
+                saveValues["energy"] += randomInteger(lowerEnergyRate, upperEnergyRate);
+                clickDelay = 20;
+            }
+        }
+    }
     
     //--------------------------------------------------------------------------MAIN BODY----------------------------------------------------------------------//
     function loadingAnimation() {
@@ -244,7 +275,48 @@
 
         return bgmElement;
     }
+    
+    // TUTORIAL UPON FIRST LOAD
+    function tutorial() {
+        var currentSlide = 1;
+        var tutorialDark = document.createElement("div");
+        tutorialDark.classList.add("tutorial-dark");
 
+        var tutorialImage = document.createElement("img");
+        tutorialImage.classList.add("tutorial-img");
+        tutorialImage.id = "tutorialImg";
+        tutorialImage.src = "./assets/tutorial/tut-1.jpg"
+        
+        var tutorialScreen = document.createElement("div");
+        tutorialScreen.classList.add("tutorial-screen");
+        tutorialScreen.addEventListener("click", () => {
+            if (currentSlide == 4) {
+                tutorialDark.remove();
+                timer = setInterval(timerEvents,500);
+                currentBGM = playAudio();
+                settingsVolume(currentBGM);
+                return;
+            }
+
+            currentSlide++;
+            let currentTutorialImage = document.getElementById("tutorialImg");
+            currentTutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".jpg";
+        })
+
+        tutorialScreen.appendChild(tutorialImage);
+        tutorialDark.appendChild(tutorialScreen);
+        para1.appendChild(tutorialDark);
+    }
+
+    function saveData() {
+        localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
+        localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
+        localStorage.setItem("expeditionDictSave", JSON.stringify(expeditionDict));
+        localStorage.setItem("InventorySave", JSON.stringify(Inventory));
+        localStorage.setItem("achievementListSave", JSON.stringify(achievementList));
+    }
+
+    //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
     // TAB UI
     createTabs();
     function createTabs() {
@@ -283,38 +355,6 @@
          expedDiv.style.display = (x === 2) ? 'block' : 'none';
     }
     
-    // TUTORIAL UPON FIRST LOAD
-    function tutorial() {
-        var currentSlide = 1;
-        var tutorialDark = document.createElement("div");
-        tutorialDark.classList.add("tutorial-dark");
-
-        var tutorialImage = document.createElement("img");
-        tutorialImage.classList.add("tutorial-img");
-        tutorialImage.id = "tutorialImg";
-        tutorialImage.src = "./assets/tutorial/tut-1.jpg"
-        
-        var tutorialScreen = document.createElement("div");
-        tutorialScreen.classList.add("tutorial-screen");
-        tutorialScreen.addEventListener("click", () => {
-            if (currentSlide == 4) {
-                tutorialDark.remove();
-                timer = setInterval(timerEvents,500);
-                var currentBGM = playAudio();
-                settingsVolume(currentBGM);
-                return;
-            }
-
-            currentSlide++;
-            let currentTutorialImage = document.getElementById("tutorialImg");
-            currentTutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".jpg";
-        })
-
-        tutorialScreen.appendChild(tutorialImage);
-        tutorialDark.appendChild(tutorialScreen);
-        para1.appendChild(tutorialDark);
-    }
-
     // SETTINGS MENU - SAVES & VOLUME CONTROL
     var settingsOpen = false;
     function settings() {
@@ -331,24 +371,13 @@
 
         var saveSetting = document.createElement("button");
         saveSetting.classList.add("setting-save");
-        saveSetting.addEventListener("click",() => {
-            // SAVES ALL DATA TO LOCAL STORAGE
-            localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
-            localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
-            localStorage.setItem("expeditionDictSave", JSON.stringify(expeditionDict));
-            localStorage.setItem("InventorySave", JSON.stringify(Inventory));
-            localStorage.setItem("achievementListSave", JSON.stringify(achievementList));
-        })
+        saveSetting.addEventListener("click",() => {saveData();})
 
         var clearSetting = document.createElement("button");
         clearSetting.classList.add("setting-clear");
         clearSetting.addEventListener("click",() => {localStorage.clear();location.reload()})
 
-        var debugSetting = document.createElement("button");
-        debugSetting.classList.add("setting-debug");
-        debugSetting.addEventListener("click",() => {costMultiplier(5)})
-
-        settingsMenu.append(volumeScroller, saveSetting, clearSetting, debugSetting);
+        settingsMenu.append(volumeScroller, saveSetting, clearSetting);
         mainBody.appendChild(settingsMenu);
 
         let settingButton = document.createElement("button");
@@ -373,28 +402,32 @@
         });
     }
 
-    // BIG BUTTON FUNCTIONS
-    var demo = document.getElementById("demo");
-    demo.addEventListener("click", () => {
-        saveValues["clickCount"] += 1;
-        saveValues["realScore"] += 1 * saveValues["clickFactor"];
-        energyRoll();
-        refresh();
-    });
-    demoFunction();
-    
-    // ROLL FOR ENERGY
-    function energyRoll() {
-        let randInt = Math.floor(Math.random() * 1000);
-        clickDelay--;
+    function createMultiplierButton() {
+        var multiplierButtonContainer = document.createElement("div");
+        multiplierButtonContainer.classList.add("multiplier-button-container");
 
-        if (clickDelay < 1){
-            if (randInt < ENERGYCHANCE){
-                saveValues["energy"] += randomInteger(lowerEnergyRate, upperEnergyRate);
-                clickDelay = 20;
-            }
-        }
+        let multiplierButton1 = document.createElement("button");
+        multiplierButton1.classList.add("multiplier-button");
+        multiplierButton1.id = "multiplierButton-1";
+        multiplierButton1.style.background = "url(./assets/settings/multi-1.webp";
+        multiplierButton1.addEventListener("click",() => {costMultiplier(10),dimMultiplierButton(1)})
+
+        let multiplierButton2 = document.createElement("button");
+        multiplierButton2.classList.add("multiplier-button");
+        multiplierButton2.id = "multiplierButton-2";
+        multiplierButton2.style.background = "url(./assets/settings/multi-2.webp";
+        multiplierButton2.addEventListener("click",() => {costMultiplier(25),dimMultiplierButton(2)})
+
+        let multiplierButton3 = document.createElement("button");
+        multiplierButton3.classList.add("multiplier-button");
+        multiplierButton3.id = "multiplierButton-3";
+        multiplierButton3.addEventListener("click",() => {costMultiplier(100),dimMultiplierButton(3)})
+        multiplierButton3.style.background = "url(./assets/settings/multi-3.webp";
+
+        multiplierButtonContainer.append(multiplierButton1, multiplierButton2, multiplierButton3);
+        para1.appendChild(multiplierButtonContainer)
     }
+    
     
     //------------------------------------------------------------------------TABLE 1 (HEROES)------------------------------------------------------------------------//
     // LOAD SAVED HEROES IN TABLE1
@@ -486,23 +519,34 @@
             if (upgradeDict[i].Row == butIdArray) {
                 let realScoreCurrent = saveValues["realScore"];
                 let costCurrent = upgradeDict[i]["Cost"];
+                let currentMultiplierLocal = currentMultiplier;
+
+                if (upgradeDict[i].Purchased === 0) {
+                    currentMultiplierLocal = 1;
+                }
+
+                if (currentMultiplierLocal != 1) {
+                    costCurrent = Math.round(costCurrent * (1-(1.2**(currentMultiplierLocal-1)))/-0.2);
+                }
 
                 if (realScoreCurrent >= costCurrent) {
-                    if (saveValues["freeLevels"] > 0) {
+                    if (saveValues["freeLevels"] > 0 && currentMultiplierLocal === 1) {
                         realScoreCurrent += costCurrent;
                         saveValues["freeLevels"]--;
                     }
 
                     realScoreCurrent -= costCurrent;
                     if (i === 0) {
-                        saveValues["clickFactor"] += upgradeDict[i]["Factor"];
+                        saveValues["clickFactor"] += upgradeDict[i]["Factor"] * currentMultiplierLocal;
                     } else {
-                        saveValues["dps"] += upgradeDict[i]["Factor"];
+                        saveValues["dps"] += upgradeDict[i]["Factor"] * currentMultiplierLocal;
                     }
 
-                    var nextPrice =  Math.round(costCurrent * (1.2));
+                    let nextPrice = Math.round(costCurrent * (1.2 * currentMultiplierLocal));
                     upgradeDict[i]["Cost"] = nextPrice;
-                    upgradeDict[i].Purchased += 1;
+                    upgradeDict[i].Purchased += 1 * currentMultiplierLocal;
+                    saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
+                    checkExpeditionUnlock(saveValues["heroesPurchased"]);
 
                     refresh(clicked_id, nextPrice, i);
                     dimHeroButton();
@@ -516,20 +560,44 @@
         } 
     }
 
+    var currentDimMultiplier = 0;
+    function dimMultiplierButton(int) {
+        
+        if (currentDimMultiplier === int) {
+            let buttonDimmed = document.getElementById("multiplierButton-" + int);
+            buttonDimmed.classList.remove("dim-filter");
+            currentDimMultiplier = 0;
+        } else if (currentDimMultiplier === 0) {
+            let buttonDimmed = document.getElementById("multiplierButton-" + int);
+            buttonDimmed.classList.add("dim-filter");
+            currentDimMultiplier = int;
+        } else {
+            console.log(currentDimMultiplier)
+            let buttonUndimmed = document.getElementById("multiplierButton-" + currentDimMultiplier);
+            buttonUndimmed.classList.remove("dim-filter");
+            
+            let buttonDimmed = document.getElementById("multiplierButton-" + int);
+            buttonDimmed.classList.add("dim-filter");
+            currentDimMultiplier = int;
+        }
+
+    }
+
     var currentMultiplier = 1;
     function costMultiplier(multi) {
-        currentMultiplier = multi;
+        if (currentMultiplier == multi) {
+            currentMultiplier = 1;
+        } else {
+            currentMultiplier = multi;
+        }
+
         let i = WISHHEROMAX;
         while (i--) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i]["Purchased"] > 0) {
                 let realScoreCurrent = saveValues["realScore"];
-                let costCurrent = upgradeDict[i]["Cost"];
-                let upgradedPrice = Math.round(costCurrent * (1-(1.2**(multi-1)))/-0.2);
-
                 let buttID = "but-" + i;
-                
-                refresh(buttID, upgradedPrice, i, multi);
+                refresh(buttID, upgradeDict[i]["Cost"], i);
             }
         } 
         dimHeroButton();
@@ -543,7 +611,7 @@
             if (upgradeDict[i]["Purchased"] < 0) continue;
 
             let checkPrice;
-            if (currentMultiplier > 1) {
+            if (currentMultiplier > 1 && upgradeDict[i]["Purchased"] > 0) {
                     checkPrice = Math.round(upgradeDict[i]["Cost"] * (1-(1.2**(currentMultiplier-1)))/-0.2);
                 } else {
                     checkPrice = upgradeDict[i]["Cost"];
@@ -920,9 +988,8 @@
 
         if (type == "hero") {
             let upgradeDictLocal = upgradeDict;
-            tooltipText.innerHTML += "Times upgraded: " + upgradeDictLocal[ID]["Purchased"];
-            tooltipText.innerHTML += "\n Weapon: " + upgradeDictLocal[ID]["Type"];
-            tooltipText.innerHTML += "\n Element: " + upgradeDictLocal[ID]["Ele"];
+            let tooltipTextLocal = "Times upgraded: " + upgradeDictLocal[ID]["Purchased"] + "\n Weapon: " + upgradeDictLocal[ID]["Type"] + "\n Element: " + upgradeDictLocal[ID]["Ele"] + "<br />" + "Free Levels: " + saveValues["freeLevels"];
+            tooltipText.innerHTML += tooltipTextLocal;
         }
     }
 
@@ -955,28 +1022,33 @@
                     formatATK *= currentMultiplier;
                 }
 
-                formatCost = abbrNum(formatCost)
-                formatATK = abbrNum(formatATK);
+                formatCost = abbrNum(formatCost);
 
                 if (arguments[2] == 0) {
-                    let singular = ` Nut${upgradeDict[arguments[2]]["Factor"] !== 1 ? 's' : ''} per click`;
-                    heroTextFirst = upgradeDict[arguments[2]].Name + ": " + formatCost + ", " + formatATK + singular;
+                    let singular = ` Nut${formatATK !== 1 ? 's' : ''} per click`;
+                    formatATK = abbrNum(formatATK)
+                    heroTextFirst = upgradeDict[arguments[2]].Name + ": " + formatCost + ", +" + formatATK + singular;
                 } else {
+                    formatATK = abbrNum(formatATK)
                     heroTextFirst = upgradeDict[arguments[2]].Name + ": " + formatCost + ", +" + formatATK + " NpS";
                 }
-
-                saveValues["heroesPurchased"]++;
-                checkExpeditionUnlock(saveValues["heroesPurchased"]);
                 
                 let upgradedHeroButton = document.getElementById(arguments[0]);
                 upgradedHeroButton.innerText = heroTextFirst;
                 upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeDict[arguments[2]].Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
             }
             else if (arguments[0] == "hero") { // REFRESH FOR ARTIFACTS
-                let formatATK = abbrNum(upgradeDict[arguments[1]]["Factor"]);
-                let formatCost = abbrNum(arguments[1]);
-                let heroText =  upgradeDict[arguments[1]].Name + ": " + formatCost + ", " + formatATK + " NpS";
-                let id="but-" + arguments[1].rowCount + "";
+                let hero = upgradeDict[arguments[1]];
+                let formatATK = hero["Factor"];
+                let formatCost = hero["Cost"];
+
+                if (currentMultiplier != 1) {
+                    formatCost *= ((1-(1.2**(currentMultiplier-1)))/-0.2);
+                    formatATK *= currentMultiplier;
+                }
+
+                let heroText = hero.Name + ": " + abbrNum(formatCost) + ", +" + abbrNum(formatATK) + " NpS";
+                let id="but-" + hero.Row + "";
                 document.getElementById(id).innerText = heroText;
             }
         }

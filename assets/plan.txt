@@ -53,7 +53,7 @@ Inventory:
 	%ATK/%Ele Artifacts
 
 Party:
-	x5 x10 purchase
+	✔️x5 x10 purchase
 
 Talent System at lvl 10, 25, 50, 100, 150, 200, 250, 300, 400, 500
 	unlock Skill at lvl 100

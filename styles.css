@@ -153,6 +153,30 @@ button {
     background-color: rgb(216, 28, 28);
 }
 
+.multiplier-button-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    
+    width: 50px;
+    height: 166px;
+    top: 610px;
+    left: 623px;
+}
+
+.multiplier-button {
+    width: 49px;
+    height: 48px;
+}
+
+
+.dim-filter {
+    transition: 0.1s ease;
+    filter: brightness(50%);
+}
+
 /* BUTTON CSS */
 #demo {
     width: 95%;
