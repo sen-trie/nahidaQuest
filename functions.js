@@ -26,7 +26,7 @@ function abbrNum(number) {
 // GET HIGHEST KEY IN AN OBJECT
 function getHighestKey(obj) {
     var highestValue = 0;
-    obj =  Object.keys(obj)
+    obj = Object.keys(obj)
     for (const key of Object.keys(obj)) {
         if (parseInt(obj[key]) > highestValue) {
             highestValue = obj[key];

@@ -173,7 +173,7 @@ button {
 
 
 .dim-filter {
-    transition: 0.1s ease;
+    transition: 0.3s ease;
     filter: brightness(50%);
 }
 
@@ -495,7 +495,6 @@ img {
     content: url(./assets/primogemIcon.png);
 }
 
-
 .wish-mail-container {
     position: absolute;
     top: 0px;
@@ -574,7 +573,7 @@ img {
 }
 
 .table6 {
-    background: yellow;
+    background: url(./assets/tooltips/background.webp);
     position: absolute; 
     top: 90px; 
     left: 1350px;
@@ -605,4 +604,11 @@ img {
 .tool-tip-lore {
     font-size: 20px;
     text-align: left;
+}
+
+.tool-tip-extraimg {
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
+    align-items: center;
 }

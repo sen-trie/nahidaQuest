@@ -63,7 +63,7 @@ function createHeroButtonContainer(heroID,heroText) {
 function createExpedTable(expedDiv) {
     let expedTable = document.createElement("table");
     expedTable.classList = "tooltipTABLEEXPED";
-    expedTable.id = "expedTableID"
+    expedTable.id = "expedTableID";
 
     let expedRow = expedTable.insertRow(0);
     expedRow.style.height = "110px";

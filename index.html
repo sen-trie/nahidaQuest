@@ -127,7 +127,6 @@
 
     // TOOLTIPS FOR EXPEDITION
     var expedContainer = document.getElementById("table3");
-    expedDiv.style.display = "none";
 
     // INITIAL LOADING
     loadingAnimation();
@@ -138,6 +137,7 @@
     loadSaveData();
 
     var WISHHEROMAX = getHighestKey(upgradeDict) + 1;
+    var wishCounter = WISHHEROMAX - WISHHEROMIN;
     refresh();
 
     saveValues["realScore"]++;
@@ -214,6 +214,7 @@
             achievementList = JSON.parse(achievementListTemp);
             achievementListload();
         }
+        
     }
 
     // BIG BUTTON FUNCTIONS
@@ -348,11 +349,11 @@
             table6.style["z-index"] = -1; 
          }
 
-         if (x != 3) {
+         if (x != 3 && wishCounter != saveValues["wishCounterSaved"]) {
             let mailImageTemp = document.getElementById("mailImageID")
              mailImageTemp.style.opacity = 1;
          }
-         expedDiv.style.display = (x === 2) ? 'block' : 'none';
+         expedDiv.style["z-index"] = (x === 2) ? 1 : -1;
     }
     
     // SETTINGS MENU - SAVES & VOLUME CONTROL
@@ -472,7 +473,8 @@
             let toolName = upgradeDict[loadedHeroID].Name;
             if (purchased == true) {heroButtonContainer.style="background:url(./assets/nameplates/"+upgradeDict[loadedHeroID].Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;"}
 
-            heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", rowTempDict[j])});
+            
+            heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", rowTempDict[j]);});
             heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
             heroButtonContainer.addEventListener("click", () => {upgrade(heroID)});
             table1.appendChild(heroButtonContainer);
@@ -526,7 +528,7 @@
                 }
 
                 if (currentMultiplierLocal != 1) {
-                    costCurrent = Math.round(costCurrent * (1-(1.2**(currentMultiplierLocal-1)))/-0.2);
+                    costCurrent = Math.round(costCurrent * (1-(1.15**(currentMultiplierLocal-1)))/-0.2);
                 }
 
                 if (realScoreCurrent >= costCurrent) {
@@ -542,7 +544,7 @@
                         saveValues["dps"] += upgradeDict[i]["Factor"] * currentMultiplierLocal;
                     }
 
-                    let nextPrice = Math.round(costCurrent * (1.2 * currentMultiplierLocal));
+                    let nextPrice = Math.round(costCurrent * (1.15 * currentMultiplierLocal));
                     upgradeDict[i]["Cost"] = nextPrice;
                     upgradeDict[i].Purchased += 1 * currentMultiplierLocal;
                     saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
@@ -572,7 +574,6 @@
             buttonDimmed.classList.add("dim-filter");
             currentDimMultiplier = int;
         } else {
-            console.log(currentDimMultiplier)
             let buttonUndimmed = document.getElementById("multiplierButton-" + currentDimMultiplier);
             buttonUndimmed.classList.remove("dim-filter");
             
@@ -596,7 +597,7 @@
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i]["Purchased"] > 0) {
                 let realScoreCurrent = saveValues["realScore"];
-                let buttID = "but-" + i;
+                let buttID = "but-" + upgradeDict[i].Row;
                 refresh(buttID, upgradeDict[i]["Cost"], i);
             }
         } 
@@ -612,7 +613,7 @@
 
             let checkPrice;
             if (currentMultiplier > 1 && upgradeDict[i]["Purchased"] > 0) {
-                    checkPrice = Math.round(upgradeDict[i]["Cost"] * (1-(1.2**(currentMultiplier-1)))/-0.2);
+                    checkPrice = Math.round(upgradeDict[i]["Cost"] * (1-(1.15**(currentMultiplier-1)))/-0.2);
                 } else {
                     checkPrice = upgradeDict[i]["Cost"];
                 }
@@ -707,7 +708,7 @@
     const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
     function adventure(type) {
         if (expeditionDict[type].Locked == '1'){
-             alert("ITS LOCKED CANT YOU SEE!!!!!!!")
+            alert("ITS LOCKED CANT YOU SEE!!!!!!!")
             return;                                //// <------------------------ ADD THE POPUP FOR LOCKED
         } else {                                                     
             if (saveValues["energy"] >= ADVENTURECOSTS[type]){
@@ -826,30 +827,56 @@
     }
 
     //------------------------------------------------------------------------TABLE 4 (WISH)------------------------------------------------------------------------//
+     // UNLOCK WISH SYSTEM
+     function wishUnlock() {
+        let wishButton = document.getElementById("wishButton");
+        wishButton.innerText = "Write for help | 160 ";
+        wishButton.classList.add("wish-button-new");
+        wishButton.addEventListener("click",() => {
+            wish();
+        })
+    }
+    
     // DRAWS/WISH FOR SPECIAL HEROS
     function drawWish() {
         var wishButton = document.createElement("button");
         wishButton.classList += "wish-button";
         wishButton.id = "wishButton";
-        wishButton.innerText = "???"
-    
+        wishButton.innerText = "???";
+
         table4 = drawMailTable(table4);
         table4.appendChild(wishButton);
+
+        if (wishCounter === saveValues["wishCounterSaved"]) {
+            stopWish();
+        } else if (saveValues["wishUnlocked"] == true) {
+            wishUnlock();
+        } 
     }
 
-    var wishCounter = WISHHEROMAX - WISHHEROMIN;
+    function stopWish() {
+        wishButton.innerText = "Closed";
+        wishButton.classList.remove("wish-button-new");
+        var wishButtonDone = wishButton.cloneNode(true);
+        wishButton.parentNode.replaceChild(wishButtonDone, wishButton);
+
+        let mailImageTemp = document.getElementById("mailImageID");
+        mailImageTemp.remove();
+    }
+
     function wish() {
-        if (wishCounter == 0) {
+        if (wishCounter === saveValues["wishCounterSaved"]) {
+            stopWish();
             return;
         }
 
-        if (saveValues["primogem"] > WISHCOST) {
+        if (saveValues["primogem"] >= WISHCOST) {
             saveValues["primogem"] -= WISHCOST;
 
             // SCARAMOUCHE WILL ALWAYS BE THE FIRST WISH HERO
             while (wishCounter) {
                 let randomWishHero;
-                if (wishCounter == WISHHEROMAX - WISHHEROMIN) {
+                if (upgradeDict[100].Purchased === -10) {
                     randomWishHero = 100;
                     unlockExpedition(5,expeditionDict);
                     newPop(3);
@@ -863,12 +890,13 @@
                     upgradeDict[randomWishHero].Purchased = -1;
                     upgradeDict[randomWishHero]["Factor"] = Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/50 + 1);
                     upgradeDict[randomWishHero]["Cost"] = Math.round(saveValues["dps"] * (55) + 1);
+                    
                     wishMultiplier += 1.5;
-                    wishCounter--;
+                    saveValues["wishCounterSaved"]++;
                     refresh();
                     newPop(1);
 
-                    let mailImageTemp = document.getElementById("mailImageID")
+                    let mailImageTemp = document.getElementById("mailImageID");
                     mailImageTemp.style.opacity = 0;
                     break;
                 }
@@ -942,7 +970,6 @@
 
     function checkAchievement() {
         let saveValuesLocal = saveValues;
-
         if (achievementData["achievementTypeRawScore"].length !== 0){
             if (saveValuesLocal["realScore"] >= achievementData["achievementTypeRawScore"][0]) {
                 popAchievement("score");
@@ -976,19 +1003,30 @@
     
     var tooltipText = document.createElement("div");
     tooltipText.classList += "tool-tip-text";
-    var tooltipLore= document.createElement("div");
+    var tooltipLore = document.createElement("div");
     tooltipLore.classList += "tool-tip-lore";
 
-    table6.append(tooltipName,toolImg,tooltipText,tooltipLore);
+    let tooltipExtraImg = document.createElement("div");
+    tooltipExtraImg.classList += "tool-tip-extraimg";
+    var tooltipWeaponImg = document.createElement("img");
+    var tooltipElementImg = document.createElement("img");
+    
+    tooltipExtraImg.append(tooltipWeaponImg,tooltipElementImg)
+    table6.append(tooltipName,toolImg,tooltipText,tooltipLore,tooltipExtraImg);
 
     function changeTooltip(name, type, ID) {
+        console.log(name + type + ID)
         tooltipName.innerText = tooltip[name]["name"];
         tooltipLore.innerText = tooltip[name]["lore"];
         toolImg.src = "./assets/tooltips/"+name+".webp";
 
         if (type == "hero") {
             let upgradeDictLocal = upgradeDict;
-            let tooltipTextLocal = "Times upgraded: " + upgradeDictLocal[ID]["Purchased"] + "\n Weapon: " + upgradeDictLocal[ID]["Type"] + "\n Element: " + upgradeDictLocal[ID]["Ele"] + "<br />" + "Free Levels: " + saveValues["freeLevels"];
+            let tooltipTextLocal = "Times upgraded: " +upgradeDictLocal[ID]["Purchased"]+ "<br />Free Levels: " +saveValues["freeLevels"];
+            tooltipElementImg.src = "./assets/tooltips/" +upgradeDictLocal[ID].Ele+ ".svg";
+            tooltipWeaponImg.src = "./assets/tooltips/" +upgradeDictLocal[ID].Weapon+ ".svg";
+            
+
             tooltipText.innerHTML += tooltipTextLocal;
         }
     }
@@ -997,6 +1035,8 @@
         tooltipName.innerText = "";
         tooltipText.innerText = "";
         tooltipLore.innerText = "";
+        tooltipWeaponImg.src = "./assets/tooltips/Empty.webp";
+        tooltipElementImg.src = "./assets/tooltips/Empty.webp";
         toolImg.src = "./assets/tooltips/Empty.webp";
     }
 
@@ -1018,7 +1058,7 @@
                 let formatATK = (upgradeDict[arguments[2]]["Factor"]);
 
                 if (currentMultiplier != 1) {
-                    formatCost *= ((1-(1.2**(currentMultiplier-1)))/-0.2);
+                    formatCost *= ((1-(1.15**(currentMultiplier-1)))/-0.2);
                     formatATK *= currentMultiplier;
                 }
 
@@ -1032,6 +1072,8 @@
                     formatATK = abbrNum(formatATK)
                     heroTextFirst = upgradeDict[arguments[2]].Name + ": " + formatCost + ", +" + formatATK + " NpS";
                 }
+
+                console.log(arguments[0])
                 
                 let upgradedHeroButton = document.getElementById(arguments[0]);
                 upgradedHeroButton.innerText = heroTextFirst;
@@ -1043,7 +1085,7 @@
                 let formatCost = hero["Cost"];
 
                 if (currentMultiplier != 1) {
-                    formatCost *= ((1-(1.2**(currentMultiplier-1)))/-0.2);
+                    formatCost *= ((1-(1.15**(currentMultiplier-1)))/-0.2);
                     formatATK *= currentMultiplier;
                 }
 
@@ -1063,23 +1105,24 @@
             return;
         } else if (heroesPurchasedNumber >= heroUnlockLevels[0]) {
             if (expeditionDict[expeditionCounter + 3].Locked == 1) {
-                newPop(expeditionCounter + 4);
                 if (heroUnlockLevels.length != 1) {
                     unlockExpedition(expeditionCounter + 3,expeditionDict);
                     newPop(3);
                 } else {
-                    wishButton.innerText = "Write for help | 160 ";
-                    wishButton.classList.add("wish-button-new");
-                    wishButton.addEventListener("click",() => {
-                        wish();
-                    });
+                    if (saveValues["wishUnlocked"] === true) {
+                        return;
+                    } else {
+                        wishUnlock();
+                        saveValues["wishUnlocked"] = true;
+                    }
                 }
+                newPop(expeditionCounter + 4);
             }
             expeditionCounter++;
             heroUnlockLevels.shift()
         }
     }
-
+    
     // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION
     var currentPopUps = [];
     function newPop(type) {
