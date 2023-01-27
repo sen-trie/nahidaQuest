@@ -935,15 +935,22 @@
             mainBody.removeChild(oldAchievement); 
         }
 
-        if (achievement == "score") {
-            achievementType = scoreAchievement[0];
-            scoreAchievement[0]++;
-        } else if (achievement == "dps") {
-            achievementType = scoreAchievement[1];
-            scoreAchievement[1]++;
-        } else if (achievement == "collection") {
-            achievementType = scoreAchievement[3];
-            scoreAchievement[3]++;
+        switch (achievement) {
+                case "score":
+                    achievementType = scoreAchievement[0];
+                    scoreAchievement[0]++;
+                    break;
+                case "dps":
+                    achievementType = scoreAchievement[1];
+                    scoreAchievement[1]++;
+                    break;
+                case "collection":
+                    achievementType = scoreAchievement[3];
+                    scoreAchievement[3]++;
+                    break;
+                default:
+                    console.log("No more Achievements left!");
+                    return;
         }
 
         if (achievementList[achievementType]["Done"] == true) {

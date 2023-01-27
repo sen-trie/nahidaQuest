@@ -16,12 +16,55 @@
           background: white;
           padding: 10px;
         }
+
+        body {
+  font-family: sans-serif;
+  display: grid;
+  height: 100vh;
+  place-items: center;
+}
+
+.base-timer {
+  position: relative;
+  width: 50px;
+  height: 50px;
+}
+
+.base-timer__svg {
+  transform: scaleX(-1);
+}
+
+.base-timer__circle {
+  fill: none;
+  stroke: none;
+}
+
+.base-timer__path-elapsed {
+  stroke-width: 7px;
+  stroke: grey;
+}
+
+.base-timer__path-remaining {
+  stroke-width: 7px;
+  stroke-linecap: round;
+  transform: rotate(90deg);
+  transform-origin: center;
+  transition: 1s linear all;
+  fill-rule: nonzero;
+  stroke: currentColor;
+  color:white;
+}
+
+
+
     </style>
     <title>nahidaQuest!</title>
 </head>
 <body style="background: url(./assets/bg1.png);width: device-width;height:1000px;background-repeat: no-repeat;background-size: 100%;">
     <p style="position: absolute;">Saved name is:</p>
     <p style="left:10px; top:40px; position: absolute;" id="demo"></p>
+    <div style="left:100px; top:300px; position: absolute;" id="app">
+    </div>
     <div style="left:10px; top:100px;position: absolute;">
         <button id="add"  style="height:100px;width:100px;left:100px;position: absolute;">add</button>
     <button id="save"  style="height:100px;width:100px;left:200px;position: absolute;">save</button>
@@ -42,6 +85,83 @@
     addBut.addEventListener("click",function() {add()})
     saveBut.addEventListener("click",function() {save()})
     clearBut.addEventListener("click",function() {clear()})
+
+const FULL_DASH_ARRAY = 283;
+const TIME_LIMIT = 20;
+let timePassed = 0;
+let timeLeft = TIME_LIMIT;
+let timerInterval = null;
+
+document.getElementById("app").innerHTML = `
+<div class="base-timer">
+  <svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <g class="base-timer__circle">
+      <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
+      <path
+        id="base-timer-path-remaining"
+        stroke-dasharray="283"
+        class="base-timer__path-remaining"
+        d="
+          M 50, 50
+          m -45, 0
+          a 45,45 0 1,0 90,0
+          a 45,45 0 1,0 -90,0
+        "
+      ></path>
+    </g>
+  </svg>
+</div>
+`;
+
+startTimer();
+
+function onTimesUp() {
+  clearInterval(timerInterval);
+  document.getElementById("app").style.display = "none";
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timePassed = timePassed += 1;
+    timeLeft = TIME_LIMIT - timePassed;
+    setCircleDasharray();
+
+    if (timeLeft === 0) {
+      onTimesUp();
+    }
+  }, 1000);
+}
+
+
+function calculateTimeFraction() {
+  const rawTimeFraction = timeLeft / TIME_LIMIT;
+  return rawTimeFraction - (1 / TIME_LIMIT) * (1 - rawTimeFraction);
+}
+
+function setCircleDasharray() {
+  const circleDasharray = `${(
+    calculateTimeFraction() * FULL_DASH_ARRAY
+  ).toFixed(0)} 283`;
+  document
+    .getElementById("base-timer-path-remaining")
+    .setAttribute("stroke-dasharray", circleDasharray);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     if (localStorage.getItem("upgradeDictSave") === null) {
         upgradeDict = upgradeDictDefault;
