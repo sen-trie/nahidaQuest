@@ -7,7 +7,7 @@
 >MUST HAVE
 	✔️Weapons (flat increase to %ATK)
 	✔️artifacts (increase ATK)
-	Food (temp increase to ATK)
+	✔️Food (temp increase to ATK)
 
 3. Expedition Tab ✔️
 >MUST HAVE

@@ -33,7 +33,7 @@
 
 /* MAIN BODY CSS */
 table {
-    cursor: url(./assets/cursor.png), auto;
+    cursor: url(./assets/icon/cursor.png), auto;
 }
 
 .score-container {
@@ -110,12 +110,47 @@ button {
     height: 29px;
 }
 
+/* TEMP BUFFS CSS */
+.temp-buff {
+  left:622px; 
+  top:85px; 
+  position: absolute;
+}
+
+svg {
+  position: relative;
+  top: -4px;
+  left: -3px;
+  width: 48px;
+  height: 50px;
+  transform: rotateY(-180deg) rotateZ(-90deg);
+}
+
+circle {
+  stroke-dasharray: 125px;
+  stroke-dashoffset: 0px;
+  stroke-linecap: round;
+  stroke-width: 2px;
+  stroke: white;
+  fill: none;
+  animation: countdown 31s linear infinite forwards;
+}
+
+@keyframes countdown {
+  from {
+    stroke-dashoffset: 0px;
+  }
+  to {
+    stroke-dashoffset: 125px;
+  }
+}
+
 /* SETTINGS CSS */
 .settings-button {
     position: absolute;
     width: 48px;
     height: 46px;
-    top:780px;
+    top:790px;
     left: 623px;
     background-color: rgba(0,0,0,0);
     background-image: url(./assets/settings.webp);
@@ -170,7 +205,6 @@ button {
     width: 49px;
     height: 48px;
 }
-
 
 .dim-filter {
     transition: 0.3s ease;
@@ -247,7 +281,7 @@ img {
     z-index: 3;
     width: 43px;
     height: 24px;
-    content: url(./assets/new.webp);
+    content: url(./assets/icon/new.webp);
 }
 
 .pop-new-1 {
@@ -314,10 +348,10 @@ img {
     flex-direction: column;
     gap: 10px;
     position: absolute;
-    left: -5px; 
+    left: -2px; 
     top: 45px;
-    width: 657px;
-    height: 760px;
+    width: 652px;
+    height: 748px;
     overflow-y: scroll;  
     overflow-x: hidden;
 }
@@ -378,8 +412,9 @@ img {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
+    justify-content: flex-start;
     align-content: flex-start;
-    gap: 10px 10px;
+    gap: 8px 6px;
 }
 
 .flex-container-INVENTORY button:hover{
@@ -390,6 +425,21 @@ img {
     width: 118px;
     height: 144px;
 }
+
+.button-inv-star {
+    position: relative;
+    top: -10px;
+    width: auto;
+    height: 27px;
+}
+
+.button-inv-item {
+    position: relative;
+    top: 8px;
+    left: -2px;
+    width: 110px;
+    height: 110px;
+} 
 
 /* EXPEDITION (TABLE3) CSS */
 .flex-container-EXPEDITION button {
@@ -442,7 +492,7 @@ img {
 }
 
 .after-icon {
-    content: url(./assets/energyIcon.png);
+    content: url(./assets/icon/energyIcon.png);
     width:23px;
     height:25px;
 }
@@ -458,7 +508,7 @@ img {
     z-index: 1;
     position: absolute; 
     top:40px; 
-    left:5px; 
+    left:-2px; 
     background:url(./assets/wishBG.png);
     background-size: 105%;
     background-position: center center;
@@ -492,7 +542,7 @@ img {
 }
 
 .wish-button-new:after{
-    content: url(./assets/primogemIcon.png);
+    content: url(./assets/icon/primogemIcon.png);
 }
 
 .wish-mail-container {
@@ -516,21 +566,34 @@ img {
 }
 
 /* ACHIEVEMENT (TABLE5) CSS */
-.flex-container-ACHIEVEMENT {
-    background-color: aqua;
-    position: absolute; 
-    top:45px; 
-    left:5px; 
+#table5-container {
+    position: absolute;
+    top:95px; 
+    left:695px; 
     width:969px;
-    height:759px;
+    height:761px;
+    background: url(./assets/achievementBG.webp);
+    background-size: 102%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.flex-container-ACHIEVEMENT {
+    position: absolute;
+    margin: 0;
+    top:33px;
+    left:38px; 
+    width:880px;
+    height:670px;
     overflow-y: auto;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
     align-content: flex-start;
+    gap: 5px 8px;
 }
 
-.achieve {                                                  /* ADJUST IT TO THE LEFT, BELOW BUTTON */
+.achieve {                                         
     z-index:2;
     position: absolute; 
     top:685px; 
@@ -550,18 +613,35 @@ img {
 
 .achieve-stored {
     z-index:1;
-    width:400px;
+    width:420px;
     height:98px;
-    text-align: center;
-    background:url(./assets/achievement.png);
-}
 
+    display: flex;
+
+
+    font-family: 'gi-font';
+    color: #5b4e32;
+    text-align: center;
+    border: 5px ridge #a59e8e;
+    background-image: url(./assets/achievement.webp);
+    background-size: 109%;
+    background-position: center center;
+    /* background-color: #D4C7AC; */
+}
 /* TOOLTIP UI (TABLE6) CSS */
 .sideImg {
     position: absolute;
     left: 1279px;
     width: 382px;
     height: 869px;
+}
+
+.toolImgOverlay {
+    position: absolute;
+    left: 47px;
+    top: 55px;
+    width: 215px;
+    height: auto;
 }
 
 #table-tab {
@@ -587,8 +667,8 @@ img {
 }
 
 .table6 > div {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .tool-tip-name {
@@ -608,7 +688,12 @@ img {
 
 .tool-tip-extraimg {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     flex-direction: row;
     align-items: center;
+}
+
+.tool-tip-extraimg img{
+    height: 70px;
+    width: 70px;
 }

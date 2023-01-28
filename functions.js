@@ -88,7 +88,7 @@ function sortList(table) {
 function unlockExpedition(i,expeditionDict) {
     let expedID = "exped-" + i;
     let unlockButton = document.getElementById(expedID);
-    let backgroundImage = "url(./assets/exped" + i + ".png)";
+    let backgroundImage = "url(./assets/expedbg/exped" + i + ".png)";
 
     expeditionDict[i].Locked = 0;
     unlockButton.style.background = backgroundImage;
@@ -96,4 +96,16 @@ function unlockExpedition(i,expeditionDict) {
     unlockButton.style["background-size"]= "93%";
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey };
+// INNER HTML FOR FOOD BUFFS
+function countdownText(int) {
+    return `<div id="countdown">
+    <div class="countdown-number" style=${'background:url(./assets/icon/food'+int+'.webp);'}>
+        <svg>
+        <circle r="20" cx="21" cy="21"></circle>
+        </svg>  
+    </div>
+    
+    </div>`
+}
+
+export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText};

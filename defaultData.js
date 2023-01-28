@@ -2,10 +2,10 @@ var saveValuesDefault = {
     clickCount:0,
     clickFactor:1,
     dps:12,
-    realScore:1e24,
+    realScore:1e10,
     freeLevels:0,
     primogem:112000,
-    energy:1000,
+    energy:102200,
     rowCount:0,
     heroesPurchased:0,
 
@@ -82,29 +82,29 @@ var upgradeDictDefault = {
 
 // RMB TO UPDATE MAX CONSTANTS
 var InventoryDefault = {
-    1001: {Name:"coolSteel",                     Star:3,  Type:"Sword"          ,itemCount:0                       },
-    1002: {Name:"ferrous",                       Star:3,  Type:"Claymore"       ,itemCount:0                       },
+    1001: {Name:"skywardBlade",                  Star:5,  Type:"Sword"          ,itemCount:0                       },
+    1002: {Name:"aquilaFavonia",                 Star:5,  Type:"Sword"          ,itemCount:0                       },
     1003: {Name:"mappa",                         Star:4,  Type:"Catalyst"       ,itemCount:0                       },
     1004: {Name:"rust",                          Star:4,  Type:"Bow"            ,itemCount:0                       },
-    1005: {Name:"silverSword",                   Star:2,  Type:"Sword"          ,itemCount:0                       },
-    1006: {Name:"dullSword",                     Star:1,  Type:"Sword"          ,itemCount:0                       },
-    1007: {Name:"skywardBlade",                  Star:5,  Type:"Sword"          ,itemCount:0                       },
-    1008: {Name:"harbingerDawn",                 Star:3,  Type:"Sword"          ,itemCount:0                       },
-    1009: {Name:"travelerHandySword",            Star:3,  Type:"Sword"          ,itemCount:0                       },
-    1010: {Name:"sacSword",                      Star:3,  Type:"Sword"          ,itemCount:0                       },
-    1011: {Name:"lionsRoar",                     Star:3,  Type:"Sword"          ,itemCount:0                       },
-    1012: {Name:"aquilaFavonia",                 Star:5,  Type:"Sword"          ,itemCount:0                       },
+    1005: {Name:"ferrous",                       Star:3,  Type:"Claymore"       ,itemCount:0                       },
+    1006: {Name:"coolSteel",                     Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1007: {Name:"harbingerDawn",                 Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1008: {Name:"travelerHandySword",            Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1009: {Name:"sacSword",                      Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1010: {Name:"lionsRoar",                     Star:3,  Type:"Sword"          ,itemCount:0                       },
+    1011: {Name:"silverSword",                   Star:2,  Type:"Sword"          ,itemCount:0                       },
+    1012: {Name:"dullSword",                     Star:1,  Type:"Sword"          ,itemCount:0                       },
 // RMB TO UPDATE MAX CONSTANTS
-    2001: {Name:"gladiator",                     Star:4                         ,itemCount:0                         },
-    2002: {Name:"deepwood",                      Star:5                         ,itemCount:0                         },
-    2003: {Name:"crimWitch",                     Star:5                         ,itemCount:0                         },
+    2001: {Name:"deepwoodGoblet",                Star:5                         ,itemCount:0                         },
+    2002: {Name:"crimFeather",                   Star:5                         ,itemCount:0                         },
+    2003: {Name:"gladiatorFlower",               Star:4                         ,itemCount:0                         },
 // RMB TO UPDATE MAX CONSTANTS
-    3001: {Name:"masalaCheese",                  Star:2                        ,itemCount:0            ,BuffTemp:10},
-    3002: {Name:"jueyunchili",                   Star:2                        ,itemCount:0            ,BuffTemp:10},
+    3001: {Name:"masalaCheese",                  Star:2                         ,itemCount:0            ,BuffTemp:10},
+    3002: {Name:"jueyunChili",                   Star:2                         ,itemCount:0            ,BuffTemp:10},
 // RMB TO UPDATE MAX CONSTANTS
-    4001: {Name:"wandererEXP",                   Star:2                        ,itemCount:0            ,BuffLvl:1},
-    4002: {Name:"adventureEXP",                  Star:3                        ,itemCount:0            ,BuffLvl:5},
-    4003: {Name:"heroEXP",                       Star:4                        ,itemCount:0            ,BuffLvl:10},
+    4003: {Name:"wandererEXP",                   Star:2                         ,itemCount:0            ,BuffLvlLow:1,BuffLvlHigh:3},
+    4002: {Name:"adventureEXP",                  Star:3                         ,itemCount:0            ,BuffLvlLow:6,BuffLvlHigh:10},
+    4001: {Name:"heroEXP",                       Star:4                         ,itemCount:0            ,BuffLvlLow:15,BuffLvlHigh:20},
 };
 
 var tooltip = {
@@ -172,29 +172,30 @@ var tooltip = {
     Tartaglia:{name:"           Tartaglia               ", lore:""}        ,
     Scaramouche:{name:"           Scaramouche               ", lore:""}        ,
     // ^^^ CHARACTERS ^^^ | vvv ITEMS vvv 
-    coolSteel:{name:"", lore:""},               
-    ferrous:{name:"", lore:""},               
-    mappa:{name:"", lore:""},               
-    rust:{name:"", lore:""},               
-    silverSword:{name:"", lore:""},               
-    dullSword:{name:"", lore:""},               
-    skywardBlade:{name:"", lore:""},               
-    harbingerDawn:{name:"", lore:""},               
-    travelerHandySword:{name:"", lore:""},               
-    sacSword:{name:"", lore:""},               
-    lionsRoar:{name:"", lore:""},               
-    aquilaFavonia:{name:"", lore:""},               
+    coolSteel:{name:"                            ", lore:"          "               },                  
+    ferrous:{name:"                            ", lore:"          "               },                    
+    mappa:{name:"                            ", lore:"          "               },                      
+    rust:{name:"                            ", lore:"          "               },                       
+    silverSword:{name:"                            ", lore:"          "               },                
+    dullSword:{name:"                            ", lore:"          "               },                  
+    skywardBlade:{name:"                            ", lore:"          "               },               
+    harbingerDawn:{name:"                            ", lore:"          "               },              
+    travelerHandySword:{name:"                            ", lore:"          "               },         
+    sacSword:{name:"                            ", lore:"          "               },                   
+    lionsRoar:{name:"                            ", lore:"          "               },                  
+    aquilaFavonia:{name:"                            ", lore:"          "               },              
+// RMB TO UPDATE MAX CONSTANTS
+    gladiatorFlower:{name:"                            ", lore:"          "               },           
+    deepwoodGoblet:{name:"                            ", lore:"          "               },             
+    crimFeather:{name:"                            ", lore:"          "               },                
+// RMB TO UPDATE MAX CONSTANTS
+    masalaCheese:{name:"                            ", lore:"          "               },               
+    jueyunChili:{name:"                            ", lore:"          "               },                
+// RMB TO UPDATE MAX CONSTANTS
+    wandererEXP:{name:"                            ", lore:"          "               },                
+    adventureEXP:{name:"                            ", lore:"          "               },               
+    heroEXP:{name:"                            ", lore:"          "               },                   
 
-    gladiator:{name:"", lore:""},               
-    deepwood:{name:"", lore:""},               
-    crimWitch:{name:"", lore:""},               
-
-    masalaCheese:{name:"", lore:""},               
-    jueyunchili:{name:"", lore:""},               
-
-    wandererEXP:{name:"", lore:""},               
-    adventureEXP:{name:"", lore:""},               
-    heroEXP:{name:"", lore:""},               
 };
 
 var expeditionDictDefault = {

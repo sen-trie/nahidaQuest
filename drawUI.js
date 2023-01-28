@@ -97,7 +97,14 @@ function createAchievement(achievementText,achievementDesc) {
 }
 
 function storeAchievement(achievementText,achievementDesc,achievementID) {
-    let achievementStored = document.createElement("button");
+    let achievementStored = document.createElement("div");
+    achievementStored.classList += "achieve-stored";
+
+    let achievementImage = document.createElement("img");
+    achievementImage.src = "./assets/achievement/"+(1)+".webp";
+    achievementImage.classList.add("achievementImage");
+
+    let achievementTextStored = document.createElement("div");
     let achievementStoredH1 = document.createElement("h2");
     achievementStoredH1.innerText = achievementText;
     achievementStoredH1.classList += "achieveStoredH1"
@@ -105,11 +112,11 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
     achievementStoredH2.innerText = achievementDesc;                     // HAVE THE MIDDLE PART INFINITELY EXTEND
     achievementStoredH2.classList += "achieveStoredH2"
 
-    achievementStored.appendChild(achievementStoredH1);
-    achievementStored.appendChild(achievementStoredH2);
-    achievementStored.classList += "achieve-stored"
-    achievementStored.id = achievementID;
+    achievementTextStored.append(achievementStoredH1,achievementStoredH2)
+    achievementTextStored.classList += "achieve-stored-text";
 
+    achievementStored.append(achievementImage,achievementTextStored);
+    achievementStored.id = achievementID;
     return achievementStored;
 }
 
