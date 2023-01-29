@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name = "viewport" content = "width=device-width, initial-scale=1, maximum-scale=1">
     <style>
+
         body {
           background: #555;
           position: relative;
@@ -24,6 +25,42 @@
   place-items: center;
 }
 
+.floatingText {
+    position: absolute;
+    animation: fadeOutOpacity 4s cubic-bezier(.02,.57,.7,.29);
+  }
+
+@keyframes fadeOutOpacity {
+    from {opacity: 1;}
+    to {opacity: 0;
+        top: -300px;}
+  }
+
+ 
+
+.falling-image {
+    position: absolute;
+    opacity: 1;
+    z-Index: 3;
+}
+
+@keyframes fall {
+    from { top: -5vh;}
+    to { top: 100vh; }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+
+
+/* 
 .container {
   left:100px; 
   top:300px; 
@@ -63,13 +100,13 @@ circle {
   to {
     stroke-dashoffset: 125px;
   }
-}
+} */
 
 
     </style>
     <title>nahidaQuest!</title>
 </head>
-<body style="background: url(./assets/bg1.png);width: device-width;height:1000px;background-repeat: no-repeat;background-size: 100%;">
+<body style="background: url(./spare/bg1.png);width: device-width;height:1000px;background-repeat: no-repeat;background-size: 100%;">
     <p style="position: absolute;">Saved name is:</p>
     <p style="left:10px; top:40px; position: absolute;" id="demo"></p>
 
@@ -96,82 +133,116 @@ circle {
     var saveBut = document.getElementById("save");
     var clearBut = document.getElementById("clear");
     var upgradeDict = "";
+    var fadeCooldown = "";
 
-    addBut.addEventListener("click",()=> foodButton(currentTime))
+    addBut.addEventListener("click",()=> animateImage())
+    addBut.addEventListener("click",function(event) {
+      const x = event.clientX;
+    const y = event.clientY;
+    console.log(y)
+
+    const text = document.createElement("div");
+    text.innerHTML = "Hello World!";
+    text.classList.add("floatingText");
+    text.style.left = x + "px";
+    text.style.top = y - 40 +"px";
+    document.body.appendChild(text);
+
+    setTimeout(function() {
+      text.remove();
+    }, 2000);
+  });
+
+
     saveBut.addEventListener("click",()=> foodButton2())
     clearBut.addEventListener("click",function() {clear()})
 
-    var currentTime = 0;
-    var timer = setInterval(() => count(), 1000)
+    // var currentTime = 0;
+    //  var timer = setInterval(() => animateImage(), 200)
     
     
+    
+
+    function animateImage() {
+    var img = document.createElement("img");
+    img.src = "./assets/icon/primogemIcon.png";
+    img.style.left = `${(Math.random() * 20) + 50}vw`
+    let number = (Math.random() * 3) + 1.5;
+
+    let animation = `fall ${number}s ease-in, fadeOut ${number}s cubic-bezier(1,.05,.55,1.04)`
+    img.style.animation = animation;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function count() {
-  foodCheck();
-  currentTime++
+    img.addEventListener('animationend', () => {
+    img.remove();
+    });
+    img.classList.add("falling-image");
+    document.body.appendChild(img);
 }
 
-var timeSnapshot = 0;
-var timeSnapshot2 = 0;
-function foodCheck() {
-  if (currentTime - timeSnapshot >= 30) {
-    onTimesUp(1);
-  }
 
-  if (currentTime - timeSnapshot2 >= 30) {
-    onTimesUp(2);
-  }
 
-}
 
-function foodButton() {
-  timeSnapshot = currentTime;
-  document.getElementById("app1").innerHTML = countdownText(1);
-}
 
-function foodButton2() {
-  timeSnapshot = currentTime;
-  document.getElementById("app2").innerHTML = countdownText(2);
-}
 
-function countdownText(int) {
-  return `<div id="countdown">
-  <div class="countdown-number" style=${'background:url(./assets/food'+int+'.webp);'}>
-    <svg>
-    <circle r="20" cx="21" cy="21"></circle>
-    </svg>  
-  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function count() {
+//   foodCheck();
+//   currentTime++
+// }
+
+// var timeSnapshot = 0;
+// var timeSnapshot2 = 0;
+// function foodCheck() {
+//   if (currentTime - timeSnapshot >= 30) {
+//     onTimesUp(1);
+//   }
+
+//   if (currentTime - timeSnapshot2 >= 30) {
+//     onTimesUp(2);
+//   }
+
+// }
+
+// function foodButton() {
+//   timeSnapshot = currentTime;
+//   document.getElementById("app1").innerHTML = countdownText(1);
+// }
+
+// function foodButton2() {
+//   timeSnapshot = currentTime;
+//   document.getElementById("app2").innerHTML = countdownText(2);
+// }
+
+// function countdownText(int) {
+//   return `<div id="countdown">
+//   <div class="countdown-number" style=${'background:url(./assets/food'+int+'.webp);'}>
+//     <svg>
+//     <circle r="20" cx="21" cy="21"></circle>
+//     </svg>  
+//   </div>
   
-</div>`
-}
+// </div>`
+// }
 
- function onTimesUp(int) {
-   document.getElementById("app"+int).innerHTML = '';
- }
+//  function onTimesUp(int) {
+//    document.getElementById("app"+int).innerHTML = '';
+//  }
 
 
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

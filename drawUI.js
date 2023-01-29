@@ -83,15 +83,15 @@ function createAchievement(achievementText,achievementDesc) {
 
     let achievementH1 = document.createElement("h2");
     achievementH1.innerText = achievementText;
-    achievementH1.classList += "achieveH1"
+    achievementH1.classList += "achieveH1";
     let achievementH2 = document.createElement("h3");
     achievementH2.innerText = achievementDesc;
-    achievementH2.classList += "achieveH2"
+    achievementH2.classList += "achieveH2";
 
     achievementPopUpTemp.appendChild(achievementH1);
     achievementPopUpTemp.appendChild(achievementH2);
-    achievementPopUpTemp.id = "tempAchievement"
-    achievementPopUpTemp.classList += "achieve"
+    achievementPopUpTemp.id = "tempAchievement";
+    achievementPopUpTemp.classList += "achieve";
 
     return achievementPopUpTemp;
 }
@@ -99,24 +99,33 @@ function createAchievement(achievementText,achievementDesc) {
 function storeAchievement(achievementText,achievementDesc,achievementID) {
     let achievementStored = document.createElement("div");
     achievementStored.classList += "achieve-stored";
+    achievementStored.id = achievementID;
 
-    let achievementImage = document.createElement("img");
-    achievementImage.src = "./assets/achievement/"+(1)+".webp";
-    achievementImage.classList.add("achievementImage");
+    achievementID = Number(String(achievementID).slice(-3))
+    let achievementImageContainer = document.createElement("div");
+    achievementImageContainer.classList.add("achievementImageContainer");
+    achievementImageContainer.style.background = "url(./assets/achievement/"+Math.floor(achievementID / 100) * 100+".webp)";
+    achievementImageContainer.style.backgroundSize = "contain";
+
+    achievementID = Number(String(achievementID).slice(-2))
+    let achievementImageNumber = document.createElement("img");
+    achievementImageNumber.classList.add("achievementImageNumber");
+    achievementImageNumber.src = "./assets/achievement/"+achievementID+".webp";
+    achievementImageContainer.append(achievementImageNumber);
 
     let achievementTextStored = document.createElement("div");
-    let achievementStoredH1 = document.createElement("h2");
+    let achievementStoredH1 = document.createElement("p");
     achievementStoredH1.innerText = achievementText;
-    achievementStoredH1.classList += "achieveStoredH1"
-    let achievementStoredH2 = document.createElement("h3");              // MAKE THE BACKGROUND IMAGE SUMERU TALENT
+    achievementStoredH1.classList += "achieveStoredH1";
+    let achievementStoredH2 = document.createElement("p");              // MAKE THE BACKGROUND IMAGE SUMERU TALENT
     achievementStoredH2.innerText = achievementDesc;                     // HAVE THE MIDDLE PART INFINITELY EXTEND
-    achievementStoredH2.classList += "achieveStoredH2"
+    achievementStoredH2.classList += "achieveStoredH2";
 
-    achievementTextStored.append(achievementStoredH1,achievementStoredH2)
+    achievementTextStored.append(achievementStoredH1,achievementStoredH2);
     achievementTextStored.classList += "achieve-stored-text";
 
-    achievementStored.append(achievementImage,achievementTextStored);
-    achievementStored.id = achievementID;
+    achievementStored.append(achievementTextStored,achievementImageContainer);
+    
     return achievementStored;
 }
 

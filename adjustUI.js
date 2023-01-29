@@ -18,6 +18,21 @@ function inventoryAddButton(buttonInv, Item) {
     return buttonInv;
 }
 
+// ADDS FLOATING TEXT UPON CLICKING ON DEMO BUTTON
+function floatText(demoContainer,clickFactor,randNum1,randNum2) {
+    let clickCountAppear = document.createElement("div");
+
+    clickCountAppear.innerHTML = "+" + clickFactor;
+    clickCountAppear.classList.add("floatingText");
+    clickCountAppear.style.position = "absolute";
+    clickCountAppear.style.left = randNum1 + "px";
+    clickCountAppear.style.top = randNum2 + "px";
+    clickCountAppear.addEventListener('animationend', () => {clickCountAppear.remove();});
+
+    demoContainer.appendChild(clickCountAppear);
+    return demoContainer;
+}
+
 // ADJUSTS EXPED BUTTON FOR EXPEDITION UI
 function expedButtonAdjust(expedButton, backgroundImg, i) {
     expedButton.id = "exped-" + i;
@@ -58,4 +73,4 @@ function volumeScrollerAdjust(volumeScroller) {
     return volumeScroller;
 }
 
-export {inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust};
+export {inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText};

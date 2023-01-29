@@ -9,7 +9,7 @@
     flex-direction:  row;
     justify-content: center;
     align-items: center;
-    z-index: 4;
+    z-index: 6;
 }
 
 * {
@@ -44,11 +44,11 @@ table {
     flex-direction: column;
     position: absolute;
     left:-8px; 
-    top:90px;
-    width:609px;
+    top:75px;
+    width:608px;
     height:90px;
     background-color: rgba(0,0,0,0.4);
-    z-index: 2;
+    z-index: 4;
 }
 
 button {
@@ -61,7 +61,7 @@ button {
     left: -20px;
     width: 1670px;
     height: 867px;
-    z-index: 3;
+    z-index: 5;
     border: 14px ridge #ACC35B;
     border-radius: 20px;
     pointer-events: none;
@@ -194,7 +194,6 @@ circle {
     flex-direction: column;
     justify-content: center;
     gap: 5px;
-    
     width: 50px;
     height: 166px;
     top: 610px;
@@ -219,6 +218,7 @@ circle {
     margin-left: 2.5%;
     position: absolute;
     transition: 0.08s ease;
+    z-index: 3;
     
     background-position: center center;
     background: url(./assets/nahida.png);
@@ -241,6 +241,37 @@ circle {
     left: 50px;
     width:508px;
     height:508px;
+}
+
+.floatingText {
+    font-size: 25px;
+    color: white;
+    text-shadow: 2px 2px 0px #000000;
+    position: absolute;
+    animation: fadeOutOpacity 1.5s cubic-bezier(.02,.97,.91,.14);
+    z-index: 3;
+    pointer-events: none;
+}
+
+@keyframes fadeOutOpacity {
+    from {
+      opacity: 1.0;
+    }
+    to {
+      opacity: 0.2;
+      top: -20px;
+    }
+  }
+
+.falling-image {
+    position: absolute;
+    opacity: 0.7;
+    z-Index: 2;
+}
+
+@keyframes fall {
+    from {top: -200px;opacity: 0.7s;}
+    to {top: 600px;opacity: 0;}
 }
 
 /* TAB BODY CSS */
@@ -299,6 +330,11 @@ img {
     top: 0px;
 }
 
+.pop-new-4 {
+    left: 1345px;
+    top: 0px;
+}
+
 .pop-new-corner {
     position: absolute;
     z-index: 3;
@@ -319,14 +355,14 @@ img {
     left: -7px;
     width: 1670px;
     height: 867px;
-    z-index: 3;
+    z-index: 5;
     background-color: rgba(0,0,0,0.90);
 }
 
 .tutorial-screen {
     width: 1233px;
     height: 738px;
-    z-index: 3;
+    z-index: 5;
     background: url(./assets/tutorial/tutorialFrame.webp);
 }
 
@@ -568,6 +604,7 @@ img {
 /* ACHIEVEMENT (TABLE5) CSS */
 #table5-container {
     position: absolute;
+    font-size: 10px;
     top:95px; 
     left:695px; 
     width:969px;
@@ -604,30 +641,68 @@ img {
     background-size: 100%;
     background-position: 5px center;
     background-repeat: no-repeat;
+    animation: fadeOut 7s cubic-bezier(.93,-0.24,.93,.81);
 }
+
+@keyframes fadeOut {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
 
 .achieve:hover {
     transition: 0.4s ease;
     background-color: yellow;
 }
 
+.achievementImageContainer {
+    width:100px;
+    height:100px;
+}
+
+.achievementImageNumber {
+    position:relative; 
+    top: 63%;
+    width:30px;
+    height:30px;
+    
+}
+
+.achieve-stored-text {
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: 12px;
+}
+
 .achieve-stored {
-    z-index:1;
     width:420px;
     height:98px;
 
     display: flex;
-
-
+    justify-content: space-evenly;
     font-family: 'gi-font';
+    
     color: #5b4e32;
     text-align: center;
     border: 5px ridge #a59e8e;
     background-image: url(./assets/achievement.webp);
     background-size: 109%;
     background-position: center center;
-    /* background-color: #D4C7AC; */
 }
+
+.achieveStoredH1 {
+    font-size: 2.5em;
+    color: #343030;
+    margin: 0;
+}
+
+.achieveStoredH2 {
+    font-size: 1.8em;
+    margin: 0;
+}
+
 /* TOOLTIP UI (TABLE6) CSS */
 .sideImg {
     position: absolute;

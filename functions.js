@@ -50,7 +50,7 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
     for (let i = 1; i < NONWISHHEROMAX + 1; i++) {
         let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** (i-1)));
         let baseLevel = Math.round(0.75 * baseCost);
-        upgradeDict[i]["Cost"] = Number(baseCost.toPrecision(3));
+        upgradeDict[i]["BaseCost"] = Number(baseCost.toPrecision(3));
         upgradeDict[i]["Level"] = baseLevel;
         
         let baseATK = Math.round(initATKCost * (multiplierATKCost ** (i-1)));
@@ -68,7 +68,7 @@ function sortList(table) {
 
     while (switching) {
         switching = false;
-        b = list.getElementsByTagName("button");
+        b = list.children;
         for (i = 0; i < (b.length - 1); i++) {
             shouldSwitch = false;
             if (b[i].id > b[i + 1].id) {
