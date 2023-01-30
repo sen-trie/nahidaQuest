@@ -3,18 +3,39 @@
     src: url(./assets/gi-font.ttf);
 }
 
+html {
+    height: 100%;
+    cursor: url(./assets/icon/cursor.png), auto;
+}
+
+button {
+    cursor: url(./assets/icon/cursor.png), auto
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background-color: aqua;
+    position: relative;
+    overflow: hidden;
+    font-family: 'gi-font';
+  }
+
 .overlay {
     display: flex;
     background: url(./assets/wood.jpg);
     flex-direction:  row;
     justify-content: center;
     align-items: center;
-    z-index: 6;
+    z-index: 200;
 }
 
 * {
     scrollbar-width: auto;
     scrollbar-color: #ffffff #3d3d3d;
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
 
 ::-webkit-scrollbar {
@@ -51,11 +72,83 @@ table {
     z-index: 4;
 }
 
-button {
-    border: 0px;
+.left-area {
+    width: 35%;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    background-color: rgb(249, 126, 12);
+    display:flex;
+    flex-direction: column;
+  }
+
+.middle-area {
+    width: 5%;
+    height: 100%;
+    left: 35%;
+    position: absolute;
+    background-color: #57783b;
+    display:flex;
+    flex-direction: column;
 }
 
-#body-border {
+.middle-bar {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 5;
+}
+
+.right-area {
+    width: 60%;
+    height: 100%;
+    position: absolute;
+    right: 0px;
+    background-color: rgb(191, 255, 0);
+    display:flex;
+    flex-direction: column;
+  }
+
+.div-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.top-bar {
+    position: absolute;
+    width: 100%;
+    height: inherit;
+    object-fit: fill;
+}
+
+.main-table {
+    width: 100%;
+    height: 90%;
+    display: flex;
+    flex-direction: row;
+    z-index: 5;
+}
+
+.table-with-tooltip {
+    flex-grow: 2;
+    width: 70%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 2%;
+    overflow-y: scroll;
+}
+
+.table-without-tooltip {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+
+/* #body-border {
     position: absolute;
     top:-27px;
     left: -20px;
@@ -65,7 +158,7 @@ button {
     border: 14px ridge #ACC35B;
     border-radius: 20px;
     pointer-events: none;
-}
+} */
 
 #score {
     font-size: 40px;
@@ -76,27 +169,19 @@ button {
 }
 
 .energy-primo-container {
-    position:absolute;
+    position: relative;
+    top:1%;
+    width: 100%;
+    height: 20%;
+    z-index: 10;
+    row-gap: 1%;
     display:flex;
     flex-direction: column;
-    left:601px; 
-    top:5px;
-    width:96px;
-    height:65px;
-    justify-content: space-between;
-}
-
-.icon {
-    width:19px;
-    height:27px;
-}
-
-.primogem {
-    width:23px;
-    height:25px;
+    justify-content: flex-start;
 }
 
 .pill-value {
+    position: relative;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -104,11 +189,40 @@ button {
     align-items: center;
     text-align: right;
     color:white;
-    background: url(./assets/pill.png);
-    background-size: 100%;
-    width:96px;
-    height: 29px;
+    height: 20%;
+    z-index: 10;
 }
+
+.pill {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 5;
+    object-fit: contain;
+    mix-blend-mode:color-dodge;
+}
+/* 
+.energy-primo-container {
+    position:absolute;
+    
+    left:601px; 
+    top:5px;
+    width:96px;
+    height:65px;
+    
+}
+
+.icon {
+    width:19px;
+    height:27px;
+} */
+
+/* .primogem {
+    width:23px;
+    height:25px;
+}
+
+ */
 
 /* TEMP BUFFS CSS */
 .temp-buff {
@@ -147,13 +261,16 @@ circle {
 
 /* SETTINGS CSS */
 .settings-button {
-    position: absolute;
-    width: 48px;
-    height: 46px;
-    top:790px;
-    left: 623px;
-    background-color: rgba(0,0,0,0);
-    background-image: url(./assets/settings.webp);
+    height: 24%;
+    width: 100%;
+    background:transparent;
+}
+
+.settings-button-img {
+    width: 100%;
+    height: 100%;
+    object-fit:contain;
+    position: relative;
 }
 
 .settings-button:hover{
@@ -189,21 +306,32 @@ circle {
 }
 
 .multiplier-button-container {
-    position: absolute;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-    width: 50px;
-    height: 166px;
-    top: 610px;
-    left: 623px;
+    position: absolute;
+    flex-direction: column-reverse;
+    justify-content:space-between;
+    align-items: center;
+
+    width: 100%;
+    height: 24%;
+    bottom: 2%;
+    z-index: 15;
+    row-gap: 2%;
 }
 
 .multiplier-button {
-    width: 49px;
-    height: 48px;
+    background:transparent;
+    height: 22%;
+    width: 100%;
 }
+
+.multiplier-button-img {
+    width: 100%;
+    height: 100%;
+    object-fit:contain;
+    position: relative;
+}
+
 
 .dim-filter {
     transition: 0.3s ease;
@@ -275,22 +403,35 @@ circle {
 }
 
 /* TAB BODY CSS */
+#flex-container-TAB {
+    width: 100%;
+    height: 10%;
+    z-index: 3;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
 .tab-button {
-    width:64px;
-    height:64px;
+    width: 100%;
+    height: 100%;
+    object-fit:contain;
+    position: relative;
+    z-index: 3;
 }
 
-img {
-    height: 48px;
-    width: 48px;
+.tab-button-div {
+    width: 6%;
+    height: 66%;
 }
 
-.uiTab {
-    margin-top:56px;
-    margin-left:697px;
+.tab-button:hover{
+    filter: drop-shadow(0px 0px 3px #ffffff);
 }
 
-.flex-container-TAB {
+
+/* .flex-container-TAB {
     position: absolute;
     left:800px; 
     top:5px; 
@@ -300,11 +441,9 @@ img {
     flex-wrap: no-wrap;
     flex-direction: row-reverse;
     justify-content: space-between;
-}
+} */
 
-.flex-container-TAB button:hover{
-    filter: drop-shadow(0px 0px 3px #ffffff);
-}
+
 
 /* ALL POP UP CSS (New/Tut) */
 .pop-new {
@@ -355,14 +494,14 @@ img {
     left: -7px;
     width: 1670px;
     height: 867px;
-    z-index: 5;
+    z-index: 200;
     background-color: rgba(0,0,0,0.90);
 }
 
 .tutorial-screen {
     width: 1233px;
     height: 738px;
-    z-index: 5;
+    z-index: 200;
     background: url(./assets/tutorial/tutorialFrame.webp);
 }
 
@@ -379,15 +518,10 @@ img {
 }
 
 /* HERO UPGRADES (TABLE1) CSS */
-.flex-container-HERO {
+#table1 {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    position: absolute;
-    left: -2px; 
-    top: 45px;
-    width: 652px;
-    height: 748px;
     overflow-y: scroll;  
     overflow-x: hidden;
 }
@@ -443,8 +577,8 @@ img {
 
 .flex-container-INVENTORY {
     overflow-y: auto;
-    width: 652px;
-    height: 757px;
+    /* width: 652px;
+    height: 757px; */
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -603,12 +737,7 @@ img {
 
 /* ACHIEVEMENT (TABLE5) CSS */
 #table5-container {
-    position: absolute;
     font-size: 10px;
-    top:95px; 
-    left:695px; 
-    width:969px;
-    height:761px;
     background: url(./assets/achievementBG.webp);
     background-size: 102%;
     background-position: center;
@@ -616,12 +745,7 @@ img {
 }
 
 .flex-container-ACHIEVEMENT {
-    position: absolute;
     margin: 0;
-    top:33px;
-    left:38px; 
-    width:880px;
-    height:670px;
     overflow-y: auto;
     display: flex;
     flex-wrap: wrap;
@@ -648,7 +772,6 @@ img {
     from {opacity: 1;}
     to {opacity: 0;}
 }
-
 
 .achieve:hover {
     transition: 0.4s ease;
@@ -727,23 +850,29 @@ img {
     height: 10px;
 }
 
-.table6 {
-    background: url(./assets/tooltips/background.webp);
-    position: absolute; 
-    top: 90px; 
-    left: 1350px;
-    width:275px;
-    height:724px;
+#table6 {
+    position: relative;
+    width: 30%;
+    height: 100%;
     display: flex;
-    padding: 20px;
     flex-direction: column;
     gap: 10px 302px;
     align-items: center;
 }
 
-.table6 > div {
-    padding-left: 10px;
-    padding-right: 10px;
+#table6 > div {
+    z-index: 5;
+}
+
+
+.table6-background {
+    position: absolute;
+    object-fit: fill;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
 }
 
 .tool-tip-name {
@@ -766,6 +895,7 @@ img {
     gap: 10px;
     flex-direction: row;
     align-items: center;
+    z-index: 5;
 }
 
 .tool-tip-extraimg img{

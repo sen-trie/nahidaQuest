@@ -3,275 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name = "viewport" content = "width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name = "viewport" content = "width=device-width, height=device-height, initial-scale=1">
     <style>
+      * {
+        margin: 0;
+    padding: 0;
+    border: 0;
+      }
+
+      html {
+        height: 100%;
+      }
 
         body {
-          background: #555;
+          width: 100%;
+          height: 100%;
+          background-color: aqua;
           position: relative;
+          overflow: hidden;
+        }
+
+        #backgroundCanvas {
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          right: 0px;
+          bottom: 0px;
+        }
+
+        .bar {
+          width: 95px;
+          height: 100%;
+          position: absolute;
+          top: 0px;
+          bottom: 0px;
+          right: 60%;
+          z-index: 100;
+        }
+
+        .topBarImg {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        .topBar {
+          width: 100%;
+          height: 106px;
+          z-index: 90;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-around;
+          align-items: center;
+        }
+
+
+        .tab-button {
+          z-index: 4;
+          width:64px;
+          height:64px;
+        }
+
+        .right {
+          width: 60%;
+          height: 100%;
+          position: absolute;
+          right: 0px;
+          background-color: aqua;
+          display:flex;
+          flex-direction: column;
+        }
+
+        .table {
+          width: 100%;
+          flex-grow: 2;
+          background-color: blueviolet;
+        }
+
+        .table1 {
+          width: 70%;
+          height: 100%;
+          position: absolute;
+          left: 0px;
+          background-color: greenyellow;
+          
+          overflow-y: scroll;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          min-height: 0;
+        }
+
+        .table2 {
+          font-size: 12px;
+          width: 30%;
+          height: 100%;
+          position: absolute;
+          right: 0px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+          align-items: center;
+        }
+
+        
+        .topImgImg {
+          position: absolute;
+          object-fit: fill;
+          top: 0;
+          height: 100%;
+          width: 100%;
+          z-index: 2;
+        }
+
+        .upgrade {
+          display: flex;
+          font-family: 'gi-font';
+          justify-content: center;
+          align-items: center;
+          width:90%;
+          height: 10%;
+          background-color: white;
+          flex:none;
         }
         
-        .content {
-          max-width: 1200px;
-          margin: auto;
-          background: white;
-          padding: 10px;
-        }
-
-        body {
-  font-family: sans-serif;
-  display: grid;
-  height: 100vh;
-  place-items: center;
-}
-
-.floatingText {
-    position: absolute;
-    animation: fadeOutOpacity 4s cubic-bezier(.02,.57,.7,.29);
-  }
-
-@keyframes fadeOutOpacity {
-    from {opacity: 1;}
-    to {opacity: 0;
-        top: -300px;}
-  }
-
- 
-
-.falling-image {
-    position: absolute;
-    opacity: 1;
-    z-Index: 3;
-}
-
-@keyframes fall {
-    from { top: -5vh;}
-    to { top: 100vh; }
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
-}
-
-
-
-/* 
-.container {
-  left:100px; 
-  top:300px; 
-  position: absolute;
-}
-
-.countdown-number {
-  color: white;
-  display: inline-block;
-  width: 48px;
-  height: 49px;
-}
-
-svg {
-  position: relative;
-  top: -4px;
-  left: -3px;
-  width: 48px;
-  height: 50px;
-  transform: rotateY(-180deg) rotateZ(-90deg);
-}
-
-circle {
-  stroke-dasharray: 125px;
-  stroke-dashoffset: 0px;
-  stroke-linecap: round;
-  stroke-width: 2px;
-  stroke: white;
-  fill: none;
-  animation: countdown 31s linear infinite forwards;
-}
-
-@keyframes countdown {
-  from {
-    stroke-dashoffset: 0px;
-  }
-  to {
-    stroke-dashoffset: 125px;
-  }
-} */
-
-
     </style>
     <title>nahidaQuest!</title>
 </head>
-<body style="background: url(./spare/bg1.png);width: device-width;height:1000px;background-repeat: no-repeat;background-size: 100%;">
-    <p style="position: absolute;">Saved name is:</p>
-    <p style="left:10px; top:40px; position: absolute;" id="demo"></p>
-
-  <div class="container">
-    <div id="app1"></div>
-    <div id="app2"></div>
+<body>
+  <div id="game">
+    <canvas id="backgroundCanvas" style="background-color: yellow"></canvas>
   </div>
 
-
-    
-    <div style="left:10px; top:100px;position: absolute;">
-        <button id="add"  style="height:100px;width:100px;left:100px;position: absolute;">add</button>
-    <button id="save"  style="height:100px;width:100px;left:200px;position: absolute;">save</button>
-    <button id="clear"  style="height:100px;width:100px;left:300px;position: absolute;">clear</button>
-    </div>
-    
-
-
-
     <script type="module">
-    import { upgradeDictDefault } from "./test_script.js"
-    var demoBut = document.getElementById("demo");
-    var addBut = document.getElementById("add");
-    var saveBut = document.getElementById("save");
-    var clearBut = document.getElementById("clear");
-    var upgradeDict = "";
-    var fadeCooldown = "";
+      const canvas = document.getElementById("backgroundCanvas");
+      const game = document.getElementById("game");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      resizeCanvasOnWindowResize();
 
-    addBut.addEventListener("click",()=> animateImage())
-    addBut.addEventListener("click",function(event) {
-      const x = event.clientX;
-    const y = event.clientY;
-    console.log(y)
+      var barImg =  document.createElement("div");
+    barImg.style.background = "url(./assets/bar.jpg)";
+    barImg.classList.add("bar");
+    game.appendChild(barImg);
 
-    const text = document.createElement("div");
-    text.innerHTML = "Hello World!";
-    text.classList.add("floatingText");
-    text.style.left = x + "px";
-    text.style.top = y - 40 +"px";
-    document.body.appendChild(text);
+    var right = document.createElement("div");
+    right.classList.add("right");
+    game.appendChild(right);
 
-    setTimeout(function() {
-      text.remove();
-    }, 2000);
-  });
+    var topImg =  document.createElement("div");
+    topImg.classList.add("topBar");
+    right.appendChild(topImg);
 
+    var topBarImg =  document.createElement("img");
+    topBarImg.src = "./assets/top-bar.png";
+    topBarImg.classList.add("topBarImg")
+    topImg.appendChild(topBarImg)
 
-    saveBut.addEventListener("click",()=> foodButton2())
-    clearBut.addEventListener("click",function() {clear()})
+    var table =  document.createElement("div");
+    table.classList.add("table");
+    right.appendChild(table);
 
-    // var currentTime = 0;
-    //  var timer = setInterval(() => animateImage(), 200)
+    var table1 =  document.createElement("div");
+    table1.classList.add("table1");
+    table.appendChild(table1);
+
+    var nu = 0;
+
+    createbutton()
     
+    createbutton()
     
+    createbutton()
     
+    createbutton()
+    
+    createbutton()
+    
+    createbutton()
+    
+    createbutton()
 
-    function animateImage() {
-    var img = document.createElement("img");
-    img.src = "./assets/icon/primogemIcon.png";
-    img.style.left = `${(Math.random() * 20) + 50}vw`
-    let number = (Math.random() * 3) + 1.5;
+    
+    createbutton()
 
-    let animation = `fall ${number}s ease-in, fadeOut ${number}s cubic-bezier(1,.05,.55,1.04)`
-    img.style.animation = animation;
-
-
-    img.addEventListener('animationend', () => {
-    img.remove();
-    });
-    img.classList.add("falling-image");
-    document.body.appendChild(img);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function count() {
-//   foodCheck();
-//   currentTime++
-// }
-
-// var timeSnapshot = 0;
-// var timeSnapshot2 = 0;
-// function foodCheck() {
-//   if (currentTime - timeSnapshot >= 30) {
-//     onTimesUp(1);
-//   }
-
-//   if (currentTime - timeSnapshot2 >= 30) {
-//     onTimesUp(2);
-//   }
-
-// }
-
-// function foodButton() {
-//   timeSnapshot = currentTime;
-//   document.getElementById("app1").innerHTML = countdownText(1);
-// }
-
-// function foodButton2() {
-//   timeSnapshot = currentTime;
-//   document.getElementById("app2").innerHTML = countdownText(2);
-// }
-
-// function countdownText(int) {
-//   return `<div id="countdown">
-//   <div class="countdown-number" style=${'background:url(./assets/food'+int+'.webp);'}>
-//     <svg>
-//     <circle r="20" cx="21" cy="21"></circle>
-//     </svg>  
-//   </div>
-  
-// </div>`
-// }
-
-//  function onTimesUp(int) {
-//    document.getElementById("app"+int).innerHTML = '';
-//  }
-
-
- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (localStorage.getItem("upgradeDictSave") === null) {
-        upgradeDict = upgradeDictDefault;
-        demoBut.innerHTML = upgradeDict[0]["Level"];
-    } else {
-        let upgradeDictTemp = window.localStorage.getItem("upgradeDictSave");
-        upgradeDict = JSON.parse(upgradeDictTemp)
-        demoBut.innerHTML = upgradeDict[0]["Level"];
-    }
-
-    function add() {
-        upgradeDict[0]["Level"]++;
-        console.log(upgradeDict[0]["Level"])
-        demoBut.innerHTML = upgradeDict[0]["Level"];
-    }
-
-    function save() {
-         localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
-         console.log(JSON.stringify(upgradeDict))
+      
+    createbutton()  
+    createbutton()
+    createbutton()
+   
+    
+    function createbutton() {
+    let button = document.createElement("div");
+    button.classList.add("upgrade");
+    nu++;
+    button.innerText = nu;
+    table1.appendChild(button);
   }
 
-    function clear() {
-        localStorage.clear();
+
+    var table2 =  document.createElement("div");
+    table2.classList.add("table2");
+    var topImgImg =  document.createElement("img");
+    topImgImg.classList.add("topImgImg");
+    topImgImg.src = "./assets/tooltips/background.webp";
+    table2.appendChild(topImgImg)
+    table.appendChild(table2);
+
+    
+    for (let i=5; i--;){
+      let tabButton = document.createElement("button");
+      tabButton.classList += "tab-button";
+      tabButton.style.background = "url(./assets/icon/tab"+ (i + 1) +".png)";
+      tabButton.id = "tab-" + i;
+      topImg.appendChild(tabButton)
     }
-        
-        
-        
+
+
+
+      function resizeCanvasOnWindowResize() {
+        window.addEventListener("resize", function() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        });
+      }
     </script>
 
 

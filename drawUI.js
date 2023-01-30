@@ -1,30 +1,29 @@
 // MAIN BODY GUI
 function drawMainBody() {
     var para1 = document.getElementById("para");
+    var rightDiv = document.getElementById("right-div");
+    var leftDiv = document.getElementById("left-div");
 
     var leftImg =  document.createElement("img");
-    leftImg.src = "./assets/bg-1.png";
-    leftImg.style = "position: absolute; left:-8px; top: -17px; width: 630px; height: 870px;";
-    para1.appendChild(leftImg);
+    leftImg.src = "./assets/bg.png";
+    leftImg.classList.add("div-img");
+    leftDiv.appendChild(leftImg);
 
-    var barImg =  document.createElement("img");
-    barImg.src = "./assets/bar.jpg";
-    barImg.style = "position: absolute; left: 600px; top: -16px; width: 95px; height: 870px;";
-    para1.appendChild(barImg);
+    // var topRightDiv = document.createElement("div");
+    // topRightDiv.id = "flex-container-TAB";
+    // var topImg =  document.createElement("img");
+    // topImg.src = "./assets/top-bar.png";
+    // topImg.classList.add("top-bar");
 
-    var topImg =  document.createElement("img");
-    topImg.src = "./assets/top-bar.png";
-    topImg.style = "position: absolute; left: 695px; top: -16px; width: 969px; height: 106px;";
-    para1.appendChild(topImg);
+    // // var mainBodyRight = document.createElement("div");
+    // // mainBodyRight.id = "table-container" mainBodyRight
+    // // topRightDiv.append(topImg)
+    // rightDiv.insertBefore(topRightDiv,rightDiv.firstChild);
 
     var mainImg =  document.createElement("img");
+    mainImg.classList.add("div-img");
     mainImg.src = "./assets/main-bar.png";
-    mainImg.style = "position: absolute; left: 695px; top: 90px; width: 970px; height: 765px;";
-    para1.appendChild(mainImg);
-
-    mainImg.src = "./assets/main-bar.png";
-    mainImg.style = "position: absolute; left: 695px; top: 90px; width: 970px; height: 765px;";
-    para1.appendChild(mainImg);
+    rightDiv.appendChild(mainImg);
 
     var expedDiv = document.getElementById("expedDiv");
     expedDiv.classList = "tooltipEXPED";
