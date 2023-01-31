@@ -1,6 +1,5 @@
 // MAIN BODY GUI
 function drawMainBody() {
-    var para1 = document.getElementById("para");
     var rightDiv = document.getElementById("right-div");
     var leftDiv = document.getElementById("left-div");
 
@@ -30,31 +29,36 @@ function drawMainBody() {
     expedDiv.id = "expedDivID";
 }
 
-function demoFunction() {
-    demo.onmousedown = function() {
-        demo.style.width = "92%";
-        demo.style.height = "92%";
-        demo.style["margin-top"] = '4%';
-        demo.style["margin-left"] = '4%';
+function demoFunction(demoImg) {
+    demoImg.onmousedown = function() {
+        demoImg.style.width = "92%";
+        demoImg.style.height = "92%";
+        demoImg.style["margin-top"] = '4%';
+        demoImg.style["margin-left"] = '4%';
     }
     
-    demo.onmouseup = function () {
-        demo.style.width = "98%";
-        demo.style.height = "98%";
-        demo.style["margin-top"] = '1%';
-        demo.style["margin-left"] = '1%';
+    demoImg.onmouseup = function () {
+        demoImg.style.width = "98%";
+        demoImg.style.height = "98%";
+        demoImg.style["margin-top"] = '1%';
+        demoImg.style["margin-left"] = '1%';
     };
 }
 
 function createHeroButtonContainer(heroID,heroText) {
-    let heroButtonContainer = document.createElement("button");
+    let heroButtonContainer = document.createElement("div");
+
+    let heroButtonText = document.createElement("p")
+    heroButtonText.innerText = heroText;
+    heroButtonText.classList += "upgrade-text";
     
     heroButtonContainer.id = heroID;
-    heroButtonContainer.innerText = heroText;
     heroButtonContainer.classList += "upgrade";
-    heroButtonContainer.style.background = "url(./assets/button.webp)";
-    heroButtonContainer.style["background-position"] = "center";
-    heroButtonContainer.style["background-size"] = "cover";
+    heroButtonContainer.appendChild(heroButtonText);
+
+    // heroButtonContainer.style.background = "url(./assets/button.webp)";
+    // heroButtonContainer.style["background-position"] = "center";
+    // heroButtonContainer.style["background-size"] = "cover";
 
     return heroButtonContainer;
 }

@@ -18,10 +18,19 @@
 </head>
 <body>
     <div id="game" class="prevent-select">
-        <div id="body-border" class="overlay">
+        <!-- <div id="body-border" class="overlay">
             <img src="./assets/loading.gif" class="overlay-tutorial">
+        </div> -->
+        <div id="left-div" class="left-area">
+            <div class="score-container">
+                <span id="score">0</span>      
+                <span id="dps">0</span>
+            </div>
+
+            <div id="demo-container">
+                <span id='demo'></span>
+            </div>
         </div>
-        <div id="left-div" class="left-area"></div>
 
         <div id="mid-div" class="middle-area">
             <img src="./assets/bar.jpg" class="middle-bar">
@@ -62,16 +71,6 @@
             <div class="temp-buff">
                 <div id="app1"></div>
                 <div id="app2"></div>
-            </div>
-            
-            <div class="score-container">
-                <span id="score">0</span>      
-                <span id="dps">0</span>
-            </div>
-            </div>
-
-            <div id="demo-container">
-                <span id='demo'></span>
             </div>
         </p>
 
@@ -252,6 +251,11 @@
         refresh();
     });
 
+    let demoImg = document.createElement("img");
+    demoImg.src = "./assets/nahida.png";
+    demoImg.classList.add("demo-img");
+    demo.appendChild(demoImg);
+
     demo.addEventListener("click",function(event) {
         demoContainer = floatText(demoContainer,abbrNum(saveValues["clickFactor"]),randomInteger(160,280),randomInteger(400,440));
 
@@ -266,7 +270,7 @@
         img.classList.add("falling-image");
         demoContainer.appendChild(img);
     });
-    demoFunction();
+    demoFunction(demoImg);
     
     // ROLL FOR ENERGY
     function energyRoll() {
@@ -292,16 +296,16 @@
         }, 1200);
     }
 
-    function removeLoading() {
-        dimHeroButton();
-        setTimeout(() => {
-            let overlay = document.getElementById("body-border");
-            overlay.removeChild(overlay.firstElementChild);
-            overlay.classList.remove("overlay");
-            tutorial();
-        }, 200);
+    // function removeLoading() {
+    //     dimHeroButton();
+    //     setTimeout(() => {
+    //         let overlay = document.getElementById("body-border");
+    //         overlay.removeChild(overlay.firstElementChild);
+    //         overlay.classList.remove("overlay");
+    //         tutorial();
+    //     }, 200);
         
-    }
+    // }
 
     // SETUP AUDIO API
     var currentSong = 1;
@@ -542,11 +546,16 @@
             let heroID = "but-" + j;
             let heroButtonContainer = createHeroButtonContainer(heroID,heroTextLoad);
             let toolName = upgradeDictTemp.Name;
-            if (purchased == true) {heroButtonContainer.style="background:url(./assets/nameplates/"+upgradeDictTemp.Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;"}
             
             heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", rowTempDict[j]);});
             heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
             heroButtonContainer.addEventListener("click", () => {upgrade(heroID)});
+
+            let heroButtonFrame = document.createElement("img")
+            heroButtonFrame.classList.add("hero-button-frame")
+            if (purchased == true) {heroButtonFrame.src = "./assets/nameplates/"+upgradeDictTemp.Name.replace(/ /g,'')+".webp"};
+            heroButtonContainer.prepend(heroButtonFrame);
+
             table1.appendChild(heroButtonContainer);
         }
     }
@@ -576,6 +585,7 @@
                 heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
                 heroButtonContainer.addEventListener("click", () => {upgrade(heroID)});
                 table1.appendChild(heroButtonContainer);
+
                 saveValues["rowCount"]++;
             }
         }
@@ -707,6 +717,7 @@
             itemUniqueID = idNum + "." + count;
         }
         let buttonInv = document.createElement("button");
+        buttonInv.classList.add("button-container");
         buttonInv.id = itemUniqueID;
         buttonInv.addEventListener('click', () => {
             itemUse(itemUniqueID);
@@ -1207,7 +1218,9 @@
 
                 let heroText = hero.Name + ": " + abbrNum(formatCost) + ", +" + abbrNum(formatATK) + " NpS";
                 let id="but-" + hero.Row + "";
-                document.getElementById(id).innerText = heroText;
+                let heroButtonText = document.createElement("p")
+                heroButtonText.innerText = heroText
+                document.getElementById(id).appendChild(heroButtonText);
             }
         }
     }

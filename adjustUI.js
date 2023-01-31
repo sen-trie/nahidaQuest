@@ -1,9 +1,8 @@
 // ADD TO INVENTORY BUTTON ADJUST
 function inventoryAddButton(buttonInv, Item) {
-    buttonInv.classList += "inventoryButton";
-    buttonInv.style.background = "url(./assets/frames/rarity-" + Item.Star + ".webp)";
-    buttonInv.style["background-repeat"] = "no-repeat";
-    buttonInv.style["background-size"] = "118px 144px";
+    let buttonInvFrame = document.createElement("img");
+    buttonInvFrame.src = "./assets/frames/rarity-" + Item.Star + ".webp";
+    buttonInvFrame.classList.add("button-inv-frame");
 
     let buttonInvStar = document.createElement("img");
     buttonInvStar.src = "./assets/frames/star-" + Item.Star + ".webp";
@@ -13,7 +12,7 @@ function inventoryAddButton(buttonInv, Item) {
     buttonInvItem.src = "./assets/tooltips/inventory/" + Item.Name + ".webp";
     buttonInvItem.classList.add("button-inv-item");
 
-    buttonInv.append(buttonInvItem,buttonInvStar);
+    buttonInv.append(buttonInvFrame,buttonInvItem,buttonInvStar);
 
     return buttonInv;
 }
