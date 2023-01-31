@@ -4,15 +4,18 @@ function inventoryAddButton(buttonInv, Item) {
     buttonInvFrame.src = "./assets/frames/rarity-" + Item.Star + ".webp";
     buttonInvFrame.classList.add("button-inv-frame");
 
+    let buttonInvStarDiv = document.createElement("div");
+    buttonInvStarDiv.classList.add("button-inv-stardiv");
     let buttonInvStar = document.createElement("img");
     buttonInvStar.src = "./assets/frames/star-" + Item.Star + ".webp";
     buttonInvStar.classList.add("button-inv-star");
+    buttonInvStarDiv.appendChild(buttonInvStar)
 
     let buttonInvItem = document.createElement("img");
     buttonInvItem.src = "./assets/tooltips/inventory/" + Item.Name + ".webp";
     buttonInvItem.classList.add("button-inv-item");
 
-    buttonInv.append(buttonInvFrame,buttonInvItem,buttonInvStar);
+    buttonInv.append(buttonInvFrame,buttonInvItem,buttonInvStarDiv);
 
     return buttonInv;
 }

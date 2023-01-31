@@ -14,12 +14,94 @@ button {
 
 body {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background-color: aqua;
     position: relative;
     overflow: hidden;
     font-family: 'gi-font';
+    display: flex;
+  align-items: center;
+  justify-content: center;
   }
+
+#game {
+    background-color: white;
+    position: relative;
+    margin: 0 auto;
+}
+
+  /* @media (min-aspect-ratio: 12/7) {
+    #game {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+  } */
+
+@media (min-aspect-ratio: 21/9) {
+    #game {
+        width: 50%;
+        height: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-aspect-ratio: 27/9) {
+    #game {
+        width: 70%;
+        height: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-aspect-ratio: 23/9) {
+    #game {
+        width: 85%;
+        height: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-aspect-ratio: 19/9) {
+    #game {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-aspect-ratio: 16/9) {
+    #game {
+        width: 100%;
+        height: 90%;
+        margin: 0;
+    }
+}
+
+@media (max-aspect-ratio: 14/9) {
+    #game {
+        width: 100%;
+        height: 80%;
+        margin: 0;
+    }
+}
+
+@media (max-aspect-ratio: 12/9) {
+    #game {
+        width: 100%;
+        height: 70%;
+        margin: 0;
+    }
+}
+
+@media (max-aspect-ratio: 10/9) {
+    #game {
+        width: 100%;
+        height: 60%;
+        margin: 0;
+    }
+}
+  
 
 .overlay {
     display: flex;
@@ -596,7 +678,7 @@ circle {
     justify-content: flex-start;
     align-content: flex-start;
     align-items: stretch;
-    gap: 5px 1%;
+    gap: 1% 1%;
 }
 
 .flex-container-INVENTORY button:hover{
@@ -604,8 +686,10 @@ circle {
 }
 
 .button-container {
-    width: 103px;
-    height: 130px;
+    aspect-ratio: 13/17;
+    flex-basis: 15%;
+    /* width: 103px;
+    height: 130px; */
     position: relative;
 }
 
@@ -618,19 +702,27 @@ circle {
     object-fit: fill;
 } 
 
+.button-inv-stardiv {
+    position: absolute;
+    left: 0%;
+    bottom: 10%;
+    width: 100%;
+    height: 17%;
+
+}
+
 .button-inv-star {
-    position: relative;
-    top: -10px;
-    width: auto;
-    height: 27px;
+    width: 100%;
+    height: 100%;
+    object-fit:contain;
 }
 
 .button-inv-item {
-    position: relative;
-    top: 8px;
-    left: -2px;
-    width: 110px;
-    height: 110px;
+    position: absolute;
+    left:0%;
+    bottom: 18%;
+    width: 100%;
+    height: 80%;
 } 
 
 /* EXPEDITION (TABLE3) CSS */
@@ -698,29 +790,33 @@ circle {
 /* WISH (TABLE4) CSS */
 .wish-counter {
     z-index: 1;
-    position: absolute; 
-    top:40px; 
-    left:-2px; 
-    background:url(./assets/wishBG.png);
-    background-size: 105%;
-    background-position: center center;
-    background-repeat: no-repeat;
-    width:969px; 
-    height:764px;
+    display: flex;
+    flex-direction: column;
+}
+
+.wish-mail-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .wish-button {
     font-family: gi-font;
     position: absolute;
-    top: 615px;
-    left: 270px;
-    width:412px;
-    height:96px;
-    
-    background:url(./assets/wishButton.webp);
+    top: 100%;
+    height: 20%;
+    width: 70%;
     font-size: 29px;
     color: #F8E8C7;
     text-shadow: #73603D 3px 3px 1px;
+}
+
+.wish-button-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .wish-button:hover{
@@ -733,24 +829,44 @@ circle {
     transition: 0.1s ease;
 }
 
+.wish-button-text {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .wish-button-new:after{
     content: url(./assets/icon/primogemIcon.png);
 }
 
 .wish-mail-container {
-    position: absolute;
-    top: 0px;
-    left: 140px;
-    width: 634px;
-    height: 528px;
+    position: relative;
+    top: 0%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wish-mail-div {
+    position: relative;
+    top: -10%;
+    width: 80%;
+    height: 80%;
+    object-fit:cover;
+    display: flex;
+    justify-content: center;
 }
 
 .wish-mail {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
+    object-fit: contain;
     -webkit-transition: opacity 0.35s ease-in-out;
     -moz-transition: opacity 0.35s ease-in-out;
     -o-transition: opacity 0.35s ease-in-out;

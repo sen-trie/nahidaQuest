@@ -133,6 +133,11 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
 }
 
 function drawMailTable(table4) {
+    let mailImageBackground= document.createElement("img");
+    mailImageBackground.classList.add("wish-mail-image");
+    mailImageBackground.src = "./assets/wish-bg.webp"
+    table4.append(mailImageBackground)
+
     let mailImageContainer = document.createElement("div");
     mailImageContainer.classList.add("wish-mail-container");
     
@@ -145,7 +150,12 @@ function drawMailTable(table4) {
     mailImageTop.id = "mailImageID";
     mailImageTop.classList.add("wish-mail");
 
-    mailImageContainer.append(mailImageBottom,mailImageTop);
+    let mailImageDiv = document.createElement("div");
+    mailImageDiv.id = "mail-image-div";
+    mailImageDiv.classList.add("wish-mail-div");
+    mailImageDiv.append(mailImageBottom,mailImageTop);
+
+    mailImageContainer.append(mailImageDiv);
     table4.append(mailImageContainer);
     return table4;
 }

@@ -13,6 +13,7 @@
             -ms-user-select: none;
             user-select: none;
         }
+
     </style>
 
 </head>
@@ -918,9 +919,9 @@
     //------------------------------------------------------------------------TABLE 4 (WISH)------------------------------------------------------------------------//
      // UNLOCK WISH SYSTEM
      function wishUnlock() {
-        let wishButton = document.getElementById("wishButton");
-        wishButton.innerText = "Write for help | 160 ";
-        wishButton.classList.add("wish-button-new");
+        let wishButtonText = document.getElementById("wishButtonText");
+        wishButtonText.innerText = "Write for help | 160 ";
+        wishButtonText.classList.add("wish-button-new");
         wishButton.addEventListener("click",() => {
             wish();
         })
@@ -928,13 +929,23 @@
     
     // DRAWS/WISH FOR SPECIAL HEROS
     function drawWish() {
-        var wishButton = document.createElement("button");
+        var wishButton = document.createElement("div");
         wishButton.classList += "wish-button";
-        wishButton.id = "wishButton";
-        wishButton.innerText = "???";
+        let wishButtonText = document.createElement("div");
+        wishButtonText.id = "wishButtonText";
+        wishButtonText.classList += "wish-button-text";
+        wishButtonText.innerText = "???";
 
         table4 = drawMailTable(table4);
-        table4.appendChild(wishButton);
+
+        let mailImageDiv = document.getElementById("mail-image-div");
+        let wishButtonImg = document.createElement("img");
+        wishButtonImg.src = "./assets/wishButton.webp";
+        wishButtonImg.classList += "wish-button-img";
+        wishButton.append(wishButtonImg,wishButtonText)
+        mailImageDiv.append(wishButton)
+
+        
 
         if (wishCounter === saveValues["wishCounterSaved"]) {
             stopWish();
