@@ -13,7 +13,6 @@
             -ms-user-select: none;
             user-select: none;
         }
-
     </style>
 
 </head>
@@ -50,22 +49,6 @@
         </div>
 
         <div id="right-div" class="right-area">
-            <div id="flex-container-TAB" >
-                <img src="./assets/top-bar.png" class="top-bar">
-            </div>
-            <div class="main-table">
-                <div id="table1" class="table-with-tooltip"></div>
-                <div id="table2" class="flex-container-INVENTORY table-with-tooltip"></div>
-                <div id="table3" class="flex-container-EXPEDITION table-without-tooltip">
-                    <div id="expedDiv"></div>
-                </div>
-                <div id="table4" class="wish-counter table-without-tooltip"></div>
-                <div id="table5-container">
-                    <div id="table5" class="flex-container-ACHIEVEMENT table-without-tooltip"></div>
-                </div>
-                <div id="table6">
-                </div>
-            </div>
         </div>
 
         <p id="para">
@@ -82,7 +65,7 @@
     import { upgradeDictDefault,InventoryDefault,tooltip,expeditionDictDefault,achievementListDefault,saveValuesDefault } from "./defaultData.js"
     import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText } from "./functions.js"
     import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
-    import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText } from "./adjustUI.js"
+    import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
     var saveValues;
     const ENERGYCHANCE = 500;
@@ -116,24 +99,21 @@
 
     var midDiv = document.getElementById("mid-div");
     var multiplierButtonContainer;
+    //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
+    // MAIN BODY VARIABLES
+    var mainBody = document.getElementById("game");    
+    var para1 = document.getElementById("para");
+    drawMainBody();
 
     var table1 = document.getElementById("table1");
     var table2 = document.getElementById("table2");
     var table3 = document.getElementById("table3");
+    var expedDiv = document.getElementById("expedDiv");
     var table4 = document.getElementById("table4");
     var table5 = document.getElementById("table5");
     var table5Container = document.getElementById("table5-container");
     var table6 = document.getElementById("table6");
     var TABS = [table1,table2, table3, table4, table5Container];
-
-    //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
-    // MAIN BODY VARIABLES
-    var mainBody = document.getElementById("game");
-
-    
-    var para1 = document.getElementById("para");
-    var expedDiv = document.getElementById("expedDiv");
-    drawMainBody();
 
     // TOOLTIPS FOR EXPEDITION
     var expedContainer = document.getElementById("table3");
@@ -462,38 +442,22 @@
             bgmElement.volume = this.value / 100;
         });
     }
-    // center / cover no-repeat
+    
     function createMultiplierButton() {
         multiplierButtonContainer = document.createElement("div");
         multiplierButtonContainer.classList.add("multiplier-button-container");
 
         let multiplierButton1 = document.createElement("button");
-        let multiplierButton1Img = document.createElement("img");
-        // multiplierButton1Img.classList.add("multiplier-button");
-        multiplierButton1.id = "multiplierButton-1";
-        multiplierButton1.classList.add("multiplier-button");
-        multiplierButton1Img.src = "./assets/settings/multi-1.webp";
-        multiplierButton1Img.classList.add("multiplier-button-img");
+        multiplierButton1 = multiplierButtonAdjust(multiplierButton1,1)
         multiplierButton1.addEventListener("click",() => {costMultiplier(10),currentDimMultiplier = dimMultiplierButton(1, currentDimMultiplier)})
-        multiplierButton1.appendChild(multiplierButton1Img);
 
         let multiplierButton2 = document.createElement("button");
-        let multiplierButton2Img = document.createElement("img");
-        multiplierButton2.classList.add("multiplier-button");
-        multiplierButton2.id = "multiplierButton-2";
-        multiplierButton2Img.src = "./assets/settings/multi-2.webp";
-        multiplierButton2Img.classList.add("multiplier-button-img");
+        multiplierButton2 = multiplierButtonAdjust(multiplierButton2,2)
         multiplierButton2.addEventListener("click",() => {costMultiplier(25),currentDimMultiplier = dimMultiplierButton(2, currentDimMultiplier)})
-        multiplierButton2.appendChild(multiplierButton2Img);
-
+        
         let multiplierButton3 = document.createElement("button");
-        let multiplierButton3Img = document.createElement("img");
-        multiplierButton3.classList.add("multiplier-button");
-        multiplierButton3.id = "multiplierButton-3";
-        multiplierButton3Img.classList.add("multiplier-button-img");
+        multiplierButton3 = multiplierButtonAdjust(multiplierButton3,3)
         multiplierButton3.addEventListener("click",() => {costMultiplier(100),currentDimMultiplier = dimMultiplierButton(3, currentDimMultiplier)})
-        multiplierButton3Img.src = "./assets/settings/multi-3.webp";
-        multiplierButton3.appendChild(multiplierButton3Img);
 
         multiplierButtonContainer.append(multiplierButton3, multiplierButton2, multiplierButton1);
         midDiv.appendChild(multiplierButtonContainer)

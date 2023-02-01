@@ -1,32 +1,59 @@
 // MAIN BODY GUI
 function drawMainBody() {
-    var rightDiv = document.getElementById("right-div");
+    // LEFT DIV/AREA
     var leftDiv = document.getElementById("left-div");
-
     var leftImg =  document.createElement("img");
     leftImg.src = "./assets/bg.png";
     leftImg.classList.add("div-img");
     leftDiv.appendChild(leftImg);
 
-    // var topRightDiv = document.createElement("div");
-    // topRightDiv.id = "flex-container-TAB";
-    // var topImg =  document.createElement("img");
-    // topImg.src = "./assets/top-bar.png";
-    // topImg.classList.add("top-bar");
+    // RIGHT DIV/AREA
+    var rightDiv = document.getElementById("right-div");
+        let TabDiv = document.createElement("div");
+        TabDiv.id = "flex-container-TAB";
+        let TabDivImg = document.createElement("img");
+        TabDivImg.src = "./assets/top-bar.png";
+        TabDivImg.classList.add("top-bar")
+        TabDiv.appendChild(TabDivImg);
 
-    // // var mainBodyRight = document.createElement("div");
-    // // mainBodyRight.id = "table-container" mainBodyRight
-    // // topRightDiv.append(topImg)
-    // rightDiv.insertBefore(topRightDiv,rightDiv.firstChild);
+        let mainTable = document.createElement("div");
+            mainTable.classList.add("main-table")
 
-    var mainImg =  document.createElement("img");
-    mainImg.classList.add("div-img");
-    mainImg.src = "./assets/main-bar.png";
-    rightDiv.appendChild(mainImg);
+            let table1 = document.createElement("div");
+            table1.classList.add("table-with-tooltip");
+            table1.id = "table1";
 
-    var expedDiv = document.getElementById("expedDiv");
-    expedDiv.classList = "tooltipEXPED";
-    expedDiv.id = "expedDivID";
+            let table2 = document.createElement("div");
+            table2.classList += ("flex-container-INVENTORY table-with-tooltip")
+            table2.id = "table2";
+
+            let table3 = document.createElement("div");
+            table3.classList += ("flex-container-EXPEDITION table-without-tooltip");
+            table3.id = "table3";
+            let table3Div = document.createElement("div");
+            table3Div.id = "expedDiv";
+            table3Div.classList = "tooltipEXPED";
+            table3.appendChild(table3Div);
+
+            let table4 = document.createElement("div");
+            table4.classList += ("wish-counter table-without-tooltip")
+            table4.id = "table4"
+
+            let table5Container = document.createElement("div");
+            let table5 = document.createElement("div");
+            table5.classList += ("flex-container-ACHIEVEMENT table-without-tooltip");
+            table5.id = "table5";
+            table5Container.id = "table5-container";
+            table5Container.appendChild(table5);
+            
+            let table6 = document.createElement("div");
+            table6.id = "table6";
+        mainTable.append(table1,table2,table3,table4,table5Container,table6);
+
+        var mainImg =  document.createElement("img");
+        mainImg.classList.add("div-img");
+        mainImg.src = "./assets/main-bar.png";
+    rightDiv.append(TabDiv,mainTable,mainImg);
 }
 
 function demoFunction(demoImg) {

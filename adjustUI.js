@@ -45,6 +45,19 @@ function expedButtonAdjust(expedButton, backgroundImg, i) {
     return expedButton;
 }
 
+// ADJUSTS IMAGES FOR MULTIPLIER BUTTONS
+function multiplierButtonAdjust(multiplierButton, int) {
+    multiplierButton.id = "multiplierButton-" + int;
+    multiplierButton.classList.add("multiplier-button");
+
+    let multiplierButtonImg = document.createElement("img");
+    multiplierButtonImg.src = "./assets/settings/multi-"+int+".webp";
+    multiplierButtonImg.classList.add("multiplier-button-img");
+    multiplierButton.appendChild(multiplierButtonImg)
+    return multiplierButton;
+}
+
+
 // ADJUSTS DIM LEVELS FOR x10,x25,x100 BUTTONS
 function dimMultiplierButton(int,currentDimMultiplier) {
     if (currentDimMultiplier === int) {
@@ -75,4 +88,4 @@ function volumeScrollerAdjust(volumeScroller) {
     return volumeScroller;
 }
 
-export {inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText};
+export {inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust};
