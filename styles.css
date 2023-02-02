@@ -1,3 +1,4 @@
+/*/////////////////////// HTML CSS ///////////////////////////////*/
 @font-face {
     font-family: gi-font;
     src: url(./assets/gi-font.ttf);
@@ -8,28 +9,6 @@ html {
     cursor: url(./assets/icon/cursor.png), auto;
 }
 
-button {
-    cursor: url(./assets/icon/cursor.png), auto
-}
-
-body {
-    width: 100%;
-    height: 100vh;
-    background-color: aqua;
-    position: relative;
-    overflow: hidden;
-    font-family: 'gi-font';
-    display: flex;
-  align-items: center;
-  justify-content: center;
-  }
-
-#game {
-    background-color: white;
-    position: relative;
-    margin: 0 auto;
-}
-
   /* @media (min-aspect-ratio: 12/7) {
     #game {
       width: 100%;
@@ -38,7 +17,9 @@ body {
     }
   } */
 
-@media (min-aspect-ratio: 21/9) {
+/* <--------- STRETCHING HORIZONTALLY -----------> */
+
+@media (min-aspect-ratio: 28/9) {
     #game {
         width: 50%;
         height: 100%;
@@ -46,17 +27,25 @@ body {
     }
 }
 
-@media (max-aspect-ratio: 27/9) {
+@media (max-aspect-ratio: 28/9) {
     #game {
-        width: 70%;
+        width: 68%;
         height: 100%;
         margin: 0;
     }
 }
 
-@media (max-aspect-ratio: 23/9) {
+@media (max-aspect-ratio: 24/9) {
     #game {
-        width: 85%;
+        width: 80%;
+        height: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-aspect-ratio: 22/9) {
+    #game {
+        width: 90%;
         height: 100%;
         margin: 0;
     }
@@ -69,6 +58,14 @@ body {
         margin: 0;
     }
 }
+
+/*           ^
+             |
+             |          
+  STRETCHING VERTICALLY 
+             |
+             |
+             v          */
 
 @media (max-aspect-ratio: 16/9) {
     #game {
@@ -97,21 +94,20 @@ body {
 @media (max-aspect-ratio: 10/9) {
     #game {
         width: 100%;
-        height: 60%;
+        height: 58%;
         margin: 0;
     }
 }
-  
 
-.overlay {
-    display: flex;
-    background: url(./assets/wood.jpg);
-    flex-direction:  row;
-    justify-content: center;
-    align-items: center;
-    z-index: 200;
+@media (max-aspect-ratio: 8/9) {
+    #game {
+        width: 100%;
+        height: 50%;
+        margin: 0;
+    }
 }
 
+/*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
     scrollbar-width: auto;
     scrollbar-color: #ffffff #3d3d3d;
@@ -120,8 +116,32 @@ body {
     border: 0;
 }
 
+#game {
+    background-color: white;
+    position: relative;
+    margin: 0 auto;
+}
+
+.overlay {
+    position: absolute;
+    display: flex;
+    background: url(./assets/wood.jpg);
+    background-size:cover;
+    flex-direction:  row;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+}
+
+.prevent-select {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
 ::-webkit-scrollbar {
-    width: 12px;
+    width: auto;
     background-color: #F5F5F5;
 }
 
@@ -134,9 +154,25 @@ body {
   background-color: #555;
 }
 
-/* MAIN BODY CSS */
+/*/////////////////////// MAIN BODY CSS ///////////////////////////////*/
+body {
+    width: 100%;
+    height: 100vh;
+    background-color: aqua;
+    position: relative;
+    overflow: hidden;
+    font-family: 'gi-font';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 table {
     cursor: url(./assets/icon/cursor.png), auto;
+}
+
+button {
+    cursor: url(./assets/icon/cursor.png), auto
 }
 
 .score-container {
@@ -227,20 +263,21 @@ table {
     height: 100%;
 }
 
-
-
-
-/* #body-border {
+#loading {
     position: absolute;
-    top:-27px;
-    left: -20px;
-    width: 1670px;
-    height: 867px;
-    z-index: 5;
-    border: 14px ridge #ACC35B;
-    border-radius: 20px;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    /* border: 14px ridge #ACC35B;
+    border-radius: 20px; */
     pointer-events: none;
-} */
+}
+
+.overlay-tutorial {
+    width: 50%;
+    height: 55%;
+    object-fit: contain;
+}
 
 #score {
     font-size: 40px;
@@ -306,7 +343,7 @@ table {
 
  */
 
-/* TEMP BUFFS CSS */
+/*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
 .temp-buff {
   left:622px; 
   top:85px; 
@@ -341,7 +378,7 @@ circle {
   }
 }
 
-/* SETTINGS CSS */
+/*/////////////////////////////// SETTINGS CSS ///////////////////////////////*/
 .settings-button {
     height: 24%;
     width: 100%;
@@ -447,15 +484,15 @@ circle {
 
 #demo-container {
     position: relative;
-    top: 15%;
+    top: 12.5%;
     width:83%;
     height: 55%;
 }
 
 .floatingText {
     font-size: 25px;
-    color: white;
-    text-shadow: 2px 2px 0px #000000;
+    color: rgb(10, 52, 18);
+    text-shadow: 2px 2px 0px #fbfbfb;
     position: absolute;
     animation: fadeOutOpacity 1.5s cubic-bezier(.02,.97,.91,.14);
     z-index: 3;
@@ -467,23 +504,24 @@ circle {
       opacity: 1.0;
     }
     to {
-      opacity: 0.2;
+      opacity: 0.5;
       top: -20px;
     }
   }
 
 .falling-image {
     position: absolute;
-    opacity: 0.7;
     z-Index: 2;
+    width: 7%;
+    aspect-ratio: 1;
 }
 
 @keyframes fall {
-    from {top: -200px;opacity: 0.7s;}
-    to {top: 600px;opacity: 0;}
+    from {top: 0%;opacity: 0.7;}
+    to {top: 100%;opacity: 0;}
 }
 
-/* TAB BODY CSS */
+/*/////////////////////////////// TAB BODY CSS ///////////////////////////////*/
 #flex-container-TAB {
     width: 100%;
     height: 10%;
@@ -524,9 +562,7 @@ circle {
     justify-content: space-between;
 } */
 
-
-
-/* ALL POP UP CSS (New/Tut) */
+/*/////////////////////////////// ALL POP UP CSS (New/Tut) ///////////////////////////////*/
 .pop-new {
     position: absolute;
     z-index: 3;
@@ -564,45 +600,53 @@ circle {
     top: 620px;
 }
 
-/* TUTORIAL CSS */
+/*/////////////////////////////// TUTORIAL CSS ///////////////////////////////*/
 .tutorial-dark {
     position: absolute;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    top:-14px;
-    left: -7px;
-    width: 1670px;
-    height: 867px;
+    width: 100%;
+    height: 100%;
     z-index: 200;
     background-color: rgba(0,0,0,0.90);
+    pointer-events: all;
+    
+}
+
+.tutorial-text {
+    width: 80%;
+    height: 10%;
+    object-fit: contain;
 }
 
 .tutorial-screen {
-    width: 1233px;
-    height: 738px;
+    width: 72%;
+    height: 80%; 
     z-index: 200;
-    background: url(./assets/tutorial/tutorialFrame.webp);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 1%;
 }
 
 .tutorial-img {
-    position: absolute;
-    left: 321px;
-    top: 200px;
-    width: 1019px;
-    height: 530px;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .tutorial-button:hover {
     filter: drop-shadow(0px 0px 7px #57783b);
 }
 
-/* HERO UPGRADES (TABLE1) CSS */
+/*/////////////////////////////// HERO UPGRADES (TABLE1) CSS ///////////////////////////////*/
 #table1 {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 1.5%;
     overflow-y: scroll;  
     overflow-x: hidden;
 }
@@ -612,6 +656,15 @@ circle {
     font-family: 'gi-font';
     justify-content: center;
     align-items: center; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex: none;
+
+    color: white;
+    width: 100%;
+    height: 14%;
     position: relative;
     transition: 0.4s ease;
     filter: brightness(var(--brightness)) 
@@ -631,12 +684,17 @@ circle {
 
 }
 
-.hero-button-frame {
+/* .hero-button-frame {
     width: 100%;
     height: 100%;
     position: relative;
     top:0px;
     left:0px;
+} */
+
+.not-purchased {
+    background: url(./assets/button.webp) center center / 100% no-repeat;
+    background-size: contain;
 }
 
 :root {
@@ -663,7 +721,7 @@ circle {
     --brightness:60%;
 }
 
-/* INVENTORY (TABLE2) CSS */
+/*/////////////////////////////// INVENTORY (TABLE2) CSS ///////////////////////////////*/
 .item-button {
     border: 0px;
     width: 131px;
@@ -725,7 +783,7 @@ circle {
     height: 80%;
 } 
 
-/* EXPEDITION (TABLE3) CSS */
+/*/////////////////////////////// EXPEDITION (TABLE3) CSS ///////////////////////////////*/
 .flex-container-EXPEDITION button {
     transition: 0.2s ease;
     opacity: 0.25;
@@ -739,24 +797,40 @@ circle {
 .flex-container-EXPEDITION {
     justify-content: center;
     align-items: center;
+    display: flex;
+    flex-direction: column;
+    row-gap: 2%;
+}
+
+#expedDiv {
+    width:98%;
+    height:60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .expedition {
     margin: auto;
-    width:190px;
-    height: 489px;
+    width: 19%;
+    height: 100%;
 }
 
-/* EXPEDITION TOOLTIP CSS */
+/*/////////////////////////////// EXPEDITION TOOLTIP CSS ///////////////////////////////*/
 .tooltipEXPED {
     text-align: center;
-    z-index:2;
-    background: url(./assets/tooltipEXPED.png);
-    position: absolute; 
-    left: 745px; 
-    top: 595px; 
-    width: 850px;
-    height: 238px;
+    width: 90%;
+    height: 30%;
+    position: relative;
+}
+
+.exped-table-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left:0;
+    object-fit: contain;
 }
 
 .tooltipTABLEEXPED {
@@ -787,18 +861,14 @@ circle {
     text-justify: inter-word;
 }
 
-/* WISH (TABLE4) CSS */
+/*/////////////////////////////// WISH (TABLE4) CSS ///////////////////////////////*/
 .wish-counter {
     z-index: 1;
     display: flex;
     flex-direction: column;
-}
-
-.wish-mail-image {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    background: url(./assets/wish-bg.webp);
+    background-position: center;
+    background-size: cover;
 }
 
 .wish-button {
@@ -873,31 +943,54 @@ circle {
     transition: opacity 0.35s ease-in-out;
 }
 
-/* ACHIEVEMENT (TABLE5) CSS */
+/*/////////////////////////////// ACHIEVEMENT (TABLE5) CSS ///////////////////////////////*/
 #table5-container {
     font-size: 10px;
     background: url(./assets/achievementBG.webp);
-    background-size: 102%;
-    background-position: center;
+    background-size:cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* url(./assets/middle.webp), url(./assets/right.webp)
+repeat, no-repeat
+ 100% auto, auto 100% */
+
+.table5-Image {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    background:url(./assets/left.webp), url(./assets/middle.webp), url(./assets/right.webp);
     background-repeat: no-repeat;
+    background-position: left, center, right;
+    background-size: auto 100%, 90% 100%, auto 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .flex-container-ACHIEVEMENT {
-    margin: 0;
+    position: absolute;
+    top: 14%;
+    width: 80%;
+    height: 75%;
+    
     overflow-y: auto;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
     align-content: flex-start;
-    gap: 5px 8px;
+    justify-content: flex-start;
+    gap: 1% 2%;
 }
 
 .achieve {                                         
     z-index:2;
-    position: absolute; 
-    top:685px; 
-    width:593px;
-    height:98px;
+    position: relative;
+    bottom: -15%;
+    width:90%;
+    height:10%;
     text-align: center;
     background:url(./assets/achievement.png);
     background-size: 100%;
@@ -917,29 +1010,32 @@ circle {
 }
 
 .achievementImageContainer {
-    width:100px;
-    height:100px;
+    width: 20%;
+    height: auto;
+    position:relative;
 }
 
-.achievementImageNumber {
-    position:relative; 
-    top: 63%;
-    width:30px;
-    height:30px;
-    
-}
+ .achievementImageNumber {
+    position: absolute;
+    bottom: 11%;
+    width:25%;
+    left: 38%;
+    object-fit: contain;
+ }
 
 .achieve-stored-text {
-    flex-grow: 2;
+    width: 80%;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    row-gap: 12px;
+    row-gap: 10%;
 }
 
 .achieve-stored {
-    width:420px;
-    height:98px;
+    width: 49%;
+    aspect-ratio: 4.5;
+    /* flex-basis: 15%;
+    position: relative; */
 
     display: flex;
     justify-content: space-evenly;
@@ -947,9 +1043,8 @@ circle {
     
     color: #5b4e32;
     text-align: center;
-    border: 5px ridge #a59e8e;
     background-image: url(./assets/achievement.webp);
-    background-size: 109%;
+    background-size: 100%;
     background-position: center center;
 }
 
@@ -964,21 +1059,15 @@ circle {
     margin: 0;
 }
 
-/* TOOLTIP UI (TABLE6) CSS */
+/*/////////////////////////////// TOOLTIP UI (TABLE6) CSS ///////////////////////////////*/
 .sideImg {
     position: absolute;
     left: 1279px;
     width: 382px;
     height: 869px;
+    background-color: cyan;
 }
 
-.toolImgOverlay {
-    position: absolute;
-    left: 47px;
-    top: 55px;
-    width: 215px;
-    height: auto;
-}
 
 #table-tab {
     position: absolute;
@@ -986,15 +1075,18 @@ circle {
     right:140px;
     width: 100px;
     height: 10px;
+    background-color: plum;
 }
 
 #table6 {
+    padding-top: 2.5%;
+    font-size: 1.5vw;
     position: relative;
     width: 30%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 10px 302px;
+    gap: 1%;
     align-items: center;
 }
 
@@ -1002,6 +1094,31 @@ circle {
     z-index: 5;
 }
 
+.toolImg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 10;
+}
+
+.toolImgContainer {
+    position: relative;
+    width: 70%;
+    height: auto;
+}
+
+.toolImgOverlay {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 50;
+}
 
 .table6-background {
     position: absolute;
@@ -1014,29 +1131,36 @@ circle {
 }
 
 .tool-tip-name {
-    font-size: 30px;
+    font-size: inherit;
     text-align: center;
+    max-height: 10%;
+    background-color: dodgerblue;
 }
 
 .tool-tip-text {
-    font-size: 22px;
+    font-size: inherit;
     text-align: center;
+    max-width: 84%;
+    background-color:rgb(249, 126, 12);
 }
 
 .tool-tip-lore {
-    font-size: 20px;
+    font-size: inherit;
     text-align: left;
+    max-width: 84%;
+    background-color: crimson;
 }
 
 .tool-tip-extraimg {
     display: flex;
-    gap: 10px;
+    gap: 5%;
     flex-direction: row;
     align-items: center;
     z-index: 5;
+    width: 40%;
+    background-color: #57783b;
 }
 
 .tool-tip-extraimg img{
-    height: 70px;
-    width: 70px;
+    width: 47.5%;
 }

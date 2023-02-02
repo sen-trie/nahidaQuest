@@ -32,19 +32,25 @@ function drawMainBody() {
             table3.id = "table3";
             let table3Div = document.createElement("div");
             table3Div.id = "expedDiv";
-            table3Div.classList = "tooltipEXPED";
-            table3.appendChild(table3Div);
+            let table3Tooltip = document.createElement("div");
+            table3Tooltip.id = "expedTooltip";
+            table3Tooltip.classList = "tooltipEXPED";
+            table3.append(table3Div,table3Tooltip);
 
             let table4 = document.createElement("div");
             table4.classList += ("wish-counter table-without-tooltip")
             table4.id = "table4"
 
             let table5Container = document.createElement("div");
+            table5Container.classList += ("table-without-tooltip");
+            let table5Image = document.createElement("div");
+            table5Image.classList += ("table5-Image");
+
             let table5 = document.createElement("div");
-            table5.classList += ("flex-container-ACHIEVEMENT table-without-tooltip");
+            table5.classList += ("flex-container-ACHIEVEMENT");
             table5.id = "table5";
             table5Container.id = "table5-container";
-            table5Container.appendChild(table5);
+            table5Container.append(table5Image,table5);
             
             let table6 = document.createElement("div");
             table6.id = "table6";
@@ -72,25 +78,20 @@ function demoFunction(demoImg) {
     };
 }
 
-function createHeroButtonContainer(heroID,heroText) {
+function createHeroButtonContainer(heroID) {
     let heroButtonContainer = document.createElement("div");
 
-    let heroButtonText = document.createElement("p")
-    heroButtonText.innerText = heroText;
-    heroButtonText.classList += "upgrade-text";
-    
     heroButtonContainer.id = heroID;
-    heroButtonContainer.classList += "upgrade";
-    heroButtonContainer.appendChild(heroButtonText);
-
-    // heroButtonContainer.style.background = "url(./assets/button.webp)";
-    // heroButtonContainer.style["background-position"] = "center";
-    // heroButtonContainer.style["background-size"] = "cover";
-
+    heroButtonContainer.classList.add("upgrade");
+    heroButtonContainer.classList.add("not-purchased");
     return heroButtonContainer;
 }
 
 function createExpedTable(expedDiv) {
+    let expedTableImg = document.createElement("img");
+    expedTableImg.classList.add("exped-table-img")
+    expedTableImg.src = "./assets/tooltipEXPED.png";
+
     let expedTable = document.createElement("table");
     expedTable.classList = "tooltipTABLEEXPED";
     expedTable.id = "expedTableID";
@@ -105,7 +106,7 @@ function createExpedTable(expedDiv) {
     let expedCell1 = expedRow2.insertCell(0);
     expedCell1.classList += "exped-cell-one"
 
-    expedDiv.appendChild(expedTable);
+    expedDiv.appendChild(expedTableImg,expedTable);
 }
 
 function createAchievement(achievementText,achievementDesc) {
@@ -135,7 +136,9 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
     let achievementImageContainer = document.createElement("div");
     achievementImageContainer.classList.add("achievementImageContainer");
     achievementImageContainer.style.background = "url(./assets/achievement/"+Math.floor(achievementID / 100) * 100+".webp)";
+    achievementImageContainer.style.backgroundPosition = "center center"
     achievementImageContainer.style.backgroundSize = "contain";
+    achievementImageContainer.style.backgroundRepeat = "no-repeat";
 
     achievementID = Number(String(achievementID).slice(-2))
     let achievementImageNumber = document.createElement("img");
@@ -160,11 +163,6 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
 }
 
 function drawMailTable(table4) {
-    let mailImageBackground= document.createElement("img");
-    mailImageBackground.classList.add("wish-mail-image");
-    mailImageBackground.src = "./assets/wish-bg.webp"
-    table4.append(mailImageBackground)
-
     let mailImageContainer = document.createElement("div");
     mailImageContainer.classList.add("wish-mail-container");
     

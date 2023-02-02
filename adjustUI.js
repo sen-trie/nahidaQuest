@@ -27,8 +27,8 @@ function floatText(demoContainer,clickFactor,randNum1,randNum2) {
     clickCountAppear.innerHTML = "+" + clickFactor;
     clickCountAppear.classList.add("floatingText");
     clickCountAppear.style.position = "absolute";
-    clickCountAppear.style.left = randNum1 + "px";
-    clickCountAppear.style.top = randNum2 + "px";
+    clickCountAppear.style.left = randNum1 + "%";
+    clickCountAppear.style.top = randNum2 + "%";
     clickCountAppear.addEventListener('animationend', () => {clickCountAppear.remove();});
 
     demoContainer.appendChild(clickCountAppear);
@@ -40,7 +40,8 @@ function expedButtonAdjust(expedButton, backgroundImg, i) {
     expedButton.id = "exped-" + i;
     expedButton.style.background = backgroundImg;
     expedButton.style['background-repeat'] = "no-repeat";
-    expedButton.style['background-size'] = "93%"
+    expedButton.style['background-size'] = "contain"
+    expedButton.style['background-position'] = "center";
     expedButton.classList += "expedition";
     return expedButton;
 }

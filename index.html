@@ -8,19 +8,14 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <style type="text/css">
-        .prevent-select {
-            -webkit-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
     </style>
 
 </head>
 <body>
     <div id="game" class="prevent-select">
-        <!-- <div id="body-border" class="overlay">
+        <div id="loading" class="overlay">
             <img src="./assets/loading.gif" class="overlay-tutorial">
-        </div> -->
+        </div>
         <div id="left-div" class="left-area">
             <div class="score-container">
                 <span id="score">0</span>      
@@ -81,6 +76,9 @@
 
     const NONWISHHEROMAX = 49
     const WISHHEROMIN = 100;
+    // NAHIDA'S BASE COST   v
+    var heroCurrentCosts = new Map();
+    heroCurrentCosts.set(0,20);
     
     const WISHCOST = 160;
     const STARTINGWISHFACTOR = 50;
@@ -97,6 +95,7 @@
     var dpsDisplay = document.getElementById("dps");
     var primogemDisplay = document.getElementById("primogem");
 
+    var leftDiv = document.getElementById("left-div");
     var midDiv = document.getElementById("mid-div");
     var multiplierButtonContainer;
     //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -108,6 +107,7 @@
     var table1 = document.getElementById("table1");
     var table2 = document.getElementById("table2");
     var table3 = document.getElementById("table3");
+    var expedTooltip = document.getElementById("expedTooltip");
     var expedDiv = document.getElementById("expedDiv");
     var table4 = document.getElementById("table4");
     var table5 = document.getElementById("table5");
@@ -136,8 +136,8 @@
 
     createMultiplierButton();
     createExpedition();
-    createExpedTable(expedDiv);
-    para1.appendChild(expedDiv);
+    createExpedTable(expedTooltip);
+    table3.appendChild(expedTooltip);
     settings();
     
     drawWish();
@@ -190,7 +190,7 @@
         }
         // LOAD HEROES DATA
         if (localStorage.getItem("upgradeDictSave") == null) {
-            let upgradeDictTemp = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX);
+            let upgradeDictTemp = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX,heroCurrentCosts);
             upgradeDict = upgradeDictTemp;
         } else {
             let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
@@ -238,18 +238,18 @@
     demo.appendChild(demoImg);
 
     demo.addEventListener("click",function(event) {
-        demoContainer = floatText(demoContainer,abbrNum(saveValues["clickFactor"]),randomInteger(160,280),randomInteger(400,440));
-
-        var img = document.createElement("img");
-        img.src = "./assets/icon/primogemIcon.png";
-        img.style.left = `${randomInteger(-70,500)}px`
+        demoContainer = floatText(demoContainer,abbrNum(saveValues["clickFactor"]),randomInteger(20,80),randomInteger(70,100));
 
         let number = randomInteger(2,6);
         let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04)`
+
+        var img = document.createElement("img");
+        img.src = "./assets/icon/primogemIcon.png";
+        img.style.left = `${randomInteger(0,100)}%`
         img.style.animation = animation;
         img.addEventListener('animationend', () => {img.remove();});
         img.classList.add("falling-image");
-        demoContainer.appendChild(img);
+        leftDiv.appendChild(img);
     });
     demoFunction(demoImg);
     
@@ -277,16 +277,16 @@
         }, 1200);
     }
 
-    // function removeLoading() {
-    //     dimHeroButton();
-    //     setTimeout(() => {
-    //         let overlay = document.getElementById("body-border");
-    //         overlay.removeChild(overlay.firstElementChild);
-    //         overlay.classList.remove("overlay");
-    //         tutorial();
-    //     }, 200);
+    function removeLoading() {
+        dimHeroButton();
+        setTimeout(() => {
+            let overlay = document.getElementById("loading");
+            overlay.removeChild(overlay.firstElementChild);
+            overlay.classList.remove("overlay");
+            tutorial();
+        }, 200);
         
-    // }
+    }
 
     // SETUP AUDIO API
     var currentSong = 1;
@@ -310,9 +310,14 @@
     
     // TUTORIAL UPON FIRST LOAD
     function tutorial() {
+        let overlay = document.getElementById("loading");
         var currentSlide = 1;
         var tutorialDark = document.createElement("div");
         tutorialDark.classList.add("tutorial-dark");
+
+        // let tutorialTopText = document.createElement("img");
+        // tutorialTopText.classList.add("tutorial-text");
+        // tutorialTopText.src = "./assets/tutorial/tutorialText.webp"
 
         var tutorialImage = document.createElement("img");
         tutorialImage.classList.add("tutorial-img");
@@ -323,7 +328,7 @@
         tutorialScreen.classList.add("tutorial-screen");
         tutorialScreen.addEventListener("click", () => {
             if (currentSlide == 4) {
-                tutorialDark.remove();
+                overlay.style.zIndex = -1;
                 timer = setInterval(timerEvents,timeRatio);
                 currentBGM = playAudio();
                 settingsVolume(currentBGM);
@@ -335,9 +340,9 @@
             currentTutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".jpg";
         })
 
-        tutorialScreen.appendChild(tutorialImage);
+        tutorialScreen.append(tutorialImage);
         tutorialDark.appendChild(tutorialScreen);
-        para1.appendChild(tutorialDark);
+        overlay.appendChild(tutorialDark);
     }
 
     function saveData() {
@@ -393,7 +398,6 @@
             let mailImageTemp = document.getElementById("mailImageID")
              mailImageTemp.style.opacity = 1;
          }
-         expedDiv.style["z-index"] = (x === 2) ? 1 : -1;
     }
     
     // SETTINGS MENU - SAVES & VOLUME CONTROL
@@ -468,7 +472,7 @@
     // LOAD SAVED HEROES IN TABLE1
     var rowTempDict = {};
     function loadRow() {
-        let i = WISHHEROMAX
+        let i = WISHHEROMAX;
         while (i--) {
             if (upgradeDict[i] == undefined) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
@@ -476,19 +480,21 @@
                 rowTempDict[[upgradeDict[i].Row]] = i;
             }
         }
-        
+
         for (let j = 0, len=Object.keys(rowTempDict).length; j < len; j++) {
-            let loadedHeroID = rowTempDict[j]
+            let loadedHeroID = rowTempDict[j];
             var heroTextLoad;
             var heroPurchasedOnceStyle;
             var purchased = false;
 
             let upgradeDictTemp = upgradeDict[loadedHeroID];
             let formatCost = upgradeDictTemp["BaseCost"];
+            heroCurrentCosts.set(j,formatCost)
             let formatATK = upgradeDictTemp["Factor"];
 
             if (upgradeDictTemp["Purchased"] > 0) {
                 formatCost *= (COSTRATIO**upgradeDictTemp["Purchased"])
+                heroCurrentCosts.set(j,formatCost)
                 formatCost = abbrNum(formatCost)
                 formatATK = abbrNum(formatATK)
                 purchased = true;
@@ -509,17 +515,21 @@
             }
 
             let heroID = "but-" + j;
-            let heroButtonContainer = createHeroButtonContainer(heroID,heroTextLoad);
+            let heroButtonContainer = createHeroButtonContainer(heroID);
             let toolName = upgradeDictTemp.Name;
+
+            
             
             heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", rowTempDict[j]);});
             heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
-            heroButtonContainer.addEventListener("click", () => {upgrade(heroID)});
+            heroButtonContainer.addEventListener("click", () => {upgrade(loadedHeroID)});
+            heroButtonContainer.innerText = heroTextLoad;
 
-            let heroButtonFrame = document.createElement("img")
-            heroButtonFrame.classList.add("hero-button-frame")
-            if (purchased == true) {heroButtonFrame.src = "./assets/nameplates/"+upgradeDictTemp.Name.replace(/ /g,'')+".webp"};
-            heroButtonContainer.prepend(heroButtonFrame);
+            if (purchased == true) {
+                heroButtonContainer.style = "background:url(./assets/nameplates/"+upgradeDictTemp.Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
+            } else {
+                heroButtonContainer.classList += " not-purchased";
+            }
 
             table1.appendChild(heroButtonContainer);
         }
@@ -542,13 +552,17 @@
                     var heroText = "Call for " + upgradeDict[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
                 }
 
+                heroCurrentCosts.set(saveValues["rowCount"],upgradeDict[i]["BaseCost"])
                 let heroID = "but-" + saveValues["rowCount"];
-                let heroButtonContainer = createHeroButtonContainer(heroID,heroText);
+                let heroButtonContainer = createHeroButtonContainer(heroID);
                 let toolName = upgradeDict[i].Name;
+
+                // console.log(i)
                 
                 heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", i)});
                 heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
-                heroButtonContainer.addEventListener("click", () => {upgrade(heroID)});
+                heroButtonContainer.addEventListener("click", () => {upgrade(i)});
+                heroButtonContainer.innerText = heroText;
                 table1.appendChild(heroButtonContainer);
 
                 saveValues["rowCount"]++;
@@ -558,30 +572,35 @@
     
     // UPGRADE HEROES
     function upgrade(clicked_id) {
-        var butIdArray = clicked_id.split("-")[1];
-        let i = WISHHEROMAX;
-        while (i--) {
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
-            if (upgradeDict[i].Row == butIdArray) {
+        
+         var butIdArray = "but-" + upgradeDict[clicked_id].Row;
+        // let max = WISHHEROMAX;
+        // let wishMin = WISHHEROMIN;
+        // let nonWishMax = NONWISHHEROMAX;
+        // let i = 0;
+        // while (i < max) {
+        //     if (i < wishMin && i > nonWishMax) {
+        //         i += (wishMin - nonWishMax - 1);
+        //         continue;
+        //     }
+        //     if (upgradeDict[clicked_id].Row == butIdArray) {
                 let realScoreCurrent = saveValues["realScore"];
                 let costCurrent;
-                let currentPurchasedLocal = upgradeDict[i].Purchased;
+                let currentPurchasedLocal = upgradeDict[clicked_id].Purchased;
                 let currentMultiplierLocal = currentMultiplier;
                 let requiredFree = 0;
 
-                if (upgradeDict[i].Purchased === 0) {
+                if (upgradeDict[clicked_id].Purchased === 0) {
                     currentMultiplierLocal = 1;
                 }
-
+                
                 if (currentMultiplierLocal != 1) {
-                    costCurrent = Math.round(upgradeDict[i]["BaseCost"] * ((COSTRATIO**currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO))
+                    costCurrent = Math.round(upgradeDict[clicked_id]["BaseCost"] * ((COSTRATIO**currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO))
                     requiredFree = currentMultiplierLocal;
                 } else {
-                    costCurrent = Math.round(upgradeDict[i]["BaseCost"] * (COSTRATIO **currentPurchasedLocal));
+                    costCurrent = Math.round(upgradeDict[clicked_id]["BaseCost"] * (COSTRATIO **currentPurchasedLocal));
                     requiredFree = 1;
                 }
-
-                console.log(costCurrent)
 
                 if (realScoreCurrent >= costCurrent) {
                     if (requiredFree) {
@@ -590,28 +609,24 @@
                             saveValues["freeLevels"] -= requiredFree;
                         }
                     }
-
+                    
                     realScoreCurrent -= costCurrent;
-                    if (i === 0) {
-                        saveValues["clickFactor"] += upgradeDict[i]["Factor"] * currentMultiplierLocal;
+                    if (clicked_id === 0) {
+                        saveValues["clickFactor"] += upgradeDict[clicked_id]["Factor"] * currentMultiplierLocal;
                     } else {
-                        saveValues["dps"] += upgradeDict[i]["Factor"] * currentMultiplierLocal;
+                        saveValues["dps"] += upgradeDict[clicked_id]["Factor"] * currentMultiplierLocal;
                     }
 
-                    upgradeDict[i].Purchased += 1 * currentMultiplierLocal;
+                    upgradeDict[clicked_id].Purchased += 1 * currentMultiplierLocal;
                     saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
-                    checkExpeditionUnlock(saveValues["heroesPurchased"]);
+                    checkExpeditionUnlock(saveValues["heroesPurchased"]);                                        
+                    refresh(butIdArray, upgradeDict[clicked_id]["BaseCost"], clicked_id);
 
-                    refresh(clicked_id, upgradeDict[i]["BaseCost"], i);
-                    dimHeroButton();
+                    dimHeroButton();                    
                     clearTooltip();
-                    changeTooltip(upgradeDict[i]["Name"],"hero",i);
-
+                    changeTooltip(upgradeDict[clicked_id]["Name"],"hero",clicked_id);                   
                     saveValues["realScore"] = realScoreCurrent;
                 }
-                break;
-            }
-        } 
     }
 
     var currentDimMultiplier = 0;
@@ -637,19 +652,25 @@
 
     // CHECK IF PRICE IS LOWER THAN CURRENT SCORE
     function dimHeroButton() {
+        console.log(heroCurrentCosts)
         let i = WISHHEROMAX;
         while (i--) {
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
+                i -= WISHHEROMIN - NONWISHHEROMAX;
+                i += 2;
+                continue;
+            };
             if (upgradeDict[i]["Purchased"] < 0) continue;
 
             let checkPrice;
-            if (currentMultiplier > 1 && upgradeDict[i]["Purchased"] > 0) {
-                    checkPrice = Math.round (upgradeDict[i]["BaseCost"] * ((COSTRATIO**upgradeDict[i]["Purchased"]) - COSTRATIO**(upgradeDict[i]["Purchased"] + currentMultiplier)) / (1 - COSTRATIO));
+            let upgradeDictTemp = upgradeDict[i];
+            if (currentMultiplier > 1 && upgradeDictTemp["Purchased"] > 0) {
+                    checkPrice = Math.round(upgradeDictTemp["BaseCost"] * ((COSTRATIO**upgradeDictTemp["Purchased"]) - COSTRATIO**(upgradeDictTemp["Purchased"] + currentMultiplier)) / (1 - COSTRATIO));
                 } else {
-                    checkPrice = upgradeDict[i]["BaseCost"] * (COSTRATIO ** (upgradeDict[i]["Purchased"]));
+                    checkPrice = upgradeDictTemp["BaseCost"] * (COSTRATIO ** (upgradeDictTemp["Purchased"]));
                 }
 
-            let heroID = "but-" + upgradeDict[i].Row;
+            let heroID = "but-" + upgradeDictTemp.Row;
             if (checkPrice > saveValues["realScore"]) {
                 document.getElementById(heroID).classList.add("dim");
                 document.getElementById(heroID).classList.remove("not-dim");
@@ -658,6 +679,15 @@
                 document.getElementById(heroID).classList.remove("dim");
             }
         } 
+    }
+
+    
+    function calculatePrice(type) {
+        if (type === "all") {
+            let i = NONWISHHEROMAX;
+
+        }
+
     }
 
     //------------------------------------------------------------------------TABLE 2 (INVENTORY)------------------------------------------------------------------------//
@@ -846,8 +876,7 @@
             expedButton.addEventListener("click", () => {adventure(i)});
             expedButton.addEventListener("mouseover", function() {expedInfo(this.id)});
             expedButton.addEventListener("mouseout", () => {expedInfo(7)});
-
-            expedContainer.appendChild(expedButton);
+            expedDiv.appendChild(expedButton);
         }
     }
 
@@ -884,6 +913,7 @@
      // UNLOCK WISH SYSTEM
      function wishUnlock() {
         let wishButtonText = document.getElementById("wishButtonText");
+        let wishButton = document.getElementById("wishButton");
         wishButtonText.innerText = "Write for help | 160 ";
         wishButtonText.classList.add("wish-button-new");
         wishButton.addEventListener("click",() => {
@@ -895,6 +925,7 @@
     function drawWish() {
         var wishButton = document.createElement("div");
         wishButton.classList += "wish-button";
+        wishButton.id = "wishButton"
         let wishButtonText = document.createElement("div");
         wishButtonText.id = "wishButtonText";
         wishButtonText.classList += "wish-button-text";
@@ -907,9 +938,7 @@
         wishButtonImg.src = "./assets/wishButton.webp";
         wishButtonImg.classList += "wish-button-img";
         wishButton.append(wishButtonImg,wishButtonText)
-        mailImageDiv.append(wishButton)
-
-        
+        mailImageDiv.append(wishButton);
 
         if (wishCounter === saveValues["wishCounterSaved"]) {
             stopWish();
@@ -995,7 +1024,7 @@
         let achievementType = "";
 
         if (oldAchievement != null) {
-            mainBody.removeChild(oldAchievement); 
+            leftDiv.removeChild(oldAchievement); 
         }
 
         switch (achievement) {
@@ -1034,7 +1063,7 @@
         var achievementPopUp = createAchievement(achievementText,achievementDesc);
         achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
         achievementPopUp.addEventListener('animationend', () => {achievementPopUp.remove()});
-        mainBody.appendChild(achievementPopUp);
+        leftDiv.appendChild(achievementPopUp);
 
         //  ^^^ TEMP ACHIEVEMENT | PERMANENT ACHIEVEMENT vvv
         
@@ -1084,12 +1113,15 @@
     var tooltipName = document.createElement("div");
     tooltipName.classList += "tool-tip-name";
 
+    var toolImgContainer = document.createElement("div");
+    toolImgContainer.classList.add("toolImgContainer")
     var toolImg = document.createElement("img");
     toolImg.src = "./assets/tooltips/Empty.webp";
-    toolImg.style = "width:250px;height:250px;z-index: 5";
+    toolImg.classList.add("toolImg");
     var toolImgOverlay = document.createElement("img");
     toolImgOverlay.src = "./assets/tooltips/Empty.webp";
     toolImgOverlay.classList.add("toolImgOverlay");
+    toolImgContainer.append(toolImg,toolImgOverlay)
     
     var tooltipText = document.createElement("div");
     tooltipText.classList += "tool-tip-text";
@@ -1106,7 +1138,7 @@
     var table6Background = document.createElement("img");
     table6Background.src = "./assets/tooltips/background.webp"
     table6Background.classList.add("table6-background");
-    table6.append(tooltipName,toolImg,tooltipText,tooltipExtraImg,tooltipLore,toolImgOverlay,table6Background);
+    table6.append(tooltipName,toolImgContainer,tooltipText,tooltipExtraImg,tooltipLore,table6Background);
 
     function changeTooltip(name, type, ID) {
         tooltipName.innerText = tooltip[name]["name"];
@@ -1115,11 +1147,11 @@
         if (type == "hero") {
             let upgradeDictLocal = upgradeDict;
             let tooltipTextLocal = "Times upgraded: " +upgradeDictLocal[ID]["Purchased"]+ "<br />Free Levels: " +saveValues["freeLevels"];
-            toolImg.src = "./assets/tooltips/hero/"+name+".webp";
+            toolImgOverlay.src = "./assets/tooltips/hero/"+name+".webp";
             tooltipElementImg.src = "./assets/tooltips/elements/" +upgradeDictLocal[ID].Ele+ ".webp";
             tooltipWeaponImg.src = "./assets/tooltips/elements/" +upgradeDictLocal[ID].Type+ ".webp";
             
-            tooltipText.innerHTML += tooltipTextLocal;
+            tooltipText.innerHTML = tooltipTextLocal;
         } else if (type == "item") {
             toolImg.src = "./assets/frames/background-" + ID + ".webp";
             toolImgOverlay.src = "./assets/tooltips/inventory/" + name + ".webp";
@@ -1194,7 +1226,7 @@
                 let heroText = hero.Name + ": " + abbrNum(formatCost) + ", +" + abbrNum(formatATK) + " NpS";
                 let id="but-" + hero.Row + "";
                 let heroButtonText = document.createElement("p")
-                heroButtonText.innerText = heroText
+                heroButtonText.innerText = heroText;
                 document.getElementById(id).appendChild(heroButtonText);
             }
         }
