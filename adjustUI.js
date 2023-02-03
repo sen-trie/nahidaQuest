@@ -85,7 +85,6 @@ function volumeScrollerAdjust(volumeScroller) {
     volumeScroller.type = "range";
     volumeScroller.min = "0";
     volumeScroller.max = "100";
-    volumeScroller.id = "volume-scroller";
     return volumeScroller;
 }
 

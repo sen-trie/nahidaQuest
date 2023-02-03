@@ -405,13 +405,45 @@
     // SETTINGS MENU - SAVES & VOLUME CONTROL
     var settingsOpen = false;
     function settings() {
+        // JUST THE BUTTON FOR SETTING MENU
+        let settingButton = document.createElement("button");
+        settingButton.classList.add("settings-button");
+        let settingButtonImg = document.createElement("img");
+        settingButtonImg.src = "./assets/settings.webp";
+        settingButtonImg.classList.add("settings-button-img")
+        settingButton.appendChild(settingButtonImg);
+        settingButton.addEventListener("click", () => {
+            if (settingsOpen == false) {
+                settingsMenu.style.zIndex = 200;
+                settingsOpen = true;
+            } else {
+                settingsMenu.style.zIndex = -1;
+                settingsOpen = false;
+            }
+        })
+        multiplierButtonContainer.prepend(settingButton);
+
+        // RELATED TO SETTINGS MENU
         var settingsMenu = document.createElement("div");
         settingsMenu.id = "settings-menu";
         settingsMenu.classList.add("settings-menu");
 
-        var volumeScroller = document.createElement("input");
-        volumeScroller = volumeScrollerAdjust(volumeScroller);
-        volumeScroller.value = "50";
+        let settingsMenuBackground = document.createElement("img");
+        settingsMenuBackground.classList.add("settings-menu-background");
+        settingsMenuBackground.src = "./assets/achievementBG.webp"
+
+        let settingsText = document.createElement("img");
+        settingsText.classList.add("settings-text");
+        
+        let volumeScrollerContainer = document.createElement("div")
+        volumeScrollerContainer.classList.add("volume-scroller-container")
+
+        var volumeScrollerBGM = document.createElement("input");
+        volumeScrollerBGM = volumeScrollerAdjust(volumeScrollerBGM);
+        volumeScrollerBGM.id = "volume-scroller-bgm";
+        volumeScrollerBGM.value = "50";
+
+        volumeScrollerContainer.append(volumeScrollerBGM);
 
         var saveSetting = document.createElement("button");
         saveSetting.classList.add("setting-save");
@@ -421,29 +453,14 @@
         clearSetting.classList.add("setting-clear");
         clearSetting.addEventListener("click",() => {localStorage.clear();location.reload()})
 
-        settingsMenu.append(volumeScroller, saveSetting, clearSetting);
+        settingsMenu.append(settingsMenuBackground, settingsText, volumeScrollerContainer, saveSetting, clearSetting);
         mainBody.appendChild(settingsMenu);
 
-        let settingButton = document.createElement("button");
-        settingButton.classList.add("settings-button");
-        let settingButtonImg = document.createElement("img");
-        settingButtonImg.src = "./assets/settings.webp";
-        settingButtonImg.classList.add("settings-button-img")
-        settingButton.appendChild(settingButtonImg);
-        settingButton.addEventListener("click", () => {
-            if (settingsOpen == false) {
-                settingsMenu.style.zIndex = 100;
-                settingsOpen = true;
-            } else {
-                settingsMenu.style.zIndex = -1;
-                settingsOpen = false;
-            }
-        })
-        multiplierButtonContainer.prepend(settingButton);
+        
     }
 
     function settingsVolume(bgmElement) {
-        let volumeScroller = document.getElementById('volume-scroller');
+        let volumeScroller = document.getElementById('volume-scroller-bgm');
         volumeScroller.addEventListener("change", function() {
             bgmElement.volume = this.value / 100;
         });
