@@ -2,7 +2,7 @@ var saveValuesDefault = {
     clickCount:0,
     clickFactor:1,
     dps:12,
-    realScore:1e31,
+    realScore:1e11,
     freeLevels:0,
     primogem:112000,
     energy:102200,

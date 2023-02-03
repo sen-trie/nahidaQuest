@@ -156,13 +156,14 @@
         // 1 timerSeconds == 1 SECOND IN REAL TIME
         let timeRatioTemp =  timeRatio / 1000;
         timerSeconds += timeRatioTemp;
-
+        
         checkAchievement();
         saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff;
         refresh();
         dimHeroButton();
         addNewRow();
         foodCheck(timerSeconds);
+        
 
         // SAVES EVERY 3 MINUTES
         if (timerSeconds > 180) {
@@ -273,7 +274,7 @@
         document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
         setTimeout(() => {
             removeLoading();
-            clearInterval(timerEventsLoading);
+            clearInterval(timerLoad);
         }, 1200);
     }
 
@@ -489,12 +490,12 @@
 
             let upgradeDictTemp = upgradeDict[loadedHeroID];
             let formatCost = upgradeDictTemp["BaseCost"];
-            heroCurrentCosts.set(j,formatCost)
+            // heroCurrentCosts.set(j,formatCost)
             let formatATK = upgradeDictTemp["Factor"];
 
             if (upgradeDictTemp["Purchased"] > 0) {
                 formatCost *= (COSTRATIO**upgradeDictTemp["Purchased"])
-                heroCurrentCosts.set(j,formatCost)
+                // heroCurrentCosts.set(j,formatCost)
                 formatCost = abbrNum(formatCost)
                 formatATK = abbrNum(formatATK)
                 purchased = true;
@@ -552,12 +553,10 @@
                     var heroText = "Call for " + upgradeDict[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
                 }
 
-                heroCurrentCosts.set(saveValues["rowCount"],upgradeDict[i]["BaseCost"])
+                // heroCurrentCosts.set(saveValues["rowCount"],upgradeDict[i]["BaseCost"])
                 let heroID = "but-" + saveValues["rowCount"];
                 let heroButtonContainer = createHeroButtonContainer(heroID);
                 let toolName = upgradeDict[i].Name;
-
-                // console.log(i)
                 
                 heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", i)});
                 heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
@@ -572,61 +571,49 @@
     
     // UPGRADE HEROES
     function upgrade(clicked_id) {
+        var butIdArray = "but-" + upgradeDict[clicked_id].Row;
+        let realScoreCurrent = saveValues["realScore"];
+        let costCurrent;
+        let currentPurchasedLocal = upgradeDict[clicked_id].Purchased;
+        let currentMultiplierLocal = currentMultiplier;
+        let requiredFree = 0;
+
+        if (upgradeDict[clicked_id].Purchased === 0) {
+            currentMultiplierLocal = 1;
+        }
         
-         var butIdArray = "but-" + upgradeDict[clicked_id].Row;
-        // let max = WISHHEROMAX;
-        // let wishMin = WISHHEROMIN;
-        // let nonWishMax = NONWISHHEROMAX;
-        // let i = 0;
-        // while (i < max) {
-        //     if (i < wishMin && i > nonWishMax) {
-        //         i += (wishMin - nonWishMax - 1);
-        //         continue;
-        //     }
-        //     if (upgradeDict[clicked_id].Row == butIdArray) {
-                let realScoreCurrent = saveValues["realScore"];
-                let costCurrent;
-                let currentPurchasedLocal = upgradeDict[clicked_id].Purchased;
-                let currentMultiplierLocal = currentMultiplier;
-                let requiredFree = 0;
+        if (currentMultiplierLocal != 1) {
+            costCurrent = Math.round(upgradeDict[clicked_id]["BaseCost"] * ((COSTRATIO**currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO))
+            requiredFree = currentMultiplierLocal;
+        } else {
+            costCurrent = Math.round(upgradeDict[clicked_id]["BaseCost"] * (COSTRATIO **currentPurchasedLocal));
+            requiredFree = 1;
+        }
 
-                if (upgradeDict[clicked_id].Purchased === 0) {
-                    currentMultiplierLocal = 1;
+        if (realScoreCurrent >= costCurrent) {
+            if (requiredFree) {
+                if (saveValues["freeLevels"] > requiredFree) {
+                    realScoreCurrent += costCurrent;
+                    saveValues["freeLevels"] -= requiredFree;
                 }
-                
-                if (currentMultiplierLocal != 1) {
-                    costCurrent = Math.round(upgradeDict[clicked_id]["BaseCost"] * ((COSTRATIO**currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO))
-                    requiredFree = currentMultiplierLocal;
-                } else {
-                    costCurrent = Math.round(upgradeDict[clicked_id]["BaseCost"] * (COSTRATIO **currentPurchasedLocal));
-                    requiredFree = 1;
-                }
+            }
+            
+            realScoreCurrent -= costCurrent;
+            if (clicked_id === 0) {
+                saveValues["clickFactor"] += upgradeDict[clicked_id]["Factor"] * currentMultiplierLocal;
+            } else {
+                saveValues["dps"] += upgradeDict[clicked_id]["Factor"] * currentMultiplierLocal;
+            }
 
-                if (realScoreCurrent >= costCurrent) {
-                    if (requiredFree) {
-                        if (saveValues["freeLevels"] > requiredFree) {
-                            realScoreCurrent += costCurrent;
-                            saveValues["freeLevels"] -= requiredFree;
-                        }
-                    }
-                    
-                    realScoreCurrent -= costCurrent;
-                    if (clicked_id === 0) {
-                        saveValues["clickFactor"] += upgradeDict[clicked_id]["Factor"] * currentMultiplierLocal;
-                    } else {
-                        saveValues["dps"] += upgradeDict[clicked_id]["Factor"] * currentMultiplierLocal;
-                    }
-
-                    upgradeDict[clicked_id].Purchased += 1 * currentMultiplierLocal;
-                    saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
-                    checkExpeditionUnlock(saveValues["heroesPurchased"]);                                        
-                    refresh(butIdArray, upgradeDict[clicked_id]["BaseCost"], clicked_id);
-
-                    dimHeroButton();                    
-                    clearTooltip();
-                    changeTooltip(upgradeDict[clicked_id]["Name"],"hero",clicked_id);                   
-                    saveValues["realScore"] = realScoreCurrent;
-                }
+            upgradeDict[clicked_id].Purchased += 1 * currentMultiplierLocal;
+            saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
+            checkExpeditionUnlock(saveValues["heroesPurchased"]);                                        
+            refresh(butIdArray, upgradeDict[clicked_id]["BaseCost"], clicked_id);
+               
+            clearTooltip();
+            changeTooltip(upgradeDict[clicked_id]["Name"],"hero",clicked_id);                   
+            saveValues["realScore"] = realScoreCurrent;
+        }
     }
 
     var currentDimMultiplier = 0;
@@ -647,12 +634,10 @@
                 refresh(buttID, upgradeDict[i]["BaseCost"], i);
             }
         } 
-        dimHeroButton();
     }
 
     // CHECK IF PRICE IS LOWER THAN CURRENT SCORE
     function dimHeroButton() {
-        console.log(heroCurrentCosts)
         let i = WISHHEROMAX;
         while (i--) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
@@ -670,24 +655,26 @@
                     checkPrice = upgradeDictTemp["BaseCost"] * (COSTRATIO ** (upgradeDictTemp["Purchased"]));
                 }
 
+            // heroCurrentCosts.set(upgradeDictTemp.Row,checkPrice)
+
             let heroID = "but-" + upgradeDictTemp.Row;
+            let heroElem = document.getElementById(heroID);
             if (checkPrice > saveValues["realScore"]) {
-                document.getElementById(heroID).classList.add("dim");
-                document.getElementById(heroID).classList.remove("not-dim");
+                if (heroElem.classList.contains("dim")) {
+                    continue;
+                } else {
+                    heroElem.classList.add("dim");
+                    heroElem.classList.remove("not-dim");
+                }
             } else {
-                document.getElementById(heroID).classList.add("not-dim");
-                document.getElementById(heroID).classList.remove("dim");
+                if (heroElem.classList.contains("not-dim")) {
+                    continue
+                } else {
+                    heroElem.classList.add("not-dim");
+                    heroElem.classList.remove("dim");
+                }
             }
-        } 
-    }
-
-    
-    function calculatePrice(type) {
-        if (type === "all") {
-            let i = NONWISHHEROMAX;
-
         }
-
     }
 
     //------------------------------------------------------------------------TABLE 2 (INVENTORY)------------------------------------------------------------------------//
