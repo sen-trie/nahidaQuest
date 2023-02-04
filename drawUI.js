@@ -90,23 +90,22 @@ function createHeroButtonContainer(heroID) {
 function createExpedTable(expedDiv) {
     let expedTableImg = document.createElement("img");
     expedTableImg.classList.add("exped-table-img")
-    expedTableImg.src = "./assets/tooltipEXPED.png";
+    expedTableImg.src = "./assets/tooltipEXPED.webp";
 
-    let expedTable = document.createElement("table");
+    let expedTable = document.createElement("div");
     expedTable.classList = "tooltipTABLEEXPED";
-    expedTable.id = "expedTableID";
 
-    let expedRow = expedTable.insertRow(0);
-    expedRow.style.height = "110px";
-    let expedCell2 = expedRow.insertCell(0);
-    expedCell2.classList += "exped-cell-two"
+    let expedRow1 = document.createElement("div");
+    expedRow1.id = "exped-row-1";
 
-    let expedRow2 = expedTable.insertRow(0);
-    expedRow2.style.height = "80px";
-    let expedCell1 = expedRow2.insertCell(0);
-    expedCell1.classList += "exped-cell-one"
+    let expedRowImg = document.createElement("img");
+    expedRowImg.src = "./assets/arrow.webp";
 
-    expedDiv.appendChild(expedTableImg,expedTable);
+    let expedRow2 = document.createElement("div");
+    expedRow2.id = "exped-row-2";
+
+    expedTable.append(expedRow1,expedRowImg,expedRow2)
+    expedDiv.append(expedTableImg,expedTable);
 }
 
 function createAchievement(achievementText,achievementDesc) {

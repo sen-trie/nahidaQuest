@@ -24,6 +24,7 @@ html {
         width: 50%;
         height: 100%;
         margin: 0;
+        font-size: 0.7vw;
     }
 }
 
@@ -32,6 +33,7 @@ html {
         width: 68%;
         height: 100%;
         margin: 0;
+        font-size: 0.952vw;
     }
 }
 
@@ -40,6 +42,7 @@ html {
         width: 80%;
         height: 100%;
         margin: 0;
+        font-size: 1.12vw;
     }
 }
 
@@ -48,6 +51,7 @@ html {
         width: 90%;
         height: 100%;
         margin: 0;
+        font-size: 1.26vw;
     }
 }
 
@@ -56,6 +60,7 @@ html {
         width: 100%;
         height: 100%;
         margin: 0;
+        font-size: 1.4vw;
     }
 }
 
@@ -66,7 +71,7 @@ html {
              |
              |
              v          */
-
+/* 
 @media (max-aspect-ratio: 16/9) {
     #game {
         width: 100%;
@@ -97,15 +102,15 @@ html {
         height: 58%;
         margin: 0;
     }
-}
-
+} */
+/* 
 @media (max-aspect-ratio: 8/9) {
     #game {
         width: 100%;
         height: 50%;
         margin: 0;
     }
-}
+} */
 
 /*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
@@ -187,6 +192,7 @@ button {
     height: 10%;
     background-color: rgba(0,0,0,0.4);
     z-index: 4;
+    font-size: inherit;
 }
 
 .left-area {
@@ -280,23 +286,24 @@ button {
 }
 
 #score {
-    font-size: 40px;
+    font-size: 1.8em;
 }
 
 #dps {
-    font-size: 25px;
+    font-size: 1.0em;
 }
 
 .energy-primo-container {
     position: relative;
     top:1%;
     width: 100%;
-    height: 20%;
+    height: 10%;
     z-index: 10;
     row-gap: 1%;
     display:flex;
     flex-direction: column;
     justify-content: flex-start;
+    align-content: center;
 }
 
 .pill-value {
@@ -308,8 +315,9 @@ button {
     align-items: center;
     text-align: right;
     color:white;
-    height: 20%;
+    height: 40%;
     z-index: 10;
+    font-size: 0.6em;
 }
 
 .pill {
@@ -329,28 +337,60 @@ button {
     width:96px;
     height:65px;
     
-}
-
-.icon {
-    width:19px;
-    height:27px;
 } */
 
-/* .primogem {
-    width:23px;
-    height:25px;
+.icon {
+    height:80%;
+    aspect-ratio: 0.7;
 }
 
- */
+ .primogem {
+    height:65%;
+    aspect-ratio: 0.9;
+}
+
+ 
 
 /*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
 .temp-buff {
-  left:622px; 
-  top:85px; 
-  position: absolute;
+  width: 100%;
+  height: 20%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+justify-content: flex-start;
+align-items: center;
 }
 
-svg {
+.temp-buff > div {
+    width: 80%;
+    aspect-ratio: 1;
+}
+
+.countdown-number {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+/* TIMER SET TO 30 SECONDS */
+.countdown-number::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: darken-animation 30s linear forwards;
+  }
+  
+@keyframes darken-animation {
+    from { height: 0%; }
+    to { height: 100%; }
+}
+
+/* svg {
   position: relative;
   top: -4px;
   left: -3px;
@@ -367,7 +407,7 @@ circle {
   stroke: white;
   fill: none;
   animation: countdown 31s linear infinite forwards;
-}
+} */
 
 @keyframes countdown {
   from {
@@ -399,49 +439,109 @@ circle {
 
 .settings-menu {
     position: absolute;
-    left: 20%;
+    left: 30%;
     top: 25%;
-    width: 60%;
-    height: 50%;
-    background-color: rgba(0,0,0,1);
+    width: 40%;
+    height: 45%;
+    background-color: #DEE2BB;
     z-index: -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .settings-text {
     position: relative;
     width: 100%;
-    height: 15%;
+    height: 20%;
     z-index: 201;
+    object-fit: contain;
 }
 
-.settings-menu-background {
+/* .settings-menu-background {
     position: absolute;
     width: 100%;
     height: 100%;
-}
+} */
+
 .volume-scroller-container {
     position: relative;
     width: 100%;
     height: 40%;
-    background-color: white;
     z-index: 201;
 }
+
+.volume-scroller-container-children {
+    height: 50%;
+    width: 100%;
+    position: relative;
+    display: flex;
+}
+
+.volume-scroller-container-children > input {
+    height: 100%;
+    width: 65%;
+}
+
+.volume-scroller-container-children > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 30%;
+}
+
+.volume-scroller-container-children > div > img {
+    height: 80%;
+    width: 80%;
+    object-fit: contain;
+}
+
+.settings-bottom {
+    width: 100%;
+    height: 35%;
+    display: flex;
+    z-index: 201;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.settings-bottom-left {
+    width: 50%;
+    height: 100%;
+}
+
+.settings-bottom-right {
+    width: 48%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.settings-bottom-right > button {
+    width: 30%;
+    aspect-ratio: 1;
+    background-color: transparent;
+    background-size:contain;
+    background-repeat: no-repeat;
+}
+
+.setting-info {
+    background-image: url(./assets/settings/Info.webp);
+}
+
 .setting-save {
-    position: absolute;
-    width: 48px;
-    height: 46px;
-    top: 280px;
-    left: 123px;
-    background-color: rgb(24, 215, 14);
+    background-color: transparent;
+    background-image: url(./assets/settings/Save.webp);
+    background-size:contain;
 }
 
 .setting-clear {
-    position: absolute;
-    width: 48px;
-    height: 46px;
-    top: 280px;
-    left: 223px;
-    background-color: rgb(216, 28, 28);
+    background-color: transparent;
+    background-image: url(./assets/settings/Delete.webp);
+    background-size:contain;
 }
 
 .multiplier-button-container {
@@ -669,29 +769,26 @@ circle {
     gap: 1.5%;
     overflow-y: scroll;  
     overflow-x: hidden;
+    font-size: inherit;
 }
 
 .upgrade {
-    /* display: flex;
-    font-family: 'gi-font';
-    justify-content: center;
-    align-items: center; */
     display: flex;
     justify-content: center;
     align-items: center;
-
     flex: none;
 
     color: white;
     width: 100%;
     height: 14%;
+    font-size: 0.85em;
     position: relative;
     transition: 0.4s ease;
+    text-shadow: #3C3C3C 0.21375em 0em 0em, #3C3C3C 0.20102554875em 0.06442056725em 0em, #3C3C3C 0.16545309125em 0.125256034375em 0em, #3C3C3C 0.114100525em 0.17245005em 0em, #3C3C3C 0.0495299125em 0.1929347625em 0em, #3C3C3C -0.020926788125em 0.1987703525em 0em, #3C3C3C -0.08683835em 0.182958245em 0em, #3C3C3C -0.140307092em 0.145025515em 0em, #3C3C3C -0.18035769em 0.09045148em 0em, #3C3C3C -0.209242475em 0.025948895em 0em, #3C3C3C -0.20681056375em -0.0373652975em 0em, #3C3C3C -0.18052885375em -0.0934511275em 0em, #3C3C3C -0.1379573405em -0.138057635em 0em, #3C3C3C -0.0800555925em -0.159165915em 0em, #3C3C3C -0.0164290525em -0.165675565em 0em, #3C3C3C 0.0535315125em -0.1594206825em 0em, #3C3C3C 0.1188833225em -0.1486998625em 0em, #3C3C3C 0.15738429125em -0.102757115em 0em, #3C3C3C 0.1825355875em -0.05246907125em 0em;
     filter: brightness(var(--brightness)) 
-            grayscale(var(--grayscale)); 
-    text-shadow: #3C3C3C 3px 0px 0px, #3C3C3C 2.83487px 0.981584px 0px, #3C3C3C 2.35766px 1.85511px 0px, #3C3C3C 1.62091px 2.52441px 0px, #3C3C3C 0.705713px 2.91581px 0px, #3C3C3C -0.287171px 2.98622px 0px, #3C3C3C -1.24844px 2.72789px 0px, #3C3C3C -2.07227px 2.16926px 0px, #3C3C3C -2.66798px 1.37182px 0px, #3C3C3C -2.96998px 0.42336px 0px, #3C3C3C -2.94502px -0.571704px 0px, #3C3C3C -2.59586px -1.50383px 0px, #3C3C3C -1.96093px -2.27041px 0px, #3C3C3C -1.11013px -2.78704px 0px, #3C3C3C -0.137119px -2.99686px 0px, #3C3C3C 0.850987px -2.87677px 0px, #3C3C3C 1.74541px -2.43999px 0px, #3C3C3C 2.44769px -1.73459px 0px, #3C3C3C 2.88051px -0.838247px 0px;
+            grayscale(var(--grayscale));
 }
-
+/*             
 .upgrade-text {
     position: absolute;
     top: 35%;
@@ -700,17 +797,16 @@ circle {
     height: 100%;
     line-height: 100%;
     text-align: center;
-    font-size: 29px;
+    font-size: 0.7em;
+}  */
 
-}
-
-/* .hero-button-frame {
+ .hero-button-frame {
     width: 100%;
     height: 100%;
     position: relative;
     top:0px;
     left:0px;
-} */
+} 
 
 .not-purchased {
     background: url(./assets/button.webp) center center / 100% no-repeat;
@@ -839,47 +935,72 @@ circle {
 /*/////////////////////////////// EXPEDITION TOOLTIP CSS ///////////////////////////////*/
 .tooltipEXPED {
     text-align: center;
-    width: 90%;
+    width: 80%;
     height: 30%;
     position: relative;
+    display: flex;
+    justify-content: center;
+    color: white;
+    font-size: inherit;
 }
 
 .exped-table-img {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    top:0;
-    left:0;
+    width: 120%;
+    height: 120%;
+    top:-10%;
+    left:-10%;
     object-fit: contain;
 }
 
 .tooltipTABLEEXPED {
-    color: #DEDEDE;
+    z-index: 200;
+    width: 100%;
+    /* padding-top: calc(16 / 9 * 10%); */
     display:flex;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    border:10px 1px #000000;
-    width: inherit;
-    height: inherit;
 }
 
-.exped-cell-one {
-    width: 780px;
-    top: -210px;
-    font-size: xx-large;
+.tooltipTABLEEXPED > div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 201;
+}
+
+.tooltipTABLEEXPED > img {
+    z-index: 200;
+    height: 20%;
+    width: 100%;
+    object-fit: contain;
+}
+
+#exped-row-1 {
+    position: relative;
+    top:5%;
+    font-size: 1.4em;
+    height: 20%;
+    align-items: flex-end;
+    column-gap: 1%;
+}
+
+#exped-row-2 {
+    position: relative;
+    top: -2%;
+    font-size: 1.05em;
+    height: 50%;
+    align-items: flex-start;
 }
 
 .after-icon {
     content: url(./assets/icon/energyIcon.png);
-    width:23px;
-    height:25px;
+    height: 90%;
+    object-fit: contain;
 }
 
-.exped-cell-two {
-    width: 780px;
-    font-size: 23px;
-    text-justify: inter-word;
-}
 
 /*/////////////////////////////// WISH (TABLE4) CSS ///////////////////////////////*/
 .wish-counter {
@@ -971,6 +1092,7 @@ circle {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: inherit;
 }
 
 /* url(./assets/middle.webp), url(./assets/right.webp)
@@ -1044,7 +1166,7 @@ repeat, no-repeat
  }
 
 .achieve-stored-text {
-    width: 80%;
+    width: 75%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1069,13 +1191,13 @@ repeat, no-repeat
 }
 
 .achieveStoredH1 {
-    font-size: 2.5em;
+    font-size: 1.0em;
     color: #343030;
     margin: 0;
 }
 
 .achieveStoredH2 {
-    font-size: 1.8em;
+    font-size: 0.7em;
     margin: 0;
 }
 
@@ -1100,7 +1222,7 @@ repeat, no-repeat
 
 #table6 {
     padding-top: 2.5%;
-    font-size: 1.5vw;
+    font-size: inherit;
     position: relative;
     width: 30%;
     height: 100%;

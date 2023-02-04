@@ -35,7 +35,7 @@ function getHighestKey(obj) {
     return parseInt(highestValue);
 }
 
-// RANDOM NUMBER GENERATOR
+// RANDOM NUMBER GENERATOR (DOES NOT INCLUDE MAX)
 function randomInteger(min, max) {
     return Math.floor(Math.random() * (max - min) ) + min;
 }
@@ -98,14 +98,7 @@ function unlockExpedition(i,expeditionDict) {
 
 // INNER HTML FOR FOOD BUFFS
 function countdownText(int) {
-    return `<div id="countdown">
-    <div class="countdown-number" style=${'background:url(./assets/icon/food'+int+'.webp);'}>
-        <svg>
-        <circle r="20" cx="21" cy="21"></circle>
-        </svg>  
-    </div>
-    
-    </div>`
+    return `<div class="countdown-number" style=${'background:url(./assets/icon/food'+int+'.webp);background-size:contain;'}>`
 }
 
 export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText};
