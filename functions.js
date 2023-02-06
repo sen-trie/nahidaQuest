@@ -88,17 +88,20 @@ function sortList(table) {
 function unlockExpedition(i,expeditionDict) {
     let expedID = "exped-" + i;
     let unlockButton = document.getElementById(expedID);
-    let backgroundImage = "url(./assets/expedbg/exped" + i + ".png)";
+    let backgroundImage = "url(./assets/expedbg/exped" + i + ".png) center center / contain no-repeat";
 
     expeditionDict[i].Locked = 0;
     unlockButton.style.background = backgroundImage;
-    unlockButton.style["background-repeat"] = "no-repeat";
-    unlockButton.style["background-size"]= "93%";
 }
 
 // INNER HTML FOR FOOD BUFFS
 function countdownText(int) {
-    return `<div class="countdown-number" style=${'background:url(./assets/icon/food'+int+'.webp);background-size:contain;'}>`
+    let foodCooldown = document.createElement("div");
+    foodCooldown.classList.add("countdown-number");
+    foodCooldown.style.background = "url(./assets/icon/food"+int+".webp)";
+    foodCooldown.style.backgroundSize = "contain";
+    foodCooldown.addEventListener("animationend",() => {foodCooldown.remove()})
+    return foodCooldown;
 }
 
 export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText};

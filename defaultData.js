@@ -4,12 +4,17 @@ var saveValuesDefault = {
     dps:12,
     realScore:1e11,
     freeLevels:0,
-    primogem:112000,
-    energy:102200,
+    primogem:1000,
+    energy:12200,
     rowCount:0,
     heroesPurchased:0,
     wishUnlocked:false,
     wishCounterSaved:0,
+}
+
+var SettingsDefault = {
+    bgmVolume:0.5,
+    sfxVolume:0.5,
 }
 
 var upgradeDictDefault = {
@@ -224,10 +229,10 @@ var achievementListDefault = {
     14: {Name:"Nut Antiquarian",       Description:"Collect 1 sextillion nuts"         ,"Done": false            },
     15: {Name:"Nut Savant",            Description:"Collect 100 sextillion nuts"       ,"Done": false            },
     16: {Name:"Nut Archon",            Description:"Collect 1 septillion nuts"         ,"Done": false            },
-    101: {Name:"",                     Description:"Reach 1 NpS"                       ,"Done": false            },
-    102: {Name:"",                     Description:"Reach 10 NpS"                      ,"Done": false            },
-    103: {Name:"",                     Description:"Reach 100 NpS"                     ,"Done": false            },
-    104: {Name:"",                     Description:"Reach 10,000 NpS"                  ,"Done": false            },
+    101: {Name:"dasdasd",                     Description:"Reach 1 NpS"                       ,"Done": false            },
+    102: {Name:"sdasasd",                     Description:"Reach 10 NpS"                      ,"Done": false            },
+    103: {Name:"sdsdsds",                     Description:"Reach 100 NpS"                     ,"Done": false            },
+    104: {Name:"sds",                     Description:"Reach 10,000 NpS"                  ,"Done": false            },
     105: {Name:"",                     Description:"Reach 100,000 NpS"                 ,"Done": false            },
     106: {Name:"",                     Description:"Reach 1 million NpS"               ,"Done": false            },
     107: {Name:"",                     Description:"Reach 100 million NpS"             ,"Done": false            },
@@ -265,4 +270,4 @@ var achievementListDefault = {
     408: {Name:"Golden Experience",    Description:"Obtain 100 Golden Nuts"                                  ,"Done": false            },
 }
 
-export { upgradeDictDefault,tooltip,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault };
+export { upgradeDictDefault,SettingsDefault,tooltip,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault };

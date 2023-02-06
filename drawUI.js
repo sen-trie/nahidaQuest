@@ -62,19 +62,21 @@ function drawMainBody() {
     rightDiv.append(TabDiv,mainTable,mainImg);
 }
 
-function demoFunction(demoImg) {
-    demoImg.onmousedown = function() {
+function demoFunction(demoContainer,demoImg) {
+    demoContainer.onmousedown = function() {
         demoImg.style.width = "92%";
         demoImg.style.height = "92%";
         demoImg.style["margin-top"] = '4%';
         demoImg.style["margin-left"] = '4%';
+        demoImg.style["border-radius"] = '50%';
     }
     
-    demoImg.onmouseup = function () {
+    window.onmouseup = function () {
         demoImg.style.width = "98%";
         demoImg.style.height = "98%";
         demoImg.style["margin-top"] = '1%';
         demoImg.style["margin-left"] = '1%';
+        demoImg.style["border-radius"] = '50%';
     };
 }
 
@@ -109,17 +111,16 @@ function createExpedTable(expedDiv) {
 }
 
 function createAchievement(achievementText,achievementDesc) {
-    let achievementPopUpTemp = document.createElement("p");
+    let achievementPopUpTemp = document.createElement("div");
 
-    let achievementH1 = document.createElement("h2");
+    let achievementH1 = document.createElement("p");
     achievementH1.innerText = achievementText;
     achievementH1.classList += "achieveH1";
-    let achievementH2 = document.createElement("h3");
+    let achievementH2 = document.createElement("p");
     achievementH2.innerText = achievementDesc;
     achievementH2.classList += "achieveH2";
 
-    achievementPopUpTemp.appendChild(achievementH1);
-    achievementPopUpTemp.appendChild(achievementH2);
+    achievementPopUpTemp.append(achievementH1,achievementH2);
     achievementPopUpTemp.id = "tempAchievement";
     achievementPopUpTemp.classList += "achieve";
 

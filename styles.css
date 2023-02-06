@@ -9,6 +9,14 @@ html {
     cursor: url(./assets/icon/cursor.png), auto;
 }
 
+img {  
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+ }
+
   /* @media (min-aspect-ratio: 12/7) {
     #game {
       width: 100%;
@@ -115,7 +123,7 @@ html {
 /*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
     scrollbar-width: auto;
-    scrollbar-color: #ffffff #3d3d3d;
+    scrollbar-color: #E1DBD0 #3d3d3d;
     margin: 0;
     padding: 0;
     border: 0;
@@ -147,7 +155,7 @@ html {
 
 ::-webkit-scrollbar {
     width: auto;
-    background-color: #F5F5F5;
+    background-color: #E1DBD0;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -200,7 +208,6 @@ button {
     height: 100%;
     position: absolute;
     left: 0px;
-    background-color: rgb(249, 126, 12);
     display:flex;
     flex-direction: column;
     align-items: center;
@@ -211,7 +218,6 @@ button {
     height: 100%;
     left: 35%;
     position: absolute;
-    background-color: #57783b;
     display:flex;
     flex-direction: column;
 }
@@ -228,7 +234,6 @@ button {
     height: 100%;
     position: absolute;
     right: 0px;
-    background-color: rgb(191, 255, 0);
     display:flex;
     flex-direction: column;
   }
@@ -583,10 +588,11 @@ circle {
     width: 100%;
     height: 100%;
     z-index: 3;
-    
 }
 
 .demo-img {
+    position: relative;
+    z-index: 10;
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -615,7 +621,7 @@ circle {
     text-shadow: 2px 2px 0px #fbfbfb;
     position: absolute;
     animation: fadeOutOpacity 1.5s cubic-bezier(.02,.97,.91,.14);
-    z-index: 3;
+    z-index: 13;
     pointer-events: none;
 }
 
@@ -661,6 +667,7 @@ circle {
 }
 
 .tab-button-div {
+    position: relative;
     width: 6%;
     height: 66%;
 }
@@ -685,39 +692,26 @@ circle {
 /*/////////////////////////////// ALL POP UP CSS (New/Tut) ///////////////////////////////*/
 .pop-new {
     position: absolute;
-    z-index: 3;
-    width: 43px;
-    height: 24px;
+    z-index: 103;
     content: url(./assets/icon/new.webp);
-}
-
-.pop-new-1 {
-    left: 848px;
-    top: 0px;
-}
-
-.pop-new-2 {
-    left: 1018px;
-    top: 0px;
-}
-
-.pop-new-3 {
-    left: 1175px;
-    top: 0px;
-}
-
-.pop-new-4 {
-    left: 1345px;
-    top: 0px;
+    width: 75%;
+    object-fit: contain;
+    top:0;
+    right: -50%;
 }
 
 .pop-new-corner {
     position: absolute;
-    z-index: 3;
-    width: 867px;
-    height: 233px;
-    left: 810px;
-    top: 620px;
+    z-index: 103;
+    width: 55%;
+    right: 0;
+    bottom: 0;
+}
+
+.pop-new-corner > img {
+    width:100%;
+    height:100%;
+    object-fit: contain;
 }
 
 /*/////////////////////////////// TUTORIAL CSS ///////////////////////////////*/
@@ -785,7 +779,7 @@ circle {
     position: relative;
     transition: 0.4s ease;
     text-shadow: #3C3C3C 0.21375em 0em 0em, #3C3C3C 0.20102554875em 0.06442056725em 0em, #3C3C3C 0.16545309125em 0.125256034375em 0em, #3C3C3C 0.114100525em 0.17245005em 0em, #3C3C3C 0.0495299125em 0.1929347625em 0em, #3C3C3C -0.020926788125em 0.1987703525em 0em, #3C3C3C -0.08683835em 0.182958245em 0em, #3C3C3C -0.140307092em 0.145025515em 0em, #3C3C3C -0.18035769em 0.09045148em 0em, #3C3C3C -0.209242475em 0.025948895em 0em, #3C3C3C -0.20681056375em -0.0373652975em 0em, #3C3C3C -0.18052885375em -0.0934511275em 0em, #3C3C3C -0.1379573405em -0.138057635em 0em, #3C3C3C -0.0800555925em -0.159165915em 0em, #3C3C3C -0.0164290525em -0.165675565em 0em, #3C3C3C 0.0535315125em -0.1594206825em 0em, #3C3C3C 0.1188833225em -0.1486998625em 0em, #3C3C3C 0.15738429125em -0.102757115em 0em, #3C3C3C 0.1825355875em -0.05246907125em 0em;
-    filter: brightness(var(--brightness)) 
+    filter: brightness(var(--brightness))  
             grayscale(var(--grayscale));
 }
 /*             
@@ -1018,7 +1012,7 @@ circle {
     top: 100%;
     height: 20%;
     width: 70%;
-    font-size: 29px;
+    font-size: inherit;
     color: #F8E8C7;
     text-shadow: #73603D 3px 3px 1px;
 }
@@ -1047,10 +1041,13 @@ circle {
     display: flex;
     justify-content: center;
     align-items: center;
+    column-gap: 1%;
+    font-size: 1.4em;
 }
 
-.wish-button-new:after{
-    content: url(./assets/icon/primogemIcon.png);
+.wish-button-primo {
+    width: 5%;
+    object-fit: contain;
 }
 
 .wish-mail-container {
@@ -1133,12 +1130,24 @@ repeat, no-repeat
     bottom: -15%;
     width:90%;
     height:10%;
+    font-size: inherit;
     text-align: center;
     background:url(./assets/achievement.png);
     background-size: 100%;
     background-position: 5px center;
     background-repeat: no-repeat;
-    animation: fadeOut 7s cubic-bezier(.93,-0.24,.93,.81);
+    animation: fadeOut 3s cubic-bezier(.93,-0.24,.93,.81);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.achieveH1 {
+    font-size: 1.1em;
+}
+
+.achieveH2 {
+    font-size: 0.8em;
 }
 
 @keyframes fadeOut {
@@ -1207,7 +1216,6 @@ repeat, no-repeat
     left: 1279px;
     width: 382px;
     height: 869px;
-    background-color: cyan;
 }
 
 
@@ -1217,7 +1225,6 @@ repeat, no-repeat
     right:140px;
     width: 100px;
     height: 10px;
-    background-color: plum;
 }
 
 #table6 {
@@ -1273,24 +1280,21 @@ repeat, no-repeat
 }
 
 .tool-tip-name {
-    font-size: inherit;
+    font-size: 1.1em;
     text-align: center;
     max-height: 10%;
-    background-color: dodgerblue;
 }
 
 .tool-tip-text {
-    font-size: inherit;
+    font-size:  0.85em;
     text-align: center;
     max-width: 84%;
-    background-color:rgb(249, 126, 12);
 }
 
 .tool-tip-lore {
-    font-size: inherit;
+    font-size: 0.9em;
     text-align: left;
     max-width: 84%;
-    background-color: crimson;
 }
 
 .tool-tip-extraimg {
@@ -1300,7 +1304,6 @@ repeat, no-repeat
     align-items: center;
     z-index: 5;
     width: 40%;
-    background-color: #57783b;
 }
 
 .tool-tip-extraimg img{

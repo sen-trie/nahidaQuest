@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
     <meta name="google-site-verification" content="0t3askxEnPVFJR9Weog42wM1qUF5l0nH63GhSrtzCfg" />
+    <meta name="description" content="Help Nahida on her quest to obtain riches!"/>
     <title>nahidaQuest!</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
     <link rel="stylesheet" href="styles.css">
@@ -24,7 +25,7 @@
             </div>
 
             <div id="demo-container">
-                <span id='demo'></span>
+                <!-- <span id='demo'></span> -->
             </div>
         </div>
 
@@ -52,7 +53,7 @@
     </div>
         
 <script type="module">
-    import { upgradeDictDefault,InventoryDefault,tooltip,expeditionDictDefault,achievementListDefault,saveValuesDefault } from "./defaultData.js"
+    import { upgradeDictDefault,SettingsDefault,InventoryDefault,tooltip,expeditionDictDefault,achievementListDefault,saveValuesDefault } from "./defaultData.js"
     import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText } from "./functions.js"
     import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
     import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
@@ -116,7 +117,7 @@
     // INITIAL LOADING
     loadSaveData();
     loadingAnimation();
-    var upgradeDict;tabElement
+    var upgradeDict;
     var expeditionDict;
     var Inventory;
     var achievementList;
@@ -136,16 +137,21 @@
     settings();           
     
     drawWish();
+    var settingsValues;
     var currentBGM;
     var bgmElement;
     var tabElement = new Audio("./assets/sfx/tab-change.mp3");
     var demoElement = new Audio("./assets/sfx/click.mp3");
+    var upgradeElement = new Audio("./assets/sfx/upgrade.mp3");
+    var mailElement = new Audio("./assets/sfx/mail.mp3");
+    var achievementElement = new Audio("./assets/sfx/achievement.mp3");
+    var sfxArray = [tabElement,demoElement,upgradeElement];
 
-    var timerLoad = setInterval(timerEventsLoading,100);
+    var timerLoad = setInterval(timerEventsLoading,50);
     var timer = setInterval(timerEvents,1000000);
     const timeRatio = 500;
     var timerSeconds = 0;
-    tabChange(1);
+    tabChange(5);
     
     
     // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH FREQUENCY SET TO TIME RATIO)
@@ -172,13 +178,20 @@
 
     // TEMPORARY TIMER
     function timerEventsLoading() {
-        checkAchievement();
-        refresh();
         addNewRow();
+        refresh();
+        checkAchievement();
     }
 
     // LOAD SAVE DATA
     function loadSaveData() {
+        // LOAD SETTIGNS
+        if (localStorage.getItem("settingsValues") == null) {
+            settingsValues = SettingsDefault;
+        } else {
+            let settingsTemp = localStorage.getItem("settingsValues");
+            settingsValues = JSON.parse(settingsTemp)
+        }
         // LOAD VALUES DATA
         if (localStorage.getItem("saveValuesSave") == null) {
             saveValues = saveValuesDefault;
@@ -188,7 +201,7 @@
         }
         // LOAD HEROES DATA
         if (localStorage.getItem("upgradeDictSave") == null) {
-            let upgradeDictTemp = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX,heroCurrentCosts);
+            let upgradeDictTemp = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX);
             upgradeDict = upgradeDictTemp;
         } else {
             let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
@@ -218,31 +231,31 @@
             achievementList = JSON.parse(achievementListTemp);
             achievementListload();
         }
-        
     }
 
     // BIG BUTTON FUNCTIONS
-    var demo = document.getElementById("demo");
-    demo.addEventListener("click", () => {
+    var clickAudioDelay = null;
+    let demoImg = document.createElement("img");
+    demoImg.src = "./assets/nahida.png";
+    demoImg.classList.add("demo-img");
+
+    demoContainer.addEventListener("click", () => {
         saveValues["clickCount"] += 1;
         saveValues["realScore"] += 1 * saveValues["clickFactor"];
         energyRoll();
         refresh();
 
-        demoElement.load()
-        let randomInt = (randomInteger(9,15) / 10)
-        demoElement.playbackRate = randomInt;
-        demoElement.play()
-    });
+        if (clickAudioDelay === null) {
+            if (timerSeconds !== 0) {
+                let randomInt = (randomInteger(9,15) / 10);
+                demoElement.load();
+                demoElement.playbackRate = randomInt;
+                clickAudioDelay = setTimeout(function() {clickAudioDelay = null}, 75);
+                demoElement.play();
+            }
+        }
 
-    let demoImg = document.createElement("img");
-    demoImg.src = "./assets/nahida.png";
-    demoImg.classList.add("demo-img");
-    demo.appendChild(demoImg);
-
-    demo.addEventListener("click",function(event) {
         demoContainer = floatText(demoContainer,abbrNum(saveValues["clickFactor"]),randomInteger(20,80),randomInteger(70,100));
-
         let number = randomInteger(2,6);
         let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04)`
 
@@ -254,7 +267,8 @@
         img.classList.add("falling-image");
         leftDiv.appendChild(img);
     });
-    demoFunction(demoImg);
+    demoFunction(demoContainer,demoImg);
+    demoContainer.appendChild(demoImg);
     
     // ROLL FOR ENERGY
     function energyRoll() {
@@ -274,10 +288,7 @@
         var siteWidth = 1080;
         var scale = screen.width / (siteWidth);
         document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
-        setTimeout(() => {
-            removeLoading();
-            clearInterval(timerLoad);
-        }, 1200);
+        setTimeout(() => {removeLoading()}, 1200);
     }
 
     function removeLoading() {
@@ -297,6 +308,7 @@
     function playAudio() {
         bgmElement = new Audio("./assets/sfx/bgm"+currentSong+".mp3");
         bgmElement.id = "bgm";
+        bgmElement.volume = settingsValues.bgmVolume;
         bgmElement.play();
         bgmElement.addEventListener('ended', () => {
             if (currentSong === 5) {
@@ -309,6 +321,11 @@
             bgmElement.load();
             bgmElement.play();
         }, false); 
+
+        for (let i=0,len=sfxArray.length; i < len; i++) {
+            sfxArray[i].volume = settingsValues.sfxVolume;
+        }
+
         return bgmElement;
     }
     
@@ -333,6 +350,7 @@
         tutorialScreen.addEventListener("click", () => {
             if (currentSlide == 4) {
                 overlay.style.zIndex = -1;
+                clearInterval(timerLoad);
                 timer = setInterval(timerEvents,timeRatio);
                 currentBGM = playAudio();
                 settingsVolume();
@@ -350,6 +368,11 @@
     }
 
     function saveData() {
+        let settingsSaved = {
+            bgmVolume:bgmElement.volume,
+            sfxVolume:tabElement.volume,
+        }
+        localStorage.setItem("settingsValues", JSON.stringify(settingsSaved));
         localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
         localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
         localStorage.setItem("expeditionDictSave", JSON.stringify(expeditionDict));
@@ -446,7 +469,7 @@
         let volumeScrollerBGM = document.createElement("input");
         volumeScrollerBGM = volumeScrollerAdjust(volumeScrollerBGM);
         volumeScrollerBGM.id = "volume-scroller-bgm";
-        volumeScrollerBGM.value = "50";
+        volumeScrollerBGM.value = settingsValues.bgmVolume * 100;
 
         let volumeScrollerBGMText = document.createElement("div");
         let volumeScrollerBGMTextImage = document.createElement("img");
@@ -460,7 +483,7 @@
         let volumeScrollerSFX = document.createElement("input");
         volumeScrollerSFX = volumeScrollerAdjust(volumeScrollerSFX);
         volumeScrollerSFX.id = "volume-scroller-sfx";
-        volumeScrollerSFX.value = "50";
+        volumeScrollerSFX.value = settingsValues.sfxVolume * 100;
 
         let volumeScrollerSFXText = document.createElement("div");
         let volumeScrollerSFXTextImage = document.createElement("img");
@@ -508,7 +531,9 @@
 
         let sfxScroller = document.getElementById('volume-scroller-sfx');
         sfxScroller.addEventListener("change", function() {
-            tabElement.volume = this.value / 100;
+            for (let i=0,len=sfxArray.length; i < len; i++) {
+                sfxArray[i].volume = this.value / 100;
+            }
         });
     }
     
@@ -582,12 +607,16 @@
             let heroID = "but-" + j;
             let heroButtonContainer = createHeroButtonContainer(heroID);
             let toolName = upgradeDictTemp.Name;
-
-            
             
             heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", rowTempDict[j]);});
             heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
-            heroButtonContainer.addEventListener("click", () => {upgrade(loadedHeroID)});
+            heroButtonContainer.addEventListener("click", () => {
+                upgrade(loadedHeroID);
+                if (timerSeconds !== 0) {
+                    upgradeElement.load();
+                    upgradeElement.play();
+                }
+            });
             heroButtonContainer.innerText = heroTextLoad;
 
             if (purchased == true) {
@@ -624,7 +653,13 @@
                 
                 heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", i)});
                 heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
-                heroButtonContainer.addEventListener("click", () => {upgrade(i)});
+                heroButtonContainer.addEventListener("click", () => {
+                    upgrade(i);
+                    if (timerSeconds !== 0) {
+                        upgradeElement.load();
+                        upgradeElement.play();
+                    }
+                });
                 heroButtonContainer.innerText = heroText;
                 table1.appendChild(heroButtonContainer);
 
@@ -828,12 +863,15 @@
     }
     
     function foodButton(type) {
+        let container = document.getElementById("app"+type);
         if (type == 1) {
             timeSnapshot1 = timerSeconds;
-            document.getElementById("app1").innerHTML = countdownText(1);
+            container.innerHTML = '';
+            container.appendChild(countdownText(1));
         } else {
             timeSnapshot2 = timerSeconds;
-            document.getElementById("app2").innerHTML = countdownText(2);
+            container.innerHTML = '';
+            container.appendChild(countdownText(2));
         }
         
     }
@@ -967,8 +1005,12 @@
      function wishUnlock() {
         let wishButtonText = document.getElementById("wishButtonText");
         let wishButton = document.getElementById("wishButton");
+        let wishButtonPrimo = document.createElement("img");
+        wishButtonPrimo.classList.add("wish-button-primo");
+        wishButtonPrimo.src = "./assets/icon/primogemIcon.png";
+        
         wishButtonText.innerText = "Write for help | 160 ";
-        wishButtonText.classList.add("wish-button-new");
+        wishButtonText.append(wishButtonPrimo);
         wishButton.addEventListener("click",() => {
             wish();
         })
@@ -1001,11 +1043,12 @@
     }
 
     function stopWish() {
-        wishButton.innerText = "Closed";
-        wishButton.classList.remove("wish-button-new");
-        var wishButtonDone = wishButton.cloneNode(true);
-        wishButton.parentNode.replaceChild(wishButtonDone, wishButton);
+        let wishButton = document.getElementById("wishButton");
+        let wishButtonText = document.getElementById("wishButtonText");
+        wishButtonText.innerHTML = "Closed";
 
+        var new_wishButton = wishButton.cloneNode(true);
+        wishButton.parentNode.replaceChild(new_wishButton, wishButton);
         let mailImageTemp = document.getElementById("mailImageID");
         mailImageTemp.remove();
     }
@@ -1017,6 +1060,8 @@
         }
 
         if (saveValues["primogem"] >= WISHCOST) {
+            mailElement.load();
+            mailElement.play();
             saveValues["primogem"] -= WISHCOST;
 
             // SCARAMOUCHE WILL ALWAYS BE THE FIRST WISH HERO
@@ -1047,7 +1092,7 @@
                     break;
                 }
             }
-        } else {return;}
+        }
     }
 
     //------------------------------------------------------------------------TABLE 5 (ACHIEVEMENTS)------------------------------------------------------------------------//
@@ -1113,10 +1158,15 @@
         achievementID += achievementType;
         saveValues["primogem"] += 20;
 
-        var achievementPopUp = createAchievement(achievementText,achievementDesc);
-        achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
-        achievementPopUp.addEventListener('animationend', () => {achievementPopUp.remove()});
-        leftDiv.appendChild(achievementPopUp);
+        if (timerSeconds !== 0) {
+            var achievementPopUp = createAchievement(achievementText,achievementDesc);
+            achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
+            achievementPopUp.addEventListener('animationend', () => {achievementPopUp.remove()});
+            leftDiv.appendChild(achievementPopUp);
+            achievementElement.load();
+            achievementElement.play();
+        }
+        
 
         //  ^^^ TEMP ACHIEVEMENT | PERMANENT ACHIEVEMENT vvv
         
@@ -1333,7 +1383,7 @@
             return;
         }
         
-        newPopUp = document.createElement("img");
+        newPopUp = document.createElement("div");
         if (place == "tab") {
             currentPopUps.push(type);
             newPopUp.classList.add("pop-new", className);
@@ -1346,21 +1396,26 @@
                     newPopUp = null;
                 }
             });
-            para1.appendChild(newPopUp);
+            tab.appendChild(newPopUp);
         } else if (place == "corner"){
             newPopUp.classList.add(className);
+            let newPopUpImg = document.createElement("img");
             type--;
-            newPopUp.src = "./assets/tutorial/unlockExp-"+type+".webp"
+            newPopUpImg.src = "./assets/tutorial/unlockExp-"+type+".webp"
+            newPopUp.appendChild(newPopUpImg)
+
+            
             setTimeout(() => {
                 newPopUp.addEventListener("click", () => {
                     if (newPopUp != null) {
                         newPopUp.remove();
                     }
                 });
-            }, 3000)
+            }, 2000)
 
             setTimeout(() => newPopUp.remove(), 13000)
-            para1.appendChild(newPopUp);
+            let mainBody = document.getElementById("game");    
+            mainBody.append(newPopUp);
         }    
     }
 
