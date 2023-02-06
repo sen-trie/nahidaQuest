@@ -72,10 +72,10 @@ function demoFunction(demoContainer,demoImg) {
     }
     
     window.onmouseup = function () {
-        demoImg.style.width = "98%";
-        demoImg.style.height = "98%";
-        demoImg.style["margin-top"] = '1%';
-        demoImg.style["margin-left"] = '1%';
+        demoImg.style.width = "100%";
+        demoImg.style.height = "100%";
+        demoImg.style["margin-top"] = '0%';
+        demoImg.style["margin-left"] = '0%';
         demoImg.style["border-radius"] = '50%';
     };
 }

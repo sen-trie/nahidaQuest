@@ -111,6 +111,15 @@ var InventoryDefault = {
     4001: {Name:"heroEXP",                       Star:4                         ,itemCount:0            ,BuffLvlLow:15,BuffLvlHigh:20},
 };
 
+var eventText = {
+    0: "TEXT ONE - TRIGGER RAIN MINI-GAME",
+    1: "TEXT TWO - GAIN CLICKING BUFF FOR x MINUTES",
+    2: "TEXT THREE - doubles energy gain",
+    3: "TEXT FOUR - permanent increase to energy rate",
+    4: "TEXT FIVE - increases NPS for x ELEMENT",
+    5: "TEXT SIX - gain a golden nut",
+}
+
 var tooltip = {
     Nahida:{name:"Nahida", lore:"A caged bird secluded within the confines of the Sanctuary of Surasthana who can only see the world in her dreams."},
     Traveller:{name:"The Traveller", lore:"The keeper is fading away; the creator has not yet come.But the world shall burn no more, for you shall ascend."},
@@ -250,7 +259,7 @@ var achievementListDefault = {
     203: {Name:"",                     Description:"Click 1000 times"                ,"Done": false            },
     204: {Name:"",                     Description:"Click 10,000 times"               ,"Done": false            },
     205: {Name:"Master of Cultivation",Description:"Click 100,000 times"             ,"Done": false            },
-    301: {Name:"",                     Description:"Upgrade 1 time"         ,"Done": false            },
+    301: {Name:"The Longest Achievement Name Ever",                     Description:"Upgrade 1 time"         ,"Done": false            },
     302: {Name:"",                     Description:"Upgrade 10 times"        ,"Done": false            },
     303: {Name:"",                     Description:"Upgrade 100 times"       ,"Done": false            },
     304: {Name:"",                     Description:"Upgrade 250 times"      ,"Done": false            },
@@ -270,4 +279,4 @@ var achievementListDefault = {
     408: {Name:"Golden Experience",    Description:"Obtain 100 Golden Nuts"                                  ,"Done": false            },
 }
 
-export { upgradeDictDefault,SettingsDefault,tooltip,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault };
+export { upgradeDictDefault,SettingsDefault,tooltip,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText };

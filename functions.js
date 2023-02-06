@@ -104,4 +104,16 @@ function countdownText(int) {
     return foodCooldown;
 }
 
+// PREVENTS AUDIO FROM BEING PLAYED TOO OFTEN
+// function audioWrapper(clickAudioDelay, element) {
+//     console.log(clickAudioDelay)
+//     if (clickAudioDelay == null) {
+//         element.play()
+        
+//         return (clickAudioDelay = "on");
+//     } else {
+//         return clickAudioDelay;
+//     }
+
+
 export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText};

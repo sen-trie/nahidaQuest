@@ -53,7 +53,7 @@
     </div>
         
 <script type="module">
-    import { upgradeDictDefault,SettingsDefault,InventoryDefault,tooltip,expeditionDictDefault,achievementListDefault,saveValuesDefault } from "./defaultData.js"
+    import { upgradeDictDefault,SettingsDefault,InventoryDefault,tooltip,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText } from "./defaultData.js"
     import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText } from "./functions.js"
     import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
     import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
@@ -110,6 +110,7 @@
     var table5Container = document.getElementById("table5-container");
     var table6 = document.getElementById("table6");
     var TABS = [table1,table2, table3, table4, table5Container];
+    var tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,tooltipWeaponImg,tooltipElementImg,table6Background;
 
     // TOOLTIPS FOR EXPEDITION
     var expedContainer = document.getElementById("table3");
@@ -134,6 +135,7 @@
     createExpedition();
     createExpedTable(expedTooltip);
     table3.appendChild(expedTooltip);
+    createTooltip();
     settings();           
     
     drawWish();
@@ -145,15 +147,17 @@
     var upgradeElement = new Audio("./assets/sfx/upgrade.mp3");
     var mailElement = new Audio("./assets/sfx/mail.mp3");
     var achievementElement = new Audio("./assets/sfx/achievement.mp3");
-    var sfxArray = [tabElement,demoElement,upgradeElement];
+    var eventElement = new Audio("./assets/sfx/event.mp3");
+    var sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement];
 
     var timerLoad = setInterval(timerEventsLoading,50);
     var timer = setInterval(timerEvents,1000000);
     const timeRatio = 500;
     var timerSeconds = 0;
+    createTabs();
     tabChange(1);
     
-    
+    //------------------------------------------------------------------------GAME FUNCTIONS------------------------------------------------------------------------//
     // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH FREQUENCY SET TO TIME RATIO)
     function timerEvents() {
         // 1 timerSeconds == 1 SECOND IN REAL TIME
@@ -166,14 +170,8 @@
         dimHeroButton();
         addNewRow();
         foodCheck(timerSeconds);
-        
-
-        // SAVES EVERY 3 MINUTES
-        if (timerSeconds > 180) {
-            saveData();
-            console.log("Saved!");
-            timerSeconds = 0;
-        }
+        randomEventTimer(timerSeconds);
+        timerSave(timerSeconds);
     } 
 
     // TEMPORARY TIMER
@@ -181,6 +179,42 @@
         addNewRow();
         refresh();
         checkAchievement();
+    }
+
+    // SAVE DATA TIMER
+    var savedTimes = 1;
+    function timerSave(timerSeconds) {
+        // SAVES EVERY 3 MINUTES
+        let saveTimeMin = 180 * savedTimes;
+        if (timerSeconds > saveTimeMin) {
+            saveData();
+            console.log("Saved!");
+            savedTimes++;
+        }
+    }
+
+    // RANDOM EVENTS TIMER (MAXIMUM 10 MINUTE DIFFERENCE)
+    var eventTimes = 1;
+    var eventChance = 0;
+    function randomEventTimer(timerSeconds) {
+        // SET TO 10 SECONDS AND 5 SECONDS
+        let eventTimeMin = 10 * eventTimes;
+        if (eventChance !== 0) {
+            let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/5)
+            if (Math.ceil(upperLimit) >= eventChance) {
+                eventChance = 0;
+                eventTimes++;
+                console.log("Event started!");
+                startRandomEvent();
+                return;
+            } else {
+                return;
+            }
+        }
+        
+        if (timerSeconds > eventTimeMin) {
+            eventChance = randomInteger(0,100);
+        }
     }
 
     // LOAD SAVE DATA
@@ -239,7 +273,7 @@
     demoImg.src = "./assets/nahida.png";
     demoImg.classList.add("demo-img");
 
-    demoContainer.addEventListener("click", () => {
+    demoContainer.addEventListener("mouseup", () => {
         saveValues["clickCount"] += 1;
         saveValues["realScore"] += 1 * saveValues["clickFactor"];
         energyRoll();
@@ -250,8 +284,10 @@
                 let randomInt = (randomInteger(9,15) / 10);
                 demoElement.load();
                 demoElement.playbackRate = randomInt;
-                clickAudioDelay = setTimeout(function() {clickAudioDelay = null}, 75);
+                // clickAudioDelay = audioWrapper(clickAudioDelay,demoElement)
                 demoElement.play();
+                clickAudioDelay = setTimeout(function() {clickAudioDelay = null}, 75);
+                
             }
         }
 
@@ -281,6 +317,47 @@
                 clickDelay = 20;
             }
         }
+    }
+
+    // START A RANDOM EVENT
+    function startRandomEvent() {
+        let eventPicture = document.createElement("div");
+        eventPicture.classList.add("random-event");
+        eventPicture.addEventListener("click", () => {clickedEvent();eventPicture.remove()});
+        eventPicture.addEventListener("animationend", () => {eventPicture.remove()});
+        eventPicture.style.left = randomInteger(10,90) + "%";
+        eventPicture.style.top = randomInteger(10,90) + "%";
+
+        let eventPictureImg = document.createElement("img");
+        eventPictureImg.src = "./assets/mouse.png";
+        eventPicture.appendChild(eventPictureImg);
+        mainBody.appendChild(eventPicture);
+    }
+
+    function clickedEvent() {
+        eventElement.load();
+        eventElement.play();
+
+        let eventDropdown = document.createElement("div");
+        eventDropdown.classList.add("event-dropdown");
+        let eventDropdownBackground = document.createElement("img");
+        eventDropdownBackground.src = "./assets/tutorial/eventPill.webp";
+
+        let aranaraNumber = randomInteger(0,5);
+        let eventDropdownText = document.createElement("div");
+        eventDropdownText.innerText = eventText[aranaraNumber];
+        eventDropdownText.classList.add("event-dropdown-text");
+
+        aranaraNumber++
+        let eventDropdownImage = document.createElement("div");
+        eventDropdownImage.style.background = "url(./assets/tutorial/aranara-"+ (aranaraNumber) +".webp)";
+        eventDropdownImage.style.backgroundSize = "contain";
+        eventDropdownImage.style.backgroundRepeat = "no-repeat";
+        eventDropdownImage.classList.add("event-dropdown-image");
+        
+        eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
+        eventDropdown.addEventListener("animationend", () => {eventDropdown.remove()});
+        mainBody.appendChild(eventDropdown);
     }
     
     //--------------------------------------------------------------------------MAIN BODY----------------------------------------------------------------------//
@@ -382,7 +459,6 @@
 
     //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
     // TAB UI
-    createTabs();
     function createTabs() {
         let tabFlex = document.getElementById("flex-container-TAB");
         for (let i=0, len=TABS.length; i < len; i++){
@@ -407,6 +483,19 @@
             tabElement.load();
             tabElement.play();
         }
+
+        let i = 5;
+        while (i--) {
+            let tabButton = document.getElementById("tab-" + (i));
+            if (!tabButton.classList.contains("darken")) {
+                tabButton.classList.add("darken")
+            }
+            if (i == x - 1) {
+                if (tabButton.classList.contains("darken")) {
+                    tabButton.classList.remove("darken");
+                }
+            }
+        }
         
         for (let i=0, len=TABS.length; i < len; i++){
             TABS[i].style.display = "none";
@@ -425,6 +514,7 @@
             let mailImageTemp = document.getElementById("mailImageID")
              mailImageTemp.style.opacity = 1;
          }
+         clearTooltip();
     }
     
     // SETTINGS MENU - SAVES & VOLUME CONTROL
@@ -1213,37 +1303,44 @@
 
     //-----------------------------------------------------------------TABLE 6 (TOOLTIPS FOR TABLE 1 & 2)-----------------------------------------------------------//
     // TOOLTIP UI
-    var tooltipName = document.createElement("div");
-    tooltipName.classList += "tool-tip-name";
+    function createTooltip() {
+        tooltipName = document.createElement("div");
+        tooltipName.classList += "tool-tip-name";
 
-    var toolImgContainer = document.createElement("div");
-    toolImgContainer.classList.add("toolImgContainer")
-    var toolImg = document.createElement("img");
-    toolImg.src = "./assets/tooltips/Empty.webp";
-    toolImg.classList.add("toolImg");
-    var toolImgOverlay = document.createElement("img");
-    toolImgOverlay.src = "./assets/tooltips/Empty.webp";
-    toolImgOverlay.classList.add("toolImgOverlay");
-    toolImgContainer.append(toolImg,toolImgOverlay)
-    
-    var tooltipText = document.createElement("div");
-    tooltipText.classList += "tool-tip-text";
-    var tooltipLore = document.createElement("div");
-    tooltipLore.classList += "tool-tip-lore";
+        toolImgContainer = document.createElement("div");
+        toolImgContainer.classList.add("toolImgContainer")
+        toolImg = document.createElement("img");
+        toolImg.src = "./assets/tooltips/Empty.webp";
+        toolImg.classList.add("toolImg");
+        toolImgOverlay = document.createElement("img");
+        toolImgOverlay.src = "./assets/tooltips/Empty.webp";
+        toolImgOverlay.classList.add("toolImgOverlay");
+        toolImgContainer.append(toolImg,toolImgOverlay)
+        
+        tooltipText = document.createElement("div");
+        tooltipText.classList += "tool-tip-text";
+        tooltipLore = document.createElement("div");
+        tooltipLore.classList += "tool-tip-lore";
 
-    let tooltipExtraImg = document.createElement("div");
-    tooltipExtraImg.classList += "tool-tip-extraimg";
-    var tooltipWeaponImg = document.createElement("img");
-    var tooltipElementImg = document.createElement("img");
-    
-    tooltipExtraImg.append(tooltipWeaponImg,tooltipElementImg)
+        let tooltipExtraImg = document.createElement("div");
+        tooltipExtraImg.classList += "tool-tip-extraimg";
+        tooltipWeaponImg = document.createElement("img");
+        tooltipElementImg = document.createElement("img");
+        
+        tooltipExtraImg.append(tooltipWeaponImg,tooltipElementImg)
 
-    var table6Background = document.createElement("img");
-    table6Background.src = "./assets/tooltips/background.webp"
-    table6Background.classList.add("table6-background");
-    table6.append(tooltipName,toolImgContainer,tooltipText,tooltipExtraImg,tooltipLore,table6Background);
+        table6Background = document.createElement("img");
+        table6Background.src = "./assets/tooltips/background.webp"
+        table6Background.classList.add("table6-background");
+        table6.append(tooltipName,toolImgContainer,tooltipText,tooltipExtraImg,tooltipLore,table6Background);
+    }
 
+    var tooltipInterval = null;
     function changeTooltip(name, type, ID) {
+        if (tooltipInterval !== null) {
+            clearInterval(tooltipInterval);
+            tooltipInterval = null;
+        }
         tooltipName.innerText = tooltip[name]["name"];
         tooltipLore.innerText = tooltip[name]["lore"];
 
@@ -1263,13 +1360,23 @@
     }
 
     function clearTooltip() {
-        tooltipName.innerText = "";
-        tooltipText.innerText = "";
-        tooltipLore.innerText = "";
-        tooltipWeaponImg.src = "./assets/tooltips/Empty.webp";
-        tooltipElementImg.src = "./assets/tooltips/Empty.webp";
-        toolImg.src = "./assets/tooltips/Empty.webp";
-        toolImgOverlay.src = "./assets/tooltips/Empty.webp";
+        tooltipInterval = setTimeout(() => {
+            if (table1.style.display !== "none") {
+                tooltipName.innerText = "Hover over a character for more info!";
+            }
+
+            if (table2.style.display !== "none") {
+                tooltipName.innerText = "Go on expeditions to get items!";
+            }
+
+            tooltipText.innerText = "";
+            tooltipLore.innerText = "";
+            tooltipWeaponImg.src = "./assets/tooltips/Empty.webp";
+            tooltipElementImg.src = "./assets/tooltips/Empty.webp";
+            toolImg.src = "./assets/tooltips/Empty.webp";
+            toolImgOverlay.src = "./assets/tooltips/Empty.webp";
+            tooltipInterval = null;
+            }, 100)
     }
 
     //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
