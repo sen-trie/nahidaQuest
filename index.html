@@ -25,7 +25,6 @@
             </div>
 
             <div id="demo-container">
-                <!-- <span id='demo'></span> -->
             </div>
         </div>
 
@@ -148,7 +147,9 @@
     var mailElement = new Audio("./assets/sfx/mail.mp3");
     var achievementElement = new Audio("./assets/sfx/achievement.mp3");
     var eventElement = new Audio("./assets/sfx/event.mp3");
-    var sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement];
+    var reactionStartElement = new Audio("./assets/sfx/timestart.mp3");
+    var reactionCorrectElement = new Audio("./assets/sfx/timesup.mp3");
+    var sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement,reactionStartElement,reactionCorrectElement];
 
     var timerLoad = setInterval(timerEventsLoading,50);
     var timer = setInterval(timerEvents,1000000);
@@ -158,6 +159,12 @@
     tabChange(1);
     
     //------------------------------------------------------------------------GAME FUNCTIONS------------------------------------------------------------------------//
+    window.addEventListener("load", function() {
+        setTimeout(function() {
+            window.scrollTo(0, 1);
+        }, 100);
+    });
+
     // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH FREQUENCY SET TO TIME RATIO)
     function timerEvents() {
         // 1 timerSeconds == 1 SECOND IN REAL TIME
@@ -190,30 +197,6 @@
             saveData();
             console.log("Saved!");
             savedTimes++;
-        }
-    }
-
-    // RANDOM EVENTS TIMER (MAXIMUM 10 MINUTE DIFFERENCE)
-    var eventTimes = 1;
-    var eventChance = 0;
-    function randomEventTimer(timerSeconds) {
-        // SET TO 10 SECONDS AND 5 SECONDS
-        let eventTimeMin = 10 * eventTimes;
-        if (eventChance !== 0) {
-            let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/5)
-            if (Math.ceil(upperLimit) >= eventChance) {
-                eventChance = 0;
-                eventTimes++;
-                console.log("Event started!");
-                startRandomEvent();
-                return;
-            } else {
-                return;
-            }
-        }
-        
-        if (timerSeconds > eventTimeMin) {
-            eventChance = randomInteger(0,100);
         }
     }
 
@@ -318,13 +301,36 @@
             }
         }
     }
+    
+    //--------------------------------------------------------------------------RANDOM EVENTS----------------------------------------------------------------------//
+    // RANDOM EVENTS TIMER (MAXIMUM 10 MINUTE DIFFERENCE)
+    var eventTimes = 1;
+    var eventChance = 0;
+    function randomEventTimer(timerSeconds) {
+        // SET TO 10 SECONDS AND 5 SECONDS
+        let eventTimeMin = 10 * eventTimes;
+        if (eventChance !== 0) {
+            let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/5)
+            if (Math.ceil(upperLimit) >= eventChance) {
+                eventChance = 0;
+                eventTimes++;
+                // console.log("Event started!");
+                startRandomEvent();
+            }
+            return;
+        }
+        
+        if (timerSeconds > eventTimeMin) {
+            eventChance = randomInteger(0,100);
+        }
+    }
 
     // START A RANDOM EVENT
     function startRandomEvent() {
         let eventPicture = document.createElement("div");
         eventPicture.classList.add("random-event");
         eventPicture.addEventListener("click", () => {clickedEvent();eventPicture.remove()});
-        eventPicture.addEventListener("animationend", () => {eventPicture.remove()});
+        setTimeout(() => {eventPicture.remove()}, 10000);
         eventPicture.style.left = randomInteger(10,90) + "%";
         eventPicture.style.top = randomInteger(10,90) + "%";
 
@@ -337,18 +343,17 @@
     function clickedEvent() {
         eventElement.load();
         eventElement.play();
-
+    
         let eventDropdown = document.createElement("div");
         eventDropdown.classList.add("event-dropdown");
         let eventDropdownBackground = document.createElement("img");
         eventDropdownBackground.src = "./assets/tutorial/eventPill.webp";
 
-        let aranaraNumber = randomInteger(0,5);
+        let aranaraNumber = randomInteger(1,6);
         let eventDropdownText = document.createElement("div");
         eventDropdownText.innerText = eventText[aranaraNumber];
         eventDropdownText.classList.add("event-dropdown-text");
 
-        aranaraNumber++
         let eventDropdownImage = document.createElement("div");
         eventDropdownImage.style.background = "url(./assets/tutorial/aranara-"+ (aranaraNumber) +".webp)";
         eventDropdownImage.style.backgroundSize = "contain";
@@ -358,7 +363,152 @@
         eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
         eventDropdown.addEventListener("animationend", () => {eventDropdown.remove()});
         mainBody.appendChild(eventDropdown);
+
+        setTimeout(() => {chooseEvent()},6000);
     }
+
+    function chooseEvent() {
+        let randInt = randomInteger(1,4);
+        if (randInt == 1) {
+            rainEvent();
+        } else if (randInt == 2) {
+            clickEvent();
+        } else if (randInt == 3) {
+            reactionEvent();
+        }
+    }
+
+    // EVENT 1 (RAIN)
+    function rainEvent() {
+        let eventBackdrop = document.createElement("div");
+        eventBackdrop.classList.add("event-dark");
+
+        let rainText = document.createElement("div");
+        let rainTextBackground = document.createElement("div");
+        let rainTextDiv = document.createElement("p");
+
+        rainText.classList.add("event-rain-text");
+        let dpsMultiplier = (saveValues.dps + 1)* 15;
+        let tempScore = 0;
+        rainTextDiv.innerText = tempScore;
+        rainText.append(rainTextBackground,rainTextDiv)
+        mainBody.appendChild(rainText);
+
+        function spawnRain() {
+            let animation = `rain ${6}s linear`
+            var img = document.createElement("img");
+            img.src = "./assets/icon/tab3.png";
+            img.style.top = 0;
+            img.style.left = `${randomInteger(5,95)}%`
+            img.style.animation = animation;
+            img.addEventListener('click', () => {
+                img.remove();
+                tempScore++;
+                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier);
+            });
+            img.addEventListener('animationend', () => {img.remove()});
+            img.classList.add("raining-image");
+            eventBackdrop.append(img);
+        }
+
+        let rainTimer = setInterval(() => {spawnRain()}, 200);
+        setTimeout(()=>{
+            eventBackdrop.remove();
+            clearInterval(rainTimer);
+            rainText.classList.add("text-pop");
+            rainText.addEventListener('animationend', () => {
+                rainText.remove();
+                saveValues.realScore += tempScore * dpsMultiplier;
+            })
+        }, 30000);
+        mainBody.append(eventBackdrop)
+    }
+
+    // EVENT 2 (ENERGY OVERLOAD)
+    function clickEvent() {
+        let button = demoContainer.firstElementChild;
+        button.style.animation = "rotation-scale 5s infinite linear";
+        button.style["box-shadow"] = "inset 0em 0em 6em #93d961";
+
+        setTimeout(() => {
+            button.style.animation = "rotation 18s infinite linear"
+            button.style["box-shadow"] = "";
+        },20000)
+    }
+
+    // EVENT 3 (WHERES WALDO)
+    // EVENT 4 (REACTION TIME)
+    var reactionReady = false;
+    var reactionGame = false;
+    function reactionEvent() {
+        let eventBackdrop = document.createElement("div");
+        eventBackdrop.classList.add("event-dark");
+
+        let reactionImage = document.createElement("img");
+        reactionImage.src = "./assets/clock1.webp"
+        reactionImage.id = "reaction-image";
+
+        let reactionButton = document.createElement("div");
+        reactionButton.id = "reaction-button";
+        reactionButton.innerText = "Not yet..."
+        reactionButton.addEventListener("click",()=>{reactionFunction(eventBackdrop)})
+
+        reactionStartElement.load();
+        reactionStartElement.play();
+        reactionStartElement.addEventListener("ended", ()=> {
+            if (reactionGame == true) {
+                reactionReady = true;
+                reactionButton.innerText = "Now!"
+                reactionImage.src = "./assets/clock2.webp";
+                setTimeout(() => {
+                    if (reactionGame == true) {
+                        reactionReady = false;
+                        reactionButton.innerText = "Too Slow!";
+                        reactionFunction(eventBackdrop);
+                    }
+                }, 800)
+            }
+        });
+       
+        eventBackdrop.append(reactionImage,reactionButton);
+        mainBody.append(eventBackdrop);
+        reactionGame = true;
+    }
+
+    function reactionFunction(eventBackdrop) {
+        if (reactionGame == false) {return};
+        let outcomeText = document.createElement("div");
+        let outcomeTextBackground = document.createElement("div");
+        let outcomeTextDiv = document.createElement("p");
+        outcomeText.classList.add("event-rain-text");
+        outcomeText.id = "outcome-text";
+
+        reactionStartElement.pause();
+        if (reactionReady == false) {
+            outcomeTextDiv.innerText = "You missed!";
+        } else if (reactionReady == true) {
+            reactionCorrectElement.load();
+            reactionCorrectElement.play();
+            adventure(10);
+            adventure(10);
+            outcomeTextDiv.innerText = "You did it!";
+        }
+
+        reactionReady = false;
+        reactionGame = false;
+        outcomeText.append(outcomeTextBackground,outcomeTextDiv);
+        mainBody.append(outcomeText);
+        setTimeout(()=> {
+            outcomeText.remove();
+            eventBackdrop.remove();
+            
+        },4000)
+    }
+
+
+    // EVENT 5 (8 BOXES)
+    // EVENT 6 (WHACK-A-MOLE)
+
     
     //--------------------------------------------------------------------------MAIN BODY----------------------------------------------------------------------//
     function loadingAnimation() {
@@ -487,12 +637,12 @@
         let i = 5;
         while (i--) {
             let tabButton = document.getElementById("tab-" + (i));
-            if (!tabButton.classList.contains("darken")) {
-                tabButton.classList.add("darken")
+            if (!tabButton.firstChild.classList.contains("darken")) {
+                tabButton.firstChild.classList.add("darken")
             }
             if (i == x - 1) {
-                if (tabButton.classList.contains("darken")) {
-                    tabButton.classList.remove("darken");
+                if (tabButton.firstChild.classList.contains("darken")) {
+                    tabButton.firstChild.classList.remove("darken");
                 }
             }
         }
@@ -529,7 +679,7 @@
         settingButton.appendChild(settingButtonImg);
         settingButton.addEventListener("click", () => {
             if (settingsOpen == false) {
-                settingsMenu.style.zIndex = 200;
+                settingsMenu.style.zIndex = 1000;
                 settingsOpen = true;
             } else {
                 settingsMenu.style.zIndex = -1;
@@ -760,22 +910,23 @@
     
     // UPGRADE HEROES
     function upgrade(clicked_id) {
-        var butIdArray = "but-" + upgradeDict[clicked_id].Row;
+        let upgradeDictTemp = upgradeDict[clicked_id];
+        var butIdArray = "but-" + upgradeDictTemp.Row;
         let realScoreCurrent = saveValues["realScore"];
         let costCurrent;
-        let currentPurchasedLocal = upgradeDict[clicked_id].Purchased;
+        let currentPurchasedLocal = upgradeDictTemp.Purchased;
         let currentMultiplierLocal = currentMultiplier;
         let requiredFree = 0;
 
-        if (upgradeDict[clicked_id].Purchased === 0) {
+        if (upgradeDictTemp.Purchased === 0) {
             currentMultiplierLocal = 1;
         }
         
         if (currentMultiplierLocal != 1) {
-            costCurrent = Math.round(upgradeDict[clicked_id]["BaseCost"] * ((COSTRATIO**currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO))
+            costCurrent = Math.round(upgradeDictTemp["BaseCost"] * ((COSTRATIO**currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO))
             requiredFree = currentMultiplierLocal;
         } else {
-            costCurrent = Math.round(upgradeDict[clicked_id]["BaseCost"] * (COSTRATIO **currentPurchasedLocal));
+            costCurrent = Math.round(upgradeDictTemp["BaseCost"] * (COSTRATIO **currentPurchasedLocal));
             requiredFree = 1;
         }
 
@@ -788,19 +939,21 @@
             }
             
             realScoreCurrent -= costCurrent;
+            let heroIncrease = upgradeDictTemp["Factor"] * currentMultiplierLocal;
             if (clicked_id === 0) {
-                saveValues["clickFactor"] += upgradeDict[clicked_id]["Factor"] * currentMultiplierLocal;
+                saveValues["clickFactor"] += heroIncrease;
             } else {
-                saveValues["dps"] += upgradeDict[clicked_id]["Factor"] * currentMultiplierLocal;
+                saveValues["dps"] += heroIncrease;
             }
 
-            upgradeDict[clicked_id].Purchased += 1 * currentMultiplierLocal;
+            upgradeDictTemp.Contribution += heroIncrease;
+            upgradeDictTemp.Purchased += 1 * currentMultiplierLocal;
             saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
             checkExpeditionUnlock(saveValues["heroesPurchased"]);                                        
-            refresh(butIdArray, upgradeDict[clicked_id]["BaseCost"], clicked_id);
+            refresh(butIdArray, upgradeDictTemp["BaseCost"], clicked_id);
                
             clearTooltip();
-            changeTooltip(upgradeDict[clicked_id]["Name"],"hero",clicked_id);                   
+            changeTooltip(upgradeDictTemp["Name"],"hero",clicked_id);                   
             saveValues["realScore"] = realScoreCurrent;
         }
     }
@@ -970,58 +1123,72 @@
     // EXPEDITION MECHANICS
     const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
     function adventure(type) {
-        if (expeditionDict[type].Locked == '1'){
+        if (type == 10) {
+            if (expeditionDict[5].Locked !== '1') {
+                type = 5;
+            }
+            else if (expeditionDict[4].Locked !== '1') {
+                type = 4;
+            }
+            else if (expeditionDict[3].Locked !== '1') {
+                type = 3;
+            } else {
+                type = 2;
+            }
+            saveValues["energy"] += ADVENTURECOSTS[type];
+        } else if (expeditionDict[type].Locked == '1'){
             alert("ITS LOCKED CANT YOU SEE!!!!!!!")
-            return;                                //// <------------------------ ADD THE POPUP FOR LOCKED
-        } else {                                                     
-            if (saveValues["energy"] >= ADVENTURECOSTS[type]){
-                saveValues["energy"] -= ADVENTURECOSTS[type];
-                refresh();
-                
-                switch (type) {
-                    case 1:
-                        inventoryDraw("artifact", 1, 4);
-                        inventoryDraw("weapon", 1, 1);
-                        inventoryDraw("xp", 2, 2);
-                        inventoryDraw("food", 1, 3);
-                        break;
-                    case 2:
-                        inventoryDraw("xp", 2, 2);
-                        inventoryDraw("xp", 2, 2);
-                        inventoryDraw("xp", 2, 2);
-                        inventoryDraw("food", 2, 3);
-                        inventoryDraw("artifact", 2, 4);
-                        inventoryDraw("weapon", 1, 2);
-                        break;
-                    case 3:
-                        inventoryDraw("xp", 3, 3);
-                        inventoryDraw("xp", 2, 2);
-                        inventoryDraw("artifact", 3, 4);
-                        inventoryDraw("food", 2, 4);
-                        inventoryDraw("weapon", 2, 3);
-                        break;
-                    case 4:
-                        inventoryDraw("xp", 3, 3);
-                        inventoryDraw("xp", 3, 3);
-                        inventoryDraw("weapon", 3, 4);
-                        inventoryDraw("artifact", 3, 4);
-                        inventoryDraw("food", 2, 4);
-                        break;
-                    case 5:
-                        inventoryDraw("xp", 3, 3);
-                        inventoryDraw("xp", 4, 4);
-                        inventoryDraw("artifact", 4, 5);
-                        inventoryDraw("weapon", 4, 5);
-                        inventoryDraw("food", 2, 5);
-                        break;
-                    default:
-                        break;
-                }
-                sortList("table2");
-                newPop(1);
-            }  
-        }   
-    }
+            return;  
+        }
+
+        if (saveValues["energy"] >= ADVENTURECOSTS[type]){
+            saveValues["energy"] -= ADVENTURECOSTS[type];
+            refresh();
+            
+            switch (type) {
+                case 1:
+                    inventoryDraw("artifact", 1, 4);
+                    inventoryDraw("weapon", 1, 1);
+                    inventoryDraw("xp", 2, 2);
+                    inventoryDraw("food", 1, 3);
+                    break;
+                case 2:
+                    inventoryDraw("xp", 2, 2);
+                    inventoryDraw("xp", 2, 2);
+                    inventoryDraw("xp", 2, 2);
+                    inventoryDraw("food", 2, 3);
+                    inventoryDraw("artifact", 2, 4);
+                    inventoryDraw("weapon", 1, 2);
+                    break;
+                case 3:
+                    inventoryDraw("xp", 3, 3);
+                    inventoryDraw("xp", 2, 2);
+                    inventoryDraw("artifact", 3, 4);
+                    inventoryDraw("food", 2, 4);
+                    inventoryDraw("weapon", 2, 3);
+                    break;
+                case 4:
+                    inventoryDraw("xp", 3, 3);
+                    inventoryDraw("xp", 3, 3);
+                    inventoryDraw("weapon", 3, 4);
+                    inventoryDraw("artifact", 3, 4);
+                    inventoryDraw("food", 2, 4);
+                    break;
+                case 5:
+                    inventoryDraw("xp", 3, 3);
+                    inventoryDraw("xp", 4, 4);
+                    inventoryDraw("artifact", 4, 5);
+                    inventoryDraw("weapon", 4, 5);
+                    inventoryDraw("food", 2, 5);
+                    break;
+                default:
+                    break;
+            }
+            sortList("table2");
+            newPop(1);
+        }  
+    }   
+    
 
     // DRAWS FOR RANDOM INVENTORY LOOT 
     function inventoryDraw(itemType, min, max){
@@ -1168,11 +1335,13 @@
                 if (upgradeDict[randomWishHero].Purchased >= -1) {
                     continue;
                 } else {
-                    upgradeDict[randomWishHero].Purchased = -1;
-                    upgradeDict[randomWishHero]["Factor"] = Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/50 + 1);
-                    upgradeDict[randomWishHero]["BaseCost"] = Math.round(saveValues["dps"] * (55) + 1);
+                    let upgradeDictTemp = upgradeDict[randomWishHero];
+                    upgradeDictTemp.Purchased = -1;
+                    upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/300 + 1);
+                    upgradeDictTemp["BaseCost"] = Math.round(saveValues["dps"] * (55) + 1);
+                    upgradeDictTemp["Contribution"] = 0;
                     
-                    wishMultiplier += 1.5;
+                    wishMultiplier += 3;
                     saveValues["wishCounterSaved"]++;
                     refresh();
                     newPop(0);
@@ -1346,7 +1515,9 @@
 
         if (type == "hero") {
             let upgradeDictLocal = upgradeDict;
-            let tooltipTextLocal = "Times upgraded: " +upgradeDictLocal[ID]["Purchased"]+ "<br />Free Levels: " +saveValues["freeLevels"];
+            let tooltipTextLocal = "Level: " + upgradeDictLocal[ID]["Purchased"] + 
+                                    "<br />Free Levels: " + saveValues["freeLevels"] + 
+                                    "<br />" + abbrNum(upgradeDictLocal[ID]["Contribution"]) + ` ${ID === 0 ? 'Nuts per Click' : 'Nps'}`;
             toolImgOverlay.src = "./assets/tooltips/hero/"+name+".webp";
             tooltipElementImg.src = "./assets/tooltips/elements/" +upgradeDictLocal[ID].Ele+ ".webp";
             tooltipWeaponImg.src = "./assets/tooltips/elements/" +upgradeDictLocal[ID].Type+ ".webp";

@@ -4,7 +4,7 @@
     src: url(./assets/gi-font.ttf);
 }
 
-html {
+html,body {
     height: 100%;
     cursor: url(./assets/icon/cursor.png), auto;
 }
@@ -72,54 +72,6 @@ img {
     }
 }
 
-/*           ^
-             |
-             |          
-  STRETCHING VERTICALLY 
-             |
-             |
-             v          */
-/* 
-@media (max-aspect-ratio: 16/9) {
-    #game {
-        width: 100%;
-        height: 90%;
-        margin: 0;
-    }
-}
-
-@media (max-aspect-ratio: 14/9) {
-    #game {
-        width: 100%;
-        height: 80%;
-        margin: 0;
-    }
-}
-
-@media (max-aspect-ratio: 12/9) {
-    #game {
-        width: 100%;
-        height: 70%;
-        margin: 0;
-    }
-}
-
-@media (max-aspect-ratio: 10/9) {
-    #game {
-        width: 100%;
-        height: 58%;
-        margin: 0;
-    }
-} */
-/* 
-@media (max-aspect-ratio: 8/9) {
-    #game {
-        width: 100%;
-        height: 50%;
-        margin: 0;
-    }
-} */
-
 /*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
     scrollbar-width: auto;
@@ -170,7 +122,6 @@ img {
 /*/////////////////////// MAIN BODY CSS ///////////////////////////////*/
 body {
     width: 100%;
-    height: 100vh;
     background-color: aqua;
     position: relative;
     overflow: hidden;
@@ -195,9 +146,10 @@ button {
     text-shadow: 3px 3px 5px black;
     flex-direction: column;
     position: relative;
+    justify-content: space-around;
     top: 10%;
     width: 100%;
-    height: 10%;
+    height: 9.25%;
     background-color: rgba(0,0,0,0.4);
     z-index: 4;
     font-size: inherit;
@@ -291,11 +243,11 @@ button {
 }
 
 #score {
-    font-size: 1.8em;
+    font-size: 1.6em;
 }
 
 #dps {
-    font-size: 1.0em;
+    font-size: 0.9em;
 }
 
 .energy-primo-container {
@@ -366,7 +318,7 @@ button {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    animation: vibrate 110s linear 0s 1 normal forwards;
+    animation: vibrate 10s linear 0s 1 normal forwards;
 }
 
 @keyframes vibrate {
@@ -436,6 +388,127 @@ button {
     to {opacity: 0;}
     
 }
+
+.event-dark {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 3%;
+}
+
+.event-dark::before {
+    content: "";
+    background-color: #000000;
+    background-size: cover;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    opacity: 0.85;
+}
+
+.event-rain-text {
+    position: absolute;
+    text-shadow: #686464 0.21375em 0em 0em, #686464 0.20102554875em 0.06442056725em 0em, #686464 0.16545309125em 0.125256034375em 0em, #686464 0.114100525em 0.17245005em 0em, #686464 0.0495299125em 0.1929347625em 0em, #686464 -0.020926788125em 0.1987703525em 0em, #686464 -0.08683835em 0.182958245em 0em, #686464 -0.140307092em 0.145025515em 0em, #686464 -0.18035769em 0.09045148em 0em, #686464 -0.209242475em 0.025948895em 0em, #686464 -0.20681056375em -0.0373652975em 0em, #686464 -0.18052885375em -0.0934511275em 0em, #686464 -0.1379573405em -0.138057635em 0em, #686464 -0.0800555925em -0.159165915em 0em, #686464 -0.0164290525em -0.165675565em 0em, #686464 0.0535315125em -0.1594206825em 0em, #686464 0.1188833225em -0.1486998625em 0em, #686464 0.15738429125em -0.102757115em 0em, #686464 0.1825355875em -0.05246907125em 0em;
+    bottom: 1%;
+    width: 100%;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10006;
+}
+
+.event-rain-text > p {
+    font-size: 2.3em;
+    color: white;
+    background-color: transparent;
+    z-index: 10007;
+}
+
+.event-rain-text > div {
+    content: "";
+    background-color: #000000;
+    background-size: cover;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    opacity: 0.8;
+    z-index:10005;
+}
+
+.text-pop {
+    -webkit-animation: text-pop-up-top 3s cubic-bezier(.48,-0.01,0,1) both;
+	        animation: text-pop-up-top 3s cubic-bezier(.48,-0.01,0,1) both;
+}
+  
+@keyframes text-pop-up-top {
+    0% {
+        -webkit-transform: translateY(0);
+                transform: translateY(0);
+        /* text-shadow: none; */
+    }
+    100% {
+        -webkit-transform: translateY(-450%);
+                transform: translateY(-450%);
+                /* text-shadow: 0 0.1em 0 #cccccc */
+    }
+}
+
+.raining-image {
+    position: absolute;
+    width: 5%;
+    aspect-ratio: 1;
+    z-index: 101;
+    pointer-events: auto;
+}
+
+@keyframes rain {
+    from {transform: translateY(0);}
+    to {transform: translateY(1000%);}
+}
+
+@keyframes rotation-scale {
+    0% {transform: scale(1) rotateZ(0);}
+    50% {transform: scale(1.3) rotateZ(180deg);}
+    100% {transform: scale(1) rotateZ(360deg);}
+}
+
+#reaction-image {
+    position: relative;
+    z-index: 10001;
+    width: 30%;
+    object-fit: contain;
+}
+
+#reaction-button {
+    position: relative;
+    z-index: 10001;
+    width: 35%;
+    aspect-ratio: 5.89;
+    background-image: url(./assets/tutorial/tut-button.webp);
+    background-size: contain;
+    background-repeat: no-repeat;
+    color: white;
+    text-shadow: #3C3C3C 0.21375em 0em 0em, #3C3C3C 0.20102554875em 0.06442056725em 0em, #3C3C3C 0.16545309125em 0.125256034375em 0em, #3C3C3C 0.114100525em 0.17245005em 0em, #3C3C3C 0.0495299125em 0.1929347625em 0em, #3C3C3C -0.020926788125em 0.1987703525em 0em, #3C3C3C -0.08683835em 0.182958245em 0em, #3C3C3C -0.140307092em 0.145025515em 0em, #3C3C3C -0.18035769em 0.09045148em 0em, #3C3C3C -0.209242475em 0.025948895em 0em, #3C3C3C -0.20681056375em -0.0373652975em 0em, #3C3C3C -0.18052885375em -0.0934511275em 0em, #3C3C3C -0.1379573405em -0.138057635em 0em, #3C3C3C -0.0800555925em -0.159165915em 0em, #3C3C3C -0.0164290525em -0.165675565em 0em, #3C3C3C 0.0535315125em -0.1594206825em 0em, #3C3C3C 0.1188833225em -0.1486998625em 0em, #3C3C3C 0.15738429125em -0.102757115em 0em, #3C3C3C 0.1825355875em -0.05246907125em 0em;
+    font-size: 1.4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#outcome-text {
+    bottom: 50%;
+}
+
 
 /*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
 .temp-buff {
@@ -516,7 +589,7 @@ circle {
     height: 100%;
     object-fit:contain;
     position: relative;
-    z-index: 200;
+    z-index: 1000;
 }
 
 .settings-button:hover{
@@ -687,18 +760,15 @@ circle {
 }
 
 @keyframes rotation {
-    from {
-      transform: rotate(0deg);
-    } to {
-      transform: rotate(359deg);
-    }
+    from {transform: rotate(0deg);} 
+    to {transform: rotate(359deg);}
 }
 
 #demo-container {
     position: relative;
     top: 12.5%;
     width:83%;
-    height: 55%;
+    aspect-ratio: 1;
 }
 
 .floatingText {
@@ -763,7 +833,7 @@ circle {
 }
 
 .tab-button:hover{
-    filter: drop-shadow(0px 0px 3px #ffffff);
+    filter: drop-shadow(0px 0px 7px #ffffff);
 }
 
 

@@ -5,7 +5,7 @@ var saveValuesDefault = {
     realScore:1e6,
     freeLevels:0,
     primogem:1000,
-    energy:500,
+    energy:1000,
     rowCount:0,
     heroesPurchased:0,
     wishUnlocked:false,
@@ -18,7 +18,7 @@ var SettingsDefault = {
 }
 
 var upgradeDictDefault = {
-    0: {Name: "Nahida",      Row:-1,  "Level": 1, "BaseCost":20, Factor:1,        Purchased: -1,   Type: "Catalyst",   Ele: "Dendro"          },
+    0: {Name: "Nahida",      Row:-1,  "Contribution": 0, "Level": 1, "BaseCost":20, Factor:1,        Purchased: -1,   Type: "Catalyst",   Ele: "Dendro"          },
     1: {Name: "Traveller",   Row:-1,          Purchased: -1,   Type: "Sword",      Ele: "Any"                                             },
     2: {Name: "Collei",      Row:-1,          Purchased: -1,   Type: "Bow",        Ele: "Dendro"                                             },
     3: {Name: "Tighnari",    Row:-1,          Purchased: -1,   Type: "Bow",      Ele: "Dendro"                                             },
@@ -112,12 +112,12 @@ var InventoryDefault = {
 };
 
 var eventText = {
-    0: "TEXT ONE - TRIGGER RAIN MINI-GAME",
-    1: "TEXT TWO - GAIN CLICKING BUFF FOR x MINUTES",
-    2: "TEXT THREE - doubles energy gain",
-    3: "TEXT FOUR - permanent increase to energy rate",
-    4: "TEXT FIVE - increases NPS for x ELEMENT",
-    5: "TEXT SIX - gain a golden nut",
+    0: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
+    1: "TEXT TWO - Trigger reaction time minigame (free items + primogem)",
+    2: "TEXT THREE - Trigger waldo minigame (increase click power)",
+    3: "TEXT FOUR - Trigger x2 demo clicking (increase energy)",
+    4: "TEXT FIVE - Pick from 7 boxes (increases NPS for x element)",
+    5: "TEXT SIX - Trigger whack-a-mole (3 x 3 grid get a golden nut)",
 }
 
 var tooltip = {

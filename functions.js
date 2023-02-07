@@ -1,7 +1,7 @@
 // ABBREVIATES NUMBERS TO SHORTER FORM
 function abbrNum(number) {
-   let decPlaces = Math.pow(10, 2);
-   var abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion"];
+   let decPlaces = Math.pow(10, 3);
+   var abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion", " Undecillion", " Duodecillion"];
 
    if (number > 1e6) {
        for (var i = abbrev.length - 1; i >= 0; i--) {
@@ -43,9 +43,9 @@ function randomInteger(min, max) {
 // GENERATE BASE ATK AND COSTS OF NON-WISH HEROES (IF SAVE NOT FOUND)
 function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
     let initBaseCost = 50;
-    let multiplierBaseCost = 2.5;
+    let multiplierBaseCost = 4;
     let initATKCost = 1;
-    let multiplierATKCost = 2.5;
+    let multiplierATKCost = 1.8;
 
     for (let i = 1; i < NONWISHHEROMAX + 1; i++) {
         let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** (i-1)));
@@ -53,8 +53,9 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
         upgradeDict[i]["BaseCost"] = Number(baseCost.toPrecision(3));
         upgradeDict[i]["Level"] = baseLevel;
         
-        let baseATK = Math.round(initATKCost * (multiplierATKCost ** (i-1)));
+        let baseATK = Math.round(initATKCost * (multiplierATKCost **((i-1)*2)));
         upgradeDict[i]["Factor"] = Number(baseATK.toPrecision(3));
+        upgradeDict[i]["Contribution"] = 0;
     }
 
     return upgradeDict;
