@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
     <meta name="google-site-verification" content="0t3askxEnPVFJR9Weog42wM1qUF5l0nH63GhSrtzCfg" />
     <meta name="description" content="Help Nahida on her quest to obtain riches!"/>
+    <meta http-equiv='cache-control' content='no-cache'> 
+    <meta http-equiv='expires' content='0'> 
+    <meta http-equiv='pragma' content='no-cache'>
     <title>nahidaQuest!</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
     <link rel="stylesheet" href="styles.css">
@@ -368,13 +371,15 @@
     }
 
     function chooseEvent() {
-        let randInt = randomInteger(1,4);
-        if (randInt == 1) {
+        let randInt = randomInteger(1,5);
+        if (randInt === 1) {
             rainEvent();
-        } else if (randInt == 2) {
+        } else if (randInt === 2) {
             clickEvent();
-        } else if (randInt == 3) {
+        } else if (randInt === 3) {
             reactionEvent();
+        } else if (randInt === 4) {
+            boxFunction();
         }
     }
 
@@ -402,7 +407,7 @@
                 img.src = "./assets/icon/scarab.webp"
                 img.addEventListener('click', () => {
                     img.remove();
-                    tempScore -= 5;
+                    tempScore -= 10;
                     tempScore = Math.max(0, tempScore);
                     rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier);
                 });
@@ -516,19 +521,97 @@
     }
 
 
-    // EVENT 5 (8 BOXES)
+    // EVENT 5 (7 BOXES)
     function boxFunction() {
         let eventBackdrop = document.createElement("div");
         eventBackdrop.classList.add("event-dark");
 
+        let boxOuterDiv = document.createElement("div");
+        boxOuterDiv.id = "box-outer-div";
+        boxOuterDiv.classList.add("box-outer-div");
+        boxOuterDiv.classList.add("box-event")
         let count = 8;
         while (count--) {
             let boxImageDiv = document.createElement("div");
             boxImageDiv.classList.add("box-image-div");
-            eventBackdrop.appendChild(boxImageDiv);
+
+            let boxImageImg = document.createElement("img");
+            boxImageImg.src = "./assets/icon/box-" + count + ".webp";
+            boxImageImg.id = ("box-" + count);
+            boxImageImg.addEventListener("click", function() {boxOpen(eventBackdrop)})
+
+            boxImageDiv.appendChild(boxImageImg);
+            boxOuterDiv.appendChild(boxImageDiv);
+            if (count == 1) {break};
+        }
+        mainBody.append(eventBackdrop,boxOuterDiv);
+    }
+
+    function boxOpen(eventBackdrop) {
+        console.log("Here")
+        let boxOuter = document.getElementById("box-outer-div")
+        let boxOuterNew = boxOuter.cloneNode(true);
+        boxOuter.parentNode.replaceChild(boxOuterNew, boxOuter);
+
+        let boxOutcome = document.createElement("img");
+        boxOutcome.classList.add("box-outcome");
+        boxOutcome.classList.add("slide-in-blurred-top");
+        let outcomeText;
+        let badOutcomeNumber = 0;
+
+        let boxChance = randomInteger(1,101);
+        if (boxChance >= 40) {
+            let goodOutcome = randomInteger(1,8);
+            boxOutcome.src = "./assets/icon/good-" + goodOutcome + ".webp";
+            outcomeText = "Oh, it had a gemstone! (Increased power for {ele} characters)";
+        } else if (boxChance >= 20) {
+            let badOutcome = randomInteger(1,5);
+            boxOutcome.src = "./assets/icon/bad-" + badOutcome + ".webp";
+
+            let badOutcomePercentage = randomInteger(10,16);
+            outcomeText = "Uh oh, an enemy was hiding in there! (Lost " +badOutcomePercentage+"% of  Nuts)";
+            badOutcomePercentage = badOutcomePercentage/100;
+            badOutcomeNumber = (saveValues.realScore * badOutcomePercentage);
+        } else if (boxChance >= 5) {
+            let veryGoodOutcome = randomInteger(1,4);
+            boxOutcome.src = "./assets/icon/verygood-" + veryGoodOutcome + ".webp";
+            outcomeText = "Oh! it had a precious gemstone! (Increased power for all characters)";
+        } else {
+            boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
+            
+            let badOutcomePercentage = randomInteger(40,61);
+            outcomeText = "Uh oh! Run! (Lost " +badOutcomePercentage+ "% of Nuts LOL LOSER)";
+            badOutcomePercentage = badOutcomePercentage/100;
+            badOutcomeNumber = (saveValues.realScore * badOutcomePercentage);
         }
 
-        mainBody.appendChild(eventBackdrop)
+        boxOuterNew.appendChild(boxOutcome);
+        let boxText = document.createElement("div");
+        let boxTextBackground = document.createElement("div");
+        let boxTextDiv = document.createElement("p");
+
+        boxText.classList.add("event-rain-text");
+        boxText.id = "box-text"
+        boxTextDiv.innerText = outcomeText;
+        boxText.append(boxTextBackground,boxTextDiv)
+        
+        setTimeout(()=> {
+            boxOuterNew.remove();
+            eventBackdrop.remove();
+        },4000);
+
+        setTimeout(()=> {
+            mainBody.appendChild(boxText);
+            setTimeout(()=> {
+                boxText.classList.add("slide-out-animation");
+                boxText.addEventListener("animationend",() => {
+                    boxText.remove()
+                    if (badOutcomeNumber !== 0) {
+                        saveValues.realScore -= badOutcomeNumber;
+                    }
+                });
+            },4000)
+        },1000);
     }
 
 
