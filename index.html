@@ -388,30 +388,41 @@
         let rainTextDiv = document.createElement("p");
 
         rainText.classList.add("event-rain-text");
-        let dpsMultiplier = (saveValues.dps + 1)* 15;
+        let dpsMultiplier = (saveValues.dps + 1)* 13;
         let tempScore = 0;
         rainTextDiv.innerText = tempScore;
         rainText.append(rainTextBackground,rainTextDiv)
         mainBody.appendChild(rainText);
 
         function spawnRain() {
-            let animation = `rain ${6}s linear`
+            let animation = `rain ${(randomInteger(8,12)/2)}s linear`
+            let type = randomInteger(1,9);
             var img = document.createElement("img");
-            img.src = "./assets/icon/tab3.png";
-            img.style.top = 0;
+            if (type >= 7) {
+                img.src = "./assets/icon/scarab.webp"
+                img.addEventListener('click', () => {
+                    img.remove();
+                    tempScore -= 5;
+                    tempScore = Math.max(0, tempScore);
+                    rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier);
+                });
+            } else {
+                img.src = "./assets/icon/nut.webp";
+                img.addEventListener('click', () => {
+                    img.remove();
+                    tempScore++;
+                    rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier);
+                });
+            }
+            img.style.top = "-15%";
             img.style.left = `${randomInteger(5,95)}%`
             img.style.animation = animation;
-            img.addEventListener('click', () => {
-                img.remove();
-                tempScore++;
-                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier);
-            });
             img.addEventListener('animationend', () => {img.remove()});
             img.classList.add("raining-image");
             eventBackdrop.append(img);
         }
 
-        let rainTimer = setInterval(() => {spawnRain()}, 200);
+        let rainTimer = setInterval(() => {spawnRain()}, 300);
         setTimeout(()=>{
             eventBackdrop.remove();
             clearInterval(rainTimer);
@@ -484,10 +495,10 @@
         outcomeText.id = "outcome-text";
 
         reactionStartElement.pause();
+        reactionCorrectElement.load();
         if (reactionReady == false) {
             outcomeTextDiv.innerText = "You missed!";
         } else if (reactionReady == true) {
-            reactionCorrectElement.load();
             reactionCorrectElement.play();
             adventure(10);
             adventure(10);
@@ -501,7 +512,6 @@
         setTimeout(()=> {
             outcomeText.remove();
             eventBackdrop.remove();
-            
         },4000)
     }
 

@@ -43,17 +43,17 @@ function randomInteger(min, max) {
 // GENERATE BASE ATK AND COSTS OF NON-WISH HEROES (IF SAVE NOT FOUND)
 function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
     let initBaseCost = 50;
-    let multiplierBaseCost = 4;
+    let multiplierBaseCost = 3;
     let initATKCost = 1;
-    let multiplierATKCost = 1.8;
+    let multiplierATKCost = 1.5;
 
     for (let i = 1; i < NONWISHHEROMAX + 1; i++) {
-        let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** (i-1)));
+        let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((i-1)*1.25)));
         let baseLevel = Math.round(0.75 * baseCost);
         upgradeDict[i]["BaseCost"] = Number(baseCost.toPrecision(3));
         upgradeDict[i]["Level"] = baseLevel;
         
-        let baseATK = Math.round(initATKCost * (multiplierATKCost **((i-1)*2)));
+        let baseATK = Math.round(initATKCost * (multiplierATKCost **((i-1)*3.2)));
         upgradeDict[i]["Factor"] = Number(baseATK.toPrecision(3));
         upgradeDict[i]["Contribution"] = 0;
     }
