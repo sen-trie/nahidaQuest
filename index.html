@@ -517,6 +517,23 @@
 
 
     // EVENT 5 (8 BOXES)
+    function boxFunction() {
+        let eventBackdrop = document.createElement("div");
+        eventBackdrop.classList.add("event-dark");
+
+        let count = 8;
+        while (count--) {
+            let boxImageDiv = document.createElement("div");
+            boxImageDiv.classList.add("box-image-div");
+            eventBackdrop.appendChild(boxImageDiv);
+        }
+
+        mainBody.appendChild(eventBackdrop)
+    }
+
+
+
+
     // EVENT 6 (WHACK-A-MOLE)
 
     
