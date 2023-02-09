@@ -111,7 +111,8 @@
     var table5 = document.getElementById("table5");
     var table5Container = document.getElementById("table5-container");
     var table6 = document.getElementById("table6");
-    var TABS = [table1,table2, table3, table4, table5Container];
+    var table7 = document.getElementById("table7");
+    var TABS = [table1,table2, table3, table4, table5Container,table7];
     var tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,tooltipWeaponImg,tooltipElementImg,table6Background;
 
     // TOOLTIPS FOR EXPEDITION
@@ -161,12 +162,11 @@
     createTabs();
     tabChange(1);
     
+    
     //------------------------------------------------------------------------GAME FUNCTIONS------------------------------------------------------------------------//
-    window.addEventListener("load", function() {
-        setTimeout(function() {
-            window.scrollTo(0, 1);
-        }, 100);
-    });
+    // window.oncontextmenu = function () {
+    //     return false;
+    // };
 
     // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH FREQUENCY SET TO TIME RATIO)
     function timerEvents() {
@@ -289,6 +289,7 @@
         img.classList.add("falling-image");
         leftDiv.appendChild(img);
     });
+
     demoFunction(demoContainer,demoImg);
     demoContainer.appendChild(demoImg);
     
@@ -333,6 +334,7 @@
         let eventPicture = document.createElement("div");
         eventPicture.classList.add("random-event");
         eventPicture.addEventListener("click", () => {clickedEvent();eventPicture.remove()});
+
         setTimeout(() => {eventPicture.remove()}, 10000);
         eventPicture.style.left = randomInteger(10,90) + "%";
         eventPicture.style.top = randomInteger(10,90) + "%";
@@ -517,7 +519,7 @@
         setTimeout(()=> {
             outcomeText.remove();
             eventBackdrop.remove();
-        },4000)
+        },3000)
     }
 
 
@@ -635,8 +637,8 @@
             overlay.removeChild(overlay.firstElementChild);
             overlay.classList.remove("overlay");
             tutorial();
+            document.documentElement.requestFullscreen();
         }, 200);
-        
     }
 
     // SETUP AUDIO API
@@ -721,13 +723,14 @@
     // TAB UI
     function createTabs() {
         let tabFlex = document.getElementById("flex-container-TAB");
-        for (let i=0, len=TABS.length; i < len; i++){
+        for (let i=0, len=(TABS.length - 1); i < len; i++){
             let tabButton = document.createElement("div");
             tabButton.classList += "tab-button-div";
-            let tabButtonImage = document.createElement("img");
 
+            let tabButtonImage = document.createElement("img");
             tabButtonImage.src = "./assets/icon/tab"+ (i + 1) +".png";
             tabButtonImage.classList += "tab-button";
+
             tabButton.id = "tab-" + (i);
             tabButton.addEventListener('click', () =>{
                 tabChange(i + 1);
@@ -737,6 +740,26 @@
         }
     }
 
+    function addShop() {
+        let tabFlex = document.getElementById("flex-container-TAB");
+        let tabButton = document.createElement("div");
+        tabButton.classList += "tab-button-div";
+
+        let tabButtonImage = document.createElement("img");
+        tabButtonImage.src = "./assets/icon/tab"+ (7) +".webp";
+        tabButtonImage.classList += "tab-button";
+        tabButtonImage.classList.add("darken")
+        tabButton.id = "tab-" + (6);
+
+        tabButton.addEventListener('click', () =>{
+                tabChange(7);
+        })
+
+        tabButton.appendChild(tabButtonImage);
+        tabFlex.appendChild(tabButton);
+        newPop(6);
+    }
+
     // CHANGE TABS
     function tabChange(x) {
         if (timerSeconds !== 0) {
@@ -744,11 +767,17 @@
             tabElement.play();
         }
 
-        let i = 5;
+        let i = 7;
+        let tabButton;
         while (i--) {
-            let tabButton = document.getElementById("tab-" + (i));
+            if (document.getElementById("tab-" + (i)) != null) {
+                tabButton = document.getElementById("tab-" + (i));
+            } else {
+                continue;
+            }
+            
             if (!tabButton.firstChild.classList.contains("darken")) {
-                tabButton.firstChild.classList.add("darken")
+                tabButton.firstChild.classList.add("darken");
             }
             if (i == x - 1) {
                 if (tabButton.firstChild.classList.contains("darken")) {
@@ -757,7 +786,10 @@
             }
         }
         
+        console.log(TABS)
         for (let i=0, len=TABS.length; i < len; i++){
+
+           
             TABS[i].style.display = "none";
         }
 
@@ -1438,6 +1470,7 @@
                     randomWishHero = 100;
                     unlockExpedition(5,expeditionDict);
                     newPop(2);
+                    addShop();
                 } else {
                     randomWishHero = randomInteger(WISHHEROMIN, WISHHEROMAX);
                 }
@@ -1643,7 +1676,7 @@
     function clearTooltip() {
         tooltipInterval = setTimeout(() => {
             if (table1.style.display !== "none") {
-                tooltipName.innerText = "Hover over a character for more info!";
+                tooltipName.innerText = "Hover/Hold a character for more info!";
             }
 
             if (table2.style.display !== "none") {
@@ -1742,7 +1775,7 @@
                         saveValues["wishUnlocked"] = true;
                     }
                 }
-                newPop(expeditionCounter + 4);
+                newPop(expeditionCounter + 10);
             }
             expeditionCounter++;
             heroUnlockLevels.shift()
@@ -1752,19 +1785,20 @@
     // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION
     var currentPopUps = [];
     function newPop(type) {
+        console.log(type)
         var newPopUp;
         let className;
         let tabId;
         let place;
 
-        if (type <=3 && type >=0) {
+        if (type <=7 && type >=0) {
             if (newPopUp || currentPopUps.includes(type) == true) {
                 return;
             }
             className = "pop-new-" + (type + 1);
             tabId = "tab-" +  (type).toString();
             place = "tab";
-        } else if (type <=6 && type >=4) {
+        } else if (type >=10) {
             className = "pop-new-corner";
             place = "corner";
         } else {
@@ -1789,7 +1823,7 @@
             newPopUp.classList.add(className);
             let newPopUpImg = document.createElement("img");
             type--;
-            newPopUpImg.src = "./assets/tutorial/unlockExp-"+type+".webp"
+            newPopUpImg.src = "./assets/tutorial/unlockExp-"+(type-6)+".webp"
             newPopUp.appendChild(newPopUpImg)
 
             

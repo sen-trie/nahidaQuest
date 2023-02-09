@@ -54,7 +54,11 @@ function drawMainBody() {
             
             let table6 = document.createElement("div");
             table6.id = "table6";
-        mainTable.append(table1,table2,table3,table4,table5Container,table6);
+
+            let table7 = document.createElement("div");
+            table7.id = "table7";
+
+            mainTable.append(table1,table2,table3,table4,table5Container,table6,table7);
 
         var mainImg =  document.createElement("img");
         mainImg.classList.add("div-img");
