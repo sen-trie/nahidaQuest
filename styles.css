@@ -1634,21 +1634,39 @@ repeat, no-repeat
 }
 
 .shop-button {
+    width: 18%;
+    height: 40%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background-color: #57783b;
 }
 
-.shop-button > img {
-    width:90%;
-    height: 70%;
+.shop-button-container > img {
+    width: 100%;
     object-fit: contain;
 }
 
-.store-div > div {
-    width: 17%;
-    height: 42%;
+.shop-button-text {
+    height: 20%;
+    width: 100%;
+    text-align: center;
+}
+
+.shop-button-text {
+    height: 20%;
+    width: 100%;
+    text-align: center;
+}
+
+.shop-button-container {
+    width: 100%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .store-dialog {

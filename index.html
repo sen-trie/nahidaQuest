@@ -570,7 +570,7 @@
             let goodOutcome = randomInteger(1,8);
             boxOutcome.src = "./assets/icon/good-" + goodOutcome + ".webp";
             outcomeText = "Oh, it had a gemstone! (Increased power for " +boxElement[goodOutcome]+ " characters)";
-            itemUse(String(10000+(0.1 * goodOutcome)));
+            itemUse((5000 + goodOutcome));
         } else if (boxChance >= 20) {
             let badOutcome = randomInteger(1,5);
             boxOutcome.src = "./assets/icon/bad-" + badOutcome + ".webp";
@@ -584,7 +584,7 @@
             saveValues.primogem += randomInteger(40,60);
             boxOutcome.src = "./assets/icon/verygood-" + veryGoodOutcome + ".webp";
             outcomeText = "Oh! it had a precious gemstone! (Increased power for all characters)";
-            itemUse(String(10000.0));
+            itemUse(5000);
         } else {
             boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
             
@@ -1200,9 +1200,10 @@
         let buttonInv = document.createElement("button");
         buttonInv.classList.add("button-container");
         buttonInv.id = itemUniqueID;
-        buttonInv.addEventListener('click', () => {
+        buttonInv.addEventListener('click', function() {
             itemUse(itemUniqueID);
-            Inventory[idNum].itemCount--
+            this.remove();
+            Inventory[idNum].itemCount--;
         });
         
         buttonInv.addEventListener('mouseover', () => {changeTooltip(Inventory[idNum].Name, "item", Inventory[idNum].Star)})
@@ -1219,14 +1220,15 @@
     function itemUse(itemUniqueId) {
         let item = document.getElementById(itemUniqueId);
         let itemID = itemUniqueId.split(".")[0];
-        if (itemID >= 1001 && itemID < WEAPONMAX){
+        if ((itemID >= 1001 && itemID < WEAPONMAX) || (itemID >= 7000 && itemID < 7030)){
             for (let i = 0, len=WISHHEROMAX; i < len; i++) {
                 if (upgradeDict[i] == undefined) continue;
                 if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
-                if (upgradeDict[i].Purchased > 0){
-                    if (upgradeDict[i].Type == Inventory[itemID].Type){
-                        upgradeDict[i]["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
-                        upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
+                let upgradeDictTemp = upgradeDict[i];
+                if (upgradeDictTemp.Purchased > 0){
+                    if (upgradeDictTemp.Type == Inventory[itemID].Type){
+                        upgradeDictTemp["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
+                        upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                         refresh("hero", i);
                     }
                 }
@@ -1235,46 +1237,70 @@
             for (let i = 0, len=WISHHEROMAX; i < len; i++) {
                 if (upgradeDict[i] == undefined) continue;
                 if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
-                if (upgradeDict[i].Purchased > 0){
-                    upgradeDict[i]["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
-                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
+                let upgradeDictTemp = upgradeDict[i];
+                if (upgradeDictTemp.Purchased > 0){
+                    upgradeDictTemp["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
+                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                     refresh("hero", i);
                 }
             }
-        } else if (itemID >= 3001 && itemID <  FOODMAX){
+        } else if (itemID >= 3001 && itemID < FOODMAX){
             foodButton(1);
             foodBuff = foodBuffPercent[Inventory[itemID].Star];
-        } else if (itemID >= 4001 && itemID <  XPMAX){
+        } else if (itemID >= 4001 && itemID < XPMAX){
             saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
             refresh();
-        } else if (itemID >= 10000){
-            let element = itemUniqueId.split(".")[1];
-            if (element === 0) {
-                for (let i = 0, len=WISHHEROMAX; i < len; i++) {
-                    if (upgradeDict[i] == undefined) continue;
-                    if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
-                    if (upgradeDict[i].Purchased > 0){
-                        upgradeDict[i]["Factor"] *= 3;
+        } else if (itemID === 5000) {
+            for (let i = 0, len=WISHHEROMAX; i < len; i++) {
+                if (upgradeDict[i] == undefined) continue;
+                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+                let upgradeDictTemp = upgradeDict[i];
+                if (upgradeDictTemp .Purchased > 0){
+                    upgradeDictTemp["Factor"] *= 3;
+                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
+                    refresh("hero", i);
+               }
+            }
+        } else if (itemID >= 5001 && itemID < 5050){
+            let power;
+            let elem = Inventory[itemID].element;
+            if (Inventory[itemID].Star === 4) {
+                power = 1.5;
+            } else {
+                power = 3;
+            };
+
+            for (let i = 0, len=WISHHEROMAX; i < len; i++) {
+                if (upgradeDict[i] == undefined) continue;
+                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+                if (upgradeDict[i].Purchased > 0)
+                    if (upgradeDict[i].Ele == elem) {
+                        upgradeDict[i]["Factor"] *= power;
+                        upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
+                        refresh("hero", i);
+                }
+            }
+        } else if (itemID >= 6001 && itemID < 6050){
+            let power;
+            let elem = Inventory[itemID].element;
+            if (Inventory[itemID].Star === 4) {
+                power = 2;
+            } else {
+                power = 4;
+            };
+
+            for (let i = 0, len=WISHHEROMAX; i < len; i++) {
+                if (upgradeDict[i] == undefined) continue;
+                if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+                if (upgradeDict[i].Purchased > 0){
+                    if (upgradeDict[i].Nation === Inventory[itemID].nation) {
+                        upgradeDict[i]["Factor"] *= power;
                         upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                         refresh("hero", i);
                     }
                 }
-            } else {
-                for (let i = 0, len=WISHHEROMAX; i < len; i++) {
-                    if (upgradeDict[i] == undefined) continue;
-                    if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
-                    if (upgradeDict[i].Purchased > 0){
-                        if (upgradeDict[i].Ele == boxElement[element] || i == 1){
-                            upgradeDict[i]["Factor"] *= 3;
-                            upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
-                            refresh("hero", i);
-                        }
-                    }
-                }
             }
-            return;
         }
-        item.remove();
     }
 
     // FUNCTIONALITY FOR TEMP FOOD BUFFS (SET TO 30 SECONDS) + RMB TO CHANGE ANIMATION TIME TOO
@@ -1750,25 +1776,7 @@
         shopDiv.classList.add("store-div");
         let i=10;
         while (i--) {
-            let shopButton = document.createElement("div");
-            shopButton.classList.add("shop-button");
-            shopButton.id = ("shop-" + i);
-            shopButton.style.background = "url(./assets/frames/background-6.webp)";
-            shopButton.style.backgroundSize = "contain";
-            shopButton.style.backgroundRepeat = "no-repeat";
-            shopButton.addEventListener("click", function() {
-                buyShop(this.id)
-            })
-
-            let shopButtonImage = document.createElement("img");
-            shopButtonImage.src = "./assets/icon/nut.webp";
-            
-
-            let shopButtonText = document.createElement("div");
-            shopButtonText.innerText = "60";
-            
-            shopButton.append(shopButtonImage,shopButtonText);
-            shopDiv.append(shopButton);
+            createShopItems(shopDiv);
         }
 
         let shopDialogueDiv = document.createElement("div");
@@ -1796,6 +1804,35 @@
         }
     }
     
+    function createShopItems(shopDiv) {
+        let shopButton = document.createElement("div");
+            shopButton.classList.add("shop-button");
+            shopButton.id = ("shop-" + i);
+            
+            shopButton.addEventListener("click", function() {
+                buyShop(this.id)
+            })
+
+            let shopButtonImage = document.createElement("img");
+            shopButtonImage.src = "./assets/icon/nut.webp";
+
+            let shopButtonImageContainer = document.createElement("div");
+            shopButtonImageContainer.classList.add("shop-button-container")
+            shopButtonImageContainer.style.background = "url(./assets/frames/background-6.webp)";
+            shopButtonImageContainer.style.backgroundSize = "contain";
+            shopButtonImageContainer.style.backgroundPosition = "center center";
+            shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
+            
+            let shopButtonText = document.createElement("div");
+            shopButtonText.classList.add("shop-button-text")
+            shopButtonText.innerText = "60";
+            
+            shopButtonImageContainer.appendChild(shopButtonImage);
+            shopButton.append(shopButtonImageContainer,shopButtonText);
+            shopDiv.append(shopButton);
+
+            return shopDiv;
+    }
 
     //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
     // REFRESH SCORES & ENERGY
