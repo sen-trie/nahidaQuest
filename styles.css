@@ -881,7 +881,7 @@ circle {
     height: 100%;
     object-fit: contain;
     transition: 0.08s ease;
-    animation: rotation 18s infinite linear;
+    animation: rotation 18s infinite linear forwards;
 }
 
 @keyframes rotation {
@@ -901,7 +901,7 @@ circle {
     color: rgb(10, 52, 18);
     text-shadow: 2px 2px 0px #fbfbfb;
     position: absolute;
-    animation: fadeOutOpacity 1.5s cubic-bezier(.02,.97,.91,.14);
+    animation: fadeOutOpacity 1.5s cubic-bezier(.02,.97,.91,.14) forwards;
     z-index: 13;
     pointer-events: none;
 }
@@ -1421,7 +1421,7 @@ repeat, no-repeat
     background-size: 100%;
     background-position: 5px center;
     background-repeat: no-repeat;
-    animation: fadeOut 3s cubic-bezier(.93,-0.24,.93,.81);
+    animation: fadeOut 3s cubic-bezier(.93,-0.24,.93,.81) forwards;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1594,4 +1594,98 @@ repeat, no-repeat
 
 .tool-tip-extraimg img{
     width: 47.5%;
+}
+
+/*/////////////////////// SHOP CSS (TABLE 7) ///////////////////////////////*/
+#table7 {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 2%;
+    position: relative;
+}
+
+#table7 > div {
+    position: relative;
+    top: 2%;
+}
+
+.store-timer {
+    width: 50%;
+    height: 10%;
+    background-color: aquamarine;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.store-div {
+    width: 85%;
+    height: 60%;
+    gap: 1%;
+    background-color: pink;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content:space-evenly;
+    align-items: center;
+}
+
+.shop-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.shop-button > img {
+    width:90%;
+    height: 70%;
+    object-fit: contain;
+}
+
+.store-div > div {
+    width: 17%;
+    height: 42%;
+}
+
+.store-dialog {
+    position: relative;
+    left: 5%;
+    width: 75%;
+    height: 20%;
+    background-color: yellow;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#table7-text {
+    width: 70%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: orange;
+    
+}
+
+.store-buy {
+    width:20%;
+    height: 90%;
+    background-color: darkviolet;
+}
+
+#table7 > img {
+    position: absolute;
+    width: 30%;
+    height: 25%;
+    bottom: 0;
+    left: 0;
+    object-fit: contain;
+    z-index: 5;
 }

@@ -139,6 +139,7 @@
     createExpedTable(expedTooltip);
     table3.appendChild(expedTooltip);
     createTooltip();
+    setShop();
     settings();           
     
     drawWish();
@@ -279,7 +280,7 @@
 
         demoContainer = floatText(demoContainer,abbrNum(saveValues["clickFactor"]),randomInteger(20,80),randomInteger(70,100));
         let number = randomInteger(2,6);
-        let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04)`
+        let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`
 
         var img = document.createElement("img");
         img.src = "./assets/icon/primogemIcon.png";
@@ -373,16 +374,17 @@
     }
 
     function chooseEvent() {
-        let randInt = randomInteger(1,5);
-        if (randInt === 1) {
-            rainEvent();
-        } else if (randInt === 2) {
-            clickEvent();
-        } else if (randInt === 3) {
-            reactionEvent();
-        } else if (randInt === 4) {
-            boxFunction();
-        }
+        boxFunction();
+        // let randInt = randomInteger(1,5);
+        // if (randInt === 1) {
+        //     rainEvent();
+        // } else if (randInt === 2) {
+        //     clickEvent();
+        // } else if (randInt === 3) {
+        //     reactionEvent();
+        // } else if (randInt === 4) {
+        //     boxFunction();
+        // }
     }
 
     // EVENT 1 (RAIN)
@@ -402,7 +404,7 @@
         mainBody.appendChild(rainText);
 
         function spawnRain() {
-            let animation = `rain ${(randomInteger(8,12)/2)}s linear`
+            let animation = `rain ${(randomInteger(8,12)/2)}s linear forwards`
             let type = randomInteger(1,9);
             var img = document.createElement("img");
             if (type >= 7) {
@@ -431,25 +433,26 @@
 
         let rainTimer = setInterval(() => {spawnRain()}, 300);
         setTimeout(()=>{
-            eventBackdrop.remove();
             clearInterval(rainTimer);
-            rainText.classList.add("text-pop");
-            rainText.addEventListener('animationend', () => {
-                rainText.remove();
-                saveValues.realScore += tempScore * dpsMultiplier;
-            })
-        }, 30000);
-        mainBody.append(eventBackdrop)
+            setTimeout(()=>{
+                eventBackdrop.remove();   
+                rainText.classList.add("text-pop");
+                rainText.addEventListener('animationend', () => {
+                    rainText.remove();
+                    saveValues.realScore += tempScore * dpsMultiplier;
+            }),2000})
+        }, 28000);
+        mainBody.append(eventBackdrop);
     }
 
     // EVENT 2 (ENERGY OVERLOAD)
     function clickEvent() {
         let button = demoContainer.firstElementChild;
-        button.style.animation = "rotation-scale 5s infinite linear";
+        button.style.animation = "rotation-scale 5s infinite linear forwards";
         button.style["box-shadow"] = "inset 0em 0em 6em #93d961";
 
         setTimeout(() => {
-            button.style.animation = "rotation 18s infinite linear"
+            button.style.animation = "rotation 18s infinite linear forwards";
             button.style["box-shadow"] = "";
         },20000)
     }
@@ -463,20 +466,20 @@
         eventBackdrop.classList.add("event-dark");
 
         let reactionImage = document.createElement("img");
-        reactionImage.src = "./assets/clock1.webp"
+        reactionImage.src = "./assets/clock1.webp";
         reactionImage.id = "reaction-image";
 
         let reactionButton = document.createElement("div");
         reactionButton.id = "reaction-button";
-        reactionButton.innerText = "Not yet..."
-        reactionButton.addEventListener("click",()=>{reactionFunction(eventBackdrop)})
+        reactionButton.innerText = "Not yet...";
+        reactionButton.addEventListener("click",()=>{reactionFunction(eventBackdrop)});
 
         reactionStartElement.load();
         reactionStartElement.play();
         reactionStartElement.addEventListener("ended", ()=> {
             if (reactionGame == true) {
                 reactionReady = true;
-                reactionButton.innerText = "Now!"
+                reactionButton.innerText = "Now!";
                 reactionImage.src = "./assets/clock2.webp";
                 setTimeout(() => {
                     if (reactionGame == true) {
@@ -509,6 +512,7 @@
             reactionCorrectElement.play();
             adventure(10);
             adventure(10);
+            saveValues.primogem += randomInteger(40,60);
             outcomeTextDiv.innerText = "You did it!";
         }
 
@@ -549,8 +553,8 @@
         mainBody.append(eventBackdrop,boxOuterDiv);
     }
 
+    var boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
     function boxOpen(eventBackdrop) {
-        console.log("Here")
         let boxOuter = document.getElementById("box-outer-div")
         let boxOuterNew = boxOuter.cloneNode(true);
         boxOuter.parentNode.replaceChild(boxOuterNew, boxOuter);
@@ -565,7 +569,8 @@
         if (boxChance >= 40) {
             let goodOutcome = randomInteger(1,8);
             boxOutcome.src = "./assets/icon/good-" + goodOutcome + ".webp";
-            outcomeText = "Oh, it had a gemstone! (Increased power for {ele} characters)";
+            outcomeText = "Oh, it had a gemstone! (Increased power for " +boxElement[goodOutcome]+ " characters)";
+            itemUse(String(10000+(0.1 * goodOutcome)));
         } else if (boxChance >= 20) {
             let badOutcome = randomInteger(1,5);
             boxOutcome.src = "./assets/icon/bad-" + badOutcome + ".webp";
@@ -576,8 +581,10 @@
             badOutcomeNumber = (saveValues.realScore * badOutcomePercentage);
         } else if (boxChance >= 5) {
             let veryGoodOutcome = randomInteger(1,4);
+            saveValues.primogem += randomInteger(40,60);
             boxOutcome.src = "./assets/icon/verygood-" + veryGoodOutcome + ".webp";
             outcomeText = "Oh! it had a precious gemstone! (Increased power for all characters)";
+            itemUse(String(10000.0));
         } else {
             boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
             
@@ -637,7 +644,6 @@
             overlay.removeChild(overlay.firstElementChild);
             overlay.classList.remove("overlay");
             tutorial();
-            document.documentElement.requestFullscreen();
         }, 200);
     }
 
@@ -693,6 +699,12 @@
                 timer = setInterval(timerEvents,timeRatio);
                 currentBGM = playAudio();
                 settingsVolume();
+
+                if (document.fullscreenEnabled) {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen();
+                    }
+                }
                 return;
             }
 
@@ -738,8 +750,13 @@
             tabButton.appendChild(tabButtonImage);
             tabFlex.appendChild(tabButton);
         }
+
+        if (upgradeDict[100].Row !== -1) {
+            addShop();
+         }
     }
 
+    // ADDS MID-GAME SHOP TAB
     function addShop() {
         let tabFlex = document.getElementById("flex-container-TAB");
         let tabButton = document.createElement("div");
@@ -752,12 +769,11 @@
         tabButton.id = "tab-" + (6);
 
         tabButton.addEventListener('click', () =>{
-                tabChange(7);
+                tabChange(6);
         })
 
         tabButton.appendChild(tabButtonImage);
         tabFlex.appendChild(tabButton);
-        newPop(6);
     }
 
     // CHANGE TABS
@@ -786,13 +802,13 @@
             }
         }
         
-        console.log(TABS)
         for (let i=0, len=TABS.length; i < len; i++){
-
-           
-            TABS[i].style.display = "none";
+            if (TABS[i].style.display !== "none") {
+                TABS[i].style.display = "none";
+            }
         }
 
+        clearTooltip();
         x--;
         TABS[x].style.display = "flex";
 
@@ -806,7 +822,6 @@
             let mailImageTemp = document.getElementById("mailImageID")
              mailImageTemp.style.opacity = 1;
          }
-         clearTooltip();
     }
     
     // SETTINGS MENU - SAVES & VOLUME CONTROL
@@ -1198,9 +1213,9 @@
 
     // INVENTORY FUNCTIONALITY
     // RMB TO UPDATE CONSTANTS
-    const weaponBuffPercent = [0, 1.1, 1.3, 1.7, 2.3, 3];
-    const artifactBuffPercent = [0, 1.02, 1.05, 1.10, 1.20, 1.35];
-    const foodBuffPercent = [0, 1.2, 1.6, 2.2, 3.0, 4.0];
+    const weaponBuffPercent = [0, 1.2, 1.8, 2.7, 3.9, 5.2, 10];
+    const artifactBuffPercent = [0, 1.1, 1.3, 1.7, 2.3, 3.0];
+    const foodBuffPercent = [0, 1.4, 2.0, 3.0, 4.4, 6.2];
     function itemUse(itemUniqueId) {
         let item = document.getElementById(itemUniqueId);
         let itemID = itemUniqueId.split(".")[0];
@@ -1232,6 +1247,32 @@
         } else if (itemID >= 4001 && itemID <  XPMAX){
             saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
             refresh();
+        } else if (itemID >= 10000){
+            let element = itemUniqueId.split(".")[1];
+            if (element === 0) {
+                for (let i = 0, len=WISHHEROMAX; i < len; i++) {
+                    if (upgradeDict[i] == undefined) continue;
+                    if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+                    if (upgradeDict[i].Purchased > 0){
+                        upgradeDict[i]["Factor"] *= 3;
+                        upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
+                        refresh("hero", i);
+                    }
+                }
+            } else {
+                for (let i = 0, len=WISHHEROMAX; i < len; i++) {
+                    if (upgradeDict[i] == undefined) continue;
+                    if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+                    if (upgradeDict[i].Purchased > 0){
+                        if (upgradeDict[i].Ele == boxElement[element] || i == 1){
+                            upgradeDict[i]["Factor"] *= 3;
+                            upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
+                            refresh("hero", i);
+                        }
+                    }
+                }
+            }
+            return;
         }
         item.remove();
     }
@@ -1471,6 +1512,7 @@
                     unlockExpedition(5,expeditionDict);
                     newPop(2);
                     addShop();
+                    newPop(6);
                 } else {
                     randomWishHero = randomInteger(WISHHEROMIN, WISHHEROMAX);
                 }
@@ -1693,6 +1735,68 @@
             }, 100)
     }
 
+    //------------------------------------------------------------------------TABLE 7 (STORE)------------------------------------------------------------------------//
+    function setShop() {
+        table7.classList.add("table-without-tooltip");
+
+        let shopImg = document.createElement("img");
+        shopImg.src = "./assets/shop.webp";
+
+        let shopTimer = document.createElement("div");
+        shopTimer.classList.add("store-timer");
+        shopTimer.innerText = "Inventory resets in: " + Date.now();
+
+        let shopDiv = document.createElement("div");
+        shopDiv.classList.add("store-div");
+        let i=10;
+        while (i--) {
+            let shopButton = document.createElement("div");
+            shopButton.classList.add("shop-button");
+            shopButton.id = ("shop-" + i);
+            shopButton.style.background = "url(./assets/frames/background-6.webp)";
+            shopButton.style.backgroundSize = "contain";
+            shopButton.style.backgroundRepeat = "no-repeat";
+            shopButton.addEventListener("click", function() {
+                buyShop(this.id)
+            })
+
+            let shopButtonImage = document.createElement("img");
+            shopButtonImage.src = "./assets/icon/nut.webp";
+            
+
+            let shopButtonText = document.createElement("div");
+            shopButtonText.innerText = "60";
+            
+            shopButton.append(shopButtonImage,shopButtonText);
+            shopDiv.append(shopButton);
+        }
+
+        let shopDialogueDiv = document.createElement("div");
+        shopDialogueDiv.classList.add("store-dialog");
+
+        let shopDialogueButton = document.createElement("div");
+        shopDialogueButton.classList.add("store-buy");
+        let shopDialogueText = document.createElement("div");
+        shopDialogueText.id = "table7-text";
+
+        shopDialogueDiv.append(shopDialogueText,shopDialogueButton)
+        table7.append(shopImg,shopTimer,shopDiv,shopDialogueDiv);
+    }
+
+    var shopId;
+    function buyShop(id) {
+        let dialog = document.getElementById("table7-text");
+
+        if (shopId == id) {
+            dialog.innerText = "";
+            shopId = null;
+        } else {
+            dialog.innerText = "Are you sure? Remember, no refunds!";
+            shopId = id;
+        }
+    }
+    
+
     //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
     // REFRESH SCORES & ENERGY
     function refresh() {
@@ -1785,7 +1889,6 @@
     // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION
     var currentPopUps = [];
     function newPop(type) {
-        console.log(type)
         var newPopUp;
         let className;
         let tabId;
@@ -1823,19 +1926,18 @@
             newPopUp.classList.add(className);
             let newPopUpImg = document.createElement("img");
             type--;
-            newPopUpImg.src = "./assets/tutorial/unlockExp-"+(type-6)+".webp"
-            newPopUp.appendChild(newPopUpImg)
+            newPopUpImg.src = "./assets/tutorial/unlockExp-"+(type-6)+".webp";
+            newPopUp.appendChild(newPopUpImg);
 
-            
             setTimeout(() => {
                 newPopUp.addEventListener("click", () => {
                     if (newPopUp != null) {
                         newPopUp.remove();
                     }
                 });
-            }, 2000)
+            }, 2000);
 
-            setTimeout(() => newPopUp.remove(), 13000)
+            setTimeout(() => newPopUp.remove(), 13000);
             let mainBody = document.getElementById("game");    
             mainBody.append(newPopUp);
         }    
