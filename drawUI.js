@@ -9,58 +9,65 @@ function drawMainBody() {
 
     // RIGHT DIV/AREA
     var rightDiv = document.getElementById("right-div");
-        let TabDiv = document.createElement("div");
-        TabDiv.id = "flex-container-TAB";
-        let TabDivImg = document.createElement("img");
-        TabDivImg.src = "./assets/top-bar.png";
-        TabDivImg.classList.add("top-bar")
-        TabDiv.appendChild(TabDivImg);
+    let TabDiv = document.createElement("div");
+    TabDiv.id = "flex-container-TAB";
+    let TabDivImg = document.createElement("img");
+    TabDivImg.src = "./assets/top-bar.png";
+    TabDivImg.classList.add("top-bar")
+    TabDiv.appendChild(TabDivImg);
 
-        let mainTable = document.createElement("div");
-            mainTable.classList.add("main-table")
+    let mainTable = document.createElement("div");
+    mainTable.classList.add("main-table")
 
-            let table1 = document.createElement("div");
-            table1.classList.add("table-with-tooltip");
-            table1.id = "table1";
+    // TABLE 1
+    let table1 = document.createElement("div");
+    table1.classList.add("table-with-tooltip");
+    table1.id = "table1";
 
-            let table2 = document.createElement("div");
-            table2.classList += ("flex-container-INVENTORY table-with-tooltip")
-            table2.id = "table2";
+    // TABLE 2
+    let table2 = document.createElement("div");
+    table2.classList += ("flex-container-INVENTORY table-with-tooltip")
+    table2.id = "table2";
 
-            let table3 = document.createElement("div");
-            table3.classList += ("flex-container-EXPEDITION table-without-tooltip");
-            table3.id = "table3";
-            let table3Div = document.createElement("div");
-            table3Div.id = "expedDiv";
-            let table3Tooltip = document.createElement("div");
-            table3Tooltip.id = "expedTooltip";
-            table3Tooltip.classList = "tooltipEXPED";
-            table3.append(table3Div,table3Tooltip);
+    // TABLE 3
+    let table3 = document.createElement("div");
+    table3.classList += ("flex-container-EXPEDITION table-without-tooltip");
+    table3.id = "table3";
+    let table3Div = document.createElement("div");
+    table3Div.id = "expedDiv";
+    let table3Tooltip = document.createElement("div");
+    table3Tooltip.id = "expedTooltip";
+    table3Tooltip.classList = "tooltipEXPED";
+    table3.append(table3Div,table3Tooltip);
 
-            let table4 = document.createElement("div");
-            table4.classList += ("wish-counter table-without-tooltip")
-            table4.id = "table4"
+    // TABLE 4
+    let table4 = document.createElement("div");
+    table4.classList += ("wish-counter table-without-tooltip")
+    table4.id = "table4"
 
-            let table5Container = document.createElement("div");
-            table5Container.classList += ("table-without-tooltip");
-            let table5Image = document.createElement("div");
-            table5Image.classList += ("table5-Image");
+    // TABLE 5
+    let table5Container = document.createElement("div");
+    table5Container.classList += ("table-without-tooltip");
+    let table5Image = document.createElement("div");
+    table5Image.classList += ("table5-Image");
 
-            let table5 = document.createElement("div");
-            table5.classList += ("flex-container-ACHIEVEMENT");
-            table5.id = "table5";
-            table5Container.id = "table5-container";
-            table5Container.append(table5Image,table5);
-            
-            let table6 = document.createElement("div");
-            table6.id = "table6";
+    let table5 = document.createElement("div");
+    table5.classList += ("flex-container-ACHIEVEMENT");
+    table5.id = "table5";
+    table5Container.id = "table5-container";
+    table5Container.append(table5Image,table5);
+    
+    // TABLE 6
+    let table6 = document.createElement("div");
+    table6.id = "table6";
 
-            let table7 = document.createElement("div");
-            table7.id = "table7";
+    // TABLE 7
+    let table7 = document.createElement("div");
+    table7.id = "table7";
 
-            mainTable.append(table1,table2,table3,table4,table5Container,table6,table7);
+    mainTable.append(table1,table2,table3,table4,table5Container,table6,table7);
 
-        var mainImg =  document.createElement("img");
+var mainImg =  document.createElement("img");
         mainImg.classList.add("div-img");
         mainImg.src = "./assets/main-bar.png";
     rightDiv.append(TabDiv,mainTable,mainImg);

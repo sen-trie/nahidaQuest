@@ -19,6 +19,16 @@ img {
     -ms-user-select: none;
  }
 
+.version-text {
+    position: absolute;
+    color: rgb(255, 255, 255);
+    bottom: 0;
+    right: 0;
+    z-index: 5000;
+    font-size: 0.75em;
+    text-shadow: 0.1em 0.1em 0.15em black;
+}
+
   /* @media (min-aspect-ratio: 12/7) {
     #game {
       width: 100%;
