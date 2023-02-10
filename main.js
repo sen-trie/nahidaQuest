@@ -3,17 +3,17 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.1.9-2-23"
+const VERSIONNUMBER = "v0.1.10-2-23"
 var saveValues;
 const ENERGYCHANCE = 500;
-const upperEnergyRate = 15;
-const lowerEnergyRate = 7;
+var upperEnergyRate = 20;
+var lowerEnergyRate = 10;
 const COSTRATIO = 1.15;
 var clickDelay = 10;
 
-const WEAPONMAX = 1161;
-const ARTIFACTMAX = 2104;
-const FOODMAX = 3003;
+const WEAPONMAX = 1300;
+const ARTIFACTMAX = 2150;
+const FOODMAX = 3150;
 const XPMAX = 4004;
 
 const NONWISHHEROMAX = 49
@@ -63,6 +63,7 @@ var tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,
 var expedContainer = document.getElementById("table3");
 
 // INITIAL LOADING
+var InventoryMap;
 loadSaveData();
 loadingAnimation();
 var upgradeDict;
@@ -180,12 +181,22 @@ function loadSaveData() {
     }
     // LOAD INVENTORY DATA
     if (localStorage.getItem("InventorySave") == null) {
+        InventoryMap = new Map();
         Inventory = InventoryDefault;
+        let i = 10;
+        while (i--) {
+            for (let j = (i * 1000); j <= (i * 1000 + 100); j++) {
+                InventoryMap.set(j, 0);
+            }
+        }
     } else {
         let InventoryTemp = localStorage.getItem("InventorySave");
-        Inventory = JSON.parse(InventoryTemp);
+        InventoryMap = new Map(JSON.parse(InventoryTemp));
+        Inventory = InventoryDefault;
         inventoryload();
     }
+
+    
     // LOAD EXPEDITION DATA
     if (localStorage.getItem("expeditionDictSave") == null) {
         expeditionDict = expeditionDictDefault;
@@ -333,8 +344,8 @@ function clickedEvent() {
 }
 
 function chooseEvent() {
-    clickEvent();
-    // boxFunction();
+    //clickEvent();
+     boxFunction();
     // let randInt = randomInteger(1,5);
     // if (randInt === 1) {
     //     rainEvent();
@@ -527,14 +538,19 @@ function boxOpen(eventBackdrop) {
     boxOutcome.classList.add("slide-in-blurred-top");
     let outcomeText;
     let badOutcomeNumber = 0;
+    let goodOutcomeNumber = 0;
 
     let boxChance = randomInteger(1,101);
-    if (boxChance >= 40) {
+    if (boxChance >= 60) {
+        goodOutcomeNumber = randomInteger(60,160);
+        boxOutcome.src = "./assets/icon/primogemLarge.webp";
+        outcomeText = "The box contained primogems! (Gain "+goodOutcomeNumber+" Primogems)";
+    } else if (boxChance >= 25) {
         let goodOutcome = randomInteger(1,8);
         boxOutcome.src = "./assets/icon/good-" + goodOutcome + ".webp";
         outcomeText = "Oh, it had a gemstone! (Increased power for " +boxElement[goodOutcome]+ " characters)";
-        itemUse((5000 + goodOutcome));
-    } else if (boxChance >= 20) {
+        goodOutcomeNumber = 5000.1 + goodOutcome;
+    } else if (boxChance >= 15) {
         let badOutcome = randomInteger(1,5);
         boxOutcome.src = "./assets/icon/bad-" + badOutcome + ".webp";
 
@@ -547,7 +563,7 @@ function boxOpen(eventBackdrop) {
         saveValues.primogem += randomInteger(40,60);
         boxOutcome.src = "./assets/icon/verygood-" + veryGoodOutcome + ".webp";
         outcomeText = "Oh! It had a precious gemstone!! (Increased power for all characters)";
-        itemUse(5000);
+        goodOutcomeNumber = 5000.1;
     } else {
         boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
         
@@ -580,6 +596,10 @@ function boxOpen(eventBackdrop) {
                 boxText.remove()
                 if (badOutcomeNumber !== 0) {
                     saveValues.realScore -= badOutcomeNumber;
+                } else if (goodOutcomeNumber >= 50 && goodOutcomeNumber <= 200) {
+                    saveValues.primogem += goodOutcomeNumber
+                } else if (goodOutcomeNumber > 200) {
+                    itemUse(goodOutcomeNumber.toString())
                 }
             });
         },4000)
@@ -690,7 +710,7 @@ function saveData() {
     localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
     localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
     localStorage.setItem("expeditionDictSave", JSON.stringify(expeditionDict));
-    localStorage.setItem("InventorySave", JSON.stringify(Inventory));
+    localStorage.setItem("InventorySave", JSON.stringify(Array.from(InventoryMap)));
     localStorage.setItem("achievementListSave", JSON.stringify(achievementList));
 }
 
@@ -1122,8 +1142,8 @@ function dimHeroButton() {
 function inventoryload() {
     for (let i = 1000, len=getHighestKey(Inventory); i < len; i++) {
         if (Inventory[i] == undefined) continue;
-        if (Inventory[i].itemCount == 0) continue;
-        for (let j = 1, len=Inventory[i].itemCount + 1; j < len; j++) {
+        if (InventoryMap.get(i) == 0) continue;
+        for (let j = 1, len=InventoryMap.get(i) + 1; j < len; j++) {
             inventoryAdd(i, "load", j);
         }
     }
@@ -1133,8 +1153,10 @@ function inventoryload() {
 function inventoryAdd(idNum, type, count) {
     let itemUniqueID;
     if (type != "load") {
-        Inventory[idNum].itemCount++
-        itemUniqueID = idNum + "." + Inventory[idNum].itemCount;
+        let currentValue = InventoryMap.get(idNum);
+        currentValue++;
+        InventoryMap.set(idNum,currentValue)
+        itemUniqueID = idNum + "." + currentValue;
     } else {
         itemUniqueID = idNum + "." + count;
     }
@@ -1144,7 +1166,9 @@ function inventoryAdd(idNum, type, count) {
     buttonInv.addEventListener('click', function() {
         itemUse(itemUniqueID);
         this.remove();
-        Inventory[idNum].itemCount--;
+        let currentValue = InventoryMap.get(idNum);
+        currentValue--;
+        InventoryMap.set(idNum,currentValue);
     });
     
     buttonInv.addEventListener('mouseover', () => {changeTooltip(Inventory[idNum], "item")})
@@ -1160,11 +1184,15 @@ const artifactBuffPercent = [0, 1.1, 1.3, 1.7, 2.3, 3.0];
 const foodBuffPercent = [0, 1.4, 2.0, 3.0, 4.4, 6.2];
 function itemUse(itemUniqueId) {
     let itemID;
+    
     if (typeof itemUniqueId === 'string') {
         itemID = itemUniqueId.split(".")[0];
     } else {
         itemID = itemUniqueId;
     }
+
+    console.log(itemID)
+    console.log(Inventory[itemID].Type)
     
     if ((itemID >= 1001 && itemID < WEAPONMAX) || (itemID >= 7000 && itemID < 7030)){
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
@@ -1213,7 +1241,7 @@ function itemUse(itemUniqueId) {
         if (Inventory[itemID].Star === 4) {
             power = 2;
         } else {
-            power = 6;
+            power = 4;
         };
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
@@ -1228,7 +1256,7 @@ function itemUse(itemUniqueId) {
         }
     } else if (itemID >= 6001 && itemID < 6050){
         let power;
-        let elem = Inventory[itemID].element;
+        let nation = Inventory[itemID].nation;
         if (Inventory[itemID].Star === 4) {
             power = 2;
         } else {
@@ -1239,7 +1267,7 @@ function itemUse(itemUniqueId) {
             if (upgradeDict[i] == undefined) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
             if (upgradeDict[i].Purchased > 0){
-                if (upgradeDict[i].Nation === Inventory[itemID].nation) {
+                if (upgradeDict[i].Nation === nation) {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
@@ -1247,6 +1275,7 @@ function itemUse(itemUniqueId) {
             }
         }
     }
+    clearTooltip();
 }
 
 // FUNCTIONALITY FOR TEMP FOOD BUFFS (SET TO 30 SECONDS) + RMB TO CHANGE ANIMATION TIME TOO
@@ -1352,9 +1381,9 @@ function inventoryDraw(itemType, min, max, type){
         "artifact": ARTIFACTMAX, 
         "food": FOODMAX, 
         "xp": XPMAX,
-        "gem": 5016,
-        "talent": 6009,
-        "specialWeapon": 7017,
+        "gem": 5017,
+        "talent": 6013,
+        "specialWeapon": 7030,
     };
     let lowerInventoryType = {
         "weapon": 1001, 
@@ -1763,9 +1792,9 @@ function setShop() {
     while (i--) {
         let inventoryNumber;
         if (i >= 7 && i <= 10) {
-            inventoryNumber = inventoryDraw("gem", 5,6, "shop");
+            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
         } else if (i >= 2 && i <= 6) {
-            inventoryNumber = inventoryDraw("talent", 3,4, "shop");
+            inventoryNumber = inventoryDraw("talent", 2,4, "shop");
         } else {
             inventoryNumber = inventoryDraw("specialWeapon", 6,6, "shop")
         }
@@ -1778,6 +1807,8 @@ function setShop() {
 
     let shopDialogueButton = document.createElement("div");
     shopDialogueButton.classList.add("store-buy");
+    shopDialogueButton.innerText = "Confirm Purchase"
+    shopDialogueButton.id = "shop-confirm";
     let shopDialogueText = document.createElement("div");
     shopDialogueText.id = "table7-text";
 
@@ -1786,28 +1817,60 @@ function setShop() {
 }
 
 var shopId = null;
-function buyShop(id) {
-    console.log(id)
+function buyShop(id,shopCost) {
     let dialog = document.getElementById("table7-text");
     let button = document.getElementById(id);
+    let confirmButton = document.getElementById("shop-confirm");
+
+    if (button.classList.contains("purchased")) {
+        return;
+    }
 
     if (shopId !== null) {
         let oldButton = document.getElementById(shopId);
         if (oldButton.classList.contains("shadow-pop-tr")) {
             oldButton.classList.remove("shadow-pop-tr");
         }
+        let confirmButtonNew = confirmButton.cloneNode(true);
+        confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
+        confirmButton = confirmButtonNew;
     }
-    
 
     if (shopId == id) {
         dialog.innerText = "";
         shopId = null;
+        let confirmButtonNew = confirmButton.cloneNode(true);
+        confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
     } else {
         dialog.innerText = "Are you sure? Remember, no refunds!";
         button.classList.add("shadow-pop-tr");
+        confirmButton.addEventListener("click", function() {confirmPurchase(shopCost,id)});
         shopId = id;
     }
 }
+
+function confirmPurchase(shopCost,id) {
+    let mainButton = document.getElementById(id);
+    let dialog = document.getElementById("table7-text");
+    if (saveValues.primogem >= shopCost) {
+        id = id.split("-")[2];
+        newPop(1)
+        inventoryAdd(id);
+        sortList("table2");
+        mainButton.classList.remove("shadow-pop-tr");
+        mainButton.classList.add("purchased");
+        saveValues.primogem -= shopCost;
+
+        let confirmButton = document.getElementById("shop-confirm");
+        let confirmButtonNew = confirmButton.cloneNode(true);
+        confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
+        dialog.innerText = "My Mora is mine, and your Mora is mine too! Hehehe."
+    } else {
+        dialog.innerText = "Hmph, come back when you're a little richer."
+        return;
+    }
+}
+
 
 function createShopItems(shopDiv, i, inventoryNumber) {
     let shopButton = document.createElement("div");
@@ -1849,7 +1912,7 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     
     shopButton.id = ("shop-" + i + "-" + inventoryNumber + "-" + shopCost);
     shopButton.addEventListener("click", function() {
-        buyShop(this.id)
+        buyShop(this.id,shopCost)
     })
     
     shopButtonImageContainer.appendChild(shopButtonImage);

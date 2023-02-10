@@ -1744,6 +1744,10 @@ repeat, no-repeat
     background-color: darkviolet;
 }
 
+.purchased {
+    filter: brightness(25%);
+}
+
 #table7 > img {
     position: absolute;
     width: 30%;

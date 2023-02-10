@@ -137,97 +137,102 @@
   </div>
 
     <script type="module">
-      const canvas = document.getElementById("backgroundCanvas");
-      const game = document.getElementById("game");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      resizeCanvasOnWindowResize();
+      
 
-      var barImg =  document.createElement("div");
-    barImg.style.background = "url(./assets/bar.jpg)";
-    barImg.classList.add("bar");
-    game.appendChild(barImg);
+       console.log(map)
 
-    var right = document.createElement("div");
-    right.classList.add("right");
-    game.appendChild(right);
 
-    var topImg =  document.createElement("div");
-    topImg.classList.add("topBar");
-    right.appendChild(topImg);
+  //     const canvas = document.getElementById("backgroundCanvas");
+  //     const game = document.getElementById("game");
+  //     canvas.width = window.innerWidth;
+  //     canvas.height = window.innerHeight;
+  //     resizeCanvasOnWindowResize();
 
-    var topBarImg =  document.createElement("img");
-    topBarImg.src = "./assets/top-bar.png";
-    topBarImg.classList.add("topBarImg")
-    topImg.appendChild(topBarImg)
+  //     var barImg =  document.createElement("div");
+  //   barImg.style.background = "url(./assets/bar.jpg)";
+  //   barImg.classList.add("bar");
+  //   game.appendChild(barImg);
 
-    var table =  document.createElement("div");
-    table.classList.add("table");
-    right.appendChild(table);
+  //   var right = document.createElement("div");
+  //   right.classList.add("right");
+  //   game.appendChild(right);
 
-    var table1 =  document.createElement("div");
-    table1.classList.add("table1");
-    table.appendChild(table1);
+  //   var topImg =  document.createElement("div");
+  //   topImg.classList.add("topBar");
+  //   right.appendChild(topImg);
 
-    var nu = 0;
+  //   var topBarImg =  document.createElement("img");
+  //   topBarImg.src = "./assets/top-bar.png";
+  //   topBarImg.classList.add("topBarImg")
+  //   topImg.appendChild(topBarImg)
 
-    createbutton()
+  //   var table =  document.createElement("div");
+  //   table.classList.add("table");
+  //   right.appendChild(table);
+
+  //   var table1 =  document.createElement("div");
+  //   table1.classList.add("table1");
+  //   table.appendChild(table1);
+
+  //   var nu = 0;
+
+  //   createbutton()
     
-    createbutton()
+  //   createbutton()
     
-    createbutton()
+  //   createbutton()
     
-    createbutton()
+  //   createbutton()
     
-    createbutton()
+  //   createbutton()
     
-    createbutton()
+  //   createbutton()
     
-    createbutton()
+  //   createbutton()
 
     
-    createbutton()
+  //   createbutton()
 
       
-    createbutton()  
-    createbutton()
-    createbutton()
+  //   createbutton()  
+  //   createbutton()
+  //   createbutton()
    
     
-    function createbutton() {
-    let button = document.createElement("div");
-    button.classList.add("upgrade");
-    nu++;
-    button.innerText = nu;
-    table1.appendChild(button);
-  }
+  //   function createbutton() {
+  //   let button = document.createElement("div");
+  //   button.classList.add("upgrade");
+  //   nu++;
+  //   button.innerText = nu;
+  //   table1.appendChild(button);
+  // }
 
 
-    var table2 =  document.createElement("div");
-    table2.classList.add("table2");
-    var topImgImg =  document.createElement("img");
-    topImgImg.classList.add("topImgImg");
-    topImgImg.src = "./assets/tooltips/background.webp";
-    table2.appendChild(topImgImg)
-    table.appendChild(table2);
+  //   var table2 =  document.createElement("div");
+  //   table2.classList.add("table2");
+  //   var topImgImg =  document.createElement("img");
+  //   topImgImg.classList.add("topImgImg");
+  //   topImgImg.src = "./assets/tooltips/background.webp";
+  //   table2.appendChild(topImgImg)
+  //   table.appendChild(table2);
 
     
-    for (let i=5; i--;){
-      let tabButton = document.createElement("button");
-      tabButton.classList += "tab-button";
-      tabButton.style.background = "url(./assets/icon/tab"+ (i + 1) +".png)";
-      tabButton.id = "tab-" + i;
-      topImg.appendChild(tabButton)
-    }
+  //   for (let i=5; i--;){
+  //     let tabButton = document.createElement("button");
+  //     tabButton.classList += "tab-button";
+  //     tabButton.style.background = "url(./assets/icon/tab"+ (i + 1) +".png)";
+  //     tabButton.id = "tab-" + i;
+  //     topImg.appendChild(tabButton)
+  //   }
 
 
 
-      function resizeCanvasOnWindowResize() {
-        window.addEventListener("resize", function() {
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-        });
-      }
+  //     function resizeCanvasOnWindowResize() {
+  //       window.addEventListener("resize", function() {
+  //         canvas.width = window.innerWidth;
+  //         canvas.height = window.innerHeight;
+  //       });
+  //     }
     </script>
 
 
