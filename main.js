@@ -1,4 +1,4 @@
-import { upgradeDictDefault,SettingsDefault,InventoryDefault,tooltip,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText } from "./defaultData.js"
+import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText } from "./defaultData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText } from "./functions.js"
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
@@ -30,6 +30,7 @@ var foodBuff = 1;
 var timeSnapshot1 = 0;
 var timeSnapshot2 = 0;
 var timerAchievement = "";
+var clickerEvent = false;
 
 var demoContainer = document.getElementById("demo-container");
 var score = document.getElementById("score");
@@ -204,13 +205,23 @@ function loadSaveData() {
 
 // BIG BUTTON FUNCTIONS
 var clickAudioDelay = null;
+var currentClick = 1;
 let demoImg = document.createElement("img");
 demoImg.src = "./assets/nahida.png";
 demoImg.classList.add("demo-img");
 
 demoContainer.addEventListener("mouseup", () => {
+    let clickEarn;
     saveValues["clickCount"] += 1;
-    saveValues["realScore"] += 1 * saveValues["clickFactor"];
+    if (clickerEvent === false) {
+        clickEarn = 1 * saveValues["clickFactor"];
+    } else {
+        clickEarn = currentClick;
+        clickDelay -= 10;
+    }
+
+    saveValues["realScore"] += clickEarn;
+    
     energyRoll();
     refresh();
 
@@ -226,7 +237,7 @@ demoContainer.addEventListener("mouseup", () => {
         }
     }
 
-    demoContainer = floatText(demoContainer,abbrNum(saveValues["clickFactor"]),randomInteger(20,80),randomInteger(70,100));
+    demoContainer = floatText(demoContainer,abbrNum(clickEarn),randomInteger(20,80),randomInteger(70,100));
     let number = randomInteger(2,6);
     let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`
 
@@ -322,7 +333,8 @@ function clickedEvent() {
 }
 
 function chooseEvent() {
-    boxFunction();
+    clickEvent();
+    // boxFunction();
     // let randInt = randomInteger(1,5);
     // if (randInt === 1) {
     //     rainEvent();
@@ -398,10 +410,13 @@ function clickEvent() {
     let button = demoContainer.firstElementChild;
     button.style.animation = "rotation-scale 5s infinite linear forwards";
     button.style["box-shadow"] = "inset 0em 0em 6em #93d961";
+    clickerEvent = true;
+    currentClick = 15 * saveValues["dps"];
 
     setTimeout(() => {
         button.style.animation = "rotation 18s infinite linear forwards";
         button.style["box-shadow"] = "";
+        clickerEvent = false;
     },20000)
 }
 
@@ -523,8 +538,8 @@ function boxOpen(eventBackdrop) {
         let badOutcome = randomInteger(1,5);
         boxOutcome.src = "./assets/icon/bad-" + badOutcome + ".webp";
 
-        let badOutcomePercentage = randomInteger(10,16);
-        outcomeText = "Uh oh, an enemy was hiding in there! (Lost " +badOutcomePercentage+"% of  Nuts)";
+        let badOutcomePercentage = randomInteger(5,16);
+        outcomeText = "Uh oh, an enemy was hiding in the box! (Lost " +badOutcomePercentage+"% of  Nuts)";
         badOutcomePercentage = badOutcomePercentage/100;
         badOutcomeNumber = (saveValues.realScore * badOutcomePercentage);
     } else if (boxChance >= 5) {
@@ -536,8 +551,8 @@ function boxOpen(eventBackdrop) {
     } else {
         boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
         
-        let badOutcomePercentage = randomInteger(40,61);
-        outcomeText = "Uh oh! Run! (Lost " +badOutcomePercentage+ "% of Nuts LOL LOSER)";
+        let badOutcomePercentage = randomInteger(35,61);
+        outcomeText = "Uh oh! Run away! (Lost " +badOutcomePercentage+ "% of Nuts LOL LOSER)";
         badOutcomePercentage = badOutcomePercentage/100;
         badOutcomeNumber = (saveValues.realScore * badOutcomePercentage);
     }
@@ -702,26 +717,6 @@ function createTabs() {
     if (upgradeDict[100].Row !== -1) {
         addShop();
         }
-}
-
-// ADDS MID-GAME SHOP TAB
-function addShop() {
-    let tabFlex = document.getElementById("flex-container-TAB");
-    let tabButton = document.createElement("div");
-    tabButton.classList += "tab-button-div";
-
-    let tabButtonImage = document.createElement("img");
-    tabButtonImage.src = "./assets/icon/tab"+ (7) +".webp";
-    tabButtonImage.classList += "tab-button";
-    tabButtonImage.classList.add("darken")
-    tabButton.id = "tab-" + (6);
-
-    tabButton.addEventListener('click', () =>{
-            tabChange(6);
-    })
-
-    tabButton.appendChild(tabButtonImage);
-    tabFlex.appendChild(tabButton);
 }
 
 // CHANGE TABS
@@ -950,9 +945,8 @@ function loadRow() {
 
         let heroID = "but-" + j;
         let heroButtonContainer = createHeroButtonContainer(heroID);
-        let toolName = upgradeDictTemp.Name;
         
-        heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", rowTempDict[j]);});
+        heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(upgradeDictTemp, "hero");});
         heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
         heroButtonContainer.addEventListener("click", () => {
             upgrade(loadedHeroID);
@@ -993,9 +987,9 @@ function addNewRow() {
             // heroCurrentCosts.set(saveValues["rowCount"],upgradeDict[i]["BaseCost"])
             let heroID = "but-" + saveValues["rowCount"];
             let heroButtonContainer = createHeroButtonContainer(heroID);
-            let toolName = upgradeDict[i].Name;
+            let toolName = upgradeDict[i];
             
-            heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero", i)});
+            heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero")});
             heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
             heroButtonContainer.addEventListener("click", () => {
                 upgrade(i);
@@ -1057,7 +1051,7 @@ function upgrade(clicked_id) {
         refresh(butIdArray, upgradeDictTemp["BaseCost"], clicked_id);
             
         clearTooltip();
-        changeTooltip(upgradeDictTemp["Name"],"hero",clicked_id);                   
+        changeTooltip(upgradeDictTemp,"hero");                   
         saveValues["realScore"] = realScoreCurrent;
     }
 }
@@ -1153,7 +1147,7 @@ function inventoryAdd(idNum, type, count) {
         Inventory[idNum].itemCount--;
     });
     
-    buttonInv.addEventListener('mouseover', () => {changeTooltip(Inventory[idNum].Name, "item", Inventory[idNum].Star)})
+    buttonInv.addEventListener('mouseover', () => {changeTooltip(Inventory[idNum], "item")})
     buttonInv.addEventListener('mouseout', () => {clearTooltip()})
     buttonInv = inventoryAddButton(buttonInv,Inventory[idNum])
     table2.appendChild(buttonInv);
@@ -1217,9 +1211,9 @@ function itemUse(itemUniqueId) {
         let power;
         let elem = Inventory[itemID].element;
         if (Inventory[itemID].Star === 4) {
-            power = 1.5;
+            power = 2;
         } else {
-            power = 3;
+            power = 6;
         };
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
@@ -1352,15 +1346,35 @@ function adventure(type) {
 
 
 // DRAWS FOR RANDOM INVENTORY LOOT 
-function inventoryDraw(itemType, min, max){
-    let upperInventoryType = {"weapon": WEAPONMAX, "artifact": ARTIFACTMAX, "food": FOODMAX, "xp": XPMAX};
-    let lowerInventoryType = {"weapon": 1001, "artifact": 2001, "food": 3001, "xp": 4001};
+function inventoryDraw(itemType, min, max, type){
+    let upperInventoryType = {
+        "weapon": WEAPONMAX, 
+        "artifact": ARTIFACTMAX, 
+        "food": FOODMAX, 
+        "xp": XPMAX,
+        "gem": 5016,
+        "talent": 6009,
+        "specialWeapon": 7017,
+    };
+    let lowerInventoryType = {
+        "weapon": 1001, 
+        "artifact": 2001, 
+        "food": 3001, 
+        "xp": 4001,
+        "gem": 5001,
+        "talent": 6001,
+        "specialWeapon": 7001,
+    };
     let drawnItem = 0;
     while (true){
         drawnItem = randomInteger(lowerInventoryType[itemType], upperInventoryType[itemType])
         if (Inventory[drawnItem] == undefined) {continue}
         if (Inventory[drawnItem].Star >= min && Inventory[drawnItem].Star < (max + 1)) {
-            inventoryAdd(drawnItem);
+            if (type === "shop") {
+                return drawnItem;
+            } else {
+                inventoryAdd(drawnItem);
+            }
             break;
         } else {
             continue;
@@ -1668,27 +1682,26 @@ function createTooltip() {
 }
 
 var tooltipInterval = null;
-function changeTooltip(name, type, ID) {
+function changeTooltip(dict, type) {
     if (tooltipInterval !== null) {
         clearInterval(tooltipInterval);
         tooltipInterval = null;
     }
-    tooltipName.innerText = tooltip[name]["name"];
-    tooltipLore.innerText = tooltip[name]["lore"];
+    tooltipName.innerText = dict.Name;
+    tooltipLore.innerText = dict.Lore;
 
     if (type == "hero") {
-        let upgradeDictLocal = upgradeDict;
-        let tooltipTextLocal = "Level: " + upgradeDictLocal[ID]["Purchased"] + 
+        let tooltipTextLocal = "Level: " + dict["Purchased"] + 
                                 "<br />Free Levels: " + saveValues["freeLevels"] + 
-                                "<br />" + abbrNum(upgradeDictLocal[ID]["Contribution"]) + ` ${ID === 0 ? 'Nuts per Click' : 'Nps'}`;
-        toolImgOverlay.src = "./assets/tooltips/hero/"+name+".webp";
-        tooltipElementImg.src = "./assets/tooltips/elements/" +upgradeDictLocal[ID].Ele+ ".webp";
-        tooltipWeaponImg.src = "./assets/tooltips/elements/" +upgradeDictLocal[ID].Type+ ".webp";
+                                "<br />" + abbrNum(dict["Contribution"]) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
+        toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
+        tooltipElementImg.src = "./assets/tooltips/elements/" +dict.Ele+ ".webp";
+        tooltipWeaponImg.src = "./assets/tooltips/elements/" +dict.Type+ ".webp";
         
         tooltipText.innerHTML = tooltipTextLocal;
     } else if (type == "item") {
-        toolImg.src = "./assets/frames/background-" + ID + ".webp";
-        toolImgOverlay.src = "./assets/tooltips/inventory/" + name + ".webp";
+        toolImg.src = "./assets/frames/background-" + dict.Star + ".webp";
+        toolImgOverlay.src = "./assets/tooltips/inventory/" + dict.File + ".webp";
         return;
     }
 }
@@ -1714,6 +1727,26 @@ function clearTooltip() {
 }
 
 //------------------------------------------------------------------------TABLE 7 (STORE)------------------------------------------------------------------------//
+// ADDS MID-GAME SHOP TAB
+function addShop() {
+    let tabFlex = document.getElementById("flex-container-TAB");
+    let tabButton = document.createElement("div");
+    tabButton.classList += "tab-button-div";
+
+    let tabButtonImage = document.createElement("img");
+    tabButtonImage.src = "./assets/icon/tab"+ (7) +".webp";
+    tabButtonImage.classList += "tab-button";
+    tabButtonImage.classList.add("darken")
+    tabButton.id = "tab-" + (6);
+
+    tabButton.addEventListener('click', () =>{
+            tabChange(6);
+    })
+
+    tabButton.appendChild(tabButtonImage);
+    tabFlex.appendChild(tabButton);
+}
+
 function setShop() {
     table7.classList.add("table-without-tooltip");
 
@@ -1728,7 +1761,16 @@ function setShop() {
     shopDiv.classList.add("store-div");
     let i=10;
     while (i--) {
-        createShopItems(shopDiv, i);
+        let inventoryNumber;
+        if (i >= 7 && i <= 10) {
+            inventoryNumber = inventoryDraw("gem", 5,6, "shop");
+        } else if (i >= 2 && i <= 6) {
+            inventoryNumber = inventoryDraw("talent", 3,4, "shop");
+        } else {
+            inventoryNumber = inventoryDraw("specialWeapon", 6,6, "shop")
+        }
+        
+        createShopItems(shopDiv, i, inventoryNumber);
     }
 
     let shopDialogueDiv = document.createElement("div");
@@ -1743,47 +1785,78 @@ function setShop() {
     table7.append(shopImg,shopTimer,shopDiv,shopDialogueDiv);
 }
 
-var shopId;
+var shopId = null;
 function buyShop(id) {
+    console.log(id)
     let dialog = document.getElementById("table7-text");
+    let button = document.getElementById(id);
+
+    if (shopId !== null) {
+        let oldButton = document.getElementById(shopId);
+        if (oldButton.classList.contains("shadow-pop-tr")) {
+            oldButton.classList.remove("shadow-pop-tr");
+        }
+    }
+    
 
     if (shopId == id) {
         dialog.innerText = "";
         shopId = null;
     } else {
         dialog.innerText = "Are you sure? Remember, no refunds!";
+        button.classList.add("shadow-pop-tr");
         shopId = id;
     }
 }
 
-function createShopItems(shopDiv, i) {
+function createShopItems(shopDiv, i, inventoryNumber) {
     let shopButton = document.createElement("div");
-        shopButton.classList.add("shop-button");
-        shopButton.id = ("shop-" + i);
-        
-        shopButton.addEventListener("click", function() {
-            buyShop(this.id)
-        })
+    shopButton.classList.add("shop-button");
+    let inventoryTemp = Inventory[inventoryNumber];
 
-        let shopButtonImage = document.createElement("img");
-        shopButtonImage.src = "./assets/icon/nut.webp";
+    let shopButtonImage = document.createElement("img");
+    shopButtonImage.src = "./assets/tooltips/inventory/"+ inventoryTemp.File+ ".webp";
 
-        let shopButtonImageContainer = document.createElement("div");
-        shopButtonImageContainer.classList.add("shop-button-container")
-        shopButtonImageContainer.style.background = "url(./assets/frames/background-6.webp)";
-        shopButtonImageContainer.style.backgroundSize = "contain";
-        shopButtonImageContainer.style.backgroundPosition = "center center";
-        shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
-        
-        let shopButtonText = document.createElement("div");
-        shopButtonText.classList.add("shop-button-text")
-        shopButtonText.innerText = "60";
-        
-        shopButtonImageContainer.appendChild(shopButtonImage);
-        shopButton.append(shopButtonImageContainer,shopButtonText);
-        shopDiv.append(shopButton);
+    let shopButtonImageContainer = document.createElement("div");
+    shopButtonImageContainer.classList.add("shop-button-container")
+    shopButtonImageContainer.style.background = "url(./assets/frames/background-" +inventoryTemp.Star+ ".webp)";
+    shopButtonImageContainer.style.backgroundSize = "cover";
+    shopButtonImageContainer.style.backgroundPosition = "center center";
+    shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
+    
+    let shopButtonText = document.createElement("div");
+    shopButtonText.classList.add("shop-button-text");
 
-        return shopDiv;
+    let shopCost = 0;
+    switch (inventoryTemp.Star) {
+        case 3: 
+            shopCost = 40;
+            break;
+        case 4:
+            shopCost = 100;
+            break;
+        case 5:
+            shopCost = 240;
+            break;
+        case 6:
+            shopCost = 600;
+            break;
+        default:
+            break;
+    }
+
+    shopButtonText.innerText = shopCost;
+    
+    shopButton.id = ("shop-" + i + "-" + inventoryNumber + "-" + shopCost);
+    shopButton.addEventListener("click", function() {
+        buyShop(this.id)
+    })
+    
+    shopButtonImageContainer.appendChild(shopButtonImage);
+    shopButton.append(shopButtonImageContainer,shopButtonText);
+    shopDiv.append(shopButton);
+
+    return shopDiv;
 }
 
 //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//

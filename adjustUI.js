@@ -12,7 +12,7 @@ function inventoryAddButton(buttonInv, Item) {
     buttonInvStarDiv.appendChild(buttonInvStar)
 
     let buttonInvItem = document.createElement("img");
-    buttonInvItem.src = "./assets/tooltips/inventory/" + Item.Name + ".webp";
+    buttonInvItem.src = "./assets/tooltips/inventory/" + Item.File + ".webp";
     buttonInvItem.classList.add("button-inv-item");
 
     buttonInv.append(buttonInvFrame,buttonInvItem,buttonInvStarDiv);
