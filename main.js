@@ -3,7 +3,52 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.1.10-2-23"
+const VERSIONNUMBER = "v0.1.A-11-2-23"
+//------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
+// START SCREEN 
+let startText = document.getElementById("start-screen"); 
+let versionText = document.getElementById("vers-number"); 
+versionText.innerText = VERSIONNUMBER;
+versionText.classList.add("version-text");
+
+
+let deleteButton = document.getElementById("start-delete");
+deleteButton.addEventListener("click",()=> {
+    localStorage.clear();
+    startGame();
+    startText.remove();
+});
+
+if (localStorage.getItem("settingsValues") !== null) {
+    let startButton = document.getElementById("start-button");
+    startButton.classList.remove("dim-filter");
+    startButton.addEventListener("click",()=> {
+        startGame();
+        startText.remove();
+    });
+
+    let startChance = randomInteger(1,11);
+    if (startChance === 1) {
+        let startIdle = document.createElement("img");
+        startIdle.src = "./assets/start-idle.webp";
+        startIdle.id = "start-idle-nahida";
+        startText.append(startIdle);
+    } else if (startChance === 2) {
+        let startIdle = document.createElement("img");
+        startIdle.src = "./assets/shop.webp";
+        startIdle.id = "start-idle-dori";
+        startText.append(startIdle);
+    } else if (startChance === 3) {
+        let startIdle = document.createElement("img");
+        startIdle.src = "./assets/scara.webp";
+        startIdle.id = "start-idle-scara";
+        startText.style.backgroundImage = "url(./assets/start-night.webp)";
+        startText.append(startIdle);
+    }
+}
+
+function startGame() {
+// GLOBAL VARIABLES
 var saveValues;
 const ENERGYCHANCE = 500;
 var upperEnergyRate = 20;
@@ -41,7 +86,7 @@ var primogemDisplay = document.getElementById("primogem");
 var leftDiv = document.getElementById("left-div");
 var midDiv = document.getElementById("mid-div");
 var multiplierButtonContainer;
-//------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
+
 // MAIN BODY VARIABLES
 var mainBody = document.getElementById("game");    
 drawMainBody();
@@ -85,12 +130,13 @@ createExpedTable(expedTooltip);
 table3.appendChild(expedTooltip);
 createTooltip();
 setShop();
-settings();           
 
-drawWish();
+settings();
 var settingsValues;
 var currentBGM;
-var bgmElement;
+var bgmElement;           
+
+drawWish();
 var tabElement = new Audio("./assets/sfx/tab-change.mp3");
 var demoElement = new Audio("./assets/sfx/click.mp3");
 var upgradeElement = new Audio("./assets/sfx/upgrade.mp3");
@@ -113,11 +159,6 @@ tabChange(1);
 window.oncontextmenu = function (){
     return false;
 };
-
-let versionText = document.createElement("p")
-versionText.innerText = VERSIONNUMBER;
-versionText.classList.add("version-text");
-mainBody.appendChild(versionText);
 
 // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH FREQUENCY SET TO TIME RATIO)
 function timerEvents() {
@@ -345,7 +386,7 @@ function clickedEvent() {
 
 function chooseEvent() {
     //clickEvent();
-     boxFunction();
+    rainEvent()
     // let randInt = randomInteger(1,5);
     // if (randInt === 1) {
     //     rainEvent();
@@ -368,30 +409,41 @@ function rainEvent() {
     let rainTextDiv = document.createElement("p");
 
     rainText.classList.add("event-rain-text");
-    let dpsMultiplier = (saveValues.dps + 1)* 13;
+    let dpsMultiplier = (saveValues.dps + 1)* 20;
     let tempScore = 0;
+    let tempPrimogem = 0;
     rainTextDiv.innerText = tempScore;
     rainText.append(rainTextBackground,rainTextDiv)
     mainBody.appendChild(rainText);
 
     function spawnRain() {
         let animation = `rain ${(randomInteger(8,12)/2)}s linear forwards`
-        let type = randomInteger(1,9);
+        let type = randomInteger(1,101);
         var img = document.createElement("img");
-        if (type >= 7) {
+        if (type >= 85) {
+            img.src = "./assets/icon/primogemLarge.webp"
+            animation = `rain-rotate ${(randomInteger(3,8)/2)}s linear forwards`
+            img.addEventListener('click', () => {
+                img.remove();
+                tempPrimogem += randomInteger(20,40);
+                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier) + " Nuts | " + tempPrimogem + " Primos";
+            });
+        } else if (type >= 65) {
             img.src = "./assets/icon/scarab.webp"
             img.addEventListener('click', () => {
                 img.remove();
                 tempScore -= 10;
                 tempScore = Math.max(0, tempScore);
-                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier);
+                tempPrimogem -= randomInteger(30,100);
+                tempPrimogem = Math.max(0, tempPrimogem)
+                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + tempPrimogem + " Primos";
             });
         } else {
             img.src = "./assets/icon/nut.webp";
             img.addEventListener('click', () => {
                 img.remove();
                 tempScore++;
-                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier);
+                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + tempPrimogem + " Primos";
             });
         }
         img.style.top = "-15%";
@@ -406,12 +458,13 @@ function rainEvent() {
     setTimeout(()=>{
         clearInterval(rainTimer);
         setTimeout(()=>{
-            eventBackdrop.remove();   
+            setTimeout(()=>{eventBackdrop.remove();},3000)
             rainText.classList.add("text-pop");
             rainText.addEventListener('animationend', () => {
                 rainText.remove();
                 saveValues.realScore += tempScore * dpsMultiplier;
-        }),2000})
+                saveValues.primogem += tempPrimogem;
+        }),8000})
     }, 28000);
     mainBody.append(eventBackdrop);
 }
@@ -436,17 +489,32 @@ function clickEvent() {
 var reactionReady = false;
 var reactionGame = false;
 function reactionEvent() {
+    reactionGame = true;
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("event-dark");
 
-    let reactionImage = document.createElement("img");
-    reactionImage.src = "./assets/clock1.webp";
+    let reactionImage = document.createElement("div");
     reactionImage.id = "reaction-image";
+
+    let reactionImageBottom = document.createElement("img");
+    reactionImageBottom.src = "./assets/clock-back.webp";
+    reactionImageBottom.id = "reaction-image-bot";
+    let reactionImageArrow = document.createElement("img");
+    reactionImageArrow.src = "./assets/clock-arrow.webp";
+    reactionImageArrow.id = "reaction-image-arrow";
+    let reactionImageTop = document.createElement("img");
+    reactionImageTop.src = "./assets/clock-top.webp";
+    reactionImageTop.id = "reaction-image-top";
 
     let reactionButton = document.createElement("div");
     reactionButton.id = "reaction-button";
     reactionButton.innerText = "Not yet...";
-    reactionButton.addEventListener("click",()=>{reactionFunction(eventBackdrop)});
+    reactionButton.addEventListener("click",()=>{
+        reactionFunction(eventBackdrop)
+        setTimeout(()=> {
+            eventBackdrop.remove();
+        },2000)
+    });
 
     reactionStartElement.load();
     reactionStartElement.play();
@@ -454,7 +522,7 @@ function reactionEvent() {
         if (reactionGame == true) {
             reactionReady = true;
             reactionButton.innerText = "Now!";
-            reactionImage.src = "./assets/clock2.webp";
+            reactionImageArrow.style.animationPlayState = "paused";
             setTimeout(() => {
                 if (reactionGame == true) {
                     reactionReady = false;
@@ -465,9 +533,10 @@ function reactionEvent() {
         }
     });
     
+    reactionImage.append(reactionImageBottom,reactionImageArrow,reactionImageTop)
     eventBackdrop.append(reactionImage,reactionButton);
     mainBody.append(eventBackdrop);
-    reactionGame = true;
+    
 }
 
 function reactionFunction(eventBackdrop) {
@@ -494,12 +563,12 @@ function reactionFunction(eventBackdrop) {
     reactionGame = false;
     outcomeText.append(outcomeTextBackground,outcomeTextDiv);
     mainBody.append(outcomeText);
-    setTimeout(()=> {
-        outcomeText.remove();
-        eventBackdrop.remove();
-    },3000)
-}
 
+    setTimeout(()=> {
+        eventBackdrop.remove();
+        outcomeText.remove();
+    },2000)
+}
 
 // EVENT 5 (7 BOXES)
 function boxFunction() {
@@ -558,12 +627,13 @@ function boxOpen(eventBackdrop) {
         outcomeText = "Uh oh, an enemy was hiding in the box! (Lost " +badOutcomePercentage+"% of  Nuts)";
         badOutcomePercentage = badOutcomePercentage/100;
         badOutcomeNumber = (saveValues.realScore * badOutcomePercentage);
+        saveValues.realScore -= badOutcomeNumber;
     } else if (boxChance >= 5) {
         let veryGoodOutcome = randomInteger(1,4);
         saveValues.primogem += randomInteger(40,60);
         boxOutcome.src = "./assets/icon/verygood-" + veryGoodOutcome + ".webp";
         outcomeText = "Oh! It had a precious gemstone!! (Increased power for all characters)";
-        goodOutcomeNumber = 5000.1;
+        goodOutcomeNumber = 5015.1;
     } else {
         boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
         
@@ -571,6 +641,7 @@ function boxOpen(eventBackdrop) {
         outcomeText = "Uh oh! Run away! (Lost " +badOutcomePercentage+ "% of Nuts LOL LOSER)";
         badOutcomePercentage = badOutcomePercentage/100;
         badOutcomeNumber = (saveValues.realScore * badOutcomePercentage);
+        saveValues.realScore -= badOutcomeNumber;
     }
 
     boxOuterNew.appendChild(boxOutcome);
@@ -594,10 +665,8 @@ function boxOpen(eventBackdrop) {
             boxText.classList.add("slide-out-animation");
             boxText.addEventListener("animationend",() => {
                 boxText.remove()
-                if (badOutcomeNumber !== 0) {
-                    saveValues.realScore -= badOutcomeNumber;
-                } else if (goodOutcomeNumber >= 50 && goodOutcomeNumber <= 200) {
-                    saveValues.primogem += goodOutcomeNumber
+                 if (goodOutcomeNumber >= 50 && goodOutcomeNumber <= 200) {
+                    saveValues.primogem += goodOutcomeNumber;
                 } else if (goodOutcomeNumber > 200) {
                     itemUse(goodOutcomeNumber.toString())
                 }
@@ -605,9 +674,6 @@ function boxOpen(eventBackdrop) {
         },4000)
     },1000);
 }
-
-
-
 
 // EVENT 6 (WHACK-A-MOLE)
 
@@ -1190,9 +1256,6 @@ function itemUse(itemUniqueId) {
     } else {
         itemID = itemUniqueId;
     }
-
-    console.log(itemID)
-    console.log(Inventory[itemID].Type)
     
     if ((itemID >= 1001 && itemID < WEAPONMAX) || (itemID >= 7000 && itemID < 7030)){
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
@@ -1224,17 +1287,29 @@ function itemUse(itemUniqueId) {
     } else if (itemID >= 4001 && itemID < XPMAX){
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         refresh();
-    } else if (itemID === 5000) {
+    } else if (itemID === 5015 || itemID === 5016) {
+        console.log("here")
+        let power = 1;
+        if (Inventory[itemID].Star === 5) {
+            power = 1.5;
+        } else {
+            power = 3.5;
+        };
+
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             let upgradeDictTemp = upgradeDict[i];
-            if (upgradeDictTemp .Purchased > 0){
-                upgradeDictTemp["Factor"] *= 3;
+            if (upgradeDictTemp.Purchased > 0){
+                console.log(upgradeDictTemp[i].Name)
+                upgradeDictTemp["Factor"] *= power;
                 upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                 refresh("hero", i);
             }
         }
+
+        clearTooltip();
+        return;
     } else if (itemID >= 5001 && itemID < 5050){
         let power;
         let elem = Inventory[itemID].element;
@@ -1244,11 +1319,13 @@ function itemUse(itemUniqueId) {
             power = 4;
         };
 
+        console.log(Inventory[itemID])
+
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i].Purchased > 0)
-                if (upgradeDict[i].Ele == elem) {
+                if (upgradeDict[i].Ele == elem || i === 1) {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
@@ -1892,6 +1969,9 @@ function createShopItems(shopDiv, i, inventoryNumber) {
 
     let shopCost = 0;
     switch (inventoryTemp.Star) {
+        case 2:
+            shopCost = 15;
+            break;
         case 3: 
             shopCost = 40;
             break;
@@ -2066,4 +2146,5 @@ function newPop(type) {
         let mainBody = document.getElementById("game");    
         mainBody.append(newPopUp);
     }    
+}
 }

@@ -10,6 +10,7 @@ var saveValuesDefault = {
     heroesPurchased:0,
     wishUnlocked:false,
     wishCounterSaved:0,
+    goldenNut:0,
 }
 
 var SettingsDefault = {
@@ -113,10 +114,10 @@ var InventoryDefault = {
     5001: {File:"pyro5",         Name:"Agnidus Agate Gemstone",   Lore:"",      Star:5,                   element:"Pyro"         },
     5002: {File:"hydro5",        Name:"Varunada Lazurite Gemstone",   Lore:"",       Star:5,                   element:"Hydro"         },
     5003: {File:"dendro5",       Name:"Nagadus Emerald Gemstone",   Lore:"",        Star:5,                    element:"Dendro"         },
-    5004: {File:"electro5",      Name:"Vajrada Amethyst Gemstone",   Lore:"",         Star:5,                    element:"Electo"         },
+    5004: {File:"electro5",      Name:"Vajrada Amethyst Gemstone",   Lore:"",         Star:5,                    element:"Electro"         },
     5005: {File:"anemo5",        Name:"Vayuda Turquoise Gemstone",   Lore:"",       Star:5,                     element:"Anemo"         },
-    5006: {File:"cryo5",         Name:"Shivada Jade",   Lore:"",      Star:5,                     element:"Cryo"         },
-    5007: {File:"geo5",          Name:"Prithiva Topaz",   Lore:"",     Star:5,                       element:"Geo"         },
+    5006: {File:"cryo5",         Name:"Shivada Jade",   Lore:"",      Star:5,                                element:"Cryo"         },
+    5007: {File:"geo5",          Name:"Prithiva Topaz",   Lore:"",     Star:5,                              element:"Geo"         },
     5008: {File:"pyro4",         Name:"Agnidus Agate Chunk",   Lore:"",      Star:4,                      element:"Pyro"      },
     5009: {File:"hydro4",        Name:"Varunada Lazurite Chunk",   Lore:"",       Star:4,                    element:"Hydro"      },
     5010: {File:"dendro4",       Name:"Nagadus Emerald Chunk",   Lore:"",        Star:4,                     element:"Dendro"      },

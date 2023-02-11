@@ -10,7 +10,7 @@
     <meta http-equiv='pragma' content='no-cache'/>
     <title>nahidaQuest!</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=b08ccc8bb9ff77a9b2b2fe6ac4888add">
+    <link rel="stylesheet" href="styles.css?v=02729dc271f347dd1d1eb34211602463">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <style type="text/css">
     </style>
@@ -18,6 +18,11 @@
 </head>
 <body>
     <div id="game" class="prevent-select">
+        <div id="start-screen">
+            <img id="start-image" src="./assets/settings/nahidaQuest.webp">
+            <button id="start-button" class="dim-filter">Continue</button>
+            <button id="start-delete">New Game</button>
+        </div>
         <div id="loading" class="overlay">
             <img src="./assets/loading.gif" class="overlay-tutorial">
         </div>
@@ -26,21 +31,19 @@
                 <span id="score">0</span>      
                 <span id="dps">0</span>
             </div>
-
             <div id="demo-container">
             </div>
         </div>
-
         <div id="mid-div" class="middle-area">
             <img src="./assets/bar.jpg" class="middle-bar">
             <div class="energy-primo-container">
                 <div class="pill-value">
-                    <img class="pill" src="./assets/pill.png">
+                    <img class="pill" src="./assets/pill.webp">
                     <img class="icon" src="./assets/icon/energyIcon.png">
                     <span id="energy">0</span>
                 </div>
                 <div class="pill-value">
-                    <img class="pill" src="./assets/pill.png">
+                    <img class="pill" src="./assets/pill.webp">
                     <img class="primogem icon" src="./assets/icon/primogemIcon.png">
                     <span id="primogem">0</span>
                 </div>
@@ -50,10 +53,10 @@
                 <div id="app2"></div>
             </div>
         </div>
-
         <div id="right-div" class="right-area"></div>
+        <p id="vers-number"></p>
     </div>
     <!-- RMB TO UPDATE HASH EVERY PUSH!!! -->
-<script type="module" src="main.js?v=b08ccc8bb9ff77a9b2b2fe6ac4888add"></script>
+<script type="module" src="main.js?v=02729dc271f347dd1d1eb34211602463"></script>
 </body>
 </html>
