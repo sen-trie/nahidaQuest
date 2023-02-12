@@ -131,6 +131,7 @@ table3.appendChild(expedTooltip);
 
 var tooltipTable = 1;
 var heroTooltip = -1;
+var heroIndexTooltip = -1;
 var itemTooltip = 0;
 createTooltip();
 setShop();
@@ -280,7 +281,6 @@ demoContainer.addEventListener("mouseup", () => {
     saveValues["realScore"] += clickEarn;
     
     energyRoll();
-    refresh();
 
     if (clickAudioDelay === null) {
         if (timerSeconds !== 0) {
@@ -843,7 +843,8 @@ function tabChange(x) {
     }
 
     if (heroTooltip !== -1) {
-        let removeActiveHero = document.getElementById(`but-${heroTooltip}`)
+        heroTooltip = upgradeDict[heroTooltip].Row;
+        let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
         if (removeActiveHero.classList.contains("active-hero")) {
             removeActiveHero.classList.remove("active-hero");
         }
@@ -1056,17 +1057,20 @@ function loadRow() {
         
         heroButtonContainer.addEventListener("click", () => {
             changeTooltip(upgradeDictTemp, "hero");
+            
             if (heroTooltip !== -1) {
-                let removeActiveHero = document.getElementById(`but-${heroTooltip}`)
+                heroTooltip = upgradeDict[heroTooltip].Row;
+                let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
                 if (removeActiveHero.classList.contains("active-hero")) {
                     removeActiveHero.classList.remove("active-hero");
                 }
             }
-            heroTooltip = j;
+
+            heroTooltip = loadedHeroID;
             heroButtonContainer.classList.add("active-hero");
         });
-        heroButtonContainer.innerText = heroTextLoad;
 
+        heroButtonContainer.innerText = heroTextLoad;
         if (purchased == true) {
             heroButtonContainer.style = "background:url(./assets/nameplates/"+upgradeDictTemp.Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
         } else {
@@ -1094,18 +1098,29 @@ function addNewRow() {
                 var heroText = "Call for " + upgradeDict[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
             }
 
+            
             let heroID = "but-" + saveValues["rowCount"];
+            console.log(heroID)
             let heroButtonContainer = createHeroButtonContainer(heroID);
             let toolName = upgradeDict[i];
-            
+            saveValues["rowCount"]++;
+
             heroButtonContainer.addEventListener("click", () => {
                 changeTooltip(toolName, "hero");
+                if (heroTooltip !== -1) {
+                    heroTooltip = upgradeDict[heroTooltip].Row;
+                    let removeActiveHero = document.getElementById(`but-${heroTooltip}`)
+                    if (removeActiveHero.classList.contains("active-hero")) {
+                        removeActiveHero.classList.remove("active-hero");
+                    }
+                }
                 heroTooltip = i;
+                heroButtonContainer.classList.add("active-hero");
             });
             heroButtonContainer.innerText = heroText;
             table1.appendChild(heroButtonContainer);
 
-            saveValues["rowCount"]++;
+            
         }
     }
 }
@@ -1850,6 +1865,7 @@ function clearTooltip() {
 
 function tooltipFunction() {
     if (tooltipTable == 1) {
+        console.log(heroTooltip)
         if (heroTooltip === -1) {return}
         upgrade(heroTooltip);
         if (timerSeconds !== 0) {
@@ -1874,7 +1890,6 @@ function tooltipFunction() {
             if (nextButton) {
                 let idNum = parseInt(nextButton.id);
                 itemTooltip = idNum;
-                console.log(itemTooltip)
                 changeTooltip(Inventory[idNum],"item",idNum);
             } else {
                 itemTooltip = -1;
