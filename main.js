@@ -11,7 +11,6 @@ let versionText = document.getElementById("vers-number");
 versionText.innerText = VERSIONNUMBER;
 versionText.classList.add("version-text");
 
-
 let deleteButton = document.getElementById("start-delete");
 deleteButton.addEventListener("click",()=> {
     localStorage.clear();
@@ -109,6 +108,7 @@ var expedContainer = document.getElementById("table3");
 
 // INITIAL LOADING
 var InventoryMap;
+var achievementMap;
 loadSaveData();
 loadingAnimation();
 var upgradeDict;
@@ -128,6 +128,10 @@ createMultiplierButton();
 createExpedition();
 createExpedTable(expedTooltip);
 table3.appendChild(expedTooltip);
+
+var tooltipTable = 1;
+var heroTooltip = -1;
+var itemTooltip = 0;
 createTooltip();
 setShop();
 
@@ -221,22 +225,18 @@ function loadSaveData() {
         var timer2 = setTimeout(loadRow,1000);
     }
     // LOAD INVENTORY DATA
+    Inventory = InventoryDefault;
     if (localStorage.getItem("InventorySave") == null) {
         InventoryMap = new Map();
-        Inventory = InventoryDefault;
-        let i = 10;
+        let i = 10000;
         while (i--) {
-            for (let j = (i * 1000); j <= (i * 1000 + 100); j++) {
-                InventoryMap.set(j, 0);
-            }
+            InventoryMap.set(i,0);
         }
     } else {
         let InventoryTemp = localStorage.getItem("InventorySave");
         InventoryMap = new Map(JSON.parse(InventoryTemp));
-        Inventory = InventoryDefault;
         inventoryload();
     }
-
     
     // LOAD EXPEDITION DATA
     if (localStorage.getItem("expeditionDictSave") == null) {
@@ -246,11 +246,16 @@ function loadSaveData() {
         expeditionDict = JSON.parse(expeditionDictTemp)
     }
     // LOAD ACHIEVEMENT DATA
+    achievementList = achievementListDefault;
     if (localStorage.getItem("achievementListSave") == null) {
-        achievementList = achievementListDefault;
+        achievementMap = new Map();
+        let i = 1000;
+        while (i--) {
+            achievementMap.set(i,false);
+        }
     } else {
         let achievementListTemp = localStorage.getItem("achievementListSave");
-        achievementList = JSON.parse(achievementListTemp);
+        achievementMap = new Map(JSON.parse(achievementListTemp));
         achievementListload();
     }
 }
@@ -777,7 +782,7 @@ function saveData() {
     localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
     localStorage.setItem("expeditionDictSave", JSON.stringify(expeditionDict));
     localStorage.setItem("InventorySave", JSON.stringify(Array.from(InventoryMap)));
-    localStorage.setItem("achievementListSave", JSON.stringify(achievementList));
+    localStorage.setItem("achievementListSave", JSON.stringify(Array.from(achievementMap)));
 }
 
 //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
@@ -837,20 +842,40 @@ function tabChange(x) {
         }
     }
 
+    if (heroTooltip !== -1) {
+        let removeActiveHero = document.getElementById(`but-${heroTooltip}`)
+        if (removeActiveHero.classList.contains("active-hero")) {
+            removeActiveHero.classList.remove("active-hero");
+        }
+    }
+
+    
     clearTooltip();
     x--;
     TABS[x].style.display = "flex";
 
-        if (x == 0 || x == 1) {
+    if (x == 0) {
         table6.style.display = "flex";
-        } else {
+        tooltipTable = 1;
+        if (document.getElementById("tool-tip-button")) {
+            let tooltipButtonText = document.getElementById("tool-tip-button");
+            tooltipButtonText.innerText = "Purchase";
+        }
+    } else if (x == 1){
+        table6.style.display = "flex";  
+        tooltipTable = 2;
+        if (document.getElementById("tool-tip-button")) {
+            let tooltipButtonText = document.getElementById("tool-tip-button");
+            tooltipButtonText.innerText = "Use";
+        }
+    } else {
         table6.style.display = "none";
-        }
+    }
 
-        if (x != 3 && wishCounter != saveValues["wishCounterSaved"]) {
-        let mailImageTemp = document.getElementById("mailImageID")
-            mailImageTemp.style.opacity = 1;
-        }
+    if (x != 3 && wishCounter != saveValues["wishCounterSaved"]) {
+    let mailImageTemp = document.getElementById("mailImageID")
+        mailImageTemp.style.opacity = 1;
+    }
 }
 
 // SETTINGS MENU - SAVES & VOLUME CONTROL
@@ -999,17 +1024,14 @@ function loadRow() {
     for (let j = 0, len=Object.keys(rowTempDict).length; j < len; j++) {
         let loadedHeroID = rowTempDict[j];
         var heroTextLoad;
-        var heroPurchasedOnceStyle;
         var purchased = false;
 
         let upgradeDictTemp = upgradeDict[loadedHeroID];
         let formatCost = upgradeDictTemp["BaseCost"];
-        // heroCurrentCosts.set(j,formatCost)
         let formatATK = upgradeDictTemp["Factor"];
 
         if (upgradeDictTemp["Purchased"] > 0) {
             formatCost *= (COSTRATIO**upgradeDictTemp["Purchased"])
-            // heroCurrentCosts.set(j,formatCost)
             formatCost = abbrNum(formatCost)
             formatATK = abbrNum(formatATK)
             purchased = true;
@@ -1032,14 +1054,16 @@ function loadRow() {
         let heroID = "but-" + j;
         let heroButtonContainer = createHeroButtonContainer(heroID);
         
-        heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(upgradeDictTemp, "hero");});
-        heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
         heroButtonContainer.addEventListener("click", () => {
-            upgrade(loadedHeroID);
-            if (timerSeconds !== 0) {
-                upgradeElement.load();
-                upgradeElement.play();
+            changeTooltip(upgradeDictTemp, "hero");
+            if (heroTooltip !== -1) {
+                let removeActiveHero = document.getElementById(`but-${heroTooltip}`)
+                if (removeActiveHero.classList.contains("active-hero")) {
+                    removeActiveHero.classList.remove("active-hero");
+                }
             }
+            heroTooltip = j;
+            heroButtonContainer.classList.add("active-hero");
         });
         heroButtonContainer.innerText = heroTextLoad;
 
@@ -1070,19 +1094,13 @@ function addNewRow() {
                 var heroText = "Call for " + upgradeDict[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
             }
 
-            // heroCurrentCosts.set(saveValues["rowCount"],upgradeDict[i]["BaseCost"])
             let heroID = "but-" + saveValues["rowCount"];
             let heroButtonContainer = createHeroButtonContainer(heroID);
             let toolName = upgradeDict[i];
             
-            heroButtonContainer.addEventListener("mouseover", () => {changeTooltip(toolName, "hero")});
-            heroButtonContainer.addEventListener("mouseout", () => {clearTooltip()});
             heroButtonContainer.addEventListener("click", () => {
-                upgrade(i);
-                if (timerSeconds !== 0) {
-                    upgradeElement.load();
-                    upgradeElement.play();
-                }
+                changeTooltip(toolName, "hero");
+                heroTooltip = i;
             });
             heroButtonContainer.innerText = heroText;
             table1.appendChild(heroButtonContainer);
@@ -1136,7 +1154,6 @@ function upgrade(clicked_id) {
         checkExpeditionUnlock(saveValues["heroesPurchased"]);                                        
         refresh(butIdArray, upgradeDictTemp["BaseCost"], clicked_id);
             
-        clearTooltip();
         changeTooltip(upgradeDictTemp,"hero");                   
         saveValues["realScore"] = realScoreCurrent;
     }
@@ -1181,8 +1198,6 @@ function dimHeroButton() {
                 checkPrice = upgradeDictTemp["BaseCost"] * (COSTRATIO ** (upgradeDictTemp["Purchased"]));
             }
 
-        // heroCurrentCosts.set(upgradeDictTemp.Row,checkPrice)
-
         let heroID = "but-" + upgradeDictTemp.Row;
         let heroElem = document.getElementById(heroID);
         if (checkPrice > saveValues["realScore"]) {
@@ -1206,39 +1221,36 @@ function dimHeroButton() {
 //------------------------------------------------------------------------TABLE 2 (INVENTORY)------------------------------------------------------------------------//
 // LOAD SAVED INVENTORY
 function inventoryload() {
-    for (let i = 1000, len=getHighestKey(Inventory); i < len; i++) {
-        if (Inventory[i] == undefined) continue;
-        if (InventoryMap.get(i) == 0) continue;
-        for (let j = 1, len=InventoryMap.get(i) + 1; j < len; j++) {
-            inventoryAdd(i, "load", j);
+    for (let i = 1000, len=10000; i < len; i++) {
+        if (InventoryMap.get(i) === 0) {
+            continue;
+        } else {
+            inventoryAdd(i, "load");
         }
     }
 }
 
 // ADD TO INVENTORY 
-function inventoryAdd(idNum, type, count) {
+function inventoryAdd(idNum, type) {
     let itemUniqueID;
+    idNum = parseInt(idNum);
     if (type != "load") {
         let currentValue = InventoryMap.get(idNum);
         currentValue++;
-        InventoryMap.set(idNum,currentValue)
-        itemUniqueID = idNum + "." + currentValue;
-    } else {
-        itemUniqueID = idNum + "." + count;
+        InventoryMap.set(idNum,currentValue);
+        if (currentValue > 1) {
+            return;
+        }
     }
+
+    itemUniqueID = idNum;
     let buttonInv = document.createElement("button");
     buttonInv.classList.add("button-container");
     buttonInv.id = itemUniqueID;
     buttonInv.addEventListener('click', function() {
-        itemUse(itemUniqueID);
-        this.remove();
-        let currentValue = InventoryMap.get(idNum);
-        currentValue--;
-        InventoryMap.set(idNum,currentValue);
+        changeTooltip(Inventory[idNum], "item", idNum);
+        itemTooltip = itemUniqueID;
     });
-    
-    buttonInv.addEventListener('mouseover', () => {changeTooltip(Inventory[idNum], "item")})
-    buttonInv.addEventListener('mouseout', () => {clearTooltip()})
     buttonInv = inventoryAddButton(buttonInv,Inventory[idNum])
     table2.appendChild(buttonInv);
 }
@@ -1288,7 +1300,6 @@ function itemUse(itemUniqueId) {
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         refresh();
     } else if (itemID === 5015 || itemID === 5016) {
-        console.log("here")
         let power = 1;
         if (Inventory[itemID].Star === 5) {
             power = 1.5;
@@ -1301,7 +1312,6 @@ function itemUse(itemUniqueId) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
-                console.log(upgradeDictTemp[i].Name)
                 upgradeDictTemp["Factor"] *= power;
                 upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                 refresh("hero", i);
@@ -1318,8 +1328,6 @@ function itemUse(itemUniqueId) {
         } else {
             power = 4;
         };
-
-        console.log(Inventory[itemID])
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
@@ -1648,8 +1656,9 @@ var achievementData = {
 
 function achievementListload() {
     for (let i = 1, len=getHighestKey(achievementList); i < len; i++) {
-        if (achievementList[i] == undefined) continue;
-        if (achievementList[i]["Done"] == true) {
+        if (achievementMap.get(i) === false) {
+            continue;
+        } else {
             let achievementStored = storeAchievement(achievementList[i].Name,achievementList[i].Description,10000 + i);
             table5.appendChild(achievementStored); 
             sortList("table5");
@@ -1696,7 +1705,7 @@ function popAchievement(achievement) {
 
     var achievementText = achievementListTemp.Name;
     var achievementDesc = achievementListTemp.Description;
-    achievementList[achievementType]["Done"] = true;
+    achievementMap.set(achievementType,true);
     achievementID += achievementType;
     saveValues["primogem"] += 20;
 
@@ -1778,17 +1787,21 @@ function createTooltip() {
     tooltipExtraImg.classList += "tool-tip-extraimg";
     tooltipWeaponImg = document.createElement("img");
     tooltipElementImg = document.createElement("img");
-    
-    tooltipExtraImg.append(tooltipWeaponImg,tooltipElementImg)
+    tooltipExtraImg.append(tooltipWeaponImg,tooltipElementImg);
+
+    let tooltipButton = document.createElement("button");
+    tooltipButton.id = "tool-tip-button";
+    tooltipButton.innerText = "Purchase";
+    tooltipButton.addEventListener("click",()=>{tooltipFunction()})
 
     table6Background = document.createElement("img");
     table6Background.src = "./assets/tooltips/background.webp"
     table6Background.classList.add("table6-background");
-    table6.append(tooltipName,toolImgContainer,tooltipText,tooltipExtraImg,tooltipLore,table6Background);
+    table6.append(tooltipName,toolImgContainer,tooltipText,tooltipExtraImg,tooltipLore,table6Background,tooltipButton);
 }
 
 var tooltipInterval = null;
-function changeTooltip(dict, type) {
+function changeTooltip(dict, type, number) {
     if (tooltipInterval !== null) {
         clearInterval(tooltipInterval);
         tooltipInterval = null;
@@ -1808,14 +1821,17 @@ function changeTooltip(dict, type) {
     } else if (type == "item") {
         toolImg.src = "./assets/frames/background-" + dict.Star + ".webp";
         toolImgOverlay.src = "./assets/tooltips/inventory/" + dict.File + ".webp";
+        tooltipText.innerHTML = "Amount: " + InventoryMap.get(number);
         return;
     }
 }
 
 function clearTooltip() {
+    heroTooltip = -1;
+    itemTooltip = -1;
     tooltipInterval = setTimeout(() => {
         if (table1.style.display !== "none") {
-            tooltipName.innerText = "Hover/Hold a character for more info!";
+            tooltipName.innerText = "Tap a character for more info!";
         }
 
         if (table2.style.display !== "none") {
@@ -1830,6 +1846,44 @@ function clearTooltip() {
         toolImgOverlay.src = "./assets/tooltips/Empty.webp";
         tooltipInterval = null;
         }, 100)
+}
+
+function tooltipFunction() {
+    if (tooltipTable == 1) {
+        if (heroTooltip === -1) {return}
+        upgrade(heroTooltip);
+        if (timerSeconds !== 0) {
+            upgradeElement.load();
+            upgradeElement.play();
+        }
+        return;
+    } else if (tooltipTable == 2) {
+        if (itemTooltip === -1) {return}
+        
+        itemUse(itemTooltip);
+        let itemButton = document.getElementById(itemTooltip);
+        let inventoryCount = InventoryMap.get(itemTooltip);
+        inventoryCount--;
+        InventoryMap.set(itemTooltip,inventoryCount)
+
+        if (inventoryCount > 0) {
+            changeTooltip(Inventory[itemTooltip],"item",itemTooltip)
+        } else {
+            let nextButton = itemButton.nextSibling;
+            itemButton.remove();
+            if (nextButton) {
+                let idNum = parseInt(nextButton.id);
+                itemTooltip = idNum;
+                console.log(itemTooltip)
+                changeTooltip(Inventory[idNum],"item",idNum);
+            } else {
+                itemTooltip = -1;
+                clearTooltip();
+            }
+        }
+    } else {
+        return;
+    }
 }
 
 //------------------------------------------------------------------------TABLE 7 (STORE)------------------------------------------------------------------------//

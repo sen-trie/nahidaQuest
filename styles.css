@@ -110,7 +110,7 @@ img {
 .overlay {
     position: absolute;
     display: flex;
-    background: url(./assets/wood.jpg);
+    background: url(./assets/wood.webp);
     background-size:cover;
     flex-direction:  row;
     justify-content: center;
@@ -1061,9 +1061,9 @@ circle {
 }
 
 .floatingText {
-    font-size: 25px;
+    font-size: 1em;
     color: rgb(10, 52, 18);
-    text-shadow: 2px 2px 0px #fbfbfb;
+    text-shadow: 0.1em 0.1em 0px #fbfbfb;
     position: absolute;
     animation: fadeOutOpacity 1.5s cubic-bezier(.02,.97,.91,.14) forwards;
     z-index: 13;
@@ -1267,7 +1267,7 @@ circle {
     --dropshadow:0px 0px 3px #000000;
 }
 
-.not-dim:hover {
+.active-hero {
     transform:scale(1.035);
     transition: 0.4s ease;
     filter: drop-shadow(var(--dropshadow)) 
@@ -1463,7 +1463,7 @@ circle {
     width: 70%;
     font-size: inherit;
     color: #F8E8C7;
-    text-shadow: #73603D 3px 3px 1px;
+    text-shadow: #73603D 0.15em 0.15em 0.1em;
 }
 
 .wish-button-img {
@@ -1474,7 +1474,7 @@ circle {
 }
 
 .wish-button:hover{
-    filter: drop-shadow(0px 0px 2px #ffffff);
+    filter: drop-shadow(0px 0px 0.2em #ffffff);
     transition: .3s ease;
 }
 
@@ -1686,6 +1686,7 @@ repeat, no-repeat
     flex-direction: column;
     gap: 1%;
     align-items: center;
+    color: #43351c;
 }
 
 #table6 > div {
@@ -1758,6 +1759,23 @@ repeat, no-repeat
 
 .tool-tip-extraimg img{
     width: 47.5%;
+}
+
+#tool-tip-button {
+    position: absolute;
+    bottom:6%;
+    background-image: url(./assets/tooltips/tooltip-button.webp);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    background-color: transparent;
+    aspect-ratio: 2.3;
+    width: 87%;
+    z-index: 5;
+    font-family: gi-font;
+    font-size: 1.4em;
+    color: #F8E8C7;
+    text-shadow: #2e2411 0.15em 0.15em 0.2em;
 }
 
 /*/////////////////////// SHOP CSS (TABLE 7) ///////////////////////////////*/

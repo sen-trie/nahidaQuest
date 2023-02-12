@@ -3,7 +3,7 @@ function drawMainBody() {
     // LEFT DIV/AREA
     var leftDiv = document.getElementById("left-div");
     var leftImg =  document.createElement("img");
-    leftImg.src = "./assets/bg.png";
+    leftImg.src = "./assets/bg.webp";
     leftImg.classList.add("div-img");
     leftDiv.appendChild(leftImg);
 
@@ -178,11 +178,11 @@ function drawMailTable(table4) {
     mailImageContainer.classList.add("wish-mail-container");
     
     let mailImageBottom = document.createElement("img");
-    mailImageBottom.src = "./assets/closed.png";
+    mailImageBottom.src = "./assets/closed.webp";
     mailImageBottom.classList.add("wish-mail");
 
     let mailImageTop = document.createElement("img");
-    mailImageTop.src = "./assets/open.png";
+    mailImageTop.src = "./assets/open.webp";
     mailImageTop.id = "mailImageID";
     mailImageTop.classList.add("wish-mail");
 
