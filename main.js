@@ -55,7 +55,7 @@ var lowerEnergyRate = 10;
 const COSTRATIO = 1.15;
 var clickDelay = 10;
 
-const WEAPONMAX = 1300;
+const WEAPONMAX = 1500;
 const ARTIFACTMAX = 2150;
 const FOODMAX = 3150;
 const XPMAX = 4004;
@@ -981,7 +981,7 @@ function createTabs() {
         tabButton.classList += "tab-button-div";
 
         let tabButtonImage = document.createElement("img");
-        tabButtonImage.src = "./assets/icon/tab"+ (i + 1) +".png";
+        tabButtonImage.src = "./assets/icon/tab"+ (i + 1) +".webp";
         tabButtonImage.classList += "tab-button";
 
         tabButton.id = "tab-" + (i);
@@ -1436,9 +1436,11 @@ function inventoryAdd(idNum, type) {
     let itemUniqueID;
     idNum = parseInt(idNum);
     if (type != "load") {
+        console.log(idNum,",",InventoryMap.get(idNum))
         let currentValue = InventoryMap.get(idNum);
         currentValue++;
         InventoryMap.set(idNum,currentValue);
+        console.log(idNum,",",InventoryMap.get(idNum));
         if (currentValue > 1) {
             return;
         }
@@ -1450,7 +1452,8 @@ function inventoryAdd(idNum, type) {
     buttonInv.id = itemUniqueID;
     buttonInv.addEventListener('click', function() {
         changeTooltip(Inventory[idNum], "item", idNum);
-        itemTooltip = itemUniqueID;
+        console.log(itemUniqueID)
+        itemTooltip = idNum;
     });
     buttonInv = inventoryAddButton(buttonInv,Inventory[idNum])
     table2.appendChild(buttonInv);
@@ -1669,7 +1672,6 @@ function inventoryDraw(itemType, min, max, type){
         "xp": XPMAX,
         "gem": 5017,
         "talent": 6013,
-        "specialWeapon": 7030,
     };
     let lowerInventoryType = {
         "weapon": 1001, 
@@ -1678,7 +1680,6 @@ function inventoryDraw(itemType, min, max, type){
         "xp": 4001,
         "gem": 5001,
         "talent": 6001,
-        "specialWeapon": 7001,
     };
     let drawnItem = 0;
     while (true){
@@ -1817,9 +1818,9 @@ function wish() {
             if (upgradeDict[100].Purchased === -10) {
                 randomWishHero = 100;
                 unlockExpedition(5,expeditionDict);
-                newPop(2);
                 addShop();
-                newPop(6);
+                newPop(5);
+                newPop(2);
             } else {
                 randomWishHero = randomInteger(WISHHEROMIN, WISHHEROMAX);
             }
@@ -2029,7 +2030,6 @@ function changeTooltip(dict, type, number) {
 
 function clearTooltip() {
     heroTooltip = -1;
-    itemTooltip = -1;
     tooltipInterval = setTimeout(() => {
         if (table1.style.display !== "none") {
             tooltipName.innerText = "Tap a character for more info!";
@@ -2061,16 +2061,18 @@ function tooltipFunction() {
         return;
     } else if (tooltipTable == 2) {
         if (itemTooltip === -1) {return}
-        
         itemUse(itemTooltip);
         let itemButton = document.getElementById(itemTooltip);
         let inventoryCount = InventoryMap.get(itemTooltip);
         inventoryCount--;
         InventoryMap.set(itemTooltip,inventoryCount)
 
+        
+        
+
         if (inventoryCount > 0) {
             changeTooltip(Inventory[itemTooltip],"item",itemTooltip)
-        } else {
+        } else if (inventoryCount <= 0) {
             let nextButton = itemButton.nextSibling;
             itemButton.remove();
             if (nextButton) {
@@ -2128,7 +2130,7 @@ function setShop() {
         } else if (i >= 2 && i <= 6) {
             inventoryNumber = inventoryDraw("talent", 2,4, "shop");
         } else {
-            inventoryNumber = inventoryDraw("specialWeapon", 6,6, "shop")
+            inventoryNumber = inventoryDraw("weapon", 6,6, "shop")
         }
         
         createShopItems(shopDiv, i, inventoryNumber);
