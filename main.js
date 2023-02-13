@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.1.A-12-2-23"
+const VERSIONNUMBER = "v0.1.A-13-2-23"
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
 let startText = document.getElementById("start-screen"); 
@@ -352,7 +352,7 @@ function startRandomEvent() {
     eventPicture.classList.add("random-event");
     eventPicture.addEventListener("click", () => {clickedEvent();eventPicture.remove()});
 
-    setTimeout(() => {eventPicture.remove()}, 10000);
+    setTimeout(() => {eventPicture.remove()}, 5000);
     eventPicture.style.left = randomInteger(10,90) + "%";
     eventPicture.style.top = randomInteger(10,90) + "%";
 
@@ -391,7 +391,8 @@ function clickedEvent() {
 
 function chooseEvent() {
     //clickEvent();
-    rainEvent()
+    // rainEvent()
+    minesweeperEvent();
     // let randInt = randomInteger(1,5);
     // if (randInt === 1) {
     //     rainEvent();
@@ -489,7 +490,160 @@ function clickEvent() {
     },20000)
 }
 
-// EVENT 3 (WHERES WALDO)
+// EVENT 3 (MINESWEEPER)
+const ROWS = 8;
+const COLS = 8;
+function minesweeperEvent() {
+    var mines = randomInteger(8,10)
+    let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("event-dark");
+    let mineInfo = document.createElement("img");
+    mineInfo.src = "./assets/event/mine-info.webp"
+    mineInfo.id = "mine-info";
+
+    let mineBackground = document.createElement("table");
+    let board;
+    let firstClick = true;
+    let cellsLeft = ROWS * COLS - mines;
+    mineBackground.classList.add("event-mine-bg");
+    initializeBoard();
+
+    // Initialize Board
+    function initializeBoard() {
+        board = [];
+        for (let r = 0; r < ROWS; r++) {
+          board[r] = [];
+          for (let c = 0; c < COLS; c++) {
+            board[r][c] = { mine: false, revealed: false, flagged: false, adjMines: 0 };
+          }
+        }
+      
+        for (let i = 0; i < mines; i++) {
+          let r = Math.floor(Math.random() * ROWS);
+          let c = Math.floor(Math.random() * COLS);
+          if (board[r][c].mine) {
+            i--;
+          } else {
+            board[r][c].mine = true;
+          }
+        }
+      
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < COLS; c++) {
+            if (!board[r][c].mine) {
+              for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                  if (r + dr >= 0 && r + dr < ROWS && c + dc >= 0 && c + dc < COLS) {
+                    if (board[r + dr][c + dc].mine) {
+                      board[r][c].adjMines++;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+
+    // Count number of mines adjacent to a cell
+    function countAdjacentMines(row, col) {
+        let count = 0;
+        for (let r = Math.max(0, row - 1); r <= Math.min(ROWS - 1, row + 1); r++) {
+          for (let c = Math.max(0, col - 1); c <= Math.min(COLS - 1, col + 1); c++) {
+            if (board[r][c].mine && (r !== row || c !== col)) {
+              count++;
+            }
+          }
+        }
+        return count;
+    }
+
+    // Reveal a cell and its neighbors (recursively) if it has no adjacent mines
+    function revealCell(r, c) {
+        if (r >= 0 && r < ROWS && c >= 0 && c < COLS && !board[r][c].revealed) {
+          board[r][c].revealed = true;
+          console.log(cellsLeft)
+          cellsLeft--;
+          const tr = mineBackground.children[r];
+          const td = tr.children[c];
+          if (countAdjacentMines(r, c) === 0) {
+            td.innerText = "-";
+            td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
+            for (let r2 = r - 1; r2 <= r + 1; r2++) {
+              for (let c2 = c - 1; c2 <= c + 1; c2++) {
+                revealCell(r2, c2);
+              }
+            }
+          } else {
+            td.innerText = countAdjacentMines(r, c);
+            td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
+          }
+        }
+    }
+        
+    
+    // Render the game to event backdrop
+    for (let r = 0; r < ROWS; r++) {
+        const tr = document.createElement("tr");
+        for (let c = 0; c < COLS; c++) {
+            const td = document.createElement("td");
+            td.innerText = board[r][c].revealed
+                ? countAdjacentMines(r, c) || "-"
+                : "";
+            td.addEventListener("contextmenu", function(event) {
+                event.preventDefault();
+                if (!board[r][c].revealed) {
+                    if (board[r][c].flagged) {
+                        td.innerText = "";
+                        td.style.backgroundImage = "url(./assets/event/mine-unclicked.webp)";
+                        board[r][c].flagged = false;
+                    } else {
+                        td.innerText = "";
+                        td.style.backgroundImage = "url(./assets/event/mine-flag.webp)";
+                        board[r][c].flagged = true;
+                    }
+                }
+            });
+            td.addEventListener("click", function() {
+                if (firstClick) {
+                    while (board[r][c].mine) {
+                        initializeBoard();
+                    }
+                    firstClick = false;
+                }
+                if (board[r][c].mine) {
+                    td.innerText = "";
+                    td.style.backgroundImage = "url(./assets/event/mine-wrong.webp)";
+
+                    let mineFileOutcome = document.createElement("img");
+                    let whopperInt = randomInteger(1,4);
+                    mineFileOutcome.src = "./assets/event/whopperflower-"+whopperInt+".webp";
+                    mineFileOutcome.classList.add("mine-outcome");
+                    mineFileOutcome.classList.add("slide-in-blurred-bottom");
+                    eventBackdrop.append(mineFileOutcome);
+
+                    eventOutcome("The whopperflowers were alerted!",eventBackdrop);
+                } else {
+                    revealCell(r, c);
+                    td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
+                }
+                if (cellsLeft <= 0) {
+                    let randomPrimo = randomInteger(200,400);
+                    eventOutcome(`All whopperflowers have been revealed! (+${randomPrimo} Primogems)`,eventBackdrop, "primogem", randomPrimo);
+                }
+            });
+            tr.appendChild(td);
+        }
+    mineBackground.appendChild(tr);
+    }
+    eventBackdrop.append(mineBackground,mineInfo)
+    mainBody.append(eventBackdrop);
+
+   
+}
+
+
 // EVENT 4 (REACTION TIME)
 var reactionReady = false;
 var reactionGame = false;
@@ -502,13 +656,13 @@ function reactionEvent() {
     reactionImage.id = "reaction-image";
 
     let reactionImageBottom = document.createElement("img");
-    reactionImageBottom.src = "./assets/clock-back.webp";
+    reactionImageBottom.src = "./assets/event/clock-back.webp";
     reactionImageBottom.id = "reaction-image-bot";
     let reactionImageArrow = document.createElement("img");
-    reactionImageArrow.src = "./assets/clock-arrow.webp";
+    reactionImageArrow.src = "./assets/event/clock-arrow.webp";
     reactionImageArrow.id = "reaction-image-arrow";
     let reactionImageTop = document.createElement("img");
-    reactionImageTop.src = "./assets/clock-top.webp";
+    reactionImageTop.src = "./assets/event/clock-top.webp";
     reactionImageTop.id = "reaction-image-top";
 
     let reactionButton = document.createElement("div");
@@ -683,12 +837,45 @@ function boxOpen(eventBackdrop) {
 // EVENT 6 (WHACK-A-MOLE)
 
 
+
+// EVENT OUTCOME
+function eventOutcome(innerText,eventBackdrop, type, amount) {
+    let removeClick = document.createElement("div");
+    let boxText = document.createElement("div");
+    let boxTextBackground = document.createElement("div");
+    let boxTextDiv = document.createElement("p");
+
+    removeClick.id = "prevent-clicker";
+    boxText.classList.add("event-rain-text");
+    boxText.id = "box-text";
+    boxTextDiv.innerText = innerText;
+    boxText.append(boxTextBackground,boxTextDiv);
+
+    setTimeout(()=> {
+        removeClick.append(boxText);
+        mainBody.appendChild(removeClick);
+        setTimeout(()=> {
+            boxText.classList.add("slide-out-animation");
+            boxText.addEventListener("animationend",() => {
+                removeClick.remove();
+                if (type === "primogem") {
+                    saveValues.primogem += amount;
+                }
+            });
+        },4000)
+    },500);
+
+    setTimeout(()=> {
+        eventBackdrop.remove()
+    },4000)
+}
+
 //--------------------------------------------------------------------------MAIN BODY----------------------------------------------------------------------//
 function loadingAnimation() {
     var siteWidth = 1080;
     var scale = screen.width / (siteWidth);
     document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
-    setTimeout(() => {removeLoading()}, 1200);
+    setTimeout(() => {removeLoading()}, 2000);
 }
 
 function removeLoading() {
@@ -1100,7 +1287,6 @@ function addNewRow() {
 
             
             let heroID = "but-" + saveValues["rowCount"];
-            console.log(heroID)
             let heroButtonContainer = createHeroButtonContainer(heroID);
             let toolName = upgradeDict[i];
             saveValues["rowCount"]++;
@@ -1912,7 +2098,7 @@ function addShop() {
     tabButtonImage.src = "./assets/icon/tab"+ (7) +".webp";
     tabButtonImage.classList += "tab-button";
     tabButtonImage.classList.add("darken")
-    tabButton.id = "tab-" + (6);
+    tabButton.id = "tab-" + (5);
 
     tabButton.addEventListener('click', () =>{
             tabChange(6);
