@@ -1132,7 +1132,7 @@ circle {
 
 .dim-filter {
     transition: 0.3s ease;
-    filter: brightness(50%);
+    filter: brightness(25%);
 }
 
 /* BUTTON CSS */
@@ -1311,7 +1311,8 @@ circle {
 #table1 {
     display: flex;
     flex-direction: column;
-    gap: 1.5%;
+    align-items: center;
+    gap: 1%;
     overflow-y: scroll;  
     overflow-x: hidden;
     font-size: inherit;
@@ -1324,7 +1325,7 @@ circle {
     flex: none;
 
     color: white;
-    width: 100%;
+    width: 98%;
     height: 14%;
     font-size: 0.85em;
     position: relative;
@@ -1370,9 +1371,8 @@ circle {
 }
 
 .active-hero {
-    transform:scale(1.035);
+    transform:scaleY(1.08) scaleX(1.07);
     transition: 0.4s ease;
-    filter: drop-shadow(var(--dropshadow)) 
 }
 
 .dim {
@@ -1397,18 +1397,22 @@ circle {
     justify-content: flex-start;
     align-content: flex-start;
     align-items: stretch;
-    gap: 1% 1%;
+    gap: 2% 2%;
 }
 
-.flex-container-INVENTORY button:hover{
-    box-shadow: 5px 5px;
+.inventory-selected {
+    border: #867357;
+    border-style:inset;
+    border-width: 0.4em;
+    border-radius: 1em;
+    transition: 0.2s ease;
+    transform: scale(1.20);
 }
 
 .button-container {
+    background-color: transparent;
     aspect-ratio: 13/17;
     flex-basis: 15%;
-    /* width: 103px;
-    height: 130px; */
     position: relative;
 }
 
@@ -1541,7 +1545,7 @@ circle {
 }
 
 .after-icon {
-    content: url(./assets/icon/energyIcon.png);
+    content: url(./assets/icon/energyIcon.webp);
     height: 90%;
     object-fit: contain;
 }
@@ -1708,7 +1712,6 @@ repeat, no-repeat
 
 .achieve:hover {
     transition: 0.4s ease;
-    background-color: yellow;
 }
 
 .achievementImageContainer {
@@ -1927,13 +1930,15 @@ repeat, no-repeat
 }
 
 .shop-button {
-    width: 18%;
+    border: #867357;
+    border-style:groove;
+    border-width: 0.2em;
+    width: 17.5%;
     height: 45%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: plum;
 }
 
 .shop-button-container > img {
@@ -2000,14 +2005,14 @@ repeat, no-repeat
  * ---------------------------------------------- */
 @-webkit-keyframes shadow-pop-tr {
     0% {
-      -webkit-box-shadow: 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e;
-              box-shadow: 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e;
+      -webkit-box-shadow: 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357;
+              box-shadow: 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357;
       -webkit-transform: translateX(0) translateY(0);
               transform: translateX(0) translateY(0);
     }
     100% {
-      -webkit-box-shadow: 0.05em -0.05em #3e3e3e, 0.1em -0.1em  #3e3e3e, 0.15em -0.15em #3e3e3e, 0.2em -0.2em  #3e3e3e, 0.25em -0.25em #3e3e3e, 0.3em -0.3em  #3e3e3e, 0.35em -0.35em #3e3e3e, 0.4em -0.4em #3e3e3e;
-              box-shadow: 0.05em -0.05em #3e3e3e, 0.1em -0.1em  #3e3e3e, 0.15em -0.15em #3e3e3e, 0.2em -0.2em  #3e3e3e, 0.25em -0.25em #3e3e3e, 0.3em -0.3em  #3e3e3e, 0.35em -0.35em #3e3e3e, 0.4em -0.4em #3e3e3e;
+      -webkit-box-shadow: 0.05em -0.05em #867357, 0.1em -0.1em  #867357, 0.15em -0.15em #867357, 0.2em -0.2em  #867357, 0.25em -0.25em #867357, 0.3em -0.3em  #867357, 0.35em -0.35em #867357, 0.4em -0.4em #867357;
+              box-shadow: 0.05em -0.05em #867357, 0.1em -0.1em  #867357, 0.15em -0.15em #867357, 0.2em -0.2em  #867357, 0.25em -0.25em #867357, 0.3em -0.3em  #867357, 0.35em -0.35em #867357, 0.4em -0.4em #867357;
       -webkit-transform: translateX(-0.4em) translateY(0.4em);
               transform: translateX(-0.4em) translateY(0.4em);
     }
@@ -2015,14 +2020,14 @@ repeat, no-repeat
 
 @keyframes shadow-pop-tr {
     0% {
-      -webkit-box-shadow: 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e;
-              box-shadow: 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e, 0 0 #3e3e3e;
+      -webkit-box-shadow: 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357;
+              box-shadow: 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357, 0 0 #867357;
       -webkit-transform: translateX(0) translateY(0);
               transform: translateX(0) translateY(0);
     }
     100% {
-      -webkit-box-shadow: 0.05em -0.05em #3e3e3e, 0.1em -0.1em  #3e3e3e, 0.15em -0.15em #3e3e3e, 0.2em -0.2em  #3e3e3e, 0.25em -0.25em #3e3e3e, 0.3em -0.3em  #3e3e3e, 0.35em -0.35em #3e3e3e, 0.4em -0.4em #3e3e3e;
-              box-shadow: 0.05em -0.05em #3e3e3e, 0.1em -0.1em  #3e3e3e, 0.15em -0.15em #3e3e3e, 0.2em -0.2em  #3e3e3e, 0.25em -0.25em #3e3e3e, 0.3em -0.3em  #3e3e3e, 0.35em -0.35em #3e3e3e, 0.4em -0.4em #3e3e3e;
+      -webkit-box-shadow: 0.05em -0.05em #867357, 0.1em -0.1em  #867357, 0.15em -0.15em #867357, 0.2em -0.2em  #867357, 0.25em -0.25em #867357, 0.3em -0.3em  #867357, 0.35em -0.35em #867357, 0.4em -0.4em #867357;
+              box-shadow: 0.05em -0.05em #867357, 0.1em -0.1em  #867357, 0.15em -0.15em #867357, 0.2em -0.2em  #867357, 0.25em -0.25em #867357, 0.3em -0.3em  #867357, 0.35em -0.35em #867357, 0.4em -0.4em #867357;
       -webkit-transform: translateX(-0.4em) translateY(0.4em);
               transform: translateX(-0.4em) translateY(0.4em);
     }

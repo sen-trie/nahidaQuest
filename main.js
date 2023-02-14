@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.1.A-13-2-23"
+const VERSIONNUMBER = "v0.1.A-14-2-23"
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
 let startText = document.getElementById("start-screen"); 
@@ -131,8 +131,7 @@ table3.appendChild(expedTooltip);
 
 var tooltipTable = 1;
 var heroTooltip = -1;
-var heroIndexTooltip = -1;
-var itemTooltip = 0;
+var itemTooltip = -1;
 createTooltip();
 setShop();
 
@@ -265,7 +264,7 @@ function loadSaveData() {
 var clickAudioDelay = null;
 var currentClick = 1;
 let demoImg = document.createElement("img");
-demoImg.src = "./assets/nahida.png";
+demoImg.src = "./assets/nahida.webp";
 demoImg.classList.add("demo-img");
 
 demoContainer.addEventListener("mouseup", () => {
@@ -299,7 +298,7 @@ demoContainer.addEventListener("mouseup", () => {
     let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`
 
     var img = document.createElement("img");
-    img.src = "./assets/icon/primogemIcon.png";
+    img.src = "./assets/icon/primogemIcon.webp";
     img.style.left = `${randomInteger(0,100)}%`
     img.style.animation = animation;
     img.addEventListener('animationend', () => {img.remove();});
@@ -391,8 +390,9 @@ function clickedEvent() {
 
 function chooseEvent() {
     //clickEvent();
-    // rainEvent()
-    minesweeperEvent();
+    // rainEvent();
+    reactionEvent();
+    // minesweeperEvent();
     // let randInt = randomInteger(1,5);
     // if (randInt === 1) {
     //     rainEvent();
@@ -777,7 +777,7 @@ function boxOpen(eventBackdrop) {
         let goodOutcome = randomInteger(1,8);
         boxOutcome.src = "./assets/icon/good-" + goodOutcome + ".webp";
         outcomeText = "Oh, it had a gemstone! (Increased power for " +boxElement[goodOutcome]+ " characters)";
-        goodOutcomeNumber = 5000.1 + goodOutcome;
+        goodOutcomeNumber = 5002.1 + goodOutcome;
     } else if (boxChance >= 15) {
         let badOutcome = randomInteger(1,5);
         boxOutcome.src = "./assets/icon/bad-" + badOutcome + ".webp";
@@ -792,7 +792,7 @@ function boxOpen(eventBackdrop) {
         saveValues.primogem += randomInteger(40,60);
         boxOutcome.src = "./assets/icon/verygood-" + veryGoodOutcome + ".webp";
         outcomeText = "Oh! It had a precious gemstone!! (Increased power for all characters)";
-        goodOutcomeNumber = 5015.1;
+        goodOutcomeNumber = 5001.1;
     } else {
         boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
         
@@ -1035,6 +1035,14 @@ function tabChange(x) {
         if (removeActiveHero.classList.contains("active-hero")) {
             removeActiveHero.classList.remove("active-hero");
         }
+    } else if (heroTooltip !== -2) {
+        if (document.getElementById(itemTooltip)) { 
+            let buttonInv = document.getElementById(itemTooltip);
+            if (buttonInv.classList.contains("inventory-selected")) {
+                buttonInv.classList.remove("inventory-selected");
+            }
+        };
+        itemTooltip = -1;
     }
 
     
@@ -1073,7 +1081,7 @@ function settings() {
     let settingButton = document.createElement("button");
     settingButton.classList.add("settings-button");
     let settingButtonImg = document.createElement("img");
-    settingButtonImg.src = "./assets/settings.webp";
+    settingButtonImg.src = "./assets/settings/settings.webp";
     settingButtonImg.classList.add("settings-button-img")
     settingButton.appendChild(settingButtonImg);
     settingButton.addEventListener("click", () => {
@@ -1098,7 +1106,7 @@ function settings() {
 
     let settingsText = document.createElement("img");
     settingsText.classList.add("settings-text");
-    settingsText.src = "./assets/settings/Settings.webp"
+    settingsText.src = "./assets/settings/SettingsText.webp"
     
     let volumeScrollerContainer = document.createElement("div")
     volumeScrollerContainer.classList.add("volume-scroller-container");
@@ -1305,8 +1313,6 @@ function addNewRow() {
             });
             heroButtonContainer.innerText = heroText;
             table1.appendChild(heroButtonContainer);
-
-            
         }
     }
 }
@@ -1436,11 +1442,9 @@ function inventoryAdd(idNum, type) {
     let itemUniqueID;
     idNum = parseInt(idNum);
     if (type != "load") {
-        console.log(idNum,",",InventoryMap.get(idNum))
         let currentValue = InventoryMap.get(idNum);
         currentValue++;
         InventoryMap.set(idNum,currentValue);
-        console.log(idNum,",",InventoryMap.get(idNum));
         if (currentValue > 1) {
             return;
         }
@@ -1452,7 +1456,14 @@ function inventoryAdd(idNum, type) {
     buttonInv.id = itemUniqueID;
     buttonInv.addEventListener('click', function() {
         changeTooltip(Inventory[idNum], "item", idNum);
-        console.log(itemUniqueID)
+        if (itemTooltip === -1) {
+            buttonInv.classList.add("inventory-selected");
+        } else if (idNum !== itemTooltip) {
+            let buttonDocument = document.getElementById(itemTooltip);
+            buttonDocument.classList.remove("inventory-selected");
+            buttonInv.classList.add("inventory-selected");
+        }
+        
         itemTooltip = idNum;
     });
     buttonInv = inventoryAddButton(buttonInv,Inventory[idNum])
@@ -1704,9 +1715,9 @@ function createExpedition() {
         let expedButton = document.createElement("button");
         
         if (expeditionDict[i]["Locked"] == 1){
-            var backgroundImg = "url(./assets/expedbg/exped6.png)";
+            var backgroundImg = "url(./assets/expedbg/exped6.webp)";
         } else {
-            var backgroundImg = "url(./assets/expedbg/exped" + i + ".png)";
+            var backgroundImg = "url(./assets/expedbg/exped" + i + ".webp)";
         }
 
         expedButton = expedButtonAdjust(expedButton, backgroundImg, i)
@@ -1755,7 +1766,7 @@ function expedInfo(butId) {
     let wishButton = document.getElementById("wishButton");
     let wishButtonPrimo = document.createElement("img");
     wishButtonPrimo.classList.add("wish-button-primo");
-    wishButtonPrimo.src = "./assets/icon/primogemIcon.png";
+    wishButtonPrimo.src = "./assets/icon/primogemIcon.webp";
     
     wishButtonText.innerText = "Write for help | 160 ";
     wishButtonText.append(wishButtonPrimo);
