@@ -391,18 +391,20 @@ function clickedEvent() {
 function chooseEvent() {
     //clickEvent();
     // rainEvent();
-    reactionEvent();
-    // minesweeperEvent();
-    // let randInt = randomInteger(1,5);
-    // if (randInt === 1) {
-    //     rainEvent();
-    // } else if (randInt === 2) {
-    //     clickEvent();
-    // } else if (randInt === 3) {
-    //     reactionEvent();
-    // } else if (randInt === 4) {
-    //     boxFunction();
-    // }
+    // weaselEvent();
+    
+    let randInt = randomInteger(1,6);
+    if (randInt === 1) {
+        rainEvent();
+    } else if (randInt === 2) {
+        clickEvent();
+    } else if (randInt === 3) {
+        reactionEvent();
+    } else if (randInt === 4) {
+        boxFunction();
+    } else {
+        minesweeperEvent();
+    }
 }
 
 // EVENT 1 (RAIN)
@@ -639,10 +641,7 @@ function minesweeperEvent() {
     }
     eventBackdrop.append(mineBackground,mineInfo)
     mainBody.append(eventBackdrop);
-
-   
 }
-
 
 // EVENT 4 (REACTION TIME)
 var reactionReady = false;
@@ -665,20 +664,25 @@ function reactionEvent() {
     reactionImageTop.src = "./assets/event/clock-top.webp";
     reactionImageTop.id = "reaction-image-top";
 
+    reactionStartElement.load();
+    reactionStartElement.play();
+
     let reactionButton = document.createElement("div");
     reactionButton.id = "reaction-button";
     reactionButton.innerText = "Not yet...";
     reactionButton.addEventListener("click",()=>{
-        reactionFunction(eventBackdrop)
+        reactionStartElement.pause();
+        reactionImageArrow.style.animationPlayState = "paused";
+        reactionFunction(eventBackdrop);
         setTimeout(()=> {
             eventBackdrop.remove();
         },2000)
     });
 
-    reactionStartElement.load();
-    reactionStartElement.play();
-    reactionStartElement.addEventListener("ended", ()=> {
-        if (reactionGame == true) {
+    let randomTime = randomInteger(6000,9500);
+    setTimeout(()=>{
+        if (reactionGame === true) {
+            reactionStartElement.pause();
             reactionReady = true;
             reactionButton.innerText = "Now!";
             reactionImageArrow.style.animationPlayState = "paused";
@@ -688,14 +692,13 @@ function reactionEvent() {
                     reactionButton.innerText = "Too Slow!";
                     reactionFunction(eventBackdrop);
                 }
-            }, 800)
+            }, 700)
         }
-    });
+    },randomTime);
     
     reactionImage.append(reactionImageBottom,reactionImageArrow,reactionImageTop)
     eventBackdrop.append(reactionImage,reactionButton);
     mainBody.append(eventBackdrop);
-    
 }
 
 function reactionFunction(eventBackdrop) {
@@ -765,7 +768,6 @@ function boxOpen(eventBackdrop) {
     boxOutcome.classList.add("box-outcome");
     boxOutcome.classList.add("slide-in-blurred-top");
     let outcomeText;
-    let badOutcomeNumber = 0;
     let goodOutcomeNumber = 0;
 
     let boxChance = randomInteger(1,101);
@@ -781,12 +783,7 @@ function boxOpen(eventBackdrop) {
     } else if (boxChance >= 15) {
         let badOutcome = randomInteger(1,5);
         boxOutcome.src = "./assets/icon/bad-" + badOutcome + ".webp";
-
-        let badOutcomePercentage = randomInteger(5,16);
-        outcomeText = "Uh oh, an enemy was hiding in the box! (Lost " +badOutcomePercentage+"% of  Nuts)";
-        badOutcomePercentage = badOutcomePercentage/100;
-        badOutcomeNumber = (saveValues.realScore * badOutcomePercentage);
-        saveValues.realScore -= badOutcomeNumber;
+        outcomeText = "Uh oh, an enemy was hiding in the box!";
     } else if (boxChance >= 5) {
         let veryGoodOutcome = randomInteger(1,4);
         saveValues.primogem += randomInteger(40,60);
@@ -796,11 +793,10 @@ function boxOpen(eventBackdrop) {
     } else {
         boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
         
-        let badOutcomePercentage = randomInteger(35,61);
-        outcomeText = "Uh oh! Run away! (Lost " +badOutcomePercentage+ "% of Nuts LOL LOSER)";
-        badOutcomePercentage = badOutcomePercentage/100;
-        badOutcomeNumber = (saveValues.realScore * badOutcomePercentage);
-        saveValues.realScore -= badOutcomeNumber;
+        let badOutcomePercentage = randomInteger(15,30);
+        outcomeText = "Uh oh! Run away! (Lost " +badOutcomePercentage+ "% of Energy)";
+        badOutcomePercentage = 100 - badOutcomePercentage/100;
+        saveValues.energy = saveValues.energy * badOutcomePercentage;
     }
 
     boxOuterNew.appendChild(boxOutcome);
@@ -835,7 +831,28 @@ function boxOpen(eventBackdrop) {
 }
 
 // EVENT 6 (WHACK-A-MOLE)
+function weaselEvent() {
+    let weaselRow = 3;
+    let weaselColumn = 6;
+    let weaselElement = weaselRow * weaselColumn
 
+
+    let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("event-dark");
+    let weaselBack = document.createElement("div");
+    weaselBack.classList.add("weasel-back");
+
+    while (weaselElement--) {
+        let weaselBackDiv = document.createElement("div");
+        let weaselBackImage = document.createElement("div");
+        weaselBackImage.classList.add("weasel");
+        weaselBackDiv.append(weaselBackImage);
+        weaselBack.append(weaselBackDiv);
+    }
+    
+    eventBackdrop.append(weaselBack);
+    mainBody.append(eventBackdrop);
+}
 
 
 // EVENT OUTCOME
@@ -2077,9 +2094,6 @@ function tooltipFunction() {
         let inventoryCount = InventoryMap.get(itemTooltip);
         inventoryCount--;
         InventoryMap.set(itemTooltip,inventoryCount)
-
-        
-        
 
         if (inventoryCount > 0) {
             changeTooltip(Inventory[itemTooltip],"item",itemTooltip)

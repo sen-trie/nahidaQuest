@@ -2,6 +2,7 @@
 @font-face {
     font-family: gi-font;
     src: url(./assets/gi-font.ttf);
+    font-display: swap;
 }
 
 html,body {
@@ -733,6 +734,36 @@ button {
     width: 70%;
     height: 150%;
     object-fit: contain;
+}
+
+.weasel {
+    /* height: 341px; */
+    max-width: 100%;
+    max-height: 100%;
+    height: 341px;
+    /* width: 225px; */
+    width: 225px;
+    background-image: url(./assets/event/weasel.webp);
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    background-size: auto;
+}
+
+.weasel-back > div {
+    background-color: yellow;
+}
+
+.weasel-back {
+    z-index: 10010;
+    position: absolute;
+    left: 15%;
+    width: 70%;
+    aspect-ratio: 1.459;
+    background-image: url(./assets/event/weasel-back.webp);
+    background-size: contain;
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(6, 1fr);
 }
 
 /* ----------------------------------------------
@@ -1782,7 +1813,7 @@ repeat, no-repeat
 }
 
 #table6 {
-    padding-top: 2.5%;
+    padding-top: 2.0%;
     font-size: inherit;
     position: relative;
     width: 30%;
@@ -1853,13 +1884,10 @@ repeat, no-repeat
 .tool-tip-text {
     font-size:  0.85em;
     text-align: center;
-    max-width: 84%;
 }
 
 .tool-tip-lore {
-    font-size: 0.9em;
-    text-align: left;
-    max-width: 84%;
+    font-size: 0.8em;
 }
 
 .tool-tip-extraimg {

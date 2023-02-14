@@ -25,7 +25,7 @@ var upgradeDictDefault = {
     3: {Name: "Tighnari",    Row:-1,    Lore:"",      Purchased: -1,   Type: "Bow",      Ele: "Dendro",           Nation:"Sumeru"                                             },
     4: {Name: "Dori",        Row:-1,    Lore:"",      Purchased: -1,  Type: "Claymore",   Ele: "Electro",           Nation:"Sumeru"                                             },
     5: {Name: "Candace",     Row:-1,    Lore:"",      Purchased: -1,   Type: "Polearm",   Ele: "Hydro",           Nation:"Sumeru"                                             },
-    6: {Name: "Cyno",        Row:-1,    Lore:"",      Purchased: -1,   Type: "Polearm",   Ele: "Electro",           Nation:"Sumeru"                                             },
+    6: {Name: "Cyno",        Row:-1,    Lore:"I just thought of a new joke. 'Good morning. Have a Candied Ajilenakh Nut, and I'll ca-shew later.'",      Purchased: -1,   Type: "Polearm",   Ele: "Electro",           Nation:"Sumeru"                                             },
     7: {Name: "Nilou",       Row:-1,    Lore:"",      Purchased: -1,   Type: "Sword",     Ele: "Hydro",           Nation:"Sumeru"                                             },
     8: {Name: "Layla",       Row:-1,    Lore:"",      Purchased: -1,   Type: "Sword",     Ele: "Cryo",           Nation:"Sumeru"                                             },
     9: {Name: "Faruzan",     Row:-1,    Lore:"",      Purchased: -1,   Type: "Bow",       Ele: "Anemo",           Nation:"Sumeru"                                             },
