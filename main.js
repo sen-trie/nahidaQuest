@@ -1081,7 +1081,7 @@ function settings() {
     let settingButton = document.createElement("button");
     settingButton.classList.add("settings-button");
     let settingButtonImg = document.createElement("img");
-    settingButtonImg.src = "./assets/settings/settings.webp";
+    settingButtonImg.src = "./assets/settings/settings-logo.webp";
     settingButtonImg.classList.add("settings-button-img")
     settingButton.appendChild(settingButtonImg);
     settingButton.addEventListener("click", () => {
