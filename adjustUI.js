@@ -82,9 +82,7 @@ function dimMultiplierButton(int,currentDimMultiplier) {
 
 // ADJUST SETTINGS VOLUME 
 function volumeScrollerAdjust(volumeScroller) {
-    volumeScroller.type = "range";
-    volumeScroller.min = "0";
-    volumeScroller.max = "100";
+    volumeScroller.x = "100";
     return volumeScroller;
 }
 

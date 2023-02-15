@@ -1,4 +1,4 @@
-import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText } from "./defaultData.js"
+import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo } from "./defaultData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText } from "./functions.js"
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
@@ -1133,6 +1133,7 @@ function settings() {
     let volumeScrollerBGM = document.createElement("input");
     volumeScrollerBGM = volumeScrollerAdjust(volumeScrollerBGM);
     volumeScrollerBGM.id = "volume-scroller-bgm";
+    volumeScrollerBGM.setAttribute("type", "range");
     volumeScrollerBGM.value = settingsValues.bgmVolume * 100;
 
     let volumeScrollerBGMText = document.createElement("div");
@@ -1146,6 +1147,7 @@ function settings() {
     volumeScrollerSFXContainer.classList.add("volume-scroller-container-children");
     let volumeScrollerSFX = document.createElement("input");
     volumeScrollerSFX = volumeScrollerAdjust(volumeScrollerSFX);
+    volumeScrollerSFX.setAttribute("type", "range");
     volumeScrollerSFX.id = "volume-scroller-sfx";
     volumeScrollerSFX.value = settingsValues.sfxVolume * 100;
 
@@ -1250,17 +1252,17 @@ function loadRow() {
             purchased = true;
             if (j == 0) {
                 let singular = ` Nut${upgradeDict[j]["Factor"] !== 1 ? 's' : ''} per click`;
-                heroTextLoad =  upgradeDict[j].Name + ": " + formatCost + ", " + formatATK + singular;
+                heroTextLoad =  upgradeInfo[j].Name + ": " + formatCost + ", " + formatATK + singular;
             } else {
-                heroTextLoad =  upgradeDictTemp.Name + ": " + formatCost + ", +" + formatATK + " NpS";
+                heroTextLoad =  upgradeInfo[j].Name + ": " + formatCost + ", +" + formatATK + " NpS";
             }
         } else {
             if (upgradeDictTemp["Level"] == 0) {
-                heroTextLoad = "Summon " + upgradeDictTemp.Name + " for help. (" + abbrNum(formatCost) + ")";
+                heroTextLoad = "Summon " + upgradeInfo[j].Name + " for help. (" + abbrNum(formatCost) + ")";
             } else if (j == 0) {
                 heroTextLoad = "Level Up Nahida (" + abbrNum(formatCost) + ")";
             } else {
-                heroTextLoad = "Call for " + upgradeDictTemp.Name + "'s help... (" + abbrNum(formatCost) + ")";
+                heroTextLoad = "Call for " + upgradeInfo[j].Name + "'s help... (" + abbrNum(formatCost) + ")";
             }
         }
 
@@ -1268,7 +1270,7 @@ function loadRow() {
         let heroButtonContainer = createHeroButtonContainer(heroID);
         
         heroButtonContainer.addEventListener("click", () => {
-            changeTooltip(upgradeDictTemp, "hero");
+            changeTooltip(upgradeInfo[j], "hero",j);
             
             if (heroTooltip !== -1) {
                 heroTooltip = upgradeDict[heroTooltip].Row;
@@ -1284,7 +1286,7 @@ function loadRow() {
 
         heroButtonContainer.innerText = heroTextLoad;
         if (purchased == true) {
-            heroButtonContainer.style = "background:url(./assets/nameplates/"+upgradeDictTemp.Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
+            heroButtonContainer.style = "background:url(./assets/nameplates/"+upgradeInfo[loadedHeroID].Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
         } else {
             heroButtonContainer.classList += " not-purchased";
         }
@@ -1303,21 +1305,20 @@ function addNewRow() {
             upgradeDict[i].Purchased = 0;
             
             if (upgradeDict[i]["Level"] === 0) {
-                var heroText = "Summon " + upgradeDict[i].Name + " for help. (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
+                var heroText = "Summon " + upgradeInfo[i].Name + " for help. (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
             } else if (i === 0) {
                 var heroText = "Level Up Nahida (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
             } else {
-                var heroText = "Call for " + upgradeDict[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
+                var heroText = "Call for " + upgradeInfo[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
             }
 
             
             let heroID = "but-" + saveValues["rowCount"];
             let heroButtonContainer = createHeroButtonContainer(heroID);
-            let toolName = upgradeDict[i];
             saveValues["rowCount"]++;
 
             heroButtonContainer.addEventListener("click", () => {
-                changeTooltip(toolName, "hero");
+                changeTooltip(upgradeInfo[i], "hero",i);
                 if (heroTooltip !== -1) {
                     heroTooltip = upgradeDict[heroTooltip].Row;
                     let removeActiveHero = document.getElementById(`but-${heroTooltip}`)
@@ -1378,7 +1379,7 @@ function upgrade(clicked_id) {
         checkExpeditionUnlock(saveValues["heroesPurchased"]);                                        
         refresh(butIdArray, upgradeDictTemp["BaseCost"], clicked_id);
             
-        changeTooltip(upgradeDictTemp,"hero");                   
+        changeTooltip(upgradeInfo[clicked_id],"hero",clicked_id);                   
         saveValues["realScore"] = realScoreCurrent;
     }
 }
@@ -1565,7 +1566,7 @@ function itemUse(itemUniqueId) {
             if (upgradeDict[i] == undefined) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i].Purchased > 0)
-                if (upgradeDict[i].Ele == elem || i === 1) {
+                if (upgradeInfo[i].Ele == elem || i === 1) {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
@@ -1584,7 +1585,7 @@ function itemUse(itemUniqueId) {
             if (upgradeDict[i] == undefined) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
             if (upgradeDict[i].Purchased > 0){
-                if (upgradeDict[i].Nation === nation) {
+                if (upgradeInfo[i].Nation === nation) {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
@@ -2040,9 +2041,9 @@ function changeTooltip(dict, type, number) {
     tooltipLore.innerText = dict.Lore;
 
     if (type == "hero") {
-        let tooltipTextLocal = "Level: " + dict["Purchased"] + 
+        let tooltipTextLocal = "Level: " + upgradeDict[number]["Purchased"] + 
                                 "<br />Free Levels: " + saveValues["freeLevels"] + 
-                                "<br />" + abbrNum(dict["Contribution"]) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
+                                "<br />" + abbrNum(upgradeDict[number]["Contribution"]) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
         tooltipElementImg.src = "./assets/tooltips/elements/" +dict.Ele+ ".webp";
         tooltipWeaponImg.src = "./assets/tooltips/elements/" +dict.Type+ ".webp";
@@ -2300,6 +2301,7 @@ function refresh() {
             let heroTextFirst = "";
             let formatCost = arguments[1];
             let upgradeDictTemp = upgradeDict[arguments[2]];
+            let upgradeInfoTemp = upgradeInfo[arguments[2]];
             let currentPurchased = upgradeDictTemp["Purchased"];
             let formatATK = upgradeDictTemp["Factor"];
 
@@ -2315,15 +2317,15 @@ function refresh() {
             if (arguments[2] == 0) {
                 let singular = ` Nut${formatATK !== 1 ? 's' : ''} per click`;
                 formatATK = abbrNum(formatATK)
-                heroTextFirst = upgradeDictTemp.Name + ": " + formatCost + ", +" + formatATK + singular;
+                heroTextFirst = upgradeInfoTemp.Name + ": " + formatCost + ", +" + formatATK + singular;
             } else {
                 formatATK = abbrNum(formatATK)
-                heroTextFirst = upgradeDictTemp.Name + ": " + formatCost + ", +" + formatATK + " NpS";
+                heroTextFirst = upgradeInfoTemp.Name + ": " + formatCost + ", +" + formatATK + " NpS";
             }
             
             let upgradedHeroButton = document.getElementById(arguments[0]);
             upgradedHeroButton.innerText = heroTextFirst;
-            upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeDictTemp.Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
+            upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeInfoTemp.Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
         }
         else if (arguments[0] == "hero") { // REFRESH FOR ARTIFACTS
             let hero = upgradeDict[arguments[1]];
@@ -2338,7 +2340,7 @@ function refresh() {
                 formatCost *= (COSTRATIO**currentPurchased);
             }
 
-            let heroText = hero.Name + ": " + abbrNum(formatCost) + ", +" + abbrNum(formatATK) + " NpS";
+            let heroText = upgradeInfoTemp.Name + ": " + abbrNum(formatCost) + ", +" + abbrNum(formatATK) + " NpS";
             let id="but-" + hero.Row + "";
             document.getElementById(id).innerText = heroText;
         }
