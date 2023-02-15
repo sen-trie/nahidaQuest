@@ -222,7 +222,7 @@ function loadSaveData() {
     } else {
         let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
         upgradeDict = JSON.parse(upgradeDictTemp);
-        var timer2 = setTimeout(loadRow,1000);
+        setTimeout(loadRow,1000);
     }
     // LOAD INVENTORY DATA
     Inventory = InventoryDefault;
@@ -370,7 +370,7 @@ function clickedEvent() {
     let eventDropdownBackground = document.createElement("img");
     eventDropdownBackground.src = "./assets/tutorial/eventPill.webp";
 
-    let aranaraNumber = randomInteger(1,6);
+    let aranaraNumber = randomInteger(1,7);
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
     eventDropdownText.classList.add("event-dropdown-text");
@@ -385,25 +385,31 @@ function clickedEvent() {
     eventDropdown.addEventListener("animationend", () => {eventDropdown.remove()});
     mainBody.appendChild(eventDropdown);
 
-    setTimeout(() => {chooseEvent()},6000);
+    setTimeout(() => {chooseEvent(aranaraNumber)},6000);
 }
 
-function chooseEvent() {
-    //clickEvent();
-    // rainEvent();
-    // weaselEvent();
-    
-    let randInt = randomInteger(1,6);
-    if (randInt === 1) {
-        rainEvent();
-    } else if (randInt === 2) {
-        clickEvent();
-    } else if (randInt === 3) {
-        reactionEvent();
-    } else if (randInt === 4) {
-        boxFunction();
-    } else {
-        minesweeperEvent();
+function chooseEvent(type) {
+    switch (type) {
+        case 1:
+            rainEvent();
+            break;
+        case 2:
+            clickEvent();
+            break;
+        case 3:
+            reactionEvent();
+            break;
+        case 4:
+            boxFunction();
+            break
+        case 5:
+            minesweeperEvent();
+            break;
+        case 6:
+            weaselEvent();
+            break;
+        default:
+            break;
     }
 }
 
@@ -565,7 +571,6 @@ function minesweeperEvent() {
     function revealCell(r, c) {
         if (r >= 0 && r < ROWS && c >= 0 && c < COLS && !board[r][c].revealed) {
           board[r][c].revealed = true;
-          console.log(cellsLeft)
           cellsLeft--;
           const tr = mineBackground.children[r];
           const td = tr.children[c];
@@ -584,8 +589,7 @@ function minesweeperEvent() {
         }
     }
         
-    
-    // Render the game to event backdrop
+    // Render minesweeper to event backdrop
     for (let r = 0; r < ROWS; r++) {
         const tr = document.createElement("tr");
         for (let c = 0; c < COLS; c++) {
@@ -832,28 +836,112 @@ function boxOpen(eventBackdrop) {
 
 // EVENT 6 (WHACK-A-MOLE)
 function weaselEvent() {
-    let weaselRow = 3;
-    let weaselColumn = 6;
-    let weaselElement = weaselRow * weaselColumn
-
-
+    let weaselElement = 18;
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("event-dark");
     let weaselBack = document.createElement("div");
     weaselBack.classList.add("weasel-back");
 
     while (weaselElement--) {
-        let weaselBackDiv = document.createElement("div");
-        let weaselBackImage = document.createElement("div");
-        weaselBackImage.classList.add("weasel");
-        weaselBackDiv.append(weaselBackImage);
-        weaselBack.append(weaselBackDiv);
+            let weaselContainer = document.createElement("div");
+            weaselContainer.classList.add("weasel");
+
+            let weaselBackImage = document.createElement("img");
+            weaselBackImage.src = './assets/event/weasel-10.webp';
+            weaselContainer.append(weaselBackImage)
+            weaselBack.append(weaselContainer);
     }
-    
-    eventBackdrop.append(weaselBack);
+
+    let delay = 2000;
+    setTimeout(()=>{
+        addWeasel(weaselBack,delay);
+    },2000)
+
+    let weaselTimer = document.createElement("div");
+    weaselTimer.classList.add("weasel-timer");
+    let weaselTimerImage = document.createElement("img");
+    weaselTimerImage.addEventListener("animationend",()=> {
+        eventBackdrop.remove();
+    })
+
+    weaselTimer.append(weaselTimerImage)
+    eventBackdrop.append(weaselBack,weaselTimer);
     mainBody.append(eventBackdrop);
 }
 
+function addWeasel(weaselBack,delay) {
+    let weaselDiv = weaselBack.children;
+    let realWeasel = randomInteger(0,18);
+
+    for (let i=0, len=weaselDiv.length; i < len; i++) {
+        let weaselImage = weaselDiv[i].querySelector('img');
+        if (i === realWeasel) {
+            let realWeasel = randomInteger(2,4);
+            weaselImage.src = "./assets/event/weasel-"+realWeasel+".webp";
+
+            let springInterval = (randomInteger(15,25) / 100)
+            weaselImage.classList.add("spring");
+            weaselImage.style["animation-duration"] = springInterval + "s";
+            weaselImage.addEventListener("click",()=>{clearWeasel(weaselBack,delay)})
+        } else {
+            let emptyWeasel = randomInteger(7,11);
+            if (emptyWeasel != 10 & emptyWeasel != 9) {
+                let springInterval = (randomInteger(15,25) / 100)
+                weaselImage.classList.add("spring");
+                weaselImage.style["animation-duration"] = springInterval + "s";
+            }
+            weaselImage.src = "./assets/event/weasel-"+emptyWeasel+".webp"
+        }
+    }
+
+    let fakeAmount = Math.floor(2000/delay + 0.3);
+    if (fakeAmount > 10) {fakeAmount = 10}
+    let combination = generateCombination(fakeAmount);
+    for (let j=0, len=combination.length; j < len; j++) {
+        if ((combination[j] - 1) === realWeasel) {continue}
+        let weaselImage = weaselDiv[combination[j] - 1].querySelector('img');
+        let fakeWeasel = randomInteger(5,7);
+        weaselImage.src = "./assets/event/weasel-"+fakeWeasel+".webp";
+
+        let springInterval = (randomInteger(15,35) / 100)
+        weaselImage.classList.add("spring");
+        weaselImage.style["animation-duration"] = springInterval + "s";
+        weaselImage.addEventListener("click",()=>{clearWeasel(weaselBack,delay)})
+    }
+}
+
+function clearWeasel(weaselBack,delay) {
+    let weaselDiv = weaselBack.children;
+    for (let i=0, len=weaselDiv.length; i < len; i++) {
+        let weaselImage = weaselDiv[i].querySelector('img');
+        weaselImage.src = './assets/event/weasel-10.webp';
+        if (weaselImage.classList.contains("spring")) {
+            weaselImage.classList.remove("spring");
+        }
+        let new_weaselImage = weaselImage.cloneNode(true);
+        weaselImage.parentNode.replaceChild(new_weaselImage, weaselImage);
+    }
+
+    delay *= 0.75;
+    setTimeout(()=>{
+        addWeasel(weaselBack,delay);
+    },delay)
+}
+
+// CHOOSE n POSITIONS FROM AN ARRAY OF 18
+function generateCombination(n) {
+    let positions = Array.from({ length: 18 }, (_, i) => i + 1);
+    let combination = [];
+  
+    for (let i = 0; i < n; i++) {
+      const randomIndex = Math.floor(Math.random() * positions.length);
+      combination.push(positions[randomIndex]);
+      positions.splice(randomIndex, 1);
+    }
+
+    combination.sort((a,b) => a - b)
+    return combination;
+  }
 
 // EVENT OUTCOME
 function eventOutcome(innerText,eventBackdrop, type, amount) {
@@ -1251,18 +1339,18 @@ function loadRow() {
             formatATK = abbrNum(formatATK)
             purchased = true;
             if (j == 0) {
-                let singular = ` Nut${upgradeDict[j]["Factor"] !== 1 ? 's' : ''} per click`;
-                heroTextLoad =  upgradeInfo[j].Name + ": " + formatCost + ", " + formatATK + singular;
+                let singular = ` Nut${upgradeDict[loadedHeroID]["Factor"] !== 1 ? 's' : ''} per click`;
+                heroTextLoad =  upgradeInfo[loadedHeroID].Name + ": " + formatCost + ", " + formatATK + singular;
             } else {
-                heroTextLoad =  upgradeInfo[j].Name + ": " + formatCost + ", +" + formatATK + " NpS";
+                heroTextLoad =  upgradeInfo[loadedHeroID].Name + ": " + formatCost + ", +" + formatATK + " NpS";
             }
         } else {
             if (upgradeDictTemp["Level"] == 0) {
-                heroTextLoad = "Summon " + upgradeInfo[j].Name + " for help. (" + abbrNum(formatCost) + ")";
+                heroTextLoad = "Summon " + upgradeInfo[loadedHeroID].Name + " for help. (" + abbrNum(formatCost) + ")";
             } else if (j == 0) {
                 heroTextLoad = "Level Up Nahida (" + abbrNum(formatCost) + ")";
             } else {
-                heroTextLoad = "Call for " + upgradeInfo[j].Name + "'s help... (" + abbrNum(formatCost) + ")";
+                heroTextLoad = "Call for " + upgradeInfo[loadedHeroID].Name + "'s help... (" + abbrNum(formatCost) + ")";
             }
         }
 
@@ -1270,7 +1358,7 @@ function loadRow() {
         let heroButtonContainer = createHeroButtonContainer(heroID);
         
         heroButtonContainer.addEventListener("click", () => {
-            changeTooltip(upgradeInfo[j], "hero",j);
+            changeTooltip(upgradeInfo[loadedHeroID], "hero",loadedHeroID);
             
             if (heroTooltip !== -1) {
                 heroTooltip = upgradeDict[heroTooltip].Row;
@@ -2080,7 +2168,6 @@ function clearTooltip() {
 
 function tooltipFunction() {
     if (tooltipTable == 1) {
-        console.log(heroTooltip)
         if (heroTooltip === -1) {return}
         upgrade(heroTooltip);
         if (timerSeconds !== 0) {
