@@ -426,6 +426,7 @@ button {
 .icon {
     height:80%;
     aspect-ratio: 0.7;
+    filter: drop-shadow(0px 0px 0.15em #ffefef);
 }
 
  .primogem {
@@ -445,7 +446,7 @@ button {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    animation: vibrate 10s linear 0s 1 normal forwards;
+    animation: vibrate 8s linear 0s 1 normal forwards;
 }
 
 @keyframes vibrate {
@@ -475,11 +476,11 @@ button {
     align-items: center;
 }
 
-.event-dropdown > div {
+ .event-dropdown > div {
     position: relative;
     z-index: 151;
     opacity: 0.9;
-}
+} 
 
 .event-dropdown-text {
     width: 70%;
@@ -536,6 +537,14 @@ button {
     row-gap: 3%;
 }
 
+.event-dark-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    column-gap: 3%;
+}
+
 .event-dark::before {
     content: "";
     background-color: #000000;
@@ -548,36 +557,12 @@ button {
     opacity: 0.95;
 }
 
-.event-rain-text {
-    position: absolute;
-    text-shadow: #686464 0.21375em 0em 0em, #686464 0.20102554875em 0.06442056725em 0em, #686464 0.16545309125em 0.125256034375em 0em, #686464 0.114100525em 0.17245005em 0em, #686464 0.0495299125em 0.1929347625em 0em, #686464 -0.020926788125em 0.1987703525em 0em, #686464 -0.08683835em 0.182958245em 0em, #686464 -0.140307092em 0.145025515em 0em, #686464 -0.18035769em 0.09045148em 0em, #686464 -0.209242475em 0.025948895em 0em, #686464 -0.20681056375em -0.0373652975em 0em, #686464 -0.18052885375em -0.0934511275em 0em, #686464 -0.1379573405em -0.138057635em 0em, #686464 -0.0800555925em -0.159165915em 0em, #686464 -0.0164290525em -0.165675565em 0em, #686464 0.0535315125em -0.1594206825em 0em, #686464 0.1188833225em -0.1486998625em 0em, #686464 0.15738429125em -0.102757115em 0em, #686464 0.1825355875em -0.05246907125em 0em;
-    bottom: 1%;
-    width: 100%;
-    height: 10%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10006;
-}
-
 .event-rain-text > p {
+    text-align: center;
     font-size: 2.3em;
     color: white;
     background-color: transparent;
     z-index: 10007;
-}
-
-.event-rain-text > div {
-    content: "";
-    background-color: #000000;
-    background-size: cover;
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    left: 0px;
-    opacity: 0.8;
-    z-index:10005;
 }
 
 .text-pop {
@@ -735,6 +720,22 @@ button {
     object-fit: contain;
 }
 
+.weasel-back {
+    z-index: 10010;
+    position: relative;
+    left: 4%;
+    width: 70%;
+    height: 90%;
+    background-image: url(./assets/event/weasel-back.webp);
+    background-size: contain;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
 .weasel {
     width: 15%;
     height: 33%;
@@ -747,48 +748,54 @@ button {
     object-fit: contain;
 }
 
-.weasel-timer {
-    position: absolute;
-    bottom: 5%;
-    right: 5%;
-    height: 90%;
-    
-    width: 5%;
+.weasel-timer-div {
+    position: relative;
+    left: 4%;
+    width: 7%;
+    height: 86%;
+    display: flex;
+    flex-direction: column;
+    justify-content:space-evenly;
+    align-items: center;
 }
 
-.weasel-timer > img {
-    position: absolute;
-    bottom: 0;
+.weasel-timer {
+    position: relative;
+    height: 80%;
+    aspect-ratio: 0.11855;
+}
+
+.weasel-hourglass {
+    width: 90%;
+    height: 12%;
+    object-fit: contain;
+}
+
+.weasel-outline {
+    position: relative;
+    z-index: 1002;
     width: 100%;
     height: 100%;
-    background-color: rgb(179, 213, 45);
+    object-fit: contain;
+}
+
+.weasel-sand {
+    z-index: 1001;
+    position: absolute;
+    width: 100%;
+    height: 99%;
+    bottom: 1%;
     transform-origin: bottom center;
-    animation: scale-down 30s linear forwards;
+    animation: scale-down 25s linear forwards;
 }
 
 @keyframes scale-down {
     0% {
-        transform: scaleY(1);
+        height: 99%;
     }
     100% {
-        transform: scaleY(0);
+        height: 0%;
     }
-}
-
-.weasel-back {
-    z-index: 10010;
-    position: absolute;
-    left: 15%;
-    width: 70%;
-    aspect-ratio: 1.459;
-    background-image: url(./assets/event/weasel-back.webp);
-    background-size: contain;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-
 }
 
 .spring {
@@ -859,8 +866,20 @@ button {
 }
 
 #box-text {
+    position: absolute;
     top: 45%;
+    width: 100%;
+    height: 10%;
+    z-index: 10006;
+    background-color: #000000e0;
+    background-size: cover;
     font-size: 0.7em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: 1%;
+    text-shadow: #686464 0.21375em 0em 0em, #686464 0.20102554875em 0.06442056725em 0em, #686464 0.16545309125em 0.125256034375em 0em, #686464 0.114100525em 0.17245005em 0em, #686464 0.0495299125em 0.1929347625em 0em, #686464 -0.020926788125em 0.1987703525em 0em, #686464 -0.08683835em 0.182958245em 0em, #686464 -0.140307092em 0.145025515em 0em, #686464 -0.18035769em 0.09045148em 0em, #686464 -0.209242475em 0.025948895em 0em, #686464 -0.20681056375em -0.0373652975em 0em, #686464 -0.18052885375em -0.0934511275em 0em, #686464 -0.1379573405em -0.138057635em 0em, #686464 -0.0800555925em -0.159165915em 0em, #686464 -0.0164290525em -0.165675565em 0em, #686464 0.0535315125em -0.1594206825em 0em, #686464 0.1188833225em -0.1486998625em 0em, #686464 0.15738429125em -0.102757115em 0em, #686464 0.1825355875em -0.05246907125em 0em;
+    
 }
 
 .slide-out-animation {
@@ -982,13 +1001,13 @@ button {
 
 /*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
 .temp-buff {
-  width: 100%;
-  height: 20%;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-justify-content: flex-start;
-align-items: center;
+    width: 100%;
+    height: 20%;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .temp-buff > div {
@@ -1342,6 +1361,41 @@ circle {
     width:100%;
     height:100%;
     object-fit: contain;
+}
+
+.currency-pop {
+    top: 11%;
+    left: 32%;
+    width: 10%;
+    height: 9%;
+    background-color: #CEE375;
+    border: 0.35em solid #64873B;
+    border-radius: 8%;
+    position: absolute;
+    row-gap: 2%;
+    z-index: 150;
+    color: #20310d;
+    text-shadow: #e5f6d3 0.106875em 0em 0em, #e5f6d3 0.100512774375em 0.032210283625em 0em, #e5f6d3 0.082726545625em 0.0626280171875em 0em, #e5f6d3 0.0570502625em 0.086225025em 0em, #e5f6d3 0.02476495625em 0.09646738125em 0em, #e5f6d3 -0.0104633940625em 0.09938517625em 0em, #e5f6d3 -0.043419175em 0.0914791225em 0em, #e5f6d3 -0.070153546em 0.0725127575em 0em, #e5f6d3 -0.090178845em 0.04522574em 0em, #e5f6d3 -0.1046212375em 0.0129744475em 0em, #e5f6d3 -0.103405281875em -0.01868264875em 0em, #e5f6d3 -0.090264426875em -0.04672556375em 0em, #e5f6d3 -0.06897867025em -0.0690288175em 0em, #e5f6d3 -0.04002779625em -0.0795829575em 0em, #e5f6d3 -0.00821452625em -0.0828377825em 0em, #e5f6d3 0.02676575625em -0.07971034125em 0em, #e5f6d3 0.05944166125em -0.07434993125em 0em, #e5f6d3 0.078692145625em -0.0513785575em 0em, #e5f6d3 0.09126779375em -0.026234535625em 0em;
+    font-size: 1em;
+    animation: slidedown-pop 0.8s ease-in-out both;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.currency-pop-first {
+    height: 50%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes slidedown-pop {
+    0% { transform: translateY(-205%);}
+    100% { transform: translateY(0); }
 }
 
 /*/////////////////////////////// TUTORIAL CSS ///////////////////////////////*/

@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.1.A-14-2-23"
+const VERSIONNUMBER = "v0.1.A-16-2-23"
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
 let startText = document.getElementById("start-screen"); 
@@ -149,7 +149,8 @@ var achievementElement = new Audio("./assets/sfx/achievement.mp3");
 var eventElement = new Audio("./assets/sfx/event.mp3");
 var reactionStartElement = new Audio("./assets/sfx/timestart.mp3");
 var reactionCorrectElement = new Audio("./assets/sfx/timesup.mp3");
-var sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement,reactionStartElement,reactionCorrectElement];
+var weaselBurrow = new Audio("./assets/sfx/weasel-pop.mp3");
+var sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement,reactionStartElement,reactionCorrectElement,weaselBurrow];
 
 var timerLoad = setInterval(timerEventsLoading,50);
 var timer = setInterval(timerEvents,1000000);
@@ -278,7 +279,6 @@ demoContainer.addEventListener("mouseup", () => {
     }
 
     saveValues["realScore"] += clickEarn;
-    
     energyRoll();
 
     if (clickAudioDelay === null) {
@@ -351,7 +351,7 @@ function startRandomEvent() {
     eventPicture.classList.add("random-event");
     eventPicture.addEventListener("click", () => {clickedEvent();eventPicture.remove()});
 
-    setTimeout(() => {eventPicture.remove()}, 5000);
+    setTimeout(() => {eventPicture.remove()}, 8000);
     eventPicture.style.left = randomInteger(10,90) + "%";
     eventPicture.style.top = randomInteger(10,90) + "%";
 
@@ -389,28 +389,29 @@ function clickedEvent() {
 }
 
 function chooseEvent(type) {
-    switch (type) {
-        case 1:
-            rainEvent();
-            break;
-        case 2:
-            clickEvent();
-            break;
-        case 3:
-            reactionEvent();
-            break;
-        case 4:
-            boxFunction();
-            break
-        case 5:
-            minesweeperEvent();
-            break;
-        case 6:
-            weaselEvent();
-            break;
-        default:
-            break;
-    }
+    weaselEvent();
+    // switch (type) {
+    //     case 1:
+    //         rainEvent();
+    //         break;
+    //     case 2:
+    //         clickEvent();
+    //         break;
+    //     case 3:
+    //         reactionEvent();
+    //         break;
+    //     case 4:
+    //         boxFunction();
+    //         break
+    //     case 5:
+    //         minesweeperEvent();
+    //         break;
+    //     case 6:
+    //         weaselEvent();
+    //         break;
+    //     default:
+    //         break;
+    // }
 }
 
 // EVENT 1 (RAIN)
@@ -799,8 +800,8 @@ function boxOpen(eventBackdrop) {
         
         let badOutcomePercentage = randomInteger(15,30);
         outcomeText = "Uh oh! Run away! (Lost " +badOutcomePercentage+ "% of Energy)";
-        badOutcomePercentage = 100 - badOutcomePercentage/100;
-        saveValues.energy = saveValues.energy * badOutcomePercentage;
+        badOutcomePercentage = (100 - badOutcomePercentage)/100;
+        saveValues.energy = Math.floor(saveValues.energy * badOutcomePercentage);
     }
 
     boxOuterNew.appendChild(boxOutcome);
@@ -834,11 +835,14 @@ function boxOpen(eventBackdrop) {
     },1000);
 }
 
+var weaselCount = 0;
 // EVENT 6 (WHACK-A-MOLE)
 function weaselEvent() {
     let weaselElement = 18;
+    weaselCount = 0;
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("event-dark");
+    eventBackdrop.classList.add("event-dark-row");
     let weaselBack = document.createElement("div");
     weaselBack.classList.add("weasel-back");
 
@@ -855,17 +859,32 @@ function weaselEvent() {
     let delay = 2000;
     setTimeout(()=>{
         addWeasel(weaselBack,delay);
+        weaselBurrow.load();
+        weaselBurrow.play();
     },2000)
 
+    let weaselTimerDiv = document.createElement("div");
+    weaselTimerDiv.classList.add("weasel-timer-div");
     let weaselTimer = document.createElement("div");
     weaselTimer.classList.add("weasel-timer");
-    let weaselTimerImage = document.createElement("img");
-    weaselTimerImage.addEventListener("animationend",()=> {
-        eventBackdrop.remove();
-    })
+    let weaselClock = document.createElement("img");
+    weaselClock.src = "./assets/icon/hourglass.webp"
+    weaselClock.classList.add("weasel-hourglass");
 
-    weaselTimer.append(weaselTimerImage)
-    eventBackdrop.append(weaselBack,weaselTimer);
+    let weaselTimerOutline = document.createElement("img");
+    weaselTimerOutline.src = "./assets/event/timer-bar.webp";
+    weaselTimerOutline.classList.add("weasel-outline");
+    let weaselTimerImage = document.createElement("img");
+    weaselTimerImage.src = "./assets/event/timer-sand.webp";
+    weaselTimerImage.classList.add("weasel-sand");
+    weaselTimerImage.addEventListener("animationend",()=> {
+        let eventText = `You caught ${weaselCount} weasel thieves!`;
+        eventOutcome(eventText,eventBackdrop,"weasel",weaselCount);
+    })
+    weaselTimer.append(weaselTimerImage,weaselTimerOutline);
+
+    weaselTimerDiv.append(weaselTimer,weaselClock)
+    eventBackdrop.append(weaselBack,weaselTimerDiv);
     mainBody.append(eventBackdrop);
 }
 
@@ -879,14 +898,24 @@ function addWeasel(weaselBack,delay) {
             let realWeasel = randomInteger(2,4);
             weaselImage.src = "./assets/event/weasel-"+realWeasel+".webp";
 
-            let springInterval = (randomInteger(15,25) / 100)
+            let springInterval = (randomInteger(20,25) / 100)
             weaselImage.classList.add("spring");
             weaselImage.style["animation-duration"] = springInterval + "s";
-            weaselImage.addEventListener("click",()=>{clearWeasel(weaselBack,delay)})
+            weaselImage.addEventListener("click",()=>{
+                mailElement.load();
+                mailElement.playbackRate = 1.35;
+                mailElement.play();
+                delay *= 0.65;
+                if (delay <= 450) {
+                    delay = 450;
+                }
+                clearWeasel(weaselBack,delay);
+                weaselCount++;
+            })
         } else {
             let emptyWeasel = randomInteger(7,11);
             if (emptyWeasel != 10 & emptyWeasel != 9) {
-                let springInterval = (randomInteger(15,25) / 100)
+                let springInterval = (randomInteger(15,20) / 100);
                 weaselImage.classList.add("spring");
                 weaselImage.style["animation-duration"] = springInterval + "s";
             }
@@ -922,13 +951,14 @@ function clearWeasel(weaselBack,delay) {
         weaselImage.parentNode.replaceChild(new_weaselImage, weaselImage);
     }
 
-    delay *= 0.75;
     setTimeout(()=>{
         addWeasel(weaselBack,delay);
+        weaselBurrow.load();
+        weaselBurrow.play();
     },delay)
 }
 
-// CHOOSE n POSITIONS FROM AN ARRAY OF 18
+// CHOOSE FAKE WEASEL POSITIONS FROM 18 SPOTS
 function generateCombination(n) {
     let positions = Array.from({ length: 18 }, (_, i) => i + 1);
     let combination = [];
@@ -947,15 +977,35 @@ function generateCombination(n) {
 function eventOutcome(innerText,eventBackdrop, type, amount) {
     let removeClick = document.createElement("div");
     let boxText = document.createElement("div");
-    let boxTextBackground = document.createElement("div");
     let boxTextDiv = document.createElement("p");
 
     removeClick.id = "prevent-clicker";
     boxText.classList.add("event-rain-text");
     boxText.id = "box-text";
-    boxTextDiv.innerText = innerText;
-    boxText.append(boxTextBackground,boxTextDiv);
+    if (type == "weasel") {
+        let weaselCount = amount;
+        boxText.style.height = "13%";
+        if (weaselCount >= 10) {
+            innerText += `\n You received a large reward!`;
+            adventure(10);
+            adventure(10);
+            amount = randomInteger(800,1000);
+        } else if (weaselCount >= 7) {
+            innerText += `\n You received a medium reward!`;
+            adventure(10);
+            adventure(10);
+            amount = randomInteger(500,650);
+        } else if (weaselCount >= 4) {
+            innerText += `\n You received a small reward!`;
+            adventure(10);
+            amount = randomInteger(200,400);
+        } else {
+            innerText += `\n Catch more to get a reward!`;
+        }
+    }
 
+    boxTextDiv.innerText = innerText;
+    boxText.append(boxTextDiv);
     setTimeout(()=> {
         removeClick.append(boxText);
         mainBody.appendChild(removeClick);
@@ -965,6 +1015,10 @@ function eventOutcome(innerText,eventBackdrop, type, amount) {
                 removeClick.remove();
                 if (type === "primogem") {
                     saveValues.primogem += amount;
+                    currencyPopUp("primogem",amount);
+                } else if (type === "weasel") {
+                    saveValues.primogem += amount;
+                    currencyPopUp("primogem",amount);
                 }
             });
         },4000)
@@ -2318,7 +2372,6 @@ function confirmPurchase(shopCost,id) {
     }
 }
 
-
 function createShopItems(shopDiv, i, inventoryNumber) {
     let shopButton = document.createElement("div");
     shopButton.classList.add("shop-button");
@@ -2460,6 +2513,60 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
         expeditionCounter++;
         heroUnlockLevels.shift()
     }
+}
+
+// POP UPS FOR SPECIAL CURRENCY
+function currencyPopUp(type1, amount1, type2, amount2) {
+    let currencyPop = document.createElement("div");
+    currencyPop.classList.add("currency-pop");
+    currencyPop.innerText = 'Obtained';
+
+    let currencyPopFirst = document.createElement("div");
+    currencyPopFirst.classList.add("currency-pop-first");
+    currencyPopFirst.innerText = amount1;
+    let currencyPopFirstImg = document.createElement("img");
+
+    if (type1 == "energy") {
+        currencyPopFirstImg.src = "./assets/icon/energyIcon.webp";
+        currencyPopFirstImg.classList.add("icon");
+    } else if (type1 == "primogem") {
+        currencyPopFirstImg.src = "./assets/icon/primogemIcon.webp";
+        currencyPopFirstImg.classList.add("icon");
+        currencyPopFirstImg.classList.add("primogem");
+    }
+
+    currencyPopFirst.append(currencyPopFirstImg);
+    currencyPop.append(currencyPopFirst);
+
+    if (type2 != undefined) {
+        let currencyPopSecond = document.createElement("div");
+        currencyPopSecond.classList.add("currency-pop-first");
+        currencyPopSecond.innerText = amount2;
+
+        let currencyPopSecondImg = document.createElement("img");
+        if (type2 == "energy") {
+            currencyPopSecondImg.src = "./assets/icon/energyIcon.webp";
+            currencyPopSecondImg.classList.add("icon");
+        } else if (type2 == "primogem") {
+            currencyPopSecondImg.src = "./assets/icon/primogemIcon.webp";
+            currencyPopSecondImg.classList.add("icon");
+            currencyPopSecondImg.classList.add("primogem");
+        }
+
+        currencyPopFirst.style.height = "30%";
+        currencyPopSecond.style.height = "30%";
+        currencyPopSecond.append(currencyPopSecondImg);
+        currencyPop.append(currencyPopSecond);
+    }
+    
+    
+    
+
+    setTimeout(()=> {
+        currencyPop.style.animation = "fadeOut 2s cubic-bezier(.93,-0.24,.93,.81) forwards";
+        currencyPop.addEventListener("animationend",()=>{currencyPop.remove()})
+    },1000)
+    mainBody.appendChild(currencyPop);
 }
 
 // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION

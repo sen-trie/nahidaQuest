@@ -89,7 +89,7 @@ function sortList(table) {
 function unlockExpedition(i,expeditionDict) {
     let expedID = "exped-" + i;
     let unlockButton = document.getElementById(expedID);
-    let backgroundImage = "url(./assets/expedbg/exped" + i + ".png) center center / contain no-repeat";
+    let backgroundImage = "url(./assets/expedbg/exped" + i + ".webp) center center / contain no-repeat";
 
     expeditionDict[i].Locked = 0;
     unlockButton.style.background = backgroundImage;
