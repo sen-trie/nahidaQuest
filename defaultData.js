@@ -89,7 +89,7 @@ var upgradeDictDefault = {
 var upgradeInfo = {
     0: {
         Name: "Nahida",
-        Lore: "",
+        Lore: " Being a listener has never been enough for me. I've always dreamed of going out and seeing things for myself.  Can you be my guide? I want to experience all your future tales first-hand.",
         Type: "Catalyst",
         Ele: "Dendro",
         Nation: "Sumeru"
@@ -138,14 +138,14 @@ var upgradeInfo = {
     },
     7: {
         Name: "Nilou",
-        Lore: "",
+        Lore: "Remember, let out all your frustrations before bedtime for a better night's rest. If you want, I'm more than happy to be your audience.",
         Type: "Sword",
         Ele: "Hydro",
         Nation: "Sumeru"
     },
     8: {
         Name: "Layla",
-        Lore: "",
+        Lore: "Mm, this sun's making me so... yawn sleepy... Mkay, lemme grab a pillow and rest my eyes before this wears off... It's been two, two days since I last, last... Zzz...",
         Type: "Sword",
         Ele: "Cryo",
         Nation: "Sumeru"
@@ -180,7 +180,7 @@ var upgradeInfo = {
     },
     13: {
         Name: "Noelle",
-        Lore: "",
+        Lore: "I am devoted to what I do, but make no mistake — I devote myself freely. A maid, to me, is the most liberating job there is. I'm a chef, a gardener, a warrior, a guide... I can be anything you need me to be!",
         Type: "Claymore",
         Ele: "Geo",
         Nation: "Sumeru"
@@ -194,14 +194,14 @@ var upgradeInfo = {
     },
     15: {
         Name: "Lisa",
-        Lore: "",
+        Lore: " Hey darling, would you like to try one of my magic potions? There's no knowing what it will do to you until you try it, though... Don't say I didn't warn you!",
         Type: "Catalyst",
         Ele: "Electro",
         Nation: "Mondstadt"
     },
     16: {
         Name: "Kaeya",
-        Lore: "",
+        Lore: "Please, allow me to join you on your journey. Guarding you on your journey sounds far more entertaining than any of the usual Favonius stuff.",
         Type: "Sword",
         Ele: "Cryo",
         Nation: "Mondstadt"
@@ -229,49 +229,49 @@ var upgradeInfo = {
     },
     20: {
         Name: "Mona",
-        Lore: "",
+        Lore: "Do you know about constellations? Astrologers believe that the patterns of the stars map out the destiny of Vision bearers — past, present, and future, everything is written in the stars.",
         Type: "Catalyst",
         Ele: "Hydro",
         Nation: "Mondstadt"
     },
     21: {
         Name: "Rosaria",
-        Lore: "",
+        Lore: "Listen, if you've got a problem you can't handle, then I'm the one for the job. But if you're looking for prayer, you'd better find some other Sister.",
         Type: "Polearm",
         Ele: "Cryo",
         Nation: "Mondstadt"
     },
     22: {
         Name: "Klee",
-        Lore: "",
+        Lore: "This is my new and improved bomb! Whaddya think? Great huh? ...Oh, but ahh... If you find it near any fires, it's not mine. Definitely. Not. Mine.",
         Type: "Catalyst",
         Ele: "Pyro",
         Nation: "Mondstadt"
     },
     23: {
         Name: "Razor",
-        Lore: "",
+        Lore: "I like the stars at night. So many stars. In the sky, in the lake. And in the city.",
         Type: "Claymore",
         Ele: "Electro",
         Nation: "Mondstadt"
     },
     24: {
         Name: "Sucrose",
-        Lore: "",
+        Lore: "Th-The sun is already out? Oh, ah, okay! Just one last experiment, and then we can get some rest. Last one, I promise...",
         Type: "Catalyst",
         Ele: "Anemo",
         Nation: "Mondstadt"
     },
     25: {
         Name: "Xiangling",
-        Lore: "",
+        Lore: "I'm much better at cooking than navigating... but if you do go out, definitely take me with you!",
         Type: "Polearm",
         Ele: "Pyro",
         Nation: "Liyue"
     },
     26: {
         Name: "Xingqiu",
-        Lore: "",
+        Lore: " I always have to put on an act around other people, because they see me only as the second son of the Feiyun Commerce Guild. It's a relief that I can just be myself around you.",
         Type: "Sword",
         Ele: "Hydro",
         Nation: "Liyue"
@@ -285,14 +285,14 @@ var upgradeInfo = {
     },
     28: {
         Name: "Hu Tao",
-        Lore: "",
+        Lore: "Need a hand, need a hand? I'm here! If you need some assistance, I'm here to give it my all to the very end!",
         Type: "Polearm",
         Ele: "Pyro",
         Nation: "Liyue"
     },
     29: {
         Name: "Xinyan",
-        Lore: "",
+        Lore: " I'd sure love to add some extra flavor to my rock 'n' roll. Wanna get on the drums next time? Don't sweat it, it's a question of soul, not skill! Give it a go, I just know you'll be great!",
         Type: "Claymore",
         Ele: "Pyro",
         Nation: "Liyue"
@@ -313,21 +313,21 @@ var upgradeInfo = {
     },
     32: {
         Name: "Ningguang",
-        Lore: "",
+        Lore: "I suppose you've heard enough rumors about me. What kind of person am I? I shall leave that for you to decide... Of course, your judgement will become a part of the rumor.",
         Type: "Catalyst",
         Ele: "Geo",
         Nation: "Liyue"
     },
     33: {
         Name: "Ganyu",
-        Lore: "May Rex Lapis watch over you. May your dreams be peaceful and sweet.",
+        Lore: "Should we really be off work this early? There is still a lot left to do...",
         Type: "Bow",
         Ele: "Cryo",
         Nation: "Liyue"
     },
     34: {
         Name: "Keqing",
-        Lore: "",
+        Lore: "If you feel strongly about something, you should speak up and take action. That's the philosophy I live by.",
         Type: "Sword",
         Ele: "Electro",
         Nation: "Liyue"
@@ -348,7 +348,7 @@ var upgradeInfo = {
     },
     37: {
         Name: "Thoma",
-        Lore: "",
+        Lore: "Anything I can lend a hand with, just say the word. A conversation? I see, I see. That's a little different from what I'm used to, but I'm all for it",
         Type: "Polearm",
         Ele: "Pyro",
         Nation: "Inazuma"
@@ -362,42 +362,42 @@ var upgradeInfo = {
     },
     39: {
         Name: "Ayaka",
-        Lore: "",
+        Lore: "'Was it one's thoughts that drew him to my dreams? Had I known it a dream, one would not have awakened.' Hehe, I love that poem.",
         Type: "Sword",
         Ele: "Cryo",
         Nation: "Inazuma"
     },
     40: {
         Name: "Sayu",
-        Lore: "",
+        Lore: "Hey, will you do me a favor and let me know if you see the shrine maiden coming? I'm just gonna, um... rest my eyes for a moment.",
         Type: "Claymore",
         Ele: "Anemo",
         Nation: "Inazuma"
     },
     41: {
         Name: "Gorou",
-        Lore: "",
+        Lore: " It'd be nice to just lie in the sun... Ahem, but I must set an example for the others.",
         Type: "Bow",
         Ele: "Geo",
         Nation: "Inazuma"
     },
     42: {
         Name: "Kokomi",
-        Lore: "",
+        Lore: " I like to find a quiet place by myself and read books on strategy. Ahh, the whole day without interruption. I'd be even happier if we looked over some of it together... One thing though, you'd have to sleep on the floor.",
         Type: "Catalyst",
         Ele: "Hydro",
         Nation: "Inazuma"
     },
     43: {
         Name: "Heizou",
-        Lore: "",
+        Lore: "Seems to me like these commissions of yours are an endless gold mine of cases, and you'll never be able to finish them all. So maybe you could throw one my way every once in a while?",
         Type: "Catalyst",
         Ele: "Anemo",
         Nation: "Inazuma"
     },
     44: {
         Name: "Shinobu",
-        Lore: "",
+        Lore: "Just let me know if you ever find yourself in a pinch. I can help you out. If the Arataki Gang stirs up any trouble, I'll drag every last one of them back to apologize.",
         Type: "Sword",
         Ele: "Electro",
         Nation: "Inazuma"
@@ -411,14 +411,14 @@ var upgradeInfo = {
     },
     46: {
         Name: "Sara",
-        Lore: "",
+        Lore: "I have agreed to fight by your side, and I will honor that commitment. I may be uncompromising on matters of great importance, but on most other things, you will find me quite easygoing.",
         Type: "Bow",
         Ele: "Electro",
         Nation: "Inazuma"
     },
     47: {
         Name: "Venti",
-        Lore: "",
+        Lore: "My tummy is rumbling, but I can't get caught pilfering food again... Oh, it's you! Where are you heading? May I join?",
         Type: "Bow",
         Ele: "Anemo",
         Nation: "Mondstadt"
@@ -432,7 +432,7 @@ var upgradeInfo = {
     },
     49: {
         Name: "Ei",
-        Lore: "",
+        Lore: "Do you wish to know the truth about the shooting stars at night? Haha, they are but fleeting moments of luminosity.",
         Type: "Polearm",
         Ele: "Electro",
         Nation: "Inazuma"
@@ -454,7 +454,7 @@ var upgradeInfo = {
     },
     102: {
         Name: "Qiqi",
-        Lore: "",
+        Lore: "Some people want to take advantage of me. Others are terrified of me. But you... You are not like any of those people.",
         Type: "Sword",
         Ele: "Cryo",
         Nation: "Liyue"
@@ -468,14 +468,14 @@ var upgradeInfo = {
     },
     104: {
         Name: "Shenhe",
-        Lore: "",
+        Lore: "I rarely leave the mountains, so I was never taught proper manners. If you don't approve of my methods, please do let me know.",
         Type: "Polearm",
         Ele: "Cryo",
         Nation: "Liyue"
     },
     105: {
         Name: "Ayato",
-        Lore: "",
+        Lore: "I'm no stickler for doing things in a certain way. Whatever method you use, the important thing is that it delivers acceptable results",
         Type: "Sword",
         Ele: "Hydro",
         Nation: "Inazuma"
@@ -496,28 +496,28 @@ var upgradeInfo = {
     },
     108: {
         Name: "Kazuha",
-        Lore: "",
+        Lore: "You'd like to know more about me, you say? Well, as you see, I am but a wandering samurai that you could have run into just about anywhere.",
         Type: "Sword",
         Ele: "Anemo",
         Nation: "Inazuma"
     },
     109: {
         Name: "Xiao",
-        Lore: "",
+        Lore: "I'm willing to protect you. But don't think about getting close, and stay out of my way, or all that awaits you is regret.",
         Type: "Polearm",
         Ele: "Anemo",
         Nation: "Liyue"
     },
     110: {
         Name: "Tartaglia",
-        Lore: "",
+        Lore: "Ah, I'm sure the Harbingers must know of my dealings with you by now. Oh, I'd love to see the look on their faces... Hahaha...",
         Type: "Bow",
         Ele: "Hydro",
         Nation: "Liyue"
     },
     111: {
         Name: "Jean",
-        Lore: "",
+        Lore: "'Dandelion, Dandelion, ride the wind to a faraway land.' Who knows, the wind might take it all the way to Celestia",
         Type: "Sword",
         Ele: "Anemo",
         Nation: "Mondstadt"
