@@ -18,85 +18,83 @@ var SettingsDefault = {
     sfxVolume:0.5,
 }
 
-
 var upgradeDictDefault = {
     0:  {Row:-1,        Purchased: -1,   "Contribution": 0, "Level": 1, "BaseCost":20, Factor:1  },
-    1:  {Row:-1,        Purchased: -1,                         },
-    2:  {Row:-1,        Purchased: -1,                                         },
-    3:  {Row:-1,        Purchased: -1,                                       },
-    4:  {Row:-1,        Purchased: -1,                                          },
-    5:  {Row:-1,        Purchased: -1,                                       },
-    6:  {Row:-1,        Purchased: -1,                                         },
-    7:  {Row:-1,        Purchased: -1,                                       },
-    8:  {Row:-1,        Purchased: -1,                                      },
-    9:  {Row:-1,        Purchased: -1,                                       },
-    10: {Row:-1,        Purchased: -1,                                       },
-    11: {Row:-1,        Purchased: -1,                                     },
-    12: {Row:-1,        Purchased: -1,                                       },
-    13: {Row:-1,        Purchased: -1,                                         },
-    14: {Row:-1,        Purchased: -1,                                              },
-    15: {Row:-1,        Purchased: -1,                                                },
-    16: {Row:-1,        Purchased: -1,                                          },
-    17: {Row:-1,        Purchased: -1,                                             },
-    18: {Row:-1,        Purchased: -1,                                        },
-    19: {Row:-1,        Purchased: -1,                                           },
-    20: {Row:-1,        Purchased: -1,                                              },
-    21: {Row:-1,        Purchased: -1,                                            },
-    22: {Row:-1,        Purchased: -1,                                             },
-    23: {Row:-1,        Purchased: -1,                                                },
-    24: {Row:-1,        Purchased: -1,                                              },
-    25: {Row:-1,        Purchased: -1,                                        },
-    26: {Row:-1,        Purchased: -1,                                       },
-    27: {Row:-1,        Purchased: -1,                                         },
-    28: {Row:-1,        Purchased: -1,                                     },
-    29: {Row:-1,        Purchased: -1,                                         },
-    30: {Row:-1,        Purchased: -1,                                       },
-    31: {Row:-1,        Purchased: -1,                                            },
-    32: {Row:-1,        Purchased: -1,                                        },
-    33: {Row:-1,        Purchased: -1,                                    },
-    34: {Row:-1,        Purchased: -1,                                         },
-    35: {Row:-1,        Purchased: -1,                                         },    
-    36: {Row:-1,        Purchased: -1,                                             },
-    37: {Row:-1,        Purchased: -1,                                          },
-    38: {Row:-1,        Purchased: -1,                                      },
-    39: {Row:-1,        Purchased: -1,                                        },
-    40: {Row:-1,        Purchased: -1,                                            },
-    41: {Row:-1,        Purchased: -1,                                     },
-    42: {Row:-1,        Purchased: -1,                                            },
-    43: {Row:-1,        Purchased: -1,                                            },
-    44: {Row:-1,        Purchased: -1,                                           },
-    45: {Row:-1,        Purchased: -1,                                          },
-    46: {Row:-1,        Purchased: -1,                                         },
-    47: {Row:-1,        Purchased: -1,                                      },
-    48: {Row:-1,        Purchased: -1,                                    },
-    49: {Row:-1,        Purchased: -1,                                          },
+    1:  {Row:-1,        Purchased: -1,    },
+    2:  {Row:-1,        Purchased: -1,    },
+    3:  {Row:-1,        Purchased: -1,    },
+    4:  {Row:-1,        Purchased: -1,    },
+    5:  {Row:-1,        Purchased: -1,    },
+    6:  {Row:-1,        Purchased: -1,    },
+    7:  {Row:-1,        Purchased: -1,    },
+    8:  {Row:-1,        Purchased: -1,    },
+    9:  {Row:-1,        Purchased: -1,    },
+    10: {Row:-1,        Purchased: -1,    },
+    11: {Row:-1,        Purchased: -1,    },
+    12: {Row:-1,        Purchased: -1,    },
+    13: {Row:-1,        Purchased: -1,    },
+    14: {Row:-1,        Purchased: -1,    },
+    15: {Row:-1,        Purchased: -1,    },
+    16: {Row:-1,        Purchased: -1,    },
+    17: {Row:-1,        Purchased: -1,    },
+    18: {Row:-1,        Purchased: -1,    },
+    19: {Row:-1,        Purchased: -1,    },
+    20: {Row:-1,        Purchased: -1,    },
+    21: {Row:-1,        Purchased: -1,    },
+    22: {Row:-1,        Purchased: -1,    },
+    23: {Row:-1,        Purchased: -1,    },
+    24: {Row:-1,        Purchased: -1,    },
+    25: {Row:-1,        Purchased: -1,    },
+    26: {Row:-1,        Purchased: -1,    },
+    27: {Row:-1,        Purchased: -1,    },
+    28: {Row:-1,        Purchased: -1,    },
+    29: {Row:-1,        Purchased: -1,    },
+    30: {Row:-1,        Purchased: -1,    },
+    31: {Row:-1,        Purchased: -1,    },
+    32: {Row:-1,        Purchased: -1,    },
+    33: {Row:-1,        Purchased: -1,    },
+    34: {Row:-1,        Purchased: -1,    },
+    35: {Row:-1,        Purchased: -1,    },    
+    36: {Row:-1,        Purchased: -1,    },
+    37: {Row:-1,        Purchased: -1,    },
+    38: {Row:-1,        Purchased: -1,    },
+    39: {Row:-1,        Purchased: -1,    },
+    40: {Row:-1,        Purchased: -1,    },
+    41: {Row:-1,        Purchased: -1,    },
+    42: {Row:-1,        Purchased: -1,    },
+    43: {Row:-1,        Purchased: -1,    },
+    44: {Row:-1,        Purchased: -1,    },
+    45: {Row:-1,        Purchased: -1,    },
+    46: {Row:-1,        Purchased: -1,    },
+    47: {Row:-1,        Purchased: -1,    },
+    48: {Row:-1,        Purchased: -1,    },
+    49: {Row:-1,        Purchased: -1,    },
 // RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS
-    100: {Row:-1,    "Level": 0, Purchased: -10,                                        },
-    101: {Row:-1,    "Level": 0, Purchased: -10,                                      },
-    102: {Row:-1,    "Level": 0, Purchased: -10,                                   },
-    103: {Row:-1,    "Level": 0, Purchased: -10,                                  },
-    104: {Row:-1,    "Level": 0, Purchased: -10,                                     },
-    105: {Row:-1,    "Level": 0, Purchased: -10,                                      },
-    106: {Row:-1,    "Level": 0, Purchased: -10,                                           },
-    107: {Row:-1,    "Level": 0, Purchased: -10,                                          },
-    108: {Row:-1,    "Level": 0, Purchased: -10,                                         },
-    109: {Row:-1,    "Level": 0, Purchased: -10,                                      },
-    110: {Row:-1,    "Level": 0, Purchased: -10,                                  },
-    111: {Row:-1,    "Level": 0, Purchased: -10,                                        },
-    // 112: {Row:-1,     "Level": 0, Purchased: -10,                                    },
+    100: {Row:-1,    "Level": 0, Purchased: -10,   },
+    101: {Row:-1,    "Level": 0, Purchased: -10,   },
+    102: {Row:-1,    "Level": 0, Purchased: -10,   },
+    103: {Row:-1,    "Level": 0, Purchased: -10,   },
+    104: {Row:-1,    "Level": 0, Purchased: -10,   },
+    105: {Row:-1,    "Level": 0, Purchased: -10,   },
+    106: {Row:-1,    "Level": 0, Purchased: -10,   },
+    107: {Row:-1,    "Level": 0, Purchased: -10,   },
+    108: {Row:-1,    "Level": 0, Purchased: -10,   },
+    109: {Row:-1,    "Level": 0, Purchased: -10,   },
+    110: {Row:-1,    "Level": 0, Purchased: -10,   },
+    111: {Row:-1,    "Level": 0, Purchased: -10,   },
 };
 
 var upgradeInfo = {
     0: {
         Name: "Nahida",
-        Lore: " Being a listener has never been enough for me. I've always dreamed of going out and seeing things for myself.  Can you be my guide? I want to experience all your future tales first-hand.",
+        Lore: "I've always dreamed of going out and seeing things for myself. Can you be my guide? I want to experience all your future tales first-hand.",
         Type: "Catalyst",
         Ele: "Dendro",
         Nation: "Sumeru"
     },
     1: {
         Name: "Traveller",
-        Lore: "",
+        Lore: "'A traveler from another world who had their only kin taken away, forcing them to embark on a journey to find The Seven.'",
         Type: "Sword",
         Ele: "Any",
         Nation: "Any"
@@ -124,7 +122,7 @@ var upgradeInfo = {
     },
     5: {
         Name: "Candace",
-        Lore: "I am right by your side. But if you're still nervous, just take my hand.",
+        Lore: "If ever you tire of your journey, know that here, you can always find rest in. Aaru Village welcomes you with open arms... as do I.",
         Type: "Polearm",
         Ele: "Hydro",
         Nation: "Sumeru"
@@ -172,29 +170,29 @@ var upgradeInfo = {
         Nation: "Sumeru"
     },
     12: {
-        Name: "Bennett",
-        Lore: "No one's joined me on an adventure in ages. C'mon, let's go!",
-        Type: "Sword",
-        Ele: "Pyro",
-        Nation: "Sumeru"
-    },
-    13: {
         Name: "Noelle",
-        Lore: "I am devoted to what I do, but make no mistake — I devote myself freely. A maid, to me, is the most liberating job there is. I'm a chef, a gardener, a warrior, a guide... I can be anything you need me to be!",
+        Lore: "A maid, to me, is the most liberating job there is. I'm a chef, a gardener, a warrior, a guide... I can be anything you need me to be!",
         Type: "Claymore",
         Ele: "Geo",
         Nation: "Sumeru"
     },
-    14: {
+    13: {
         Name: "Barbara",
-        Lore: "Are you tired? Try my new spicy energy drink, I'm sure it'll wake you up!",
+        Lore: "Tada! Barbara is here~ Leave the healing to me! As long as I can help you on your journey, I'm happy~",
         Type: "Catalyst",
         Ele: "Hydro",
         Nation: "Mondstadt"
     },
+    14: {
+        Name: "Diluc",
+        Lore: "You should really bring the Knights of Favonius with you next time.",
+        Type: "Claymore",
+        Ele: "Pyro",
+        Nation: "Mondstadt"
+    },
     15: {
         Name: "Lisa",
-        Lore: " Hey darling, would you like to try one of my magic potions? There's no knowing what it will do to you until you try it, though... Don't say I didn't warn you!",
+        Lore: "Hey darling, would you like to try one of my magic potions? There's no knowing what it will do to you until you try it, though... Don't say I didn't warn you!",
         Type: "Catalyst",
         Ele: "Electro",
         Nation: "Mondstadt"
@@ -207,38 +205,38 @@ var upgradeInfo = {
         Nation: "Mondstadt"
     },
     17: {
-        Name: "Diluc",
-        Lore: "You should really bring the Knights of Favonius with you next time.",
-        Type: "Claymore",
-        Ele: "Pyro",
-        Nation: "Mondstadt"
-    },
-    18: {
         Name: "Diona",
         Lore: "What's that!? Let me see! Maybe I can add it to my next cocktail to give it a dreadful taste... Huh? It's just a strange-looking mushroom, how boring...",
         Type: "Bow",
         Ele: "Cryo",
         Nation: "Mondstadt"
     },
+    18: {
+        Name: "Bennett",
+        Lore: "No one's joined me on an adventure in ages. C'mon, let's go find some treasure!",
+        Type: "Sword",
+        Ele: "Pyro",
+        Nation: "Sumeru"
+    },
     19: {
+        Name: "Sucrose",
+        Lore: "Th-The sun is already out? Oh, ah, okay! Just one last experiment, and then we can get some rest. Last one, I promise...",
+        Type: "Catalyst",
+        Ele: "Anemo",
+        Nation: "Mondstadt"
+    },
+    20: {
         Name: "Fischl",
         Lore: "Remember thou this, that I, Fischl, am the Prinzessin der Verurteilung, Sovereign of Immernachtreich, omniscient and eminent judge of all the world's iniquity!",
         Type: "Bow",
         Ele: "Electro",
         Nation: "Mondstadt"
     },
-    20: {
+    21: {
         Name: "Mona",
-        Lore: "Do you know about constellations? Astrologers believe that the patterns of the stars map out the destiny of Vision bearers — past, present, and future, everything is written in the stars.",
+        Lore: "Astrologers believe that the patterns of the stars map out the destiny of Vision bearers — past, present, and future, everything is written in the stars.",
         Type: "Catalyst",
         Ele: "Hydro",
-        Nation: "Mondstadt"
-    },
-    21: {
-        Name: "Rosaria",
-        Lore: "Listen, if you've got a problem you can't handle, then I'm the one for the job. But if you're looking for prayer, you'd better find some other Sister.",
-        Type: "Polearm",
-        Ele: "Cryo",
         Nation: "Mondstadt"
     },
     22: {
@@ -256,179 +254,179 @@ var upgradeInfo = {
         Nation: "Mondstadt"
     },
     24: {
-        Name: "Sucrose",
-        Lore: "Th-The sun is already out? Oh, ah, okay! Just one last experiment, and then we can get some rest. Last one, I promise...",
-        Type: "Catalyst",
-        Ele: "Anemo",
+        Name: "Rosaria",
+        Lore: "Listen, if you've got a problem you can't handle, then I'm the one for the job. But if you're looking for prayer, you'd better find some other Sister.",
+        Type: "Polearm",
+        Ele: "Cryo",
         Nation: "Mondstadt"
     },
     25: {
-        Name: "Xiangling",
-        Lore: "I'm much better at cooking than navigating... but if you do go out, definitely take me with you!",
-        Type: "Polearm",
-        Ele: "Pyro",
-        Nation: "Liyue"
-    },
-    26: {
-        Name: "Xingqiu",
-        Lore: " I always have to put on an act around other people, because they see me only as the second son of the Feiyun Commerce Guild. It's a relief that I can just be myself around you.",
-        Type: "Sword",
-        Ele: "Hydro",
-        Nation: "Liyue"
-    },
-    27: {
-        Name: "Chongyun",
-        Lore: "'Heart be pure, evil be erased. Mind be purged, world be...' Um... Ugh, I always forget that last part.",
-        Type: "Claymore",
-        Ele: "Cryo",
-        Nation: "Liyue"
-    },
-    28: {
-        Name: "Hu Tao",
-        Lore: "Need a hand, need a hand? I'm here! If you need some assistance, I'm here to give it my all to the very end!",
-        Type: "Polearm",
-        Ele: "Pyro",
-        Nation: "Liyue"
-    },
-    29: {
-        Name: "Xinyan",
-        Lore: " I'd sure love to add some extra flavor to my rock 'n' roll. Wanna get on the drums next time? Don't sweat it, it's a question of soul, not skill! Give it a go, I just know you'll be great!",
-        Type: "Claymore",
-        Ele: "Pyro",
-        Nation: "Liyue"
-    },
-    30: {
-        Name: "Yun Jin",
-        Lore: "",
-        Type: "Polearm",
-        Ele: "Geo",
-        Nation: "Liyue"
-    },
-    31: {
-        Name: "Beidou",
-        Lore: "Wind's picking up. If sand gets in your eyes, be sure not to rub them.",
-        Type: "Claymore",
-        Ele: "Electro",
-        Nation: "Liyue"
-    },
-    32: {
-        Name: "Ningguang",
-        Lore: "I suppose you've heard enough rumors about me. What kind of person am I? I shall leave that for you to decide... Of course, your judgement will become a part of the rumor.",
-        Type: "Catalyst",
-        Ele: "Geo",
-        Nation: "Liyue"
-    },
-    33: {
-        Name: "Ganyu",
-        Lore: "Should we really be off work this early? There is still a lot left to do...",
-        Type: "Bow",
-        Ele: "Cryo",
-        Nation: "Liyue"
-    },
-    34: {
-        Name: "Keqing",
-        Lore: "If you feel strongly about something, you should speak up and take action. That's the philosophy I live by.",
-        Type: "Sword",
-        Ele: "Electro",
-        Nation: "Liyue"
-    },
-    35: {
-        Name: "Yanfei",
-        Lore: "",
-        Type: "Catalyst",
-        Ele: "Pyro",
-        Nation: "Liyue"
-    },
-    36: {
-        Name: "Yaoyao",
-        Lore: "",
-        Type: "Polearm",
-        Ele: "Dendro",
-        Nation: "Liyue"
-    },
-    37: {
-        Name: "Thoma",
-        Lore: "Anything I can lend a hand with, just say the word. A conversation? I see, I see. That's a little different from what I'm used to, but I'm all for it",
-        Type: "Polearm",
-        Ele: "Pyro",
-        Nation: "Inazuma"
-    },
-    38: {
-        Name: "Yoimiya",
-        Lore: "",
-        Type: "Bow",
-        Ele: "Pyro",
-        Nation: "Inazuma"
-    },
-    39: {
-        Name: "Ayaka",
-        Lore: "'Was it one's thoughts that drew him to my dreams? Had I known it a dream, one would not have awakened.' Hehe, I love that poem.",
-        Type: "Sword",
-        Ele: "Cryo",
-        Nation: "Inazuma"
-    },
-    40: {
-        Name: "Sayu",
-        Lore: "Hey, will you do me a favor and let me know if you see the shrine maiden coming? I'm just gonna, um... rest my eyes for a moment.",
-        Type: "Claymore",
-        Ele: "Anemo",
-        Nation: "Inazuma"
-    },
-    41: {
-        Name: "Gorou",
-        Lore: " It'd be nice to just lie in the sun... Ahem, but I must set an example for the others.",
-        Type: "Bow",
-        Ele: "Geo",
-        Nation: "Inazuma"
-    },
-    42: {
-        Name: "Kokomi",
-        Lore: " I like to find a quiet place by myself and read books on strategy. Ahh, the whole day without interruption. I'd be even happier if we looked over some of it together... One thing though, you'd have to sleep on the floor.",
-        Type: "Catalyst",
-        Ele: "Hydro",
-        Nation: "Inazuma"
-    },
-    43: {
-        Name: "Heizou",
-        Lore: "Seems to me like these commissions of yours are an endless gold mine of cases, and you'll never be able to finish them all. So maybe you could throw one my way every once in a while?",
-        Type: "Catalyst",
-        Ele: "Anemo",
-        Nation: "Inazuma"
-    },
-    44: {
-        Name: "Shinobu",
-        Lore: "Just let me know if you ever find yourself in a pinch. I can help you out. If the Arataki Gang stirs up any trouble, I'll drag every last one of them back to apologize.",
-        Type: "Sword",
-        Ele: "Electro",
-        Nation: "Inazuma"
-    },
-    45: {
-        Name: "Itto",
-        Lore: "~Arataki 'He Might Lose but He'll Never Admit Defeatto'...",
-        Type: "Claymore",
-        Ele: "Geo",
-        Nation: "Inazuma"
-    },
-    46: {
-        Name: "Sara",
-        Lore: "I have agreed to fight by your side, and I will honor that commitment. I may be uncompromising on matters of great importance, but on most other things, you will find me quite easygoing.",
-        Type: "Bow",
-        Ele: "Electro",
-        Nation: "Inazuma"
-    },
-    47: {
         Name: "Venti",
         Lore: "My tummy is rumbling, but I can't get caught pilfering food again... Oh, it's you! Where are you heading? May I join?",
         Type: "Bow",
         Ele: "Anemo",
         Nation: "Mondstadt"
     },
-    48: {
-        Name: "Zhongli",
-        Lore: "",
+    26: {
+        Name: "Xiangling",
+        Lore: "I'm much better at cooking than navigating... but if you do go out, definitely take me with you!",
+        Type: "Polearm",
+        Ele: "Pyro",
+        Nation: "Liyue"
+    },
+    27: {
+        Name: "Xingqiu",
+        Lore: "I always have to put on an act around other people, because they see me only as the second son of the Feiyun Commerce Guild. It's a relief that I can just be myself around you.",
+        Type: "Sword",
+        Ele: "Hydro",
+        Nation: "Liyue"
+    },
+    28: {
+        Name: "Chongyun",
+        Lore: "'Heart be pure, evil be erased. Mind be purged, world be...' Um... Ugh, I always forget that last part.",
+        Type: "Claymore",
+        Ele: "Cryo",
+        Nation: "Liyue"
+    },
+    29: {
+        Name: "Hu Tao",
+        Lore: "Need a hand, need a hand? I'm here! If you need some assistance, I'm here to give it my all to the very end!",
+        Type: "Polearm",
+        Ele: "Pyro",
+        Nation: "Liyue"
+    },
+    30: {
+        Name: "Xinyan",
+        Lore: "I'd sure love to add some extra flavor to my rock 'n' roll. Wanna get on the drums next time? Give it a go, I just know you'll be great!",
+        Type: "Claymore",
+        Ele: "Pyro",
+        Nation: "Liyue"
+    },
+    31: {
+        Name: "Yun Jin",
+        Lore: "As the saying goes, you never truly know someone until you meet them in person, and at long last, I finally have the great honor of meeting you today.",
         Type: "Polearm",
         Ele: "Geo",
         Nation: "Liyue"
+    },
+    32: {
+        Name: "Beidou",
+        Lore: "You've heard of my ship, The Crux, and its crew? If you too love adventure, then join me. I've got your back.",
+        Type: "Claymore",
+        Ele: "Electro",
+        Nation: "Liyue"
+    },
+    33: {
+        Name: "Ningguang",
+        Lore: "I suppose you've heard enough rumors about me. What kind of person am I? I shall leave that for you to decide... Of course, your judgement will become a part of the rumor.",
+        Type: "Catalyst",
+        Ele: "Geo",
+        Nation: "Liyue"
+    },
+    34: {
+        Name: "Ganyu",
+        Lore: "Should we really be off work this early? There is still a lot left to do...",
+        Type: "Bow",
+        Ele: "Cryo",
+        Nation: "Liyue"
+    },
+    35: {
+        Name: "Keqing",
+        Lore: "If you feel strongly about something, you should speak up and take action. That's the philosophy I live by.",
+        Type: "Sword",
+        Ele: "Electro",
+        Nation: "Liyue"
+    },
+    36: {
+        Name: "Yanfei",
+        Lore: "Next time, be sure to make a proper appointment. I charge 710,000 Mora per case — final quote and commission rate depending on the details of your case. Not a bad deal, right?",
+        Type: "Catalyst",
+        Ele:  "Pyro",
+        Nation: "Liyue"
+    },
+    37: {
+        Name: "Yaoyao",
+        Lore: "It's a pleasure to make your acquaintance! If you encounter any difficulties outdoors, then lemme help you! Oh, by the way, I brought some Fried Radish Balls with me, help yourself!",
+        Type: "Polearm",
+        Ele: "Dendro",
+        Nation: "Liyue"
+    },
+    38: {
+        Name: "Zhongli",
+        Lore: "A new contract? Okay. I'm still on leave, but I can accompany you for a while.",
+        Type: "Polearm",
+        Ele: "Geo",
+        Nation: "Liyue"
+    },
+    39: {
+        Name: "Thoma",
+        Lore: "Anything I can lend a hand with, just say the word. A conversation? I see, I see. That's a little different from what I'm used to, but I'm all for it",
+        Type: "Polearm",
+        Ele: "Pyro",
+        Nation: "Inazuma"
+    },
+    40: {
+        Name: "Ayaka",
+        Lore: "'Was it one's thoughts that drew him to my dreams? Had I known it a dream, one would not have awakened.' Hehe, I love that poem.",
+        Type: "Sword",
+        Ele: "Cryo",
+        Nation: "Inazuma"
+    },
+    41: {
+        Name: "Yoimiya",
+        Lore: "Well, who do we have here? Welcome, welcome, you're just in time for the fireworks show.",
+        Type: "Bow",
+        Ele: "Pyro",
+        Nation: "Inazuma"
+    },
+    42: {
+        Name: "Sayu",
+        Lore: "Hey, will you do me a favor and let me know if you see the shrine maiden coming? I'm just gonna, um... rest my eyes for a moment.",
+        Type: "Claymore",
+        Ele: "Anemo",
+        Nation: "Inazuma"
+    },
+    43: {
+        Name: "Gorou",
+        Lore: "It'd be nice to just lie in the sun... Ahem, but I must set an example for the others.",
+        Type: "Bow",
+        Ele: "Geo",
+        Nation: "Inazuma"
+    },
+    44: {
+        Name: "Kokomi",
+        Lore: "My journey with you will be an opportunity to unwind... Ahem, I mean... to survey beyond our borders.",
+        Type: "Catalyst",
+        Ele: "Hydro",
+        Nation: "Inazuma"
+    },
+    45: {
+        Name: "Heizou",
+        Lore: "Seems to me like these commissions of yours are an endless gold mine of cases, and you'll never be able to finish them all. So maybe you could throw one my way every once in a while?",
+        Type: "Catalyst",
+        Ele: "Anemo",
+        Nation: "Inazuma"
+    },
+    46: {
+        Name: "Shinobu",
+        Lore: "Just let me know if you ever find yourself in a pinch. I can help you out. If the Arataki Gang stirs up any trouble, I'll drag every last one of them back to apologize.",
+        Type: "Sword",
+        Ele: "Electro",
+        Nation: "Inazuma"
+    },
+    47: {
+        Name: "Itto",
+        Lore: "The first and greatest head of the Arataki Gang, Arataki 'Numero Uno' Itto, here in the flesh! Hahaha... *cough*",
+        Type: "Claymore",
+        Ele: "Geo",
+        Nation: "Inazuma"
+    },
+    48: {
+        Name: "Sara",
+        Lore: "I may be uncompromising on matters of great importance, but on most other things, you will find me quite easygoing.",
+        Type: "Bow",
+        Ele: "Electro",
+        Nation: "Inazuma"
     },
     49: {
         Name: "Ei",
@@ -461,7 +459,7 @@ var upgradeInfo = {
     },
     103: {
         Name: "Yelan",
-        Lore: "",
+        Lore: "Call me Yelan. I think you may need my help, and I just so happen to be interested in some information you have. In other words — you scratch my back, I'll scratch yours.",
         Type: "Bow",
         Ele: "Hydro",
         Nation: "Liyue"
@@ -482,7 +480,7 @@ var upgradeInfo = {
     },
     106: {
         Name: "Yae Miko",
-        Lore: "",
+        Lore: "Traveling to other worlds is all that anyone seems be writing about these days. Huh, goodness knows what they find so disappointing about their own world.",
         Type: "Catalyst",
         Ele: "Electro",
         Nation: "Inazuma"
@@ -522,7 +520,6 @@ var upgradeInfo = {
         Ele: "Anemo",
         Nation: "Mondstadt"
     },
-    // 112: {Name: "Dehya",         Lore:"",     "Level":   Type: "Claymore",   Ele: "Pyro",           Nation:"Mond"                                             },
 };
 
 // RMB TO UPDATE MAX CONSTANTS

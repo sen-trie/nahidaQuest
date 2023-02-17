@@ -107,13 +107,10 @@ function createExpedTable(expedDiv) {
 
     let expedTable = document.createElement("div");
     expedTable.classList = "tooltipTABLEEXPED";
-
     let expedRow1 = document.createElement("div");
     expedRow1.id = "exped-row-1";
-
     let expedRowImg = document.createElement("img");
     expedRowImg.src = "./assets/arrow.webp";
-
     let expedRow2 = document.createElement("div");
     expedRow2.id = "exped-row-2";
 

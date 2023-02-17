@@ -557,11 +557,18 @@ button {
     opacity: 0.95;
 }
 
-.event-rain-text > p {
-    text-align: center;
+.event-rain-text {
+    height: 10%;
+    width: 100%;
+    bottom: 1%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: 2.3em;
     color: white;
-    background-color: transparent;
+    background-color: #000000c4;
+    pointer-events: none;
     z-index: 10007;
 }
 
@@ -669,6 +676,9 @@ button {
 
 #outcome-text {
     bottom: 50%;
+    font-size: 2.3em;
+    text-shadow: 0.05em 0.05em  #000000;
+    background-color: #000000ee;
 }
 
 .box-outer-div {
@@ -1533,8 +1543,7 @@ circle {
 .inventory-selected {
     border: #867357;
     border-style:inset;
-    border-width: 0.4em;
-    border-radius: 1em;
+    border-radius: 10%;
     transition: 0.2s ease;
     transform: scale(1.20);
 }
@@ -1579,14 +1588,9 @@ circle {
 } 
 
 /*/////////////////////////////// EXPEDITION (TABLE3) CSS ///////////////////////////////*/
-.flex-container-EXPEDITION button {
-    transition: 0.2s ease;
-    opacity: 0.25;
-}
-
-.flex-container-EXPEDITION button:hover {
+.expedition-selected {
     transition: 0.4s ease;
-    opacity: 1;
+    opacity: 1 !important;
 }
 
 .flex-container-EXPEDITION {
@@ -1594,12 +1598,29 @@ circle {
     align-items: center;
     display: flex;
     flex-direction: column;
-    row-gap: 2%;
+    row-gap: 1%;
+}
+
+#adventure-button {
+    height: 12%;
+    width: 100%;
+    background-image: url(./assets/expedbg/exped-button.webp);
+    font-size: 1.4em;
+    color: #E1D8CB;
+    text-shadow: #40312b 0.05em 0.05em 0.05em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: 0.2s ease;
+    opacity: 0.25;
 }
 
 #expedDiv {
-    width:98%;
-    height:60%;
+    width:100%;
+    height:57%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1607,15 +1628,17 @@ circle {
 
 .expedition {
     margin: auto;
-    width: 19%;
+    width: 20%;
     height: 100%;
+    transition: 0.2s ease;
+    opacity: 0.25;
 }
 
 /*/////////////////////////////// EXPEDITION TOOLTIP CSS ///////////////////////////////*/
 .tooltipEXPED {
     text-align: center;
-    width: 80%;
-    height: 30%;
+    width: 90%;
+    height: 33%;
     position: relative;
     display: flex;
     justify-content: center;
@@ -1625,11 +1648,9 @@ circle {
 
 .exped-table-img {
     position: absolute;
-    width: 120%;
-    height: 120%;
-    top:-10%;
-    left:-10%;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit:fill;
 }
 
 .tooltipTABLEEXPED {
@@ -1653,7 +1674,7 @@ circle {
 .tooltipTABLEEXPED > img {
     z-index: 200;
     height: 20%;
-    width: 100%;
+    width: 70%;
     object-fit: contain;
 }
 
@@ -1668,8 +1689,11 @@ circle {
 
 #exped-row-2 {
     position: relative;
+    padding-left: 4%;
+    padding-right: 4%;
+    box-sizing: border-box;
     top: -2%;
-    font-size: 1.05em;
+    font-size: 1em;
     height: 50%;
     align-items: flex-start;
 }

@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.1.A-16-2-23"
+const VERSIONNUMBER = "v0.1.A-17-2-23"
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
 let startText = document.getElementById("start-screen"); 
@@ -69,6 +69,7 @@ const WISHHEROMIN = 100;
 const WISHCOST = 160;
 const STARTINGWISHFACTOR = 50;
 var wishMultiplier = 0;
+var adventureType = 0;
 
 var foodBuff = 1;
 var timeSnapshot1 = 0;
@@ -389,29 +390,28 @@ function clickedEvent() {
 }
 
 function chooseEvent(type) {
-    weaselEvent();
-    // switch (type) {
-    //     case 1:
-    //         rainEvent();
-    //         break;
-    //     case 2:
-    //         clickEvent();
-    //         break;
-    //     case 3:
-    //         reactionEvent();
-    //         break;
-    //     case 4:
-    //         boxFunction();
-    //         break
-    //     case 5:
-    //         minesweeperEvent();
-    //         break;
-    //     case 6:
-    //         weaselEvent();
-    //         break;
-    //     default:
-    //         break;
-    // }
+    switch (type) {
+        case 1:
+            rainEvent();
+            break;
+        case 2:
+            clickEvent();
+            break;
+        case 3:
+            reactionEvent();
+            break;
+        case 4:
+            boxFunction();
+            break
+        case 5:
+            minesweeperEvent();
+            break;
+        case 6:
+            weaselEvent();
+            break;
+        default:
+            break;
+    }
 }
 
 // EVENT 1 (RAIN)
@@ -810,7 +810,7 @@ function boxOpen(eventBackdrop) {
     let boxTextDiv = document.createElement("p");
 
     boxText.classList.add("event-rain-text");
-    boxText.id = "box-text"
+    boxText.id = "outcome-text"
     boxTextDiv.innerText = outcomeText;
     boxText.append(boxTextBackground,boxTextDiv)
     
@@ -974,14 +974,14 @@ function generateCombination(n) {
   }
 
 // EVENT OUTCOME
-function eventOutcome(innerText,eventBackdrop, type, amount) {
+function eventOutcome(innerText,eventBackdrop,type,amount) {
     let removeClick = document.createElement("div");
     let boxText = document.createElement("div");
     let boxTextDiv = document.createElement("p");
 
     removeClick.id = "prevent-clicker";
     boxText.classList.add("event-rain-text");
-    boxText.id = "box-text";
+    boxText.id = "outcome-text";
     if (type == "weasel") {
         let weaselCount = amount;
         boxText.style.height = "13%";
@@ -1204,7 +1204,6 @@ function tabChange(x) {
         itemTooltip = -1;
     }
 
-    
     clearTooltip();
     x--;
     TABS[x].style.display = "flex";
@@ -1781,7 +1780,6 @@ function adventure(type) {
         }
         saveValues["energy"] += ADVENTURECOSTS[type];
     } else if (expeditionDict[type].Locked == '1'){
-        alert("ITS LOCKED CANT YOU SEE!!!!!!!")
         return;  
     }
 
@@ -1881,15 +1879,53 @@ function createExpedition() {
         }
 
         expedButton = expedButtonAdjust(expedButton, backgroundImg, i)
-        expedButton.addEventListener("click", () => {adventure(i)});
-        expedButton.addEventListener("mouseover", function() {expedInfo(this.id)});
-        expedButton.addEventListener("mouseout", () => {expedInfo(7)});
+        expedButton.addEventListener("click", () => {
+            if (adventureType === i) {
+                expedButton.classList.remove("expedition-selected");
+                adventureType = 0;
+                expedInfo(7);
+                let advButton = document.getElementById("adventure-button");
+                if (advButton.classList.contains("expedition-selected")) {
+                    advButton.classList.remove("expedition-selected");
+                }
+            } else {
+                clearExped();
+                adventureType = i;
+                expedButton.classList.add("expedition-selected");
+                expedInfo(expedButton.id);
+            }  
+        });
         expedDiv.appendChild(expedButton);
+    }
+
+    let advButton = document.createElement("div");
+    advButton.id = "adventure-button";
+    advButton.innerText = "Adventure!"
+    advButton.addEventListener("click",() => {
+        if (adventureType != 0) {
+            adventure(adventureType);
+        }
+    })
+    table3.appendChild(advButton);
+}
+
+function clearExped() {
+    if (adventureType != 0) {
+        let id = "exped-" + adventureType;
+        let old_exped = document.getElementById(id);
+        if (old_exped.classList.contains("expedition-selected")) {
+            old_exped.classList.remove("expedition-selected");
+        }
+        adventureType = 0;
+        expedInfo(7);
+        let advButton = document.getElementById("adventure-button");
+            if (advButton.classList.contains("expedition-selected")) {
+                advButton.classList.remove("expedition-selected");
+        }
     }
 }
 
 function expedInfo(butId) {
-    let expedTableTemp = document.getElementById("expedTableID");
     let expedRow1 = document.getElementById("exped-row-1");
     let expedRow2 = document.getElementById("exped-row-2");
     let i = 0;
@@ -1905,6 +1941,10 @@ function expedInfo(butId) {
     }
 
     if (expeditionDict[i]["Locked"] == 0 || i == 7) {
+        let advButton = document.getElementById("adventure-button");
+                if (!advButton.classList.contains("expedition-selected")) {
+                    advButton.classList.add("expedition-selected");
+                }
         expedRow1.innerText = expeditionDict[i]["Text"];
         expedRow2.innerText = expeditionDict[i]["Lore"];
         expedRow1.appendChild(afterEnergyIcon);
@@ -1989,6 +2029,7 @@ function wish() {
             if (upgradeDict[100].Purchased === -10) {
                 randomWishHero = 100;
                 unlockExpedition(5,expeditionDict);
+                clearExped();
                 addShop();
                 newPop(5);
                 newPop(2);
@@ -2498,6 +2539,7 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
         if (expeditionDict[expeditionCounter + 3].Locked == 1) {
             if (heroUnlockLevels.length != 1) {
                 unlockExpedition(expeditionCounter + 3,expeditionDict);
+                clearExped();
                 newPop(2);
             } else {
                 if (saveValues["wishUnlocked"] === true) {
