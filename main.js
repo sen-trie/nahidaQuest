@@ -3,7 +3,8 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.1.A-17-2-23"
+const VERSIONNUMBER = "v0.2.BETA-18-2"
+
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
 let startText = document.getElementById("start-screen"); 
@@ -62,20 +63,29 @@ const XPMAX = 4004;
 
 const NONWISHHEROMAX = 49
 const WISHHEROMIN = 100;
-// NAHIDA'S BASE COST   v
-// var heroCurrentCosts = new Map();
-// heroCurrentCosts.set(0,20);
 
-const WISHCOST = 160;
+const WISHCOST = 600;
 const STARTINGWISHFACTOR = 50;
 var wishMultiplier = 0;
 var adventureType = 0;
+const SHOPCOOLDOWN = 60;
+
+// ACHIEVEMENT THRESHOLDS
+var achievementData = {
+    achievementTypeRawScore: [100,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29,1e30,1e32],
+    achievementTypeRawDPS:   [10,100,1000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29],
+    achievementTypeRawClick: [1e1,1e2,5e2,1e3,2.5e3,5e3,7.5e3,1e4,1e5,1.5e5,2e5,2.5e5,3e5,3.5e5,4e5,4.5e5,5e5],
+    achievementTypeRawCollection: [1,10,100,250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000],
+};
+var scoreAchievement = [1,101,201,301];
 
 var foodBuff = 1;
 var timeSnapshot1 = 0;
 var timeSnapshot2 = 0;
 var timerAchievement = "";
 var clickerEvent = false;
+var shopTime = 0;
+var shopTimerElement;
 
 var demoContainer = document.getElementById("demo-container");
 var score = document.getElementById("score");
@@ -134,7 +144,6 @@ var tooltipTable = 1;
 var heroTooltip = -1;
 var itemTooltip = -1;
 createTooltip();
-setShop();
 
 settings();
 var settingsValues;
@@ -160,7 +169,6 @@ var timerSeconds = 0;
 createTabs();
 tabChange(1);
 
-
 //------------------------------------------------------------------------GAME FUNCTIONS------------------------------------------------------------------------//
 window.oncontextmenu = function (){
     return false;
@@ -180,13 +188,26 @@ function timerEvents() {
     foodCheck(timerSeconds);
     randomEventTimer(timerSeconds);
     timerSave(timerSeconds);
-} 
+
+    shopTimerFunction();
+}
+
+// SHOP TIMER
+function shopTimerFunction() {
+    let startOfYear = new Date('2022-01-01T00:00:00');
+    let now = new Date();
+    let minutesPassedNow = (now - startOfYear) / (1000 * 60);
+    let time_passed = Math.floor(minutesPassedNow - parseInt(shopTime));
+    shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
+    if (time_passed >= SHOPCOOLDOWN) {
+        refreshShop(minutesPassedNow)
+    }
+}
 
 // TEMPORARY TIMER
 function timerEventsLoading() {
     addNewRow();
     refresh();
-    checkAchievement();
 }
 
 // SAVE DATA TIMER
@@ -196,6 +217,13 @@ function timerSave(timerSeconds) {
     let saveTimeMin = 180 * savedTimes;
     if (timerSeconds > saveTimeMin) {
         saveData();
+        let saveCurrently = document.createElement("img");
+        saveCurrently.src = "./assets/settings/saving.webp";
+        saveCurrently.id = "currently-saving";
+        saveCurrently.addEventListener("animationend", ()=> {
+            saveCurrently.remove();
+        })
+        mainBody.append(saveCurrently);
         console.log("Saved!");
         savedTimes++;
     }
@@ -259,6 +287,14 @@ function loadSaveData() {
         let achievementListTemp = localStorage.getItem("achievementListSave");
         achievementMap = new Map(JSON.parse(achievementListTemp));
         achievementListload();
+    }
+    // LOAD STORE DATA
+    if (localStorage.getItem("storeInventory") != null) {
+        let localStore = localStorage.getItem("storeInventory");
+        let currentMin = localStorage.getItem("shopStartMinute");
+        localStore = JSON.stringify(localStore);
+        shopTime = currentMin;
+        loadShop();
     }
 }
 
@@ -349,20 +385,35 @@ function randomEventTimer(timerSeconds) {
 // START A RANDOM EVENT
 function startRandomEvent() {
     let eventPicture = document.createElement("div");
+    let aranaraEasy = randomInteger(1,4);
+    let aranaraNumber;
+    if (aranaraEasy < 3) {
+        aranaraNumber = randomInteger(1,4);
+    } else {
+        aranaraNumber = randomInteger(4,7);
+    }
+     
     eventPicture.classList.add("random-event");
-    eventPicture.addEventListener("click", () => {clickedEvent();eventPicture.remove()});
+    eventPicture.addEventListener("click", () => {clickedEvent(aranaraNumber);eventPicture.remove()});
 
     setTimeout(() => {eventPicture.remove()}, 8000);
-    eventPicture.style.left = randomInteger(10,90) + "%";
-    eventPicture.style.top = randomInteger(10,90) + "%";
+    eventPicture.style.left = randomInteger(35,95) + "%";
+    eventPicture.style.top = randomInteger(10,75) + "%";
 
     let eventPictureImg = document.createElement("img");
-    eventPictureImg.src = "./assets/mouse.png";
+    eventPictureImg.classList.add("event-pic-img");
+    if (aranaraNumber < 4) {
+        eventPictureImg.src = "./assets/event-easy.webp";
+    } else {
+        eventPictureImg.src = "./assets/event-hard.webp";
+        eventPictureImg.classList.add("vibrate-more");
+    }
+    
     eventPicture.appendChild(eventPictureImg);
     mainBody.appendChild(eventPicture);
 }
 
-function clickedEvent() {
+function clickedEvent(aranaraNumber) {
     eventElement.load();
     eventElement.play();
 
@@ -371,7 +422,6 @@ function clickedEvent() {
     let eventDropdownBackground = document.createElement("img");
     eventDropdownBackground.src = "./assets/tutorial/eventPill.webp";
 
-    let aranaraNumber = randomInteger(1,7);
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
     eventDropdownText.classList.add("event-dropdown-text");
@@ -392,99 +442,29 @@ function clickedEvent() {
 function chooseEvent(type) {
     switch (type) {
         case 1:
-            rainEvent();
-            break;
-        case 2:
             clickEvent();
             break;
-        case 3:
+        case 2:
             reactionEvent();
             break;
-        case 4:
+        case 3:
             boxFunction();
             break
-        case 5:
+        case 4:
             minesweeperEvent();
             break;
-        case 6:
+        case 5:
             weaselEvent();
+            break;
+        case 6:
+            rainEvent();
             break;
         default:
             break;
     }
 }
 
-// EVENT 1 (RAIN)
-function rainEvent() {
-    let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("event-dark");
-
-    let rainText = document.createElement("div");
-    let rainTextBackground = document.createElement("div");
-    let rainTextDiv = document.createElement("p");
-
-    rainText.classList.add("event-rain-text");
-    let dpsMultiplier = (saveValues.dps + 1)* 20;
-    let tempScore = 0;
-    let tempPrimogem = 0;
-    rainTextDiv.innerText = tempScore;
-    rainText.append(rainTextBackground,rainTextDiv)
-    mainBody.appendChild(rainText);
-
-    function spawnRain() {
-        let animation = `rain ${(randomInteger(8,12)/2)}s linear forwards`
-        let type = randomInteger(1,101);
-        var img = document.createElement("img");
-        if (type >= 85) {
-            img.src = "./assets/icon/primogemLarge.webp"
-            animation = `rain-rotate ${(randomInteger(3,8)/2)}s linear forwards`
-            img.addEventListener('click', () => {
-                img.remove();
-                tempPrimogem += randomInteger(20,40);
-                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier) + " Nuts | " + tempPrimogem + " Primos";
-            });
-        } else if (type >= 65) {
-            img.src = "./assets/icon/scarab.webp"
-            img.addEventListener('click', () => {
-                img.remove();
-                tempScore -= 10;
-                tempScore = Math.max(0, tempScore);
-                tempPrimogem -= randomInteger(30,100);
-                tempPrimogem = Math.max(0, tempPrimogem)
-                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + tempPrimogem + " Primos";
-            });
-        } else {
-            img.src = "./assets/icon/nut.webp";
-            img.addEventListener('click', () => {
-                img.remove();
-                tempScore++;
-                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + tempPrimogem + " Primos";
-            });
-        }
-        img.style.top = "-15%";
-        img.style.left = `${randomInteger(5,95)}%`
-        img.style.animation = animation;
-        img.addEventListener('animationend', () => {img.remove()});
-        img.classList.add("raining-image");
-        eventBackdrop.append(img);
-    }
-
-    let rainTimer = setInterval(() => {spawnRain()}, 300);
-    setTimeout(()=>{
-        clearInterval(rainTimer);
-        setTimeout(()=>{
-            setTimeout(()=>{eventBackdrop.remove();},3000)
-            rainText.classList.add("text-pop");
-            rainText.addEventListener('animationend', () => {
-                rainText.remove();
-                saveValues.realScore += tempScore * dpsMultiplier;
-                saveValues.primogem += tempPrimogem;
-        }),8000})
-    }, 28000);
-    mainBody.append(eventBackdrop);
-}
-
-// EVENT 2 (ENERGY OVERLOAD)
+// EVENT 1 (ENERGY OVERLOAD)
 function clickEvent() {
     let button = demoContainer.firstElementChild;
     button.style.animation = "rotation-scale 5s infinite linear forwards";
@@ -499,156 +479,7 @@ function clickEvent() {
     },20000)
 }
 
-// EVENT 3 (MINESWEEPER)
-const ROWS = 8;
-const COLS = 8;
-function minesweeperEvent() {
-    var mines = randomInteger(8,10)
-    let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("event-dark");
-    let mineInfo = document.createElement("img");
-    mineInfo.src = "./assets/event/mine-info.webp"
-    mineInfo.id = "mine-info";
-
-    let mineBackground = document.createElement("table");
-    let board;
-    let firstClick = true;
-    let cellsLeft = ROWS * COLS - mines;
-    mineBackground.classList.add("event-mine-bg");
-    initializeBoard();
-
-    // Initialize Board
-    function initializeBoard() {
-        board = [];
-        for (let r = 0; r < ROWS; r++) {
-          board[r] = [];
-          for (let c = 0; c < COLS; c++) {
-            board[r][c] = { mine: false, revealed: false, flagged: false, adjMines: 0 };
-          }
-        }
-      
-        for (let i = 0; i < mines; i++) {
-          let r = Math.floor(Math.random() * ROWS);
-          let c = Math.floor(Math.random() * COLS);
-          if (board[r][c].mine) {
-            i--;
-          } else {
-            board[r][c].mine = true;
-          }
-        }
-      
-        for (let r = 0; r < ROWS; r++) {
-          for (let c = 0; c < COLS; c++) {
-            if (!board[r][c].mine) {
-              for (let dr = -1; dr <= 1; dr++) {
-                for (let dc = -1; dc <= 1; dc++) {
-                  if (r + dr >= 0 && r + dr < ROWS && c + dc >= 0 && c + dc < COLS) {
-                    if (board[r + dr][c + dc].mine) {
-                      board[r][c].adjMines++;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-
-    // Count number of mines adjacent to a cell
-    function countAdjacentMines(row, col) {
-        let count = 0;
-        for (let r = Math.max(0, row - 1); r <= Math.min(ROWS - 1, row + 1); r++) {
-          for (let c = Math.max(0, col - 1); c <= Math.min(COLS - 1, col + 1); c++) {
-            if (board[r][c].mine && (r !== row || c !== col)) {
-              count++;
-            }
-          }
-        }
-        return count;
-    }
-
-    // Reveal a cell and its neighbors (recursively) if it has no adjacent mines
-    function revealCell(r, c) {
-        if (r >= 0 && r < ROWS && c >= 0 && c < COLS && !board[r][c].revealed) {
-          board[r][c].revealed = true;
-          cellsLeft--;
-          const tr = mineBackground.children[r];
-          const td = tr.children[c];
-          if (countAdjacentMines(r, c) === 0) {
-            td.innerText = "-";
-            td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
-            for (let r2 = r - 1; r2 <= r + 1; r2++) {
-              for (let c2 = c - 1; c2 <= c + 1; c2++) {
-                revealCell(r2, c2);
-              }
-            }
-          } else {
-            td.innerText = countAdjacentMines(r, c);
-            td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
-          }
-        }
-    }
-        
-    // Render minesweeper to event backdrop
-    for (let r = 0; r < ROWS; r++) {
-        const tr = document.createElement("tr");
-        for (let c = 0; c < COLS; c++) {
-            const td = document.createElement("td");
-            td.innerText = board[r][c].revealed
-                ? countAdjacentMines(r, c) || "-"
-                : "";
-            td.addEventListener("contextmenu", function(event) {
-                event.preventDefault();
-                if (!board[r][c].revealed) {
-                    if (board[r][c].flagged) {
-                        td.innerText = "";
-                        td.style.backgroundImage = "url(./assets/event/mine-unclicked.webp)";
-                        board[r][c].flagged = false;
-                    } else {
-                        td.innerText = "";
-                        td.style.backgroundImage = "url(./assets/event/mine-flag.webp)";
-                        board[r][c].flagged = true;
-                    }
-                }
-            });
-            td.addEventListener("click", function() {
-                if (firstClick) {
-                    while (board[r][c].mine) {
-                        initializeBoard();
-                    }
-                    firstClick = false;
-                }
-                if (board[r][c].mine) {
-                    td.innerText = "";
-                    td.style.backgroundImage = "url(./assets/event/mine-wrong.webp)";
-
-                    let mineFileOutcome = document.createElement("img");
-                    let whopperInt = randomInteger(1,4);
-                    mineFileOutcome.src = "./assets/event/whopperflower-"+whopperInt+".webp";
-                    mineFileOutcome.classList.add("mine-outcome");
-                    mineFileOutcome.classList.add("slide-in-blurred-bottom");
-                    eventBackdrop.append(mineFileOutcome);
-
-                    eventOutcome("The whopperflowers were alerted!",eventBackdrop);
-                } else {
-                    revealCell(r, c);
-                    td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
-                }
-                if (cellsLeft <= 0) {
-                    let randomPrimo = randomInteger(200,400);
-                    eventOutcome(`All whopperflowers have been revealed! (+${randomPrimo} Primogems)`,eventBackdrop, "primogem", randomPrimo);
-                }
-            });
-            tr.appendChild(td);
-        }
-    mineBackground.appendChild(tr);
-    }
-    eventBackdrop.append(mineBackground,mineInfo)
-    mainBody.append(eventBackdrop);
-}
-
-// EVENT 4 (REACTION TIME)
+// EVENT 2 (REACTION TIME)
 var reactionReady = false;
 var reactionGame = false;
 function reactionEvent() {
@@ -708,36 +539,38 @@ function reactionEvent() {
 
 function reactionFunction(eventBackdrop) {
     if (reactionGame == false) {return};
-    let outcomeText = document.createElement("div");
-    let outcomeTextBackground = document.createElement("div");
-    let outcomeTextDiv = document.createElement("p");
-    outcomeText.classList.add("event-rain-text");
-    outcomeText.id = "outcome-text";
+    // let outcomeText = document.createElement("div");
+    // let outcomeTextBackground = document.createElement("div");
+    // let outcomeTextDiv = document.createElement("p");
+    let outcomeText;
+    let primogem = 0;
+    // outcomeText.classList.add("event-rain-text");
+    // outcomeText.id = "outcome-text";
 
     reactionStartElement.pause();
     reactionCorrectElement.load();
     if (reactionReady == false) {
-        outcomeTextDiv.innerText = "You missed!";
+        outcomeText = "You missed!";
     } else if (reactionReady == true) {
         reactionCorrectElement.play();
         adventure(10);
-        adventure(10);
-        saveValues.primogem += randomInteger(40,60);
-        outcomeTextDiv.innerText = "You did it!";
+        primogem = randomInteger(40,60);
+        outcomeText = "You did it!";
     }
 
     reactionReady = false;
     reactionGame = false;
-    outcomeText.append(outcomeTextBackground,outcomeTextDiv);
-    mainBody.append(outcomeText);
+    eventOutcome(outcomeText,eventBackdrop,"reaction",primogem)
+    // outcomeText.append(outcomeTextBackground,outcomeTextDiv);
+    // mainBody.append(outcomeText);
 
-    setTimeout(()=> {
-        eventBackdrop.remove();
-        outcomeText.remove();
-    },2000)
+    // setTimeout(()=> {
+    //     eventBackdrop.remove();
+    //     // outcomeText.remove();
+    // },2000)
 }
 
-// EVENT 5 (7 BOXES)
+// EVENT 3 (7 BOXES)
 function boxFunction() {
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("event-dark");
@@ -773,70 +606,195 @@ function boxOpen(eventBackdrop) {
     boxOutcome.classList.add("box-outcome");
     boxOutcome.classList.add("slide-in-blurred-top");
     let outcomeText;
-    let goodOutcomeNumber = 0;
+    let outcomeNumber = 0;
 
     let boxChance = randomInteger(1,101);
     if (boxChance >= 60) {
-        goodOutcomeNumber = randomInteger(60,160);
+        outcomeNumber = randomInteger(40,60);
         boxOutcome.src = "./assets/icon/primogemLarge.webp";
-        outcomeText = "The box contained primogems! (Gain "+goodOutcomeNumber+" Primogems)";
+        outcomeText = "The box contained primogems!";
     } else if (boxChance >= 25) {
         let goodOutcome = randomInteger(1,8);
         boxOutcome.src = "./assets/icon/good-" + goodOutcome + ".webp";
         outcomeText = "Oh, it had a gemstone! (Increased power for " +boxElement[goodOutcome]+ " characters)";
-        goodOutcomeNumber = 5002.1 + goodOutcome;
+        outcomeNumber = 5009.1 + goodOutcome;
     } else if (boxChance >= 15) {
         let badOutcome = randomInteger(1,5);
         boxOutcome.src = "./assets/icon/bad-" + badOutcome + ".webp";
         outcomeText = "Uh oh, an enemy was hiding in the box!";
     } else if (boxChance >= 5) {
-        let veryGoodOutcome = randomInteger(1,4);
+        // let veryGoodOutcome = randomInteger(1,2);
         saveValues.primogem += randomInteger(40,60);
-        boxOutcome.src = "./assets/icon/verygood-" + veryGoodOutcome + ".webp";
+        boxOutcome.src = "./assets/icon/verygood-" + 3 + ".webp";
         outcomeText = "Oh! It had a precious gemstone!! (Increased power for all characters)";
-        goodOutcomeNumber = 5001.1;
+        outcomeNumber = 5002.1;
     } else {
         boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
-        
         let badOutcomePercentage = randomInteger(15,30);
         outcomeText = "Uh oh! Run away! (Lost " +badOutcomePercentage+ "% of Energy)";
-        badOutcomePercentage = (100 - badOutcomePercentage)/100;
-        saveValues.energy = Math.floor(saveValues.energy * badOutcomePercentage);
+        outcomeNumber = badOutcomePercentage;
     }
 
-    boxOuterNew.appendChild(boxOutcome);
-    let boxText = document.createElement("div");
-    let boxTextBackground = document.createElement("div");
-    let boxTextDiv = document.createElement("p");
 
-    boxText.classList.add("event-rain-text");
-    boxText.id = "outcome-text"
-    boxTextDiv.innerText = outcomeText;
-    boxText.append(boxTextBackground,boxTextDiv)
+    boxOuterNew.appendChild(boxOutcome);
+    eventOutcome(outcomeText,eventBackdrop,"box",outcomeNumber)
     
     setTimeout(()=> {
         boxOuterNew.remove();
         eventBackdrop.remove();
     },4000);
+}
 
-    setTimeout(()=> {
-        mainBody.appendChild(boxText);
-        setTimeout(()=> {
-            boxText.classList.add("slide-out-animation");
-            boxText.addEventListener("animationend",() => {
-                boxText.remove()
-                 if (goodOutcomeNumber >= 50 && goodOutcomeNumber <= 200) {
-                    saveValues.primogem += goodOutcomeNumber;
-                } else if (goodOutcomeNumber > 200) {
-                    itemUse(goodOutcomeNumber.toString())
+// EVENT 4 (MINESWEEPER)
+const ROWS = 8;
+const COLS = 8;
+function minesweeperEvent() {
+    var mines = randomInteger(8,10)
+    let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("event-dark");
+    let mineInfo = document.createElement("img");
+    mineInfo.src = "./assets/event/mine-info.webp"
+    mineInfo.id = "mine-info";
+
+    let mineBackground = document.createElement("table");
+    let board;
+    let firstClick = true;
+    let cellsLeft = ROWS * COLS - mines;
+    mineBackground.classList.add("event-mine-bg");
+    initializeBoard();
+
+    // INITIALIZE BOARD
+    function initializeBoard() {
+        board = [];
+        for (let r = 0; r < ROWS; r++) {
+          board[r] = [];
+          for (let c = 0; c < COLS; c++) {
+            board[r][c] = { mine: false, revealed: false, flagged: false, adjMines: 0 };
+          }
+        }
+      
+        for (let i = 0; i < mines; i++) {
+            let r = Math.floor(Math.random() * ROWS);
+            let c = Math.floor(Math.random() * COLS);
+            if (board[r][c].mine) {
+                i--;
+            } else {
+                board[r][c].mine = true;
+            }
+        }
+      
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                if (!board[r][c].mine) {
+                    for (let dr = -1; dr <= 1; dr++) {
+                        for (let dc = -1; dc <= 1; dc++) {
+                            if (r + dr >= 0 && r + dr < ROWS && c + dc >= 0 && c + dc < COLS) {
+                                if (board[r + dr][c + dc].mine) {
+                                    board[r][c].adjMines++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // COUNT ADJACENT NUMBER OF CELLS
+    function countAdjacentMines(row, col) {
+        let count = 0;
+        for (let r = Math.max(0, row - 1); r <= Math.min(ROWS - 1, row + 1); r++) {
+          for (let c = Math.max(0, col - 1); c <= Math.min(COLS - 1, col + 1); c++) {
+            if (board[r][c].mine && (r !== row || c !== col)) {
+              count++;
+            }
+          }
+        }
+        return count;
+    }
+
+    // REVEAL CELL + NEIGHBOURS RECURSIVELY IF EMPTY
+    function revealCell(r, c) {
+        if (r >= 0 && r < ROWS && c >= 0 && c < COLS && !board[r][c].revealed) {
+            board[r][c].revealed = true;
+            cellsLeft--;
+            const tr = mineBackground.children[r];
+            const td = tr.children[c];
+            if (countAdjacentMines(r, c) === 0) {
+                td.innerText = "-";
+                td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
+                for (let r2 = r - 1; r2 <= r + 1; r2++) {
+                    for (let c2 = c - 1; c2 <= c + 1; c2++) {
+                        revealCell(r2, c2);
+                    }
+                }
+            } else {
+                td.innerText = countAdjacentMines(r, c);
+                td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
+            }
+        }
+    }
+        
+    // RENDER MINESWEEPER TO SCREEN
+    for (let r = 0; r < ROWS; r++) {
+        const tr = document.createElement("tr");
+        for (let c = 0; c < COLS; c++) {
+            const td = document.createElement("td");
+            td.innerText = board[r][c].revealed
+                ? countAdjacentMines(r, c) || "-"
+                : "";
+            td.addEventListener("contextmenu", function(event) {
+                event.preventDefault();
+                if (!board[r][c].revealed) {
+                    if (board[r][c].flagged) {
+                        td.innerText = "";
+                        td.style.backgroundImage = "url(./assets/event/mine-unclicked.webp)";
+                        board[r][c].flagged = false;
+                    } else {
+                        td.innerText = "";
+                        td.style.backgroundImage = "url(./assets/event/mine-flag.webp)";
+                        board[r][c].flagged = true;
+                    }
                 }
             });
-        },4000)
-    },1000);
+            td.addEventListener("click", function() {
+                if (firstClick) {
+                    while (board[r][c].mine) {
+                        initializeBoard();
+                    }
+                    firstClick = false;
+                }
+                if (board[r][c].mine) {
+                    td.innerText = "";
+                    td.style.backgroundImage = "url(./assets/event/mine-wrong.webp)";
+
+                    let mineFileOutcome = document.createElement("img");
+                    let whopperInt = randomInteger(1,4);
+                    mineFileOutcome.src = "./assets/event/whopperflower-"+whopperInt+".webp";
+                    mineFileOutcome.classList.add("mine-outcome");
+                    mineFileOutcome.classList.add("slide-in-blurred-bottom");
+                    eventBackdrop.append(mineFileOutcome);
+
+                    eventOutcome("The whopperflowers were alerted!",eventBackdrop);
+                } else {
+                    revealCell(r, c);
+                    td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
+                }
+                if (cellsLeft <= 0) {
+                    let randomPrimo = randomInteger(200,400);
+                    eventOutcome(`All whopperflowers have been revealed! (+${randomPrimo} Primogems)`,eventBackdrop, "primogem", randomPrimo);
+                }
+            });
+            tr.appendChild(td);
+        }
+    mineBackground.appendChild(tr);
+    }
+    eventBackdrop.append(mineBackground,mineInfo)
+    mainBody.append(eventBackdrop);
 }
 
 var weaselCount = 0;
-// EVENT 6 (WHACK-A-MOLE)
+// EVENT 5 (WHACK-A-MOLE)
 function weaselEvent() {
     let weaselElement = 18;
     weaselCount = 0;
@@ -972,12 +930,86 @@ function generateCombination(n) {
     combination.sort((a,b) => a - b)
     return combination;
   }
+ 
+// EVENT 6 (RAIN)
+function rainEvent() {
+    let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("event-dark");
 
-// EVENT OUTCOME
+    let rainText = document.createElement("div");
+    let rainTextBackground = document.createElement("div");
+    let rainTextDiv = document.createElement("p");
+
+    rainText.classList.add("event-rain-text");
+    let dpsMultiplier = (saveValues.dps + 1)* 20;
+    let tempScore = 0;
+    let tempPrimogem = 0;
+    rainTextDiv.innerText = tempScore;
+    rainText.append(rainTextBackground,rainTextDiv)
+    mainBody.appendChild(rainText);
+
+    function spawnRain() {
+        let animation = `rain ${(randomInteger(8,12)/2)}s linear forwards`
+        let type = randomInteger(1,101);
+        var img = document.createElement("img");
+        if (type >= 85) {
+            img.src = "./assets/icon/primogemLarge.webp"
+            animation = `rain-rotate ${(randomInteger(3,8)/2)}s linear forwards`
+            img.addEventListener('click', () => {
+                img.remove();
+                tempPrimogem += randomInteger(10,20);
+                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier) + " Nuts | " + tempPrimogem + " Primos";
+            });
+        } else if (type >= 65) {
+            img.src = "./assets/icon/scarab.webp"
+            img.addEventListener('click', () => {
+                img.remove();
+                tempScore -= 10;
+                tempScore = Math.max(0, tempScore);
+                tempPrimogem -= randomInteger(50,80);
+                tempPrimogem = Math.max(0, tempPrimogem)
+                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + tempPrimogem + " Primos";
+            });
+        } else {
+            img.src = "./assets/icon/nut.webp";
+            img.addEventListener('click', () => {
+                img.remove();
+                tempScore++;
+                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + tempPrimogem + " Primos";
+            });
+        }
+        img.style.top = "-15%";
+        img.style.left = `${randomInteger(5,95)}%`
+        img.style.animation = animation;
+        img.addEventListener('animationend', () => {img.remove()});
+        img.classList.add("raining-image");
+        eventBackdrop.append(img);
+    }
+
+    let rainTimer = setInterval(() => {spawnRain()}, 300);
+    setTimeout(()=>{
+        clearInterval(rainTimer);
+        setTimeout(()=>{
+            setTimeout(()=>{eventBackdrop.remove();},3000)
+            rainText.classList.add("text-pop");
+            rainText.addEventListener('animationend', () => {
+                rainText.remove();
+                saveValues.realScore += tempScore * dpsMultiplier;
+                saveValues.primogem += tempPrimogem;
+                if (tempPrimogem != 0) {
+                    currencyPopUp("primogem",tempPrimogem);
+                }
+        }),8000})
+    }, 28000);
+    mainBody.append(eventBackdrop);
+}
+
+// EVENT OUTCOME (BLACK BAR THAT APPEARS IN THE MIDDLE OF SCREEN)
 function eventOutcome(innerText,eventBackdrop,type,amount) {
     let removeClick = document.createElement("div");
     let boxText = document.createElement("div");
     let boxTextDiv = document.createElement("p");
+    let outcomeDelay = 500;
 
     removeClick.id = "prevent-clicker";
     boxText.classList.add("event-rain-text");
@@ -986,22 +1018,22 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
         let weaselCount = amount;
         boxText.style.height = "13%";
         if (weaselCount >= 10) {
-            innerText += `\n You received a large reward!`;
+            innerText += `\n You received some items!`;
             adventure(10);
             adventure(10);
-            amount = randomInteger(800,1000);
+            amount = randomInteger(80,140);
         } else if (weaselCount >= 7) {
-            innerText += `\n You received a medium reward!`;
+            innerText += `\n You received a few items!`;
             adventure(10);
-            adventure(10);
-            amount = randomInteger(500,650);
+            amount = randomInteger(40,100);
         } else if (weaselCount >= 4) {
-            innerText += `\n You received a small reward!`;
-            adventure(10);
-            amount = randomInteger(200,400);
+            innerText += `\n You received a few primogems!`;
+            amount = randomInteger(20,60);
         } else {
             innerText += `\n Catch more to get a reward!`;
         }
+    } else if (type == "reaction") {
+        outcomeDelay = 0;
     }
 
     boxTextDiv.innerText = innerText;
@@ -1014,15 +1046,26 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
             boxText.addEventListener("animationend",() => {
                 removeClick.remove();
                 if (type === "primogem") {
-                    saveValues.primogem += amount;
                     currencyPopUp("primogem",amount);
                 } else if (type === "weasel") {
-                    saveValues.primogem += amount;
                     currencyPopUp("primogem",amount);
+                } else if (type === "box") {
+                    if (amount < 30) {
+                        amount = (100 - amount)/100;
+                        saveValues.energy = Math.floor(saveValues.energy * amount);
+                    } else if (amount >= 30 && amount <= 200) {
+                        currencyPopUp("primogem",amount);
+                    } else if (amount > 200) {
+                        itemUse(amount.toString())
+                    }
+                } else if (type === "reaction") {
+                    if (amount != 0) {
+                        currencyPopUp("primogem",amount);
+                    }
                 }
             });
         },4000)
-    },500);
+    },outcomeDelay);
 
     setTimeout(()=> {
         eventBackdrop.remove()
@@ -1088,7 +1131,7 @@ function tutorial() {
     var tutorialImage = document.createElement("img");
     tutorialImage.classList.add("tutorial-img");
     tutorialImage.id = "tutorialImg";
-    tutorialImage.src = "./assets/tutorial/tut-1.jpg"
+    tutorialImage.src = "./assets/tutorial/tut-1.webp"
     
     var tutorialScreen = document.createElement("div");
     tutorialScreen.classList.add("tutorial-screen");
@@ -1110,7 +1153,7 @@ function tutorial() {
 
         currentSlide++;
         let currentTutorialImage = document.getElementById("tutorialImg");
-        currentTutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".jpg";
+        currentTutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".webp";
     })
 
     tutorialScreen.append(tutorialImage);
@@ -1129,6 +1172,10 @@ function saveData() {
     localStorage.setItem("expeditionDictSave", JSON.stringify(expeditionDict));
     localStorage.setItem("InventorySave", JSON.stringify(Array.from(InventoryMap)));
     localStorage.setItem("achievementListSave", JSON.stringify(Array.from(achievementMap)));
+
+    if (table7.innerHTML != "") {
+        localStorage.setItem("storeInventory",JSON.stringify(table7.innerHTML));
+    }
 }
 
 //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
@@ -1151,9 +1198,9 @@ function createTabs() {
         tabFlex.appendChild(tabButton);
     }
 
-    if (upgradeDict[100].Row !== -1) {
+    if (localStorage.getItem("storeInventory") != null) {
         addShop();
-        }
+    }
 }
 
 // CHANGE TABS
@@ -1224,6 +1271,11 @@ function tabChange(x) {
         }
     } else {
         table6.style.display = "none";
+    }
+
+    if (x == 5) {
+        let dialog = document.getElementById("table7-text");
+        dialog.innerText = "Welcome! Feel free to have a look. I'll even help package up your purchase, free of charge."
     }
 
     if (x != 3 && wishCounter != saveValues["wishCounterSaved"]) {
@@ -1312,7 +1364,15 @@ function settings() {
 
     var infoSetting = document.createElement("button");
     infoSetting.classList.add("setting-info");
-    // infoSetting.addEventListener("click",() => {saveData();})
+    infoSetting.addEventListener("click",() => {
+        if (document.fullscreenEnabled) {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+    })
 
     var saveSetting = document.createElement("button");
     saveSetting.classList.add("setting-save");
@@ -1605,6 +1665,12 @@ function inventoryAdd(idNum, type) {
         currentValue++;
         InventoryMap.set(idNum,currentValue);
         if (currentValue > 1) {
+            let newIcon = document.createElement("img");
+            newIcon.classList.add("new-item");
+            newIcon.src = "./assets/icon/new-item.webp";
+            let updatedButton = document.getElementById(idNum);
+            updatedButton.appendChild(newIcon);
+            updatedButton.addEventListener("click",()=>{newIcon.remove()})
             return;
         }
     }
@@ -1625,6 +1691,15 @@ function inventoryAdd(idNum, type) {
         
         itemTooltip = idNum;
     });
+
+    if (type != "load") {
+        let newIcon = document.createElement("img");
+        newIcon.classList.add("new-item");
+        newIcon.src = "./assets/icon/new-item.webp";
+        buttonInv.appendChild(newIcon);
+        buttonInv.addEventListener("click",()=>{newIcon.remove()})
+    }
+
     buttonInv = inventoryAddButton(buttonInv,Inventory[idNum])
     table2.appendChild(buttonInv);
 }
@@ -1643,7 +1718,7 @@ function itemUse(itemUniqueId) {
         itemID = itemUniqueId;
     }
     
-    if ((itemID >= 1001 && itemID < WEAPONMAX) || (itemID >= 7000 && itemID < 7030)){
+    if (itemID >= 1001 && itemID < WEAPONMAX){
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
@@ -1676,7 +1751,7 @@ function itemUse(itemUniqueId) {
     } else if (itemID === 5015 || itemID === 5016) {
         let power = 1;
         if (Inventory[itemID].Star === 5) {
-            power = 1.5;
+            power = 1.75;
         } else {
             power = 3.5;
         };
@@ -1707,7 +1782,7 @@ function itemUse(itemUniqueId) {
             if (upgradeDict[i] == undefined) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i].Purchased > 0)
-                if (upgradeInfo[i].Ele == elem || i === 1) {
+                if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
@@ -1716,17 +1791,19 @@ function itemUse(itemUniqueId) {
     } else if (itemID >= 6001 && itemID < 6050){
         let power;
         let nation = Inventory[itemID].nation;
-        if (Inventory[itemID].Star === 4) {
-            power = 2;
+        if (Inventory[itemID].Star === 3) {
+            power = 1.25;
+        } else if (Inventory[itemID].Star === 4){
+            power = 1.75;
         } else {
             power = 4;
-        };
+        }
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
             if (upgradeDict[i].Purchased > 0){
-                if (upgradeInfo[i].Nation === nation) {
+                if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
@@ -1782,7 +1859,6 @@ function adventure(type) {
     } else if (expeditionDict[type].Locked == '1'){
         return;  
     }
-
     if (saveValues["energy"] >= ADVENTURECOSTS[type]){
         saveValues["energy"] -= ADVENTURECOSTS[type];
         refresh();
@@ -1960,15 +2036,15 @@ function expedInfo(butId) {
 }
 
 //------------------------------------------------------------------------TABLE 4 (WISH)------------------------------------------------------------------------//
-    // UNLOCK WISH SYSTEM
-    function wishUnlock() {
+// UNLOCK WISH SYSTEM
+function wishUnlock() {
     let wishButtonText = document.getElementById("wishButtonText");
     let wishButton = document.getElementById("wishButton");
     let wishButtonPrimo = document.createElement("img");
     wishButtonPrimo.classList.add("wish-button-primo");
     wishButtonPrimo.src = "./assets/icon/primogemIcon.webp";
     
-    wishButtonText.innerText = "Write for help | 160 ";
+    wishButtonText.innerText = "Write for help | " +WISHCOST;
     wishButtonText.append(wishButtonPrimo);
     wishButton.addEventListener("click",() => {
         wish();
@@ -2030,7 +2106,17 @@ function wish() {
                 randomWishHero = 100;
                 unlockExpedition(5,expeditionDict);
                 clearExped();
+
+                // GENERATING A LOCAL SHOP
                 addShop();
+                let startOfYear = new Date('2022-01-01T00:00:00');
+                let now = new Date();
+                shopTime = (now - startOfYear) / (1000 * 60);
+                localStorage.setItem("shopStartMinute",shopTime);
+                setShop();
+                saveData();
+                // IT IS PERSISENT TO LOCALSTORAGE
+
                 newPop(5);
                 newPop(2);
             } else {
@@ -2061,27 +2147,31 @@ function wish() {
 
 //------------------------------------------------------------------------TABLE 5 (ACHIEVEMENTS)------------------------------------------------------------------------//
 // ACHIEVEMENTS
-var achievementData = {
-    achievementTypeRawScore: [10,1e3,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24],
-    achievementTypeRawDPS:   [1,10,100,10000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21],
-    achievementTypeRawClick: [1e1,1e2,1e3,1e4,1e5],
-    achievementTypeRawCollection: [1,10,100,250,500,1000,2500,5000,7500,10000],
-};
-
 function achievementListload() {
     for (let i = 1, len=getHighestKey(achievementList); i < len; i++) {
         if (achievementMap.get(i) === false) {
             continue;
         } else {
-            let achievementStored = storeAchievement(achievementList[i].Name,achievementList[i].Description,10000 + i);
-            table5.appendChild(achievementStored); 
-            sortList("table5");
+            if (i < 100) {
+                popAchievement("score",true);
+                achievementData["achievementTypeRawScore"].shift();
+                continue;
+            } else if (i > 100 && i < 200) {
+                popAchievement("click",true);
+                achievementData["achievementTypeRawClick"].shift();
+            } else if (i > 200 && i < 300) {
+                popAchievement("dps",true);
+                achievementData["achievementTypeRawDPS"].shift();
+            } else if (i > 300 && i < 400) {
+                popAchievement("collection",true);
+                achievementData["achievementTypeRawCollection"].shift();
+            } 
         }
     }
 }
 
-var scoreAchievement = [1,101,201,301];
-function popAchievement(achievement) {
+
+function popAchievement(achievement,loading) {
     var oldAchievement = document.getElementById("tempAchievement");
     var achievementID = 10000;
     let achievementType = "";
@@ -2113,25 +2203,23 @@ function popAchievement(achievement) {
     }
 
     let achievementListTemp = achievementList[achievementType];
-    if (achievementListTemp["Done"] == true) {
-        return;
-    }
-
     var achievementText = achievementListTemp.Name;
     var achievementDesc = achievementListTemp.Description;
     achievementMap.set(achievementType,true);
     achievementID += achievementType;
-    saveValues["primogem"] += 20;
 
-    if (timerSeconds !== 0) {
-        var achievementPopUp = createAchievement(achievementText,achievementDesc);
-        achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
-        achievementPopUp.addEventListener('animationend', () => {achievementPopUp.remove()});
-        leftDiv.appendChild(achievementPopUp);
-        achievementElement.load();
-        achievementElement.play();
+    if (loading != true) {
+        saveValues["primogem"] += 20;
+
+        if (timerSeconds !== 0) {
+            var achievementPopUp = createAchievement(achievementText,achievementDesc);
+            achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
+            achievementPopUp.addEventListener('animationend', () => {achievementPopUp.remove()});
+            leftDiv.appendChild(achievementPopUp);
+            achievementElement.load();
+            achievementElement.play();
+        }
     }
-    
 
     //  ^^^ TEMP ACHIEVEMENT | PERMANENT ACHIEVEMENT vvv
     
@@ -2146,7 +2234,6 @@ function checkAchievement() {
         if (saveValuesLocal["realScore"] >= achievementData["achievementTypeRawScore"][0]) {
             popAchievement("score");
             achievementData["achievementTypeRawScore"].shift();
-
             return;
         }
     } 
@@ -2229,13 +2316,33 @@ function changeTooltip(dict, type, number) {
                                 "<br />" + abbrNum(upgradeDict[number]["Contribution"]) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
         tooltipElementImg.src = "./assets/tooltips/elements/" +dict.Ele+ ".webp";
+        tooltipElementImg.style.display = "block"
         tooltipWeaponImg.src = "./assets/tooltips/elements/" +dict.Type+ ".webp";
+        tooltipWeaponImg.style.display = "block"
         
         tooltipText.innerHTML = tooltipTextLocal;
     } else if (type == "item") {
         toolImg.src = "./assets/frames/background-" + dict.Star + ".webp";
         toolImgOverlay.src = "./assets/tooltips/inventory/" + dict.File + ".webp";
         tooltipText.innerHTML = "Amount: " + InventoryMap.get(number);
+        if (number < 2000) {
+            tooltipWeaponImg.src = "./assets/tooltips/elements/" + dict.Type + ".webp";
+        }
+        else if (number > 2000 && number < 3000) {
+            tooltipWeaponImg.src = "./assets/tooltips/elements/Artifact.webp";
+        } else if (number > 3000 && number < 4000) {
+            tooltipWeaponImg.src = "./assets/tooltips/elements/Food.webp";
+        } else if (number > 4000 && number < 5000) {
+            tooltipWeaponImg.src = "./assets/tooltips/elements/Level.webp";
+        } else if (number > 5000 && number < 6000) {
+            tooltipWeaponImg.src = "./assets/tooltips/elements/"+ dict.element + ".webp";
+        } else {
+            tooltipWeaponImg.src = "./assets/tooltips/elements/Talent.webp";
+        }
+        tooltipWeaponImg.style.display = "block"
+        tooltipWeaponImg.style.margin = "auto";
+        tooltipElementImg.style.display = "none"
+        tooltipElementImg.style.margin = "0";
         return;
     }
 }
@@ -2254,11 +2361,13 @@ function clearTooltip() {
         tooltipText.innerText = "";
         tooltipLore.innerText = "";
         tooltipWeaponImg.src = "./assets/tooltips/Empty.webp";
+        tooltipWeaponImg.style.display = "none"
         tooltipElementImg.src = "./assets/tooltips/Empty.webp";
+        tooltipElementImg.style.display = "none"
         toolImg.src = "./assets/tooltips/Empty.webp";
         toolImgOverlay.src = "./assets/tooltips/Empty.webp";
         tooltipInterval = null;
-        }, 100)
+    }, 100)
 }
 
 function tooltipFunction() {
@@ -2320,16 +2429,21 @@ function addShop() {
 
 function setShop() {
     table7.classList.add("table-without-tooltip");
-
     let shopImg = document.createElement("img");
     shopImg.src = "./assets/shop.webp";
 
-    let shopTimer = document.createElement("div");
-    shopTimer.classList.add("store-timer");
-    shopTimer.innerText = "Inventory resets in: " + Date.now();
+    shopTimerElement = document.createElement("div");
+    shopTimerElement.classList.add("store-timer");
+    shopTimerElement.id = "shop-timer"
+    let currentMin = localStorage.getItem("shopStartMinute");
+    let startOfYear = new Date('2022-01-01T00:00:00');
+    let now = new Date();
+    let minutesPassed = (now - startOfYear) / (1000 * 60);
+    shopTimerElement.innerText = "Inventory resets in: " + (SHOPCOOLDOWN - (currentMin - minutesPassed)) + " minutes";
 
     let shopDiv = document.createElement("div");
     shopDiv.classList.add("store-div");
+    shopDiv.id = "shop-container";
     let i=10;
     while (i--) {
         let inventoryNumber;
@@ -2349,13 +2463,28 @@ function setShop() {
 
     let shopDialogueButton = document.createElement("div");
     shopDialogueButton.classList.add("store-buy");
-    shopDialogueButton.innerText = "Confirm Purchase"
+    shopDialogueButton.innerText = "Confirm Purchase";
     shopDialogueButton.id = "shop-confirm";
     let shopDialogueText = document.createElement("div");
     shopDialogueText.id = "table7-text";
 
     shopDialogueDiv.append(shopDialogueText,shopDialogueButton)
-    table7.append(shopImg,shopTimer,shopDiv,shopDialogueDiv);
+    table7.append(shopImg,shopTimerElement,shopDiv,shopDialogueDiv);
+    saveData();
+}
+
+function loadShop() {
+    let shopTemp = localStorage.getItem("storeInventory");
+    shopTemp = JSON.parse(shopTemp);
+    table7.innerHTML = shopTemp;
+    shopTimerElement = document.getElementById("shop-timer");
+
+    let shopButtons = (document.getElementById("shop-container")).children;
+    for (let i=0,len=shopButtons.length; i < len; i++) {
+         shopButtons[i].addEventListener("click", function() {
+            buyShop(shopButtons[i].id,shopButtons[i].id.split("-")[3])
+        });
+    }
 }
 
 var shopId = null;
@@ -2389,6 +2518,27 @@ function buyShop(id,shopCost) {
         confirmButton.addEventListener("click", function() {confirmPurchase(shopCost,id)});
         shopId = id;
     }
+}
+
+function refreshShop(minutesPassed) {
+    let shopContainer = document.getElementById("shop-container");
+    shopContainer.innerHTML = "";
+    let i=10;
+    while (i--) {
+        let inventoryNumber;
+        if (i >= 7 && i <= 10) {
+            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+        } else if (i >= 2 && i <= 6) {
+            inventoryNumber = inventoryDraw("talent", 2,4, "shop");
+        } else {
+            inventoryNumber = inventoryDraw("weapon", 6,6, "shop")
+        }
+        createShopItems(shopContainer, i, inventoryNumber);
+    }
+
+    shopId = null;
+    shopTime = minutesPassed;
+    localStorage.setItem("shopStartMinute",minutesPassed)
 }
 
 function confirmPurchase(shopCost,id) {
@@ -2434,29 +2584,33 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     let shopCost = 0;
     switch (inventoryTemp.Star) {
         case 2:
-            shopCost = 15;
+            shopCost = Math.round(randomInteger(15,25)/ 5) * 5;
             break;
         case 3: 
-            shopCost = 40;
+            shopCost = Math.round(randomInteger(40,60)/ 5) * 5;
             break;
         case 4:
-            shopCost = 100;
+            shopCost = Math.round(randomInteger(100,125)/ 5) * 5;
             break;
         case 5:
-            shopCost = 240;
+            shopCost = Math.round(randomInteger(240,300)/ 5) * 5;
             break;
         case 6:
-            shopCost = 600;
+            shopCost = Math.round(randomInteger(600,700)/ 5) * 5;
             break;
         default:
             break;
     }
 
+    let shopButtonPrimo = document.createElement("img");
+    shopButtonPrimo.classList.add("shop-button-primo");
+    shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
     shopButtonText.innerText = shopCost;
-    
+    shopButtonText.appendChild(shopButtonPrimo);
+
     shopButton.id = ("shop-" + i + "-" + inventoryNumber + "-" + shopCost);
     shopButton.addEventListener("click", function() {
-        buyShop(this.id,shopCost)
+        buyShop(shopButton.id,shopCost)
     })
     
     shopButtonImageContainer.appendChild(shopButtonImage);
@@ -2521,7 +2675,7 @@ function refresh() {
                 formatCost *= (COSTRATIO**currentPurchased);
             }
 
-            let heroText = upgradeInfoTemp.Name + ": " + abbrNum(formatCost) + ", +" + abbrNum(formatATK) + " NpS";
+            let heroText = upgradeInfo[arguments[1]].Name + ": " + abbrNum(formatCost) + ", +" + abbrNum(formatATK) + " NpS";
             let id="but-" + hero.Row + "";
             document.getElementById(id).innerText = heroText;
         }
@@ -2575,6 +2729,7 @@ function currencyPopUp(type1, amount1, type2, amount2) {
         currencyPopFirstImg.src = "./assets/icon/primogemIcon.webp";
         currencyPopFirstImg.classList.add("icon");
         currencyPopFirstImg.classList.add("primogem");
+        saveValues.primogem += amount1;
     }
 
     currencyPopFirst.append(currencyPopFirstImg);
