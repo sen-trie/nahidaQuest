@@ -4,6 +4,7 @@ import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,cr
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
 const VERSIONNUMBER = "v0.2.BETA-18-2"
+const COPYRIGHT = "DISCLAIMER© HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse."
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
@@ -11,6 +12,10 @@ let startText = document.getElementById("start-screen");
 let versionText = document.getElementById("vers-number"); 
 versionText.innerText = VERSIONNUMBER;
 versionText.classList.add("version-text");
+
+let copyrightText = document.getElementById("copyright-number"); 
+copyrightText.innerText = COPYRIGHT;
+copyrightText.classList.add("copyright-text");
 
 let deleteButton = document.getElementById("start-delete");
 deleteButton.addEventListener("click",()=> {
@@ -80,12 +85,12 @@ var achievementData = {
 var scoreAchievement = [1,101,201,301];
 
 var foodBuff = 1;
-var timeSnapshot1 = 0;
-var timeSnapshot2 = 0;
-var timerAchievement = "";
+// var timeSnapshot1 = 0;
+// var timeSnapshot2 = 0;
+// var timerAchievement = "";
 var clickerEvent = false;
 var shopTime = 0;
-var shopTimerElement;
+var shopTimerElement = null;
 
 var demoContainer = document.getElementById("demo-container");
 var score = document.getElementById("score");
@@ -129,6 +134,7 @@ var achievementList;
 
 var WISHHEROMAX = getHighestKey(upgradeDict) + 1;
 var wishCounter = WISHHEROMAX - WISHHEROMIN;
+drawWish();
 refresh();
 
 saveValues["realScore"]++;
@@ -150,7 +156,6 @@ var settingsValues;
 var currentBGM;
 var bgmElement;           
 
-drawWish();
 var tabElement = new Audio("./assets/sfx/tab-change.mp3");
 var demoElement = new Audio("./assets/sfx/click.mp3");
 var upgradeElement = new Audio("./assets/sfx/upgrade.mp3");
@@ -185,7 +190,7 @@ function timerEvents() {
     refresh();
     dimHeroButton();
     addNewRow();
-    foodCheck(timerSeconds);
+    // foodCheck(timerSeconds);
     randomEventTimer(timerSeconds);
     timerSave(timerSeconds);
 
@@ -194,13 +199,16 @@ function timerEvents() {
 
 // SHOP TIMER
 function shopTimerFunction() {
-    let startOfYear = new Date('2022-01-01T00:00:00');
-    let now = new Date();
-    let minutesPassedNow = (now - startOfYear) / (1000 * 60);
-    let time_passed = Math.floor(minutesPassedNow - parseInt(shopTime));
-    shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
-    if (time_passed >= SHOPCOOLDOWN) {
-        refreshShop(minutesPassedNow)
+    if (shopTimerElement != null) {
+        let startOfYear = new Date('2022-01-01T00:00:00');
+        let now = new Date();
+        let minutesPassedNow = (now - startOfYear) / (1000 * 60);
+        let time_passed = Math.floor(minutesPassedNow - parseInt(shopTime));
+        
+        shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
+        if (time_passed >= SHOPCOOLDOWN) {
+            refreshShop(minutesPassedNow)
+        }
     }
 }
 
@@ -365,9 +373,9 @@ var eventTimes = 1;
 var eventChance = 0;
 function randomEventTimer(timerSeconds) {
     // SET TO 10 SECONDS AND 5 SECONDS
-    let eventTimeMin = 10 * eventTimes;
+    let eventTimeMin = 30 * eventTimes;
     if (eventChance !== 0) {
-        let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/5)
+        let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/15)
         if (Math.ceil(upperLimit) >= eventChance) {
             eventChance = 0;
             eventTimes++;
@@ -397,7 +405,7 @@ function startRandomEvent() {
     eventPicture.addEventListener("click", () => {clickedEvent(aranaraNumber);eventPicture.remove()});
 
     setTimeout(() => {eventPicture.remove()}, 8000);
-    eventPicture.style.left = randomInteger(35,95) + "%";
+    eventPicture.style.left = randomInteger(5,95) + "%";
     eventPicture.style.top = randomInteger(10,75) + "%";
 
     let eventPictureImg = document.createElement("img");
@@ -433,10 +441,11 @@ function clickedEvent(aranaraNumber) {
     eventDropdownImage.classList.add("event-dropdown-image");
     
     eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
-    eventDropdown.addEventListener("animationend", () => {eventDropdown.remove()});
+    eventDropdown.addEventListener("animationend", () => {
+        eventDropdown.remove();
+        chooseEvent(aranaraNumber)
+    });
     mainBody.appendChild(eventDropdown);
-
-    setTimeout(() => {chooseEvent(aranaraNumber)},6000);
 }
 
 function chooseEvent(type) {
@@ -476,7 +485,8 @@ function clickEvent() {
         button.style.animation = "rotation 18s infinite linear forwards";
         button.style["box-shadow"] = "";
         clickerEvent = false;
-    },20000)
+    },30000)
+    foodButton(2)
 }
 
 // EVENT 2 (REACTION TIME)
@@ -941,7 +951,7 @@ function rainEvent() {
     let rainTextDiv = document.createElement("p");
 
     rainText.classList.add("event-rain-text");
-    let dpsMultiplier = (saveValues.dps + 1)* 20;
+    let dpsMultiplier = (saveValues.dps + 1)* 10;
     let tempScore = 0;
     let tempPrimogem = 0;
     rainTextDiv.innerText = tempScore;
@@ -1174,7 +1184,9 @@ function saveData() {
     localStorage.setItem("achievementListSave", JSON.stringify(Array.from(achievementMap)));
 
     if (table7.innerHTML != "") {
-        localStorage.setItem("storeInventory",JSON.stringify(table7.innerHTML));
+        let savedTable7 = (table7.innerHTML).replace('shadow-pop-tr','')
+        savedTable7 = savedTable7.replace(/<div id="table7-text">.*</i,'<div id="table7-text">Welcome Back!</div><div class="store-buy" id="shop-confirm">Confirm Purchase</div><')
+        localStorage.setItem("storeInventory",JSON.stringify(savedTable7));
     }
 }
 
@@ -1560,7 +1572,7 @@ function upgrade(clicked_id) {
 
     if (realScoreCurrent >= costCurrent) {
         if (requiredFree) {
-            if (saveValues["freeLevels"] > requiredFree) {
+            if (saveValues["freeLevels"] >= requiredFree) {
                 realScoreCurrent += costCurrent;
                 saveValues["freeLevels"] -= requiredFree;
             }
@@ -1706,12 +1718,12 @@ function inventoryAdd(idNum, type) {
 
 // INVENTORY FUNCTIONALITY
 // RMB TO UPDATE CONSTANTS
-const weaponBuffPercent = [0, 1.2, 1.8, 2.7, 3.9, 5.2, 10];
-const artifactBuffPercent = [0, 1.1, 1.3, 1.7, 2.3, 3.0];
-const foodBuffPercent = [0, 1.4, 2.0, 3.0, 4.4, 6.2];
+const weaponBuffPercent =   [0, 1.3, 1.8, 2.7, 3.9, 5.2, 10];
+const artifactBuffPercent = [0, 1.15, 1.35, 1.7, 2.3, 3.0];
+const foodBuffPercent =     [0, 1.4, 2.0, 3.1, 4.4, 6.2];
+const nationBuffPercent =   [0, 0,0,1.4,2,4]
 function itemUse(itemUniqueId) {
     let itemID;
-    
     if (typeof itemUniqueId === 'string') {
         itemID = itemUniqueId.split(".")[0];
     } else {
@@ -1724,7 +1736,7 @@ function itemUse(itemUniqueId) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
-                if (upgradeDictTemp.Type == Inventory[itemID].Type){
+                if (upgradeInfo[i].Type == Inventory[itemID].Type){
                     upgradeDictTemp["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                     refresh("hero", i);
@@ -1751,7 +1763,7 @@ function itemUse(itemUniqueId) {
     } else if (itemID === 5015 || itemID === 5016) {
         let power = 1;
         if (Inventory[itemID].Star === 5) {
-            power = 1.75;
+            power = 1.8;
         } else {
             power = 3.5;
         };
@@ -1791,14 +1803,7 @@ function itemUse(itemUniqueId) {
     } else if (itemID >= 6001 && itemID < 6050){
         let power;
         let nation = Inventory[itemID].nation;
-        if (Inventory[itemID].Star === 3) {
-            power = 1.25;
-        } else if (Inventory[itemID].Star === 4){
-            power = 1.75;
-        } else {
-            power = 4;
-        }
-
+        power = nationBuffPercent[Inventory[itemID].Star]
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
@@ -1815,24 +1820,22 @@ function itemUse(itemUniqueId) {
 }
 
 // FUNCTIONALITY FOR TEMP FOOD BUFFS (SET TO 30 SECONDS) + RMB TO CHANGE ANIMATION TIME TOO
-function foodCheck(timerSecondsTemp) {
-    if (timerSecondsTemp - timeSnapshot1 >= 30) {
-        document.getElementById("app"+1).innerHTML = ''
-        foodBuff = 1;
-    }
-    if (timerSecondsTemp - timeSnapshot2 >= 30) {
-        document.getElementById("app"+2).innerHTML = ''
-    }
-}
+// function foodCheck(timerSecondsTemp) {
+//     if (timerSecondsTemp - timeSnapshot1 >= 30) {
+//         document.getElementById("app"+1).innerHTML = ''
+//         foodBuff = 1;
+//     }
+//     if (timerSecondsTemp - timeSnapshot2 >= 30) {
+//         document.getElementById("app"+2).innerHTML = ''
+//     }
+// }
 
 function foodButton(type) {
     let container = document.getElementById("app"+type);
     if (type == 1) {
-        timeSnapshot1 = timerSeconds;
         container.innerHTML = '';
         container.appendChild(countdownText(1));
-    } else {
-        timeSnapshot2 = timerSeconds;
+    } else if (type =2) {
         container.innerHTML = '';
         container.appendChild(countdownText(2));
     }
@@ -1865,10 +1868,10 @@ function adventure(type) {
         
         switch (type) {
             case 1:
-                inventoryDraw("artifact", 1, 4);
-                inventoryDraw("weapon", 1, 1);
+                inventoryDraw("artifact", 1, 2);
+                inventoryDraw("weapon", 1, 2);
                 inventoryDraw("xp", 2, 2);
-                inventoryDraw("food", 1, 3);
+                inventoryDraw("food", 1, 2);
                 break;
             case 2:
                 inventoryDraw("xp", 2, 2);
@@ -1876,28 +1879,29 @@ function adventure(type) {
                 inventoryDraw("xp", 2, 2);
                 inventoryDraw("food", 2, 3);
                 inventoryDraw("artifact", 2, 4);
-                inventoryDraw("weapon", 1, 2);
+                inventoryDraw("weapon", 2, 3);
                 break;
             case 3:
                 inventoryDraw("xp", 3, 3);
                 inventoryDraw("xp", 2, 2);
                 inventoryDraw("artifact", 3, 4);
                 inventoryDraw("food", 2, 4);
-                inventoryDraw("weapon", 2, 3);
+                inventoryDraw("weapon", 2, 4);
                 break;
             case 4:
                 inventoryDraw("xp", 3, 3);
                 inventoryDraw("xp", 3, 3);
                 inventoryDraw("weapon", 3, 4);
-                inventoryDraw("artifact", 3, 4);
-                inventoryDraw("food", 2, 4);
+                inventoryDraw("artifact", 3, 5);
+                inventoryDraw("food", 3, 5);
                 break;
             case 5:
                 inventoryDraw("xp", 3, 3);
                 inventoryDraw("xp", 4, 4);
                 inventoryDraw("artifact", 4, 5);
                 inventoryDraw("weapon", 4, 5);
-                inventoryDraw("food", 2, 5);
+                inventoryDraw("weapon", 4, 5);
+                inventoryDraw("food", 4, 5);
                 break;
             default:
                 break;
@@ -1982,7 +1986,19 @@ function createExpedition() {
             adventure(adventureType);
         }
     })
-    table3.appendChild(advButton);
+
+    let advTutorial = document.createElement("img");
+    advTutorial.src = "./assets/icon/help.webp";
+    advTutorial.id = "adventure-tutorial";
+    advTutorial.addEventListener("click", () => {
+        clearExped();
+        expedInfo("exped-8");
+        let advButton = document.getElementById("adventure-button");
+        if (advButton.classList.contains("expedition-selected")) {
+            advButton.classList.remove("expedition-selected");
+        }
+    })
+    table3.append(advButton,advTutorial);
 }
 
 function clearExped() {
@@ -2018,9 +2034,13 @@ function expedInfo(butId) {
 
     if (expeditionDict[i]["Locked"] == 0 || i == 7) {
         let advButton = document.getElementById("adventure-button");
-                if (!advButton.classList.contains("expedition-selected")) {
-                    advButton.classList.add("expedition-selected");
-                }
+        if (!advButton.classList.contains("expedition-selected")) {
+            advButton.classList.add("expedition-selected");
+        }
+        expedRow1.innerText = expeditionDict[i]["Text"];
+        expedRow2.innerText = expeditionDict[i]["Lore"];
+        expedRow1.appendChild(afterEnergyIcon);
+    } else if (i == 8) {
         expedRow1.innerText = expeditionDict[i]["Text"];
         expedRow2.innerText = expeditionDict[i]["Lore"];
         expedRow1.appendChild(afterEnergyIcon);
@@ -2049,6 +2069,26 @@ function wishUnlock() {
     wishButton.addEventListener("click",() => {
         wish();
     })
+
+    let wishContainer = document.getElementById("mail-image-div");
+    let wishHelpText = document.createElement("div");
+    wishHelpText.id = "wish-tutorial-text";
+    wishHelpText.innerText = "Wish for new characters using primogems! \n Wished characters take a % of your current NpS";
+
+
+    let wishTutorial = document.createElement("img");
+    wishTutorial.src = "./assets/icon/wish-help.webp";
+    wishTutorial.id = "wish-tutorial";
+    
+    wishTutorial.addEventListener("click",()=>{
+        if (wishHelpText.style.display != "none") {
+            wishHelpText.style.display = "none";
+        } else {
+            wishHelpText.style.display = "flex";
+        }
+    });
+    
+    wishContainer.append(wishTutorial,wishHelpText)
 }
 
 // DRAWS/WISH FOR SPECIAL HEROS
@@ -2101,6 +2141,7 @@ function wish() {
 
         // SCARAMOUCHE WILL ALWAYS BE THE FIRST WISH HERO
         while (wishCounter) {
+            console.log(upgradeDict)
             let randomWishHero;
             if (upgradeDict[100].Purchased === -10) {
                 randomWishHero = 100;
@@ -2114,7 +2155,7 @@ function wish() {
                 shopTime = (now - startOfYear) / (1000 * 60);
                 localStorage.setItem("shopStartMinute",shopTime);
                 setShop();
-                saveData();
+                setTimeout(()=>saveData(),1000)
                 // IT IS PERSISENT TO LOCALSTORAGE
 
                 newPop(5);
@@ -2396,6 +2437,7 @@ function tooltipFunction() {
                 let idNum = parseInt(nextButton.id);
                 itemTooltip = idNum;
                 changeTooltip(Inventory[idNum],"item",idNum);
+                nextButton.classList.add("inventory-selected");
             } else {
                 itemTooltip = -1;
                 clearTooltip();
@@ -2447,12 +2489,12 @@ function setShop() {
     let i=10;
     while (i--) {
         let inventoryNumber;
-        if (i >= 7 && i <= 10) {
-            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
-        } else if (i >= 2 && i <= 6) {
+        if (i >= 6 && i <= 10) {
             inventoryNumber = inventoryDraw("talent", 2,4, "shop");
+        } else if (i >= 2 && i <= 5) {
+            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
         } else {
-            inventoryNumber = inventoryDraw("weapon", 6,6, "shop")
+            inventoryNumber = inventoryDraw("weapon", 4,6, "shop")
         }
         
         createShopItems(shopDiv, i, inventoryNumber);
@@ -2508,7 +2550,7 @@ function buyShop(id,shopCost) {
     }
 
     if (shopId == id) {
-        dialog.innerText = "";
+        dialog.innerText = "Any questions or troubles? I'm here to personally assist you!";
         shopId = null;
         let confirmButtonNew = confirmButton.cloneNode(true);
         confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
@@ -2526,12 +2568,12 @@ function refreshShop(minutesPassed) {
     let i=10;
     while (i--) {
         let inventoryNumber;
-        if (i >= 7 && i <= 10) {
-            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
-        } else if (i >= 2 && i <= 6) {
+        if (i >= 6 && i <= 10) {
             inventoryNumber = inventoryDraw("talent", 2,4, "shop");
+        } else if (i >= 2 && i <= 5) {
+            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
         } else {
-            inventoryNumber = inventoryDraw("weapon", 6,6, "shop")
+            inventoryNumber = inventoryDraw("weapon", 4,6, "shop")
         }
         createShopItems(shopContainer, i, inventoryNumber);
     }
@@ -2556,7 +2598,7 @@ function confirmPurchase(shopCost,id) {
         let confirmButton = document.getElementById("shop-confirm");
         let confirmButtonNew = confirmButton.cloneNode(true);
         confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
-        dialog.innerText = "My Mora is mine, and your Mora is mine too! Hehehe."
+        dialog.innerText = "Hehe, you've got good eyes."
     } else {
         dialog.innerText = "Hmph, come back when you're a little richer."
         return;

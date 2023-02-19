@@ -24,10 +24,20 @@ img {
     position: absolute;
     color: rgb(255, 255, 255);
     bottom: 0;
-    right: 0;
+    right: 0.2%;
     z-index: 5000;
     font-size: 0.75em;
     text-shadow: 0.1em 0.1em 0.15em black;
+}
+
+.copyright-text {
+    position: absolute;
+    color: rgb(255, 255, 255);
+    bottom: 0;
+    left: 0.1%;
+    z-index: 5000;
+    font-size: 0.45em;
+    text-shadow: 0.05em 0.05em 0.07em black;
 }
 
   /* @media (min-aspect-ratio: 12/7) {
@@ -481,18 +491,22 @@ button {
     opacity: 1;
     font-size: 1em;
     text-align: center;
-    animation: slidedown 6s cubic-bezier(.17,.67,.33,.83) both;
+    animation: slidedown 5s cubic-bezier(.17,.67,.33,.83) both;
     pointer-events: none;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    filter: drop-shadow(0.15em 0.2em #65805472);
 }
 
  .event-dropdown > div {
     position: relative;
     z-index: 151;
-    opacity: 0.9;
+    color: #1d3011;
+    text-shadow: 0.05em 0.05em 0.2em #658054bc;
+    font-size: 1.2em;
+    /* opacity: 0.95; */
 } 
 
 .event-dropdown-text {
@@ -507,6 +521,7 @@ button {
 .event-dropdown-image {
     width: 20%;
     height: 80%;
+    filter: drop-shadow(0px 0px 0.2em #000000);
 }
 
 .event-dropdown > img {
@@ -514,7 +529,7 @@ button {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    opacity: 0.95;
+    opacity: 0.975;
 }
 
 @keyframes slidedown {
@@ -951,7 +966,6 @@ button {
     border: 0.01em inset #71ae2c;
     color: white;
     text-shadow: #3C3C3C 0.21375em 0em 0em, #3C3C3C 0.20102554875em 0.06442056725em 0em, #3C3C3C 0.16545309125em 0.125256034375em 0em, #3C3C3C 0.114100525em 0.17245005em 0em, #3C3C3C 0.0495299125em 0.1929347625em 0em, #3C3C3C -0.020926788125em 0.1987703525em 0em, #3C3C3C -0.08683835em 0.182958245em 0em, #3C3C3C -0.140307092em 0.145025515em 0em, #3C3C3C -0.18035769em 0.09045148em 0em, #3C3C3C -0.209242475em 0.025948895em 0em, #3C3C3C -0.20681056375em -0.0373652975em 0em, #3C3C3C -0.18052885375em -0.0934511275em 0em, #3C3C3C -0.1379573405em -0.138057635em 0em, #3C3C3C -0.0800555925em -0.159165915em 0em, #3C3C3C -0.0164290525em -0.165675565em 0em, #3C3C3C 0.0535315125em -0.1594206825em 0em, #3C3C3C 0.1188833225em -0.1486998625em 0em, #3C3C3C 0.15738429125em -0.102757115em 0em, #3C3C3C 0.1825355875em -0.05246907125em 0em;
-    
     text-align: center;
 } 
 
@@ -1024,8 +1038,11 @@ button {
 
 /*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
 .temp-buff {
+    position: relative;
+    top: 1%;
     width: 100%;
     height: 20%;
+    row-gap: 1%;
     z-index: 10;
     display: flex;
     flex-direction: column;
@@ -1696,6 +1713,7 @@ input[type="range"] {
 /*/////////////////////////////// EXPEDITION (TABLE3) CSS ///////////////////////////////*/
 .expedition-selected {
     transition: 0.4s ease;
+    filter: drop-shadow(0.15em 0.15em 0.07em #6f453273);
     opacity: 1 !important;
 }
 
@@ -1708,6 +1726,7 @@ input[type="range"] {
 }
 
 #adventure-button {
+    position: relative;
     height: 12%;
     width: 100%;
     background-image: url(./assets/expedbg/exped-button.webp);
@@ -1722,6 +1741,35 @@ input[type="range"] {
     background-position: center;
     transition: 0.2s ease;
     opacity: 0.25;
+}
+
+#adventure-tutorial {
+    position: absolute;
+    right: 23%;
+    bottom: 31.5%;
+    height: 7%;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0.15em 0.15em 0.07em #485b91);
+}
+
+#wish-tutorial-text {
+    z-index: 15;
+    position: absolute;
+    bottom: 5%;
+    width: 80%;
+    height: 20%;
+    font-size: inherit;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: #6F4532;
+    border-radius: 1em;
+    border-color: #876547;
+    border-width: 0.3em;
+    border-style: solid;
+    color: #f9d0bd;
+    filter: drop-shadow(0.3em 0.5em 0.15em #291504d4);
 }
 
 #expedDiv {
@@ -1749,6 +1797,7 @@ input[type="range"] {
     display: flex;
     justify-content: center;
     color: white;
+    text-shadow: 0.1em 0.1em 0.25em #000000;
     font-size: inherit;
 }
 
@@ -1885,6 +1934,16 @@ input[type="range"] {
     object-fit:cover;
     display: flex;
     justify-content: center;
+}
+
+#wish-tutorial {
+    position: absolute;
+    bottom: -16%;
+    left: -2%;
+    height: 11%;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0.15em 0.15em 0.07em #e6b880a1);
 }
 
 .wish-mail {
@@ -2162,9 +2221,26 @@ repeat, no-repeat
     position: relative;
 }
 
+#table7::before {
+    position: absolute;
+    opacity: 0.5;
+    width: 100%;
+    height: 100%;
+    content: '';
+    background-image: url(./assets/dori-back.webp);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 #table7 > div {
     position: relative;
     top: 2%;
+    filter: drop-shadow(0.2em 0.3em 0.2em rgba(0, 0, 0, 0.56));
+}
+
+#table7 > img {
+    filter: drop-shadow(0.1em 0.1em 0.2em #340650ab);
 }
 
 .store-timer {
