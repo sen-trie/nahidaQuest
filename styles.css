@@ -1686,6 +1686,17 @@ input[type="range"] {
     object-fit: contain;
 }
 
+.new-hero {
+    width: 7%;
+    height: auto;
+    position: absolute;
+    z-index: 10;
+    top: 0;
+    right: 0;
+    object-fit: contain;
+    filter: drop-shadow(0.1em 0.1em rgba(0, 0, 0, 0.556));
+}
+
 
 .button-inv-stardiv {
     position: absolute;

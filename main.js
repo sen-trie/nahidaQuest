@@ -1740,6 +1740,7 @@ function itemUse(itemUniqueId) {
                     upgradeDictTemp["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                     refresh("hero", i);
+                    updatedHero(i);
                 }
             }
         }
@@ -1798,6 +1799,7 @@ function itemUse(itemUniqueId) {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
+                    updatedHero(i);
             }
         }
     } else if (itemID >= 6001 && itemID < 6050){
@@ -1812,6 +1814,7 @@ function itemUse(itemUniqueId) {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
                     refresh("hero", i);
+                    updatedHero(i);
                 }
             }
         }
@@ -1829,6 +1832,18 @@ function itemUse(itemUniqueId) {
 //         document.getElementById("app"+2).innerHTML = ''
 //     }
 // }
+
+// FOR BUFFS SPECIFIC TO NATION/WEAPON TYPE/ELEMENT
+function updatedHero(i) {
+    let id = "but-" + upgradeDict[i].Row;
+    let heroButton = document.getElementById(id);
+
+    let updatedIcon = document.createElement("img")
+    updatedIcon.src = "./assets/icon/hero-upgraded.webp";
+    updatedIcon.classList.add("new-hero");
+    heroButton.appendChild(updatedIcon);
+    heroButton.addEventListener("click",()=>{updatedIcon.remove()})
+}
 
 function foodButton(type) {
     let container = document.getElementById("app"+type);
