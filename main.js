@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-18-2"
+const VERSIONNUMBER = "v0.2.BETA-19-2"
 const COPYRIGHT = "DISCLAIMER© HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse."
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -1739,6 +1739,8 @@ function itemUse(itemUniqueId) {
                 if (upgradeInfo[i].Type == Inventory[itemID].Type){
                     upgradeDictTemp["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
+                    saveValues["dps"] += Math.ceil((weaponBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
+                    upgradeDict[i]["Contribution"] += Math.ceil((weaponBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
                     refresh("hero", i);
                     updatedHero(i);
                 }
@@ -1752,6 +1754,8 @@ function itemUse(itemUniqueId) {
             if (upgradeDictTemp.Purchased > 0){
                 upgradeDictTemp["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
                 upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
+                saveValues["dps"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
+                upgradeDict[i]["Contribution"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
                 refresh("hero", i);
             }
         }
@@ -1776,6 +1780,8 @@ function itemUse(itemUniqueId) {
             if (upgradeDictTemp.Purchased > 0){
                 upgradeDictTemp["Factor"] *= power;
                 upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
+                saveValues["dps"] += Math.ceil((power - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
+                upgradeDict[i]["Contribution"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
                 refresh("hero", i);
             }
         }
@@ -1798,6 +1804,8 @@ function itemUse(itemUniqueId) {
                 if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
+                    saveValues["dps"] += Math.ceil((power - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
+                    upgradeDict[i]["Contribution"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
                     refresh("hero", i);
                     updatedHero(i);
             }
@@ -1813,6 +1821,8 @@ function itemUse(itemUniqueId) {
                 if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
                     upgradeDict[i]["Factor"] *= power;
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
+                    saveValues["dps"] += Math.ceil((power - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
+                    upgradeDict[i]["Contribution"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
                     refresh("hero", i);
                     updatedHero(i);
                 }
