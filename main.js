@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-19-2"
+const VERSIONNUMBER = "v0.2.BETA-20-2"
 const COPYRIGHT = "DISCLAIMER© HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse."
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -73,6 +73,8 @@ const WISHCOST = 600;
 const STARTINGWISHFACTOR = 50;
 var wishMultiplier = 0;
 var adventureType = 0;
+var goldenNutUnlocked = false;
+const EVENTCOOLDOWN = 30;
 const SHOPCOOLDOWN = 60;
 
 // ACHIEVEMENT THRESHOLDS
@@ -81,13 +83,11 @@ var achievementData = {
     achievementTypeRawDPS:   [10,100,1000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29],
     achievementTypeRawClick: [1e1,1e2,5e2,1e3,2.5e3,5e3,7.5e3,1e4,1e5,1.5e5,2e5,2.5e5,3e5,3.5e5,4e5,4.5e5,5e5],
     achievementTypeRawCollection: [1,10,100,250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000],
+    achievementTypeGolden: [1,3,7,15,30,50,75,100],
 };
-var scoreAchievement = [1,101,201,301];
+var scoreAchievement = [1,101,201,301,401];
 
 var foodBuff = 1;
-// var timeSnapshot1 = 0;
-// var timeSnapshot2 = 0;
-// var timerAchievement = "";
 var clickerEvent = false;
 var shopTime = 0;
 var shopTimerElement = null;
@@ -343,7 +343,7 @@ demoContainer.addEventListener("mouseup", () => {
     let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`
 
     var img = document.createElement("img");
-    img.src = "./assets/icon/primogemIcon.webp";
+    img.src = "./assets/icon/nut.webp";
     img.style.left = `${randomInteger(0,100)}%`
     img.style.animation = animation;
     img.addEventListener('animationend', () => {img.remove();});
@@ -373,9 +373,9 @@ var eventTimes = 1;
 var eventChance = 0;
 function randomEventTimer(timerSeconds) {
     // SET TO 10 SECONDS AND 5 SECONDS
-    let eventTimeMin = 30 * eventTimes;
+    let eventTimeMin = EVENTCOOLDOWN * eventTimes;
     if (eventChance !== 0) {
-        let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/15)
+        let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/(EVENTCOOLDOWN/2))
         if (Math.ceil(upperLimit) >= eventChance) {
             eventChance = 0;
             eventTimes++;
@@ -393,16 +393,19 @@ function randomEventTimer(timerSeconds) {
 // START A RANDOM EVENT
 function startRandomEvent() {
     let eventPicture = document.createElement("div");
-    let aranaraEasy = randomInteger(1,4);
     let aranaraNumber;
-    if (aranaraEasy < 3) {
-        aranaraNumber = randomInteger(1,4);
+    // HARD EVENTS ARE LOCKED TO 4TH EXPEDITION UNLOCK
+    if (expeditionDict[4].Locked !== '1') {
+        aranaraNumber = randomInteger(1,7);
     } else {
-        aranaraNumber = randomInteger(4,7);
+        aranaraNumber = randomInteger(1,4);
     }
      
     eventPicture.classList.add("random-event");
-    eventPicture.addEventListener("click", () => {clickedEvent(aranaraNumber);eventPicture.remove()});
+    eventPicture.addEventListener("click", () => {
+        clickedEvent(aranaraNumber);
+        eventPicture.remove();
+    });
 
     setTimeout(() => {eventPicture.remove()}, 8000);
     eventPicture.style.left = randomInteger(5,95) + "%";
@@ -416,7 +419,6 @@ function startRandomEvent() {
         eventPictureImg.src = "./assets/event-hard.webp";
         eventPictureImg.classList.add("vibrate-more");
     }
-    
     eventPicture.appendChild(eventPictureImg);
     mainBody.appendChild(eventPicture);
 }
@@ -549,13 +551,8 @@ function reactionEvent() {
 
 function reactionFunction(eventBackdrop) {
     if (reactionGame == false) {return};
-    // let outcomeText = document.createElement("div");
-    // let outcomeTextBackground = document.createElement("div");
-    // let outcomeTextDiv = document.createElement("p");
     let outcomeText;
     let primogem = 0;
-    // outcomeText.classList.add("event-rain-text");
-    // outcomeText.id = "outcome-text";
 
     reactionStartElement.pause();
     reactionCorrectElement.load();
@@ -571,13 +568,6 @@ function reactionFunction(eventBackdrop) {
     reactionReady = false;
     reactionGame = false;
     eventOutcome(outcomeText,eventBackdrop,"reaction",primogem)
-    // outcomeText.append(outcomeTextBackground,outcomeTextDiv);
-    // mainBody.append(outcomeText);
-
-    // setTimeout(()=> {
-    //     eventBackdrop.remove();
-    //     // outcomeText.remove();
-    // },2000)
 }
 
 // EVENT 3 (7 BOXES)
@@ -619,7 +609,11 @@ function boxOpen(eventBackdrop) {
     let outcomeNumber = 0;
 
     let boxChance = randomInteger(1,101);
-    if (boxChance >= 60) {
+    if (goldenNutUnlocked === true || boxChance >= 95) {
+        let outcomeNumber = randomInteger(1,4);
+        boxOutcome.src = "./assets/icon/goldenNut.webp";
+        outcomeText = `Oh! It had Golden Nuts! (+${outcomeNumber} Golden Nuts)`;
+    } else if (boxChance >= 60) {
         outcomeNumber = randomInteger(40,60);
         boxOutcome.src = "./assets/icon/primogemLarge.webp";
         outcomeText = "The box contained primogems!";
@@ -633,22 +627,18 @@ function boxOpen(eventBackdrop) {
         boxOutcome.src = "./assets/icon/bad-" + badOutcome + ".webp";
         outcomeText = "Uh oh, an enemy was hiding in the box!";
     } else if (boxChance >= 5) {
-        // let veryGoodOutcome = randomInteger(1,2);
-        saveValues.primogem += randomInteger(40,60);
         boxOutcome.src = "./assets/icon/verygood-" + 3 + ".webp";
         outcomeText = "Oh! It had a precious gemstone!! (Increased power for all characters)";
         outcomeNumber = 5002.1;
-    } else {
+    }  else {
         boxOutcome.src = "./assets/icon/verybad-" + 1 + ".webp";
         let badOutcomePercentage = randomInteger(15,30);
         outcomeText = "Uh oh! Run away! (Lost " +badOutcomePercentage+ "% of Energy)";
         outcomeNumber = badOutcomePercentage;
     }
 
-
     boxOuterNew.appendChild(boxOutcome);
     eventOutcome(outcomeText,eventBackdrop,"box",outcomeNumber)
-    
     setTimeout(()=> {
         boxOuterNew.remove();
         eventBackdrop.remove();
@@ -954,6 +944,7 @@ function rainEvent() {
     let dpsMultiplier = (saveValues.dps + 1)* 10;
     let tempScore = 0;
     let tempPrimogem = 0;
+    let tempGolden = 0;
     rainTextDiv.innerText = tempScore;
     rainText.append(rainTextBackground,rainTextDiv)
     mainBody.appendChild(rainText);
@@ -962,7 +953,16 @@ function rainEvent() {
         let animation = `rain ${(randomInteger(8,12)/2)}s linear forwards`
         let type = randomInteger(1,101);
         var img = document.createElement("img");
-        if (type >= 85) {
+        if (type >= 95 && goldenNutUnlocked === true && tempGolden <= 5) {
+            img.src = "./assets/icon/goldenIcon.webp";
+            animation = `rain-rotate ${(randomInteger(3,6)/2)}s linear forwards`
+            img.addEventListener('click', () => {
+                img.remove();
+                tempGolden++;
+                reactionCorrectElement.load();
+                reactionCorrectElement.play();
+            });
+        } else if (type >= 85) {
             img.src = "./assets/icon/primogemLarge.webp"
             animation = `rain-rotate ${(randomInteger(3,8)/2)}s linear forwards`
             img.addEventListener('click', () => {
@@ -1007,7 +1007,7 @@ function rainEvent() {
                 saveValues.realScore += tempScore * dpsMultiplier;
                 saveValues.primogem += tempPrimogem;
                 if (tempPrimogem != 0) {
-                    currencyPopUp("primogem",tempPrimogem);
+                    currencyPopUp("primogem",tempPrimogem,"nuts",tempGolden);
                 }
         }),8000})
     }, 28000);
@@ -1060,7 +1060,10 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
                 } else if (type === "weasel") {
                     currencyPopUp("primogem",amount);
                 } else if (type === "box") {
-                    if (amount < 30) {
+                    if (amount < 10) {
+                        saveValues.goldenNut += amount;
+                        currencyPopUp("nuts",amount);
+                    } else if (amount < 30) {
                         amount = (100 - amount)/100;
                         saveValues.energy = Math.floor(saveValues.energy * amount);
                     } else if (amount >= 30 && amount <= 200) {
@@ -1074,7 +1077,7 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
                     }
                 }
             });
-        },4000)
+        },3000)
     },outcomeDelay);
 
     setTimeout(()=> {
@@ -1718,10 +1721,10 @@ function inventoryAdd(idNum, type) {
 
 // INVENTORY FUNCTIONALITY
 // RMB TO UPDATE CONSTANTS
-const weaponBuffPercent =   [0, 1.3, 1.8, 2.7, 3.9, 5.2, 10];
-const artifactBuffPercent = [0, 1.15, 1.35, 1.7, 2.3, 3.0];
+const weaponBuffPercent =   [0, 1.1, 1.3, 1.7, 2.1, 2.7, 4.6];
+const artifactBuffPercent = [0, 1.05, 1.15, 1.35, 1.55, 1.85];
 const foodBuffPercent =     [0, 1.4, 2.0, 3.1, 4.4, 6.2];
-const nationBuffPercent =   [0, 0,0,1.4,2,4]
+const nationBuffPercent =   [0, 0, 1.2, 1.5, 1.8]
 function itemUse(itemUniqueId) {
     let itemID;
     if (typeof itemUniqueId === 'string') {
@@ -1737,10 +1740,12 @@ function itemUse(itemUniqueId) {
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
                 if (upgradeInfo[i].Type == Inventory[itemID].Type){
+                    let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (weaponBuffPercent[Inventory[itemID].Star] - 1));
+                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                    upgradeDict[i]["Contribution"] += additionPower;
+
                     upgradeDictTemp["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
-                    saveValues["dps"] += Math.ceil((weaponBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
-                    upgradeDict[i]["Contribution"] += Math.ceil((weaponBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
                     refresh("hero", i);
                     updatedHero(i);
                 }
@@ -1752,10 +1757,12 @@ function itemUse(itemUniqueId) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
+                let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (artifactBuffPercent[Inventory[itemID].Star] - 1));
+                if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                upgradeDict[i]["Contribution"] += additionPower;
+
                 upgradeDictTemp["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
                 upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
-                saveValues["dps"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
-                upgradeDict[i]["Contribution"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
                 refresh("hero", i);
             }
         }
@@ -1765,12 +1772,12 @@ function itemUse(itemUniqueId) {
     } else if (itemID >= 4001 && itemID < XPMAX){
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         refresh();
-    } else if (itemID === 5015 || itemID === 5016) {
+    } else if (itemID === 5001 || itemID === 5002) {
         let power = 1;
         if (Inventory[itemID].Star === 5) {
-            power = 1.8;
+            power = 1.9;
         } else {
-            power = 3.5;
+            power = 3;
         };
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
@@ -1778,10 +1785,12 @@ function itemUse(itemUniqueId) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
+                let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
+                if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                upgradeDict[i]["Contribution"] += additionPower;
+
                 upgradeDictTemp["Factor"] *= power;
                 upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
-                saveValues["dps"] += Math.ceil((power - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
-                upgradeDict[i]["Contribution"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
                 refresh("hero", i);
             }
         }
@@ -1792,22 +1801,26 @@ function itemUse(itemUniqueId) {
         let power;
         let elem = Inventory[itemID].element;
         if (Inventory[itemID].Star === 4) {
-            power = 2;
+            power = 2.2;
         } else {
-            power = 4;
+            power = 3;
         };
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
-            if (upgradeDict[i].Purchased > 0)
+            if (upgradeDict[i].Purchased > 0) {
                 if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
-                    upgradeDict[i]["Factor"] *= power;
-                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
-                    saveValues["dps"] += Math.ceil((power - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
-                    upgradeDict[i]["Contribution"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
+                    let upgradeDictTemp = upgradeDict[i];
+                    let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
+                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                    upgradeDict[i]["Contribution"] += additionPower;
+
+                    upgradeDictTemp["Factor"] *= power;
+                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                     refresh("hero", i);
                     updatedHero(i);
+                }
             }
         }
     } else if (itemID >= 6001 && itemID < 6050){
@@ -1819,10 +1832,13 @@ function itemUse(itemUniqueId) {
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
             if (upgradeDict[i].Purchased > 0){
                 if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
-                    upgradeDict[i]["Factor"] *= power;
-                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDict[i]["Factor"]);
-                    saveValues["dps"] += Math.ceil((power - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
-                    upgradeDict[i]["Contribution"] += Math.ceil((artifactBuffPercent[Inventory[itemID].Star] - 1) * upgradeDict[i]["Factor"] * upgradeDict[i].Purchased);
+                    let upgradeDictTemp = upgradeDict[i];
+                    let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
+                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                    upgradeDict[i]["Contribution"] += additionPower;
+
+                    upgradeDictTemp["Factor"] *= power;
+                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                     refresh("hero", i);
                     updatedHero(i);
                 }
@@ -1831,17 +1847,6 @@ function itemUse(itemUniqueId) {
     }
     clearTooltip();
 }
-
-// FUNCTIONALITY FOR TEMP FOOD BUFFS (SET TO 30 SECONDS) + RMB TO CHANGE ANIMATION TIME TOO
-// function foodCheck(timerSecondsTemp) {
-//     if (timerSecondsTemp - timeSnapshot1 >= 30) {
-//         document.getElementById("app"+1).innerHTML = ''
-//         foodBuff = 1;
-//     }
-//     if (timerSecondsTemp - timeSnapshot2 >= 30) {
-//         document.getElementById("app"+2).innerHTML = ''
-//     }
-// }
 
 // FOR BUFFS SPECIFIC TO NATION/WEAPON TYPE/ELEMENT
 function updatedHero(i) {
@@ -1857,12 +1862,23 @@ function updatedHero(i) {
 
 function foodButton(type) {
     let container = document.getElementById("app"+type);
+    let foodCooldown = document.createElement("div");
+
     if (type == 1) {
         container.innerHTML = '';
-        container.appendChild(countdownText(1));
+        foodCooldown = countdownText(foodCooldown, 1);
+        foodCooldown.addEventListener("animationend",() => {
+            foodCooldown.remove();
+            foodBuff = 1;
+        })
+        container.appendChild(foodCooldown);
     } else if (type =2) {
         container.innerHTML = '';
-        container.appendChild(countdownText(2));
+        foodCooldown = countdownText(foodCooldown, 2);
+        foodCooldown.addEventListener("animationend",() => {
+            foodCooldown.remove();
+        });
+        container.appendChild(foodCooldown);
     }
     
 }
@@ -1891,6 +1907,7 @@ function adventure(type) {
         saveValues["energy"] -= ADVENTURECOSTS[type];
         refresh();
         
+        let randomDraw = randomInteger(1,3);
         switch (type) {
             case 1:
                 inventoryDraw("artifact", 1, 2);
@@ -1900,33 +1917,45 @@ function adventure(type) {
                 break;
             case 2:
                 inventoryDraw("xp", 2, 2);
-                inventoryDraw("xp", 2, 2);
-                inventoryDraw("xp", 2, 2);
+                inventoryDraw("xp", 2, 3);
                 inventoryDraw("food", 2, 3);
-                inventoryDraw("artifact", 2, 4);
-                inventoryDraw("weapon", 2, 3);
+                inventoryDraw("artifact", 1, 3);
+                inventoryDraw("weapon", 1, 3);
                 break;
             case 3:
                 inventoryDraw("xp", 3, 3);
                 inventoryDraw("xp", 2, 2);
-                inventoryDraw("artifact", 3, 4);
-                inventoryDraw("food", 2, 4);
-                inventoryDraw("weapon", 2, 4);
+
+                if (randomDraw == 1) {
+                    inventoryDraw("artifact", 2, 4);
+                    inventoryDraw("weapon", 2, 4);
+                } else {
+                    inventoryDraw("talent", 2, 4);
+                    inventoryDraw("food", 2, 4);
+                }
                 break;
             case 4:
                 inventoryDraw("xp", 3, 3);
-                inventoryDraw("xp", 3, 3);
-                inventoryDraw("weapon", 3, 4);
-                inventoryDraw("artifact", 3, 5);
-                inventoryDraw("food", 3, 5);
+                if (randomDraw == 1) {
+                    inventoryDraw("weapon", 3, 4);
+                    inventoryDraw("xp", 2, 3);
+                } else {
+                    inventoryDraw("talent", 3, 4);
+                    inventoryDraw("food", 3, 5);
+                }
+                inventoryDraw("gem", 4, 4);
                 break;
             case 5:
-                inventoryDraw("xp", 3, 3);
                 inventoryDraw("xp", 4, 4);
-                inventoryDraw("artifact", 4, 5);
-                inventoryDraw("weapon", 4, 5);
-                inventoryDraw("weapon", 4, 5);
-                inventoryDraw("food", 4, 5);
+                if (randomDraw == 1) {
+                    inventoryDraw("artifact", 4, 5);
+                    inventoryDraw("weapon", 4, 5);
+                    inventoryDraw("xp", 3, 4);
+                } else {
+                    inventoryDraw("talent", 4, 4);
+                    inventoryDraw("food", 4, 5);
+                    inventoryDraw("gem", 4, 5)
+                }
                 break;
             default:
                 break;
@@ -2098,7 +2127,7 @@ function wishUnlock() {
     let wishContainer = document.getElementById("mail-image-div");
     let wishHelpText = document.createElement("div");
     wishHelpText.id = "wish-tutorial-text";
-    wishHelpText.innerText = "Wish for new characters using primogems! \n Wished characters take a % of your current NpS";
+    wishHelpText.innerText = "Wish for new characters using primogems! \n Wished characters take a % of your current NpS.";
 
 
     let wishTutorial = document.createElement("img");
@@ -2138,6 +2167,7 @@ function drawWish() {
     if (wishCounter === saveValues["wishCounterSaved"]) {
         stopWish();
     } else if (saveValues["wishUnlocked"] == true) {
+        goldenNutUnlocked = true;
         wishUnlock();
     } 
 }
@@ -2218,20 +2248,23 @@ function achievementListload() {
         if (achievementMap.get(i) === false) {
             continue;
         } else {
-            if (i < 100) {
+            if (i < 40) {
                 popAchievement("score",true);
                 achievementData["achievementTypeRawScore"].shift();
                 continue;
-            } else if (i > 100 && i < 200) {
+            } else if (i > 100 && i < 140) {
                 popAchievement("click",true);
                 achievementData["achievementTypeRawClick"].shift();
-            } else if (i > 200 && i < 300) {
+            } else if (i > 200 && i < 240) {
                 popAchievement("dps",true);
                 achievementData["achievementTypeRawDPS"].shift();
-            } else if (i > 300 && i < 400) {
+            } else if (i > 300 && i < 320) {
                 popAchievement("collection",true);
                 achievementData["achievementTypeRawCollection"].shift();
-            } 
+            } else if (i > 400 && i < 420) {
+                popAchievement("golden",true);
+                achievementData["achievementTypeGolden"].shift();
+            }
         }
     }
 }
@@ -2263,8 +2296,12 @@ function popAchievement(achievement,loading) {
             achievementType = scoreAchievement[3];
             scoreAchievement[3]++;
             break;
+        case "golden":
+            achievementType = scoreAchievement[4];
+            scoreAchievement[4]++;
+            break;
         default:
-            console.log("No more Achievements left!");
+            console.log("No more Achievements left! Good job!");
             return;
     }
 
@@ -2327,6 +2364,14 @@ function checkAchievement() {
             return;
         }
     }
+
+    if (achievementData["achievementTypeGolden"].length !== 0) {
+        if (saveValuesLocal["goldenNut"] >= achievementData["achievementTypeGolden"][0]) {
+            popAchievement("golden");
+            achievementData["achievementTypeGolden"].shift();
+            return;
+        }
+    }
 }
 
 //-----------------------------------------------------------------TABLE 6 (TOOLTIPS FOR TABLE 1 & 2)-----------------------------------------------------------//
@@ -2381,10 +2426,15 @@ function changeTooltip(dict, type, number) {
                                 "<br />Free Levels: " + saveValues["freeLevels"] + 
                                 "<br />" + abbrNum(upgradeDict[number]["Contribution"]) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
+
         tooltipElementImg.src = "./assets/tooltips/elements/" +dict.Ele+ ".webp";
-        tooltipElementImg.style.display = "block"
+        if (tooltipElementImg.style.display != "block") {
+            tooltipElementImg.style.display = "block";
+        }
         tooltipWeaponImg.src = "./assets/tooltips/elements/" +dict.Type+ ".webp";
-        tooltipWeaponImg.style.display = "block"
+        if (tooltipWeaponImg.style.display != "block") {
+            tooltipWeaponImg.style.display = "block";
+        }
         
         tooltipText.innerHTML = tooltipTextLocal;
     } else if (type == "item") {
@@ -2393,8 +2443,7 @@ function changeTooltip(dict, type, number) {
         tooltipText.innerHTML = "Amount: " + InventoryMap.get(number);
         if (number < 2000) {
             tooltipWeaponImg.src = "./assets/tooltips/elements/" + dict.Type + ".webp";
-        }
-        else if (number > 2000 && number < 3000) {
+        } else if (number > 2000 && number < 3000) {
             tooltipWeaponImg.src = "./assets/tooltips/elements/Artifact.webp";
         } else if (number > 3000 && number < 4000) {
             tooltipWeaponImg.src = "./assets/tooltips/elements/Food.webp";
@@ -2405,10 +2454,16 @@ function changeTooltip(dict, type, number) {
         } else {
             tooltipWeaponImg.src = "./assets/tooltips/elements/Talent.webp";
         }
-        tooltipWeaponImg.style.display = "block"
-        tooltipWeaponImg.style.margin = "auto";
-        tooltipElementImg.style.display = "none"
-        tooltipElementImg.style.margin = "0";
+
+        if (tooltipWeaponImg.style.display != "block") {
+            tooltipWeaponImg.style.display = "block";
+            tooltipWeaponImg.style.margin = "auto";
+        }
+        
+        if (tooltipElementImg.style.display != "none") {
+            tooltipElementImg.style.display = "none"
+            tooltipElementImg.style.margin = "0";
+        }
         return;
     }
 }
@@ -2751,7 +2806,7 @@ function refresh() {
 
 // POP UPS FOR EXPEDITIONS UNLOCKS
 // NUMBER OF UPGRADES NEEDED TO UNLOCK EXPEDITIONS vvvv
-var heroUnlockLevels = [150,300,450];
+var heroUnlockLevels = [75,150,205];
 var expeditionCounter = 0;
 function checkExpeditionUnlock(heroesPurchasedNumber) {
     if (heroUnlockLevels.length == 0) {
@@ -2769,6 +2824,7 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
                     newPop(3);
                     wishUnlock();
                     saveValues["wishUnlocked"] = true;
+                    goldenNutUnlocked = true;
                 }
             }
             newPop(expeditionCounter + 10);
@@ -2792,17 +2848,22 @@ function currencyPopUp(type1, amount1, type2, amount2) {
     if (type1 == "energy") {
         currencyPopFirstImg.src = "./assets/icon/energyIcon.webp";
         currencyPopFirstImg.classList.add("icon");
+        saveValues.energy += amount1;
     } else if (type1 == "primogem") {
         currencyPopFirstImg.src = "./assets/icon/primogemIcon.webp";
         currencyPopFirstImg.classList.add("icon");
         currencyPopFirstImg.classList.add("primogem");
         saveValues.primogem += amount1;
+    } else if (type1 == "nuts") {
+        currencyPopFirstImg.src = "./assets/icon/goldenIcon.webp";
+        currencyPopFirstImg.classList.add("icon");
+        currencyPopFirstImg.classList.add("primogem");
+        saveValues.goldenNut += amount1;
     }
 
     currencyPopFirst.append(currencyPopFirstImg);
     currencyPop.append(currencyPopFirst);
-
-    if (type2 != undefined) {
+    if (type2 !== undefined) {
         let currencyPopSecond = document.createElement("div");
         currencyPopSecond.classList.add("currency-pop-first");
         currencyPopSecond.innerText = amount2;
@@ -2811,10 +2872,17 @@ function currencyPopUp(type1, amount1, type2, amount2) {
         if (type2 == "energy") {
             currencyPopSecondImg.src = "./assets/icon/energyIcon.webp";
             currencyPopSecondImg.classList.add("icon");
+            saveValues.energy += amount2;
         } else if (type2 == "primogem") {
             currencyPopSecondImg.src = "./assets/icon/primogemIcon.webp";
             currencyPopSecondImg.classList.add("icon");
             currencyPopSecondImg.classList.add("primogem");
+            saveValues.primogem += amount2;
+        } else if (type2 == "nuts") {
+            currencyPopSecondImg.src = "./assets/icon/goldenIcon.webp";
+            currencyPopSecondImg.classList.add("icon");
+            currencyPopSecondImg.classList.add("primogem");
+            saveValues.goldenNut += amount2;
         }
 
         currencyPopFirst.style.height = "30%";
@@ -2822,9 +2890,6 @@ function currencyPopUp(type1, amount1, type2, amount2) {
         currencyPopSecond.append(currencyPopSecondImg);
         currencyPop.append(currencyPopSecond);
     }
-    
-    
-    
 
     setTimeout(()=> {
         currencyPop.style.animation = "fadeOut 2s cubic-bezier(.93,-0.24,.93,.81) forwards";

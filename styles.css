@@ -110,6 +110,7 @@ img {
     margin: 0;
     padding: 0;
     border: 0;
+    touch-action: manipulation;
 }
 
 #game {
@@ -1410,7 +1411,7 @@ input[type="range"] {
 }
 
 @keyframes fall {
-    from {top: 0%;opacity: 0.7;}
+    from {top: -5%;opacity: 0.7;}
     to {top: 100%;opacity: 0;}
 }
 
@@ -2017,11 +2018,10 @@ repeat, no-repeat
     bottom: -15%;
     width:90%;
     height:10%;
-    font-size: inherit;
     text-align: center;
     background:url(./assets/achievement.png);
-    background-size: 100%;
-    background-position: 5px center;
+    background-size: contain;
+    background-position: center;
     background-repeat: no-repeat;
     animation: fadeOut 3s cubic-bezier(.93,-0.24,.93,.81) forwards;
     display: flex;
@@ -2030,7 +2030,7 @@ repeat, no-repeat
 }
 
 .achieveH1 {
-    font-size: 1.1em;
+    font-size: 0.9em;
 }
 
 .achieveH2 {

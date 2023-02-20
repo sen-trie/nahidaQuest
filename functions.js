@@ -96,12 +96,10 @@ function unlockExpedition(i,expeditionDict) {
 }
 
 // INNER HTML FOR FOOD BUFFS
-function countdownText(int) {
-    let foodCooldown = document.createElement("div");
+function countdownText(foodCooldown, int) {
     foodCooldown.classList.add("countdown-number");
     foodCooldown.style.background = "url(./assets/icon/food"+int+".webp)";
     foodCooldown.style.backgroundSize = "contain";
-    foodCooldown.addEventListener("animationend",() => {foodCooldown.remove()})
     return foodCooldown;
 }
 
