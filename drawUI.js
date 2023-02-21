@@ -1,3 +1,64 @@
+// GAME GUI
+function buildGame(mainBody) {
+    let loadingDiv = document.createElement("div");
+    loadingDiv.id = "loading";
+    loadingDiv.classList.add("overlay");
+    let loadingGif = document.createElement("img");
+    loadingGif.src = "./assets/loading.webp";
+    loadingGif.alt = "Nahida Quest Loading Screen";
+    loadingGif.classList.add("overlay-tutorial");
+    loadingDiv.appendChild(loadingGif);
+
+
+    let leftDiv = document.createElement("div");
+    leftDiv.id = "left-div";
+    leftDiv.classList.add("left-area");
+    let scoreDiv = document.createElement("div");
+    scoreDiv.classList.add("score-container");
+    scoreDiv.innerHTML = "<span id='score'>0</span><span id='dps'>0</span>"
+    let demoContainer = document.createElement("div");
+    demoContainer.id = "demo-container";
+    leftDiv.append(scoreDiv,demoContainer)
+
+
+    let midDiv = document.createElement("div");
+    midDiv.id = "mid-div";
+    midDiv.classList.add("middle-area");
+    let midDivImg = document.createElement("img");
+    midDivImg.src = "./assets/bar.webp";
+    midDivImg.alt = "Middle of the Screen";
+    midDivImg.classList.add("middle-bar");
+
+    let energyPrimoContainer = document.createElement("div");
+    energyPrimoContainer.classList.add("energy-primo-container");
+    let energyContainer = document.createElement("div");
+    energyContainer.classList.add("pill-value");
+    energyContainer.innerHTML = "<img class='pill' alt='' src='./assets/pill.webp'><img class='icon' alt='Energy Icon' src='./assets/icon/energyIcon.webp'><span id='energy'>0</span>";
+    let primoContainer = document.createElement("div");
+    primoContainer.classList.add("pill-value");
+    primoContainer.innerHTML = `<img class="pill" alt="" src="./assets/pill.webp"><img class="primogem icon" alt="Primogem Icon" src="./assets/icon/primogemIcon.webp"><span id="primogem">0</span>`;
+    energyPrimoContainer.append(energyContainer,primoContainer)
+
+    let tempBuffDiv = document.createElement("div");
+    tempBuffDiv.classList.add("temp-buff");
+    let appOne = document.createElement("div");
+    appOne.id = "app1";
+    let appTwo = document.createElement("div");
+    appTwo.id = "app2";
+    tempBuffDiv.append(appOne,appTwo);
+    midDiv.append(midDivImg,energyPrimoContainer,tempBuffDiv)
+
+    let rightDiv = document.createElement("div");
+    rightDiv.id = "right-div";
+    rightDiv.classList.add("right-area");
+
+    mainBody.append(loadingDiv,leftDiv,midDiv,rightDiv);
+    return mainBody;
+}
+
+
+
+
 // MAIN BODY GUI
 function drawMainBody() {
     // LEFT DIV/AREA
@@ -193,4 +254,4 @@ function drawMailTable(table4) {
     return table4;
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable }
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame }

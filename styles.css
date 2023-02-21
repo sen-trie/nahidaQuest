@@ -198,6 +198,20 @@ button {
     align-items: center;
   }
 
+.vignette {
+    position: absolute;
+}
+  
+.vignette::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, #ecd59100 0%,#c8a94e4a 40%,#c8a94e5b 60%,#c8a94e8d 80%, #aa850ce2 100%);
+}
+
 .middle-area {
     width: 5%;
     height: 100%;
@@ -205,6 +219,7 @@ button {
     position: absolute;
     display:flex;
     flex-direction: column;
+    box-shadow: inset 1em 1em gold;
 }
 
 .middle-bar {

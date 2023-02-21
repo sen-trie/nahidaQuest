@@ -1,9 +1,9 @@
 import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo } from "./defaultData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText } from "./functions.js"
-import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable } from "./drawUI.js"
+import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-20-2"
+const VERSIONNUMBER = "v0.2.BETA-21-2"
 const COPYRIGHT = "DISCLAIMER© HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse."
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -52,6 +52,9 @@ if (localStorage.getItem("settingsValues") !== null) {
     }
 }
 
+var mainBody = document.getElementById("game");    
+mainBody = buildGame(mainBody);
+
 function startGame() {
 // GLOBAL VARIABLES
 var saveValues;
@@ -74,7 +77,7 @@ const STARTINGWISHFACTOR = 50;
 var wishMultiplier = 0;
 var adventureType = 0;
 var goldenNutUnlocked = false;
-const EVENTCOOLDOWN = 30;
+const EVENTCOOLDOWN = 20;
 const SHOPCOOLDOWN = 60;
 
 // ACHIEVEMENT THRESHOLDS
@@ -103,7 +106,6 @@ var midDiv = document.getElementById("mid-div");
 var multiplierButtonContainer;
 
 // MAIN BODY VARIABLES
-var mainBody = document.getElementById("game");    
 drawMainBody();
 
 var table1 = document.getElementById("table1");
@@ -478,12 +480,14 @@ function chooseEvent(type) {
 // EVENT 1 (ENERGY OVERLOAD)
 function clickEvent() {
     let button = demoContainer.firstElementChild;
-    button.style.animation = "rotation-scale 5s infinite linear forwards";
+    if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")};
+    button.style.animation = "rotation-scale 3.5s infinite linear forwards";
     button.style["box-shadow"] = "inset 0em 0em 6em #93d961";
     clickerEvent = true;
-    currentClick = 15 * saveValues["dps"];
+    currentClick = 15 * (saveValues["dps"] + 1);
 
     setTimeout(() => {
+        if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")};
         button.style.animation = "rotation 18s infinite linear forwards";
         button.style["box-shadow"] = "";
         clickerEvent = false;
@@ -609,7 +613,7 @@ function boxOpen(eventBackdrop) {
     let outcomeNumber = 0;
 
     let boxChance = randomInteger(1,101);
-    if (goldenNutUnlocked === true || boxChance >= 95) {
+    if (goldenNutUnlocked === true && boxChance >= 95) {
         let outcomeNumber = randomInteger(1,4);
         boxOutcome.src = "./assets/icon/goldenNut.webp";
         outcomeText = `Oh! It had Golden Nuts! (+${outcomeNumber} Golden Nuts)`;
@@ -1053,14 +1057,16 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
         mainBody.appendChild(removeClick);
         setTimeout(()=> {
             boxText.classList.add("slide-out-animation");
+            setTimeout(()=> {
+                removeClick.style.pointerEvents = "none";
+            },1500)
             boxText.addEventListener("animationend",() => {
-                removeClick.remove();
                 if (type === "primogem") {
                     currencyPopUp("primogem",amount);
                 } else if (type === "weasel") {
                     currencyPopUp("primogem",amount);
                 } else if (type === "box") {
-                    if (amount < 10) {
+                    if (amount < 10 && amount > 0) {
                         saveValues.goldenNut += amount;
                         currencyPopUp("nuts",amount);
                     } else if (amount < 30) {
@@ -1158,7 +1164,9 @@ function tutorial() {
 
             if (document.fullscreenEnabled) {
                 if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
+                    if (/Mobi/.test(navigator.userAgent)) {
+                        document.documentElement.requestFullscreen();
+                    }
                 }
             }
             return;
