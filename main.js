@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-21-2"
+const VERSIONNUMBER = "v0.2.BETA-22-2"
 const COPYRIGHT = "DISCLAIMER© HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse."
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -147,6 +147,7 @@ createMultiplierButton();
 createExpedition();
 createExpedTable(expedTooltip);
 table3.appendChild(expedTooltip);
+expedInfo("exped-7")
 
 var tooltipTable = 1;
 var heroTooltip = -1;
@@ -841,7 +842,7 @@ function weaselEvent() {
     weaselTimerImage.classList.add("weasel-sand");
     weaselTimerImage.addEventListener("animationend",()=> {
         let eventText = `You caught ${weaselCount} weasel thieves!`;
-        eventOutcome(eventText,eventBackdrop,"weasel",weaselCount);
+        if (weaselCount > 0) {eventOutcome(eventText,eventBackdrop,"weasel",weaselCount);}
     })
     weaselTimer.append(weaselTimerImage,weaselTimerOutline);
 
@@ -1082,6 +1083,7 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
                         currencyPopUp("primogem",amount);
                     }
                 }
+                removeClick.remove();
             });
         },3000)
     },outcomeDelay);
@@ -1162,13 +1164,6 @@ function tutorial() {
             currentBGM = playAudio();
             settingsVolume();
 
-            if (document.fullscreenEnabled) {
-                if (!document.fullscreenElement) {
-                    if (/Mobi/.test(navigator.userAgent)) {
-                        document.documentElement.requestFullscreen();
-                    }
-                }
-            }
             return;
         }
 
@@ -1912,6 +1907,7 @@ function adventure(type) {
         return;  
     }
     if (saveValues["energy"] >= ADVENTURECOSTS[type]){
+        if (table3.style.display === "flex") {expedInfo(`exped-${type}`);}
         saveValues["energy"] -= ADVENTURECOSTS[type];
         refresh();
         
@@ -1970,7 +1966,9 @@ function adventure(type) {
         }
         sortList("table2");
         newPop(1);
-    }  
+    } else {
+        expedInfo("exped-9");
+    }
 }   
 
 
@@ -2025,7 +2023,7 @@ function createExpedition() {
             if (adventureType === i) {
                 expedButton.classList.remove("expedition-selected");
                 adventureType = 0;
-                expedInfo(7);
+                expedInfo("exped-7");
                 let advButton = document.getElementById("adventure-button");
                 if (advButton.classList.contains("expedition-selected")) {
                     advButton.classList.remove("expedition-selected");
@@ -2071,7 +2069,7 @@ function clearExped() {
             old_exped.classList.remove("expedition-selected");
         }
         adventureType = 0;
-        expedInfo(7);
+        expedInfo("exped-7");
         let advButton = document.getElementById("adventure-button");
             if (advButton.classList.contains("expedition-selected")) {
                 advButton.classList.remove("expedition-selected");
@@ -2086,13 +2084,9 @@ function expedInfo(butId) {
 
     let afterEnergyIcon = document.createElement("img");
     afterEnergyIcon.classList += "after-icon";
-    afterEnergyIcon.id = "afterEnergyIcon"
+    afterEnergyIcon.id = "afterEnergyIcon";
     
-    if (butId == 7) {
-        i = 7;
-    } else {
-        i = butId.split("-")[1];
-    }
+    i = butId.split("-")[1];
 
     if (expeditionDict[i]["Locked"] == 0 || i == 7) {
         let advButton = document.getElementById("adventure-button");
@@ -2102,7 +2096,7 @@ function expedInfo(butId) {
         expedRow1.innerText = expeditionDict[i]["Text"];
         expedRow2.innerText = expeditionDict[i]["Lore"];
         expedRow1.appendChild(afterEnergyIcon);
-    } else if (i == 8) {
+    } else if (i == 8 || i == 9) {
         expedRow1.innerText = expeditionDict[i]["Text"];
         expedRow2.innerText = expeditionDict[i]["Lore"];
         expedRow1.appendChild(afterEnergyIcon);

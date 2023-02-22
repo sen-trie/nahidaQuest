@@ -769,8 +769,9 @@ var expeditionDictDefault = {
     4:{Text:"Hunt Boss Enemies | 750 "               ,Locked:"1" ,Lore:"The last confirmed sighting of the Golden Nut was in the heart of the woods, which is currently being guarded by a ferocious beast. It may well be the only stone left unturned."},
     5:{Text:"Abyss Diving | 1000 "                   ,Locked:"1" ,Lore:"All trails seem to end here. With nowhere else to go, the Abyss is the sole place left where the fruit is likely to be. Search through the floors with the help of an unlikely ally."},
     6:{Text:"Locked"                                 ,Locked:"0" ,Lore:"Perhaps this path will open after some time..."            },
-    7:{Text:""                                       ,Locked:"0" ,Lore:""            },
+    7:{Text:"Select an Expedition"                   ,Locked:"0" ,Lore:"Go on Expeditions to get items to upgrade your characters!"            },
     8:{Text:"Expeditions Use Energy "                ,Locked:"1" ,Lore:"Energy can be obtained by clicking Big Nahida"            },
+    9:{Text:"Not enough Energy "                     ,Locked:"1" ,Lore:"Obtain more before going on Expeditions!"            },
 }
 
 var achievementListDefault = {

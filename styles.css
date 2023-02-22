@@ -192,7 +192,7 @@ button {
     width: 35%;
     height: 100%;
     position: absolute;
-    left: 0px;
+    left: 0;
     display:flex;
     flex-direction: column;
     align-items: center;
@@ -233,7 +233,7 @@ button {
     width: 60%;
     height: 100%;
     position: absolute;
-    right: 0px;
+    right: 0;
     display:flex;
     flex-direction: column;
   }
@@ -367,7 +367,7 @@ button {
     top: 8%;
     font-family: 'gi-font';
     font-size: 1.4em;
-    text-shadow: #3C3C3C 0.21375em 0em 0em, #3C3C3C 0.20102554875em 0.06442056725em 0em, #3C3C3C 0.16545309125em 0.125256034375em 0em, #3C3C3C 0.114100525em 0.17245005em 0em, #3C3C3C 0.0495299125em 0.1929347625em 0em, #3C3C3C -0.020926788125em 0.1987703525em 0em, #3C3C3C -0.08683835em 0.182958245em 0em, #3C3C3C -0.140307092em 0.145025515em 0em, #3C3C3C -0.18035769em 0.09045148em 0em, #3C3C3C -0.209242475em 0.025948895em 0em, #3C3C3C -0.20681056375em -0.0373652975em 0em, #3C3C3C -0.18052885375em -0.0934511275em 0em, #3C3C3C -0.1379573405em -0.138057635em 0em, #3C3C3C -0.0800555925em -0.159165915em 0em, #3C3C3C -0.0164290525em -0.165675565em 0em, #3C3C3C 0.0535315125em -0.1594206825em 0em, #3C3C3C 0.1188833225em -0.1486998625em 0em, #3C3C3C 0.15738429125em -0.102757115em 0em, #3C3C3C 0.1825355875em -0.05246907125em 0em;
+    text-shadow: #3C3C3C 0.21375em 0 0, #3C3C3C 0.20102554875em 0.06442056725em 0, #3C3C3C 0.16545309125em 0.125256034375em 0, #3C3C3C 0.114100525em 0.17245005em 0, #3C3C3C 0.0495299125em 0.1929347625em 0, #3C3C3C -0.020926788125em 0.1987703525em 0, #3C3C3C -0.08683835em 0.182958245em 0, #3C3C3C -0.140307092em 0.145025515em 0, #3C3C3C -0.18035769em 0.09045148em 0, #3C3C3C -0.209242475em 0.025948895em 0, #3C3C3C -0.20681056375em -0.0373652975em 0, #3C3C3C -0.18052885375em -0.0934511275em 0, #3C3C3C -0.1379573405em -0.138057635em 0, #3C3C3C -0.0800555925em -0.159165915em 0, #3C3C3C -0.0164290525em -0.165675565em 0, #3C3C3C 0.0535315125em -0.1594206825em 0, #3C3C3C 0.1188833225em -0.1486998625em 0, #3C3C3C 0.15738429125em -0.102757115em 0, #3C3C3C 0.1825355875em -0.05246907125em 0;
     color:white;
     width: 30%;
     aspect-ratio: 6.1;
@@ -384,7 +384,7 @@ button {
     height: 100%;
     z-index: 100;
     /* border: 14px ridge #ACC35B;
-    border-radius: 20px; */
+    border-radius: 20; */
     pointer-events: none;
 }
 
@@ -452,7 +452,7 @@ button {
 .icon {
     height:80%;
     aspect-ratio: 0.7;
-    filter: drop-shadow(0px 0px 0.15em #ffefef);
+    filter: drop-shadow(0 0 0.15em #ffefef);
 }
 
  .primogem {
@@ -472,7 +472,7 @@ button {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    animation: vibrate 8s linear 0s 1 normal forwards;
+    animation: vibrate 4s linear 0s 2 normal forwards;
 }
 
 .vibrate-more {
@@ -481,9 +481,9 @@ button {
 
 @keyframes vibrate {
 	0% {transform: translate(0);}
-    20% {transform: translate(5%, -5%);}
+    20% {transform: translate(2.5%, -5%);}
     40% {transform: translate(5%, 5%);}
-    60% {transform: translate(-5%, 5%);}
+    60% {transform: translate(-2.5%, 2.5%);}
     80% {transform: translate(-5%, -5%);}
 	100% {transform: translate(0);}
 }
@@ -491,8 +491,8 @@ button {
 @keyframes vibrate-hard {
 	0% {transform: translate(0);}
     20% {transform: translate(7%, -7%);}
-    40% {transform: translate(7%, 7%);}
-    60% {transform: translate(-7%, 7%);}
+    40% {transform: translate(3.5%, 3.5%);}
+    60% {transform: translate(-3.5%, 3.5%);}
     80% {transform: translate(-7%, -7%);}
 	100% {transform: translate(0);}
 }
@@ -537,7 +537,7 @@ button {
 .event-dropdown-image {
     width: 20%;
     height: 80%;
-    filter: drop-shadow(0px 0px 0.2em #000000);
+    filter: drop-shadow(0 0 0.2em #000000);
 }
 
 .event-dropdown > img {
@@ -594,10 +594,10 @@ button {
     background-color: #000000;
     background-size: cover;
     position: absolute;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    left: 0px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     opacity: 0.95;
 }
 
@@ -711,7 +711,7 @@ button {
     background-size: contain;
     background-repeat: no-repeat;
     color: white;
-    text-shadow: #3C3C3C 0.21375em 0em 0em, #3C3C3C 0.20102554875em 0.06442056725em 0em, #3C3C3C 0.16545309125em 0.125256034375em 0em, #3C3C3C 0.114100525em 0.17245005em 0em, #3C3C3C 0.0495299125em 0.1929347625em 0em, #3C3C3C -0.020926788125em 0.1987703525em 0em, #3C3C3C -0.08683835em 0.182958245em 0em, #3C3C3C -0.140307092em 0.145025515em 0em, #3C3C3C -0.18035769em 0.09045148em 0em, #3C3C3C -0.209242475em 0.025948895em 0em, #3C3C3C -0.20681056375em -0.0373652975em 0em, #3C3C3C -0.18052885375em -0.0934511275em 0em, #3C3C3C -0.1379573405em -0.138057635em 0em, #3C3C3C -0.0800555925em -0.159165915em 0em, #3C3C3C -0.0164290525em -0.165675565em 0em, #3C3C3C 0.0535315125em -0.1594206825em 0em, #3C3C3C 0.1188833225em -0.1486998625em 0em, #3C3C3C 0.15738429125em -0.102757115em 0em, #3C3C3C 0.1825355875em -0.05246907125em 0em;
+    text-shadow: #3C3C3C 0.21375em 0 0, #3C3C3C 0.20102554875em 0.06442056725em 0, #3C3C3C 0.16545309125em 0.125256034375em 0, #3C3C3C 0.114100525em 0.17245005em 0, #3C3C3C 0.0495299125em 0.1929347625em 0, #3C3C3C -0.020926788125em 0.1987703525em 0, #3C3C3C -0.08683835em 0.182958245em 0, #3C3C3C -0.140307092em 0.145025515em 0, #3C3C3C -0.18035769em 0.09045148em 0, #3C3C3C -0.209242475em 0.025948895em 0, #3C3C3C -0.20681056375em -0.0373652975em 0, #3C3C3C -0.18052885375em -0.0934511275em 0, #3C3C3C -0.1379573405em -0.138057635em 0, #3C3C3C -0.0800555925em -0.159165915em 0, #3C3C3C -0.0164290525em -0.165675565em 0, #3C3C3C 0.0535315125em -0.1594206825em 0, #3C3C3C 0.1188833225em -0.1486998625em 0, #3C3C3C 0.15738429125em -0.102757115em 0, #3C3C3C 0.1825355875em -0.05246907125em 0;
     font-size: 1.4em;
     display: flex;
     align-items: center;
@@ -758,7 +758,7 @@ button {
 }
 
 .box-image-div > img:hover {
-    filter: drop-shadow(0px 0px 0.4em #ffffff);
+    filter: drop-shadow(0 0 0.4em #ffffff);
 }
 
 
@@ -845,10 +845,10 @@ button {
 
 @keyframes scale-down {
     0% {
-        height: 99%;
+        transform: scaleY(1);
     }
     100% {
-        height: 0%;
+        transform: scaleY(0);
     }
 }
 
@@ -880,12 +880,12 @@ button {
  * ---------------------------------------------- */
 @-webkit-keyframes slide-in-blurred-top {
     0% {
-      -webkit-transform: translateY(-1000px) scaleY(2.5) scaleX(0.2);
-              transform: translateY(-1000px) scaleY(2.5) scaleX(0.2);
+      -webkit-transform: translateY(-100%) scaleY(2.5) scaleX(0.2);
+              transform: translateY(-100%) scaleY(2.5) scaleX(0.2);
       -webkit-transform-origin: 50% 0%;
               transform-origin: 50% 0%;
-      -webkit-filter: blur(40px);
-              filter: blur(40px);
+      -webkit-filter: blur(40);
+              filter: blur(40);
       opacity: 0;
     }
     100% {
@@ -900,12 +900,12 @@ button {
 }
 @keyframes slide-in-blurred-top {
     0% {
-      -webkit-transform: translateY(-1000px) scaleY(2.5) scaleX(0.2);
-              transform: translateY(-1000px) scaleY(2.5) scaleX(0.2);
+      -webkit-transform: translateY(-100%) scaleY(2.5) scaleX(0.2);
+              transform: translateY(-100%) scaleY(2.5) scaleX(0.2);
       -webkit-transform-origin: 50% 0%;
               transform-origin: 50% 0%;
-      -webkit-filter: blur(40px);
-              filter: blur(40px);
+      -webkit-filter: blur(40);
+              filter: blur(40);
       opacity: 0;
     }
     100% {
@@ -914,7 +914,7 @@ button {
       -webkit-transform-origin: 50% 50%;
               transform-origin: 50% 50%;
       -webkit-filter: blur(0), drop-shadow(5px 5px 5px #222);
-              filter: drop-shadow(0em 0em 1em #ffffff);
+              filter: drop-shadow(0 0 1em #ffffff);
       opacity: 1;
     }
 }
@@ -932,7 +932,7 @@ button {
     flex-direction: column;
     justify-content: center;
     row-gap: 1%;
-    text-shadow: #686464 0.21375em 0em 0em, #686464 0.20102554875em 0.06442056725em 0em, #686464 0.16545309125em 0.125256034375em 0em, #686464 0.114100525em 0.17245005em 0em, #686464 0.0495299125em 0.1929347625em 0em, #686464 -0.020926788125em 0.1987703525em 0em, #686464 -0.08683835em 0.182958245em 0em, #686464 -0.140307092em 0.145025515em 0em, #686464 -0.18035769em 0.09045148em 0em, #686464 -0.209242475em 0.025948895em 0em, #686464 -0.20681056375em -0.0373652975em 0em, #686464 -0.18052885375em -0.0934511275em 0em, #686464 -0.1379573405em -0.138057635em 0em, #686464 -0.0800555925em -0.159165915em 0em, #686464 -0.0164290525em -0.165675565em 0em, #686464 0.0535315125em -0.1594206825em 0em, #686464 0.1188833225em -0.1486998625em 0em, #686464 0.15738429125em -0.102757115em 0em, #686464 0.1825355875em -0.05246907125em 0em;
+    text-shadow: #686464 0.21375em 0 0, #686464 0.20102554875em 0.06442056725em 0, #686464 0.16545309125em 0.125256034375em 0, #686464 0.114100525em 0.17245005em 0, #686464 0.0495299125em 0.1929347625em 0, #686464 -0.020926788125em 0.1987703525em 0, #686464 -0.08683835em 0.182958245em 0, #686464 -0.140307092em 0.145025515em 0, #686464 -0.18035769em 0.09045148em 0, #686464 -0.209242475em 0.025948895em 0, #686464 -0.20681056375em -0.0373652975em 0, #686464 -0.18052885375em -0.0934511275em 0, #686464 -0.1379573405em -0.138057635em 0, #686464 -0.0800555925em -0.159165915em 0, #686464 -0.0164290525em -0.165675565em 0, #686464 0.0535315125em -0.1594206825em 0, #686464 0.1188833225em -0.1486998625em 0, #686464 0.15738429125em -0.102757115em 0, #686464 0.1825355875em -0.05246907125em 0;
     
 }
 
@@ -942,16 +942,8 @@ button {
 
 
 @keyframes slide-out-bottom {
-    0% {
-      -webkit-transform: translateY(0);
-              transform: translateY(0);
-      opacity: 1;
-    }
-    100% {
-      -webkit-transform: translateY(1000px);
-              transform: translateY(1000px);
-      opacity: 0;
-    }
+    0% {opacity: 1}
+    100% {opacity: 0}
 }
   
 .event-mine-bg {
@@ -981,7 +973,7 @@ button {
     background-size: contain; 
     border: 0.01em inset #71ae2c;
     color: white;
-    text-shadow: #3C3C3C 0.21375em 0em 0em, #3C3C3C 0.20102554875em 0.06442056725em 0em, #3C3C3C 0.16545309125em 0.125256034375em 0em, #3C3C3C 0.114100525em 0.17245005em 0em, #3C3C3C 0.0495299125em 0.1929347625em 0em, #3C3C3C -0.020926788125em 0.1987703525em 0em, #3C3C3C -0.08683835em 0.182958245em 0em, #3C3C3C -0.140307092em 0.145025515em 0em, #3C3C3C -0.18035769em 0.09045148em 0em, #3C3C3C -0.209242475em 0.025948895em 0em, #3C3C3C -0.20681056375em -0.0373652975em 0em, #3C3C3C -0.18052885375em -0.0934511275em 0em, #3C3C3C -0.1379573405em -0.138057635em 0em, #3C3C3C -0.0800555925em -0.159165915em 0em, #3C3C3C -0.0164290525em -0.165675565em 0em, #3C3C3C 0.0535315125em -0.1594206825em 0em, #3C3C3C 0.1188833225em -0.1486998625em 0em, #3C3C3C 0.15738429125em -0.102757115em 0em, #3C3C3C 0.1825355875em -0.05246907125em 0em;
+    text-shadow: #3C3C3C 0.21375em 0 0, #3C3C3C 0.20102554875em 0.06442056725em 0, #3C3C3C 0.16545309125em 0.125256034375em 0, #3C3C3C 0.114100525em 0.17245005em 0, #3C3C3C 0.0495299125em 0.1929347625em 0, #3C3C3C -0.020926788125em 0.1987703525em 0, #3C3C3C -0.08683835em 0.182958245em 0, #3C3C3C -0.140307092em 0.145025515em 0, #3C3C3C -0.18035769em 0.09045148em 0, #3C3C3C -0.209242475em 0.025948895em 0, #3C3C3C -0.20681056375em -0.0373652975em 0, #3C3C3C -0.18052885375em -0.0934511275em 0, #3C3C3C -0.1379573405em -0.138057635em 0, #3C3C3C -0.0800555925em -0.159165915em 0, #3C3C3C -0.0164290525em -0.165675565em 0, #3C3C3C 0.0535315125em -0.1594206825em 0, #3C3C3C 0.1188833225em -0.1486998625em 0, #3C3C3C 0.15738429125em -0.102757115em 0, #3C3C3C 0.1825355875em -0.05246907125em 0;
     text-align: center;
 } 
 
@@ -1013,12 +1005,12 @@ button {
 
 @-webkit-keyframes slide-in-blurred-bottom {
     0% {
-      -webkit-transform: translateY(1000px) scaleY(2.5) scaleX(0.2);
-              transform: translateY(1000px) scaleY(2.5) scaleX(0.2);
+      -webkit-transform: translateY(1000) scaleY(2.5) scaleX(0.2);
+              transform: translateY(1000) scaleY(2.5) scaleX(0.2);
       -webkit-transform-origin: 50% 0%;
               transform-origin: 50% 0%;
-      -webkit-filter: blur(40px);
-              filter: blur(40px);
+      -webkit-filter: blur(40);
+              filter: blur(40);
       opacity: 0;
     }
     100% {
@@ -1033,12 +1025,12 @@ button {
   }
 @keyframes slide-in-blurred-bottom {
     0% {
-      -webkit-transform: translateY(1000px) scaleY(2.5) scaleX(0.2);
-              transform: translateY(1000px) scaleY(2.5) scaleX(0.2);
+      -webkit-transform: translateY(1000) scaleY(2.5) scaleX(0.2);
+              transform: translateY(1000) scaleY(2.5) scaleX(0.2);
       -webkit-transform-origin: 50% 0%;
               transform-origin: 50% 0%;
-      -webkit-filter: blur(40px);
-              filter: blur(40px);
+      -webkit-filter: blur(40);
+              filter: blur(40);
       opacity: 0;
     }
     100% {
@@ -1047,7 +1039,7 @@ button {
       -webkit-transform-origin: 50% 50%;
               transform-origin: 50% 50%;
       -webkit-filter: blur(0), drop-shadow(5px 5px 5px #222);
-              filter: drop-shadow(0em 0em 1em #ffffff);
+              filter: drop-shadow(0 0 1em #ffffff);
       opacity: 1;
     }
 }
@@ -1099,13 +1091,13 @@ button {
   top: -4px;
   left: -3px;
   width: 48px;
-  height: 50px;
+  height: 50;
   transform: rotateY(-180deg) rotateZ(-90deg);
 }
 
 circle {
   stroke-dasharray: 125px;
-  stroke-dashoffset: 0px;
+  stroke-dashoffset: 0;
   stroke-linecap: round;
   stroke-width: 2px;
   stroke: white;
@@ -1115,7 +1107,7 @@ circle {
 
 @keyframes countdown {
   from {
-    stroke-dashoffset: 0px;
+    stroke-dashoffset: 0;
   }
   to {
     stroke-dashoffset: 125px;
@@ -1138,7 +1130,7 @@ circle {
 }
 
 .settings-button:hover{
-    filter: drop-shadow(0px 0px 0.2em #ffffff);
+    filter: drop-shadow(0 0 0.2em #ffffff);
 }
 
 .settings-menu {
@@ -1314,7 +1306,7 @@ input[type="range"] {
     left: 1%;
     object-fit: contain;
     animation: blink 2s linear 2 forwards;
-    filter: drop-shadow(0px 0px 0.1em #181313);
+    filter: drop-shadow(0 0 0.1em #181313);
 }
 
 @keyframes blink {
@@ -1401,7 +1393,7 @@ input[type="range"] {
 .floatingText {
     font-size: 1em;
     color: rgb(10, 52, 18);
-    text-shadow: 0.1em 0.1em 0px #fbfbfb;
+    text-shadow: 0.1em 0.1em 0 #fbfbfb;
     position: absolute;
     animation: fadeOutOpacity 1.5s cubic-bezier(.02,.97,.91,.14) forwards;
     z-index: 13;
@@ -1410,11 +1402,12 @@ input[type="range"] {
 
 @keyframes fadeOutOpacity {
     from {
-      opacity: 1.0;
+        opacity: 1.0;
+        transform: translate(0);
     }
     to {
-      opacity: 0.5;
-      top: -20px;
+        opacity: 0.5;
+        transform: translate(0,-15em);
     }
   }
 
@@ -1426,8 +1419,14 @@ input[type="range"] {
 }
 
 @keyframes fall {
-    from {top: -5%;opacity: 0.7;}
-    to {top: 100%;opacity: 0;}
+    from {
+        transform: translate(0,-1em);
+        opacity: 0.7;
+    }
+    to {
+        transform: translate(0,40em);
+        opacity: 0;
+    }
 }
 
 /*/////////////////////////////// TAB BODY CSS ///////////////////////////////*/
@@ -1460,16 +1459,16 @@ input[type="range"] {
 }
 
 .tab-button:hover{
-    filter: drop-shadow(0px 0px 0.3em #ffffff);
+    filter: drop-shadow(0 0 0.3em #ffffff);
 }
 
 
 /* .flex-container-TAB {
     position: absolute;
-    left:800px; 
+    left:800; 
     top:5px; 
-    width: 730px;
-    gap: 10px;
+    width: 730;
+    gap: 10;
     display: flex;
     flex-wrap: no-wrap;
     flex-direction: row-reverse;
@@ -1513,7 +1512,7 @@ input[type="range"] {
     row-gap: 2%;
     z-index: 150;
     color: #20310d;
-    text-shadow: #e5f6d3 0.106875em 0em 0em, #e5f6d3 0.100512774375em 0.032210283625em 0em, #e5f6d3 0.082726545625em 0.0626280171875em 0em, #e5f6d3 0.0570502625em 0.086225025em 0em, #e5f6d3 0.02476495625em 0.09646738125em 0em, #e5f6d3 -0.0104633940625em 0.09938517625em 0em, #e5f6d3 -0.043419175em 0.0914791225em 0em, #e5f6d3 -0.070153546em 0.0725127575em 0em, #e5f6d3 -0.090178845em 0.04522574em 0em, #e5f6d3 -0.1046212375em 0.0129744475em 0em, #e5f6d3 -0.103405281875em -0.01868264875em 0em, #e5f6d3 -0.090264426875em -0.04672556375em 0em, #e5f6d3 -0.06897867025em -0.0690288175em 0em, #e5f6d3 -0.04002779625em -0.0795829575em 0em, #e5f6d3 -0.00821452625em -0.0828377825em 0em, #e5f6d3 0.02676575625em -0.07971034125em 0em, #e5f6d3 0.05944166125em -0.07434993125em 0em, #e5f6d3 0.078692145625em -0.0513785575em 0em, #e5f6d3 0.09126779375em -0.026234535625em 0em;
+    text-shadow: #e5f6d3 0.106875em 0 0, #e5f6d3 0.100512774375em 0.032210283625em 0, #e5f6d3 0.082726545625em 0.0626280171875em 0, #e5f6d3 0.0570502625em 0.086225025em 0, #e5f6d3 0.02476495625em 0.09646738125em 0, #e5f6d3 -0.0104633940625em 0.09938517625em 0, #e5f6d3 -0.043419175em 0.0914791225em 0, #e5f6d3 -0.070153546em 0.0725127575em 0, #e5f6d3 -0.090178845em 0.04522574em 0, #e5f6d3 -0.1046212375em 0.0129744475em 0, #e5f6d3 -0.103405281875em -0.01868264875em 0, #e5f6d3 -0.090264426875em -0.04672556375em 0, #e5f6d3 -0.06897867025em -0.0690288175em 0, #e5f6d3 -0.04002779625em -0.0795829575em 0, #e5f6d3 -0.00821452625em -0.0828377825em 0, #e5f6d3 0.02676575625em -0.07971034125em 0, #e5f6d3 0.05944166125em -0.07434993125em 0, #e5f6d3 0.078692145625em -0.0513785575em 0, #e5f6d3 0.09126779375em -0.026234535625em 0;
     font-size: 1em;
     animation: slidedown-pop 0.8s ease-in-out both;
     pointer-events: none;
@@ -1598,7 +1597,7 @@ input[type="range"] {
     font-size: 0.85em;
     position: relative;
     transition: 0.4s ease;
-    text-shadow: #3C3C3C 0.21375em 0em 0em, #3C3C3C 0.20102554875em 0.06442056725em 0em, #3C3C3C 0.16545309125em 0.125256034375em 0em, #3C3C3C 0.114100525em 0.17245005em 0em, #3C3C3C 0.0495299125em 0.1929347625em 0em, #3C3C3C -0.020926788125em 0.1987703525em 0em, #3C3C3C -0.08683835em 0.182958245em 0em, #3C3C3C -0.140307092em 0.145025515em 0em, #3C3C3C -0.18035769em 0.09045148em 0em, #3C3C3C -0.209242475em 0.025948895em 0em, #3C3C3C -0.20681056375em -0.0373652975em 0em, #3C3C3C -0.18052885375em -0.0934511275em 0em, #3C3C3C -0.1379573405em -0.138057635em 0em, #3C3C3C -0.0800555925em -0.159165915em 0em, #3C3C3C -0.0164290525em -0.165675565em 0em, #3C3C3C 0.0535315125em -0.1594206825em 0em, #3C3C3C 0.1188833225em -0.1486998625em 0em, #3C3C3C 0.15738429125em -0.102757115em 0em, #3C3C3C 0.1825355875em -0.05246907125em 0em;
+    text-shadow: #3C3C3C 0.21375em 0 0, #3C3C3C 0.20102554875em 0.06442056725em 0, #3C3C3C 0.16545309125em 0.125256034375em 0, #3C3C3C 0.114100525em 0.17245005em 0, #3C3C3C 0.0495299125em 0.1929347625em 0, #3C3C3C -0.020926788125em 0.1987703525em 0, #3C3C3C -0.08683835em 0.182958245em 0, #3C3C3C -0.140307092em 0.145025515em 0, #3C3C3C -0.18035769em 0.09045148em 0, #3C3C3C -0.209242475em 0.025948895em 0, #3C3C3C -0.20681056375em -0.0373652975em 0, #3C3C3C -0.18052885375em -0.0934511275em 0, #3C3C3C -0.1379573405em -0.138057635em 0, #3C3C3C -0.0800555925em -0.159165915em 0, #3C3C3C -0.0164290525em -0.165675565em 0, #3C3C3C 0.0535315125em -0.1594206825em 0, #3C3C3C 0.1188833225em -0.1486998625em 0, #3C3C3C 0.15738429125em -0.102757115em 0, #3C3C3C 0.1825355875em -0.05246907125em 0;
     filter: brightness(var(--brightness))  
             grayscale(var(--grayscale));
 }
@@ -1618,8 +1617,8 @@ input[type="range"] {
     width: 100%;
     height: 100%;
     position: relative;
-    top:0px;
-    left:0px;
+    top:0;
+    left:0;
 } 
 
 .not-purchased {
@@ -1629,13 +1628,13 @@ input[type="range"] {
 
 :root {
     --brightness:100%;
-    --dropshadow:0px 0px 0px black;
+    --dropshadow:0 0 0 black;
     --grayscale:0%;
 }
 
 .not-dim {
     transition: 0.3s ease;
-    --dropshadow:0px 0px 3px #000000;
+    --dropshadow:0 0 3px #000000;
 }
 
 .active-hero {
@@ -1652,7 +1651,7 @@ input[type="range"] {
 
 /*/////////////////////////////// INVENTORY (TABLE2) CSS ///////////////////////////////*/
 .item-button {
-    border: 0px;
+    border: 0;
     width: 131px;
     height: 158px;
 }
@@ -1772,7 +1771,7 @@ input[type="range"] {
 
 #adventure-tutorial {
     position: absolute;
-    right: 23%;
+    right: 10%;
     bottom: 31.5%;
     height: 7%;
     width: auto;
@@ -1884,7 +1883,7 @@ input[type="range"] {
     content: url(./assets/icon/energyIcon.webp);
     height: 90%;
     object-fit: contain;
-    filter: drop-shadow(0px 0px 0.075em #ffefef);
+    filter: drop-shadow(0 0 0.075em #ffefef);
 }
 
 
@@ -1902,7 +1901,7 @@ input[type="range"] {
     font-family: gi-font;
     position: absolute;
     top: 100%;
-    height: 20%;
+    height: 18%;
     width: 70%;
     font-size: inherit;
     color: #F8E8C7;
@@ -1917,7 +1916,7 @@ input[type="range"] {
 }
 
 .wish-button:hover{
-    filter: drop-shadow(0px 0px 0.2em #ffffff);
+    filter: drop-shadow(0 0 0.2em #ffffff);
     transition: .3s ease;
 }
 
@@ -1940,7 +1939,7 @@ input[type="range"] {
 .wish-button-primo {
     width: 5%;
     object-fit: contain;
-    filter: drop-shadow(0px 0px 0.1em #40280b);
+    filter: drop-shadow(0 0 0.1em #40280b);
 }
 
 .wish-mail-container {
@@ -1965,7 +1964,7 @@ input[type="range"] {
 
 #wish-tutorial {
     position: absolute;
-    bottom: -16%;
+    bottom: -15%;
     left: -2%;
     height: 11%;
     width: auto;
@@ -1986,7 +1985,7 @@ input[type="range"] {
 
 /*/////////////////////////////// ACHIEVEMENT (TABLE5) CSS ///////////////////////////////*/
 #table5-container {
-    font-size: 10px;
+    font-size: 10;
     background: url(./assets/achievementBG.webp);
     background-size:cover;
     display: flex;
@@ -2122,10 +2121,10 @@ repeat, no-repeat
 
 #table-tab {
     position: absolute;
-    top: 10px;
-    right:140px;
-    width: 100px;
-    height: 10px;
+    top: 10;
+    right:140;
+    width: 100;
+    height: 10;
 }
 
 #table6 {
@@ -2184,15 +2183,15 @@ repeat, no-repeat
 .table6-background {
     position: absolute;
     object-fit: fill;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
     z-index: 1;
 }
 
 .tool-tip-name {
-    font-size: 1.0em;
+    font-size: 1.0;
     text-align: center;
     max-height: 10%;
 }
@@ -2332,7 +2331,7 @@ repeat, no-repeat
     height: 65%;
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0px 0px 0.1em #40280b);
+    filter: drop-shadow(0 0 0.1em #40280b);
 }
 
 .shop-button-container {
