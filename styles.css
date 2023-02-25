@@ -121,12 +121,8 @@ img {
 
 .overlay {
     position: absolute;
-    display: flex;
     background: url(./assets/wood.webp);
     background-size:cover;
-    flex-direction:  row;
-    justify-content: center;
-    align-items: center;
     z-index: 10000;
 }
 
@@ -188,14 +184,15 @@ button {
     font-size: inherit;
 }
 
+#left-div {
+    justify-content: unset;
+}
+
 .left-area {
     width: 35%;
     height: 100%;
     position: absolute;
     left: 0;
-    display:flex;
-    flex-direction: column;
-    align-items: center;
   }
 
 .vignette {
@@ -239,9 +236,6 @@ button {
   }
 
 .div-img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     object-fit: cover;
 }
 
@@ -275,17 +269,10 @@ button {
 }
 
 #start-screen {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     z-index: 1000;
     background-image: url(./assets/start.webp);
     background-size: cover;
-    display: flex;
-    flex-direction: column;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
     gap: 4%;
 }
 
@@ -378,12 +365,7 @@ button {
 }
 
 #loading {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     z-index: 100;
-    /* border: 14px ridge #ACC35B;
-    border-radius: 20; */
     pointer-events: none;
 }
 
@@ -409,10 +391,6 @@ button {
     height: 10%;
     z-index: 10;
     row-gap: 1%;
-    display:flex;
-    flex-direction: column;
-    justify-content: center;
-    align-content: center;
 }
 
 .pill-value {
@@ -424,6 +402,7 @@ button {
     align-items: center;
     text-align: right;
     color:white;
+    width: 100%;
     height: 50%;
     z-index: 10;
     font-size: 0.8em;
@@ -437,16 +416,6 @@ button {
     object-fit: contain;
     mix-blend-mode:color-dodge;
 }
-/* 
-.energy-primo-container {
-    position:absolute;
-    
-    left:601px; 
-    top:5px;
-    width:96px;
-    height:65px;
-    
-} */
 
 .icon {
     height:80%;
@@ -508,10 +477,6 @@ button {
     text-align: center;
     animation: slidedown 5s cubic-bezier(.17,.67,.33,.83) both;
     pointer-events: none;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
     filter: drop-shadow(0.15em 0.2em #65805472);
 }
 
@@ -527,10 +492,6 @@ button {
 .event-dropdown-text {
     width: 70%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 .event-dropdown-image {
@@ -561,30 +522,16 @@ button {
 }
 
 #prevent-clicker {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     z-index: 20000;
     pointer-events: all;
 }
 
 .event-dark {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     row-gap: 3%;
 }
 
 .event-dark-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
     column-gap: 3%;
 }
 
@@ -610,6 +557,7 @@ button {
     align-items: center;
     font-size: 2.3em;
     color: white;
+    text-align: center;
     background-color: #000000c4;
     pointer-events: none;
     z-index: 10007;
@@ -691,10 +639,6 @@ button {
 #reaction-image-top {
     width: 20%;
     height: 43%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
     position: absolute;
     object-fit: contain;
     bottom:42%;
@@ -707,8 +651,6 @@ button {
     width: 35%;
     aspect-ratio: 5.89;
     background-image: url(./assets/tutorial/tut-button.webp);
-    background-size: contain;
-    background-repeat: no-repeat;
     color: white;
     text-shadow: #3C3C3C 0.21375em 0 0, #3C3C3C 0.20102554875em 0.06442056725em 0, #3C3C3C 0.16545309125em 0.125256034375em 0, #3C3C3C 0.114100525em 0.17245005em 0, #3C3C3C 0.0495299125em 0.1929347625em 0, #3C3C3C -0.020926788125em 0.1987703525em 0, #3C3C3C -0.08683835em 0.182958245em 0, #3C3C3C -0.140307092em 0.145025515em 0, #3C3C3C -0.18035769em 0.09045148em 0, #3C3C3C -0.209242475em 0.025948895em 0, #3C3C3C -0.20681056375em -0.0373652975em 0, #3C3C3C -0.18052885375em -0.0934511275em 0, #3C3C3C -0.1379573405em -0.138057635em 0, #3C3C3C -0.0800555925em -0.159165915em 0, #3C3C3C -0.0164290525em -0.165675565em 0, #3C3C3C 0.0535315125em -0.1594206825em 0, #3C3C3C 0.1188833225em -0.1486998625em 0, #3C3C3C 0.15738429125em -0.102757115em 0, #3C3C3C 0.1825355875em -0.05246907125em 0;
     font-size: 1.4em;
@@ -744,10 +686,6 @@ button {
 .box-image-div {
     width: 25%;
     height: 45%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
 }
 
 .box-image-div > img {
@@ -985,7 +923,6 @@ button {
 .event-mine-bg > tr > td {
     width: 12%;
     height: 12%;
-
     background-image: url(./assets/event/mine-unclicked.webp);
     background-size: contain; 
     border: 0.01em inset #71ae2c;
@@ -1103,25 +1040,6 @@ button {
     to { height: 100%; }
 }
 
-/* svg {
-  position: relative;
-  top: -4px;
-  left: -3px;
-  width: 48px;
-  height: 50;
-  transform: rotateY(-180deg) rotateZ(-90deg);
-}
-
-circle {
-  stroke-dasharray: 125px;
-  stroke-dashoffset: 0;
-  stroke-linecap: round;
-  stroke-width: 2px;
-  stroke: white;
-  fill: none;
-  animation: countdown 31s linear infinite forwards;
-} */
-
 @keyframes countdown {
   from {
     stroke-dashoffset: 0;
@@ -1157,21 +1075,10 @@ circle {
     width: 40%;
     height: 45%;
     row-gap: 2%;
+    border: 0.3em outset #8fa77e;
     border-radius: 1em;
-    border-color: #8fa77e;
-    border-width: 0.3em;
-    border-style: outset;
     background-color: #DEE3BA;
-    /* background-image: url(./assets/tutorial/tutorialFrame.webp);
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: #DEE2BB; */
     z-index: -1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 .settings-text {
@@ -1195,9 +1102,7 @@ circle {
     align-items: center;
     background-color: #DEE3BA;
     border-radius: 1em;
-    border-color: #97b086;
-    border-width: 0.3em;
-    border-style: solid;
+    border: 0.3em solid #97b086;
     color: #4b613c;
 }
 
@@ -1372,13 +1277,10 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 @keyframes blink {
-    0%,
-    50%,
-    100% {
+    0%,50%,100% {
       opacity: 1;
     }
-    25%,
-    75% {
+    25%,75% {
       opacity: 0.6;
     }
 }
@@ -1423,13 +1325,6 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 /* BUTTON CSS */
-#demo {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 3;
-}
-
 .demo-img {
     position: relative;
     z-index: 10;
@@ -1524,19 +1419,6 @@ input[type="range"]:focus::-moz-range-thumb{
     filter: drop-shadow(0 0 0.3em #ffffff);
 }
 
-
-/* .flex-container-TAB {
-    position: absolute;
-    left:800; 
-    top:5px; 
-    width: 730;
-    gap: 10;
-    display: flex;
-    flex-wrap: no-wrap;
-    flex-direction: row-reverse;
-    justify-content: space-between;
-} */
-
 /*/////////////////////////////// ALL POP UP CSS (New/Tut) ///////////////////////////////*/
 .pop-new {
     position: absolute;
@@ -1576,18 +1458,10 @@ input[type="range"]:focus::-moz-range-thumb{
     font-size: 1em;
     animation: slidedown-pop 0.8s ease-in-out both;
     pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 .currency-pop-first {
     height: 50%;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
 }
 
 @keyframes slidedown-pop {
@@ -1597,17 +1471,9 @@ input[type="range"]:focus::-moz-range-thumb{
 
 /*/////////////////////////////// TUTORIAL CSS ///////////////////////////////*/
 .tutorial-dark {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
     z-index: 200;
     background-color: rgba(0,0,0,0.90);
     pointer-events: all;
-    
 }
 
 .tutorial-text {
@@ -1620,10 +1486,6 @@ input[type="range"]:focus::-moz-range-thumb{
     width: 72%;
     height: 80%; 
     z-index: 200;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     row-gap: 1%;
 }
 
@@ -1639,6 +1501,7 @@ input[type="range"]:focus::-moz-range-thumb{
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: unset;
     gap: 1%;
     overflow-y: scroll;  
     overflow-x: hidden;
@@ -1661,17 +1524,6 @@ input[type="range"]:focus::-moz-range-thumb{
     filter: brightness(var(--brightness))  
             grayscale(var(--grayscale));
 }
-/*             
-.upgrade-text {
-    position: absolute;
-    top: 35%;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    line-height: 100%;
-    text-align: center;
-    font-size: 0.7em;
-}  */
 
  .hero-button-frame {
     width: 100%;
@@ -1728,9 +1580,8 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .inventory-selected {
-    border: #867357;
-    border-style:inset;
-    border-radius: 10%;
+    border: 0.35em inset #867357;
+    border-radius: 1em;
     transition: 0.2s ease;
     transform: scale(1.20);
 }
@@ -1804,10 +1655,6 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .flex-container-EXPEDITION {
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    flex-direction: column;
     row-gap: 1%;
 }
 
@@ -1822,9 +1669,6 @@ input[type="range"]:focus::-moz-range-thumb{
     display: flex;
     justify-content: center;
     align-items: center;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
     transition: 0.2s ease;
     opacity: 0.25;
 }
@@ -1846,14 +1690,13 @@ input[type="range"]:focus::-moz-range-thumb{
     width: 80%;
     height: 20%;
     font-size: inherit;
+    text-align: center;
     display: none;
     justify-content: center;
     align-items: center;
     background-color: #6F4532;
     border-radius: 1em;
-    border-color: #876547;
-    border-width: 0.3em;
-    border-style: solid;
+    border: 0.3em solid #876547;
     color: #f9d0bd;
     filter: drop-shadow(0.3em 0.5em 0.15em #291504d4);
 }
@@ -1888,20 +1731,12 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .exped-table-img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     object-fit:fill;
 }
 
 .tooltipTABLEEXPED {
     z-index: 200;
     width: 100%;
-    /* padding-top: calc(16 / 9 * 10%); */
-    display:flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 .tooltipTABLEEXPED > div {
@@ -1969,9 +1804,6 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .wish-button-img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     object-fit: contain;
 }
 
@@ -1989,9 +1821,6 @@ input[type="range"]:focus::-moz-range-thumb{
     width: 100%;
     height: 100%;
     position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     column-gap: 1%;
     font-size: 1.4em;
 }
@@ -2007,9 +1836,6 @@ input[type="range"]:focus::-moz-range-thumb{
     top: 0%;
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .wish-mail-div {
@@ -2033,9 +1859,6 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .wish-mail {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     object-fit: contain;
     -webkit-transition: opacity 0.35s ease-in-out;
     -moz-transition: opacity 0.35s ease-in-out;
@@ -2053,10 +1876,6 @@ input[type="range"]:focus::-moz-range-thumb{
     align-items: center;
     font-size: inherit;
 }
-
-/* url(./assets/middle.webp), url(./assets/right.webp)
-repeat, no-repeat
- 100% auto, auto 100% */
 
 .table5-Image {
     position: absolute;
@@ -2094,13 +1913,7 @@ repeat, no-repeat
     height:10%;
     text-align: center;
     background:url(./assets/achievement.png);
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
     animation: fadeOut 3s cubic-bezier(.93,-0.24,.93,.81) forwards;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
 .achieveH1 {
@@ -2145,13 +1958,9 @@ repeat, no-repeat
 .achieve-stored {
     width: 49%;
     aspect-ratio: 4.5;
-    /* flex-basis: 15%;
-    position: relative; */
-
     display: flex;
     justify-content: space-evenly;
     font-family: 'gi-font';
-    
     color: #5b4e32;
     text-align: center;
     background-image: url(./assets/achievement.webp);
@@ -2171,22 +1980,6 @@ repeat, no-repeat
 }
 
 /*/////////////////////////////// TOOLTIP UI (TABLE6) CSS ///////////////////////////////*/
-.sideImg {
-    position: absolute;
-    left: 1279px;
-    width: 382px;
-    height: 869px;
-}
-
-
-#table-tab {
-    position: absolute;
-    top: 10;
-    right:140;
-    width: 100;
-    height: 10;
-}
-
 #table6 {
     padding-top: 1.5%;
     font-size: inherit;
@@ -2221,11 +2014,6 @@ repeat, no-repeat
     width: auto;
     height: 23%;
     background-image:url(./assets/tooltips/border.webp);
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    /* border: 0.1em solid;
-    border-image:  24 / 12px / 2px space; */
 }
 
 .toolImgOverlay {
@@ -2283,10 +2071,6 @@ repeat, no-repeat
     position: absolute;
     bottom:4%;
     background-image: url(./assets/tooltips/tooltip-button.webp);
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center;
-    background-color: transparent;
     aspect-ratio: 2.3;
     width: 87%;
     z-index: 5;
@@ -2298,10 +2082,7 @@ repeat, no-repeat
 
 /*/////////////////////// SHOP CSS (TABLE 7) ///////////////////////////////*/
 #table7 {
-    display: flex;
-    flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
     gap: 1%;
     position: relative;
 }
@@ -2332,13 +2113,6 @@ repeat, no-repeat
     width: 50%;
     height: 12%;
     background-image: url(./assets/dori-deals.webp);
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     color: #4e363c;
 }
 
@@ -2348,9 +2122,7 @@ repeat, no-repeat
     gap: 1%;
     background-color: #694B31;
     border-radius: 1em;
-    border-color: #876547;
-    border-width: 0.5em;
-    border-style: outset;
+    border: 0.5em outset #876547;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -2359,15 +2131,9 @@ repeat, no-repeat
 }
 
 .shop-button {
-    border: #867357;
-    border-style:groove;
-    border-width: 0.2em;
+    border: 0.2em groove #867357;
     width: 16.5%;
     height: 45%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 .shop-button-container > img {
@@ -2380,10 +2146,6 @@ repeat, no-repeat
     position: relative;
     height: 20%;
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
     column-gap: 1%;
 }
 
@@ -2397,10 +2159,6 @@ repeat, no-repeat
 .shop-button-container {
     width: 100%;
     height: 80%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
 }
 
 .store-dialog {
@@ -2410,12 +2168,7 @@ repeat, no-repeat
     height: 16%;
     border-radius:0.5em;
     border: 0.35em solid #756F60;
-    
     background-color: #C9C0A1;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
     column-gap: 1.5%;
 }
 
@@ -2424,10 +2177,6 @@ repeat, no-repeat
     padding: 1.5%;
     width: 75%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     font-size: 1.1em;
     color: #462b15;
     text-shadow: 0.025em 0.025em 0.05em #00000048;
@@ -2475,13 +2224,9 @@ repeat, no-repeat
   }
 
 .store-buy {
+    text-align: center;
     width: 20%;
     height: 50%;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    align-items: center;
-    
     background-color: #6e6240;
     color: #ead5c3;
     text-shadow: 0.05em 0.05em 0.05em #00000048;

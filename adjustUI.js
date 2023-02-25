@@ -42,7 +42,7 @@ function expedButtonAdjust(expedButton, backgroundImg, i) {
     expedButton.style['background-repeat'] = "no-repeat";
     expedButton.style['background-size'] = "contain"
     expedButton.style['background-position'] = "center";
-    expedButton.classList += "expedition";
+    expedButton.classList += " expedition";
     return expedButton;
 }
 

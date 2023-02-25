@@ -2,6 +2,8 @@
 function buildGame(mainBody) {
     let loadingDiv = document.createElement("div");
     loadingDiv.id = "loading";
+    loadingDiv.classList.add("cover-all");
+    loadingDiv.classList.add("flex-row");
     loadingDiv.classList.add("overlay");
     let loadingGif = document.createElement("img");
     loadingGif.src = "./assets/loading.webp";
@@ -10,6 +12,7 @@ function buildGame(mainBody) {
     loadingDiv.appendChild(loadingGif);
 
     let leftDiv = document.createElement("div");
+    leftDiv.classList.add("flex-column");
     leftDiv.id = "left-div";
     leftDiv.classList.add("left-area");
     let scoreDiv = document.createElement("div");
@@ -28,6 +31,7 @@ function buildGame(mainBody) {
     midDivImg.classList.add("middle-bar");
 
     let energyPrimoContainer = document.createElement("div");
+    energyPrimoContainer.classList.add("flex-column");
     energyPrimoContainer.classList.add("energy-primo-container");
     let energyContainer = document.createElement("div");
     energyContainer.classList.add("pill-value");
@@ -60,6 +64,7 @@ function drawMainBody() {
     var leftDiv = document.getElementById("left-div");
     var leftImg =  document.createElement("img");
     leftImg.src = "./assets/bg.webp";
+    leftImg.classList.add("cover-all");
     leftImg.classList.add("div-img");
     leftDiv.appendChild(leftImg);
 
@@ -77,17 +82,18 @@ function drawMainBody() {
 
     // TABLE 1
     let table1 = document.createElement("div");
+    table1.classList.add("flex-column");
     table1.classList.add("table-with-tooltip");
     table1.id = "table1";
 
     // TABLE 2
     let table2 = document.createElement("div");
-    table2.classList += ("flex-container-INVENTORY table-with-tooltip")
+    table2.classList += (" flex-container-INVENTORY table-with-tooltip")
     table2.id = "table2";
 
     // TABLE 3
     let table3 = document.createElement("div");
-    table3.classList += ("flex-container-EXPEDITION table-without-tooltip");
+    table3.classList += (" flex-column flex-container-EXPEDITION table-without-tooltip");
     table3.id = "table3";
     let table3Div = document.createElement("div");
     table3Div.id = "expedDiv";
@@ -98,17 +104,17 @@ function drawMainBody() {
 
     // TABLE 4
     let table4 = document.createElement("div");
-    table4.classList += ("wish-counter table-without-tooltip")
+    table4.classList += (" wish-counter table-without-tooltip")
     table4.id = "table4"
 
     // TABLE 5
     let table5Container = document.createElement("div");
-    table5Container.classList += ("table-without-tooltip");
+    table5Container.classList += (" table-without-tooltip");
     let table5Image = document.createElement("div");
-    table5Image.classList += ("table5-Image");
+    table5Image.classList += (" table5-Image");
 
     let table5 = document.createElement("div");
-    table5.classList += ("flex-container-ACHIEVEMENT");
+    table5.classList += (" flex-container-ACHIEVEMENT");
     table5.id = "table5";
     table5Container.id = "table5-container";
     table5Container.append(table5Image,table5);
@@ -119,13 +125,15 @@ function drawMainBody() {
 
     // TABLE 7
     let table7 = document.createElement("div");
+    table7.classList.add("flex-column")
     table7.id = "table7";
 
     mainTable.append(table1,table2,table3,table4,table5Container,table6,table7);
 
-var mainImg =  document.createElement("img");
-        mainImg.classList.add("div-img");
-        mainImg.src = "./assets/main-bar.png";
+    var mainImg =  document.createElement("img");
+    mainImg.classList.add("cover-all");
+    mainImg.classList.add("div-img");
+    mainImg.src = "./assets/main-bar.png";
     rightDiv.append(TabDiv,mainTable,mainImg);
 }
 
@@ -158,11 +166,12 @@ function createHeroButtonContainer(heroID) {
 
 function createExpedTable(expedDiv) {
     let expedTableImg = document.createElement("img");
+    expedTableImg.classList.add("cover-all");
     expedTableImg.classList.add("exped-table-img")
     expedTableImg.src = "./assets/tooltipEXPED.webp";
 
     let expedTable = document.createElement("div");
-    expedTable.classList = "tooltipTABLEEXPED";
+    expedTable.classList += "flex-column tooltipTABLEEXPED";
     let expedRow1 = document.createElement("div");
     expedRow1.id = "exped-row-1";
     let expedRowImg = document.createElement("img");
@@ -179,21 +188,21 @@ function createAchievement(achievementText,achievementDesc) {
 
     let achievementH1 = document.createElement("p");
     achievementH1.innerText = achievementText;
-    achievementH1.classList += "achieveH1";
+    achievementH1.classList += " achieveH1";
     let achievementH2 = document.createElement("p");
     achievementH2.innerText = achievementDesc;
-    achievementH2.classList += "achieveH2";
+    achievementH2.classList += " achieveH2";
 
     achievementPopUpTemp.append(achievementH1,achievementH2);
     achievementPopUpTemp.id = "tempAchievement";
-    achievementPopUpTemp.classList += "achieve";
+    achievementPopUpTemp.classList += " background-image-cover flex-column achieve";
 
     return achievementPopUpTemp;
 }
 
 function storeAchievement(achievementText,achievementDesc,achievementID) {
     let achievementStored = document.createElement("div");
-    achievementStored.classList += "achieve-stored";
+    achievementStored.classList += " achieve-stored";
     achievementStored.id = achievementID;
 
     achievementID = Number(String(achievementID).slice(-3))
@@ -213,13 +222,13 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
     let achievementTextStored = document.createElement("div");
     let achievementStoredH1 = document.createElement("p");
     achievementStoredH1.innerText = achievementText;
-    achievementStoredH1.classList += "achieveStoredH1";
+    achievementStoredH1.classList += " achieveStoredH1";
     let achievementStoredH2 = document.createElement("p");              // MAKE THE BACKGROUND IMAGE SUMERU TALENT
     achievementStoredH2.innerText = achievementDesc;                     // HAVE THE MIDDLE PART INFINITELY EXTEND
-    achievementStoredH2.classList += "achieveStoredH2";
+    achievementStoredH2.classList += " achieveStoredH2";
 
     achievementTextStored.append(achievementStoredH1,achievementStoredH2);
-    achievementTextStored.classList += "achieve-stored-text";
+    achievementTextStored.classList += " flex-column achieve-stored-text";
 
     achievementStored.append(achievementTextStored,achievementImageContainer);
     
@@ -228,15 +237,18 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
 
 function drawMailTable(table4) {
     let mailImageContainer = document.createElement("div");
+    mailImageContainer.classList.add("flex-row");
     mailImageContainer.classList.add("wish-mail-container");
     
     let mailImageBottom = document.createElement("img");
     mailImageBottom.src = "./assets/closed.webp";
+    mailImageBottom.classList.add("cover-all");
     mailImageBottom.classList.add("wish-mail");
 
     let mailImageTop = document.createElement("img");
     mailImageTop.src = "./assets/open.webp";
     mailImageTop.id = "mailImageID";
+    mailImageTop.classList.add("cover-all");
     mailImageTop.classList.add("wish-mail");
 
     let mailImageDiv = document.createElement("div");

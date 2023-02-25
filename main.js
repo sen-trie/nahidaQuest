@@ -74,7 +74,7 @@ function deleteConfirmButton(confirmed) {
     }
         
     let deleteBox = document.getElementById("confirm-box");
-    if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+    if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
     return;
 }
 
@@ -86,9 +86,9 @@ if (localStorage.getItem("settingsValues") !== null) {
         
         setTimeout(function() {
             let deleteBox = document.getElementById("confirm-box");
-            if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+            if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
             startText.remove();
-        },100);
+        },100)
     });
 
     let startChance = randomInteger(1,11);
@@ -145,7 +145,7 @@ var achievementData = {
     achievementTypeRawClick: [1e1,1e2,5e2,1e3,2.5e3,5e3,7.5e3,1e4,1e5,1.5e5,2e5,2.5e5,3e5,3.5e5,4e5,4.5e5,5e5],
     achievementTypeRawCollection: [1,10,100,250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000],
     achievementTypeGolden: [1,3,7,15,30,50,75,100],
-};
+}
 var scoreAchievement = [1,101,201,301,401];
 
 var foodBuff = 1;
@@ -241,7 +241,7 @@ tabChange(1);
 //------------------------------------------------------------------------GAME FUNCTIONS------------------------------------------------------------------------//
 window.oncontextmenu = function (){
     return false;
-};
+}
 
 // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH FREQUENCY SET TO TIME RATIO)
 function timerEvents() {
@@ -488,12 +488,14 @@ function clickedEvent(aranaraNumber) {
     eventElement.play();
 
     let eventDropdown = document.createElement("div");
+    eventDropdown.classList.add("flex-row");
     eventDropdown.classList.add("event-dropdown");
     let eventDropdownBackground = document.createElement("img");
     eventDropdownBackground.src = "./assets/tutorial/eventPill.webp";
 
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
+    eventDropdownText.classList.add("flex-column");
     eventDropdownText.classList.add("event-dropdown-text");
 
     let eventDropdownImage = document.createElement("div");
@@ -538,14 +540,14 @@ function chooseEvent(type) {
 // EVENT 1 (ENERGY OVERLOAD)
 function clickEvent() {
     let button = demoContainer.firstElementChild;
-    if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")};
+    if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")}
     button.style.animation = "rotation-scale 3.5s infinite linear forwards";
     button.style["box-shadow"] = "inset 0em 0em 6em #93d961";
     clickerEvent = true;
     currentClick = 15 * (saveValues["dps"] + 1);
 
     setTimeout(() => {
-        if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")};
+        if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")}
         button.style.animation = "rotation 18s infinite linear forwards";
         button.style["box-shadow"] = "";
         clickerEvent = false;
@@ -559,6 +561,8 @@ var reactionGame = false;
 function reactionEvent() {
     reactionGame = true;
     let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("cover-all");
+    eventBackdrop.classList.add("flex-column");
     eventBackdrop.classList.add("event-dark");
 
     let reactionImage = document.createElement("div");
@@ -572,6 +576,7 @@ function reactionEvent() {
     reactionImageArrow.id = "reaction-image-arrow";
     let reactionImageTop = document.createElement("img");
     reactionImageTop.src = "./assets/event/clock-top.webp";
+    reactionImageTop.classList.add("flex-column");
     reactionImageTop.id = "reaction-image-top";
 
     reactionStartElement.load();
@@ -579,6 +584,7 @@ function reactionEvent() {
 
     let reactionButton = document.createElement("div");
     reactionButton.id = "reaction-button";
+    reactionButton.classList.add("background-image-cover");
     reactionButton.innerText = "Not yet...";
     reactionButton.addEventListener("click",()=>{
         reactionStartElement.pause();
@@ -612,7 +618,7 @@ function reactionEvent() {
 }
 
 function reactionFunction(eventBackdrop) {
-    if (reactionGame == false) {return};
+    if (reactionGame == false) {return}
     let outcomeText;
     let primogem = 0;
 
@@ -635,15 +641,19 @@ function reactionFunction(eventBackdrop) {
 // EVENT 3 (7 BOXES)
 function boxFunction() {
     let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("cover-all");
+    eventBackdrop.classList.add("flex-column");
     eventBackdrop.classList.add("event-dark");
 
     let boxOuterDiv = document.createElement("div");
     boxOuterDiv.id = "box-outer-div";
     boxOuterDiv.classList.add("box-outer-div");
+    boxOuterDiv.classList.add("flex-row");
     boxOuterDiv.classList.add("box-event")
     let count = 8;
     while (count--) {
         let boxImageDiv = document.createElement("div");
+        boxImageDiv.classList.add("flex-row");
         boxImageDiv.classList.add("box-image-div");
 
         let boxImageImg = document.createElement("img");
@@ -653,7 +663,7 @@ function boxFunction() {
 
         boxImageDiv.appendChild(boxImageImg);
         boxOuterDiv.appendChild(boxImageDiv);
-        if (count == 1) {break};
+        if (count == 1) {break}
     }
     mainBody.append(eventBackdrop,boxOuterDiv);
 }
@@ -713,6 +723,8 @@ const COLS = 8;
 function minesweeperEvent() {
     var mines = randomInteger(8,10)
     let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("cover-all");
+    eventBackdrop.classList.add("flex-column");
     eventBackdrop.classList.add("event-dark");
     let mineInfo = document.createElement("img");
     mineInfo.src = "./assets/event/mine-info.webp"
@@ -731,7 +743,7 @@ function minesweeperEvent() {
         for (let r = 0; r < ROWS; r++) {
           board[r] = [];
           for (let c = 0; c < COLS; c++) {
-            board[r][c] = { mine: false, revealed: false, flagged: false, adjMines: 0 };
+            board[r][c] = { mine: false, revealed: false, flagged: false, adjMines: 0 }
           }
         }
       
@@ -861,9 +873,12 @@ function weaselEvent() {
     let weaselElement = 18;
     weaselCount = 0;
     let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("cover-all");
     eventBackdrop.classList.add("event-dark");
+    eventBackdrop.classList.add("flex-row");
     eventBackdrop.classList.add("event-dark-row");
     let weaselBack = document.createElement("div");
+    weaselBack.classList.add("flex-row");
     weaselBack.classList.add("weasel-back");
 
     while (weaselElement--) {
@@ -1005,6 +1020,8 @@ function generateCombination(n) {
 // EVENT 6 (RAIN)
 function rainEvent() {
     let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("cover-all");
+    eventBackdrop.classList.add("flex-column");
     eventBackdrop.classList.add("event-dark");
 
     let rainText = document.createElement("div");
@@ -1098,6 +1115,7 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
     let boxTextDiv = document.createElement("p");
     let outcomeDelay = 500;
 
+    removeClick.classList.add("cover-all");
     removeClick.id = "prevent-clicker";
     boxText.classList.add("event-rain-text");
     boxText.id = "outcome-text";
@@ -1207,7 +1225,6 @@ function playAudio() {
     for (let i=0,len=sfxArray.length; i < len; i++) {
         sfxArray[i].volume = settingsValues.sfxVolume;
     }
-
     return bgmElement;
 }
 
@@ -1216,11 +1233,9 @@ function tutorial() {
     let overlay = document.getElementById("loading");
     var currentSlide = 1;
     var tutorialDark = document.createElement("div");
+    tutorialDark.classList.add("cover-all");
+    tutorialDark.classList.add("flex-column");
     tutorialDark.classList.add("tutorial-dark");
-
-    // let tutorialTopText = document.createElement("img");
-    // tutorialTopText.classList.add("tutorial-text");
-    // tutorialTopText.src = "./assets/tutorial/tutorialText.webp"
 
     var tutorialImage = document.createElement("img");
     tutorialImage.classList.add("tutorial-img");
@@ -1228,6 +1243,7 @@ function tutorial() {
     tutorialImage.src = "./assets/tutorial/tut-1.webp"
     
     var tutorialScreen = document.createElement("div");
+    tutorialScreen.classList.add("flex-column");
     tutorialScreen.classList.add("tutorial-screen");
     tutorialScreen.addEventListener("click", () => {
         if (currentSlide == 4) {
@@ -1261,7 +1277,6 @@ function saveData() {
         mainBody.append(saveCurrently);
     }
 
-
     let settingsSaved = {
         bgmVolume:bgmElement.volume,
         sfxVolume:tabElement.volume,
@@ -1275,7 +1290,7 @@ function saveData() {
 
     if (table7.innerHTML != "") {
         let savedTable7 = (table7.innerHTML).replace('shadow-pop-tr','')
-        savedTable7 = savedTable7.replace(/<div id="table7-text">.*</i,'<div id="table7-text">Welcome Back!</div><div class="store-buy" id="shop-confirm">Confirm Purchase</div><')
+        savedTable7 = savedTable7.replace(/<div id="table7-text.*</i,'<div id="table7-text" class="flex-column">Welcome Back!</div><div class="flex-row store-buy" id="shop-confirm">Confirm Purchase</div><')
         localStorage.setItem("storeInventory",JSON.stringify(savedTable7));
     }
 }
@@ -1286,11 +1301,11 @@ function createTabs() {
     let tabFlex = document.getElementById("flex-container-TAB");
     for (let i=0, len=(TABS.length - 1); i < len; i++){
         let tabButton = document.createElement("div");
-        tabButton.classList += "tab-button-div";
+        tabButton.classList += " tab-button-div";
 
         let tabButtonImage = document.createElement("img");
         tabButtonImage.src = "./assets/icon/tab"+ (i + 1) +".webp";
-        tabButtonImage.classList += "tab-button";
+        tabButtonImage.classList += " tab-button";
 
         tabButton.id = "tab-" + (i);
         tabButton.addEventListener('click', () =>{
@@ -1349,7 +1364,7 @@ function tabChange(x) {
             if (buttonInv.classList.contains("inventory-selected")) {
                 buttonInv.classList.remove("inventory-selected");
             }
-        };
+        }
         itemTooltip = -1;
     }
 
@@ -1371,13 +1386,12 @@ function tabChange(x) {
             let tooltipButtonText = document.getElementById("tool-tip-button");
             tooltipButtonText.innerText = "Use";
         }
-    } else {
+    } else if (x == 5) {
         table6.style.display = "none";
-    }
-
-    if (x == 5) {
         let dialog = document.getElementById("table7-text");
         dialog.innerText = "Welcome! Feel free to have a look. I'll even help package up your purchase, free of charge."
+    } else {
+        table6.style.display = "none";
     }
 
     if (x != 3 && wishCounter != saveValues["wishCounterSaved"]) {
@@ -1399,6 +1413,7 @@ function settings() {
     // RELATED TO SETTINGS MENU
     var settingsMenu = document.createElement("div");
     settingsMenu.id = "settings-menu";
+    settingsMenu.classList.add("flex-column");
     settingsMenu.classList.add("settings-menu");
 
     let settingsText = document.createElement("img");
@@ -1438,6 +1453,7 @@ function settings() {
     volumeScrollerContainer.append(volumeScrollerBGMContainer,volumeScrollerSFXContainer)
 
     let settingsBottom = document.createElement("div");
+    settingsBottom.classList.add("flex-row");
     settingsBottom.classList.add("settings-bottom");
     let settingsBottomLeft = document.createElement("div");
     settingsBottomLeft.classList.add("settings-bottom-left");
@@ -1473,7 +1489,7 @@ function settings() {
     settingButton.addEventListener("click", () => {
         toggleSettings();
         let deleteBox = document.getElementById("confirm-box");
-        if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+        if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
     })
     multiplierButtonContainer.prepend(settingButton);
 }
@@ -1530,7 +1546,7 @@ function createMultiplierButton() {
 
 //------------------------------------------------------------------------TABLE 1 (HEROES)------------------------------------------------------------------------//
 // LOAD SAVED HEROES IN TABLE1
-var rowTempDict = {};
+var rowTempDict = {}
 function loadRow() {
     let i = WISHHEROMAX;
     while (i--) {
@@ -1717,7 +1733,7 @@ function dimHeroButton() {
             i -= WISHHEROMIN - NONWISHHEROMAX;
             i += 2;
             continue;
-        };
+        }
         if (upgradeDict[i]["Purchased"] < 0) continue;
 
         let checkPrice;
@@ -1830,7 +1846,7 @@ function itemUse(itemUniqueId) {
             if (upgradeDictTemp.Purchased > 0){
                 if (upgradeInfo[i].Type == Inventory[itemID].Type){
                     let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (weaponBuffPercent[Inventory[itemID].Star] - 1));
-                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
 
                     upgradeDictTemp["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
@@ -1847,7 +1863,7 @@ function itemUse(itemUniqueId) {
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
                 let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (artifactBuffPercent[Inventory[itemID].Star] - 1));
-                if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                 upgradeDict[i]["Contribution"] += additionPower;
 
                 upgradeDictTemp["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
@@ -1867,7 +1883,7 @@ function itemUse(itemUniqueId) {
             power = 1.9;
         } else {
             power = 3;
-        };
+        }
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
@@ -1875,7 +1891,7 @@ function itemUse(itemUniqueId) {
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
                 let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
-                if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                 upgradeDict[i]["Contribution"] += additionPower;
 
                 upgradeDictTemp["Factor"] *= power;
@@ -1893,7 +1909,7 @@ function itemUse(itemUniqueId) {
             power = 2.2;
         } else {
             power = 3;
-        };
+        }
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
@@ -1902,7 +1918,7 @@ function itemUse(itemUniqueId) {
                 if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
                     let upgradeDictTemp = upgradeDict[i];
                     let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
-                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
 
                     upgradeDictTemp["Factor"] *= power;
@@ -1923,7 +1939,7 @@ function itemUse(itemUniqueId) {
                 if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
                     let upgradeDictTemp = upgradeDict[i];
                     let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
-                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
+                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
 
                     upgradeDictTemp["Factor"] *= power;
@@ -2072,7 +2088,7 @@ function inventoryDraw(itemType, min, max, type){
         "xp": XPMAX,
         "gem": 5017,
         "talent": 6013,
-    };
+    }
     let lowerInventoryType = {
         "weapon": 1001, 
         "artifact": 2001, 
@@ -2080,7 +2096,7 @@ function inventoryDraw(itemType, min, max, type){
         "xp": 4001,
         "gem": 5001,
         "talent": 6001,
-    };
+    }
     let drawnItem = 0;
     while (true){
         drawnItem = randomInteger(lowerInventoryType[itemType], upperInventoryType[itemType])
@@ -2131,6 +2147,7 @@ function createExpedition() {
 
     let advButton = document.createElement("div");
     advButton.id = "adventure-button";
+    advButton.classList.add("background-image-cover");
     advButton.innerText = "Adventure!"
     advButton.addEventListener("click",() => {
         if (adventureType != 0) {
@@ -2174,7 +2191,7 @@ function expedInfo(butId) {
     let i = 0;
 
     let afterEnergyIcon = document.createElement("img");
-    afterEnergyIcon.classList += "after-icon";
+    afterEnergyIcon.classList += " after-icon";
     afterEnergyIcon.id = "afterEnergyIcon";
     
     i = butId.split("-")[1];
@@ -2241,11 +2258,11 @@ function wishUnlock() {
 // DRAWS/WISH FOR SPECIAL HEROS
 function drawWish() {
     var wishButton = document.createElement("div");
-    wishButton.classList += "wish-button";
+    wishButton.classList += " wish-button";
     wishButton.id = "wishButton"
     let wishButtonText = document.createElement("div");
     wishButtonText.id = "wishButtonText";
-    wishButtonText.classList += "wish-button-text";
+    wishButtonText.classList += " flex-row wish-button-text";
     wishButtonText.innerText = "???";
 
     table4 = drawMailTable(table4);
@@ -2253,7 +2270,7 @@ function drawWish() {
     let mailImageDiv = document.getElementById("mail-image-div");
     let wishButtonImg = document.createElement("img");
     wishButtonImg.src = "./assets/wishButton.webp";
-    wishButtonImg.classList += "wish-button-img";
+    wishButtonImg.classList += " wish-button-img cover-all";
     wishButton.append(wishButtonImg,wishButtonText)
     mailImageDiv.append(wishButton);
 
@@ -2471,10 +2488,11 @@ function checkAchievement() {
 // TOOLTIP UI
 function createTooltip() {
     tooltipName = document.createElement("div");
-    tooltipName.classList += "tool-tip-name";
+    tooltipName.classList += " tool-tip-name";
 
     toolImgContainer = document.createElement("div");
-    toolImgContainer.classList.add("toolImgContainer")
+    toolImgContainer.classList.add("toolImgContainer");
+    toolImgContainer.classList.add("background-image-cover");
     toolImg = document.createElement("img");
     toolImg.src = "./assets/tooltips/Empty.webp";
     toolImg.classList.add("toolImg");
@@ -2484,18 +2502,20 @@ function createTooltip() {
     toolImgContainer.append(toolImg,toolImgOverlay)
     
     tooltipText = document.createElement("div");
-    tooltipText.classList += "tool-tip-text";
+    tooltipText.classList += " tool-tip-text";
     tooltipLore = document.createElement("div");
-    tooltipLore.classList += "tool-tip-lore";
+    tooltipLore.classList += " tool-tip-lore";
 
     let tooltipExtraImg = document.createElement("div");
-    tooltipExtraImg.classList += "tool-tip-extraimg";
+    tooltipExtraImg.classList.add("flex-row");
+    tooltipExtraImg.classList += " tool-tip-extraimg";
     tooltipWeaponImg = document.createElement("img");
     tooltipElementImg = document.createElement("img");
     tooltipExtraImg.append(tooltipWeaponImg,tooltipElementImg);
 
     let tooltipButton = document.createElement("button");
     tooltipButton.id = "tool-tip-button";
+    tooltipButton.classList.add("background-image-cover");
     tooltipButton.innerText = "Purchase";
     tooltipButton.addEventListener("click",()=>{tooltipFunction()})
 
@@ -2631,11 +2651,11 @@ function tooltipFunction() {
 function addShop() {
     let tabFlex = document.getElementById("flex-container-TAB");
     let tabButton = document.createElement("div");
-    tabButton.classList += "tab-button-div";
+    tabButton.classList += " tab-button-div";
 
     let tabButtonImage = document.createElement("img");
     tabButtonImage.src = "./assets/icon/tab"+ (7) +".webp";
-    tabButtonImage.classList += "tab-button";
+    tabButtonImage.classList += " tab-button";
     tabButtonImage.classList.add("darken")
     tabButton.id = "tab-" + (5);
 
@@ -2653,7 +2673,9 @@ function setShop() {
     shopImg.src = "./assets/shop.webp";
 
     shopTimerElement = document.createElement("div");
+    shopTimerElement.classList.add("flex-column");
     shopTimerElement.classList.add("store-timer");
+    shopTimerElement.classList.add("background-image-cover");
     shopTimerElement.id = "shop-timer"
     let currentMin = localStorage.getItem("shopStartMinute");
     let startOfYear = new Date('2022-01-01T00:00:00');
@@ -2679,13 +2701,16 @@ function setShop() {
     }
 
     let shopDialogueDiv = document.createElement("div");
+    shopDialogueDiv.classList.add("flex-row");
     shopDialogueDiv.classList.add("store-dialog");
 
     let shopDialogueButton = document.createElement("div");
+    shopDialogueButton.classList.add("flex-row");
     shopDialogueButton.classList.add("store-buy");
     shopDialogueButton.innerText = "Confirm Purchase";
     shopDialogueButton.id = "shop-confirm";
     let shopDialogueText = document.createElement("div");
+    shopDialogueText.classList.add("flex-column");
     shopDialogueText.id = "table7-text";
 
     shopDialogueDiv.append(shopDialogueText,shopDialogueButton)
@@ -2787,6 +2812,7 @@ function confirmPurchase(shopCost,id) {
 
 function createShopItems(shopDiv, i, inventoryNumber) {
     let shopButton = document.createElement("div");
+    shopButton.classList.add("flex-column");
     shopButton.classList.add("shop-button");
     let inventoryTemp = Inventory[inventoryNumber];
 
@@ -2794,6 +2820,7 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopButtonImage.src = "./assets/tooltips/inventory/"+ inventoryTemp.File+ ".webp";
 
     let shopButtonImageContainer = document.createElement("div");
+    shopButtonImageContainer.classList.add("flex-column");
     shopButtonImageContainer.classList.add("shop-button-container")
     shopButtonImageContainer.style.background = "url(./assets/frames/background-" +inventoryTemp.Star+ ".webp)";
     shopButtonImageContainer.style.backgroundSize = "cover";
@@ -2801,6 +2828,7 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
     
     let shopButtonText = document.createElement("div");
+    shopButtonText.classList.add("flex-row");
     shopButtonText.classList.add("shop-button-text");
 
     let shopCost = 0;
@@ -2937,10 +2965,12 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
 // POP UPS FOR SPECIAL CURRENCY
 function currencyPopUp(type1, amount1, type2, amount2) {
     let currencyPop = document.createElement("div");
+    currencyPop.classList.add("flex-column");
     currencyPop.classList.add("currency-pop");
     currencyPop.innerText = 'Obtained';
 
     let currencyPopFirst = document.createElement("div");
+    currencyPopFirst.classList.add("flex-row");
     currencyPopFirst.classList.add("currency-pop-first");
     currencyPopFirst.innerHTML = amount1 + "   ";
     let currencyPopFirstImg = document.createElement("img");
@@ -2965,6 +2995,7 @@ function currencyPopUp(type1, amount1, type2, amount2) {
     currencyPop.append(currencyPopFirst);
     if (type2 !== undefined) {
         let currencyPopSecond = document.createElement("div");
+        currencyPopSecond.classList.add("flex-row");
         currencyPopSecond.classList.add("currency-pop-first");
         currencyPopSecond.innerHTML = amount2 + "   ";
 
