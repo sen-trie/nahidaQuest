@@ -10,7 +10,8 @@ const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and G
 // START SCREEN 
 var mainBody = document.getElementById("game");   
 let startText = document.getElementById("start-screen"); 
-let versionText = document.getElementById("vers-number"); 
+let versionText = document.getElementById("vers-number");
+let startAlready = false;
 versionText.innerText = VERSIONNUMBER;
 versionText.classList.add("version-text");
 
@@ -23,8 +24,11 @@ deleteButton.addEventListener("click",()=> {
     if (localStorage.getItem("settingsValues") !== null) {
         deleteConfirmMenu("intro");
     } else {
-        startGame();
-        setTimeout(()=>startText.remove(),100);
+        if (!startAlready) {
+            startGame();
+            startAlready = true;
+            setTimeout(()=>startText.remove(),100);
+        }
     }
 });
 
@@ -61,9 +65,12 @@ function deleteConfirmMenu(type) {
 function deleteConfirmButton(confirmed) {
     if (confirmed == true) {
         if (deleteType === "intro") {
-            localStorage.clear();
-            startGame();
-            setTimeout(()=>startText.remove(),100);
+            if (!startAlready) {
+                startAlready = true;
+                localStorage.clear();
+                startGame();
+                setTimeout(()=>startText.remove(),100);
+            }
         } else if (deleteType === "loaded") {
             localStorage.clear();
             location.reload();
@@ -79,13 +86,16 @@ if (localStorage.getItem("settingsValues") !== null) {
     let startButton = document.getElementById("start-button");
     startButton.classList.remove("dim-filter");
     startButton.addEventListener("click",()=> {
-        startGame();
+        if (!startAlready) {
+            startGame();
+            startAlready = true;
         
-        setTimeout(function() {
-            let deleteBox = document.getElementById("confirm-box");
-            if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
-            startText.remove();
-        },100)
+            setTimeout(function() {
+                let deleteBox = document.getElementById("confirm-box");
+                if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
+                startText.remove();
+            },100)
+        }
     });
 
     let startChance = randomInteger(1,11);
@@ -109,9 +119,9 @@ if (localStorage.getItem("settingsValues") !== null) {
 }
 
 mainBody = drawUI.buildGame(mainBody);
+drawUI.preloadFolders();
 
 function startGame() {
-drawUI.preloadFolders();
 // GLOBAL VARIABLES
 var saveValues;
 const ENERGYCHANCE = 500;
