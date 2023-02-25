@@ -25,8 +25,8 @@ deleteButton.addEventListener("click",()=> {
         deleteConfirmMenu("intro");
     } else {
         if (!startAlready) {
-            startGame();
             startAlready = true;
+            startGame();
             setTimeout(()=>startText.remove(),100);
         }
     }
@@ -87,8 +87,9 @@ if (localStorage.getItem("settingsValues") !== null) {
     startButton.classList.remove("dim-filter");
     startButton.addEventListener("click",()=> {
         if (!startAlready) {
-            startGame();
             startAlready = true;
+            startGame();
+            
         
             setTimeout(function() {
                 let deleteBox = document.getElementById("confirm-box");
@@ -119,7 +120,7 @@ if (localStorage.getItem("settingsValues") !== null) {
 }
 
 mainBody = drawUI.buildGame(mainBody);
-drawUI.preloadFolders();
+drawUI.preloadFolders(upgradeInfo);
 
 function startGame() {
 // GLOBAL VARIABLES
@@ -1615,7 +1616,7 @@ function loadRow() {
 
         heroButtonContainer.innerText = heroTextLoad;
         if (purchased == true) {
-            heroButtonContainer.style = "background:url(./assets/nameplates/"+upgradeInfo[loadedHeroID].Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
+            heroButtonContainer.style = "background:url(./assets/nameplates/"+upgradeInfo[loadedHeroID].Name+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
         } else {
             heroButtonContainer.classList += " not-purchased";
         }
@@ -2918,7 +2919,7 @@ function refresh() {
             
             let upgradedHeroButton = document.getElementById(arguments[0]);
             upgradedHeroButton.innerText = heroTextFirst;
-            upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeInfoTemp.Name.replace(/ /g,'')+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
+            upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeInfoTemp.Name+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
         }
         else if (arguments[0] == "hero") { // REFRESH FOR ARTIFACTS
             let hero = upgradeDict[arguments[1]];

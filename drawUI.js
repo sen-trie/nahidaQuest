@@ -261,33 +261,87 @@ function drawMailTable(table4) {
     return table4;
 }
 
-function preloadFolders() {
-    console.time("load")
-    let folderUrlArray = ["tooltips/elements","tooltips/hero","tooltips/inventory","nameplates","frames","expedbg","event","achievement","tutorial"]
-    for (let i = 0; i < folderUrlArray.length; i++) {
-        let folderUrl = folderUrlArray[i];
-        preloadImages("./assets/" + folderUrl);
+function preloadFolders(upgradeInfo) {
+    let filePath = "./assets/";
+    // SCUFFED SOLUTION AS ACCESSING FILES DOESNT WORK ON CLIENT SIDE
+    for (let key in upgradeInfo) {
+        let upgradeName = upgradeInfo[key].Name;
+        let imgOne = new Image();
+        imgOne.src = filePath + "nameplates/" + upgradeName + ".webp";
+        let imgTwo = new Image();
+        imgTwo.src = filePath + "tooltips/hero/" + upgradeName + ".webp";
     }
-    console.timeEnd("load")
+
+    let bgArray = ["achievementBG","bg","closed","dori-back","left","main-bar","middle","open","right","wish-bg","wood"];
+    for (let element of bgArray) {
+        let img = new Image();
+        img.src = filePath + "bg/" + element + ".webp";
+    }
+
+    let framesArray = ["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"];
+    for (let element of framesArray) {
+        let img = new Image();
+        img.src = filePath + "frames/" + element + ".webp";
+    }
+
+    let elementArray = ["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"]
+    for (let element of elementArray) {
+        let img = new Image();
+        img.src = filePath + "tooltips/elements/" + element + ".webp";
+    }
+
+    let eventArray = ["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"];
+    for (let element of eventArray) {
+        let img = new Image();
+        img.src = filePath + "event/" + element + ".webp";
+    }
+
+    let iconArray = ["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","verybad-1","verygood-3","event-easy","event-hard"];
+    for (let element of iconArray) {
+        let img = new Image();
+        img.src = filePath + "icon/" + element + ".webp";
+    }
+
+    let tutorialArray = ["buttonBox","eventPill","tut-button","unlockExp-3","unlockExp-4","unlockExp-5"];
+    for (let element of tutorialArray) {
+        let img = new Image();
+        img.src = filePath + "tutorial/" + element + ".webp";
+    }
+
+    let sevenArray = ["expedbg/exped","frames/background-","frames/rarity-","tutorial/aranara-"];
+    for (let element of sevenArray) {
+        preloadImage(7,element);
+    }
+
+    let eightArray = ["icon/box-","icon/good-"];
+    for (let element of eightArray) {
+        preloadImage(8,element);
+    }
+
+    let m = 0;
+    while (m < 5) {
+        let imgOne = new Image();
+        imgOne.src = filePath + "achievement/" + (m * 100) + ".webp";
+        m++;
+    }
+
+    preloadImage(4,"event/whopperflower-");
+    preloadImage(5,"icon/bad-");
+    preloadImage(5,"tutorial/tut-");
+    preloadImage(10,"event/weasel-");
+    preloadImage(21,"achievement/");
+
+    let img = new Image();
+    img.src = filePath + "loading.webp";
 }
 
-function preloadImages(folderUrl) {
-    console.log(folderUrl)
-    // PRELOAD FOLDERS
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', folderUrl, false);
-    xhr.send(null);
-    let html = xhr.responseText;
-    let parser = new DOMParser();
-    let doc = parser.parseFromString(html, 'text/html');
-    let links = doc.querySelectorAll('a');
-    for (let i = 0; i < links.length; i++) {
-        let link = links[i];
-        let href = link.getAttribute('href');
-        if (href.match(/\.webp$/)) {
-            let img = new Image();
-            img.src = href;
-        }
+function preloadImage(max,path) {
+    let filePath = "./assets/";
+    let i = 1;
+    while (i < max) {
+        let img = new Image();
+        img.src = filePath + path + i + ".webp";
+        i++;
     }
 }
 
