@@ -26,7 +26,7 @@ function buildGame(mainBody) {
     midDiv.id = "mid-div";
     midDiv.classList.add("middle-area");
     let midDivImg = document.createElement("img");
-    midDivImg.src = "./assets/bar.webp";
+    midDivImg.src = "./assets/frames/bar.webp";
     midDivImg.alt = "Middle of the Screen";
     midDivImg.classList.add("middle-bar");
 
@@ -35,10 +35,10 @@ function buildGame(mainBody) {
     energyPrimoContainer.classList.add("energy-primo-container");
     let energyContainer = document.createElement("div");
     energyContainer.classList.add("pill-value");
-    energyContainer.innerHTML = "<img class='pill' alt='' src='./assets/pill.webp'><img class='icon' alt='Energy Icon' src='./assets/icon/energyIcon.webp'><span id='energy'>0</span>";
+    energyContainer.innerHTML = "<img class='pill' alt='' src='./assets/frames/pill.webp'><img class='icon' alt='Energy Icon' src='./assets/icon/energyIcon.webp'><span id='energy'>0</span>";
     let primoContainer = document.createElement("div");
     primoContainer.classList.add("pill-value");
-    primoContainer.innerHTML = `<img class="pill" alt="" src="./assets/pill.webp"><img class="primogem icon" alt="Primogem Icon" src="./assets/icon/primogemIcon.webp"><span id="primogem">0</span>`;
+    primoContainer.innerHTML = `<img class="pill" alt="" src="./assets/frames/pill.webp"><img class="primogem icon" alt="Primogem Icon" src="./assets/icon/primogemIcon.webp"><span id="primogem">0</span>`;
     energyPrimoContainer.append(energyContainer,primoContainer)
 
     let tempBuffDiv = document.createElement("div");
@@ -63,7 +63,7 @@ function drawMainBody() {
     // LEFT DIV/AREA
     var leftDiv = document.getElementById("left-div");
     var leftImg =  document.createElement("img");
-    leftImg.src = "./assets/bg.webp";
+    leftImg.src = "./assets/bg/bg.webp";
     leftImg.classList.add("cover-all");
     leftImg.classList.add("div-img");
     leftDiv.appendChild(leftImg);
@@ -73,7 +73,7 @@ function drawMainBody() {
     let TabDiv = document.createElement("div");
     TabDiv.id = "flex-container-TAB";
     let TabDivImg = document.createElement("img");
-    TabDivImg.src = "./assets/top-bar.png";
+    TabDivImg.src = "./assets/frames/top-bar.webp";
     TabDivImg.classList.add("top-bar")
     TabDiv.appendChild(TabDivImg);
 
@@ -133,7 +133,7 @@ function drawMainBody() {
     var mainImg =  document.createElement("img");
     mainImg.classList.add("cover-all");
     mainImg.classList.add("div-img");
-    mainImg.src = "./assets/main-bar.png";
+    mainImg.src = "./assets/bg/main-bar.webp";
     rightDiv.append(TabDiv,mainTable,mainImg);
 }
 
@@ -168,14 +168,14 @@ function createExpedTable(expedDiv) {
     let expedTableImg = document.createElement("img");
     expedTableImg.classList.add("cover-all");
     expedTableImg.classList.add("exped-table-img")
-    expedTableImg.src = "./assets/tooltipEXPED.webp";
+    expedTableImg.src = "./assets/frames/tooltipEXPED.webp";
 
     let expedTable = document.createElement("div");
     expedTable.classList += "flex-column tooltipTABLEEXPED";
     let expedRow1 = document.createElement("div");
     expedRow1.id = "exped-row-1";
     let expedRowImg = document.createElement("img");
-    expedRowImg.src = "./assets/arrow.webp";
+    expedRowImg.src = "./assets/frames/arrow.webp";
     let expedRow2 = document.createElement("div");
     expedRow2.id = "exped-row-2";
 
@@ -241,12 +241,12 @@ function drawMailTable(table4) {
     mailImageContainer.classList.add("wish-mail-container");
     
     let mailImageBottom = document.createElement("img");
-    mailImageBottom.src = "./assets/closed.webp";
+    mailImageBottom.src = "./assets/bg/closed.webp";
     mailImageBottom.classList.add("cover-all");
     mailImageBottom.classList.add("wish-mail");
 
     let mailImageTop = document.createElement("img");
-    mailImageTop.src = "./assets/open.webp";
+    mailImageTop.src = "./assets/bg/open.webp";
     mailImageTop.id = "mailImageID";
     mailImageTop.classList.add("cover-all");
     mailImageTop.classList.add("wish-mail");
@@ -261,4 +261,34 @@ function drawMailTable(table4) {
     return table4;
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame }
+function preloadFolders() {
+    console.time("load")
+    let folderUrlArray = ["tooltips/elements","tooltips/hero","tooltips/inventory","nameplates","frames","expedbg","event","achievement","tutorial"]
+    for (let i = 0; i < folderUrlArray.length; i++) {
+        let folderUrl = folderUrlArray[i];
+        preloadImages("./assets/" + folderUrl);
+    }
+    console.timeEnd("load")
+}
+
+function preloadImages(folderUrl) {
+    console.log(folderUrl)
+    // PRELOAD FOLDERS
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', folderUrl, false);
+    xhr.send(null);
+    let html = xhr.responseText;
+    let parser = new DOMParser();
+    let doc = parser.parseFromString(html, 'text/html');
+    let links = doc.querySelectorAll('a');
+    for (let i = 0; i < links.length; i++) {
+        let link = links[i];
+        let href = link.getAttribute('href');
+        if (href.match(/\.webp$/)) {
+            let img = new Image();
+            img.src = href;
+        }
+    }
+}
+
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders }

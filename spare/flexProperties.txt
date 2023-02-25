@@ -60,17 +60,20 @@ flex-direction
 
 
 ------------------------ COVER ALL
+.classList.add("cover-all");
 
 
 
-
-
-
-
-
-
-
-
+.div-img 
+#start-screen
+#loading
+#prevent-clicker 
+.event-dark
+#demo
+.tutorial-dark
+.exped-table-img
+.wish-button-img
+.wish-mail
 
 
 

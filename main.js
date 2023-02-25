@@ -1,10 +1,10 @@
 import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo } from "./defaultData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys } from "./functions.js"
-import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
+import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-25-2"
-const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse."
+const VERSIONNUMBER = "v0.2.BETA-25-2";
+const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
@@ -26,9 +26,7 @@ deleteButton.addEventListener("click",()=> {
         startGame();
         setTimeout(()=>startText.remove(),100);
     }
-    
 });
-
 
 let confirmationBox = document.createElement("div");
 confirmationBox.classList.add("confirm-box");
@@ -57,7 +55,6 @@ function deleteConfirmMenu(type) {
     } else {
         deleteBox.style.zIndex = -1;
     }
-
     deleteType = type;
 }
 
@@ -94,26 +91,27 @@ if (localStorage.getItem("settingsValues") !== null) {
     let startChance = randomInteger(1,11);
     if (startChance === 1) {
         let startIdle = document.createElement("img");
-        startIdle.src = "./assets/start-idle.webp";
+        startIdle.src = "./assets/icon/nahida-start.webp";
         startIdle.id = "start-idle-nahida";
         startText.append(startIdle);
     } else if (startChance === 2) {
         let startIdle = document.createElement("img");
-        startIdle.src = "./assets/shop.webp";
+        startIdle.src = "./assets/icon/shop-start.webp";
         startIdle.id = "start-idle-dori";
         startText.append(startIdle);
     } else if (startChance === 3) {
         let startIdle = document.createElement("img");
-        startIdle.src = "./assets/scara.webp";
+        startIdle.src = "./assets/icon/scara-start.webp";
         startIdle.id = "start-idle-scara";
         startText.style.backgroundImage = "url(./assets/start-night.webp)";
         startText.append(startIdle);
     }
 }
 
-mainBody = buildGame(mainBody);
+mainBody = drawUI.buildGame(mainBody);
 
 function startGame() {
+drawUI.preloadFolders();
 // GLOBAL VARIABLES
 var saveValues;
 const ENERGYCHANCE = 500;
@@ -164,7 +162,7 @@ var midDiv = document.getElementById("mid-div");
 var multiplierButtonContainer;
 
 // MAIN BODY VARIABLES
-drawMainBody();
+drawUI.drawMainBody();
 
 var table1 = document.getElementById("table1");
 var table2 = document.getElementById("table2");
@@ -203,7 +201,7 @@ saveValues["realScore"]--;
 
 createMultiplierButton();
 createExpedition();
-createExpedTable(expedTooltip);
+drawUI.createExpedTable(expedTooltip);
 table3.appendChild(expedTooltip);
 expedInfo("exped-7")
 
@@ -411,7 +409,7 @@ demoContainer.addEventListener("mouseup", () => {
     leftDiv.appendChild(img);
 });
 
-demoFunction(demoContainer,demoImg);
+drawUI.demoFunction(demoContainer,demoImg);
 demoContainer.appendChild(demoImg);
 
 // ROLL FOR ENERGY
@@ -474,9 +472,9 @@ function startRandomEvent() {
     let eventPictureImg = document.createElement("img");
     eventPictureImg.classList.add("event-pic-img");
     if (aranaraNumber < 4) {
-        eventPictureImg.src = "./assets/event-easy.webp";
+        eventPictureImg.src = "./assets/icon/event-easy.webp";
     } else {
-        eventPictureImg.src = "./assets/event-hard.webp";
+        eventPictureImg.src = "./assets/icon/event-hard.webp";
         eventPictureImg.classList.add("vibrate-more");
     }
     eventPicture.appendChild(eventPictureImg);
@@ -1588,7 +1586,7 @@ function loadRow() {
         }
 
         let heroID = "but-" + j;
-        let heroButtonContainer = createHeroButtonContainer(heroID);
+        let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
         
         heroButtonContainer.addEventListener("click", () => {
             changeTooltip(upgradeInfo[loadedHeroID], "hero",loadedHeroID);
@@ -1635,7 +1633,7 @@ function addNewRow() {
 
             
             let heroID = "but-" + saveValues["rowCount"];
-            let heroButtonContainer = createHeroButtonContainer(heroID);
+            let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
             saveValues["rowCount"]++;
 
             heroButtonContainer.addEventListener("click", () => {
@@ -2265,11 +2263,11 @@ function drawWish() {
     wishButtonText.classList += " flex-row wish-button-text";
     wishButtonText.innerText = "???";
 
-    table4 = drawMailTable(table4);
+    table4 = drawUI.drawMailTable(table4);
 
     let mailImageDiv = document.getElementById("mail-image-div");
     let wishButtonImg = document.createElement("img");
-    wishButtonImg.src = "./assets/wishButton.webp";
+    wishButtonImg.src = "./assets/frames/wishButton.webp";
     wishButtonImg.classList += " wish-button-img cover-all";
     wishButton.append(wishButtonImg,wishButtonText)
     mailImageDiv.append(wishButton);
@@ -2425,7 +2423,7 @@ function popAchievement(achievement,loading) {
         saveValues["primogem"] += 20;
 
         if (timerSeconds !== 0) {
-            var achievementPopUp = createAchievement(achievementText,achievementDesc);
+            var achievementPopUp = drawUI.createAchievement(achievementText,achievementDesc);
             achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
             achievementPopUp.addEventListener('animationend', () => {achievementPopUp.remove()});
             leftDiv.appendChild(achievementPopUp);
@@ -2436,7 +2434,7 @@ function popAchievement(achievement,loading) {
 
     //  ^^^ TEMP ACHIEVEMENT | PERMANENT ACHIEVEMENT vvv
     
-    let achievementStored = storeAchievement(achievementText,achievementDesc,achievementID);
+    let achievementStored = drawUI.storeAchievement(achievementText,achievementDesc,achievementID);
     table5.appendChild(achievementStored); 
     sortList("table5");
 }
@@ -2670,7 +2668,7 @@ function addShop() {
 function setShop() {
     table7.classList.add("table-without-tooltip");
     let shopImg = document.createElement("img");
-    shopImg.src = "./assets/shop.webp";
+    shopImg.src = "./assets/icon/shop-start.webp";
 
     shopTimerElement = document.createElement("div");
     shopTimerElement.classList.add("flex-column");

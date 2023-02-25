@@ -7,7 +7,7 @@
 
 html,body {
     height: 100%;
-    cursor: url(./assets/icon/cursor.png), auto;
+    cursor: url(./assets/icon/cursor.webp), auto;
 }
 
 img {  
@@ -121,7 +121,7 @@ img {
 
 .overlay {
     position: absolute;
-    background: url(./assets/wood.webp);
+    background: url(./assets/bg/wood.webp);
     background-size:cover;
     z-index: 10000;
 }
@@ -160,12 +160,8 @@ body {
     justify-content: center;
 }
 
-table {
-    cursor: url(./assets/icon/cursor.png), auto;
-}
-
-button {
-    cursor: url(./assets/icon/cursor.png), auto
+table, button {
+    cursor: url(./assets/icon/cursor.webp), auto;
 }
 
 .score-container {
@@ -1534,7 +1530,7 @@ input[type="range"]:focus::-moz-range-thumb{
 } 
 
 .not-purchased {
-    background: url(./assets/button.webp) center center / 100% no-repeat;
+    background: url(./assets/frames/button.webp) center center / 100% no-repeat;
     background-size: contain;
 }
 
@@ -1787,7 +1783,7 @@ input[type="range"]:focus::-moz-range-thumb{
     z-index: 1;
     display: flex;
     flex-direction: column;
-    background: url(./assets/wish-bg.webp);
+    background: url(./assets/bg/wish-bg.webp);
     background-position: center;
     background-size: cover;
 }
@@ -1869,7 +1865,7 @@ input[type="range"]:focus::-moz-range-thumb{
 /*/////////////////////////////// ACHIEVEMENT (TABLE5) CSS ///////////////////////////////*/
 #table5-container {
     font-size: 10;
-    background: url(./assets/achievementBG.webp);
+    background: url(./assets/bg/achievementBG.webp);
     background-size:cover;
     display: flex;
     justify-content: center;
@@ -1881,7 +1877,7 @@ input[type="range"]:focus::-moz-range-thumb{
     position: absolute;
     width: 90%;
     height: 90%;
-    background:url(./assets/left.webp), url(./assets/middle.webp), url(./assets/right.webp);
+    background:url(./assets/bg/left.webp), url(./assets/bg/middle.webp), url(./assets/bg/right.webp);
     background-repeat: no-repeat;
     background-position: left, center, right;
     background-size: auto 100%, 90% 100%, auto 100%;
@@ -1912,7 +1908,7 @@ input[type="range"]:focus::-moz-range-thumb{
     width:90%;
     height:10%;
     text-align: center;
-    background:url(./assets/achievement.png);
+    background:url(./assets/frames/achievement-temp.webp);
     animation: fadeOut 3s cubic-bezier(.93,-0.24,.93,.81) forwards;
 }
 
@@ -1963,7 +1959,7 @@ input[type="range"]:focus::-moz-range-thumb{
     font-family: 'gi-font';
     color: #5b4e32;
     text-align: center;
-    background-image: url(./assets/achievement.webp);
+    background-image: url(./assets/frames/achievement.webp);
     background-size: 100%;
     background-position: center center;
 }
@@ -2093,7 +2089,7 @@ input[type="range"]:focus::-moz-range-thumb{
     width: 100%;
     height: 100%;
     content: '';
-    background-image: url(./assets/dori-back.webp);
+    background-image: url(./assets/bg/dori-back.webp);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -2112,7 +2108,7 @@ input[type="range"]:focus::-moz-range-thumb{
 .store-timer {
     width: 50%;
     height: 12%;
-    background-image: url(./assets/dori-deals.webp);
+    background-image: url(./assets/frames/dori-deals.webp);
     color: #4e363c;
 }
 

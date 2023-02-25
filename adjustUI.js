@@ -86,4 +86,4 @@ function volumeScrollerAdjust(volumeScroller) {
     return volumeScroller;
 }
 
-export {inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust};
+export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust };
