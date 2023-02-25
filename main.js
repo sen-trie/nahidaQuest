@@ -1,13 +1,14 @@
 import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo } from "./defaultData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText } from "./functions.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys } from "./functions.js"
 import { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame } from "./drawUI.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-22-2"
-const COPYRIGHT = "DISCLAIMER© HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse."
+const VERSIONNUMBER = "v0.2.BETA-25-2"
+const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse."
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
+var mainBody = document.getElementById("game");   
 let startText = document.getElementById("start-screen"); 
 let versionText = document.getElementById("vers-number"); 
 versionText.innerText = VERSIONNUMBER;
@@ -19,17 +20,75 @@ copyrightText.classList.add("copyright-text");
 
 let deleteButton = document.getElementById("start-delete");
 deleteButton.addEventListener("click",()=> {
-    localStorage.clear();
-    startGame();
-    startText.remove();
+    if (localStorage.getItem("settingsValues") !== null) {
+        deleteConfirmMenu("intro");
+    } else {
+        startGame();
+        setTimeout(()=>startText.remove(),100);
+    }
+    
 });
+
+
+let confirmationBox = document.createElement("div");
+confirmationBox.classList.add("confirm-box");
+confirmationBox.style.zIndex = -1;
+confirmationBox.id = "confirm-box";
+confirmationBox.innerText = "Are you sure? Deleting your save cannot be undone.";
+
+let confirmationBoxButton = document.createElement("div");
+confirmationBoxButton.classList.add("confirm-button-div");
+let confirmDeleteButton = document.createElement("button");
+confirmDeleteButton.innerText = "Confirm";
+confirmDeleteButton.addEventListener("click",()=>deleteConfirmButton(true));
+let cancelDeleteButton = document.createElement("button");
+cancelDeleteButton.innerText = "Cancel";
+cancelDeleteButton.addEventListener("click",()=>deleteConfirmButton(false));
+
+confirmationBoxButton.append(confirmDeleteButton,cancelDeleteButton)
+confirmationBox.appendChild(confirmationBoxButton)
+mainBody.appendChild(confirmationBox);
+
+let deleteType;
+function deleteConfirmMenu(type) {
+    let deleteBox = document.getElementById("confirm-box");
+    if (deleteBox.style.zIndex == -1) {
+        deleteBox.style.zIndex = 1000;
+    } else {
+        deleteBox.style.zIndex = -1;
+    }
+
+    deleteType = type;
+}
+
+function deleteConfirmButton(confirmed) {
+    if (confirmed == true) {
+        if (deleteType === "intro") {
+            localStorage.clear();
+            startGame();
+            setTimeout(()=>startText.remove(),100);
+        } else if (deleteType === "loaded") {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+        
+    let deleteBox = document.getElementById("confirm-box");
+    if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+    return;
+}
 
 if (localStorage.getItem("settingsValues") !== null) {
     let startButton = document.getElementById("start-button");
     startButton.classList.remove("dim-filter");
     startButton.addEventListener("click",()=> {
         startGame();
-        startText.remove();
+        
+        setTimeout(function() {
+            let deleteBox = document.getElementById("confirm-box");
+            if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+            startText.remove();
+        },100);
     });
 
     let startChance = randomInteger(1,11);
@@ -52,7 +111,6 @@ if (localStorage.getItem("settingsValues") !== null) {
     }
 }
 
-var mainBody = document.getElementById("game");    
 mainBody = buildGame(mainBody);
 
 function startGame() {
@@ -77,7 +135,7 @@ const STARTINGWISHFACTOR = 50;
 var wishMultiplier = 0;
 var adventureType = 0;
 var goldenNutUnlocked = false;
-const EVENTCOOLDOWN = 20;
+const EVENTCOOLDOWN = 10;
 const SHOPCOOLDOWN = 60;
 
 // ACHIEVEMENT THRESHOLDS
@@ -168,7 +226,10 @@ var eventElement = new Audio("./assets/sfx/event.mp3");
 var reactionStartElement = new Audio("./assets/sfx/timestart.mp3");
 var reactionCorrectElement = new Audio("./assets/sfx/timesup.mp3");
 var weaselBurrow = new Audio("./assets/sfx/weasel-pop.mp3");
-var sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement,reactionStartElement,reactionCorrectElement,weaselBurrow];
+var weaselDecoy = new Audio("./assets/sfx/weasel-decoy.mp3");
+var adventureElement = new Audio("./assets/sfx/adventure.mp3");
+var shopElement = new Audio("./assets/sfx/dori-buy.mp3");
+var sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement,reactionStartElement,reactionCorrectElement,weaselBurrow,weaselDecoy,adventureElement,shopElement];
 
 var timerLoad = setInterval(timerEventsLoading,50);
 var timer = setInterval(timerEvents,1000000);
@@ -227,14 +288,7 @@ function timerSave(timerSeconds) {
     // SAVES EVERY 3 MINUTES
     let saveTimeMin = 180 * savedTimes;
     if (timerSeconds > saveTimeMin) {
-        saveData();
-        let saveCurrently = document.createElement("img");
-        saveCurrently.src = "./assets/settings/saving.webp";
-        saveCurrently.id = "currently-saving";
-        saveCurrently.addEventListener("animationend", ()=> {
-            saveCurrently.remove();
-        })
-        mainBody.append(saveCurrently);
+        saveData();        
         console.log("Saved!");
         savedTimes++;
     }
@@ -248,6 +302,7 @@ function loadSaveData() {
     } else {
         let settingsTemp = localStorage.getItem("settingsValues");
         settingsValues = JSON.parse(settingsTemp)
+        updateObjectKeys(settingsValues,SettingsDefault)
     }
     // LOAD VALUES DATA
     if (localStorage.getItem("saveValuesSave") == null) {
@@ -255,6 +310,7 @@ function loadSaveData() {
     } else {
         let saveValuesTemp = localStorage.getItem("saveValuesSave");
         saveValues = JSON.parse(saveValuesTemp)
+        updateObjectKeys(saveValues,saveValuesDefault)
     }
     // LOAD HEROES DATA
     if (localStorage.getItem("upgradeDictSave") == null) {
@@ -285,6 +341,7 @@ function loadSaveData() {
     } else {
         let expeditionDictTemp = localStorage.getItem("expeditionDictSave");
         expeditionDict = JSON.parse(expeditionDictTemp)
+        updateObjectKeys(expeditionDict,expeditionDictDefault)
     }
     // LOAD ACHIEVEMENT DATA
     achievementList = achievementListDefault;
@@ -382,7 +439,6 @@ function randomEventTimer(timerSeconds) {
         if (Math.ceil(upperLimit) >= eventChance) {
             eventChance = 0;
             eventTimes++;
-            // console.log("Event started!");
             startRandomEvent();
         }
         return;
@@ -408,6 +464,7 @@ function startRandomEvent() {
     eventPicture.addEventListener("click", () => {
         clickedEvent(aranaraNumber);
         eventPicture.remove();
+        toggleSettings(true);
     });
 
     setTimeout(() => {eventPicture.remove()}, 8000);
@@ -828,12 +885,15 @@ function weaselEvent() {
 
     let weaselTimerDiv = document.createElement("div");
     weaselTimerDiv.classList.add("weasel-timer-div");
+    
     let weaselTimer = document.createElement("div");
     weaselTimer.classList.add("weasel-timer");
+    let weaselCountText = document.createElement("p");
+    weaselCountText.id = "visible-weasel-count";
+    weaselCountText.innerText = weaselCount;
     let weaselClock = document.createElement("img");
     weaselClock.src = "./assets/icon/hourglass.webp"
     weaselClock.classList.add("weasel-hourglass");
-
     let weaselTimerOutline = document.createElement("img");
     weaselTimerOutline.src = "./assets/event/timer-bar.webp";
     weaselTimerOutline.classList.add("weasel-outline");
@@ -844,7 +904,7 @@ function weaselEvent() {
         let eventText = `You caught ${weaselCount} weasel thieves!`;
         if (weaselCount > 0) {eventOutcome(eventText,eventBackdrop,"weasel",weaselCount);}
     })
-    weaselTimer.append(weaselTimerImage,weaselTimerOutline);
+    weaselTimer.append(weaselTimerImage,weaselTimerOutline,weaselCountText);
 
     weaselTimerDiv.append(weaselTimer,weaselClock)
     eventBackdrop.append(weaselBack,weaselTimerDiv);
@@ -874,6 +934,8 @@ function addWeasel(weaselBack,delay) {
                 }
                 clearWeasel(weaselBack,delay);
                 weaselCount++;
+                let weaselCountText = document.getElementById("visible-weasel-count");
+                weaselCountText.innerText = weaselCount;
             })
         } else {
             let emptyWeasel = randomInteger(7,11);
@@ -898,7 +960,11 @@ function addWeasel(weaselBack,delay) {
         let springInterval = (randomInteger(15,35) / 100)
         weaselImage.classList.add("spring");
         weaselImage.style["animation-duration"] = springInterval + "s";
-        weaselImage.addEventListener("click",()=>{clearWeasel(weaselBack,delay)})
+        weaselImage.addEventListener("click",()=> {
+            weaselDecoy.load();
+            weaselDecoy.play();
+            clearWeasel(weaselBack,delay);
+        })
     }
 }
 
@@ -960,7 +1026,7 @@ function rainEvent() {
         var img = document.createElement("img");
         if (type >= 95 && goldenNutUnlocked === true && tempGolden <= 5) {
             img.src = "./assets/icon/goldenIcon.webp";
-            animation = `rain-rotate ${(randomInteger(3,6)/2)}s linear forwards`
+            animation = `rain-rotate ${(randomInteger(6,10)/2)}s linear forwards`
             img.addEventListener('click', () => {
                 img.remove();
                 tempGolden++;
@@ -978,6 +1044,8 @@ function rainEvent() {
         } else if (type >= 65) {
             img.src = "./assets/icon/scarab.webp"
             img.addEventListener('click', () => {
+                weaselDecoy.load();
+                weaselDecoy.play()
                 img.remove();
                 tempScore -= 10;
                 tempScore = Math.max(0, tempScore);
@@ -1012,7 +1080,11 @@ function rainEvent() {
                 saveValues.realScore += tempScore * dpsMultiplier;
                 saveValues.primogem += tempPrimogem;
                 if (tempPrimogem != 0) {
-                    currencyPopUp("primogem",tempPrimogem,"nuts",tempGolden);
+                    if (tempGolden == 0) {
+                        currencyPopUp("primogem",tempPrimogem);
+                    } else {
+                        currencyPopUp("primogem",tempPrimogem,"nuts",tempGolden);
+                    }
                 }
         }),8000})
     }, 28000);
@@ -1046,6 +1118,7 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
             amount = randomInteger(20,60);
         } else {
             innerText += `\n Catch more to get a reward!`;
+            amount = 0;
         }
     } else if (type == "reaction") {
         outcomeDelay = 0;
@@ -1065,7 +1138,7 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
                 if (type === "primogem") {
                     currencyPopUp("primogem",amount);
                 } else if (type === "weasel") {
-                    currencyPopUp("primogem",amount);
+                    if (amount > 0) {currencyPopUp("primogem",amount)}
                 } else if (type === "box") {
                     if (amount < 10 && amount > 0) {
                         saveValues.goldenNut += amount;
@@ -1178,6 +1251,17 @@ function tutorial() {
 }
 
 function saveData() {
+    if (!document.getElementById("currently-saving")) {
+        let saveCurrently = document.createElement("img");
+        saveCurrently.src = "./assets/settings/saving.webp";
+        saveCurrently.id = "currently-saving";
+        saveCurrently.addEventListener("animationend", ()=> {
+            saveCurrently.remove();
+        });
+        mainBody.append(saveCurrently);
+    }
+
+
     let settingsSaved = {
         bgmVolume:bgmElement.volume,
         sfxVolume:tabElement.volume,
@@ -1303,7 +1387,6 @@ function tabChange(x) {
 }
 
 // SETTINGS MENU - SAVES & VOLUME CONTROL
-var settingsOpen = false;
 function settings() {
     // JUST THE BUTTON FOR SETTING MENU
     let settingButton = document.createElement("button");
@@ -1312,25 +1395,11 @@ function settings() {
     settingButtonImg.src = "./assets/settings/settings-logo.webp";
     settingButtonImg.classList.add("settings-button-img")
     settingButton.appendChild(settingButtonImg);
-    settingButton.addEventListener("click", () => {
-        if (settingsOpen == false) {
-            settingsMenu.style.zIndex = 1000;
-            settingsOpen = true;
-        } else {
-            settingsMenu.style.zIndex = -1;
-            settingsOpen = false;
-        }
-    })
-    multiplierButtonContainer.prepend(settingButton);
 
     // RELATED TO SETTINGS MENU
     var settingsMenu = document.createElement("div");
     settingsMenu.id = "settings-menu";
     settingsMenu.classList.add("settings-menu");
-
-    // let settingsMenuBackground = document.createElement("img");
-    // settingsMenuBackground.classList.add("settings-menu-background");
-    // settingsMenuBackground.src = "./assets/achievementBG.webp"
 
     let settingsText = document.createElement("img");
     settingsText.classList.add("settings-text");
@@ -1352,7 +1421,6 @@ function settings() {
     volumeScrollerBGMTextImage.src = "./assets/settings/BGM.webp"
     volumeScrollerBGMText.appendChild(volumeScrollerBGMTextImage)
     volumeScrollerBGMContainer.append(volumeScrollerBGMText,volumeScrollerBGM);
-    
 
     let volumeScrollerSFXContainer = document.createElement("div");
     volumeScrollerSFXContainer.classList.add("volume-scroller-container-children");
@@ -1367,9 +1435,7 @@ function settings() {
     volumeScrollerSFXTextImage.src = "./assets/settings/SFX.webp"
     volumeScrollerSFXText.appendChild(volumeScrollerSFXTextImage)
     volumeScrollerSFXContainer.append(volumeScrollerSFXText,volumeScrollerSFX);
-
     volumeScrollerContainer.append(volumeScrollerBGMContainer,volumeScrollerSFXContainer)
-
 
     let settingsBottom = document.createElement("div");
     settingsBottom.classList.add("settings-bottom");
@@ -1398,12 +1464,32 @@ function settings() {
 
     var clearSetting = document.createElement("button");
     clearSetting.classList.add("setting-clear");
-    clearSetting.addEventListener("click",() => {localStorage.clear();location.reload()})
+    clearSetting.addEventListener("click",() => {deleteConfirmMenu("loaded")})
 
     settingsBottomRight.append(infoSetting,saveSetting,clearSetting)
-
     settingsMenu.append(settingsText, volumeScrollerContainer, settingsBottom);
     mainBody.appendChild(settingsMenu);
+
+    settingButton.addEventListener("click", () => {
+        toggleSettings();
+        let deleteBox = document.getElementById("confirm-box");
+        if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+    })
+    multiplierButtonContainer.prepend(settingButton);
+}
+
+var settingsOpen = false;
+function toggleSettings(closeOnly) {
+    let settingsMenu = document.getElementById("settings-menu");
+    if (settingsOpen == true) {
+        settingsMenu.style.zIndex = -1;
+        settingsOpen = false;
+    } else {
+        if (closeOnly !== true) {
+            settingsMenu.style.zIndex = 1000;
+            settingsOpen = true;
+        }
+    }
 }
 
 function settingsVolume() {
@@ -1890,7 +1976,12 @@ function foodButton(type) {
 // EXPEDITION MECHANICS
 const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
 function adventure(type) {
-    if (type == 10) {
+    if (type !== 10 && saveValues["energy"] >= ADVENTURECOSTS[type]) {
+        adventureElement.load();
+        adventureElement.play();
+    }
+
+    if (type === 10) {
         if (expeditionDict[5].Locked !== '1') {
             type = 5;
         }
@@ -1903,7 +1994,7 @@ function adventure(type) {
             type = 2;
         }
         saveValues["energy"] += ADVENTURECOSTS[type];
-    } else if (expeditionDict[type].Locked == '1'){
+    } else if (expeditionDict[type].Locked === '1'){
         return;  
     }
     if (saveValues["energy"] >= ADVENTURECOSTS[type]){
@@ -2504,7 +2595,12 @@ function tooltipFunction() {
         return;
     } else if (tooltipTable == 2) {
         if (itemTooltip === -1) {return}
+        if (timerSeconds !== 0) {
+            upgradeElement.load();
+            upgradeElement.play();
+        }
         itemUse(itemTooltip);
+        
         let itemButton = document.getElementById(itemTooltip);
         let inventoryCount = InventoryMap.get(itemTooltip);
         inventoryCount--;
@@ -2670,6 +2766,8 @@ function confirmPurchase(shopCost,id) {
     let dialog = document.getElementById("table7-text");
     if (saveValues.primogem >= shopCost) {
         id = id.split("-")[2];
+        shopElement.load();
+        shopElement.play();
         newPop(1)
         inventoryAdd(id);
         sortList("table2");
@@ -2844,7 +2942,7 @@ function currencyPopUp(type1, amount1, type2, amount2) {
 
     let currencyPopFirst = document.createElement("div");
     currencyPopFirst.classList.add("currency-pop-first");
-    currencyPopFirst.innerText = amount1;
+    currencyPopFirst.innerHTML = amount1 + "   ";
     let currencyPopFirstImg = document.createElement("img");
 
     if (type1 == "energy") {
@@ -2868,7 +2966,7 @@ function currencyPopUp(type1, amount1, type2, amount2) {
     if (type2 !== undefined) {
         let currencyPopSecond = document.createElement("div");
         currencyPopSecond.classList.add("currency-pop-first");
-        currencyPopSecond.innerText = amount2;
+        currencyPopSecond.innerHTML = amount2 + "   ";
 
         let currencyPopSecondImg = document.createElement("img");
         if (type2 == "energy") {
@@ -2887,6 +2985,7 @@ function currencyPopUp(type1, amount1, type2, amount2) {
             saveValues.goldenNut += amount2;
         }
 
+        currencyPop.style.height = "13%"
         currencyPopFirst.style.height = "30%";
         currencyPopSecond.style.height = "30%";
         currencyPopSecond.append(currencyPopSecondImg);

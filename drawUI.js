@@ -9,7 +9,6 @@ function buildGame(mainBody) {
     loadingGif.classList.add("overlay-tutorial");
     loadingDiv.appendChild(loadingGif);
 
-
     let leftDiv = document.createElement("div");
     leftDiv.id = "left-div";
     leftDiv.classList.add("left-area");
@@ -19,7 +18,6 @@ function buildGame(mainBody) {
     let demoContainer = document.createElement("div");
     demoContainer.id = "demo-container";
     leftDiv.append(scoreDiv,demoContainer)
-
 
     let midDiv = document.createElement("div");
     midDiv.id = "mid-div";
@@ -55,9 +53,6 @@ function buildGame(mainBody) {
     mainBody.append(loadingDiv,leftDiv,midDiv,rightDiv);
     return mainBody;
 }
-
-
-
 
 // MAIN BODY GUI
 function drawMainBody() {

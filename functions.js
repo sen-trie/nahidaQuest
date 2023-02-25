@@ -103,6 +103,16 @@ function countdownText(foodCooldown, int) {
     return foodCooldown;
 }
 
+// CHECKS FOR MISSING KEYS BETWEEN OBJECTS
+function updateObjectKeys(savedObject,referenceObject) {
+    for (let key in referenceObject) {
+        if (!savedObject.hasOwnProperty(key)) {
+            savedObject[key] = referenceObject[key];
+        }
+    }
+    return savedObject;
+}
+
 // PREVENTS AUDIO FROM BEING PLAYED TOO OFTEN
 // function audioWrapper(clickAudioDelay, element) {
 //     console.log(clickAudioDelay)
@@ -115,4 +125,4 @@ function countdownText(foodCooldown, int) {
 //     }
 
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText};
+export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys};
