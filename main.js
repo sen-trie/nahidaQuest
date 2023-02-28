@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-25-2";
+const VERSIONNUMBER = "v0.2.BETA-28-2";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -22,7 +22,7 @@ copyrightText.classList.add("copyright-text");
 let deleteButton = document.getElementById("start-delete");
 deleteButton.addEventListener("click",()=> {
     if (localStorage.getItem("settingsValues") !== null) {
-        deleteConfirmMenu("intro");
+        deleteConfirmMenu("toggle","intro");
     } else {
         if (!startAlready) {
             startAlready = true;
@@ -47,19 +47,26 @@ let cancelDeleteButton = document.createElement("button");
 cancelDeleteButton.innerText = "Cancel";
 cancelDeleteButton.addEventListener("click",()=>deleteConfirmButton(false));
 
-confirmationBoxButton.append(confirmDeleteButton,cancelDeleteButton)
-confirmationBox.appendChild(confirmationBoxButton)
+confirmationBoxButton.append(confirmDeleteButton,cancelDeleteButton);
+confirmationBox.appendChild(confirmationBoxButton);
 mainBody.appendChild(confirmationBox);
 
 let deleteType;
-function deleteConfirmMenu(type) {
+function deleteConfirmMenu(type,location) {
     let deleteBox = document.getElementById("confirm-box");
-    if (deleteBox.style.zIndex == -1) {
-        deleteBox.style.zIndex = 1000;
-    } else {
-        deleteBox.style.zIndex = -1;
+    deleteType = location;
+    if (type == "toggle") {
+        if (deleteBox.style.zIndex == -1) {
+            deleteBox.style.zIndex = 1000;
+        } else {
+            deleteBox.style.zIndex = -1;
+        }
+    } else if (type === "close") {
+        if (deleteBox.style.zIndex !== -1) {
+            deleteBox.style.zIndex = -1;
+        } 
     }
-    deleteType = type;
+    
 }
 
 function deleteConfirmButton(confirmed) {
@@ -89,7 +96,6 @@ if (localStorage.getItem("settingsValues") !== null) {
         if (!startAlready) {
             startAlready = true;
             startGame();
-            
         
             setTimeout(function() {
                 let deleteBox = document.getElementById("confirm-box");
@@ -119,10 +125,13 @@ if (localStorage.getItem("settingsValues") !== null) {
     }
 }
 
-mainBody = drawUI.buildGame(mainBody);
-drawUI.preloadFolders(upgradeInfo);
+setTimeout(()=>{
+    mainBody = drawUI.buildGame(mainBody);
+    mainBody.style.display = "block";
+},100)
 
 function startGame() {
+drawUI.preloadFolders(upgradeInfo);
 // GLOBAL VARIABLES
 var saveValues;
 const ENERGYCHANCE = 500;
@@ -139,7 +148,7 @@ const XPMAX = 4004;
 const NONWISHHEROMAX = 49
 const WISHHEROMIN = 100;
 
-const WISHCOST = 600;
+const WISHCOST = 360;
 const STARTINGWISHFACTOR = 50;
 var wishMultiplier = 0;
 var adventureType = 0;
@@ -161,6 +170,8 @@ var foodBuff = 1;
 var clickerEvent = false;
 var shopTime = 0;
 var shopTimerElement = null;
+let filteredHeroes = [];
+let filteredInv = [];
 
 var demoContainer = document.getElementById("demo-container");
 var score = document.getElementById("score");
@@ -175,21 +186,19 @@ var multiplierButtonContainer;
 // MAIN BODY VARIABLES
 drawUI.drawMainBody();
 
-var table1 = document.getElementById("table1");
-var table2 = document.getElementById("table2");
-var table3 = document.getElementById("table3");
-var expedTooltip = document.getElementById("expedTooltip");
-var expedDiv = document.getElementById("expedDiv");
-var table4 = document.getElementById("table4");
-var table5 = document.getElementById("table5");
-var table5Container = document.getElementById("table5-container");
-var table6 = document.getElementById("table6");
-var table7 = document.getElementById("table7");
-var TABS = [table1,table2, table3, table4, table5Container,table7];
-var tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,tooltipWeaponImg,tooltipElementImg,table6Background;
-
-// TOOLTIPS FOR EXPEDITION
-var expedContainer = document.getElementById("table3");
+let table1 = document.getElementById("table1");
+let table2 = document.getElementById("table2");
+let filterDiv = document.getElementById("filter-button");
+let table3 = document.getElementById("table3");
+let expedTooltip = document.getElementById("expedTooltip");
+let expedDiv = document.getElementById("expedDiv");
+let table4 = document.getElementById("table4");
+let table5 = document.getElementById("table5");
+let table5Container = document.getElementById("table5-container");
+let table6 = document.getElementById("table6");
+let table7 = document.getElementById("table7");
+let TABS = [table1,table2, table3, table4, table5Container,table7];
+let tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,tooltipWeaponImg,tooltipElementImg,table6Background;
 
 // INITIAL LOADING
 var InventoryMap;
@@ -244,6 +253,7 @@ var timerLoad = setInterval(timerEventsLoading,50);
 var timer = setInterval(timerEvents,1000000);
 const timeRatio = 500;
 var timerSeconds = 0;
+createFilter();
 createTabs();
 tabChange(1);
 
@@ -474,6 +484,8 @@ function startRandomEvent() {
         clickedEvent(aranaraNumber);
         eventPicture.remove();
         toggleSettings(true);
+        let deleteBox = document.getElementById("confirm-box");
+        if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
     });
 
     setTimeout(() => {eventPicture.remove()}, 8000);
@@ -547,21 +559,24 @@ function chooseEvent(type) {
 }
 
 // EVENT 1 (ENERGY OVERLOAD)
+let clickEventDelay;
 function clickEvent() {
     let button = demoContainer.firstElementChild;
     if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")}
+    if (clickEventDelay !== null) {clearTimeout(clickEventDelay)}
     button.style.animation = "rotation-scale 3.5s infinite linear forwards";
     button.style["box-shadow"] = "inset 0em 0em 6em #93d961";
     clickerEvent = true;
     currentClick = 15 * (saveValues["dps"] + 1);
 
-    setTimeout(() => {
+    clickEventDelay = setTimeout(() => {
         if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")}
         button.style.animation = "rotation 18s infinite linear forwards";
         button.style["box-shadow"] = "";
         clickerEvent = false;
+        clickEventDelay = null;
     },30000)
-    foodButton(2)
+    foodButton(2);
 }
 
 // EVENT 2 (REACTION TIME)
@@ -876,7 +891,7 @@ function minesweeperEvent() {
     mainBody.append(eventBackdrop);
 }
 
-var weaselCount = 0;
+let weaselCount = 0;
 // EVENT 5 (WHACK-A-MOLE)
 function weaselEvent() {
     let weaselElement = 18;
@@ -926,12 +941,18 @@ function weaselEvent() {
     weaselTimerImage.classList.add("weasel-sand");
     weaselTimerImage.addEventListener("animationend",()=> {
         let eventText = `You caught ${weaselCount} weasel thieves!`;
-        if (weaselCount > 0) {eventOutcome(eventText,eventBackdrop,"weasel",weaselCount);}
+        eventOutcome(eventText,eventBackdrop,"weasel",weaselCount);
     })
-    weaselTimer.append(weaselTimerImage,weaselTimerOutline,weaselCountText);
 
+    weaselTimer.append(weaselTimerImage,weaselTimerOutline,weaselCountText);
     weaselTimerDiv.append(weaselTimer,weaselClock)
-    eventBackdrop.append(weaselBack,weaselTimerDiv);
+
+    let fakeWeaselAlert = document.createElement("div");
+    fakeWeaselAlert.id = "fake-weasel-alert";
+    fakeWeaselAlert.classList.add("flex-row");
+    fakeWeaselAlert.innerText = "Beware of the fake weasel thieves!";
+
+    eventBackdrop.append(weaselBack,weaselTimerDiv,fakeWeaselAlert);
     mainBody.append(eventBackdrop);
 }
 
@@ -985,6 +1006,9 @@ function addWeasel(weaselBack,delay) {
         weaselImage.classList.add("spring");
         weaselImage.style["animation-duration"] = springInterval + "s";
         weaselImage.addEventListener("click",()=> {
+            let fakeWeaselAlert = document.getElementById("fake-weasel-alert");
+            fakeWeaselAlert.style.animation = "none";
+            setTimeout(()=>{fakeWeaselAlert.style.animation = "fadeOutWeasel 3s linear forwards"},10)
             weaselDecoy.load();
             weaselDecoy.play();
             clearWeasel(weaselBack,delay);
@@ -1299,7 +1323,6 @@ function saveData() {
 
     if (table7.innerHTML != "") {
         let savedTable7 = (table7.innerHTML).replace('shadow-pop-tr','')
-        savedTable7 = savedTable7.replace(/<div id="table7-text.*</i,'<div id="table7-text" class="flex-column">Welcome Back!</div><div class="flex-row store-buy" id="shop-confirm">Confirm Purchase</div><')
         localStorage.setItem("storeInventory",JSON.stringify(savedTable7));
     }
 }
@@ -1380,27 +1403,35 @@ function tabChange(x) {
     clearTooltip();
     x--;
     TABS[x].style.display = "flex";
+    filterDiv.style.display = "none";
+    table6.style.display = "none";
+    let filterMenuOne = document.getElementById("filter-menu-one");
+    if (filterMenuOne.style.display !== "none") {filterMenuOne.style.display = "none"};
+    let filterMenuTwo = document.getElementById("filter-menu-two");
+    if (filterMenuTwo.style.display !== "none") {filterMenuTwo.style.display = "none"};
 
     if (x == 0) {
-        table6.style.display = "flex";
+        if (filterDiv.style.display !== "flex") {filterDiv.style.display = "flex"};
+        if (table6.style.display !== "flex") {table6.style.display = "flex"};
         tooltipTable = 1;
+        updateFilter(filteredHeroes);
         if (document.getElementById("tool-tip-button")) {
             let tooltipButtonText = document.getElementById("tool-tip-button");
             tooltipButtonText.innerText = "Purchase";
         }
     } else if (x == 1){
+        if (filterDiv.style.display !== "flex") {filterDiv.style.display = "flex"};
+        if (table6.style.display !== "flex") {table6.style.display = "flex"};
         table6.style.display = "flex";  
         tooltipTable = 2;
+        updateFilter(filteredInv);
         if (document.getElementById("tool-tip-button")) {
             let tooltipButtonText = document.getElementById("tool-tip-button");
             tooltipButtonText.innerText = "Use";
         }
     } else if (x == 5) {
-        table6.style.display = "none";
         let dialog = document.getElementById("table7-text");
         dialog.innerText = "Welcome! Feel free to have a look. I'll even help package up your purchase, free of charge."
-    } else {
-        table6.style.display = "none";
     }
 
     if (x != 3 && wishCounter != saveValues["wishCounterSaved"]) {
@@ -1489,7 +1520,7 @@ function settings() {
 
     var clearSetting = document.createElement("button");
     clearSetting.classList.add("setting-clear");
-    clearSetting.addEventListener("click",() => {deleteConfirmMenu("loaded")})
+    clearSetting.addEventListener("click",() => {deleteConfirmMenu("toggle","loaded")})
 
     settingsBottomRight.append(infoSetting,saveSetting,clearSetting)
     settingsMenu.append(settingsText, volumeScrollerContainer, settingsBottom);
@@ -1498,7 +1529,7 @@ function settings() {
     settingButton.addEventListener("click", () => {
         toggleSettings();
         let deleteBox = document.getElementById("confirm-box");
-        if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
+        if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
     })
     multiplierButtonContainer.prepend(settingButton);
 }
@@ -1552,6 +1583,142 @@ function createMultiplierButton() {
     midDiv.appendChild(multiplierButtonContainer)
 }
 
+function createFilter() {
+    let filterButton = document.createElement("button");
+    filterButton.innerText = "Filter:";
+    let filterCurrently = document.createElement("div");
+    filterCurrently.id = "filter-currently";
+    let filterMenuOne = document.createElement("div");
+    filterMenuOne.id = "filter-menu-one";
+    let filterMenuTwo = document.createElement("div");
+    filterMenuTwo.id = "filter-menu-two";
+    
+    filterButton.addEventListener("click",()=>{
+        if (table1.style.display == "flex") {
+            if (filterMenuOne.style.display == "flex") {
+                filterMenuOne.style.display = "none";
+            } else {
+                filterMenuOne.style.display = "flex";
+            }
+        } else if (table2.style.display == "flex") {
+            if (filterMenuTwo.style.display == "flex") {
+                filterMenuTwo.style.display = "none";
+            } else {
+                filterMenuTwo.style.display = "flex";
+            }
+        }
+    })
+
+    const heroOptions = ['Anemo','Cryo','Dendro','Electro','Geo','Hydro','Pyro','Bow','Catalyst','Claymore','Polearm','Sword','Inazuma','Liyue','Mond','Sumeru'];
+    const invOptions = ['Artifact','Food','Gemstone','Level','Talent','Bow','Catalyst','Claymore','Polearm','Sword'];
+    for (let i=0,len=heroOptions.length; i < len; i++) {
+        let filterPicture = document.createElement("button");
+        filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +heroOptions[i]+ ".webp)";
+        filterPicture.classList.add("background-image-cover")
+
+        filterPicture.addEventListener("click",()=> {
+            if (filterPicture.classList.contains("dim-filter")) {
+                filterPicture.classList.remove("dim-filter");
+                filterHeroes(heroOptions[i]);
+            } else {
+                filterPicture.classList.add("dim-filter");
+                filterHeroes(heroOptions[i]);
+            }
+            updateFilter(filteredHeroes);
+        })
+
+        filterMenuOne.appendChild(filterPicture);
+    }
+
+    for (let i=0,len=invOptions.length; i < len; i++) {
+        let filterPicture = document.createElement("button");
+        filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +invOptions[i]+ ".webp)";
+        filterPicture.classList.add("background-image-cover")
+
+        filterPicture.addEventListener("click",()=> {
+            if (filterPicture.classList.contains("dim-filter")) {
+                filterPicture.classList.remove("dim-filter");
+                filterInv(invOptions[i]);
+            } else {
+                filterPicture.classList.add("dim-filter");
+                filterInv(invOptions[i]);
+            }
+            updateFilter(filteredInv);
+        })
+
+        filterMenuTwo.appendChild(filterPicture);
+    }
+    
+    filterDiv.append(filterButton,filterMenuOne,filterMenuTwo,filterCurrently);
+}
+
+
+function filterHeroes(options) {
+    if (filteredHeroes.includes(options)) {
+        filteredHeroes = filteredHeroes.filter(e => e !== options)
+    } else {
+        filteredHeroes.push(options);
+    }
+
+    for (let i = 0, len=WISHHEROMAX; i < len; i++) {
+        if (upgradeDict[i] == undefined) continue;
+        if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+        let upgradeDictTemp = upgradeDict[i];
+        let upgradeInfoTemp = upgradeInfo[i];
+
+        if (upgradeDictTemp.Purchased >= 0) {
+            let filterButton = document.getElementById("but-" + upgradeDictTemp.Row);
+
+            if (filteredHeroes.length === 0) {
+                filterButton.style.display = "flex";
+                continue;
+            } else {
+                filterButton.style.display = "none";
+            }
+
+            for (let j=0,len=filteredHeroes.length; j < len; j++) {
+                if (upgradeInfoTemp.Ele === filteredHeroes[j] || upgradeInfoTemp.Nation === filteredHeroes[j] || upgradeInfoTemp.Type === filteredHeroes[j]) {
+                    filterButton.style.display = "flex";
+                }
+            }
+        }
+    }
+}
+
+function filterInv(options) {
+    if (filteredInv.includes(options)) {
+        filteredInv = filteredInv.filter(e => e !== options)
+    } else {
+        filteredInv.push(options);
+    }
+
+    let inventoryItems = table2.children;
+    for (let i=0,len=inventoryItems.length; i < len ; i++) {
+        let currentID = inventoryItems[i];
+        if (filteredInv.length === 0) {
+            currentID.style.display = "flex";
+            continue;
+        } else {
+            currentID.style.display = "none";
+        }
+
+        let inventoryTemp = Inventory[currentID.id];
+        for (let j=0,len=filteredInv.length; j < len; j++) {
+            if (inventoryTemp.Type === filteredInv[j] || inventoryTemp.element === filteredInv[j] || inventoryTemp.nation === filteredInv[j]) {
+                currentID.style.display = "flex";
+            }
+        }
+    }
+}
+
+function updateFilter(tab) {
+    let filterCurrently = document.getElementById("filter-currently");
+    if (tab.length !== 0) {
+        filterCurrently.innerText = tab.length + " Applied";
+    } else {
+        filterCurrently.innerText = '';
+    }
+}
 
 //------------------------------------------------------------------------TABLE 1 (HEROES)------------------------------------------------------------------------//
 // LOAD SAVED HEROES IN TABLE1
@@ -1994,7 +2161,6 @@ function foodButton(type) {
         });
         container.appendChild(foodCooldown);
     }
-    
 }
 
 //-------------------------------------------------------------TABLE 3 (EXPEDITION + EXPEDITION TOOLTIPS)----------------------------------------------------------//
@@ -2086,7 +2252,6 @@ function adventure(type) {
         expedInfo("exped-9");
     }
 }   
-
 
 // DRAWS FOR RANDOM INVENTORY LOOT 
 function inventoryDraw(itemType, min, max, type){
@@ -2294,7 +2459,7 @@ function drawWish() {
 function stopWish() {
     let wishButton = document.getElementById("wishButton");
     let wishButtonText = document.getElementById("wishButtonText");
-    wishButtonText.innerHTML = "Closed";
+    wishButtonText.innerText = "Closed";
 
     var new_wishButton = wishButton.cloneNode(true);
     wishButton.parentNode.replaceChild(new_wishButton, wishButton);
@@ -2545,8 +2710,8 @@ function changeTooltip(dict, type, number) {
 
     if (type == "hero") {
         let tooltipTextLocal = "Level: " + upgradeDict[number]["Purchased"] + 
-                                "<br />Free Levels: " + saveValues["freeLevels"] + 
-                                "<br />" + abbrNum(upgradeDict[number]["Contribution"]) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
+                                "\n Free Levels: " + saveValues["freeLevels"] + 
+                                "\n" + abbrNum(upgradeDict[number]["Contribution"]) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
 
         tooltipElementImg.src = "./assets/tooltips/elements/" +dict.Ele+ ".webp";
@@ -2558,11 +2723,11 @@ function changeTooltip(dict, type, number) {
             tooltipWeaponImg.style.display = "block";
         }
         
-        tooltipText.innerHTML = tooltipTextLocal;
+        tooltipText.innerText = tooltipTextLocal;
     } else if (type == "item") {
         toolImg.src = "./assets/frames/background-" + dict.Star + ".webp";
         toolImgOverlay.src = "./assets/tooltips/inventory/" + dict.File + ".webp";
-        tooltipText.innerHTML = "Amount: " + InventoryMap.get(number);
+        tooltipText.innerText = "Amount: " + InventoryMap.get(number);
         if (number < 2000) {
             tooltipWeaponImg.src = "./assets/tooltips/elements/" + dict.Type + ".webp";
         } else if (number > 2000 && number < 3000) {

@@ -10,6 +10,11 @@ html,body {
     cursor: url(./assets/icon/cursor.webp), auto;
 }
 
+html {
+    display: flex;
+    justify-content: center;
+}
+
 img {  
     -webkit-touch-callout: none;
     -khtml-user-select: none;
@@ -40,36 +45,87 @@ img {
     text-shadow: 0.05em 0.05em 0.07em black;
 }
 
-  /* @media (min-aspect-ratio: 12/7) {
-    #game {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-    }
-  } */
+:root {
+    --brightness:100%;
+    --dropshadow:0 0 0 black;
+    --grayscale:0%;
+    --text-shadow-100:
+        #3C3C3C 0.201em 0.064em 0, 
+        #3C3C3C 0.114em 0.152em 0, 
+        #3C3C3C 0.0495em 0.182em 0, 
+        #3C3C3C -0.0809em 0.198em 0, 
+        #3C3C3C -0.140em 0.145em 0, 
+        #3C3C3C -0.209em 0.0259em 0, 
+        #3C3C3C -0.206em -0.0373em 0, 
+        #3C3C3C -0.0800em -0.159em 0, 
+        #3C3C3C -0.0164em -0.165em 0, 
+        #3C3C3C 0.0535em -0.159em 0, 
+        #3C3C3C 0.127em -0.102em 0, 
+        #3C3C3C 0.183em -0.0524em 0;
+    --text-shadow-075:
+        #3C3C3C 0.151em 0 0, 
+        #3C3C3C 0.151em 0.048em 0, 
+        #3C3C3C 0.124em 0.094em 0, 
+        #3C3C3C 0.086em 0.137em 0, 
+        #3C3C3C -0.060em 0.149em 0, 
+        #3C3C3C -0.105em 0.109em 0, 
+        #3C3C3C -0.135em 0.068em 0, 
+        #3C3C3C -0.157em 0.020em 0, 
+        #3C3C3C -0.155em -0.028em 0, 
+        #3C3C3C -0.098em -0.070em 0, 
+        #3C3C3C -0.060em -0.119em 0, 
+        #3C3C3C -0.012em -0.124em 0, 
+        #3C3C3C 0.040em -0.120em 0, 
+        #3C3C3C 0.095em -0.076em 0, 
+        #3C3C3C 0.137em -0.039em 0;
+    --text-shadow-125: 
+        #3C3C3C 0.266em 0 0, 
+        #3C3C3C 0.251em 0.08em 0, 
+        #3C3C3C 0.206em 0.156em 0, 
+        #3C3C3C 0.143em 0.215em 0, 
+        #3C3C3C 0.0619em 0.24em 0, 
+        #3C3C3C -0.026em 0.248em 0, 
+        #3C3C3C -0.108em 0.227em 0, 
+        #3C3C3C -0.175em 0.181em 0, 
+        #3C3C3C -0.225em 0.113em 0, 
+        #3C3C3C -0.261em 0.0324em 0, 
+        #3C3C3C -0.258em -0.0466em 0, 
+        #3C3C3C -0.225em -0.116em 0, 
+        #3C3C3C -0.172em -0.172em 0, 
+        #3C3C3C -0.100em -0.199em 0, 
+        #3C3C3C -0.0205em -0.206em 0, 
+        #3C3C3C 0.0669em -0.199em 0, 
+        #3C3C3C 0.149em -0.185em 0, 
+        #3C3C3C 0.196em -0.128em 0, 
+        #3C3C3C 0.228em -0.0655em 0;
+}
 
-/* <--------- STRETCHING HORIZONTALLY -----------> */
+/* <-- STRETCHING HORIZONTALLY---> */
 
 @media (min-aspect-ratio: 28/9) {
-    #game {
+    body {
         width: 50%;
         height: 100%;
         margin: 0;
         font-size: 0.7vw;
+        border-left: 0.2em groove  #465E2B;
+        border-right: 0.2em groove  #465E2B;
     }
 }
 
 @media (max-aspect-ratio: 28/9) {
-    #game {
+    body {
         width: 68%;
         height: 100%;
         margin: 0;
         font-size: 0.952vw;
+        border-left: 0.2em groove  #465E2B;
+        border-right: 0.2em groove  #465E2B;
     }
 }
 
 @media (max-aspect-ratio: 24/9) {
-    #game {
+    body {
         width: 80%;
         height: 100%;
         margin: 0;
@@ -78,7 +134,7 @@ img {
 }
 
 @media (max-aspect-ratio: 22/9) {
-    #game {
+    body {
         width: 90%;
         height: 100%;
         margin: 0;
@@ -87,11 +143,12 @@ img {
 }
 
 @media (max-aspect-ratio: 19/9) {
-    #game {
+    body {
         width: 100%;
         height: 100%;
         margin: 0;
         font-size: 1.4vw;
+        border: 0;
     }
 }
 
@@ -114,9 +171,12 @@ img {
 }
 
 #game {
+    width: 100%;
+    height: 100%;
     background-color: white;
     position: relative;
     margin: 0 auto;
+    display: none;
 }
 
 .overlay {
@@ -132,7 +192,6 @@ img {
     user-select: none;
 }
 
-
 ::-webkit-scrollbar {
     width: 0.9vw;
     background-color: #E1DBD0;
@@ -140,7 +199,7 @@ img {
 
 ::-webkit-scrollbar-thumb {
   background-color: #3F3F3F;
-  border-radius: 15pt;
+  border-radius: 3em;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -149,7 +208,6 @@ img {
 
 /*/////////////////////// MAIN BODY CSS ///////////////////////////////*/
 body {
-    width: 100%;
     background-image: url(./assets/border.webp);
     background-repeat: repeat;
     position: relative;
@@ -253,7 +311,7 @@ table, button {
 .table-with-tooltip {
     flex-grow: 2;
     width: 70%;
-    height: 100%;
+    height: 91%;
     box-sizing: border-box;
     padding: 1.5%;
     overflow-y: scroll;
@@ -422,6 +480,34 @@ table, button {
  .primogem {
     height:65%;
     aspect-ratio: 0.9;
+}
+
+/*/////////////* COMMONLY USED STYLES ///////////////*/
+.flex-row {
+    display: flex;
+    flex-direction:  row;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.background-image-cover {
+    background-color: transparent;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.cover-all {
+    position: absolute;
+    width: 100%;
+    height: 100%;
 }
 
 /*/////////////////////// EVENTS CSS ///////////////////////////////*/
@@ -784,6 +870,27 @@ table, button {
     object-fit: contain;
 }
 
+#fake-weasel-alert {
+    height: 10%;
+    width: 35%;
+    background-color: #673f31;
+    border: 0.25em solid #371a10;
+    border-radius: 1em;
+    font-size: 1.1em;
+    text-shadow: 0.075em 0.075em  #000000;
+    color: white;
+    pointer-events: none;
+    bottom: 3%;
+    position: absolute;
+    z-index: 12100;
+    opacity: 0;
+}
+
+@keyframes fadeOutWeasel {
+    0%,60% {opacity: 1}
+    100% {opacity: 0}
+}
+
 .weasel-sand {
     z-index: 1001;
     position: absolute;
@@ -820,8 +927,7 @@ table, button {
     100% {
         transform: scaleY(1);
       }
-  }
-  
+}
 
 /* ----------------------------------------------
  * Generated by Animista on 2023-2-13 17:9:45
@@ -849,6 +955,7 @@ table, button {
       opacity: 1;
     }
 }
+
 @keyframes slide-in-blurred-top {
     0% {
       -webkit-transform: translateY(-100%) scaleY(2.5) scaleX(0.2);
@@ -890,7 +997,6 @@ table, button {
 .slide-out-animation {
     animation: slide-out-bottom 1.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
 }
-
 
 @keyframes slide-out-bottom {
     0% {opacity: 1}
@@ -1147,7 +1253,6 @@ input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     background: transparent;
-    cursor: pointer;
 }
 
 /* Removes default focus */
@@ -1516,7 +1621,7 @@ input[type="range"]:focus::-moz-range-thumb{
     font-size: 0.85em;
     position: relative;
     transition: 0.4s ease;
-    text-shadow: #3C3C3C 0.21375em 0 0, #3C3C3C 0.20102554875em 0.06442056725em 0, #3C3C3C 0.16545309125em 0.125256034375em 0, #3C3C3C 0.114100525em 0.17245005em 0, #3C3C3C 0.0495299125em 0.1929347625em 0, #3C3C3C -0.020926788125em 0.1987703525em 0, #3C3C3C -0.08683835em 0.182958245em 0, #3C3C3C -0.140307092em 0.145025515em 0, #3C3C3C -0.18035769em 0.09045148em 0, #3C3C3C -0.209242475em 0.025948895em 0, #3C3C3C -0.20681056375em -0.0373652975em 0, #3C3C3C -0.18052885375em -0.0934511275em 0, #3C3C3C -0.1379573405em -0.138057635em 0, #3C3C3C -0.0800555925em -0.159165915em 0, #3C3C3C -0.0164290525em -0.165675565em 0, #3C3C3C 0.0535315125em -0.1594206825em 0, #3C3C3C 0.1188833225em -0.1486998625em 0, #3C3C3C 0.15738429125em -0.102757115em 0, #3C3C3C 0.1825355875em -0.05246907125em 0;
+    text-shadow: var(--text-shadow-100);
     filter: brightness(var(--brightness))  
             grayscale(var(--grayscale));
 }
@@ -1532,12 +1637,6 @@ input[type="range"]:focus::-moz-range-thumb{
 .not-purchased {
     background: url(./assets/frames/button.webp) center center / 100% no-repeat;
     background-size: contain;
-}
-
-:root {
-    --brightness:100%;
-    --dropshadow:0 0 0 black;
-    --grayscale:0%;
 }
 
 .not-dim {
@@ -1641,7 +1740,93 @@ input[type="range"]:focus::-moz-range-thumb{
     bottom: 18%;
     width: 100%;
     height: 80%;
-} 
+}
+
+/* FILTER HEROES AND INVENTORY */
+.filter-row {
+    position: absolute;
+    bottom: 0;
+    width: 70%;
+    height: 8%;
+    background-color: #D0BEA1;
+    box-sizing: border-box;
+    border-top: 0.2em solid #A19883;
+}
+
+.filter-row > button {
+    position: absolute;
+    left: 3%;
+    font: inherit;
+    height: 70%;
+    width: 20%;
+    background-color: #C7C2B3;
+    color: white;
+    text-shadow: var(--text-shadow-075);
+    border: 0.15em solid #7C7768;
+    border-radius: 0.3em;
+}
+
+.filter-row div:nth-child(2) {
+    position: absolute;
+    top: -400%;
+    height: 380%;
+    width: 90%;
+    background-color: #423624f6;
+    border-radius: 0.4em;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    column-gap: 5%;
+    padding: 1%;
+}
+
+.filter-row div:nth-child(2) > button {
+    height: 32%;
+    aspect-ratio: 1;
+}
+
+.filter-row div:nth-child(3) {
+    position: absolute;
+    top: -300%;
+    height: 280%;
+    width: 90%;
+    background-color: #423624f6;
+    border-radius: 0.4em;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    column-gap: 5%;
+    padding: 1%;
+}
+
+.filter-row div:nth-child(3) > button {
+    height:48%;
+    aspect-ratio: 1;
+}
+
+
+.filter-row  div:nth-child(4) {
+    position: relative;
+    left: -16%;
+    top: -2%;
+    font-size: 1.1em;
+    color: #3d311c;
+
+}
+
+.filter-row form:nth-child(3) {
+    position: absolute;
+    top: -300%;
+    height: 280%;
+    width: 90%;
+    background-color: rgb(128, 124, 0);
+}
 
 /*/////////////////////////////// EXPEDITION (TABLE3) CSS ///////////////////////////////*/
 .expedition-selected {
@@ -1909,7 +2094,11 @@ input[type="range"]:focus::-moz-range-thumb{
     height:10%;
     text-align: center;
     background:url(./assets/frames/achievement-temp.webp);
-    animation: fadeOut 3s cubic-bezier(.93,-0.24,.93,.81) forwards;
+    background-color: transparent;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: fadeOut 4s cubic-bezier(.93,-0.24,.93,.81) forwards;
 }
 
 .achieveH1 {
@@ -1921,8 +2110,8 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 @keyframes fadeOut {
-    from {opacity: 1;}
-    to {opacity: 0;}
+    from {opacity: 1}
+    to {opacity: 0}
 }
 
 .achieve:hover {
@@ -2242,3 +2431,4 @@ input[type="range"]:focus::-moz-range-thumb{
     object-fit: contain;
     z-index: 5;
 }
+

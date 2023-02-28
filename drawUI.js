@@ -128,7 +128,13 @@ function drawMainBody() {
     table7.classList.add("flex-column")
     table7.id = "table7";
 
-    mainTable.append(table1,table2,table3,table4,table5Container,table6,table7);
+    // FILTER BUTTON
+    let filterButton = document.createElement("div");
+    filterButton.classList.add("flex-row");
+    filterButton.classList.add("filter-row");
+    filterButton.id = "filter-button";
+
+    mainTable.append(table1,table2,table3,table4,table5Container,filterButton,table6,table7);
 
     var mainImg =  document.createElement("img");
     mainImg.classList.add("cover-all");
@@ -195,7 +201,7 @@ function createAchievement(achievementText,achievementDesc) {
 
     achievementPopUpTemp.append(achievementH1,achievementH2);
     achievementPopUpTemp.id = "tempAchievement";
-    achievementPopUpTemp.classList += " background-image-cover flex-column achieve";
+    achievementPopUpTemp.classList += " flex-column achieve";
 
     return achievementPopUpTemp;
 }
@@ -272,40 +278,20 @@ function preloadFolders(upgradeInfo) {
         imgTwo.src = filePath + "tooltips/hero/" + upgradeName + ".webp";
     }
 
-    let bgArray = ["achievementBG","bg","closed","dori-back","left","main-bar","middle","open","right","wish-bg","wood"];
-    for (let element of bgArray) {
-        let img = new Image();
-        img.src = filePath + "bg/" + element + ".webp";
-    }
+    let ArrayPath = ["bg/","frames/","tooltips/elements/","event/","icon/","tutorial/"];
+    let Array = [["achievementBG","bg","closed","dori-back","left","main-bar","middle","open","right","wish-bg","wood"],
+                 ["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"],
+                 ["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"],
+                 ["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"],
+                 ["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","verybad-1","verygood-3","event-easy","event-hard"],
+                 ["buttonBox","eventPill","tut-button","unlockExp-3","unlockExp-4","unlockExp-5"],
+    ];
 
-    let framesArray = ["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"];
-    for (let element of framesArray) {
-        let img = new Image();
-        img.src = filePath + "frames/" + element + ".webp";
-    }
-
-    let elementArray = ["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"]
-    for (let element of elementArray) {
-        let img = new Image();
-        img.src = filePath + "tooltips/elements/" + element + ".webp";
-    }
-
-    let eventArray = ["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"];
-    for (let element of eventArray) {
-        let img = new Image();
-        img.src = filePath + "event/" + element + ".webp";
-    }
-
-    let iconArray = ["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","verybad-1","verygood-3","event-easy","event-hard"];
-    for (let element of iconArray) {
-        let img = new Image();
-        img.src = filePath + "icon/" + element + ".webp";
-    }
-
-    let tutorialArray = ["buttonBox","eventPill","tut-button","unlockExp-3","unlockExp-4","unlockExp-5"];
-    for (let element of tutorialArray) {
-        let img = new Image();
-        img.src = filePath + "tutorial/" + element + ".webp";
+    for (let i=0; i<Array.length; i++) {
+        for (let innerElement of Array[i]) {
+            let img = new Image();
+            img.src = filePath + ArrayPath[i] + innerElement + ".webp";
+        }
     }
 
     let sevenArray = ["expedbg/exped","frames/background-","frames/rarity-","tutorial/aranara-"];
@@ -333,6 +319,8 @@ function preloadFolders(upgradeInfo) {
 
     let img = new Image();
     img.src = filePath + "loading.webp";
+    let imgTwo = new Image();
+    imgTwo.src = filePath + "/expedbg/exped-button.webp";
 }
 
 function preloadImage(max,path) {
