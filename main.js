@@ -76,7 +76,7 @@ function deleteConfirmButton(confirmed) {
                 startAlready = true;
                 localStorage.clear();
                 startGame();
-                setTimeout(()=>startText.remove(),100);
+                setTimeout(()=>startText.remove(),200);
             }
         } else if (deleteType === "loaded") {
             localStorage.clear();
@@ -101,7 +101,7 @@ if (localStorage.getItem("settingsValues") !== null) {
                 let deleteBox = document.getElementById("confirm-box");
                 if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
                 startText.remove();
-            },100)
+            },200)
         }
     });
 
@@ -128,10 +128,14 @@ if (localStorage.getItem("settingsValues") !== null) {
 setTimeout(()=>{
     mainBody = drawUI.buildGame(mainBody);
     mainBody.style.display = "block";
-},100)
+},300)
 
 function startGame() {
-drawUI.preloadFolders(upgradeInfo);
+drawUI.preloadFoldersPriority();
+setTimeout(()=>{
+    drawUI.preloadFolders(upgradeInfo);
+},300);
+
 // GLOBAL VARIABLES
 var saveValues;
 const ENERGYCHANCE = 500;
@@ -152,7 +156,7 @@ const WISHCOST = 360;
 const STARTINGWISHFACTOR = 50;
 var wishMultiplier = 0;
 var adventureType = 0;
-var goldenNutUnlocked = false;
+let goldenNutUnlocked = false;
 const EVENTCOOLDOWN = 10;
 const SHOPCOOLDOWN = 60;
 
@@ -160,7 +164,7 @@ const SHOPCOOLDOWN = 60;
 var achievementData = {
     achievementTypeRawScore: [100,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29,1e30,1e32],
     achievementTypeRawDPS:   [10,100,1000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29],
-    achievementTypeRawClick: [1e1,1e2,5e2,1e3,2.5e3,5e3,7.5e3,1e4,1e5,1.5e5,2e5,2.5e5,3e5,3.5e5,4e5,4.5e5,5e5],
+    achievementTypeRawClick: [1e1,1e2,5e2,1e3,2.5e3,5e3,7.5e3,1e4,1.5e4,2e4,2.5e4,3e4,3.5e4,4e4,5e4],
     achievementTypeRawCollection: [1,10,100,250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000],
     achievementTypeGolden: [1,3,7,15,30,50,75,100],
 }
@@ -1435,9 +1439,11 @@ function tabChange(x) {
     }
 
     if (x != 3 && wishCounter != saveValues["wishCounterSaved"]) {
-    let mailImageTemp = document.getElementById("mailImageID")
+        let mailImageTemp = document.getElementById("mailImageID")
         mailImageTemp.style.opacity = 1;
     }
+
+    updateWishDisplay();
 }
 
 // SETTINGS MENU - SAVES & VOLUME CONTROL
@@ -1609,43 +1615,54 @@ function createFilter() {
         }
     })
 
-    const heroOptions = ['Anemo','Cryo','Dendro','Electro','Geo','Hydro','Pyro','Bow','Catalyst','Claymore','Polearm','Sword','Inazuma','Liyue','Mond','Sumeru'];
-    const invOptions = ['Artifact','Food','Gemstone','Level','Talent','Bow','Catalyst','Claymore','Polearm','Sword'];
+    const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','BREAK','Sword','Claymore','Catalyst','Polearm','Bow','BREAK','Sumeru','Mond','Liyue','Inazuma'];
+    const invOptions = ['Artifact','Food','Level','Gemstone','Talent','BREAK','Sword','Claymore','Catalyst','Polearm','Bow'];
     for (let i=0,len=heroOptions.length; i < len; i++) {
-        let filterPicture = document.createElement("button");
-        filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +heroOptions[i]+ ".webp)";
-        filterPicture.classList.add("background-image-cover")
+        let filterPicture;
+        if (heroOptions[i] === 'BREAK') {
+            filterPicture = document.createElement("div");
+            filterPicture.classList.add("flex-break");
+        } else {
+            filterPicture = document.createElement("button");
+            filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +heroOptions[i]+ ".webp)";
+            filterPicture.classList.add("background-image-cover")
 
-        filterPicture.addEventListener("click",()=> {
-            if (filterPicture.classList.contains("dim-filter")) {
-                filterPicture.classList.remove("dim-filter");
-                filterHeroes(heroOptions[i]);
-            } else {
-                filterPicture.classList.add("dim-filter");
-                filterHeroes(heroOptions[i]);
-            }
-            updateFilter(filteredHeroes);
-        })
+            filterPicture.addEventListener("click",()=> {
+                if (filterPicture.classList.contains("dim-filter")) {
+                    filterPicture.classList.remove("dim-filter");
+                    filterHeroes(heroOptions[i]);
+                } else {
+                    filterPicture.classList.add("dim-filter");
+                    filterHeroes(heroOptions[i]);
+                }
+                updateFilter(filteredHeroes);
+            })
+        }
 
         filterMenuOne.appendChild(filterPicture);
     }
 
     for (let i=0,len=invOptions.length; i < len; i++) {
-        let filterPicture = document.createElement("button");
-        filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +invOptions[i]+ ".webp)";
-        filterPicture.classList.add("background-image-cover")
+        let filterPicture;
+        if (invOptions[i] === 'BREAK') {
+            filterPicture = document.createElement("div");
+            filterPicture.classList.add("flex-break");
+        } else {
+            filterPicture = document.createElement("button");
+            filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +invOptions[i]+ ".webp)";
+            filterPicture.classList.add("background-image-cover")
 
-        filterPicture.addEventListener("click",()=> {
-            if (filterPicture.classList.contains("dim-filter")) {
-                filterPicture.classList.remove("dim-filter");
-                filterInv(invOptions[i]);
-            } else {
-                filterPicture.classList.add("dim-filter");
-                filterInv(invOptions[i]);
-            }
-            updateFilter(filteredInv);
-        })
-
+            filterPicture.addEventListener("click",()=> {
+                if (filterPicture.classList.contains("dim-filter")) {
+                    filterPicture.classList.remove("dim-filter");
+                    filterInv(invOptions[i]);
+                } else {
+                    filterPicture.classList.add("dim-filter");
+                    filterInv(invOptions[i]);
+                }
+                updateFilter(filteredInv);
+            })
+        }
         filterMenuTwo.appendChild(filterPicture);
     }
     
@@ -1736,7 +1753,6 @@ function loadRow() {
     for (let j = 0, len=Object.keys(rowTempDict).length; j < len; j++) {
         let loadedHeroID = rowTempDict[j];
         var heroTextLoad;
-        var purchased = false;
 
         let upgradeDictTemp = upgradeDict[loadedHeroID];
         let formatCost = upgradeDictTemp["BaseCost"];
@@ -1746,9 +1762,8 @@ function loadRow() {
             formatCost *= (COSTRATIO**upgradeDictTemp["Purchased"])
             formatCost = abbrNum(formatCost)
             formatATK = abbrNum(formatATK)
-            purchased = true;
             if (j == 0) {
-                let singular = ` Nut${upgradeDict[loadedHeroID]["Factor"] !== 1 ? 's' : ''} per click`;
+                let singular = ` Nut${formatATK !== 1 ? 's' : ''} per click`;
                 heroTextLoad =  upgradeInfo[loadedHeroID].Name + ": " + formatCost + ", " + formatATK + singular;
             } else {
                 heroTextLoad =  upgradeInfo[loadedHeroID].Name + ": " + formatCost + ", +" + formatATK + " NpS";
@@ -1763,12 +1778,11 @@ function loadRow() {
             }
         }
 
+       
         let heroID = "but-" + j;
         let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
-        
         heroButtonContainer.addEventListener("click", () => {
             changeTooltip(upgradeInfo[loadedHeroID], "hero",loadedHeroID);
-            
             if (heroTooltip !== -1) {
                 heroTooltip = upgradeDict[heroTooltip].Row;
                 let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
@@ -1776,14 +1790,16 @@ function loadRow() {
                     removeActiveHero.classList.remove("active-hero");
                 }
             }
-
             heroTooltip = loadedHeroID;
             heroButtonContainer.classList.add("active-hero");
         });
 
         heroButtonContainer.innerText = heroTextLoad;
-        if (purchased == true) {
-            heroButtonContainer.style = "background:url(./assets/nameplates/"+upgradeInfo[loadedHeroID].Name+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
+        if (upgradeDictTemp["Purchased"] > 0) {
+            heroButtonContainer.style.background = `url(./assets/nameplates/${upgradeInfo[loadedHeroID].Name}.webp)`;  
+            heroButtonContainer.style.backgroundSize = "125%"; 
+            heroButtonContainer.style.backgroundPosition = "99% center"; 
+            heroButtonContainer.style.backgroundRepeat = "no-repeat";
         } else {
             heroButtonContainer.classList += " not-purchased";
         }
@@ -1800,13 +1816,14 @@ function addNewRow() {
         if (saveValues["realScore"] >= upgradeDict[i]["Level"] && upgradeDict[i].Purchased == -1){
             upgradeDict[i].Row = saveValues["rowCount"];
             upgradeDict[i].Purchased = 0;
-            
+
+            let heroText;
             if (upgradeDict[i]["Level"] === 0) {
-                var heroText = "Summon " + upgradeInfo[i].Name + " for help. (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
+                heroText = "Summon " + upgradeInfo[i].Name + " for help. (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
             } else if (i === 0) {
-                var heroText = "Level Up Nahida (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
+                heroText = "Level Up Nahida (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
             } else {
-                var heroText = "Call for " + upgradeInfo[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
+                heroText = "Call for " + upgradeInfo[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
             }
 
             
@@ -1873,7 +1890,7 @@ function upgrade(clicked_id) {
         upgradeDictTemp.Contribution += heroIncrease;
         upgradeDictTemp.Purchased += 1 * currentMultiplierLocal;
         saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
-        checkExpeditionUnlock(saveValues["heroesPurchased"]);                                        
+        checkExpeditionUnlock(saveValues["dps"]);                                        
         refresh(butIdArray, upgradeDictTemp["BaseCost"], clicked_id);
             
         changeTooltip(upgradeInfo[clicked_id],"hero",clicked_id);                   
@@ -2406,13 +2423,13 @@ function wishUnlock() {
     wishButtonText.append(wishButtonPrimo);
     wishButton.addEventListener("click",() => {
         wish();
+        updateWishDisplay();
     })
 
     let wishContainer = document.getElementById("mail-image-div");
     let wishHelpText = document.createElement("div");
     wishHelpText.id = "wish-tutorial-text";
     wishHelpText.innerText = "Wish for new characters using primogems! \n Wished characters take a % of your current NpS.";
-
 
     let wishTutorial = document.createElement("img");
     wishTutorial.src = "./assets/icon/wish-help.webp";
@@ -2425,8 +2442,14 @@ function wishUnlock() {
             wishHelpText.style.display = "flex";
         }
     });
+
+    let wishNpsDisplay = document.createElement("div");
+    wishNpsDisplay.id = "wish-nps-display";
+    wishNpsDisplay.classList.add("flex-row");
     
-    wishContainer.append(wishTutorial,wishHelpText)
+    
+    wishContainer.append(wishTutorial,wishHelpText,wishNpsDisplay);
+    updateWishDisplay();
 }
 
 // DRAWS/WISH FOR SPECIAL HEROS
@@ -2456,10 +2479,20 @@ function drawWish() {
     } 
 }
 
+function updateWishDisplay() {
+        if (document.getElementById("wish-nps-display")) {
+            let wishNpsDisplay = document.getElementById("wish-nps-display");
+            wishNpsDisplay.innerText = `Next character's NpS: ${abbrNum(Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/300 + 1))}`;
+        }
+    }
+
 function stopWish() {
     let wishButton = document.getElementById("wishButton");
     let wishButtonText = document.getElementById("wishButtonText");
     wishButtonText.innerText = "Closed";
+
+    let wishNpsDisplay = document.getElementById("wish-nps-display");
+    wishNpsDisplay.style.display = "none";
 
     var new_wishButton = wishButton.cloneNode(true);
     wishButton.parentNode.replaceChild(new_wishButton, wishButton);
@@ -2480,7 +2513,6 @@ function wish() {
 
         // SCARAMOUCHE WILL ALWAYS BE THE FIRST WISH HERO
         while (wishCounter) {
-            console.log(upgradeDict)
             let randomWishHero;
             if (upgradeDict[100].Purchased === -10) {
                 randomWishHero = 100;
@@ -2535,13 +2567,12 @@ function achievementListload() {
             if (i < 40) {
                 popAchievement("score",true);
                 achievementData["achievementTypeRawScore"].shift();
-                continue;
             } else if (i > 100 && i < 140) {
-                popAchievement("click",true);
-                achievementData["achievementTypeRawClick"].shift();
-            } else if (i > 200 && i < 240) {
                 popAchievement("dps",true);
                 achievementData["achievementTypeRawDPS"].shift();
+            } else if (i > 200 && i < 240) {
+                popAchievement("click",true);
+                achievementData["achievementTypeRawClick"].shift();
             } else if (i > 300 && i < 320) {
                 popAchievement("collection",true);
                 achievementData["achievementTypeRawCollection"].shift();
@@ -2590,8 +2621,8 @@ function popAchievement(achievement,loading) {
     }
 
     let achievementListTemp = achievementList[achievementType];
-    var achievementText = achievementListTemp.Name;
-    var achievementDesc = achievementListTemp.Description;
+    let achievementText = achievementListTemp.Name;
+    let achievementDesc = achievementListTemp.Description;
     achievementMap.set(achievementType,true);
     achievementID += achievementType;
 
@@ -3008,19 +3039,19 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     let shopCost = 0;
     switch (inventoryTemp.Star) {
         case 2:
-            shopCost = Math.round(randomInteger(15,25)/ 5) * 5;
+            shopCost = Math.round(randomInteger(15,35)/ 5) * 5;
             break;
         case 3: 
-            shopCost = Math.round(randomInteger(40,60)/ 5) * 5;
+            shopCost = Math.round(randomInteger(40,70)/ 5) * 5;
             break;
         case 4:
-            shopCost = Math.round(randomInteger(100,125)/ 5) * 5;
+            shopCost = Math.round(randomInteger(100,140)/ 5) * 5;
             break;
         case 5:
             shopCost = Math.round(randomInteger(240,300)/ 5) * 5;
             break;
         case 6:
-            shopCost = Math.round(randomInteger(600,700)/ 5) * 5;
+            shopCost = Math.round(randomInteger(450,600)/ 5) * 5;
             break;
         default:
             break;
@@ -3084,7 +3115,7 @@ function refresh() {
             
             let upgradedHeroButton = document.getElementById(arguments[0]);
             upgradedHeroButton.innerText = heroTextFirst;
-            upgradedHeroButton.style = "background:url(./assets/nameplates/"+upgradeInfoTemp.Name+".webp);  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;";
+            upgradedHeroButton.style = `background:url("./assets/nameplates/${upgradeInfoTemp.Name}.webp");  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;`;
         }
         else if (arguments[0] == "hero") { // REFRESH FOR ARTIFACTS
             let hero = upgradeDict[arguments[1]];
@@ -3108,7 +3139,7 @@ function refresh() {
 
 // POP UPS FOR EXPEDITIONS UNLOCKS
 // NUMBER OF UPGRADES NEEDED TO UNLOCK EXPEDITIONS vvvv
-var heroUnlockLevels = [75,150,205];
+var heroUnlockLevels = [1e6,1e12,1e18];
 var expeditionCounter = 0;
 function checkExpeditionUnlock(heroesPurchasedNumber) {
     if (heroUnlockLevels.length == 0) {

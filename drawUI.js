@@ -202,7 +202,6 @@ function createAchievement(achievementText,achievementDesc) {
     achievementPopUpTemp.append(achievementH1,achievementH2);
     achievementPopUpTemp.id = "tempAchievement";
     achievementPopUpTemp.classList += " flex-column achieve";
-
     return achievementPopUpTemp;
 }
 
@@ -235,9 +234,7 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
 
     achievementTextStored.append(achievementStoredH1,achievementStoredH2);
     achievementTextStored.classList += " flex-column achieve-stored-text";
-
     achievementStored.append(achievementTextStored,achievementImageContainer);
-    
     return achievementStored;
 }
 
@@ -267,6 +264,20 @@ function drawMailTable(table4) {
     return table4;
 }
 
+function preloadFoldersPriority() {
+    let filePath = "./assets/";
+    let ArrayPath = ["bg/","tutorial/"];
+    let Array = [["achievementBG","bg","closed","dori-back","left","main-bar","middle","open","right","wish-bg","wood"],
+                 ["buttonBox","eventPill","tut-button","unlockExp-3","unlockExp-4","unlockExp-5"],
+    ];
+    for (let i=0; i<Array.length; i++) {
+        for (let innerElement of Array[i]) {
+            let img = new Image();
+            img.src = filePath + ArrayPath[i] + innerElement + ".webp";
+        }
+    }
+}
+
 function preloadFolders(upgradeInfo) {
     let filePath = "./assets/";
     // SCUFFED SOLUTION AS ACCESSING FILES DOESNT WORK ON CLIENT SIDE
@@ -278,16 +289,14 @@ function preloadFolders(upgradeInfo) {
         imgTwo.src = filePath + "tooltips/hero/" + upgradeName + ".webp";
     }
 
-    let ArrayPath = ["bg/","frames/","tooltips/elements/","event/","icon/","tutorial/"];
-    let Array = [["achievementBG","bg","closed","dori-back","left","main-bar","middle","open","right","wish-bg","wood"],
-                 ["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"],
+    let ArrayPath = ["frames/","tooltips/elements/","event/","icon/",];
+    let Array = [["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"],
                  ["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"],
                  ["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"],
-                 ["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","verybad-1","verygood-3","event-easy","event-hard"],
-                 ["buttonBox","eventPill","tut-button","unlockExp-3","unlockExp-4","unlockExp-5"],
+                 ["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","verybad-1","verygood-3","event-easy","event-hard"],        
     ];
 
-    for (let i=0; i<Array.length; i++) {
+    for (let i=0; i < Array.length; i++) {
         for (let innerElement of Array[i]) {
             let img = new Image();
             img.src = filePath + ArrayPath[i] + innerElement + ".webp";
@@ -333,4 +342,4 @@ function preloadImage(max,path) {
     }
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders }
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders,preloadFoldersPriority }
