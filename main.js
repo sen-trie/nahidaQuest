@@ -159,6 +159,7 @@ var adventureType = 0;
 let goldenNutUnlocked = false;
 const EVENTCOOLDOWN = 10;
 const SHOPCOOLDOWN = 60;
+const SHOP_THRESHOLD = 1000;
 
 // ACHIEVEMENT THRESHOLDS
 var achievementData = {
@@ -277,9 +278,9 @@ function timerEvents() {
     refresh();
     dimHeroButton();
     addNewRow();
-    // foodCheck(timerSeconds);
     randomEventTimer(timerSeconds);
     timerSave(timerSeconds);
+    shopCheck();
 
     shopTimerFunction();
 }
@@ -421,9 +422,9 @@ demoContainer.addEventListener("mouseup", () => {
         }
     }
 
-    demoContainer = floatText(demoContainer,abbrNum(clickEarn),randomInteger(20,80),randomInteger(70,100));
+    demoContainer = floatText(leftDiv,abbrNum(clickEarn),randomInteger(20,80),randomInteger(60,80));
     let number = randomInteger(2,6);
-    let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`
+    let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`;
 
     var img = document.createElement("img");
     img.src = "./assets/icon/nut.webp";
@@ -568,15 +569,13 @@ function clickEvent() {
     let button = demoContainer.firstElementChild;
     if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")}
     if (clickEventDelay !== null) {clearTimeout(clickEventDelay)}
-    button.style.animation = "rotation-scale 3.5s infinite linear forwards";
-    button.style["box-shadow"] = "inset 0em 0em 6em #93d961";
+    button.style.animation = "rotation 3.5s infinite linear forwards";
     clickerEvent = true;
     currentClick = 15 * (saveValues["dps"] + 1);
 
     clickEventDelay = setTimeout(() => {
         if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")}
         button.style.animation = "rotation 18s infinite linear forwards";
-        button.style["box-shadow"] = "";
         clickerEvent = false;
         clickEventDelay = null;
     },30000)
@@ -749,7 +748,7 @@ function boxOpen(eventBackdrop) {
 const ROWS = 8;
 const COLS = 8;
 function minesweeperEvent() {
-    var mines = randomInteger(8,10)
+    var mines = randomInteger(6,8)
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all");
     eventBackdrop.classList.add("flex-column");
@@ -1519,7 +1518,7 @@ function settings() {
     // BOTTOM LEFT OF SETTINGS
     let exportSaveSetting = document.createElement("button");
     // copy(JSON.stringify(localStorage));
-    let importSaveSetting = doucment.createElement("button");
+    let importSaveSetting = document.createElement("button");
     // var data = JSON.parse(/*paste stringified JSON from clipboard*/);
     // Object.keys(data).forEach(function (k) {
     // localStorage.setItem(k, JSON.stringify(data[k]));
@@ -1718,9 +1717,11 @@ function filterInv(options) {
         }
 
         let inventoryTemp = Inventory[currentID.id];
+        
         for (let j=0,len=filteredInv.length; j < len; j++) {
-            if (inventoryTemp.Type === filteredInv[j] || inventoryTemp.element === filteredInv[j] || inventoryTemp.nation === filteredInv[j]) {
+            if (inventoryTemp.Type === filteredInv[j]) {
                 currentID.style.display = "flex";
+                break;
             }
         }
     }
@@ -2519,18 +2520,6 @@ function wish() {
                 randomWishHero = 100;
                 unlockExpedition(5,expeditionDict);
                 clearExped();
-
-                // GENERATING A LOCAL SHOP
-                addShop();
-                let startOfYear = new Date('2022-01-01T00:00:00');
-                let now = new Date();
-                shopTime = (now - startOfYear) / (1000 * 60);
-                localStorage.setItem("shopStartMinute",shopTime);
-                setShop();
-                setTimeout(()=>saveData(),1000)
-                // IT IS PERSISENT TO LOCALSTORAGE
-
-                newPop(5);
                 newPop(2);
             } else {
                 randomWishHero = randomInteger(WISHHEROMIN, WISHHEROMAX);
@@ -2852,6 +2841,27 @@ function tooltipFunction() {
 }
 
 //------------------------------------------------------------------------TABLE 7 (STORE)------------------------------------------------------------------------//
+// CHECK PRIMOGEMS
+function shopCheck() {
+    if (localStorage.getItem("storeInventory") === null) {
+        if (saveValues["primogem"] > SHOP_THRESHOLD) {
+            // GENERATING A LOCAL SHOP
+            addShop();
+            let startOfYear = new Date('2022-01-01T00:00:00');
+            let now = new Date();
+            shopTime = (now - startOfYear) / (1000 * 60);
+            localStorage.setItem("shopStartMinute",shopTime);
+            setShop();
+            setTimeout(()=>saveData(),1000)
+            // IT IS PERSISENT TO LOCALSTORAGE
+            newPop(5);
+            newPop(13);
+        }
+    }
+}
+
+
+
 // ADDS MID-GAME SHOP TAB
 function addShop() {
     let tabFlex = document.getElementById("flex-container-TAB");
@@ -2998,7 +3008,6 @@ function confirmPurchase(shopCost,id) {
         id = id.split("-")[2];
         shopElement.load();
         shopElement.play();
-        newPop(1)
         inventoryAdd(id);
         sortList("table2");
         mainButton.classList.remove("shadow-pop-tr");
@@ -3241,7 +3250,7 @@ function newPop(type) {
         className = "pop-new-" + (type + 1);
         tabId = "tab-" +  (type).toString();
         place = "tab";
-    } else if (type >=10) {
+    } else if (type >= 10) {
         className = "pop-new-corner";
         place = "corner";
     } else {

@@ -145,19 +145,13 @@ function drawMainBody() {
 
 function demoFunction(demoContainer,demoImg) {
     demoContainer.onmousedown = function() {
-        demoImg.style.width = "92%";
-        demoImg.style.height = "92%";
-        demoImg.style["margin-top"] = '4%';
-        demoImg.style["margin-left"] = '4%';
-        demoImg.style["border-radius"] = '50%';
+        demoImg.style.width = "94%";
+        demoImg.style.height = "94%";
     }
     
     window.onmouseup = function () {
         demoImg.style.width = "100%";
         demoImg.style.height = "100%";
-        demoImg.style["margin-top"] = '0%';
-        demoImg.style["margin-left"] = '0%';
-        demoImg.style["border-radius"] = '50%';
     };
 }
 

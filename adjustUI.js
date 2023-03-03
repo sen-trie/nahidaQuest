@@ -21,7 +21,7 @@ function inventoryAddButton(buttonInv, Item) {
 }
 
 // ADDS FLOATING TEXT UPON CLICKING ON DEMO BUTTON
-function floatText(demoContainer,clickFactor,randNum1,randNum2) {
+function floatText(leftDiv,clickFactor,randNum1,randNum2) {
     let clickCountAppear = document.createElement("div");
 
     clickCountAppear.innerHTML = "+" + clickFactor;
@@ -31,8 +31,8 @@ function floatText(demoContainer,clickFactor,randNum1,randNum2) {
     clickCountAppear.style.top = randNum2 + "%";
     clickCountAppear.addEventListener('animationend', () => {clickCountAppear.remove();});
 
-    demoContainer.appendChild(clickCountAppear);
-    return demoContainer;
+    leftDiv.appendChild(clickCountAppear);
+    return leftDiv;
 }
 
 // ADJUSTS EXPED BUTTON FOR EXPEDITION UI
