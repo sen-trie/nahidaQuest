@@ -162,11 +162,11 @@ const SHOPCOOLDOWN = 60;
 
 // ACHIEVEMENT THRESHOLDS
 var achievementData = {
-    achievementTypeRawScore: [100,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29,1e30,1e32],
-    achievementTypeRawDPS:   [10,100,1000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29],
-    achievementTypeRawClick: [1e1,1e2,5e2,1e3,2.5e3,5e3,7.5e3,1e4,1.5e4,2e4,2.5e4,3e4,3.5e4,4e4,5e4],
+    achievementTypeRawScore:      [100,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29,1e30,1e32],
+    achievementTypeRawDPS:        [10,100,1000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29],
+    achievementTypeRawClick:      [1e1,1e2,5e2,1e3,2.5e3,5e3,7.5e3,1e4,1.5e4,2e4,2.5e4,3e4,3.5e4,4e4,5e4],
     achievementTypeRawCollection: [1,10,100,250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000],
-    achievementTypeGolden: [1,3,7,15,30,50,75,100],
+    achievementTypeGolden:        [1,3,7,15,30,50,75,100],
 }
 var scoreAchievement = [1,101,201,301,401];
 
@@ -901,13 +901,9 @@ function weaselEvent() {
     let weaselElement = 18;
     weaselCount = 0;
     let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all");
-    eventBackdrop.classList.add("event-dark");
-    eventBackdrop.classList.add("flex-row");
-    eventBackdrop.classList.add("event-dark-row");
+    eventBackdrop.classList.add("cover-all","event-dark","flex-row","event-dark-row");
     let weaselBack = document.createElement("div");
-    weaselBack.classList.add("flex-row");
-    weaselBack.classList.add("weasel-back");
+    weaselBack.classList.add("flex-row","weasel-back");
 
     while (weaselElement--) {
             let weaselContainer = document.createElement("div");
@@ -1057,9 +1053,7 @@ function generateCombination(n) {
 // EVENT 6 (RAIN)
 function rainEvent() {
     let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all");
-    eventBackdrop.classList.add("flex-column");
-    eventBackdrop.classList.add("event-dark");
+    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
 
     let rainText = document.createElement("div");
     let rainTextBackground = document.createElement("div");
@@ -1270,9 +1264,7 @@ function tutorial() {
     let overlay = document.getElementById("loading");
     var currentSlide = 1;
     var tutorialDark = document.createElement("div");
-    tutorialDark.classList.add("cover-all");
-    tutorialDark.classList.add("flex-column");
-    tutorialDark.classList.add("tutorial-dark");
+    tutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
 
     var tutorialImage = document.createElement("img");
     tutorialImage.classList.add("tutorial-img");
@@ -1280,8 +1272,7 @@ function tutorial() {
     tutorialImage.src = "./assets/tutorial/tut-1.webp"
     
     var tutorialScreen = document.createElement("div");
-    tutorialScreen.classList.add("flex-column");
-    tutorialScreen.classList.add("tutorial-screen");
+    tutorialScreen.classList.add("flex-column","tutorial-screen");
     tutorialScreen.addEventListener("click", () => {
         if (currentSlide == 4) {
             overlay.style.zIndex = -1;
@@ -1459,8 +1450,7 @@ function settings() {
     // RELATED TO SETTINGS MENU
     var settingsMenu = document.createElement("div");
     settingsMenu.id = "settings-menu";
-    settingsMenu.classList.add("flex-column");
-    settingsMenu.classList.add("settings-menu");
+    settingsMenu.classList.add("flex-column","settings-menu");
 
     let settingsText = document.createElement("img");
     settingsText.classList.add("settings-text");
@@ -1499,18 +1489,16 @@ function settings() {
     volumeScrollerContainer.append(volumeScrollerBGMContainer,volumeScrollerSFXContainer)
 
     let settingsBottom = document.createElement("div");
-    settingsBottom.classList.add("flex-row");
-    settingsBottom.classList.add("settings-bottom");
+    settingsBottom.classList.add("flex-row","settings-bottom");
     let settingsBottomLeft = document.createElement("div");
     settingsBottomLeft.classList.add("settings-bottom-left");
     let settingsBottomRight = document.createElement("div");
     settingsBottomRight.classList.add("settings-bottom-right");
 
-    settingsBottom.append(settingsBottomLeft,settingsBottomRight);
-
-    var infoSetting = document.createElement("button");
+    // BOTTOM RIGHT OF SETTINGS
+    let infoSetting = document.createElement("button");
     infoSetting.classList.add("setting-info");
-    infoSetting.addEventListener("click",() => {
+    infoSetting.addEventListener("click", ()=> {
         if (document.fullscreenEnabled) {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
@@ -1520,15 +1508,25 @@ function settings() {
         }
     })
 
-    var saveSetting = document.createElement("button");
+    let saveSetting = document.createElement("button");
     saveSetting.classList.add("setting-save");
     saveSetting.addEventListener("click",() => {saveData();})
 
-    var clearSetting = document.createElement("button");
+    let clearSetting = document.createElement("button");
     clearSetting.classList.add("setting-clear");
     clearSetting.addEventListener("click",() => {deleteConfirmMenu("toggle","loaded")})
 
-    settingsBottomRight.append(infoSetting,saveSetting,clearSetting)
+    // BOTTOM LEFT OF SETTINGS
+    let exportSaveSetting = document.createElement("button");
+    // copy(JSON.stringify(localStorage));
+    let importSaveSetting = doucment.createElement("button");
+    // var data = JSON.parse(/*paste stringified JSON from clipboard*/);
+    // Object.keys(data).forEach(function (k) {
+    // localStorage.setItem(k, JSON.stringify(data[k]));
+    // });
+
+    settingsBottomRight.append(infoSetting,saveSetting,clearSetting);
+    settingsBottom.append(settingsBottomLeft,settingsBottomRight);
     settingsMenu.append(settingsText, volumeScrollerContainer, settingsBottom);
     mainBody.appendChild(settingsMenu);
 
@@ -1540,7 +1538,7 @@ function settings() {
     multiplierButtonContainer.prepend(settingButton);
 }
 
-var settingsOpen = false;
+let settingsOpen = false;
 function toggleSettings(closeOnly) {
     let settingsMenu = document.getElementById("settings-menu");
     if (settingsOpen == true) {
@@ -1864,7 +1862,7 @@ function upgrade(clicked_id) {
     }
     
     if (currentMultiplierLocal != 1) {
-        costCurrent = Math.round(upgradeDictTemp["BaseCost"] * ((COSTRATIO**currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO))
+        costCurrent = Math.round(upgradeDictTemp["BaseCost"] * ((COSTRATIO**currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO));
         requiredFree = currentMultiplierLocal;
     } else {
         costCurrent = Math.round(upgradeDictTemp["BaseCost"] * (COSTRATIO **currentPurchasedLocal));
@@ -1948,7 +1946,7 @@ function dimHeroButton() {
             }
         } else {
             if (heroElem.classList.contains("not-dim")) {
-                continue
+                continue;
             } else {
                 heroElem.classList.add("not-dim");
                 heroElem.classList.remove("dim");
@@ -2187,6 +2185,9 @@ function adventure(type) {
     if (type !== 10 && saveValues["energy"] >= ADVENTURECOSTS[type]) {
         adventureElement.load();
         adventureElement.play();
+        if (type === 5 && goldenNutUnlocked === true) {
+            currencyPopUp("nuts",randomInteger(5,10))
+        }
     }
 
     if (type === 10) {
@@ -2696,8 +2697,7 @@ function createTooltip() {
     tooltipName.classList += " tool-tip-name";
 
     toolImgContainer = document.createElement("div");
-    toolImgContainer.classList.add("toolImgContainer");
-    toolImgContainer.classList.add("background-image-cover");
+    toolImgContainer.classList.add("toolImgContainer","background-image-cover");
     toolImg = document.createElement("img");
     toolImg.src = "./assets/tooltips/Empty.webp";
     toolImg.classList.add("toolImg");
@@ -2779,7 +2779,7 @@ function changeTooltip(dict, type, number) {
         }
         
         if (tooltipElementImg.style.display != "none") {
-            tooltipElementImg.style.display = "none"
+            tooltipElementImg.style.display = "none";
             tooltipElementImg.style.margin = "0";
         }
         return;
@@ -3025,16 +3025,14 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopButtonImage.src = "./assets/tooltips/inventory/"+ inventoryTemp.File+ ".webp";
 
     let shopButtonImageContainer = document.createElement("div");
-    shopButtonImageContainer.classList.add("flex-column");
-    shopButtonImageContainer.classList.add("shop-button-container")
+    shopButtonImageContainer.classList.add("flex-column","shop-button-container");
     shopButtonImageContainer.style.background = "url(./assets/frames/background-" +inventoryTemp.Star+ ".webp)";
     shopButtonImageContainer.style.backgroundSize = "cover";
     shopButtonImageContainer.style.backgroundPosition = "center center";
     shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
     
     let shopButtonText = document.createElement("div");
-    shopButtonText.classList.add("flex-row");
-    shopButtonText.classList.add("shop-button-text");
+    shopButtonText.classList.add("flex-row","shop-button-text");
 
     let shopCost = 0;
     switch (inventoryTemp.Star) {
@@ -3170,13 +3168,11 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
 // POP UPS FOR SPECIAL CURRENCY
 function currencyPopUp(type1, amount1, type2, amount2) {
     let currencyPop = document.createElement("div");
-    currencyPop.classList.add("flex-column");
-    currencyPop.classList.add("currency-pop");
+    currencyPop.classList.add("flex-column","currency-pop");
     currencyPop.innerText = 'Obtained';
 
     let currencyPopFirst = document.createElement("div");
-    currencyPopFirst.classList.add("flex-row");
-    currencyPopFirst.classList.add("currency-pop-first");
+    currencyPopFirst.classList.add("flex-row","currency-pop-first");
     currencyPopFirst.innerHTML = amount1 + "   ";
     let currencyPopFirstImg = document.createElement("img");
 
@@ -3186,13 +3182,11 @@ function currencyPopUp(type1, amount1, type2, amount2) {
         saveValues.energy += amount1;
     } else if (type1 == "primogem") {
         currencyPopFirstImg.src = "./assets/icon/primogemIcon.webp";
-        currencyPopFirstImg.classList.add("icon");
-        currencyPopFirstImg.classList.add("primogem");
+        currencyPopFirstImg.classList.add("icon","primogem");
         saveValues.primogem += amount1;
     } else if (type1 == "nuts") {
         currencyPopFirstImg.src = "./assets/icon/goldenIcon.webp";
-        currencyPopFirstImg.classList.add("icon");
-        currencyPopFirstImg.classList.add("primogem");
+        currencyPopFirstImg.classList.add("icon","primogem");
         saveValues.goldenNut += amount1;
     }
 
@@ -3200,8 +3194,7 @@ function currencyPopUp(type1, amount1, type2, amount2) {
     currencyPop.append(currencyPopFirst);
     if (type2 !== undefined) {
         let currencyPopSecond = document.createElement("div");
-        currencyPopSecond.classList.add("flex-row");
-        currencyPopSecond.classList.add("currency-pop-first");
+        currencyPopSecond.classList.add("flex-row","currency-pop-first");
         currencyPopSecond.innerHTML = amount2 + "   ";
 
         let currencyPopSecondImg = document.createElement("img");
@@ -3211,13 +3204,11 @@ function currencyPopUp(type1, amount1, type2, amount2) {
             saveValues.energy += amount2;
         } else if (type2 == "primogem") {
             currencyPopSecondImg.src = "./assets/icon/primogemIcon.webp";
-            currencyPopSecondImg.classList.add("icon");
-            currencyPopSecondImg.classList.add("primogem");
+            currencyPopSecondImg.classList.add("icon","primogem");
             saveValues.primogem += amount2;
         } else if (type2 == "nuts") {
             currencyPopSecondImg.src = "./assets/icon/goldenIcon.webp";
-            currencyPopSecondImg.classList.add("icon");
-            currencyPopSecondImg.classList.add("primogem");
+            currencyPopSecondImg.classList.add("icon","primogem");
             saveValues.goldenNut += amount2;
         }
 

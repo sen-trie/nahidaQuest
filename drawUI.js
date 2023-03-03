@@ -228,8 +228,8 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
     let achievementStoredH1 = document.createElement("p");
     achievementStoredH1.innerText = achievementText;
     achievementStoredH1.classList += " achieveStoredH1";
-    let achievementStoredH2 = document.createElement("p");              // MAKE THE BACKGROUND IMAGE SUMERU TALENT
-    achievementStoredH2.innerText = achievementDesc;                     // HAVE THE MIDDLE PART INFINITELY EXTEND
+    let achievementStoredH2 = document.createElement("p");             
+    achievementStoredH2.innerText = achievementDesc;                    
     achievementStoredH2.classList += " achieveStoredH2";
 
     achievementTextStored.append(achievementStoredH1,achievementStoredH2);
