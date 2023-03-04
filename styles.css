@@ -1443,7 +1443,7 @@ input[type="range"]:focus::-moz-range-thumb{
 #demo-container {
     position: relative;
     top: 12.5%;
-    width:83%;
+    width:73%;
     height: auto;
     display: flex;
     flex-direction: column;
@@ -2113,7 +2113,7 @@ input[type="range"]:focus::-moz-range-thumb{
 .achieve {                                         
     z-index:2;
     position: absolute;
-    bottom: 8%;
+    bottom: 15%;
     width:90%;
     height:10%;
     text-align: center;
@@ -2456,3 +2456,21 @@ input[type="range"]:focus::-moz-range-thumb{
     z-index: 5;
 }
 
+
+
+/*/////////////////////// NUT SHOP CSS ///////////////////////////////*/
+.nut-store-access {
+    position: absolute;
+    z-index: 10;
+    right: 1%;
+    bottom: 1%;
+    height: 15%;
+    aspect-ratio: 1;
+    background:url(./assets/icon/nutShop.webp);
+    background-size: contain;
+    transition: 0.2s ease;
+}
+
+.nut-store-access:hover {
+    filter: drop-shadow(0.2em 0.3em rgba(255, 255, 255, 0.486));
+}

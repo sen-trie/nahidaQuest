@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-28-2";
+const VERSIONNUMBER = "v0.2.BETA-4-3";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -157,9 +157,9 @@ const STARTINGWISHFACTOR = 50;
 var wishMultiplier = 0;
 var adventureType = 0;
 let goldenNutUnlocked = false;
-const EVENTCOOLDOWN = 10;
+const EVENTCOOLDOWN = 30;
 const SHOPCOOLDOWN = 60;
-const SHOP_THRESHOLD = 1000;
+const SHOP_THRESHOLD = 600;
 
 // ACHIEVEMENT THRESHOLDS
 var achievementData = {
@@ -568,14 +568,15 @@ let clickEventDelay;
 function clickEvent() {
     let button = demoContainer.firstElementChild;
     if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")}
-    if (clickEventDelay !== null) {clearTimeout(clickEventDelay)}
+    if (clickEventDelay !== null) {clearTimeout(clickEventDelay)};
+    let currentAnimation = button.style.animation;
     button.style.animation = "rotation 3.5s infinite linear forwards";
     clickerEvent = true;
     currentClick = 15 * (saveValues["dps"] + 1);
 
     clickEventDelay = setTimeout(() => {
         if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")}
-        button.style.animation = "rotation 18s infinite linear forwards";
+        button.style.animation = currentAnimation;
         clickerEvent = false;
         clickEventDelay = null;
     },30000)
@@ -3080,6 +3081,15 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopDiv.append(shopButton);
 
     return shopDiv;
+}
+
+//------------------------------------------------------------------------ GOLDEN NUT STORE ------------------------------------------------------------------------//
+// ADDS ACCESS BUTTON AFTER 1 NUT
+addNutStore()
+function addNutStore() {
+    let nutStoreButton = document.createElement("button");
+    nutStoreButton.classList = "nut-store-access";
+    leftDiv.appendChild(nutStoreButton)
 }
 
 //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
