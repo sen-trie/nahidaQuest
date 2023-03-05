@@ -1,4 +1,4 @@
-import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo } from "./defaultData.js"
+import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persisentValues } from "./defaultData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys } from "./functions.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
@@ -8,7 +8,7 @@ const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and G
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
-var mainBody = document.getElementById("game");   
+let mainBody = document.getElementById("game");   
 let startText = document.getElementById("start-screen"); 
 let versionText = document.getElementById("vers-number");
 let startAlready = false;
@@ -154,9 +154,10 @@ const WISHHEROMIN = 100;
 
 const WISHCOST = 360;
 const STARTINGWISHFACTOR = 50;
-var wishMultiplier = 0;
-var adventureType = 0;
+let wishMultiplier = 0;
+let adventureType = 0;
 let goldenNutUnlocked = false;
+let stopSpawnEvents = false;
 const EVENTCOOLDOWN = 30;
 const SHOPCOOLDOWN = 60;
 const SHOP_THRESHOLD = 600;
@@ -178,14 +179,15 @@ var shopTimerElement = null;
 let filteredHeroes = [];
 let filteredInv = [];
 
-var demoContainer = document.getElementById("demo-container");
-var score = document.getElementById("score");
-var energyDisplay = document.getElementById("energy");
-var dpsDisplay = document.getElementById("dps");
-var primogemDisplay = document.getElementById("primogem");
+let demoContainer = document.getElementById("demo-container");
+let score = document.getElementById("score");
+let energyDisplay = document.getElementById("energy");
+let dpsDisplay = document.getElementById("dps");
+let primogemDisplay = document.getElementById("primogem");
 
-var leftDiv = document.getElementById("left-div");
-var midDiv = document.getElementById("mid-div");
+let leftDiv = document.getElementById("left-div");
+let midDiv = document.getElementById("mid-div");
+let rightDiv = document.getElementById("right-div");
 var multiplierButtonContainer;
 
 // MAIN BODY VARIABLES
@@ -228,31 +230,34 @@ createMultiplierButton();
 createExpedition();
 drawUI.createExpedTable(expedTooltip);
 table3.appendChild(expedTooltip);
-expedInfo("exped-7")
+expedInfo("exped-7");
+let advButtonTemp = document.getElementById("adventure-button");
+advButtonTemp.classList.remove("expedition-selected");
 
-var tooltipTable = 1;
-var heroTooltip = -1;
-var itemTooltip = -1;
+let tooltipTable = 1;
+let heroTooltip = -1;
+let itemTooltip = -1;
 createTooltip();
+addNutStore();
 
 settings();
 var settingsValues;
 var currentBGM;
 var bgmElement;           
 
-var tabElement = new Audio("./assets/sfx/tab-change.mp3");
-var demoElement = new Audio("./assets/sfx/click.mp3");
-var upgradeElement = new Audio("./assets/sfx/upgrade.mp3");
-var mailElement = new Audio("./assets/sfx/mail.mp3");
-var achievementElement = new Audio("./assets/sfx/achievement.mp3");
-var eventElement = new Audio("./assets/sfx/event.mp3");
-var reactionStartElement = new Audio("./assets/sfx/timestart.mp3");
-var reactionCorrectElement = new Audio("./assets/sfx/timesup.mp3");
-var weaselBurrow = new Audio("./assets/sfx/weasel-pop.mp3");
-var weaselDecoy = new Audio("./assets/sfx/weasel-decoy.mp3");
-var adventureElement = new Audio("./assets/sfx/adventure.mp3");
-var shopElement = new Audio("./assets/sfx/dori-buy.mp3");
-var sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement,reactionStartElement,reactionCorrectElement,weaselBurrow,weaselDecoy,adventureElement,shopElement];
+let tabElement = new Audio("./assets/sfx/tab-change.mp3");
+let demoElement = new Audio("./assets/sfx/click.mp3");
+let upgradeElement = new Audio("./assets/sfx/upgrade.mp3");
+let mailElement = new Audio("./assets/sfx/mail.mp3");
+let achievementElement = new Audio("./assets/sfx/achievement.mp3");
+let eventElement = new Audio("./assets/sfx/event.mp3");
+let reactionStartElement = new Audio("./assets/sfx/timestart.mp3");
+let reactionCorrectElement = new Audio("./assets/sfx/timesup.mp3");
+let weaselBurrow = new Audio("./assets/sfx/weasel-pop.mp3");
+let weaselDecoy = new Audio("./assets/sfx/weasel-decoy.mp3");
+let adventureElement = new Audio("./assets/sfx/adventure.mp3");
+let shopElement = new Audio("./assets/sfx/dori-buy.mp3");
+let sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement,reactionStartElement,reactionCorrectElement,weaselBurrow,weaselDecoy,adventureElement,shopElement];
 
 var timerLoad = setInterval(timerEventsLoading,50);
 var timer = setInterval(timerEvents,1000000);
@@ -396,6 +401,7 @@ var currentClick = 1;
 let demoImg = document.createElement("img");
 demoImg.src = "./assets/nahida.webp";
 demoImg.classList.add("demo-img");
+demoImg.id = "demo-main-img";
 
 demoContainer.addEventListener("mouseup", () => {
     let clickEarn;
@@ -426,7 +432,7 @@ demoContainer.addEventListener("mouseup", () => {
     let number = randomInteger(2,6);
     let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`;
 
-    var img = document.createElement("img");
+    let img = document.createElement("img");
     img.src = "./assets/icon/nut.webp";
     img.style.left = `${randomInteger(0,100)}%`
     img.style.animation = animation;
@@ -475,6 +481,7 @@ function randomEventTimer(timerSeconds) {
 
 // START A RANDOM EVENT
 function startRandomEvent() {
+    if (stopSpawnEvents === true) {return};
     let eventPicture = document.createElement("div");
     let aranaraNumber;
     // HARD EVENTS ARE LOCKED TO 4TH EXPEDITION UNLOCK
@@ -533,12 +540,13 @@ function clickedEvent(aranaraNumber) {
     eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
     eventDropdown.addEventListener("animationend", () => {
         eventDropdown.remove();
-        chooseEvent(aranaraNumber)
+        chooseEvent(aranaraNumber);
     });
     mainBody.appendChild(eventDropdown);
 }
 
 function chooseEvent(type) {
+    if (stopSpawnEvents === true) {return};
     switch (type) {
         case 1:
             clickEvent();
@@ -566,7 +574,7 @@ function chooseEvent(type) {
 // EVENT 1 (ENERGY OVERLOAD)
 let clickEventDelay;
 function clickEvent() {
-    let button = demoContainer.firstElementChild;
+    let button = document.getElementById("demo-main-img");
     if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")}
     if (clickEventDelay !== null) {clearTimeout(clickEventDelay)};
     let currentAnimation = button.style.animation;
@@ -589,9 +597,7 @@ var reactionGame = false;
 function reactionEvent() {
     reactionGame = true;
     let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all");
-    eventBackdrop.classList.add("flex-column");
-    eventBackdrop.classList.add("event-dark");
+    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
 
     let reactionImage = document.createElement("div");
     reactionImage.id = "reaction-image";
@@ -884,7 +890,7 @@ function minesweeperEvent() {
                 }
                 if (cellsLeft <= 0) {
                     let randomPrimo = randomInteger(200,400);
-                    eventOutcome(`All whopperflowers have been revealed! (+${randomPrimo} Primogems)`,eventBackdrop, "primogem", randomPrimo);
+                    eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop, "primogem", randomPrimo);
                 }
             });
             tr.appendChild(td);
@@ -1090,10 +1096,10 @@ function rainEvent() {
                 rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier) + " Nuts | " + tempPrimogem + " Primos";
             });
         } else if (type >= 65) {
-            img.src = "./assets/icon/scarab.webp"
+            img.src = "./assets/icon/scarab.webp";
             img.addEventListener('click', () => {
                 weaselDecoy.load();
-                weaselDecoy.play()
+                weaselDecoy.play();
                 img.remove();
                 tempScore -= 10;
                 tempScore = Math.max(0, tempScore);
@@ -1190,7 +1196,6 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
                     if (amount > 0) {currencyPopUp("primogem",amount)}
                 } else if (type === "box") {
                     if (amount < 10 && amount > 0) {
-                        saveValues.goldenNut += amount;
                         currencyPopUp("nuts",amount);
                     } else if (amount < 30) {
                         amount = (100 - amount)/100;
@@ -1262,16 +1267,16 @@ function playAudio() {
 // TUTORIAL UPON FIRST LOAD
 function tutorial() {
     let overlay = document.getElementById("loading");
-    var currentSlide = 1;
-    var tutorialDark = document.createElement("div");
+    let currentSlide = 1;
+    let tutorialDark = document.createElement("div");
     tutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
 
-    var tutorialImage = document.createElement("img");
+    let tutorialImage = document.createElement("img");
     tutorialImage.classList.add("tutorial-img");
     tutorialImage.id = "tutorialImg";
     tutorialImage.src = "./assets/tutorial/tut-1.webp"
     
-    var tutorialScreen = document.createElement("div");
+    let tutorialScreen = document.createElement("div");
     tutorialScreen.classList.add("flex-column","tutorial-screen");
     tutorialScreen.addEventListener("click", () => {
         if (currentSlide == 4) {
@@ -1285,8 +1290,7 @@ function tutorial() {
         }
 
         currentSlide++;
-        let currentTutorialImage = document.getElementById("tutorialImg");
-        currentTutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".webp";
+        tutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".webp";
     })
 
     tutorialScreen.append(tutorialImage);
@@ -1404,6 +1408,10 @@ function tabChange(x) {
     if (filterMenuOne.style.display !== "none") {filterMenuOne.style.display = "none"};
     let filterMenuTwo = document.getElementById("filter-menu-two");
     if (filterMenuTwo.style.display !== "none") {filterMenuTwo.style.display = "none"};
+    if (document.getElementById("nut-store-table")) {
+        let nutStoreTemp = document.getElementById("nut-store-table");
+        if (nutStoreTemp.style.display === "flex") {nutStoreTemp.style.display = "none"}
+    }
 
     if (x == 0) {
         if (filterDiv.style.display !== "flex") {filterDiv.style.display = "flex"};
@@ -2185,10 +2193,15 @@ function foodButton(type) {
 const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
 function adventure(type) {
     if (type !== 10 && saveValues["energy"] >= ADVENTURECOSTS[type]) {
-        adventureElement.load();
-        adventureElement.play();
-        if (type === 5 && goldenNutUnlocked === true) {
-            currencyPopUp("nuts",randomInteger(5,10))
+        if (expeditionDict[type].Locked !== '1') {
+            adventureElement.load();
+            adventureElement.play();
+            if (type === 5 && goldenNutUnlocked === true && expeditionDict[type].Locked !== '1') {
+                currencyPopUp("nuts",randomInteger(5,10))
+            }
+        } else {
+            weaselDecoy.load();
+            weaselDecoy.play();
         }
     }
 
@@ -2208,6 +2221,7 @@ function adventure(type) {
     } else if (expeditionDict[type].Locked === '1'){
         return;  
     }
+
     if (saveValues["energy"] >= ADVENTURECOSTS[type]){
         if (table3.style.display === "flex") {expedInfo(`exped-${type}`);}
         saveValues["energy"] -= ADVENTURECOSTS[type];
@@ -3085,11 +3099,73 @@ function createShopItems(shopDiv, i, inventoryNumber) {
 
 //------------------------------------------------------------------------ GOLDEN NUT STORE ------------------------------------------------------------------------//
 // ADDS ACCESS BUTTON AFTER 1 NUT
-addNutStore()
 function addNutStore() {
+    let mainTable = rightDiv.childNodes[1];
+    let nutStoreTable = document.createElement("div");
+    nutStoreTable.classList.add("table-without-tooltip","nut-store-table","flex-column");
+    nutStoreTable.id = "nut-store-table";
+    let shopHeader = document.createElement("img");
+    shopHeader.src = "./assets/tooltips/store-header.webp";
+    let nutShopDiv = document.createElement("div");
+    nutShopDiv.classList.add("flex-row");
+    nutShopDiv.id = "nut-shop-div";
+    let nutAscend = document.createElement("button");
+    nutAscend.innerText = "Transcend";
+
+    nutStoreTable.append(shopHeader,nutShopDiv,nutAscend);
+    mainTable.appendChild(nutStoreTable);
+
     let nutStoreButton = document.createElement("button");
     nutStoreButton.classList = "nut-store-access";
-    leftDiv.appendChild(nutStoreButton)
+    nutStoreButton.addEventListener("click",()=>{
+        if (nutStoreTable.style.display == "flex") {
+            nutStoreTable.style.display = "none";
+        } else {
+            nutStoreTable.style.display = "flex";
+        }
+    })
+    leftDiv.appendChild(nutStoreButton);
+
+    let i = 6;
+    while (i--) {
+        let nutShopItem = document.createElement("div");
+        nutShopDiv.appendChild(nutShopItem)
+    }
+}
+
+function nutPopUp() {
+    if (saveValues.goldenTutorial === true) {
+        return;
+    } else {
+        saveValues.goldenTutorial = true;
+        stopSpawnEvents = true;
+        drawUI.preloadImage(4,"tutorial/goldenNut-");
+        setTimeout(()=>{
+                let currentSlide = 1;
+                let nutTutorialDark = document.createElement("div");
+                nutTutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
+
+                let tutorialImage = document.createElement("img");
+                tutorialImage.classList.add("tutorial-img");
+                tutorialImage.src = "./assets/tutorial/goldenNut-1.webp";
+                
+                let tutorialScreen = document.createElement("div");
+                tutorialScreen.classList.add("flex-column","tutorial-screen");
+                tutorialScreen.addEventListener("click",()=>{
+                    if (currentSlide == 4) {
+                        nutTutorialDark.remove();
+                        stopSpawnEvents = false;
+                        return;
+                    }
+                    currentSlide++;
+                    tutorialImage.src = "./assets/tutorial/goldenNut-"+currentSlide+".webp";
+                })
+
+                tutorialScreen.append(tutorialImage);
+                nutTutorialDark.appendChild(tutorialScreen);
+                mainBody.appendChild(nutTutorialDark);
+        },3000);
+    }
 }
 
 //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
@@ -3156,8 +3232,8 @@ function refresh() {
 
 // POP UPS FOR EXPEDITIONS UNLOCKS
 // NUMBER OF UPGRADES NEEDED TO UNLOCK EXPEDITIONS vvvv
-var heroUnlockLevels = [1e6,1e12,1e18];
-var expeditionCounter = 0;
+let heroUnlockLevels = [1e6,1e12,1e18];
+let expeditionCounter = 0;
 function checkExpeditionUnlock(heroesPurchasedNumber) {
     if (heroUnlockLevels.length == 0) {
         return;
@@ -3180,7 +3256,7 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
             newPop(expeditionCounter + 10);
         }
         expeditionCounter++;
-        heroUnlockLevels.shift()
+        heroUnlockLevels.shift();
     }
 }
 
@@ -3207,6 +3283,8 @@ function currencyPopUp(type1, amount1, type2, amount2) {
         currencyPopFirstImg.src = "./assets/icon/goldenIcon.webp";
         currencyPopFirstImg.classList.add("icon","primogem");
         saveValues.goldenNut += amount1;
+        persisentValues.goldenCore += amount1;
+        nutPopUp();
     }
 
     currencyPopFirst.append(currencyPopFirstImg);
@@ -3229,6 +3307,8 @@ function currencyPopUp(type1, amount1, type2, amount2) {
             currencyPopSecondImg.src = "./assets/icon/goldenIcon.webp";
             currencyPopSecondImg.classList.add("icon","primogem");
             saveValues.goldenNut += amount2;
+            persisentValues.goldenCore += amount2;
+            nutPopUp();
         }
 
         currencyPop.style.height = "13%"

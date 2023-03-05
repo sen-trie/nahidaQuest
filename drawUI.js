@@ -61,15 +61,15 @@ function buildGame(mainBody) {
 // MAIN BODY GUI
 function drawMainBody() {
     // LEFT DIV/AREA
-    var leftDiv = document.getElementById("left-div");
-    var leftImg =  document.createElement("img");
+    let leftDiv = document.getElementById("left-div");
+    let leftImg =  document.createElement("img");
     leftImg.src = "./assets/bg/bg.webp";
     leftImg.classList.add("cover-all");
     leftImg.classList.add("div-img");
     leftDiv.appendChild(leftImg);
 
     // RIGHT DIV/AREA
-    var rightDiv = document.getElementById("right-div");
+    let rightDiv = document.getElementById("right-div");
     let TabDiv = document.createElement("div");
     TabDiv.id = "flex-container-TAB";
     let TabDivImg = document.createElement("img");
@@ -78,7 +78,8 @@ function drawMainBody() {
     TabDiv.appendChild(TabDivImg);
 
     let mainTable = document.createElement("div");
-    mainTable.classList.add("main-table")
+    mainTable.classList.add("main-table");
+    mainTable.id = "main-table";
 
     // TABLE 1
     let table1 = document.createElement("div");
@@ -336,4 +337,4 @@ function preloadImage(max,path) {
     }
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders,preloadFoldersPriority }
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders,preloadImage,preloadFoldersPriority }

@@ -52,20 +52,24 @@ img {
     --text-shadow-100:
         #3C3C3C 0.201em 0.064em 0, 
         #3C3C3C 0.114em 0.152em 0, 
-        #3C3C3C 0.0495em 0.182em 0, 
+        #3C3C3C 0.0495em 0.182em 0,
+        #3C3C3C 0.114em 0.172em 0, 
         #3C3C3C -0.0809em 0.198em 0, 
         #3C3C3C -0.140em 0.145em 0, 
         #3C3C3C -0.209em 0.0259em 0, 
-        #3C3C3C -0.206em -0.0373em 0, 
+        #3C3C3C -0.206em -0.0373em 0,
+        #3C3C3C -0.138em -0.138em 0,
         #3C3C3C -0.0800em -0.159em 0, 
         #3C3C3C -0.0164em -0.165em 0, 
-        #3C3C3C 0.0535em -0.159em 0, 
+        #3C3C3C 0.0535em -0.159em 0,
+        #3C3C3C 0.118em -0.148em 0,
         #3C3C3C 0.127em -0.102em 0, 
         #3C3C3C 0.183em -0.0524em 0;
     --text-shadow-075:
         #3C3C3C 0.151em 0 0, 
         #3C3C3C 0.151em 0.048em 0, 
         #3C3C3C 0.124em 0.094em 0, 
+        #3C3C3C 0.104em 0.112em 0, 
         #3C3C3C 0.086em 0.137em 0, 
         #3C3C3C -0.060em 0.149em 0, 
         #3C3C3C -0.105em 0.109em 0, 
@@ -73,9 +77,11 @@ img {
         #3C3C3C -0.157em 0.020em 0, 
         #3C3C3C -0.155em -0.028em 0, 
         #3C3C3C -0.098em -0.070em 0, 
+        #3C3C3C -0.078em -0.098em 0,
         #3C3C3C -0.060em -0.119em 0, 
         #3C3C3C -0.012em -0.124em 0, 
         #3C3C3C 0.040em -0.120em 0, 
+        #3C3C3C 0.078em -0.098em 0,
         #3C3C3C 0.095em -0.076em 0, 
         #3C3C3C 0.137em -0.039em 0;
     --text-shadow-125: 
@@ -194,7 +200,7 @@ img {
 
 ::-webkit-scrollbar {
     width: 0.9vw;
-    background-color: #E1DBD0;
+    background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -301,6 +307,7 @@ table, button {
 }
 
 .main-table {
+    position: relative;
     width: 100%;
     height: 90%;
     display: flex;
@@ -311,7 +318,7 @@ table, button {
 .table-with-tooltip {
     flex-grow: 2;
     width: 70%;
-    height: 91%;
+    height: 92%;
     box-sizing: border-box;
     padding: 1.5%;
     overflow-y: scroll;
@@ -1167,7 +1174,7 @@ table, button {
 }
 
 .settings-button:hover{
-    filter: drop-shadow(0 0 0.2em #ffffff);
+    filter: drop-shadow(0 0 0.4em #ffffff);
 }
 
 .settings-menu {
@@ -1866,7 +1873,7 @@ input[type="range"]:focus::-moz-range-thumb{
 #adventure-tutorial {
     position: absolute;
     right: 10%;
-    bottom: 31.5%;
+    bottom: 35%;
     height: 7%;
     width: auto;
     object-fit: contain;
@@ -2097,9 +2104,9 @@ input[type="range"]:focus::-moz-range-thumb{
 
 .flex-container-ACHIEVEMENT {
     position: absolute;
-    top: 14%;
+    top: 7.5%;
     width: 85%;
-    height: 75%;
+    height: 79%;
     
     overflow-y: auto;
     display: flex;
@@ -2472,5 +2479,83 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .nut-store-access:hover {
-    filter: drop-shadow(0.2em 0.3em rgba(255, 255, 255, 0.486));
+    filter: drop-shadow(0 0 0.8em #f7c624);
+}
+
+.nut-store-table {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 500;
+    display: none;
+    justify-content: flex-start;
+    background-color: #E2DAD1;
+    row-gap: 1.5%;
+}
+
+.nut-store-table > img {
+    position: relative;
+    top:1%;
+    height: 15%;
+    max-width: 90%;
+    object-fit: contain;
+}
+
+.nut-store-table > div {
+    position: absolute;
+    top: 17%;
+    height: 70%;
+    width: 90%;
+    object-fit: contain;
+    flex-wrap: wrap;
+    gap: 1%;
+    overflow-y: auto;
+    box-sizing: border-box;
+    border: 0.2em ridge #73b146;
+    background-image: url(./assets/bg/nutShopInterior.webp);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* background: url(./assets/bg/nutShopLeft.webp), url(./assets/bg/nutShopMid.webp), url(./assets/bg/nutShopRight.webp);
+    background-repeat: no-repeat;
+    background-position: left, center, right;
+    background-size: auto 100%, 80% 100%, auto 100%; */
+}
+
+.nut-store-table > div > div {
+    height: 40%;
+    width: 45%;
+    background-color: yellow;
+}
+
+.nut-store-table > button {
+    position: absolute;
+    bottom: 2%;
+    height: 9%;
+    width: 50%;
+    background-color: transparent;
+    background-image: url(./assets/tutorial/tut-button.webp);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    font: inherit;
+    font-size: 1.3em;
+    color: #203916;
+}
+
+.nut-store-table > button:hover {
+    filter: drop-shadow(0 0 0.3em #2b7236);
+}
+
+.nut-store-table::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(./assets/bg/nutShop.webp);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
 }

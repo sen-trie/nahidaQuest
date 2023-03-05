@@ -1,4 +1,4 @@
-var saveValuesDefault = {
+let saveValuesDefault = {
     clickCount:0,
     clickFactor:1,
     dps:0,
@@ -8,19 +8,24 @@ var saveValuesDefault = {
     energy:10000,
     rowCount:0,
     heroesPurchased:0,
-    wishUnlocked:false,
+    wishUnlocked: false,
     wishCounterSaved:0,
-    goldenNut:0,
+    goldenNut: 0,
+    goldenTutorial: false,
     upperEnergyRate: 20,
     lowerEnergyRate: 10,
 }
 
-var SettingsDefault = {
+let persisentValues = {
+    goldenCore: 0,
+}
+
+let SettingsDefault = {
     bgmVolume:0.5,
     sfxVolume:0.5,
 }
 
-var upgradeDictDefault = {
+let upgradeDictDefault = {
     0:  {Row:-1,        Purchased: -1,   "Contribution": 0, "Level": 1, "BaseCost":20, Factor:1  },
     1:  {Row:-1,        Purchased: -1,    },
     2:  {Row:-1,        Purchased: -1,    },
@@ -86,7 +91,7 @@ var upgradeDictDefault = {
     111: {Row:-1,    "Level": 0, Purchased: -10,   },
 };
 
-var upgradeInfo = {
+let upgradeInfo = {
     0: {
         Name: "Nahida",
         Lore: "I've always dreamed of going out and seeing things for myself. Can you be my guide? I want to experience all your future tales first-hand.",
@@ -525,7 +530,7 @@ var upgradeInfo = {
 };
 
 // RMB TO UPDATE MAX CONSTANTS
-var InventoryDefault = {
+let InventoryDefault = {
 // 6 STAR WEAPON
     1001: {File:"amosBow",                 Name:"Amos' Bow",                         Lore:"Increases power of characters with matching weapon by 360%.  \n \n (Only characters currently purchased count.)", Star:6,       Type:"Bow"        },
     1002: {File:"aquaSimulacra",           Name:"Aqua Simulacra",                    Lore:"Increases power of characters with matching weapon by 360%.  \n \n (Only characters currently purchased count.)", Star:6,       Type:"Bow"         },
@@ -752,7 +757,7 @@ var InventoryDefault = {
     6012: {File:"inazumaTal2",   Name:"Teachings of Light",                          Lore:"Increases power of characters with matching nation by 20%.\n\n (Only characters currently purchased count.)",      Star:2,            Type:"Talent",          nation:"Inazuma"    },
 };
 
-var eventText = {
+let eventText = {
     1: "A surge of power courses through Nahida - She feels empowered!",
     2: "Let's play a game! When the clock stops ticking, we'll see who can press the button first!",
     3: "We found some mysterious boxes in the wild! Shall we open them?",
@@ -761,7 +766,7 @@ var eventText = {
     6: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
 }
 
-var expeditionDictDefault = {
+let expeditionDictDefault = {
     1:{Text:"Explore Teyvat | 100 "                  ,Locked:"0" ,Lore:"The legend of the Golden Nut is from a bygone era. Some on-the-ground research is certainly needed if you wanted even a slither of a chance to find the mythical fruit."},
     2:{Text:"Ask the Adventurers' Guild | 250 "      ,Locked:"0" ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
     3:{Text:"Challenge Domains | 500 "               ,Locked:"1" ,Lore:"Clues about the origin of the Golden Nut are said to have been hidden deep inside some mysterious domain. Exploring it will likely be the next step in unravelling the fruit's location."},
@@ -773,7 +778,7 @@ var expeditionDictDefault = {
     9:{Text:"Not enough Energy "                     ,Locked:"1" ,Lore:"Obtain more before going on Expeditions!"            },
 }
 
-var achievementListDefault = {
+let achievementListDefault = {
     1: {Name:"Nut Collector",                         Description:"Collect 100 nuts"                            },
     2: {Name:"Fan of Nuts",                           Description:"Collect 10,000 nuts"                          },
     3: {Name:"Nut Gatherer",                          Description:"Collect 1 million nuts"                        },
@@ -854,4 +859,4 @@ var achievementListDefault = {
     408: {Name:"A Golden Experience",                 Description:"Obtain 100 Golden Nuts"                     },
 }
 
-export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo };
+export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persisentValues };
