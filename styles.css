@@ -70,7 +70,7 @@ img {
         #3C3C3C 0.151em 0.048em 0, 
         #3C3C3C 0.124em 0.094em 0, 
         #3C3C3C 0.104em 0.112em 0, 
-        #3C3C3C 0.086em 0.137em 0, 
+        #3C3C3C 0.026em 0.147em 0, 
         #3C3C3C -0.060em 0.149em 0, 
         #3C3C3C -0.105em 0.109em 0, 
         #3C3C3C -0.135em 0.068em 0, 
@@ -1179,9 +1179,9 @@ table, button {
 
 .settings-menu {
     position: absolute;
-    left: 30%;
+    left: 26%;
     top: 25%;
-    width: 40%;
+    width: 48%;
     height: 45%;
     row-gap: 2%;
     border: 0.3em outset #8fa77e;
@@ -1255,6 +1255,10 @@ table, button {
     display: flex;
 }
 
+input {
+    cursor: url(./assets/icon/cursor.webp), auto;
+}
+
 /*********** Baseline, reset styles ***********/
 input[type="range"] {
     -webkit-appearance: none;
@@ -1272,22 +1276,22 @@ input[type="range"]:focus {
 input[type="range"]::-webkit-slider-runnable-track {
     background-color: #99b390;
     border-radius: 0.5em;
-    height: 0.5em;
+    height: 15%;
 }
 
 /* slider thumb */
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none; /* Override default look */
     appearance: none;
-    margin-top: -0.7em; /* Centers thumb on the track */
+    margin-top: -3.5%; /* Centers thumb on the track */
     background-color: #374931;
     border-radius: 1em;
-    height: 2em;
-    aspect-ratio: 0.5;
+    height: 400%;
+    aspect-ratio: 0.25;
 }
 
 input[type="range"]:focus::-webkit-slider-thumb {
-    outline: 0.2em solid #374931;
+    outline: 0.1em solid #374931;
     outline-offset: 0.125em;
 }
 
@@ -1296,20 +1300,22 @@ input[type="range"]:focus::-webkit-slider-thumb {
 input[type="range"]::-moz-range-track {
     background-color: #99b390;
     border-radius: 0.5em;
-    height: 0.5em;
+    height: 15%;
 }
 
 /* slider thumb */
 input[type="range"]::-moz-range-thumb {
+    appearance: none;
+    margin-top: -3.5%; /* Centers thumb on the track */
+    border: none;
     background-color: #374931;
-    border: none; /*Removes extra border that FF applies*/
     border-radius: 1em;
-    height: 2em;
-    width: 0.5em;
+    height: 400%;
+    aspect-ratio: 0.25;
 }
 
 input[type="range"]:focus::-moz-range-thumb{
-    outline: 0.2em solid #374931;
+    outline: 0.1em solid #374931;
     outline-offset: 0.125em;
 }
 
@@ -1356,11 +1362,15 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .settings-bottom-right > button {
-    width: 30%;
+    width: 27%;
     aspect-ratio: 1;
     background-color: transparent;
     background-size:contain;
     background-repeat: no-repeat;
+}
+
+.settings-bottom-right > button:hover {
+    filter: drop-shadow(0 0 0.6em #474d45);
 }
 
 .setting-info {
@@ -1450,11 +1460,11 @@ input[type="range"]:focus::-moz-range-thumb{
 #demo-container {
     position: relative;
     top: 12.5%;
-    width:73%;
-    height: auto;
+    width: auto;
+    height: 47%;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
 }
 
@@ -1560,6 +1570,7 @@ input[type="range"]:focus::-moz-range-thumb{
     left: 32%;
     width: 10%;
     height: 9%;
+    color: #385225;
     background-color: #CEE375;
     border-radius: 1em;
     border: 0.20em solid #6f895d;
@@ -1573,6 +1584,12 @@ input[type="range"]:focus::-moz-range-thumb{
 
 .currency-pop-first {
     height: 50%;
+    column-gap: 2%;
+}
+
+.currency-pop-first > .icon {
+    position: relative;
+    left: 10%;
 }
 
 @keyframes slidedown-pop {
@@ -1777,12 +1794,17 @@ input[type="range"]:focus::-moz-range-thumb{
     border-radius: 0.3em;
 }
 
+.filter-row > button:hover {
+    filter: brightness(110%);
+}
+
 .filter-row div:nth-child(2) {
     position: absolute;
     top: -400%;
     height: 380%;
     width: 90%;
-    background-color: #423624f5;
+    background-color: #423624;
+    border: 0.25em solid #7C7768;
     border-radius: 0.4em;
     display: flex;
     flex-direction: row;
@@ -1809,7 +1831,8 @@ input[type="range"]:focus::-moz-range-thumb{
     top: -300%;
     height: 280%;
     width: 90%;
-    background-color: #423624f5;
+    background-color: #423624;
+    border: 0.25em solid #7C7768;
     border-radius: 0.4em;
     display: flex;
     flex-direction: row;
@@ -1858,7 +1881,7 @@ input[type="range"]:focus::-moz-range-thumb{
 #adventure-button {
     position: relative;
     height: 12%;
-    width: 100%;
+    width: 35%;
     background-image: url(./assets/expedbg/exped-button.webp);
     font-size: 1.4em;
     color: #E1D8CB;
@@ -2120,7 +2143,7 @@ input[type="range"]:focus::-moz-range-thumb{
 .achieve {                                         
     z-index:2;
     position: absolute;
-    bottom: 15%;
+    bottom: 18%;
     width:90%;
     height:10%;
     text-align: center;
@@ -2129,7 +2152,7 @@ input[type="range"]:focus::-moz-range-thumb{
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    animation: fadeOut 4s cubic-bezier(.93,-0.24,.93,.81) forwards;
+    animation: fadeInOut 4.5s cubic-bezier(.93,-0.24,.93,.81) forwards;
 }
 
 .achieveH1 {
@@ -2140,9 +2163,15 @@ input[type="range"]:focus::-moz-range-thumb{
     font-size: 0.8em;
 }
 
+@keyframes fadeInOut {
+    0% {opacity: 0.65}
+    5% {opacity: 1}
+    100% {opacity: 0}
+}
+
 @keyframes fadeOut {
-    from {opacity: 1}
-    to {opacity: 0}
+    0% {opacity: 1}
+    100% {opacity: 0}
 }
 
 .achieve:hover {
@@ -2296,6 +2325,10 @@ input[type="range"]:focus::-moz-range-thumb{
     text-shadow: #2e2411 0.15em 0.15em 0.2em;
 }
 
+#tool-tip-button:hover {
+    filter: brightness(115%);
+}
+
 /*/////////////////////// SHOP CSS (TABLE 7) ///////////////////////////////*/
 #table7 {
     justify-content: flex-start;
@@ -2305,7 +2338,7 @@ input[type="range"]:focus::-moz-range-thumb{
 
 #table7::before {
     position: absolute;
-    opacity: 0.5;
+    opacity: 0.9;
     width: 100%;
     height: 100%;
     content: '';
@@ -2391,7 +2424,7 @@ input[type="range"]:focus::-moz-range-thumb{
 #table7-text {
     box-sizing: border-box;
     padding: 1.5%;
-    width: 75%;
+    width: 70%;
     height: 100%;
     font-size: 1.1em;
     color: #462b15;
@@ -2444,9 +2477,15 @@ input[type="range"]:focus::-moz-range-thumb{
     width: 20%;
     height: 50%;
     background-color: #6e6240;
-    color: #ead5c3;
+    color: #ffffff;
     text-shadow: 0.05em 0.05em 0.05em #00000048;
+    border: 0.15em solid #3a2f17;
     border-radius:0.5em;
+}
+
+.store-buy:hover {
+    background-color: #b2a77e;
+    color: #32280f;
 }
 
 .purchased {
@@ -2462,8 +2501,6 @@ input[type="range"]:focus::-moz-range-thumb{
     object-fit: contain;
     z-index: 5;
 }
-
-
 
 /*/////////////////////// NUT SHOP CSS ///////////////////////////////*/
 .nut-store-access {
@@ -2493,6 +2530,33 @@ input[type="range"]:focus::-moz-range-thumb{
     row-gap: 1.5%;
 }
 
+.nut-store-table > :last-child {
+    position: absolute;
+    left: 10%;
+    top: 12%;
+    width: 15%;
+    height: 5%;
+    border-radius: 0.3em 0.3em 0 0;
+    border: 0.15em solid #679943;
+    border-bottom: 0;
+    background: #233d10;
+    overflow:hidden;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    color: #daedcb;
+    filter: none;
+}
+
+.nut-store-table > :last-child > img {
+    position: relative;
+    left:5%; 
+    height: 150%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.15em #b7a81e)
+}
+
 .nut-store-table > img {
     position: relative;
     top:1%;
@@ -2503,29 +2567,35 @@ input[type="range"]:focus::-moz-range-thumb{
 
 .nut-store-table > div {
     position: absolute;
+    box-sizing: border-box;
+    padding: 1%;
     top: 17%;
     height: 70%;
     width: 90%;
-    object-fit: contain;
-    flex-wrap: wrap;
     gap: 1%;
-    overflow-y: auto;
-    box-sizing: border-box;
-    border: 0.2em ridge #73b146;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    justify-content: unset;
+    align-items: center;
+    border: 0.2em solid #436928;
+    border-radius: 1em 0 0 1em;
     background-image: url(./assets/bg/nutShopInterior.webp);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    /* background: url(./assets/bg/nutShopLeft.webp), url(./assets/bg/nutShopMid.webp), url(./assets/bg/nutShopRight.webp);
-    background-repeat: no-repeat;
-    background-position: left, center, right;
-    background-size: auto 100%, 80% 100%, auto 100%; */
+    filter: drop-shadow(0.2em 0.2em 0.2em #9ac57c);
+    scrollbar-color: #E1DBD0 #88AD83;
 }
 
-.nut-store-table > div > div {
-    height: 40%;
-    width: 45%;
-    background-color: yellow;
+.nut-store-table > div::-webkit-scrollbar-thumb {
+  background-color: #88AD83;
+  border-radius: 0.1em;
+}
+
+.nut-store-table > div::-webkit-scrollbar-thumb:hover {
+  background-color: #466842;
 }
 
 .nut-store-table > button {
@@ -2540,11 +2610,12 @@ input[type="range"]:focus::-moz-range-thumb{
     background-size: contain;
     font: inherit;
     font-size: 1.3em;
-    color: #203916;
+    color: white;
+    text-shadow: var(--text-shadow-075);
 }
 
 .nut-store-table > button:hover {
-    filter: drop-shadow(0 0 0.3em #2b7236);
+    filter: drop-shadow(0 0 0.3em #e1f0e3);
 }
 
 .nut-store-table::before {
@@ -2557,5 +2628,91 @@ input[type="range"]:focus::-moz-range-thumb{
     background-image: url(./assets/bg/nutShop.webp);
     background-size: cover;
     background-position: center;
-    opacity: 0.3;
+    opacity: 0.9;
+}
+
+.nut-shop-button {
+    flex: none;
+    height: 35%;
+    width: 90%;
+    box-sizing: border-box;
+    padding: 1% 2% 1% 2%;
+    row-gap: 2%;
+    background-color: #F5F0EA;
+    border: 0.2em solid #B1A79A;
+    border-radius: 0 1em 1.8em 0;
+    flex-wrap: wrap;
+    align-items: normal;
+    justify-content: space-between;
+}
+
+.nut-shop-button > p:first-of-type {
+    height: 25%;
+    width: 70%;
+    font-size: 1.2em;
+    color: #5a4a25;
+    text-shadow: 0.05em 0.025em 0em #90795a50;
+    border-bottom: 0.1em Solid #786436;
+}
+
+.nut-shop-button > p:nth-child(2) {
+    position: relative;
+    top: 1.5%;
+    height: 25%;
+    width: 22%;
+    text-align: right;
+    font-size: 1.2em;
+    color: white;
+    text-shadow: var(--text-shadow-075);
+}
+
+.nut-shop-button > img {
+    height: 75%;
+    width: 15%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.35em rgb(145, 122, 63));
+}
+
+.nut-shop-button > p:nth-child(4) {
+    height: 75%;
+    width: 55%;
+    padding-top: 1.5%;
+    color: #7b6c47;
+    text-shadow: 0.05em 0.05em 0em #90795a51;
+}
+
+.nut-shop-button > div {
+    position: relative;
+    top: 2.5%;
+    height: 60%;
+    width: 20%;
+    row-gap: 2%;
+    font: inherit;
+    font-size: 1.1em;
+    color: #405c2d;
+    background-color: #ABD5A7;
+    border: 0.2em solid #79A274;
+    border-radius: 0.25em 0.25em 0.7em 0.25em;
+    transition: 0.35s ease;
+}
+
+.nut-shop-button > div:hover {
+    background-color: #558250;
+    border: 0.2em solid #405c2d;
+    color: #cbf2b1;
+}
+
+.nut-shop-button > div > div {
+    height: 30%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.nut-shop-button > div > div > img {
+    width: 15%;
+    object-fit: contain;
+    position: relative;
+    left:2.5%;
+    filter: drop-shadow(0 0 0.2em #b7a81e);
 }

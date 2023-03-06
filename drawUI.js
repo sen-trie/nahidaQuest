@@ -288,7 +288,7 @@ function preloadFolders(upgradeInfo) {
     let Array = [["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"],
                  ["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"],
                  ["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"],
-                 ["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","verybad-1","verygood-3","event-easy","event-hard"],        
+                 ["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","event-easy","event-hard"],        
     ];
 
     for (let i=0; i < Array.length; i++) {
@@ -303,7 +303,7 @@ function preloadFolders(upgradeInfo) {
         preloadImage(7,element);
     }
 
-    let eightArray = ["icon/box-","icon/good-"];
+    let eightArray = ["event/box-","event/good-"];
     for (let element of eightArray) {
         preloadImage(8,element);
     }
@@ -316,7 +316,7 @@ function preloadFolders(upgradeInfo) {
     }
 
     preloadImage(4,"event/whopperflower-");
-    preloadImage(5,"icon/bad-");
+    preloadImage(5,"event/bad-");
     preloadImage(5,"tutorial/tut-");
     preloadImage(10,"event/weasel-");
     preloadImage(21,"achievement/");

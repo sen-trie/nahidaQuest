@@ -5,24 +5,41 @@ let saveValuesDefault = {
     realScore:11e28,
     freeLevels:0,
     primogem:111000,
-    energy:10000,
+    energy:11100,
     rowCount:0,
     heroesPurchased:0,
     wishUnlocked: false,
     wishCounterSaved:0,
     goldenNut: 0,
     goldenTutorial: false,
-    upperEnergyRate: 20,
-    lowerEnergyRate: 10,
 }
 
-let persisentValues = {
+let persistentValuesDefault = {
     goldenCore: 0,
+    upperEnergyRate: 30,
+    lowerEnergyRate: 15,
+    upgrade0:{Cost: 1, Purchased: 0},
+    upgrade1:{Cost: 1, Purchased: 0},
+    upgrade2:{Cost: 1, Purchased: 0},
+    upgrade3:{Cost: 1, Purchased: 0},
+    upgrade4:{Cost: 1, Purchased: 0},
+    upgrade5:{Cost: 1, Purchased: 0},
+    upgrade6:{Cost: 1, Purchased: 0},
 }
 
 let SettingsDefault = {
     bgmVolume:0.5,
     sfxVolume:0.5,
+}
+
+let permUpgrades = {
+    0:{Name:"Blessing of Vitality",          Description:"Increases Energy gained by clicking Big Nahida."},
+    1:{Name:"Blessing of Riches",            Description:"Increases Primogems gained from Events/Achievements."},
+    2:{Name:"Blessing of Strength",          Description:"Increases effectiveness of Weapons and Talents."},
+    3:{Name:"Blessing of Fortification",     Description:"Increases effectiveness of Artifacts, Gems and Food."},
+    4:{Name:"Blessing of Wanderlust",        Description:"Increases power scaling of Wish characters."},
+    5:{Name:"Blessing of Enlightenment",     Description:"Decreases cooldown between Event spawns."},
+    6:{Name:"Blessing of Concession",        Description:"Decreases price of Dori's Shop items."},
 }
 
 let upgradeDictDefault = {
@@ -859,4 +876,4 @@ let achievementListDefault = {
     408: {Name:"A Golden Experience",                 Description:"Obtain 100 Golden Nuts"                     },
 }
 
-export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persisentValues };
+export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades };
