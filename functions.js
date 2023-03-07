@@ -1,10 +1,10 @@
 // ABBREVIATES NUMBERS TO SHORTER FORM
-function abbrNum(number,short) {
+function abbrNum(number,digits,short) {
     let decPlaces = Math.pow(10, 3);
     let abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion", " Undecillion", " Duodecillion"];
     let abbrevShort = [""," M"," Bi"," T"," q"," Q"," s"," S", " O", " N", " d", " U", " D"];
 
-    if (short === true) {
+    if (digits === 2) {
         decPlaces = Math.pow(10, 2);
     }
 

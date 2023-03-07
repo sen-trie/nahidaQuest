@@ -2088,7 +2088,7 @@ input[type="range"]:focus::-moz-range-thumb{
 
 #wish-nps-display {
     position: absolute;
-    top: 10%;
+    top: 15%;
     left: 3%;
     height: auto;
     width: auto;
@@ -2101,6 +2101,47 @@ input[type="range"]:focus::-moz-range-thumb{
     filter: drop-shadow(0.25em 0.25em 0.1em #90765584);
 }
 
+#wish-counter-display {
+    position: absolute;
+    top: 7%;
+    left: 5%;
+    height: 8%;
+    width: 20%;
+    background-color: #ae765c;
+    color: white;
+    border: 0.2em solid #6E4431;
+    box-sizing: border-box;
+    border-radius: 0.3em 0.3em 0 0;
+    border-bottom: 0;
+    color: #e5ddda;
+    font-size: 1.25em;
+}
+
+#wish-counter-display > img {
+    position: relative;
+    left: 8%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.15em #b7a81e);
+}
+
+.wish-img {
+    position: relative;
+    height: 60%;
+    width: auto;
+    animation: dropDown 1.5s ease forwards;
+    transition: 0.5s ease;
+}
+
+@keyframes dropDown {
+    0% {top: -100%}
+    100% {top: 0%}
+}
+
+.wish-img:hover {
+    transform: scale(1.05);
+}
+
 /*/////////////////////////////// ACHIEVEMENT (TABLE5) CSS ///////////////////////////////*/
 #table5-container {
     font-size: 10;
@@ -2110,34 +2151,6 @@ input[type="range"]:focus::-moz-range-thumb{
     justify-content: center;
     align-items: center;
     font-size: inherit;
-}
-
-.table5-Image {
-    position: absolute;
-    width: 90%;
-    height: 90%;
-    background:url(./assets/bg/left.webp), url(./assets/bg/middle.webp), url(./assets/bg/right.webp);
-    background-repeat: no-repeat;
-    background-position: left, center, right;
-    background-size: auto 100%, 90% 100%, auto 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.flex-container-ACHIEVEMENT {
-    position: absolute;
-    top: 7.5%;
-    width: 85%;
-    height: 79%;
-    
-    overflow-y: auto;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    align-content: flex-start;
-    justify-content: flex-start;
-    gap: 1% 1%;
 }
 
 .achieve {                                         
@@ -2178,6 +2191,34 @@ input[type="range"]:focus::-moz-range-thumb{
     transition: 0.4s ease;
 }
 
+.table5-Image {
+    position: absolute;
+    width: 95%;
+    height: 95%;
+    background:url(./assets/bg/left.webp), url(./assets/bg/middle.webp), url(./assets/bg/right.webp);
+    background-repeat: no-repeat;
+    background-position: left, center, right;
+    background-size: auto 100%, 90% 100%, auto 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-container-ACHIEVEMENT {
+    position: absolute;
+    top: 5%;
+    width: 90%;
+    height: 85%;
+    
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: flex-start;
+    justify-content: flex-start;
+    gap: 1% 1%;
+}
+
 .achievementImageContainer {
     width: 20%;
     height: auto;
@@ -2214,13 +2255,13 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .achieveStoredH1 {
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: #343030;
     margin: 0;
 }
 
 .achieveStoredH2 {
-    font-size: 0.7em;
+    font-size: 0.75em;
     margin: 0;
 }
 

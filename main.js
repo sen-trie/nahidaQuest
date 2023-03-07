@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-4-3";
+const VERSIONNUMBER = "v0.2.BETA-7-3";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -11,9 +11,11 @@ const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and G
 let mainBody = document.getElementById("game");   
 let startText = document.getElementById("start-screen"); 
 let versionText = document.getElementById("vers-number");
-let startAlready = false;
 versionText.innerText = VERSIONNUMBER;
 versionText.classList.add("version-text");
+let startAlready = true;
+setTimeout(()=>{startAlready = false},500);
+
 
 let copyrightText = document.getElementById("copyright-number"); 
 copyrightText.innerText = COPYRIGHT;
@@ -66,7 +68,6 @@ function deleteConfirmMenu(type,location) {
             deleteBox.style.zIndex = -1;
         } 
     }
-    
 }
 
 function deleteConfirmButton(confirmed) {
@@ -130,10 +131,11 @@ setTimeout(()=>{
     mainBody.style.display = "block";
 },300)
 
+//------------------------------------------------------------------------POST SETUP------------------------------------------------------------------------//
 function startGame() {
-drawUI.preloadFoldersPriority();
-setTimeout(()=>{
-    drawUI.preloadFolders(upgradeInfo);
+    drawUI.preloadFoldersPriority();
+    setTimeout(()=>{
+        drawUI.preloadFolders(upgradeInfo);
 },300);
 
 // GLOBAL VARIABLES
@@ -153,7 +155,7 @@ const XPMAX = 4004;
 const NONWISHHEROMAX = 49
 const WISHHEROMIN = 100;
 
-const WISHCOST = 360;
+const WISHCOST = 1;
 const STARTINGWISHFACTOR = 50;
 let wishMultiplier = 0;
 let adventureType = 0;
@@ -164,19 +166,19 @@ const SHOPCOOLDOWN = 60;
 const SHOP_THRESHOLD = 600;
 
 // ACHIEVEMENT THRESHOLDS
-var achievementData = {
+let achievementData = {
     achievementTypeRawScore:      [100,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29,1e30,1e32],
     achievementTypeRawDPS:        [10,100,1000,1e5,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29],
     achievementTypeRawClick:      [1e1,1e2,5e2,1e3,2.5e3,5e3,7.5e3,1e4,1.5e4,2e4,2.5e4,3e4,3.5e4,4e4,5e4],
     achievementTypeRawCollection: [1,10,100,250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000],
-    achievementTypeGolden:        [1,3,7,15,30,50,75,100],
+    achievementTypeGolden:        [1,10,25,50,100,200,350,500,750,1000],
 }
-var scoreAchievement = [1,101,201,301,401];
+let scoreAchievement = [1,101,201,301,401];
 
-var foodBuff = 1;
-var clickerEvent = false;
-var shopTime = 0;
-var shopTimerElement = null;
+let foodBuff = 1;
+let clickerEvent = false;
+let shopTime = 0;
+let shopTimerElement = null;
 let filteredHeroes = [];
 let filteredInv = [];
 
@@ -189,7 +191,7 @@ let primogemDisplay = document.getElementById("primogem");
 let leftDiv = document.getElementById("left-div");
 let midDiv = document.getElementById("mid-div");
 let rightDiv = document.getElementById("right-div");
-var multiplierButtonContainer;
+let multiplierButtonContainer;
 
 // MAIN BODY VARIABLES
 drawUI.drawMainBody();
@@ -274,8 +276,8 @@ window.oncontextmenu = function (){
 
 // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH FREQUENCY SET TO TIME RATIO)
 function timerEvents() {
-    // 1 timerSeconds == 1 SECOND IN REAL TIME
-    let timeRatioTemp =  timeRatio / 1000;
+    // 1 timerSeconds = 1 SECOND IN REAL TIME
+    let timeRatioTemp = timeRatio / 1000;
     timerSeconds += timeRatioTemp;
     
     checkAchievement();
@@ -440,7 +442,7 @@ demoContainer.addEventListener("mouseup", () => {
         }
     }
 
-    demoContainer = floatText(leftDiv,abbrNum(clickEarn),randomInteger(20,80),randomInteger(50,70));
+    demoContainer = floatText(leftDiv,abbrNum(clickEarn,2,true),randomInteger(20,80),randomInteger(50,70));
     let number = randomInteger(2,6);
     let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`;
 
@@ -484,7 +486,6 @@ function randomEventTimer(timerSeconds) {
         }
         return;
     }
-    
     if (timerSeconds > eventTimeMin) {eventChance = randomInteger(0,100)}
 }
 
@@ -1236,7 +1237,7 @@ function loadingAnimation() {
     var siteWidth = 1080;
     var scale = screen.width / (siteWidth);
     document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
-    setTimeout(() => {removeLoading()}, 2000);
+    setTimeout(() => {removeLoading()}, 5000);
 }
 
 function removeLoading() {
@@ -1592,15 +1593,15 @@ function createMultiplierButton() {
     multiplierButtonContainer.classList.add("multiplier-button-container");
 
     let multiplierButton1 = document.createElement("button");
-    multiplierButton1 = multiplierButtonAdjust(multiplierButton1,1)
+    multiplierButton1 = multiplierButtonAdjust(multiplierButton1,1);
     multiplierButton1.addEventListener("click",() => {costMultiplier(10),currentDimMultiplier = dimMultiplierButton(1, currentDimMultiplier)})
 
     let multiplierButton2 = document.createElement("button");
-    multiplierButton2 = multiplierButtonAdjust(multiplierButton2,2)
+    multiplierButton2 = multiplierButtonAdjust(multiplierButton2,2);
     multiplierButton2.addEventListener("click",() => {costMultiplier(25),currentDimMultiplier = dimMultiplierButton(2, currentDimMultiplier)})
     
     let multiplierButton3 = document.createElement("button");
-    multiplierButton3 = multiplierButtonAdjust(multiplierButton3,3)
+    multiplierButton3 = multiplierButtonAdjust(multiplierButton3,3);
     multiplierButton3.addEventListener("click",() => {costMultiplier(100),currentDimMultiplier = dimMultiplierButton(3, currentDimMultiplier)})
 
     multiplierButtonContainer.append(multiplierButton3, multiplierButton2, multiplierButton1);
@@ -1772,7 +1773,7 @@ function loadRow() {
 
     for (let j = 0, len=Object.keys(rowTempDict).length; j < len; j++) {
         let loadedHeroID = rowTempDict[j];
-        var heroTextLoad;
+        let heroTextLoad;
 
         let upgradeDictTemp = upgradeDict[loadedHeroID];
         let formatCost = upgradeDictTemp["BaseCost"];
@@ -1931,7 +1932,6 @@ function costMultiplier(multi) {
     while (i--) {
         if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
         if (upgradeDict[i]["Purchased"] > 0) {
-            let realScoreCurrent = saveValues["realScore"];
             let buttID = "but-" + upgradeDict[i].Row;
             refresh(buttID, upgradeDict[i]["BaseCost"], i);
         }
@@ -2090,6 +2090,8 @@ function itemUse(itemUniqueId) {
     } else if (itemID >= 4001 && itemID < XPMAX){
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         refresh();
+    } else if (itemID === 4010) {
+        saveValues["mailCore"]++;
     } else if (itemID === 5001 || itemID === 5002) {
         let power = 1;
         if (Inventory[itemID].Star === 5) {
@@ -2338,11 +2340,12 @@ function inventoryDraw(itemType, min, max, type){
 function createExpedition() {
     for (let i = 1; i < 6; i++) {
         let expedButton = document.createElement("button");
+        let backgroundImg;
         
         if (expeditionDict[i]["Locked"] == 1){
-            var backgroundImg = "url(./assets/expedbg/exped6.webp)";
+            backgroundImg = "url(./assets/expedbg/exped6.webp)";
         } else {
-            var backgroundImg = "url(./assets/expedbg/exped" + i + ".webp)";
+            backgroundImg = "url(./assets/expedbg/exped" + i + ".webp)";
         }
 
         expedButton = expedButtonAdjust(expedButton, backgroundImg, i)
@@ -2446,7 +2449,7 @@ function wishUnlock() {
     let wishButton = document.getElementById("wishButton");
     let wishButtonPrimo = document.createElement("img");
     wishButtonPrimo.classList.add("wish-button-primo");
-    wishButtonPrimo.src = "./assets/icon/primogemIcon.webp";
+    wishButtonPrimo.src = "./assets/icon/mailLogo.webp";
     
     wishButtonText.innerText = "Write for help | " +WISHCOST;
     wishButtonText.append(wishButtonPrimo);
@@ -2475,9 +2478,15 @@ function wishUnlock() {
     let wishNpsDisplay = document.createElement("div");
     wishNpsDisplay.id = "wish-nps-display";
     wishNpsDisplay.classList.add("flex-row");
+    let wishCurrencyCounter = document.createElement("div");
+    wishCurrencyCounter.id = "wish-counter-display";
+    wishCurrencyCounter.classList.add("flex-row")
+    wishCurrencyCounter.innerText = saveValues.mailCore;
+    let wishCurrencyImage = document.createElement("img");
+    wishCurrencyImage.src = "./assets/icon/mailLogo.webp";
     
-    
-    wishContainer.append(wishTutorial,wishHelpText,wishNpsDisplay);
+    wishCurrencyCounter.appendChild(wishCurrencyImage);
+    wishContainer.append(wishTutorial,wishHelpText,wishNpsDisplay,wishCurrencyCounter);
     updateWishDisplay();
 }
 
@@ -2500,7 +2509,8 @@ function drawWish() {
     wishButton.append(wishButtonImg,wishButtonText)
     mailImageDiv.append(wishButton);
 
-    if (wishCounter === saveValues["wishCounterSaved"]) {
+    if (saveValues["wishCounterSaved"] === wishCounter) {
+        wishUnlock();
         stopWish();
     } else if (saveValues["wishUnlocked"] == true) {
         goldenNutUnlocked = true;
@@ -2509,11 +2519,17 @@ function drawWish() {
 }
 
 function updateWishDisplay() {
-        if (document.getElementById("wish-nps-display")) {
-            let wishNpsDisplay = document.getElementById("wish-nps-display");
+    if (document.getElementById("wish-nps-display")) {
+        let wishNpsDisplay = document.getElementById("wish-nps-display");
+        if (saveValues["wishCounterSaved"] >= wishCounter) {
+            wishNpsDisplay.innerText = "All Wish Heroes obtained!";
+        } else {
             wishNpsDisplay.innerText = `Next character's NpS: ${abbrNum(Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/300 + 1))}`;
         }
+        let wishCurrency = document.getElementById("wish-counter-display");
+        wishCurrency.innerHTML = wishCurrency.innerHTML.replace(/[^<]+</g, `${saveValues.mailCore}<`);
     }
+}
 
 function stopWish() {
     let wishButton = document.getElementById("wishButton");
@@ -2521,7 +2537,7 @@ function stopWish() {
     wishButtonText.innerText = "Closed";
 
     let wishNpsDisplay = document.getElementById("wish-nps-display");
-    wishNpsDisplay.style.display = "none";
+    wishNpsDisplay.innerText = "All Wish Heroes obtained!";
 
     var new_wishButton = wishButton.cloneNode(true);
     wishButton.parentNode.replaceChild(new_wishButton, wishButton);
@@ -2529,16 +2545,19 @@ function stopWish() {
     mailImageTemp.remove();
 }
 
+let stopWishAnimation = false;
 function wish() {
-    if (wishCounter === saveValues["wishCounterSaved"]) {
+    if (stopWishAnimation === true) {return};
+    if (saveValues["wishCounterSaved"] >= wishCounter) {
         stopWish();
         return;
     }
 
-    if (saveValues["primogem"] >= WISHCOST) {
+    if (saveValues["mailCore"] >= 1) {
+        stopWishAnimation = true;
         mailElement.load();
         mailElement.play();
-        saveValues["primogem"] -= WISHCOST;
+        saveValues["mailCore"] -= 1;
 
         // SCARAMOUCHE WILL ALWAYS BE THE FIRST WISH HERO
         while (wishCounter) {
@@ -2568,10 +2587,32 @@ function wish() {
 
                 let mailImageTemp = document.getElementById("mailImageID");
                 mailImageTemp.style.opacity = 0;
+                wishAnimation(randomWishHero);
                 break;
             }
         }
     }
+}
+
+function wishAnimation(randomWishHero) {
+    stopSpawnEvents = true;
+    let nameTemp = upgradeInfo[randomWishHero].Name;
+    drawUI.preloadImage(1,`tooltips/letter-${nameTemp}`, true);
+    setTimeout(()=>{
+        let wishBackdropDark = document.createElement("div");
+        wishBackdropDark.classList.add("cover-all","flex-column","tutorial-dark");
+
+        let wishImage = document.createElement("img");
+        wishImage.classList.add("wish-img");
+        wishImage.src = `./assets/tooltips/letter-${nameTemp}.webp`;
+        wishImage.addEventListener("click",()=>{
+            wishBackdropDark.remove();
+            stopWishAnimation = false;
+        })
+
+        wishBackdropDark.appendChild(wishImage);
+        mainBody.appendChild(wishBackdropDark);
+    },750);
 }
 
 //------------------------------------------------------------------------TABLE 5 (ACHIEVEMENTS)------------------------------------------------------------------------//
@@ -2758,7 +2799,7 @@ function changeTooltip(dict, type, number) {
     if (type == "hero") {
         let tooltipTextLocal = "Level: " + upgradeDict[number]["Purchased"] + 
                                 "\n Free Levels: " + saveValues["freeLevels"] + 
-                                "\n" + abbrNum(upgradeDict[number]["Contribution"]) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
+                                "\n" + abbrNum(upgradeDict[number]["Contribution"],2) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
 
         tooltipElementImg.src = "./assets/tooltips/elements/" +dict.Ele+ ".webp";
@@ -2887,8 +2928,6 @@ function shopCheck() {
     }
 }
 
-
-
 // ADDS MID-GAME SHOP TAB
 function addShop() {
     let tabFlex = document.getElementById("flex-container-TAB");
@@ -2933,8 +2972,14 @@ function setShop() {
         let inventoryNumber;
         if (i >= 6 && i <= 10) {
             inventoryNumber = inventoryDraw("talent", 2,4, "shop");
-        } else if (i >= 2 && i <= 5) {
+        } else if (i >= 2 && i <= 4) {
             inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+        } else if (i === 5) {
+            if (saveValues["wishUnlocked"] === true) {
+                inventoryNumber = 4010;
+            } else {
+                inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+            }
         } else {
             inventoryNumber = inventoryDraw("weapon", 4,6, "shop")
         }
@@ -3165,7 +3210,7 @@ function addNutStore() {
         let nutShopButtonTop = document.createElement("p");
         nutShopButtonTop.innerText = `Upgrade`;
         let nutShopButtonBottom = document.createElement("div");
-        nutShopButtonBottom.innerText = `${abbrNum(persistentValues["upgrade"+i].Cost,true)}`;
+        nutShopButtonBottom.innerText = `${abbrNum(persistentValues["upgrade"+i].Cost,2,true)}`;
         let nutShopMail = document.createElement("img");
         nutShopMail.src = "./assets/icon/core.webp";
 
@@ -3215,7 +3260,7 @@ function nutPopUp() {
 function updateCoreCounter() {
     if (!document.getElementById("nut-store-currency")) {return}
     let nutCounter = document.getElementById("nut-store-currency");
-    let currentCount = abbrNum(persistentValues.goldenCore,true);
+    let currentCount = abbrNum(persistentValues.goldenCore,2,true);
     nutCounter.innerHTML = nutCounter.innerHTML.replace(/[^<]+</g, `${currentCount}<`);
 }
 
@@ -3298,7 +3343,11 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
                 if (saveValues["wishUnlocked"] === true) {
                     return;
                 } else {
+                    newPop(1);
                     newPop(3);
+                    inventoryAdd(4010);
+                    currencyPopUp("mail",1);
+                    saveValues.mailCore--;
                     wishUnlock();
                     saveValues["wishUnlocked"] = true;
                     goldenNutUnlocked = true;
@@ -3322,21 +3371,25 @@ function currencyPopUp(type1, amount1, type2, amount2) {
     currencyPopFirst.innerHTML = amount1 + "   ";
     let currencyPopFirstImg = document.createElement("img");
 
-    if (type1 == "energy") {
+    if (type1 === "energy") {
         currencyPopFirstImg.src = "./assets/icon/energyIcon.webp";
         currencyPopFirstImg.classList.add("icon");
         saveValues.energy += amount1;
-    } else if (type1 == "primogem") {
+    } else if (type1 === "primogem") {
         currencyPopFirstImg.src = "./assets/icon/primogemIcon.webp";
         currencyPopFirstImg.classList.add("icon","primogem");
         saveValues.primogem += amount1;
-    } else if (type1 == "nuts") {
+    } else if (type1 === "nuts") {
         currencyPopFirstImg.src = "./assets/icon/goldenIcon.webp";
         currencyPopFirstImg.classList.add("icon","primogem");
         saveValues.goldenNut += amount1;
         persistentValues.goldenCore += amount1;
         updateCoreCounter();
         nutPopUp();
+    } else if (type1 === "mail") {
+        currencyPopFirstImg.src = "./assets/icon/mailLogo.webp";
+        currencyPopFirstImg.classList.add("icon","primogem");
+        saveValues.mailCore += amount1;
     }
 
     currencyPopFirst.append(currencyPopFirstImg);
@@ -3347,15 +3400,15 @@ function currencyPopUp(type1, amount1, type2, amount2) {
         currencyPopSecond.innerHTML = amount2 + "   ";
 
         let currencyPopSecondImg = document.createElement("img");
-        if (type2 == "energy") {
+        if (type2 === "energy") {
             currencyPopSecondImg.src = "./assets/icon/energyIcon.webp";
             currencyPopSecondImg.classList.add("icon");
             saveValues.energy += amount2;
-        } else if (type2 == "primogem") {
+        } else if (type2 === "primogem") {
             currencyPopSecondImg.src = "./assets/icon/primogemIcon.webp";
             currencyPopSecondImg.classList.add("icon","primogem");
             saveValues.primogem += amount2;
-        } else if (type2 == "nuts") {
+        } else if (type2 === "nuts") {
             currencyPopSecondImg.src = "./assets/icon/goldenIcon.webp";
             currencyPopSecondImg.classList.add("icon","primogem");
             saveValues.goldenNut += amount2;

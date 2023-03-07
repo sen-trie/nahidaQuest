@@ -327,13 +327,18 @@ function preloadFolders(upgradeInfo) {
     imgTwo.src = filePath + "/expedbg/exped-button.webp";
 }
 
-function preloadImage(max,path) {
+function preloadImage(max,path,single) {
     let filePath = "./assets/";
     let i = 1;
-    while (i < max) {
+    if (single === true) {
         let img = new Image();
-        img.src = filePath + path + i + ".webp";
-        i++;
+        img.src = filePath + path + ".webp";
+    } else {
+        while (i < max) {
+            let img = new Image();
+            img.src = filePath + path + i + ".webp";
+            i++;
+        }
     }
 }
 
