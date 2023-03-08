@@ -3,23 +3,51 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-7-3";
+const VERSIONNUMBER = "v0.2.BETA-8-3";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
 let mainBody = document.getElementById("game");   
 let startText = document.getElementById("start-screen"); 
-let versionText = document.getElementById("vers-number");
-versionText.innerText = VERSIONNUMBER;
-versionText.classList.add("version-text");
 let startAlready = true;
 setTimeout(()=>{startAlready = false},500);
 
+if (localStorage.getItem("settingsValues") !== null) {
+    let startButton = document.getElementById("start-button");
+    startButton.classList.remove("dim-filter");
+    startButton.addEventListener("click",()=> {
+        if (!startAlready) {
+            startAlready = true;
+            startGame(false);
+        
+            setTimeout(function() {
+                let deleteBox = document.getElementById("confirm-box");
+                if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
+                startText.remove();
+            },200)
+        }
+    });
 
-let copyrightText = document.getElementById("copyright-number"); 
-copyrightText.innerText = COPYRIGHT;
-copyrightText.classList.add("copyright-text");
+    let startChance = randomInteger(1,11);
+    if (startChance === 1) {
+        let startIdle = document.createElement("img");
+        startIdle.src = "./assets/icon/nahida-start.webp";
+        startIdle.id = "start-idle-nahida";
+        startText.append(startIdle);
+    } else if (startChance === 2) {
+        let startIdle = document.createElement("img");
+        startIdle.src = "./assets/icon/shop-start.webp";
+        startIdle.id = "start-idle-dori";
+        startText.append(startIdle);
+    } else if (startChance === 3) {
+        let startIdle = document.createElement("img");
+        startIdle.src = "./assets/icon/scara-start.webp";
+        startIdle.id = "start-idle-scara";
+        startText.style.backgroundImage = "url(./assets/start-night.webp)";
+        startText.append(startIdle);
+    }
+}
 
 let deleteButton = document.getElementById("start-delete");
 deleteButton.addEventListener("click",()=> {
@@ -28,7 +56,7 @@ deleteButton.addEventListener("click",()=> {
     } else {
         if (!startAlready) {
             startAlready = true;
-            startGame();
+            startGame(true);
             setTimeout(()=>startText.remove(),100);
         }
     }
@@ -74,9 +102,9 @@ function deleteConfirmButton(confirmed) {
     if (confirmed == true) {
         if (deleteType === "intro") {
             if (!startAlready) {
-                startAlready = true;
+                startAlready = true;    
                 localStorage.clear();
-                startGame();
+                startGame(true);
                 setTimeout(()=>startText.remove(),200);
             }
         } else if (deleteType === "loaded") {
@@ -90,53 +118,28 @@ function deleteConfirmButton(confirmed) {
     return;
 }
 
-if (localStorage.getItem("settingsValues") !== null) {
-    let startButton = document.getElementById("start-button");
-    startButton.classList.remove("dim-filter");
-    startButton.addEventListener("click",()=> {
-        if (!startAlready) {
-            startAlready = true;
-            startGame();
-        
-            setTimeout(function() {
-                let deleteBox = document.getElementById("confirm-box");
-                if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
-                startText.remove();
-            },200)
-        }
-    });
-
-    let startChance = randomInteger(1,11);
-    if (startChance === 1) {
-        let startIdle = document.createElement("img");
-        startIdle.src = "./assets/icon/nahida-start.webp";
-        startIdle.id = "start-idle-nahida";
-        startText.append(startIdle);
-    } else if (startChance === 2) {
-        let startIdle = document.createElement("img");
-        startIdle.src = "./assets/icon/shop-start.webp";
-        startIdle.id = "start-idle-dori";
-        startText.append(startIdle);
-    } else if (startChance === 3) {
-        let startIdle = document.createElement("img");
-        startIdle.src = "./assets/icon/scara-start.webp";
-        startIdle.id = "start-idle-scara";
-        startText.style.backgroundImage = "url(./assets/start-night.webp)";
-        startText.append(startIdle);
-    }
-}
+let imageWorker = new Worker('workers.js');
+imageWorker.postMessage({
+    operation: 'preload',
+    priority: 'load',
+    path:upgradeInfo,
+});
 
 setTimeout(()=>{
     mainBody = drawUI.buildGame(mainBody);
     mainBody.style.display = "block";
 },300)
 
+let copyrightText = document.getElementById("copyright-number"); 
+copyrightText.innerText = COPYRIGHT;
+copyrightText.classList.add("copyright-text");
+
+let versionText = document.getElementById("vers-number");
+versionText.innerText = VERSIONNUMBER;
+versionText.classList.add("version-text");
 //------------------------------------------------------------------------POST SETUP------------------------------------------------------------------------//
-function startGame() {
-    drawUI.preloadFoldersPriority();
-    setTimeout(()=>{
-        drawUI.preloadFolders(upgradeInfo);
-},300);
+function startGame(firstGame) {
+drawUI.preloadFolders(upgradeInfo);
 
 // GLOBAL VARIABLES
 var saveValues;
@@ -1279,35 +1282,53 @@ function playAudio() {
 // TUTORIAL UPON FIRST LOAD
 function tutorial() {
     let overlay = document.getElementById("loading");
-    let currentSlide = 1;
-    let tutorialDark = document.createElement("div");
-    tutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
+    if (firstGame === true) {
+        let currentSlide = 1;
+        let tutorialDark = document.createElement("div");
+        tutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
 
-    let tutorialImage = document.createElement("img");
-    tutorialImage.classList.add("tutorial-img");
-    tutorialImage.id = "tutorialImg";
-    tutorialImage.src = "./assets/tutorial/tut-1.webp"
-    
-    let tutorialScreen = document.createElement("div");
-    tutorialScreen.classList.add("flex-column","tutorial-screen");
-    tutorialScreen.addEventListener("click", () => {
-        if (currentSlide == 4) {
+        let tutorialImage = document.createElement("img");
+        tutorialImage.classList.add("tutorial-img");
+        tutorialImage.id = "tutorialImg";
+        tutorialImage.src = "./assets/tutorial/tut-1.webp"
+        
+        let tutorialScreen = document.createElement("div");
+        tutorialScreen.classList.add("flex-column","tutorial-screen");
+        tutorialScreen.addEventListener("click", () => {
+            if (currentSlide == 4) {
+                overlay.style.zIndex = -1;
+                clearInterval(timerLoad);
+                timer = setInterval(timerEvents,timeRatio);
+                currentBGM = playAudio();
+                settingsVolume();
+                return;
+            }
+
+            currentSlide++;
+            tutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".webp";
+        })
+
+        tutorialScreen.append(tutorialImage);
+        tutorialDark.appendChild(tutorialScreen);
+        overlay.appendChild(tutorialDark);
+    } else if (firstGame === false) {
+        let tutorialDark = document.createElement("div");
+        tutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
+
+        let playButton = document.createElement("img");
+        playButton.src = "./assets/tutorial/play-button.webp"
+        playButton.classList.add("play-button");
+        playButton.addEventListener("click",()=>{
             overlay.style.zIndex = -1;
             clearInterval(timerLoad);
             timer = setInterval(timerEvents,timeRatio);
             currentBGM = playAudio();
             settingsVolume();
+        })
 
-            return;
-        }
-
-        currentSlide++;
-        tutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".webp";
-    })
-
-    tutorialScreen.append(tutorialImage);
-    tutorialDark.appendChild(tutorialScreen);
-    overlay.appendChild(tutorialDark);
+        tutorialDark.appendChild(playButton)
+        overlay.appendChild(tutorialDark);
+    }
 }
 
 function saveData() {
@@ -2597,7 +2618,11 @@ function wish() {
 function wishAnimation(randomWishHero) {
     stopSpawnEvents = true;
     let nameTemp = upgradeInfo[randomWishHero].Name;
-    drawUI.preloadImage(1,`tooltips/letter-${nameTemp}`, true);
+    imageWorker.postMessage({
+        operation: 'preload',
+        priority: 'single',
+        path:`tooltips/letter-${nameTemp}`,
+    });
     setTimeout(()=>{
         let wishBackdropDark = document.createElement("div");
         wishBackdropDark.classList.add("cover-all","flex-column","tutorial-dark");
@@ -3160,6 +3185,13 @@ function createShopItems(shopDiv, i, inventoryNumber) {
 //------------------------------------------------------------------------ GOLDEN NUT STORE ------------------------------------------------------------------------//
 // ADDS ACCESS BUTTON AFTER 1 NUT
 function addNutStore() {
+    imageWorker.postMessage({
+        operation: 'preload',
+        priority: 'folder',
+        path:`tooltips/nut-shop-`,
+        number: 7,
+    });
+
     let mainTable = rightDiv.childNodes[1];
     let nutStoreTable = document.createElement("div");
     nutStoreTable.classList.add("table-without-tooltip","nut-store-table","flex-column");
@@ -3201,8 +3233,8 @@ function addNutStore() {
         let nutShopLevel = document.createElement("p");
         nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i].Purchased}`;
         nutShopLevel.id = "nut-shop-" + i;
-        let nutShopImg = document.createElement("img");
-        nutShopImg.src = "./assets/tooltips/nut-shop-" +i+ ".webp";
+        let nutShopImg = new Image();
+        nutShopImg.src = "./assets/tooltips/nut-shop-" +(i+1)+ ".webp";
         let nutShopDesc = document.createElement("p");
         nutShopDesc.innerText = permUpgrades[i]["Description"];
         let nutShopButton = document.createElement("div");
@@ -3211,7 +3243,7 @@ function addNutStore() {
         nutShopButtonTop.innerText = `Upgrade`;
         let nutShopButtonBottom = document.createElement("div");
         nutShopButtonBottom.innerText = `${abbrNum(persistentValues["upgrade"+i].Cost,2,true)}`;
-        let nutShopMail = document.createElement("img");
+        let nutShopMail = new Image();
         nutShopMail.src = "./assets/icon/core.webp";
 
         nutShopButtonBottom.appendChild(nutShopMail);
@@ -3227,7 +3259,12 @@ function nutPopUp() {
     } else {
         saveValues.goldenTutorial = true;
         stopSpawnEvents = true;
-        drawUI.preloadImage(4,"tutorial/goldenNut-");
+        imageWorker.postMessage({
+            operation: 'preload',
+            priority: 'folder',
+            path:`tutorial/goldenNut-`,
+            number: 4,
+        });
         setTimeout(()=>{
             addNutStore();
             let currentSlide = 1;
@@ -3432,7 +3469,7 @@ function currencyPopUp(type1, amount1, type2, amount2) {
 }
 
 // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION
-var currentPopUps = [];
+let currentPopUps = [];
 function newPop(type) {
     var newPopUp;
     let className;
@@ -3482,7 +3519,6 @@ function newPop(type) {
             });
         }, 1000);
 
-        setTimeout(() => newPopUp.remove(), 6000);
         let mainBody = document.getElementById("game");    
         mainBody.append(newPopUp);
     }    

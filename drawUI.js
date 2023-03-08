@@ -259,72 +259,14 @@ function drawMailTable(table4) {
     return table4;
 }
 
-function preloadFoldersPriority() {
+function preloadFolders() {
     let filePath = "./assets/";
-    let ArrayPath = ["bg/","tutorial/"];
-    let Array = [["achievementBG","bg","closed","dori-back","left","main-bar","middle","open","right","wish-bg","wood"],
-                 ["buttonBox","eventPill","tut-button","unlockExp-3","unlockExp-4","unlockExp-5"],
-    ];
-    for (let i=0; i<Array.length; i++) {
-        for (let innerElement of Array[i]) {
-            let img = new Image();
-            img.src = filePath + ArrayPath[i] + innerElement + ".webp";
-        }
-    }
-}
-
-function preloadFolders(upgradeInfo) {
-    let filePath = "./assets/";
-    // SCUFFED SOLUTION AS ACCESSING FILES DOESNT WORK ON CLIENT SIDE
-    for (let key in upgradeInfo) {
-        let upgradeName = upgradeInfo[key].Name;
-        let imgOne = new Image();
-        imgOne.src = filePath + "nameplates/" + upgradeName + ".webp";
-        let imgTwo = new Image();
-        imgTwo.src = filePath + "tooltips/hero/" + upgradeName + ".webp";
-    }
-
-    let ArrayPath = ["frames/","tooltips/elements/","event/","icon/",];
-    let Array = [["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"],
-                 ["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"],
-                 ["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"],
-                 ["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","event-easy","event-hard"],        
-    ];
-
-    for (let i=0; i < Array.length; i++) {
-        for (let innerElement of Array[i]) {
-            let img = new Image();
-            img.src = filePath + ArrayPath[i] + innerElement + ".webp";
-        }
-    }
-
-    let sevenArray = ["expedbg/exped","frames/background-","frames/rarity-","tutorial/aranara-"];
-    for (let element of sevenArray) {
-        preloadImage(7,element);
-    }
-
-    let eightArray = ["event/box-","event/good-"];
-    for (let element of eightArray) {
-        preloadImage(8,element);
-    }
-
     let m = 0;
     while (m < 5) {
         let imgOne = new Image();
         imgOne.src = filePath + "achievement/" + (m * 100) + ".webp";
         m++;
     }
-
-    preloadImage(4,"event/whopperflower-");
-    preloadImage(5,"event/bad-");
-    preloadImage(5,"tutorial/tut-");
-    preloadImage(10,"event/weasel-");
-    preloadImage(21,"achievement/");
-
-    let img = new Image();
-    img.src = filePath + "loading.webp";
-    let imgTwo = new Image();
-    imgTwo.src = filePath + "/expedbg/exped-button.webp";
 }
 
 function preloadImage(max,path,single) {
@@ -342,4 +284,4 @@ function preloadImage(max,path,single) {
     }
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders,preloadImage,preloadFoldersPriority }
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders,preloadImage }

@@ -1604,6 +1604,19 @@ input[type="range"]:focus::-moz-range-thumb{
     pointer-events: all;
 }
 
+.play-button {
+    width: auto;
+    height: 15%;
+    object-fit: contain;
+    z-index: 200;
+    pointer-events: all;
+    transition: .15s ease;
+}
+
+.play-button:hover {
+    filter: drop-shadow(0 0 0.4em #967c5f6c)  drop-shadow(0 0 0.6em #967c5fab);
+}
+
 .tutorial-text {
     width: 80%;
     height: 10%;
