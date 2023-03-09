@@ -2,9 +2,7 @@
 function buildGame(mainBody) {
     let loadingDiv = document.createElement("div");
     loadingDiv.id = "loading";
-    loadingDiv.classList.add("cover-all");
-    loadingDiv.classList.add("flex-row");
-    loadingDiv.classList.add("overlay");
+    loadingDiv.classList.add("cover-all","flex-row","overlay");
     let loadingGif = document.createElement("img");
     loadingGif.src = "./assets/loading.webp";
     loadingGif.alt = "Nahida Quest Loading Screen";
@@ -31,8 +29,7 @@ function buildGame(mainBody) {
     midDivImg.classList.add("middle-bar");
 
     let energyPrimoContainer = document.createElement("div");
-    energyPrimoContainer.classList.add("flex-column");
-    energyPrimoContainer.classList.add("energy-primo-container");
+    energyPrimoContainer.classList.add("flex-column","energy-primo-container");
     let energyContainer = document.createElement("div");
     energyContainer.classList.add("pill-value");
     energyContainer.innerHTML = "<img class='pill' alt='' src='./assets/frames/pill.webp'><img class='icon' alt='Energy Icon' src='./assets/icon/energyIcon.webp'><span id='energy'>0</span>";
@@ -62,10 +59,9 @@ function buildGame(mainBody) {
 function drawMainBody() {
     // LEFT DIV/AREA
     let leftDiv = document.getElementById("left-div");
-    let leftImg =  document.createElement("img");
+    let leftImg = document.createElement("img");
     leftImg.src = "./assets/bg/bg.webp";
-    leftImg.classList.add("cover-all");
-    leftImg.classList.add("div-img");
+    leftImg.classList.add("cover-all","div-img");
     leftDiv.appendChild(leftImg);
 
     // RIGHT DIV/AREA
@@ -74,7 +70,7 @@ function drawMainBody() {
     TabDiv.id = "flex-container-TAB";
     let TabDivImg = document.createElement("img");
     TabDivImg.src = "./assets/frames/top-bar.webp";
-    TabDivImg.classList.add("top-bar")
+    TabDivImg.classList.add("top-bar");
     TabDiv.appendChild(TabDivImg);
 
     let mainTable = document.createElement("div");
@@ -83,18 +79,17 @@ function drawMainBody() {
 
     // TABLE 1
     let table1 = document.createElement("div");
-    table1.classList.add("flex-column");
-    table1.classList.add("table-with-tooltip");
+    table1.classList.add("flex-column","table-with-tooltip");
     table1.id = "table1";
 
     // TABLE 2
     let table2 = document.createElement("div");
-    table2.classList += (" flex-container-INVENTORY table-with-tooltip")
+    table2.classList.add("flex-container-INVENTORY","table-with-tooltip")
     table2.id = "table2";
 
     // TABLE 3
     let table3 = document.createElement("div");
-    table3.classList += (" flex-column flex-container-EXPEDITION table-without-tooltip");
+    table3.classList.add("flex-column","flex-container-EXPEDITION","table-without-tooltip");
     table3.id = "table3";
     let table3Div = document.createElement("div");
     table3Div.id = "expedDiv";
@@ -105,17 +100,17 @@ function drawMainBody() {
 
     // TABLE 4
     let table4 = document.createElement("div");
-    table4.classList += (" wish-counter table-without-tooltip")
+    table4.classList.add("wish-counter","table-without-tooltip")
     table4.id = "table4"
 
     // TABLE 5
     let table5Container = document.createElement("div");
-    table5Container.classList += (" table-without-tooltip");
+    table5Container.classList.add("table-without-tooltip");
     let table5Image = document.createElement("div");
-    table5Image.classList += (" table5-Image");
+    table5Image.classList.add("table5-Image");
 
     let table5 = document.createElement("div");
-    table5.classList += (" flex-container-ACHIEVEMENT");
+    table5.classList.add("flex-container-ACHIEVEMENT");
     table5.id = "table5";
     table5Container.id = "table5-container";
     table5Container.append(table5Image,table5);
@@ -126,20 +121,18 @@ function drawMainBody() {
 
     // TABLE 7
     let table7 = document.createElement("div");
-    table7.classList.add("flex-column")
+    table7.classList.add("flex-column");
     table7.id = "table7";
 
     // FILTER BUTTON
     let filterButton = document.createElement("div");
-    filterButton.classList.add("flex-row");
-    filterButton.classList.add("filter-row");
+    filterButton.classList.add("flex-row","filter-row");
     filterButton.id = "filter-button";
 
     mainTable.append(table1,table2,table3,table4,table5Container,filterButton,table6,table7);
 
     var mainImg =  document.createElement("img");
-    mainImg.classList.add("cover-all");
-    mainImg.classList.add("div-img");
+    mainImg.classList.add("cover-all","div-img");
     mainImg.src = "./assets/bg/main-bar.webp";
     rightDiv.append(TabDiv,mainTable,mainImg);
 }
@@ -158,21 +151,18 @@ function demoFunction(demoContainer,demoImg) {
 
 function createHeroButtonContainer(heroID) {
     let heroButtonContainer = document.createElement("div");
-
     heroButtonContainer.id = heroID;
-    heroButtonContainer.classList.add("upgrade");
-    heroButtonContainer.classList.add("not-purchased");
+    heroButtonContainer.classList.add("upgrade","not-purchased");
     return heroButtonContainer;
 }
 
 function createExpedTable(expedDiv) {
     let expedTableImg = document.createElement("img");
-    expedTableImg.classList.add("cover-all");
-    expedTableImg.classList.add("exped-table-img")
+    expedTableImg.classList.add("cover-all","exped-table-img");
     expedTableImg.src = "./assets/frames/tooltipEXPED.webp";
 
     let expedTable = document.createElement("div");
-    expedTable.classList += "flex-column tooltipTABLEEXPED";
+    expedTable.classList.add("flex-column","tooltipTABLEEXPED");
     let expedRow1 = document.createElement("div");
     expedRow1.id = "exped-row-1";
     let expedRowImg = document.createElement("img");
@@ -189,27 +179,27 @@ function createAchievement(achievementText,achievementDesc) {
 
     let achievementH1 = document.createElement("p");
     achievementH1.innerText = achievementText;
-    achievementH1.classList += " achieveH1";
+    achievementH1.classList.add("achieveH1");
     let achievementH2 = document.createElement("p");
     achievementH2.innerText = achievementDesc;
-    achievementH2.classList += " achieveH2";
+    achievementH2.classList.add("achieveH2");
 
     achievementPopUpTemp.append(achievementH1,achievementH2);
     achievementPopUpTemp.id = "tempAchievement";
-    achievementPopUpTemp.classList += " flex-column achieve";
+    achievementPopUpTemp.classList.add("flex-column","achieve");
     return achievementPopUpTemp;
 }
 
 function storeAchievement(achievementText,achievementDesc,achievementID) {
     let achievementStored = document.createElement("div");
-    achievementStored.classList += " achieve-stored";
+    achievementStored.classList.add("achieve-stored");
     achievementStored.id = achievementID;
 
     achievementID = Number(String(achievementID).slice(-3))
     let achievementImageContainer = document.createElement("div");
     achievementImageContainer.classList.add("achievementImageContainer");
     achievementImageContainer.style.background = "url(./assets/achievement/"+Math.floor(achievementID / 100) * 100+".webp)";
-    achievementImageContainer.style.backgroundPosition = "center center"
+    achievementImageContainer.style.backgroundPosition = "center center";
     achievementImageContainer.style.backgroundSize = "contain";
     achievementImageContainer.style.backgroundRepeat = "no-repeat";
 
@@ -222,32 +212,29 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
     let achievementTextStored = document.createElement("div");
     let achievementStoredH1 = document.createElement("p");
     achievementStoredH1.innerText = achievementText;
-    achievementStoredH1.classList += " achieveStoredH1";
+    achievementStoredH1.classList.add("achieveStoredH1");
     let achievementStoredH2 = document.createElement("p");             
     achievementStoredH2.innerText = achievementDesc;                    
-    achievementStoredH2.classList += " achieveStoredH2";
+    achievementStoredH2.classList.add("achieveStoredH2");
 
     achievementTextStored.append(achievementStoredH1,achievementStoredH2);
-    achievementTextStored.classList += " flex-column achieve-stored-text";
+    achievementTextStored.classList.add("flex-column","achieve-stored-text");
     achievementStored.append(achievementTextStored,achievementImageContainer);
     return achievementStored;
 }
 
 function drawMailTable(table4) {
     let mailImageContainer = document.createElement("div");
-    mailImageContainer.classList.add("flex-row");
-    mailImageContainer.classList.add("wish-mail-container");
+    mailImageContainer.classList.add("flex-row","wish-mail-container");
     
     let mailImageBottom = document.createElement("img");
     mailImageBottom.src = "./assets/bg/closed.webp";
-    mailImageBottom.classList.add("cover-all");
-    mailImageBottom.classList.add("wish-mail");
+    mailImageBottom.classList.add("cover-all","wish-mail");
 
     let mailImageTop = document.createElement("img");
     mailImageTop.src = "./assets/bg/open.webp";
     mailImageTop.id = "mailImageID";
-    mailImageTop.classList.add("cover-all");
-    mailImageTop.classList.add("wish-mail");
+    mailImageTop.classList.add("cover-all","wish-mail");
 
     let mailImageDiv = document.createElement("div");
     mailImageDiv.id = "mail-image-div";

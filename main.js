@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-8-3";
+const VERSIONNUMBER = "v0.2.BETA-9-3";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -14,21 +14,6 @@ let startAlready = true;
 setTimeout(()=>{startAlready = false},500);
 
 if (localStorage.getItem("settingsValues") !== null) {
-    let startButton = document.getElementById("start-button");
-    startButton.classList.remove("dim-filter");
-    startButton.addEventListener("click",()=> {
-        if (!startAlready) {
-            startAlready = true;
-            startGame(false);
-        
-            setTimeout(function() {
-                let deleteBox = document.getElementById("confirm-box");
-                if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
-                startText.remove();
-            },200)
-        }
-    });
-
     let startChance = randomInteger(1,11);
     if (startChance === 1) {
         let startIdle = document.createElement("img");
@@ -47,6 +32,21 @@ if (localStorage.getItem("settingsValues") !== null) {
         startText.style.backgroundImage = "url(./assets/start-night.webp)";
         startText.append(startIdle);
     }
+
+    let startButton = document.getElementById("start-button");
+    startButton.classList.remove("dim-filter");
+    startButton.addEventListener("click",()=> {
+        if (!startAlready) {
+            startAlready = true;
+            startGame(false);
+        
+            setTimeout(function() {
+                let deleteBox = document.getElementById("confirm-box");
+                if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
+                startText.remove();
+            },200)
+        }
+    });
 }
 
 let deleteButton = document.getElementById("start-delete");
@@ -109,7 +109,9 @@ function deleteConfirmButton(confirmed) {
             }
         } else if (deleteType === "loaded") {
             localStorage.clear();
-            location.reload();
+            setTimeout(()=>{
+                location.reload()
+            });
         }
     }
         
@@ -144,8 +146,6 @@ drawUI.preloadFolders(upgradeInfo);
 // GLOBAL VARIABLES
 var saveValues;
 const ENERGYCHANCE = 500;
-let upperEnergyRate;
-let lowerEnergyRate;
 let persistentValues;
 const COSTRATIO = 1.15;
 let clickDelay = 10;
@@ -155,18 +155,33 @@ const ARTIFACTMAX = 2150;
 const FOODMAX = 3150;
 const XPMAX = 4004;
 
-const NONWISHHEROMAX = 49
+const NONWISHHEROMAX = 49;
 const WISHHEROMIN = 100;
 
 const WISHCOST = 1;
-const STARTINGWISHFACTOR = 50;
+let STARTINGWISHFACTOR = 25;
 let wishMultiplier = 0;
 let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
-const EVENTCOOLDOWN = 30;
+const EVENTCOOLDOWN = 90;
 const SHOPCOOLDOWN = 60;
 const SHOP_THRESHOLD = 600;
+
+// SPECIAL UPGRADE VARIABLES
+let wishPower = 0;
+let upperEnergyRate;
+let lowerEnergyRate;
+let specialClick = 1;
+let costDiscount = 1;
+let clickCritRate = 0;
+let clickCritDmg = 0;
+let idleRate = 0;
+let luckRate = 0;
+let eventCooldownDecrease = 1;
+let additionalPrimo = 1;
+let additionalStrength = 1;
+let additionalDefense = 1;
 
 // ACHIEVEMENT THRESHOLDS
 let achievementData = {
@@ -184,6 +199,7 @@ let shopTime = 0;
 let shopTimerElement = null;
 let filteredHeroes = [];
 let filteredInv = [];
+let rowTempDict = [];
 
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");
@@ -291,7 +307,6 @@ function timerEvents() {
     randomEventTimer(timerSeconds);
     timerSave(timerSeconds);
     shopCheck();
-
     shopTimerFunction();
 }
 
@@ -305,7 +320,7 @@ function shopTimerFunction() {
         
         shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
         if (time_passed >= SHOPCOOLDOWN) {
-            refreshShop(minutesPassedNow)
+            refreshShop(minutesPassedNow);
         }
     }
 }
@@ -336,7 +351,7 @@ function loadSaveData() {
     } else {
         let settingsTemp = localStorage.getItem("settingsValues");
         settingsValues = JSON.parse(settingsTemp)
-        updateObjectKeys(settingsValues,SettingsDefault)
+        updateObjectKeys(settingsValues,SettingsDefault);
     }
     // LOAD VALUES DATA
     if (localStorage.getItem("saveValuesSave") == null) {
@@ -399,7 +414,7 @@ function loadSaveData() {
         loadShop();
     }
     // LOAD PERSISTENT VALUES 
-    if (localStorage.getItem("persistentValues") == null) {
+    if (localStorage.getItem("persistentValues") === null) {
         persistentValues = persistentValuesDefault;
     } else {
         let persistentDictTemp = localStorage.getItem("persistentValues");
@@ -409,6 +424,7 @@ function loadSaveData() {
 
     lowerEnergyRate = persistentValues.lowerEnergyRate;
     upperEnergyRate = persistentValues.upperEnergyRate;
+    specialValuesUpgrade(true);
     if (saveValues.goldenTutorial === true) {
         addNutStore();
     }
@@ -426,7 +442,7 @@ demoContainer.addEventListener("mouseup", () => {
     let clickEarn;
     saveValues["clickCount"] += 1;
     if (clickerEvent === false) {
-        clickEarn = 1 * saveValues["clickFactor"];
+        clickEarn = Math.ceil(specialClick * saveValues["clickFactor"]);
     } else {
         clickEarn = currentClick;
         clickDelay -= 10;
@@ -470,6 +486,25 @@ function energyRoll() {
             saveValues["energy"] += randomInteger(lowerEnergyRate, upperEnergyRate);
             clickDelay = 20;
         }
+    }
+}
+
+// UPDATES VALUES WITH PERSISTENT VALUES
+function specialValuesUpgrade(loading) {
+    if (loading === true) {
+        upperEnergyRate *= Math.ceil((100 + persistentValues.upgrade1.Purchased) / 100);
+        lowerEnergyRate = Math.ceil(upperEnergyRate * 0.75);
+        specialClick = 1 + (persistentValues.upgrade2.Purchased)/10;
+        wishPower = 1 + (persistentValues.upgrade3.Purchased)/50;
+        costDiscount = 1 - (persistentValues.upgrade4.Purchased)/50;
+        clickCritRate = persistentValues.upgrade5.Purchased;
+        clickCritDmg = Math.round((Math.log(persistentValues.upgrade5.Purchased + 1) * 18));
+        idleRate = persistentValues.upgrade6.Purchased;
+        luckRate = persistentValues.upgrade7.Purchased/2;
+        eventCooldownDecrease = 1 - persistentValues.upgrade8.Purchased/50;
+        additionalPrimo = 1 + persistentValues.upgrade9.Purchased/10;
+        additionalStrength = 1 + persistentValues.upgrade10.Purchased/10;
+        additionalDefense = 1 + persistentValues.upgrade11.Purchased/10;
     }
 }
 
@@ -688,20 +723,16 @@ function reactionFunction(eventBackdrop) {
 // EVENT 3 (7 BOXES)
 function boxFunction() {
     let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all");
-    eventBackdrop.classList.add("flex-column");
-    eventBackdrop.classList.add("event-dark");
+    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
 
     let boxOuterDiv = document.createElement("div");
     boxOuterDiv.id = "box-outer-div";
-    boxOuterDiv.classList.add("box-outer-div");
-    boxOuterDiv.classList.add("flex-row");
-    boxOuterDiv.classList.add("box-event")
+    boxOuterDiv.classList.add("box-outer-div","flex-row","box-event");
+
     let count = 8;
     while (count--) {
         let boxImageDiv = document.createElement("div");
-        boxImageDiv.classList.add("flex-row");
-        boxImageDiv.classList.add("box-image-div");
+        boxImageDiv.classList.add("flex-row","box-image-div");
 
         let boxImageImg = document.createElement("img");
         boxImageImg.src = "./assets/event/box-" + count + ".webp";
@@ -715,7 +746,7 @@ function boxFunction() {
     mainBody.append(eventBackdrop,boxOuterDiv);
 }
 
-var boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
+const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
 function boxOpen(eventBackdrop) {
     let boxOuter = document.getElementById("box-outer-div")
     let boxOuterNew = boxOuter.cloneNode(true);
@@ -770,9 +801,7 @@ const COLS = 8;
 function minesweeperEvent() {
     var mines = randomInteger(6,8)
     let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all");
-    eventBackdrop.classList.add("flex-column");
-    eventBackdrop.classList.add("event-dark");
+    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
     let mineInfo = document.createElement("img");
     mineInfo.src = "./assets/event/mine-info.webp"
     mineInfo.id = "mine-info";
@@ -892,10 +921,9 @@ function minesweeperEvent() {
                     let mineFileOutcome = document.createElement("img");
                     let whopperInt = randomInteger(1,4);
                     mineFileOutcome.src = "./assets/event/whopperflower-"+whopperInt+".webp";
-                    mineFileOutcome.classList.add("mine-outcome");
-                    mineFileOutcome.classList.add("slide-in-blurred-bottom");
-                    eventBackdrop.append(mineFileOutcome);
+                    mineFileOutcome.classList.add("mine-outcome","slide-in-blurred-bottom");
 
+                    eventBackdrop.append(mineFileOutcome);
                     eventOutcome("The whopperflowers were alerted!",eventBackdrop);
                 } else {
                     revealCell(r, c);
@@ -1781,21 +1809,20 @@ function updateFilter(tab) {
 
 //------------------------------------------------------------------------TABLE 1 (HEROES)------------------------------------------------------------------------//
 // LOAD SAVED HEROES IN TABLE1
-var rowTempDict = {}
 function loadRow() {
     let i = WISHHEROMAX;
     while (i--) {
+        console.log(i)
         if (upgradeDict[i] == undefined) continue;
         if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
         if (upgradeDict[i].Row > -1){
-            rowTempDict[[upgradeDict[i].Row]] = i;
+            rowTempDict[upgradeDict[i].Row] = i;
         }
     }
-
-    for (let j = 0, len=Object.keys(rowTempDict).length; j < len; j++) {
+    
+    for (let j = 0, len=rowTempDict.length; j < len; j++) {
         let loadedHeroID = rowTempDict[j];
         let heroTextLoad;
-
         let upgradeDictTemp = upgradeDict[loadedHeroID];
         let formatCost = upgradeDictTemp["BaseCost"];
         let formatATK = upgradeDictTemp["Factor"];
@@ -1838,7 +1865,7 @@ function loadRow() {
 
         heroButtonContainer.innerText = heroTextLoad;
         if (upgradeDictTemp["Purchased"] > 0) {
-            heroButtonContainer.style.background = `url(./assets/nameplates/${upgradeInfo[loadedHeroID].Name}.webp)`;  
+            heroButtonContainer.style.background = `url('./assets/nameplates/${upgradeInfo[loadedHeroID].Name}.webp')`;  
             heroButtonContainer.style.backgroundSize = "125%"; 
             heroButtonContainer.style.backgroundPosition = "99% center"; 
             heroButtonContainer.style.backgroundRepeat = "no-repeat";
@@ -2533,9 +2560,11 @@ function drawWish() {
     if (saveValues["wishCounterSaved"] === wishCounter) {
         wishUnlock();
         stopWish();
+        wishMultiplier = saveValues["wishCounterSaved"];
     } else if (saveValues["wishUnlocked"] == true) {
         goldenNutUnlocked = true;
         wishUnlock();
+        wishMultiplier = saveValues["wishCounterSaved"];
     } 
 }
 
@@ -2545,7 +2574,7 @@ function updateWishDisplay() {
         if (saveValues["wishCounterSaved"] >= wishCounter) {
             wishNpsDisplay.innerText = "All Wish Heroes obtained!";
         } else {
-            wishNpsDisplay.innerText = `Next character's NpS: ${abbrNum(Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/300 + 1))}`;
+            wishNpsDisplay.innerText = `Next character's NpS: ${abbrNum(Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/500 * wishPower + 1))}`;
         }
         let wishCurrency = document.getElementById("wish-counter-display");
         wishCurrency.innerHTML = wishCurrency.innerHTML.replace(/[^<]+</g, `${saveValues.mailCore}<`);
@@ -2597,11 +2626,11 @@ function wish() {
             } else {
                 let upgradeDictTemp = upgradeDict[randomWishHero];
                 upgradeDictTemp.Purchased = -1;
-                upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/300 + 1);
+                upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/500 * wishPower + 1);
                 upgradeDictTemp["BaseCost"] = Math.round(saveValues["dps"] * (55) + 1);
                 upgradeDictTemp["Contribution"] = 0;
                 
-                wishMultiplier += 3;
+                wishMultiplier++;
                 saveValues["wishCounterSaved"]++;
                 refresh();
                 newPop(0);
@@ -3183,6 +3212,20 @@ function createShopItems(shopDiv, i, inventoryNumber) {
 }
 
 //------------------------------------------------------------------------ GOLDEN NUT STORE ------------------------------------------------------------------------//
+// COSTS OF NUT PURCHASE
+function nutCost(id) {
+    let amount = persistentValues["upgrade"+id].Purchased;
+    let scaleCeiling = permUpgrades[id].Max;
+    let cost;
+
+    if (scaleCeiling === 50) {
+        cost = Math.ceil(1.5**(amount))
+    } else if (scaleCeiling === 25) {
+        cost = Math.ceil(2**(amount))
+    }
+    return cost;
+}
+
 // ADDS ACCESS BUTTON AFTER 1 NUT
 function addNutStore() {
     imageWorker.postMessage({
@@ -3199,7 +3242,7 @@ function addNutStore() {
     let nutStoreCurrency = document.createElement("div");
     nutStoreCurrency.id = "nut-store-currency";
     nutStoreCurrency.classList.add("flex-row");
-    nutStoreCurrency.innerText = persistentValues["goldenCore"];
+    nutStoreCurrency.innerText = abbrNum(persistentValues["goldenCore"],2,true);
     let nutStoreCurrencyImage = document.createElement("img");
     nutStoreCurrencyImage.src = "./assets/icon/core.webp";
     nutStoreCurrency.appendChild(nutStoreCurrencyImage);
@@ -3224,32 +3267,82 @@ function addNutStore() {
     })
     leftDiv.appendChild(nutStoreButton);
 
-    for (let i=0; i < 7; i++) {
+    let len = (getHighestKey(permUpgrades) + 1);
+    for (let i=1; i < len; i++) {
         let nutShopItem = document.createElement("div");
         nutShopItem.classList.add("nut-shop-button","flex-row");
+        nutShopItem.id = "nut-shop-" + i;
 
         let nutShopTitle = document.createElement("p");
         nutShopTitle.innerText = permUpgrades[i]["Name"];
-        let nutShopLevel = document.createElement("p");
-        nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i].Purchased}`;
-        nutShopLevel.id = "nut-shop-" + i;
-        let nutShopImg = new Image();
-        nutShopImg.src = "./assets/tooltips/nut-shop-" +(i+1)+ ".webp";
-        let nutShopDesc = document.createElement("p");
-        nutShopDesc.innerText = permUpgrades[i]["Description"];
         let nutShopButton = document.createElement("div");
         nutShopButton.classList.add("flex-column");
+
         let nutShopButtonTop = document.createElement("p");
         nutShopButtonTop.innerText = `Upgrade`;
         let nutShopButtonBottom = document.createElement("div");
-        nutShopButtonBottom.innerText = `${abbrNum(persistentValues["upgrade"+i].Cost,2,true)}`;
+        nutShopButtonBottom.innerText = `${abbrNum(nutCost(i),2,true)}`;
         let nutShopMail = new Image();
         nutShopMail.src = "./assets/icon/core.webp";
-
         nutShopButtonBottom.appendChild(nutShopMail);
+
+        let nutShopLevel = document.createElement("p");
+        if (permUpgrades[i].Cap === true) {
+            if (persistentValues["upgrade"+i].Purchased >= permUpgrades[i].Max) {
+                nutShopLevel.innerText = `Level MAX`;
+                nutShopButtonBottom.innerText = "MAXED";
+            } else {
+                nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i].Purchased}`;
+                nutShopButton.addEventListener("click",()=>{nutPurchase(nutShopItem.id)});
+            }
+        } else {
+            nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i].Purchased}`;
+            nutShopButton.addEventListener("click",()=>{nutPurchase(nutShopItem.id)})
+        }
+        
+        let nutShopImg = new Image();
+        nutShopImg.src = "./assets/tooltips/nut-shop-" +i+ ".webp";
+        let nutShopDesc = document.createElement("p");
+        if (permUpgrades[i]["zeroDescription"] !== undefined && persistentValues["upgrade"+i].Purchased <= 0) {
+            nutShopDesc.innerText = `${permUpgrades[i]["zeroDescription"]}
+                                    (Effect: ${permUpgrades[i].Effect*persistentValues["upgrade"+i].Purchased}%)`;
+        } else {
+            nutShopDesc.innerText = `${permUpgrades[i]["Description"]}
+                                    (Effect: ${permUpgrades[i].Effect*persistentValues["upgrade"+i].Purchased}%)`;
+        }
+        
         nutShopButton.append(nutShopButtonTop,nutShopButtonBottom);
         nutShopItem.append(nutShopTitle,nutShopLevel,nutShopImg,nutShopDesc,nutShopButton);
         nutShopDiv.appendChild(nutShopItem);
+    }
+}
+
+function nutPurchase(fullId) {
+    let id = fullId.split("-")[2];
+    let cost = nutCost(id)
+    if (persistentValues.goldenCore >= cost) {
+        persistentValues["upgrade"+id].Purchased++;
+        persistentValues.goldenCore -= cost;
+        let childArray = document.getElementById(fullId).children;
+        childArray[1].innerText = `Level ${persistentValues["upgrade"+id].Purchased}`;
+        childArray[3].innerText = `${permUpgrades[id]["Description"]}
+                                    (Effect: ${permUpgrades[id]["Effect"] * persistentValues["upgrade"+id]["Purchased"]}%)`;
+        childArray[4].children[1].innerHTML = childArray[4].children[1].innerHTML.replace(/[^<]+</g, `${abbrNum(nutCost(id),2,true)}<`);
+        updateCoreCounter();
+
+        if (permUpgrades[id].Cap === true) {
+            if (persistentValues["upgrade"+id].Purchased >= permUpgrades[id].Max) {
+                childArray[1].innerText = `Level MAX`;
+                let buttonNew = childArray[4].cloneNode(true);
+                childArray[4].parentNode.replaceChild(buttonNew, childArray[4]);
+                childArray[4].children[1].innerText = "MAXED";
+            } else {
+                childArray[1].innerText = `Level ${persistentValues["upgrade"+id].Purchased}`;
+            }
+        } else {
+            childArray[1].innerText = `Level ${persistentValues["upgrade"+id].Purchased}`;
+        }
+        
     }
 }
 

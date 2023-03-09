@@ -5,7 +5,7 @@ let saveValuesDefault = {
     realScore:11e28,
     freeLevels:0,
     primogem:200,
-    energy:11100,
+    energy:1000,
     rowCount:0,
     heroesPurchased:0,
     mailCore:110,
@@ -16,16 +16,20 @@ let saveValuesDefault = {
 }
 
 let persistentValuesDefault = {
-    goldenCore: 0,
-    upperEnergyRate: 30,
+    goldenCore: 1e20,
+    upperEnergyRate: 35,
     lowerEnergyRate: 15,
-    upgrade0:{Cost: 1, Purchased: 0, Effect:1},
-    upgrade1:{Cost: 1, Purchased: 0, Effect:1},
-    upgrade2:{Cost: 1, Purchased: 0, Effect:1},
-    upgrade3:{Cost: 1, Purchased: 0, Effect:1},
-    upgrade4:{Cost: 1, Purchased: 0, Effect:1},
-    upgrade5:{Cost: 1, Purchased: 0, Effect:1},
-    upgrade6:{Cost: 1, Purchased: 0, Effect:1},
+    upgrade1:{Purchased: 0},
+    upgrade2:{Purchased: 0},
+    upgrade3:{Purchased: 0},
+    upgrade4:{Purchased: 0},
+    upgrade5:{Purchased: 0},
+    upgrade6:{Purchased: 0},
+    upgrade7:{Purchased: 0},
+    upgrade8:{Purchased: 0},
+    upgrade9:{Purchased: 0},
+    upgrade10:{Purchased: 0},
+    upgrade11:{Purchased: 0},
 }
 
 let SettingsDefault = {
@@ -34,13 +38,17 @@ let SettingsDefault = {
 }
 
 let permUpgrades = {
-    0:{Name:"Blessing of Vitality",          Description:"Increases Energy gained by clicking Big Nahida."},
-    1:{Name:"Blessing of Riches",            Description:"Increases Primogems gained from Events/Achievements."},
-    2:{Name:"Blessing of Strength",          Description:"Increases effectiveness of Weapons and Talents."},
-    3:{Name:"Blessing of Fortification",     Description:"Increases effectiveness of Artifacts, Gems and Food."},
-    4:{Name:"Blessing of Wanderlust",        Description:"Increases power scaling of Wish characters."},
-    5:{Name:"Blessing of Enlightenment",     Description:"Decreases cooldown between Event spawns."},
-    6:{Name:"Blessing of Concession",        Description:"Decreases price of Dori's Shop items."},
+    1:{Name:"Blessing of Vitality",        Effect:10,  Max:50,   Cap:false,   Description:"Increases Energy gained by clicking Big Nahida."},
+    2:{Name:"Blessing of Technique",       Effect:10,  Max:50,   Cap:false,   Description:"Increase Nuts gained by clicking Big Nahida."},
+    3:{Name:"Blessing of Wanderlust",      Effect:2,   Max:50,   Cap:true,   Description:"Increases base power of Wish characters."},
+    4:{Name:"Blessing of Concession",      Effect:2,   Max:25,   Cap:true,   Description:"Decreases price of Dori's Shop items."},
+    5:{Name:"Blessing of Might",           Effect:1,   Max:50,   Cap:true,   Description:"Increases critical hit amount and chance.",   zeroDescription:"Enables critical hits for clicking Big Nahida."},
+    6:{Name:"Blessing of Tranquillity",    Effect:1,   Max:50,   Cap:false,   Description:"Increases offline Nut accumulation rate.",    zeroDescription:"Enables accumulation of Nuts while offline."},
+    7:{Name:"Blessing of Fortuity",        Effect:0.5, Max:50,   Cap:true,   Description:"Increases chances of lucky outcomes.",          zeroDescription:"Enables additional lucky outcomes for certain events."},
+    8:{Name:"Blessing of Enlightenment",   Effect:2,   Max:25,   Cap:true,   Description:"Decreases cooldown between Event spawns."},
+    9:{Name:"Blessing of Riches",          Effect:10,  Max:25,   Cap:true,   Description:"Increases Primogems gained from Events/Achievements."},
+    10:{Name:"Blessing of Strength",       Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
+    11:{Name:"Blessing of Fortification",  Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
 }
 
 let upgradeDictDefault = {
