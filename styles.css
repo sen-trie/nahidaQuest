@@ -11,8 +11,12 @@ html,body {
 }
 
 html {
+    height: 100%;
+    width: 100%;
     display: flex;
     justify-content: center;
+    flex-direction: row;
+    align-items: center;
 }
 
 img {  
@@ -27,6 +31,9 @@ img {
 
 cache {
     position: absolute;
+    height: 100%;
+    width: 100%;
+    top: -1000%;
     z-index: -1000;
     opacity: 0;
 }
@@ -277,6 +284,26 @@ table, button {
     right: 0;
     bottom: 0;
     background: radial-gradient(ellipse at center, #ecd59100 0%,#c8a94e4a 40%,#c8a94e5b 60%,#c8a94e8d 80%, #aa850ce2 100%);
+}
+
+.vignette-blue {
+    position: absolute;
+}
+  
+.vignette-blue::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, #88effb00 0%,#88effb33 40%,#88effb56 60%,#88effb6d 80%, #88EFFB 100%);
+}
+
+@keyframes darkness-transition {
+    0% {filter: brightness(1)}
+    50% {filter: brightness(0)}
+    100% {filter: brightness(1)}
 }
 
 .middle-area {

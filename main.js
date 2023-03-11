@@ -1,9 +1,9 @@
 import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades } from "./defaultData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys } from "./functions.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper } from "./functions.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-9-3";
+const VERSIONNUMBER = "v0.2.BETA-11-3";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -123,7 +123,7 @@ function deleteConfirmButton(confirmed) {
 let cache = document.createElement("cache");
 cache.id = "cache";
 mainBody.appendChild(cache);
-drawUI.preloadLib(cache,'load')
+drawUI.preloadLib(cache,'load',upgradeInfo);
 
 setTimeout(()=>{
     mainBody = drawUI.buildGame(mainBody);
@@ -162,8 +162,8 @@ let wishMultiplier = 0;
 let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
-const EVENTCOOLDOWN = 90;
-const SHOPCOOLDOWN = 60;
+const EVENTCOOLDOWN = 20;
+const SHOPCOOLDOWN = 30;
 const SHOP_THRESHOLD = 600;
 
 // SPECIAL UPGRADE VARIABLES
@@ -591,14 +591,13 @@ function idleCheck(idleAmount) {
 }
 
 //--------------------------------------------------------------------------RANDOM EVENTS----------------------------------------------------------------------//
-// RANDOM EVENTS TIMER (MAXIMUM 10 MINUTE DIFFERENCE)
+// RANDOM EVENTS TIMER
 let eventTimes = 1;
 let eventChance = 0;
 function randomEventTimer(timerSeconds) {
-    // SET TO 10 SECONDS AND 5 SECONDS
-    let eventTimeMin = EVENTCOOLDOWN * eventTimes;
+    let eventTimeMin = EVENTCOOLDOWN * eventTimes * eventCooldownDecrease;
     if (eventChance !== 0) {
-        let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/(EVENTCOOLDOWN/2))
+        let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/((EVENTCOOLDOWN * eventCooldownDecrease)/2))
         if (Math.ceil(upperLimit) >= eventChance) {
             eventChance = 0;
             eventTimes++;
@@ -651,35 +650,35 @@ function clickedEvent(aranaraNumber) {
     eventElement.play();
 
     let eventDropdown = document.createElement("div");
-    eventDropdown.classList.add("flex-row");
-    eventDropdown.classList.add("event-dropdown");
+    eventDropdown.classList.add("flex-row","event-dropdown");
     let eventDropdownBackground = document.createElement("img");
     eventDropdownBackground.src = "./assets/tutorial/eventPill.webp";
 
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
-    eventDropdownText.classList.add("flex-column");
-    eventDropdownText.classList.add("event-dropdown-text");
+    eventDropdownText.classList.add("flex-column","event-dropdown-text");
 
     let eventDropdownImage = document.createElement("div");
     eventDropdownImage.style.background = "url(./assets/tutorial/aranara-"+ (aranaraNumber) +".webp)";
     eventDropdownImage.style.backgroundSize = "contain";
     eventDropdownImage.style.backgroundRepeat = "no-repeat";
     eventDropdownImage.classList.add("event-dropdown-image");
+
+    let specialEvent = randomIntegerWrapper(luckRate*2,200);
     
     eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
     eventDropdown.addEventListener("animationend", () => {
         eventDropdown.remove();
-        chooseEvent(aranaraNumber);
+        chooseEvent(aranaraNumber,specialEvent);
     });
     mainBody.appendChild(eventDropdown);
 }
 
-function chooseEvent(type) {
+function chooseEvent(type,specialMode) {
     if (stopSpawnEvents === true) {return};
     switch (type) {
         case 1:
-            clickEvent();
+            clickEvent(specialMode);
             break;
         case 2:
             reactionEvent();
@@ -703,21 +702,54 @@ function chooseEvent(type) {
 
 // EVENT 1 (ENERGY OVERLOAD)
 let clickEventDelay;
-function clickEvent() {
+function clickEvent(wandererMode) {
+    stopSpawnEvents = true;
     let button = document.getElementById("demo-main-img");
-    if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")}
     if (clickEventDelay !== null) {clearTimeout(clickEventDelay)};
-    let currentAnimation = button.style.animation;
-    button.style.animation = "rotation 3.5s infinite linear forwards";
+    let currentAnimation = "rotation 18s infinite linear forwards";
     clickerEvent = true;
     currentClick = 15 * (saveValues["dps"] + 1) * specialClick;
 
-    clickEventDelay = setTimeout(() => {
-        if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")}
-        button.style.animation = currentAnimation;
-        clickerEvent = false;
-        clickEventDelay = null;
-    },30000)
+    if (wandererMode === true) {
+        leftDiv.style.animation = "none";
+        void leftDiv.offsetWidth;
+        leftDiv.style.animation = "darkness-transition 0.3s linear";
+        setTimeout(()=>{
+            button.style.animation = "rotation 3.5s infinite linear forwards";
+            if (!leftDiv.classList.contains("vignette-blue")) {leftDiv.classList.add("vignette-blue")};
+            let leftBG = document.getElementById("left-bg");
+            leftBG.src = "./assets/bg/scara-bg.webp";
+            button.src = "./assets/event/scara.webp";
+        },150);
+        
+        clickEventDelay = setTimeout(() => {
+            console.log(leftDiv.style.animation)
+            leftDiv.style.animation = "none";
+            void leftDiv.offsetWidth;
+            leftDiv.style.animation = "darkness-transition 0.3s linear";
+            console.log(leftDiv.style.animation)
+            setTimeout(()=>{
+                button.style.animation = "rotation 3.5s infinite linear forwards";
+                if (leftDiv.classList.contains("vignette-blue")) {leftDiv.classList.remove("vignette-blue")};
+                button.style.animation = currentAnimation;
+                clickerEvent = false;
+                clickEventDelay = null;
+                stopSpawnEvents = false;
+                button.src = "./assets/nahida.webp";
+                let leftBG = document.getElementById("left-bg");
+                leftBG.src = "./assets/bg/bg.webp";
+            },150);
+        },30000)
+    } else {
+        if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")};
+        clickEventDelay = setTimeout(() => {
+            if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")};
+            button.style.animation = currentAnimation;
+            clickerEvent = false;
+            clickEventDelay = null;
+            stopSpawnEvents = false;
+        },30000)
+    }
     foodButton(2);
 }
 
@@ -725,6 +757,7 @@ function clickEvent() {
 var reactionReady = false;
 var reactionGame = false;
 function reactionEvent() {
+    stopSpawnEvents = true;
     reactionGame = true;
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","flex-column","event-dark");
@@ -782,6 +815,7 @@ function reactionEvent() {
 }
 
 function reactionFunction(eventBackdrop) {
+    stopSpawnEvents = false;
     if (reactionGame == false) {return}
     let outcomeText;
     let primogem = 0;
@@ -799,11 +833,12 @@ function reactionFunction(eventBackdrop) {
 
     reactionReady = false;
     reactionGame = false;
-    eventOutcome(outcomeText,eventBackdrop,"reaction",primogem)
+    eventOutcome(outcomeText,eventBackdrop,"reaction",primogem);
 }
 
 // EVENT 3 (7 BOXES)
 function boxFunction() {
+    stopSpawnEvents = true;
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","flex-column","event-dark");
 
@@ -819,7 +854,9 @@ function boxFunction() {
         let boxImageImg = document.createElement("img");
         boxImageImg.src = "./assets/event/box-" + count + ".webp";
         boxImageImg.id = ("box-" + count);
-        boxImageImg.addEventListener("click", function() {boxOpen(eventBackdrop)})
+        boxImageImg.addEventListener("click", function() {
+            boxOpen(eventBackdrop);
+        })
 
         boxImageDiv.appendChild(boxImageImg);
         boxOuterDiv.appendChild(boxImageDiv);
@@ -881,7 +918,8 @@ function boxOpen(eventBackdrop) {
 const ROWS = 8;
 const COLS = 8;
 function minesweeperEvent() {
-    var mines = randomInteger(6,8)
+    stopSpawnEvents = true;
+    var mines = randomInteger(6,8);
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","flex-column","event-dark");
     let mineInfo = document.createElement("img");
@@ -1027,6 +1065,7 @@ function minesweeperEvent() {
 let weaselCount = 0;
 // EVENT 5 (WHACK-A-MOLE)
 function weaselEvent() {
+    stopSpawnEvents = true;
     let weaselElement = 18;
     weaselCount = 0;
     let eventBackdrop = document.createElement("div");
@@ -1053,12 +1092,12 @@ function weaselEvent() {
 
     let weaselTimerDiv = document.createElement("div");
     weaselTimerDiv.classList.add("weasel-timer-div");
-    
     let weaselTimer = document.createElement("div");
     weaselTimer.classList.add("weasel-timer");
     let weaselCountText = document.createElement("p");
     weaselCountText.id = "visible-weasel-count";
     weaselCountText.innerText = weaselCount;
+
     let weaselClock = document.createElement("img");
     weaselClock.src = "./assets/icon/hourglass.webp"
     weaselClock.classList.add("weasel-hourglass");
@@ -1095,7 +1134,7 @@ function addWeasel(weaselBack,delay) {
             let realWeasel = randomInteger(2,4);
             weaselImage.src = "./assets/event/weasel-"+realWeasel+".webp";
 
-            let springInterval = (randomInteger(20,25) / 100)
+            let springInterval = (randomInteger(20,25) / 100);
             weaselImage.classList.add("spring");
             weaselImage.style["animation-duration"] = springInterval + "s";
             weaselImage.addEventListener("click",()=>{
@@ -1181,6 +1220,7 @@ function generateCombination(n) {
  
 // EVENT 6 (RAIN)
 function rainEvent() {
+    stopSpawnEvents = true;
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","flex-column","event-dark");
 
@@ -1201,7 +1241,7 @@ function rainEvent() {
         let animation = `rain ${(randomInteger(8,12)/2)}s linear forwards`
         let type = randomInteger(1,101);
         var img = document.createElement("img");
-        if (type >= 95 && goldenNutUnlocked === true && tempGolden <= 3) {
+        if (type >= 95 && goldenNutUnlocked === true && tempGolden <= 5) {
             img.src = "./assets/icon/goldenIcon.webp";
             animation = `rain-rotate ${(randomInteger(6,10)/2)}s linear forwards`
             img.addEventListener('click', () => {
@@ -1254,6 +1294,7 @@ function rainEvent() {
             rainText.classList.add("text-pop");
             rainText.addEventListener('animationend', () => {
                 rainText.remove();
+                stopSpawnEvents = false;
                 saveValues.realScore += tempScore * dpsMultiplier;
                 if (tempPrimogem != 0) {
                     if (tempGolden == 0) {
@@ -1269,6 +1310,7 @@ function rainEvent() {
 
 // EVENT OUTCOME (BLACK BAR THAT APPEARS IN THE MIDDLE OF SCREEN)
 function eventOutcome(innerText,eventBackdrop,type,amount) {
+    stopSpawnEvents = false;
     let removeClick = document.createElement("div");
     let boxText = document.createElement("div");
     let boxTextDiv = document.createElement("p");

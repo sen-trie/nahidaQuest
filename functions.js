@@ -50,6 +50,22 @@ function randomInteger(min, max) {
     return Math.floor(Math.random() * (max - min) ) + min;
 }
 
+// WRAPS RNG TO BOOLEAN
+function randomIntegerWrapper(compare,max) {
+    let randInt;
+    if (max > 0) {
+        randInt = randomInteger(1,max+1);
+    } else {
+        randInt = randomInteger(1,101);
+    }
+    
+    if (randInt <= compare) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 // GENERATE BASE ATK AND COSTS OF NON-WISH HEROES (IF SAVE NOT FOUND)
 function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
     let initBaseCost = 50;
@@ -123,4 +139,4 @@ function updateObjectKeys(savedObject,referenceObject) {
     return savedObject;
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys};
+export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper};

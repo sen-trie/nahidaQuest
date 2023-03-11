@@ -227,6 +227,7 @@ function drawMainBody() {
     let leftDiv = document.getElementById("left-div");
     let leftImg = document.createElement("img");
     leftImg.src = "./assets/bg/bg.webp";
+    leftImg.id = "left-bg";
     leftImg.classList.add("cover-all","div-img");
     leftDiv.appendChild(leftImg);
 
