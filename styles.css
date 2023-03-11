@@ -25,6 +25,16 @@ img {
     -ms-user-select: none;
  }
 
+cache {
+    position: absolute;
+    z-index: -1000;
+    opacity: 0;
+}
+
+cache image {
+    position: absolute;
+}
+
 .version-text {
     position: absolute;
     color: rgb(255, 255, 255);
@@ -1470,24 +1480,35 @@ input[type="range"]:focus::-moz-range-thumb{
 
 .floatingText {
     font-size: 1em;
-    color: rgb(5, 39, 11);
-    text-shadow: 0.1em 0.1em 0 #fbfbfb;
+    color: #022107;
+    text-shadow: 0 0 0.25em #ffffff, 0 0 0.25em #ffffff, 0 0 0.15em #ffffff;
     position: absolute;
     animation: fadeOutOpacity 2.0s cubic-bezier(.02,.97,.91,.14) forwards;
     z-index: 13;
     pointer-events: none;
 }
 
+.floatingCritText {
+    font-size: 1.75em;
+    color: #032509;
+    text-shadow: 0 0 0.25em #ffffff, 0 0 0.35em #ffffff, 0 0 0.15em #ffffff, 0 0 0.15em #ffffff;
+    position: absolute;
+    animation: fadeOutCritOpacity 2.0s ease-out forwards;
+    z-index: 15;
+    pointer-events: none;
+}
+
 @keyframes fadeOutOpacity {
-    from {
-        opacity: 1.0;
-        transform: translate(0);
-    }
-    to {
-        opacity: 0.5;
-        transform: translate(0,-15em);
-    }
+    0% {    opacity: 1.0;   transform: translate(0)}
+    50% {   opacity: 1.0}
+    100% {  opacity: 0.5;   transform: translate(0,-15em)}
   }
+
+@keyframes fadeOutCritOpacity {
+    0% {    opacity: 1.0}
+    75% {   opacity: 0.9}
+    100% {  opacity: 0.25}
+}
 
 .falling-image {
     position: absolute;
@@ -1606,7 +1627,7 @@ input[type="range"]:focus::-moz-range-thumb{
 
 .play-button {
     width: auto;
-    height: 15%;
+    height: 12%;
     object-fit: contain;
     z-index: 200;
     pointer-events: all;
@@ -1614,7 +1635,7 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .play-button:hover {
-    filter: drop-shadow(0 0 0.4em #967c5f6c)  drop-shadow(0 0 0.6em #967c5fab);
+    filter: drop-shadow(0 0 0.4em #967c5f6c)  drop-shadow(0 0 0.2em #967c5fab);
 }
 
 .tutorial-text {
@@ -1636,6 +1657,32 @@ input[type="range"]:focus::-moz-range-thumb{
     object-fit: contain;
 }
 
+.idle-dark {
+    height: 65%;
+    width: 100%;
+    background:url(./assets/tutorial/idle.webp);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.idle-dark > p {
+    position: relative;
+    top: -8%;
+    font: inherit;
+    width: auto;
+    font-size: 2.5em;
+    color: #425d38;
+    filter: drop-shadow(0 0 0.05em #98c887);
+}
+
+.idle-dark > img {
+    position: relative;
+    top: -9%;
+    height: 25%;
+    aspect-ratio: 1;
+    filter: drop-shadow(0 0 0.2em #2c6119);
+}
 
 /*/////////////////////////////// HERO UPGRADES (TABLE1) CSS ///////////////////////////////*/
 #table1 {

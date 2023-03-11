@@ -110,7 +110,7 @@ function deleteConfirmButton(confirmed) {
         } else if (deleteType === "loaded") {
             localStorage.clear();
             setTimeout(()=>{
-                location.reload()
+                location.reload();
             });
         }
     }
@@ -120,12 +120,10 @@ function deleteConfirmButton(confirmed) {
     return;
 }
 
-let imageWorker = new Worker('workers.js');
-imageWorker.postMessage({
-    operation: 'preload',
-    priority: 'load',
-    path:upgradeInfo,
-});
+let cache = document.createElement("cache");
+cache.id = "cache";
+mainBody.appendChild(cache);
+drawUI.preloadLib(cache,'load')
 
 setTimeout(()=>{
     mainBody = drawUI.buildGame(mainBody);
@@ -170,13 +168,14 @@ const SHOP_THRESHOLD = 600;
 
 // SPECIAL UPGRADE VARIABLES
 let wishPower = 0;
-let upperEnergyRate;
-let lowerEnergyRate;
+let upperEnergyRate = 35;
+let lowerEnergyRate = 15;
 let specialClick = 1;
 let costDiscount = 1;
 let clickCritRate = 0;
 let clickCritDmg = 0;
 let idleRate = 0;
+let timeLoaded = getTime();
 let luckRate = 0;
 let eventCooldownDecrease = 1;
 let additionalPrimo = 1;
@@ -195,7 +194,7 @@ let scoreAchievement = [1,101,201,301,401];
 
 let foodBuff = 1;
 let clickerEvent = false;
-let shopTime = 0;
+let shopTime = 1e20;
 let shopTimerElement = null;
 let filteredHeroes = [];
 let filteredInv = [];
@@ -313,14 +312,10 @@ function timerEvents() {
 // SHOP TIMER
 function shopTimerFunction() {
     if (shopTimerElement != null) {
-        let startOfYear = new Date('2022-01-01T00:00:00');
-        let now = new Date();
-        let minutesPassedNow = (now - startOfYear) / (1000 * 60);
-        let time_passed = Math.floor(minutesPassedNow - parseInt(shopTime));
-        
+        let time_passed = Math.floor(getTime() - parseInt(shopTime));
         shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
         if (time_passed >= SHOPCOOLDOWN) {
-            refreshShop(minutesPassedNow);
+            refreshShop(getTime());
         }
     }
 }
@@ -334,13 +329,21 @@ function timerEventsLoading() {
 // SAVE DATA TIMER
 var savedTimes = 1;
 function timerSave(timerSeconds) {
-    // SAVES EVERY 3 MINUTES
+    // SAVES DATA EVERY 3 MINUTES
     let saveTimeMin = 180 * savedTimes;
     if (timerSeconds > saveTimeMin) {
         saveData();        
         console.log("Saved!");
         savedTimes++;
     }
+}
+
+// GET CURRENT TIME IN MINUTES SINCE 1900
+function getTime() {
+    let startOfYear = new Date('1900-01-01T00:00:00');
+    let now = new Date();
+    let minutesPassedNow = (now - startOfYear) / (1000 * 60);
+    return minutesPassedNow;
 }
 
 // LOAD SAVE DATA
@@ -422,8 +425,7 @@ function loadSaveData() {
         updateObjectKeys(persistentValues,persistentValuesDefault);
     }
 
-    lowerEnergyRate = persistentValues.lowerEnergyRate;
-    upperEnergyRate = persistentValues.upperEnergyRate;
+
     specialValuesUpgrade(true);
     if (saveValues.goldenTutorial === true) {
         addNutStore();
@@ -440,9 +442,16 @@ demoImg.id = "demo-main-img";
 
 demoContainer.addEventListener("mouseup", () => {
     let clickEarn;
+    let crit = false;
     saveValues["clickCount"] += 1;
     if (clickerEvent === false) {
-        clickEarn = Math.ceil(specialClick * saveValues["clickFactor"]);
+        let critRole = randomInteger(1,100);
+        if (critRole <= clickCritRate) {
+            clickEarn = Math.ceil(specialClick * saveValues["clickFactor"] * clickCritDmg);
+            crit = true;
+        } else {
+            clickEarn = Math.ceil(specialClick * saveValues["clickFactor"]);
+        }
     } else {
         clickEarn = currentClick;
         clickDelay -= 10;
@@ -461,10 +470,26 @@ demoContainer.addEventListener("mouseup", () => {
         }
     }
 
-    demoContainer = floatText(leftDiv,abbrNum(clickEarn,2,true),randomInteger(20,80),randomInteger(50,70));
+    if (crit === true) {
+        if (document.getElementById("crit-text")) {
+            let oldCritText = document.getElementById("crit-text");
+            let oldValue = oldCritText.critValue + clickEarn;
+            oldCritText.innerText = `+${abbrNum(oldValue,2,true)}`;
+
+            let newCritText = oldCritText.cloneNode(true);
+            oldCritText.parentNode.replaceChild(newCritText, oldCritText);
+            newCritText.critValue = oldValue
+            newCritText.addEventListener('animationend', ()=>{newCritText.remove()});
+        } else {
+            demoContainer = floatText(leftDiv,abbrNum(clickEarn,2,true),randomInteger(30,70),60,true,clickEarn);
+        }
+    } else {
+        demoContainer = floatText(leftDiv,abbrNum(clickEarn,2,true),randomInteger(20,80),randomInteger(50,70));
+    }
     let number = randomInteger(2,6);
     let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`;
 
+    spawnFallingNut();
     let img = document.createElement("img");
     img.src = "./assets/icon/nut.webp";
     img.style.left = `${randomInteger(0,100)}%`
@@ -476,6 +501,10 @@ demoContainer.addEventListener("mouseup", () => {
 
 drawUI.demoFunction(demoContainer,demoImg);
 demoContainer.appendChild(demoImg);
+
+function spawnFallingNut() {
+    return;
+}
 
 // ROLL FOR ENERGY
 function energyRoll() {
@@ -490,22 +519,75 @@ function energyRoll() {
 }
 
 // UPDATES VALUES WITH PERSISTENT VALUES
-function specialValuesUpgrade(loading) {
+function specialValuesUpgrade(loading, valueUpdate) {
     if (loading === true) {
-        upperEnergyRate *= Math.ceil((100 + persistentValues.upgrade1.Purchased) / 100);
-        lowerEnergyRate = Math.ceil(upperEnergyRate * 0.75);
-        specialClick = 1 + (persistentValues.upgrade2.Purchased)/10;
-        wishPower = 1 + (persistentValues.upgrade3.Purchased)/50;
-        costDiscount = 1 - (persistentValues.upgrade4.Purchased)/50;
+        upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade1.Purchased) / 10);
+        lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
+        specialClick = (1 + (persistentValues.upgrade2.Purchased)/10).toFixed(3);
+        wishPower = (1 + (persistentValues.upgrade3.Purchased)/50).toFixed(3);
+        costDiscount = (1 - (persistentValues.upgrade4.Purchased)/50).toFixed(3);
         clickCritRate = persistentValues.upgrade5.Purchased;
         clickCritDmg = Math.round((Math.log(persistentValues.upgrade5.Purchased + 1) * 18));
-        idleRate = persistentValues.upgrade6.Purchased;
+        idleRate = (persistentValues.upgrade6.Purchased/100).toFixed(2);
         luckRate = persistentValues.upgrade7.Purchased/2;
-        eventCooldownDecrease = 1 - persistentValues.upgrade8.Purchased/50;
-        additionalPrimo = 1 + persistentValues.upgrade9.Purchased/10;
-        additionalStrength = 1 + persistentValues.upgrade10.Purchased/10;
-        additionalDefense = 1 + persistentValues.upgrade11.Purchased/10;
+        eventCooldownDecrease = (1 - persistentValues.upgrade8.Purchased/50).toFixed(1);
+        additionalPrimo = (1 + persistentValues.upgrade9.Purchased/10).toFixed(3);
+        additionalStrength = (1 + persistentValues.upgrade10.Purchased/10).toFixed(3);
+        additionalDefense = (1 + persistentValues.upgrade11.Purchased/10).toFixed(3);
+    } else if (loading == false) {
+        switch (valueUpdate) {
+            case 1:
+                upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade1.Purchased) / 10);
+                lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
+                break;
+            case 2:
+                specialClick = (1 + (persistentValues.upgrade2.Purchased)/10).toFixed(3);
+                break;
+            case 3:
+                wishPower = (1 + (persistentValues.upgrade3.Purchased)/50).toFixed(3);
+                break;
+            case 4:
+                costDiscount = (1 - (persistentValues.upgrade4.Purchased)/50).toFixed(3);
+                break;
+            case 5:
+                clickCritRate = persistentValues.upgrade5.Purchased;
+                clickCritDmg = Math.round((Math.log(persistentValues.upgrade5.Purchased + 1) * 18));
+                break;
+            case 6:
+                idleRate = (persistentValues.upgrade6.Purchased/100).toFixed(2);
+                break;
+            case 7:
+                luckRate = (persistentValues.upgrade7.Purchased/2).toFixed(3);
+                break;
+            case 8:
+                eventCooldownDecrease = (1 - persistentValues.upgrade8.Purchased/50).toFixed(1);
+                break;
+            case 9:
+                additionalPrimo = (1 + persistentValues.upgrade9.Purchased/10).toFixed(3);
+                break;
+            case 10:
+                additionalStrength = (1 + persistentValues.upgrade10.Purchased/10).toFixed(3);
+                break;
+            case 11:
+                additionalDefense = (1 + persistentValues.upgrade11.Purchased/10).toFixed(3);
+                break;
+            default:
+                console.log('Invalid value to update');
+                break;
+        }
     }
+}
+
+function idleCheck(idleAmount) {
+    let timePassed = timeLoaded - saveValues.currentTime;
+    console.log(Math.round(timePassed) + " minutes have passed since the last save");
+    if (timePassed > 1400) {
+        timePassed = 1400;
+    }
+    if (timePassed >= 60) {
+        idleAmount = timePassed * saveValues.dps * 60 * idleRate;
+    }
+    return idleAmount;
 }
 
 //--------------------------------------------------------------------------RANDOM EVENTS----------------------------------------------------------------------//
@@ -628,7 +710,7 @@ function clickEvent() {
     let currentAnimation = button.style.animation;
     button.style.animation = "rotation 3.5s infinite linear forwards";
     clickerEvent = true;
-    currentClick = 15 * (saveValues["dps"] + 1);
+    currentClick = 15 * (saveValues["dps"] + 1) * specialClick;
 
     clickEventDelay = setTimeout(() => {
         if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")}
@@ -1134,7 +1216,7 @@ function rainEvent() {
             img.addEventListener('click', () => {
                 img.remove();
                 tempPrimogem += randomInteger(10,20);
-                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier) + " Nuts | " + tempPrimogem + " Primos";
+                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier) + " Nuts | " + Math.round(tempPrimogem * additionalPrimo) + " Primos";
             });
         } else if (type >= 65) {
             img.src = "./assets/icon/scarab.webp";
@@ -1146,7 +1228,7 @@ function rainEvent() {
                 tempScore = Math.max(0, tempScore);
                 tempPrimogem -= randomInteger(50,80);
                 tempPrimogem = Math.max(0, tempPrimogem)
-                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + tempPrimogem + " Primos";
+                rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + Math.round(tempPrimogem * additionalPrimo) + " Primos";
             });
         } else {
             img.src = "./assets/icon/nut.webp";
@@ -1173,7 +1255,6 @@ function rainEvent() {
             rainText.addEventListener('animationend', () => {
                 rainText.remove();
                 saveValues.realScore += tempScore * dpsMultiplier;
-                saveValues.primogem += tempPrimogem;
                 if (tempPrimogem != 0) {
                     if (tempGolden == 0) {
                         currencyPopUp("primogem",tempPrimogem);
@@ -1275,9 +1356,14 @@ function removeLoading() {
     dimHeroButton();
     setTimeout(() => {
         let overlay = document.getElementById("loading");
+        let idleAmount = 0;
+
         overlay.removeChild(overlay.firstElementChild);
         overlay.classList.remove("overlay");
-        tutorial();
+        if (persistentValues.upgrade6.Purchased > 0) {
+            idleAmount = idleCheck(idleAmount);
+        }
+        tutorial(idleAmount);
     }, 200);
 }
 
@@ -1308,7 +1394,7 @@ function playAudio() {
 }
 
 // TUTORIAL UPON FIRST LOAD
-function tutorial() {
+function tutorial(idleAmount) {
     let overlay = document.getElementById("loading");
     if (firstGame === true) {
         let currentSlide = 1;
@@ -1343,6 +1429,19 @@ function tutorial() {
         let tutorialDark = document.createElement("div");
         tutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
 
+        if (idleAmount != 0) {
+            let tutorialIdle = document.createElement("div");
+            tutorialIdle.classList.add("flex-row","idle-dark");
+            let idleAmountText = document.createElement("p");
+            idleAmountText.innerText = `+${abbrNum(idleAmount)}`;
+            let idleNuts = document.createElement("img");
+            idleNuts.src = "./assets/icon/nut.webp";
+            idleNuts.classList.add("icon","primogem");
+
+            tutorialIdle.append(idleAmountText,idleNuts);
+            tutorialDark.append(tutorialIdle);
+        }
+
         let playButton = document.createElement("img");
         playButton.src = "./assets/tutorial/play-button.webp"
         playButton.classList.add("play-button");
@@ -1352,14 +1451,16 @@ function tutorial() {
             timer = setInterval(timerEvents,timeRatio);
             currentBGM = playAudio();
             settingsVolume();
-        })
+            setTimeout(()=>{saveValues.realScore += idleAmount},250)
+        });
 
-        tutorialDark.appendChild(playButton)
-        overlay.appendChild(tutorialDark);
+        tutorialDark.appendChild(playButton);
+        overlay.append(tutorialDark);
     }
 }
 
 function saveData() {
+    saveValues["currentTime"] = getTime();
     if (!document.getElementById("currently-saving")) {
         let saveCurrently = document.createElement("img");
         saveCurrently.src = "./assets/settings/saving.webp";
@@ -1374,6 +1475,7 @@ function saveData() {
         bgmVolume:bgmElement.volume,
         sfxVolume:tabElement.volume,
     }
+
     localStorage.setItem("settingsValues", JSON.stringify(settingsSaved));
     localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
     localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
@@ -1812,7 +1914,6 @@ function updateFilter(tab) {
 function loadRow() {
     let i = WISHHEROMAX;
     while (i--) {
-        console.log(i)
         if (upgradeDict[i] == undefined) continue;
         if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
         if (upgradeDict[i].Row > -1){
@@ -1829,8 +1930,8 @@ function loadRow() {
 
         if (upgradeDictTemp["Purchased"] > 0) {
             formatCost *= (COSTRATIO**upgradeDictTemp["Purchased"])
-            formatCost = abbrNum(formatCost)
-            formatATK = abbrNum(formatATK)
+            formatCost = abbrNum(formatCost,2);
+            formatATK = abbrNum(formatATK,2);
             if (j == 0) {
                 let singular = ` Nut${formatATK !== 1 ? 's' : ''} per click`;
                 heroTextLoad =  upgradeInfo[loadedHeroID].Name + ": " + formatCost + ", " + formatATK + singular;
@@ -1839,11 +1940,11 @@ function loadRow() {
             }
         } else {
             if (upgradeDictTemp["Level"] == 0) {
-                heroTextLoad = "Summon " + upgradeInfo[loadedHeroID].Name + " for help. (" + abbrNum(formatCost) + ")";
+                heroTextLoad = "Summon " + upgradeInfo[loadedHeroID].Name + " for help. (" + abbrNum(formatCost,2) + ")";
             } else if (j == 0) {
-                heroTextLoad = "Level Up Nahida (" + abbrNum(formatCost) + ")";
+                heroTextLoad = "Level Up Nahida (" + abbrNum(formatCost,2) + ")";
             } else {
-                heroTextLoad = "Call for " + upgradeInfo[loadedHeroID].Name + "'s help... (" + abbrNum(formatCost) + ")";
+                heroTextLoad = "Call for " + upgradeInfo[loadedHeroID].Name + "'s help... (" + abbrNum(formatCost,2) + ")";
             }
         }
 
@@ -1888,11 +1989,11 @@ function addNewRow() {
 
             let heroText;
             if (upgradeDict[i]["Level"] === 0) {
-                heroText = "Summon " + upgradeInfo[i].Name + " for help. (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
+                heroText = "Summon " + upgradeInfo[i].Name + " for help. (" + abbrNum(upgradeDict[i]["BaseCost"],2) + ")";
             } else if (i === 0) {
                 heroText = "Level Up Nahida (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
             } else {
-                heroText = "Call for " + upgradeInfo[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"]) + ")";
+                heroText = "Call for " + upgradeInfo[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"],2) + ")";
             }
 
             
@@ -2107,9 +2208,9 @@ function itemUse(itemUniqueId) {
             if (upgradeDictTemp.Purchased > 0){
                 if (upgradeInfo[i].Type == Inventory[itemID].Type){
                     let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (weaponBuffPercent[Inventory[itemID].Star] - 1));
+                    additionPower = Math.round(additionPower * additionalStrength);
                     if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
-
                     upgradeDictTemp["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
                     upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                     refresh("hero", i);
@@ -2124,6 +2225,7 @@ function itemUse(itemUniqueId) {
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
                 let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (artifactBuffPercent[Inventory[itemID].Star] - 1));
+                additionPower = Math.round(additionPower * additionalDefense);
                 if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                 upgradeDict[i]["Contribution"] += additionPower;
 
@@ -2135,6 +2237,7 @@ function itemUse(itemUniqueId) {
     } else if (itemID >= 3001 && itemID < FOODMAX){
         foodButton(1);
         foodBuff = foodBuffPercent[Inventory[itemID].Star];
+        foodBuff *= additionalDefense;
     } else if (itemID >= 4001 && itemID < XPMAX){
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         refresh();
@@ -2154,6 +2257,7 @@ function itemUse(itemUniqueId) {
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
                 let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
+                additionPower = Math.round(additionPower * additionalDefense);
                 if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                 upgradeDict[i]["Contribution"] += additionPower;
 
@@ -2181,6 +2285,7 @@ function itemUse(itemUniqueId) {
                 if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
                     let upgradeDictTemp = upgradeDict[i];
                     let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
+                    additionPower = Math.round(additionPower * additionalDefense);
                     if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
 
@@ -2202,6 +2307,7 @@ function itemUse(itemUniqueId) {
                 if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
                     let upgradeDictTemp = upgradeDict[i];
                     let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
+                    additionPower = Math.round(additionPower * additionalStrength);
                     if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
 
@@ -2647,11 +2753,7 @@ function wish() {
 function wishAnimation(randomWishHero) {
     stopSpawnEvents = true;
     let nameTemp = upgradeInfo[randomWishHero].Name;
-    imageWorker.postMessage({
-        operation: 'preload',
-        priority: 'single',
-        path:`tooltips/letter-${nameTemp}`,
-    });
+    drawUI.preloadLib(cache,'single',`tooltips/letter-${nameTemp}`);
     setTimeout(()=>{
         let wishBackdropDark = document.createElement("div");
         wishBackdropDark.classList.add("cover-all","flex-column","tutorial-dark");
@@ -2739,7 +2841,7 @@ function popAchievement(achievement,loading) {
     achievementID += achievementType;
 
     if (loading != true) {
-        saveValues["primogem"] += 20;
+        saveValues["primogem"] += Math.round(20 * additionalPrimo);
 
         if (timerSeconds !== 0) {
             var achievementPopUp = drawUI.createAchievement(achievementText,achievementDesc);
@@ -2969,9 +3071,7 @@ function shopCheck() {
         if (saveValues["primogem"] > SHOP_THRESHOLD) {
             // GENERATING A LOCAL SHOP
             addShop();
-            let startOfYear = new Date('2022-01-01T00:00:00');
-            let now = new Date();
-            shopTime = (now - startOfYear) / (1000 * 60);
+            shopTime = getTime();
             localStorage.setItem("shopStartMinute",shopTime);
             setShop();
             setTimeout(()=>saveData(),1000)
@@ -3013,9 +3113,7 @@ function setShop() {
     shopTimerElement.classList.add("background-image-cover");
     shopTimerElement.id = "shop-timer"
     let currentMin = localStorage.getItem("shopStartMinute");
-    let startOfYear = new Date('2022-01-01T00:00:00');
-    let now = new Date();
-    let minutesPassed = (now - startOfYear) / (1000 * 60);
+    let minutesPassed = (getTime() / (1000 * 60));
     shopTimerElement.innerText = "Inventory resets in: " + (SHOPCOOLDOWN - (currentMin - minutesPassed)) + " minutes";
 
     let shopDiv = document.createElement("div");
@@ -3024,7 +3122,7 @@ function setShop() {
     let i=10;
     while (i--) {
         let inventoryNumber;
-        if (i >= 6 && i <= 10) {
+        if (i >= 6 && i <= 9) {
             inventoryNumber = inventoryDraw("talent", 2,4, "shop");
         } else if (i >= 2 && i <= 4) {
             inventoryNumber = inventoryDraw("gem", 4,6, "shop");
@@ -3035,7 +3133,7 @@ function setShop() {
                 inventoryNumber = inventoryDraw("gem", 4,6, "shop");
             }
         } else {
-            inventoryNumber = inventoryDraw("weapon", 4,6, "shop")
+            inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
         }
         
         createShopItems(shopDiv, i, inventoryNumber);
@@ -3175,24 +3273,25 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     let shopCost = 0;
     switch (inventoryTemp.Star) {
         case 2:
-            shopCost = Math.round(randomInteger(15,35)/ 5) * 5;
+            shopCost = Math.round(randomInteger(35,55)/ 5) * 5;
             break;
         case 3: 
-            shopCost = Math.round(randomInteger(40,70)/ 5) * 5;
+            shopCost = Math.round(randomInteger(70,100)/ 5) * 5;
             break;
         case 4:
-            shopCost = Math.round(randomInteger(100,140)/ 5) * 5;
+            shopCost = Math.round(randomInteger(140,210)/ 5) * 5;
             break;
         case 5:
-            shopCost = Math.round(randomInteger(240,300)/ 5) * 5;
+            shopCost = Math.round(randomInteger(300,400)/ 5) * 5;
             break;
         case 6:
-            shopCost = Math.round(randomInteger(450,600)/ 5) * 5;
+            shopCost = Math.round(randomInteger(600,750)/ 5) * 5;
             break;
         default:
             break;
     }
 
+    shopCost *= costDiscount;
     let shopButtonPrimo = document.createElement("img");
     shopButtonPrimo.classList.add("shop-button-primo");
     shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
@@ -3207,7 +3306,6 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopButtonImageContainer.appendChild(shopButtonImage);
     shopButton.append(shopButtonImageContainer,shopButtonText);
     shopDiv.append(shopButton);
-
     return shopDiv;
 }
 
@@ -3228,12 +3326,7 @@ function nutCost(id) {
 
 // ADDS ACCESS BUTTON AFTER 1 NUT
 function addNutStore() {
-    imageWorker.postMessage({
-        operation: 'preload',
-        priority: 'folder',
-        path:`tooltips/nut-shop-`,
-        number: 7,
-    });
+    drawUI.preloadLib(cache,'folder',`tooltips/nut-shop-`,7);
 
     let mainTable = rightDiv.childNodes[1];
     let nutStoreTable = document.createElement("div");
@@ -3319,7 +3412,7 @@ function addNutStore() {
 
 function nutPurchase(fullId) {
     let id = fullId.split("-")[2];
-    let cost = nutCost(id)
+    let cost = nutCost(id);
     if (persistentValues.goldenCore >= cost) {
         persistentValues["upgrade"+id].Purchased++;
         persistentValues.goldenCore -= cost;
@@ -3329,6 +3422,7 @@ function nutPurchase(fullId) {
                                     (Effect: ${permUpgrades[id]["Effect"] * persistentValues["upgrade"+id]["Purchased"]}%)`;
         childArray[4].children[1].innerHTML = childArray[4].children[1].innerHTML.replace(/[^<]+</g, `${abbrNum(nutCost(id),2,true)}<`);
         updateCoreCounter();
+        specialValuesUpgrade(false,parseInt(id));
 
         if (permUpgrades[id].Cap === true) {
             if (persistentValues["upgrade"+id].Purchased >= permUpgrades[id].Max) {
@@ -3352,12 +3446,8 @@ function nutPopUp() {
     } else {
         saveValues.goldenTutorial = true;
         stopSpawnEvents = true;
-        imageWorker.postMessage({
-            operation: 'preload',
-            priority: 'folder',
-            path:`tutorial/goldenNut-`,
-            number: 4,
-        });
+        drawUI.preloadLib(cache,'folder',`tutorial/goldenNut-`,4);
+
         setTimeout(()=>{
             addNutStore();
             let currentSlide = 1;
@@ -3421,14 +3511,14 @@ function refresh() {
                 formatCost *= (COSTRATIO**currentPurchased);
             }
 
-            formatCost = abbrNum(formatCost);
+            formatCost = abbrNum(formatCost,2);
 
             if (arguments[2] == 0) {
                 let singular = ` Nut${formatATK !== 1 ? 's' : ''} per click`;
-                formatATK = abbrNum(formatATK)
+                formatATK = abbrNum(formatATK,2);
                 heroTextFirst = upgradeInfoTemp.Name + ": " + formatCost + ", +" + formatATK + singular;
             } else {
-                formatATK = abbrNum(formatATK)
+                formatATK = abbrNum(formatATK,2);
                 heroTextFirst = upgradeInfoTemp.Name + ": " + formatCost + ", +" + formatATK + " NpS";
             }
             
@@ -3449,7 +3539,7 @@ function refresh() {
                 formatCost *= (COSTRATIO**currentPurchased);
             }
 
-            let heroText = upgradeInfo[arguments[1]].Name + ": " + abbrNum(formatCost) + ", +" + abbrNum(formatATK) + " NpS";
+            let heroText = upgradeInfo[arguments[1]].Name + ": " + abbrNum(formatCost,2) + ", +" + abbrNum(formatATK,2) + " NpS";
             let id="but-" + hero.Row + "";
             document.getElementById(id).innerText = heroText;
         }
@@ -3492,6 +3582,8 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
 
 // POP UPS FOR SPECIAL CURRENCY
 function currencyPopUp(type1, amount1, type2, amount2) {
+    if (type1 === 'primogem') {amount1 = Math.round(amount1 * additionalPrimo)};
+    if (type2 === 'primogem') {amount2 = Math.round(amount2 * additionalPrimo)};
     let currencyPop = document.createElement("div");
     currencyPop.classList.add("flex-column","currency-pop");
     currencyPop.innerText = 'Obtained';

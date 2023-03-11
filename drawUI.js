@@ -1,3 +1,169 @@
+const filePath = "./assets/";
+const uniqueFileArray = {
+    "bg/":["achievementBG","bg","closed","dori-back","left","main-bar","middle","open","right","wish-bg","wood"],
+    "tutorial/":["buttonBox","eventPill","tut-button","idle","unlockExp-3","unlockExp-4","unlockExp-5"],
+    "frames/":["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"],
+    "tooltips/elements/":["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"],
+    "event/":["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"],
+    "icon/":["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","event-easy","event-hard"],    
+}
+
+const numberedFileArray = {
+    "achievement/":20,
+    "event/box-":7,
+    "event/good-":7,
+    "expedbg/exped":6,
+    "frames/background-":6,
+    "frames/rarity-":6,
+    "tutorial/aranara-":6,
+    "event/whopperflower-":3,
+    "event/bad-":4,
+    "tutorial/tut-":4,
+    "event/weasel-":9
+}
+
+async function preloadLib(cache,type,path,number) {
+    let images = [];
+    if (type === 'load') {
+        let img = new Image();
+        let urlOne = filePath + "loading.webp";
+        img.src = urlOne;
+        let promise = new Promise((resolve, reject) => {
+            img.onload = () => {
+                resolve(img);
+                cache.appendChild(img);
+            };
+            img.onerror = reject;
+        });
+        images.push({urlOne, promise});
+
+        let imgTwo = new Image();
+        let urlTwo = filePath + "/expedbg/exped-button.webp";
+        imgTwo.src = urlTwo;
+        let promiseTwo = new Promise((resolve, reject) => {
+            imgTwo.onload = () => {
+                resolve(imgTwo);
+                cache.appendChild(imgTwo);
+            };
+            imgTwo.onerror = reject;
+        });
+        images.push({urlTwo, promiseTwo});
+
+        for (let key in uniqueFileArray) {
+            for (let i=0, len=uniqueFileArray[key].length; i < len; i++) {
+                let img = new Image();
+                let url = filePath + key + uniqueFileArray[key][i] + ".webp";
+                img.src = url;
+                let promise = new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        resolve(img);
+                        cache.appendChild(img);
+                    };
+                    img.onerror = reject;
+                });
+                images.push({url, promise});
+            }
+        }
+        for (const key in numberedFileArray) {
+            for (let i=1, len=numberedFileArray[key] + 1; i < len; i++) {
+                let img = new Image();
+                let url = filePath + key + i + ".webp";
+                img.src = url;
+                let promise = new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        resolve(img);
+                        cache.appendChild(img);
+                    };
+                    img.onerror = reject;
+                });
+                images.push({url, promise});
+            }
+        }
+        for (let key in path) {
+            let upgradeName = path[key].Name;
+            let imgOne = new Image();
+            let urlOne = filePath + "nameplates/" + upgradeName + ".webp";
+            imgOne.src = urlOne;
+            let promise = new Promise((resolve, reject) => {
+                imgOne.onload = () => {
+                    resolve(imgOne);
+                    cache.appendChild(imgOne);
+                };
+                imgOne.onerror = reject;
+            });
+            images.push({urlOne, promise});
+
+            let imgTwo = new Image();
+            let urlTwo = filePath + "tooltips/hero/" + upgradeName + ".webp";
+            imgTwo.src = urlTwo;
+            let promiseTwo = new Promise((resolve, reject) => {
+                imgTwo.onload = () => {
+                    resolve(imgTwo);
+                    cache.appendChild(imgTwo);
+                };
+                imgTwo.onerror = reject;
+            });
+            images.push({urlTwo, promiseTwo});
+        }
+    // PRELOAD SINGLE IMAGES
+    } else if (type === 'single') {
+        let img = new Image();
+        let url = filePath + path + ".webp";
+        img.src = url;
+        let promise = new Promise((resolve, reject) => {
+            img.onload = () => {
+                resolve(img);
+                cache.appendChild(img);
+            };
+            img.onerror = reject;
+        });
+        images.push({url, promise});
+    // PRELOAD MULTIPLE IMAGES
+    } else if (type === 'folder') {
+        for (let i = 1; i < (number + 1); i++) {
+            let img = new Image();
+            let url = filePath + path + i + ".webp";
+            img.src = url;
+            let promise = new Promise((resolve, reject) => {
+                img.onload = () => {
+                    resolve(img);
+                    cache.appendChild(img);
+                };
+                img.onerror = reject;
+            });
+            images.push({url, promise});
+        }
+    }
+    
+    await Promise.all(images.map(i => i.promise));
+    return cache;
+}
+
+function preloadFolders() {
+    let filePath = "./assets/";
+    let m = 0;
+    while (m < 5) {
+        let imgOne = new Image();
+        imgOne.src = filePath + "achievement/" + (m * 100) + ".webp";
+        m++;
+    }
+}
+
+function preloadImage(max,path,single) {
+    let filePath = "./assets/";
+    let i = 1;
+    if (single === true) {
+        let img = new Image();
+        img.src = filePath + path + ".webp";
+    } else {
+        while (i < max) {
+            let img = new Image();
+            img.src = filePath + path + i + ".webp";
+            i++;
+        }
+    }
+}
+
 // GAME GUI
 function buildGame(mainBody) {
     let loadingDiv = document.createElement("div");
@@ -246,29 +412,4 @@ function drawMailTable(table4) {
     return table4;
 }
 
-function preloadFolders() {
-    let filePath = "./assets/";
-    let m = 0;
-    while (m < 5) {
-        let imgOne = new Image();
-        imgOne.src = filePath + "achievement/" + (m * 100) + ".webp";
-        m++;
-    }
-}
-
-function preloadImage(max,path,single) {
-    let filePath = "./assets/";
-    let i = 1;
-    if (single === true) {
-        let img = new Image();
-        img.src = filePath + path + ".webp";
-    } else {
-        while (i < max) {
-            let img = new Image();
-            img.src = filePath + path + i + ".webp";
-            i++;
-        }
-    }
-}
-
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders,preloadImage }
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders,preloadImage,preloadLib }

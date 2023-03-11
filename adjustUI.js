@@ -21,15 +21,20 @@ function inventoryAddButton(buttonInv, Item) {
 }
 
 // ADDS FLOATING TEXT UPON CLICKING ON DEMO BUTTON
-function floatText(leftDiv,clickFactor,XrandNum1,YrandNum2) {
+function floatText(leftDiv,clickFactor,XrandNum1,YrandNum2,crit,clickEarn) {
     let clickCountAppear = document.createElement("div");
-
-    clickCountAppear.innerHTML = "+" + clickFactor;
-    clickCountAppear.classList.add("floatingText");
+    clickCountAppear.innerText = "+" + clickFactor;
+    if (crit === true) {
+        clickCountAppear.classList.add("floatingCritText");
+        clickCountAppear.id = "crit-text";
+        clickCountAppear.critValue = clickEarn;
+    } else {
+        clickCountAppear.classList.add("floatingText");
+    }
     clickCountAppear.style.position = "absolute";
     clickCountAppear.style.left = XrandNum1 + "%";
     clickCountAppear.style.top = YrandNum2 + "%";
-    clickCountAppear.addEventListener('animationend', () => {clickCountAppear.remove();});
+    clickCountAppear.addEventListener('animationend', ()=>{clickCountAppear.remove()});
 
     leftDiv.appendChild(clickCountAppear);
     return leftDiv;
