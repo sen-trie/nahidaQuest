@@ -1,7 +1,7 @@
 const filePath = "./assets/";
 const uniqueFileArray = {
-    "bg/":["achievementBG","bg","closed","dori-back","left","main-bar","middle","open","right","wish-bg","wood"],
-    "tutorial/":["buttonBox","eventPill","tut-button","idle","unlockExp-3","unlockExp-4","unlockExp-5"],
+    "bg/":["achievementBG","bg","closed","dori-back","left","main-bar","middle","nutShop","nutShopInterior","open","right","wish-bg","wood"],
+    "tutorial/":["buttonBox","eventPill","tut-button","idle","unlockExp-3","unlockExp-4","unlockExp-5","exped-button"],
     "frames/":["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"],
     "tooltips/elements/":["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"],
     "event/":["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"],
@@ -36,18 +36,6 @@ async function preloadLib(cache,type,path,number) {
             img.onerror = reject;
         });
         images.push({urlOne, promise});
-
-        let imgTwo = new Image();
-        let urlTwo = filePath + "/expedbg/exped-button.webp";
-        imgTwo.src = urlTwo;
-        let promiseTwo = new Promise((resolve, reject) => {
-            imgTwo.onload = () => {
-                resolve(imgTwo);
-                cache.appendChild(imgTwo);
-            };
-            imgTwo.onerror = reject;
-        });
-        images.push({urlTwo, promiseTwo});
 
         for (let key in uniqueFileArray) {
             for (let i=0, len=uniqueFileArray[key].length; i < len; i++) {

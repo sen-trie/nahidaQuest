@@ -47,7 +47,7 @@ cache image {
     color: rgb(255, 255, 255);
     bottom: 0;
     right: 0.2%;
-    z-index: 5000;
+    z-index: 10;
     font-size: 0.75em;
     text-shadow: 0.1em 0.1em 0.15em black;
 }
@@ -57,7 +57,7 @@ cache image {
     color: rgb(255, 255, 255);
     bottom: 0;
     left: 0.1%;
-    z-index: 5000;
+    z-index: 10;
     font-size: 0.45em;
     text-shadow: 0.05em 0.05em 0.07em black;
 }
@@ -153,6 +153,8 @@ cache image {
         height: 100%;
         margin: 0;
         font-size: 1.12vw;
+        border-left: 0.2em groove  #465E2B;
+        border-right: 0.2em groove  #465E2B;
     }
 }
 
@@ -162,6 +164,8 @@ cache image {
         height: 100%;
         margin: 0;
         font-size: 1.26vw;
+        border-left: 0.2em groove  #465E2B;
+        border-right: 0.2em groove  #465E2B;
     }
 }
 
@@ -180,8 +184,7 @@ cache image {
       height: 100%;
       overflow: hidden;
     }
-  }
-  
+}
 
 /*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
@@ -1908,7 +1911,7 @@ input[type="range"]:focus::-moz-range-thumb{
     justify-content: flex-start;
     align-items: center;
     box-sizing: border-box;
-    column-gap: 2%;
+    column-gap: 0.5%;
     padding: 1%;
 }
 
@@ -1918,7 +1921,7 @@ input[type="range"]:focus::-moz-range-thumb{
   }
 
 .filter-row div:nth-child(2) > button {
-    height: 32%;
+    height: 26%;
     aspect-ratio: 1;
 }
 
@@ -1936,7 +1939,7 @@ input[type="range"]:focus::-moz-range-thumb{
     justify-content: flex-start;
     align-items: center;
     box-sizing: border-box;
-    column-gap: 2%;
+    column-gap: 0.5%;
     padding: 1%;
 }
 
@@ -1978,7 +1981,7 @@ input[type="range"]:focus::-moz-range-thumb{
     position: relative;
     height: 12%;
     width: 35%;
-    background-image: url(./assets/expedbg/exped-button.webp);
+    background-image: url(./assets/tutorial/exped-button.webp);
     font-size: 1.4em;
     color: #E1D8CB;
     text-shadow: #40312b 0.05em 0.05em 0.05em;
@@ -2018,6 +2021,8 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 #expedDiv {
+    background-color: #ccb28f49;
+    border-radius: 1em;
     width:100%;
     height:57%;
     display: flex;
@@ -2444,7 +2449,7 @@ input[type="range"]:focus::-moz-range-thumb{
     width: 38%;
 }
 
-.tool-tip-extraimg img{
+.tool-tip-extraimg > img{
     flex-basis: 50%;
     width: 47.5%;
 }
@@ -2487,7 +2492,6 @@ input[type="range"]:focus::-moz-range-thumb{
 
 #table7 > div {
     position: relative;
-    top: 2%;
     filter: drop-shadow(0.2em 0.3em 0.2em rgba(0, 0, 0, 0.56));
 }
 

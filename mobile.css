@@ -1,0 +1,261 @@
+/*/////////////////////////////// MOBILE CSS  ///////////////////////////////*/
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-size: 2.0vw;
+    border: 0;
+}
+
+.copyright-text, .version-text {
+    bottom: 50%;
+}
+
+/* MOBILE CSS FOR MAIN GAME */
+.left-area {
+    width: 100%;
+    height: 46%;
+    position: absolute;
+    left: 0;
+    top: 5%;
+}
+
+.middle-area {
+    width: 100%;
+    height: 5%;
+    left: 0;
+    top: 0%;
+    flex-direction: row;
+}
+
+.energy-primo-container {
+    width: 15%;
+    left: 0;
+    flex-direction: row;
+}
+
+.temp-buff {
+    width: 30%;
+    top: 0;
+}
+
+.multiplier-button-container {
+    width: 60%;
+    padding-right: 1%;
+    box-sizing: border-box;
+    position: relative;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.multiplier-button-container > button {
+    padding: 0.5%;
+    width: auto;
+    height: 100%;
+    aspect-ratio: 1;
+}
+
+.middle-area > div {
+    height: 100%;
+}
+
+.right-area {
+    width: 100%;
+    height: 50%;
+    top: 50%;
+}
+
+.score-container {
+    top: 2%;
+    height: 18%;
+}
+
+#demo-container {
+    top: 5%;
+    height: 65%;
+}
+
+/* MOBILE CSS FOR TABLES */
+.right-area {
+    z-index: 3;
+}
+#table1 {
+    gap: 2%;
+}
+
+.upgrade {
+    height: 25%;
+}
+
+#table3 {
+    flex-wrap: wrap;
+}
+
+#expedDiv {
+    width:40%;
+    height: 70%;
+    overflow-x: scroll;
+    flex-direction: row;
+}
+
+.inventory-selected {
+    border: 0.25em inset #867357;
+    border-radius: 1em;
+}
+
+.inventory-selected :first-child {
+    border-radius: 0.75em;
+}
+
+.expedition {
+    flex: 0 0 auto;
+    height: 100%;
+    width: 33%;
+    background-position: center;
+}
+
+.tooltipEXPED {
+    width: 55%;
+    height: 70%;
+    font-size: 0.95em;
+}
+
+#adventure-button {
+    top:1%;
+    height: 18%;
+}
+
+#tool-tip-button {
+    width: 35%;
+}
+
+#exped-row-1 {
+    align-items: center;
+}
+
+.wish-button {
+    height: 25%;
+    bottom: 1%;
+}
+
+#wish-counter-display {
+    height: 13%;
+}
+
+#wish-nps-display {
+    top: 20%;
+}
+
+#table6 {
+    width: 50%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    padding-left: 2%;
+    padding-right: 2%;
+    column-gap: 2%;
+}
+
+.tool-tip-name {
+    flex-basis: 100%;
+}
+
+.toolImgContainer {
+    height: 20%;
+}
+
+.tool-tip-extraimg {
+    width: 15%;
+    height: 20%;
+    flex-direction: column;
+}
+
+.tool-tip-text {
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.tool-tip-extraimg > img {
+    height: 50%;
+    object-fit: contain;
+}
+
+.table-with-tooltip {
+    height: 85%;
+}
+
+.filter-row {
+    width: 56.5%;
+    height: 15%;
+}
+
+.filter-row div:nth-child(3) > button {
+    height:37%;
+    aspect-ratio: 1;
+}
+
+.table5-Image {
+    width: 70%;
+}
+
+.flex-container-ACHIEVEMENT {
+    width: 65%;
+}
+
+#table7 {
+    flex-direction: row;
+    justify-content: center;
+}
+
+#table7 > img {
+    height: 37%;
+}
+
+.store-timer {
+    width: 40%;
+    height: 20%;
+}
+
+.store-div {
+    width: 55%;
+    height: 70%;
+    position: relative;
+    top: -5%;
+}
+
+.store-div > div {
+    height: 45%;
+    width: 15%;
+}
+
+#table7 >:nth-child(2) {
+    top: -35%;
+}
+
+.shop-button-container > img {
+    height: 100%;
+    object-fit: contain;
+}
+
+#table7 >:nth-child(4) {
+    position: absolute;
+    top: 30%;
+    left: 1%;
+    width: 39%;
+    height: 35%;
+    font-size: 0.9em;
+}
+
+.store-buy {
+    width: 35%;
+    position: relative;
+    right: 1%;
+}
+
+/* EVENTS MOBILE CSS */
+.wish-img {
+    width: 90%;
+    height: auto;
+}

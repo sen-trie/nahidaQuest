@@ -162,7 +162,7 @@ let wishMultiplier = 0;
 let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
-const EVENTCOOLDOWN = 10;
+const EVENTCOOLDOWN = 80;
 const SHOPCOOLDOWN = 30;
 const SHOP_THRESHOLD = 600;
 
