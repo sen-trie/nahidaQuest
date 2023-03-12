@@ -29,7 +29,7 @@ img {
     -ms-user-select: none;
  }
 
-cache {
+#cache {
     position: absolute;
     height: 100%;
     width: 100%;
@@ -283,7 +283,8 @@ table, button {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(ellipse at center, #ecd59100 0%,#c8a94e4a 40%,#c8a94e5b 60%,#c8a94e8d 80%, #aa850ce2 100%);
+    background: radial-gradient(ellipse at center, #ecd59100 0%,#c8a94e4a 40%,#c8a94e5b 60%,#c8a94e8d 80%, #cfa10ce2 100%);
+    animation: vignette-animation 2s linear infinite;
 }
 
 .vignette-blue {
@@ -297,13 +298,20 @@ table, button {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(ellipse at center, #88effb00 0%,#88effb33 40%,#88effb56 60%,#88effb6d 80%, #88EFFB 100%);
+    background: radial-gradient(ellipse at center, #88effb00 0%,#88effb33 40%,#88effb56 60%,#88effb99 80%, #3bd4e6 100%);
+    animation: vignette-animation 2s linear infinite;
 }
 
 @keyframes darkness-transition {
     0% {filter: brightness(1)}
     50% {filter: brightness(0)}
     100% {filter: brightness(1)}
+}
+
+@keyframes vignette-animation {
+    0% { filter: opacity(1)}
+    50% { filter: opacity(0.5)}
+    100% { filter: opacity(1)}
 }
 
 .middle-area {
@@ -637,8 +645,6 @@ table, button {
 @keyframes slidedown {
     0% { transform: translateY(0);}
     100% { transform: translateY(50%); }
-	/* -webkit-animation: slide-bottom 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: slide-bottom 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both; */
 }
  
 @keyframes fadeouttwo {
@@ -824,6 +830,9 @@ table, button {
     filter: drop-shadow(0 0 0.4em #ffffff);
 }
 
+.glow:hover {
+    filter: drop-shadow(0 0 0.4em #ffffff);
+}
 
 .slide-in-blurred-top {
 	-webkit-animation: slide-in-blurred-top 0.6s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;

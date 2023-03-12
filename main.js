@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-11-3";
+const VERSIONNUMBER = "v0.2.BETA-12-3";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -120,7 +120,7 @@ function deleteConfirmButton(confirmed) {
     return;
 }
 
-let cache = document.createElement("cache");
+let cache = document.createElement("div");
 cache.id = "cache";
 mainBody.appendChild(cache);
 drawUI.preloadLib(cache,'load',upgradeInfo);
@@ -153,8 +153,8 @@ const ARTIFACTMAX = 2150;
 const FOODMAX = 3150;
 const XPMAX = 4004;
 
-const NONWISHHEROMAX = 49;
-const WISHHEROMIN = 100;
+const NONWISHHEROMAX = 200;
+const WISHHEROMIN = 800;
 
 const WISHCOST = 1;
 let STARTINGWISHFACTOR = 25;
@@ -162,7 +162,7 @@ let wishMultiplier = 0;
 let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
-const EVENTCOOLDOWN = 20;
+const EVENTCOOLDOWN = 10;
 const SHOPCOOLDOWN = 30;
 const SHOP_THRESHOLD = 600;
 
@@ -238,8 +238,8 @@ var expeditionDict;
 var Inventory;
 var achievementList;
 
-var WISHHEROMAX = getHighestKey(upgradeDict) + 1;
-var wishCounter = WISHHEROMAX - WISHHEROMIN;
+let WISHHEROMAX = getHighestKey(upgradeDict) + 1;
+let wishCounter = WISHHEROMAX - WISHHEROMIN;
 drawWish();
 refresh();
 
@@ -365,12 +365,13 @@ function loadSaveData() {
         updateObjectKeys(saveValues,saveValuesDefault);
     }
     // LOAD HEROES DATA
-    if (localStorage.getItem("upgradeDictSave") == null) {
+    if (localStorage.getItem("upgradeDictSave") === null) {
         let upgradeDictTemp = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX);
         upgradeDict = upgradeDictTemp;
     } else {
         let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
         upgradeDict = JSON.parse(upgradeDictTemp);
+        updateObjectKeys(upgradeDict,upgradeDictDefault);
         setTimeout(loadRow,1000);
     }
     // LOAD INVENTORY DATA
@@ -580,7 +581,6 @@ function specialValuesUpgrade(loading, valueUpdate) {
 
 function idleCheck(idleAmount) {
     let timePassed = timeLoaded - saveValues.currentTime;
-    console.log(Math.round(timePassed) + " minutes have passed since the last save");
     if (timePassed > 1400) {
         timePassed = 1400;
     }
@@ -646,6 +646,7 @@ function startRandomEvent() {
 }
 
 function clickedEvent(aranaraNumber) {
+    let specialEvent = randomIntegerWrapper(luckRate*2,200);
     eventElement.load();
     eventElement.play();
 
@@ -653,6 +654,12 @@ function clickedEvent(aranaraNumber) {
     eventDropdown.classList.add("flex-row","event-dropdown");
     let eventDropdownBackground = document.createElement("img");
     eventDropdownBackground.src = "./assets/tutorial/eventPill.webp";
+
+    if (specialEvent) {
+        if (aranaraNumber === 1) {
+            aranaraNumber = 1.5;
+        }
+    }
 
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
@@ -664,7 +671,6 @@ function clickedEvent(aranaraNumber) {
     eventDropdownImage.style.backgroundRepeat = "no-repeat";
     eventDropdownImage.classList.add("event-dropdown-image");
 
-    let specialEvent = randomIntegerWrapper(luckRate*2,200);
     
     eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
     eventDropdown.addEventListener("animationend", () => {
@@ -678,24 +684,26 @@ function chooseEvent(type,specialMode) {
     if (stopSpawnEvents === true) {return};
     switch (type) {
         case 1:
+        case 1.5:
             clickEvent(specialMode);
             break;
         case 2:
             reactionEvent();
             break;
         case 3:
-            boxFunction();
+            boxFunction(specialMode);
             break
         case 4:
             minesweeperEvent();
             break;
         case 5:
-            weaselEvent();
+            weaselEvent(specialMode);
             break;
         case 6:
             rainEvent();
             break;
         default:
+            console.log("Invalid event");
             break;
     }
 }
@@ -706,7 +714,7 @@ function clickEvent(wandererMode) {
     stopSpawnEvents = true;
     let button = document.getElementById("demo-main-img");
     if (clickEventDelay !== null) {clearTimeout(clickEventDelay)};
-    let currentAnimation = "rotation 18s infinite linear forwards";
+    
     clickerEvent = true;
     currentClick = 15 * (saveValues["dps"] + 1) * specialClick;
 
@@ -721,36 +729,40 @@ function clickEvent(wandererMode) {
             leftBG.src = "./assets/bg/scara-bg.webp";
             button.src = "./assets/event/scara.webp";
         },150);
-        
-        clickEventDelay = setTimeout(() => {
-            console.log(leftDiv.style.animation)
-            leftDiv.style.animation = "none";
-            void leftDiv.offsetWidth;
-            leftDiv.style.animation = "darkness-transition 0.3s linear";
-            console.log(leftDiv.style.animation)
-            setTimeout(()=>{
-                button.style.animation = "rotation 3.5s infinite linear forwards";
-                if (leftDiv.classList.contains("vignette-blue")) {leftDiv.classList.remove("vignette-blue")};
-                button.style.animation = currentAnimation;
-                clickerEvent = false;
-                clickEventDelay = null;
-                stopSpawnEvents = false;
-                button.src = "./assets/nahida.webp";
-                let leftBG = document.getElementById("left-bg");
-                leftBG.src = "./assets/bg/bg.webp";
-            },150);
-        },30000)
     } else {
+        button.style.animation = "rotation 3.5s infinite linear forwards";
         if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")};
-        clickEventDelay = setTimeout(() => {
-            if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")};
-            button.style.animation = currentAnimation;
-            clickerEvent = false;
-            clickEventDelay = null;
-            stopSpawnEvents = false;
-        },30000)
     }
     foodButton(2);
+}
+
+function stopClickEvent() {
+    let scaraMode = false;
+    let button = document.getElementById("demo-main-img");
+    button.style.animation =  "rotation 18s infinite linear forwards";
+
+    if (leftDiv.classList.contains("vignette-blue")) {
+        scaraMode = true;
+        leftDiv.classList.remove("vignette-blue");
+    };
+
+    if (scaraMode) {
+        leftDiv.style.animation = "none";
+        void leftDiv.offsetWidth;
+        leftDiv.style.animation = "darkness-transition 0.3s linear";
+
+        let leftBG = document.getElementById("left-bg");
+        setTimeout(()=>{
+            button.src = "./assets/nahida.webp";
+            leftBG.src = "./assets/bg/bg.webp";
+        },150)
+    } else {
+        if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")};
+    }
+
+    clickerEvent = false;
+    clickEventDelay = null;
+    stopSpawnEvents = false;
 }
 
 // EVENT 2 (REACTION TIME)
@@ -798,6 +810,7 @@ function reactionEvent() {
             reactionStartElement.pause();
             reactionReady = true;
             reactionButton.innerText = "Now!";
+            reactionButton.classList.add("glow");
             reactionImageArrow.style.animationPlayState = "paused";
             setTimeout(() => {
                 if (reactionGame == true) {
@@ -837,7 +850,7 @@ function reactionFunction(eventBackdrop) {
 }
 
 // EVENT 3 (7 BOXES)
-function boxFunction() {
+function boxFunction(specialBox) {
     stopSpawnEvents = true;
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","flex-column","event-dark");
@@ -855,59 +868,65 @@ function boxFunction() {
         boxImageImg.src = "./assets/event/box-" + count + ".webp";
         boxImageImg.id = ("box-" + count);
         boxImageImg.addEventListener("click", function() {
-            boxOpen(eventBackdrop);
+            boxOpen(eventBackdrop,specialBox);
         })
-
         boxImageDiv.appendChild(boxImageImg);
         boxOuterDiv.appendChild(boxImageDiv);
-        if (count == 1) {break}
+        if (count === 1) {break}
     }
     mainBody.append(eventBackdrop,boxOuterDiv);
 }
 
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
-function boxOpen(eventBackdrop) {
+const specialText = ["Oh! It's Bongo-Head!","'Thank you for releasing Arapacati!'","Woah, a treasure-seeking Seelie!","Woah, a shikigami was trapped inside!"];
+function boxOpen(eventBackdrop,specialBox) {
     let boxOuter = document.getElementById("box-outer-div")
     let boxOuterNew = boxOuter.cloneNode(true);
     boxOuter.parentNode.replaceChild(boxOuterNew, boxOuter);
 
     let boxOutcome = document.createElement("img");
-    boxOutcome.classList.add("box-outcome");
-    boxOutcome.classList.add("slide-in-blurred-top");
+    boxOutcome.classList.add("box-outcome","slide-in-blurred-top");
     let outcomeText;
     let outcomeNumber = 0;
-
-    let boxChance = randomInteger(1,101);
-    if (goldenNutUnlocked === true && boxChance >= 95) {
-        let outcomeNumber = randomInteger(1,4);
-        boxOutcome.src = "./assets/icon/goldenNut.webp";
-        outcomeText = `Oh! It had Golden Nuts! (+${outcomeNumber} Golden Nuts)`;
-    } else if (boxChance >= 60) {
-        outcomeNumber = randomInteger(40,60);
-        boxOutcome.src = "./assets/icon/primogemLarge.webp";
-        outcomeText = "The box contained primogems!";
-    } else if (boxChance >= 25) {
-        let goodOutcome = randomInteger(1,8);
-        boxOutcome.src = "./assets/event/good-" + goodOutcome + ".webp";
-        outcomeText = "Oh, it had a gemstone! (Increased power for " +boxElement[goodOutcome]+ " characters)";
-        outcomeNumber = 5009.1 + goodOutcome;
-    } else if (boxChance >= 15) {
-        let badOutcome = randomInteger(1,5);
-        boxOutcome.src = "./assets/event/bad-" + badOutcome + ".webp";
-        outcomeText = "Uh oh, an enemy was hiding in the box!";
-    } else if (boxChance >= 5) {
-        boxOutcome.src = "./assets/event/verygood-" + 3 + ".webp";
-        outcomeText = "Oh! It had a precious gemstone!! (Increased power for all characters)";
-        outcomeNumber = 5002.1;
-    }  else {
-        boxOutcome.src = "./assets/event/verybad-" + 1 + ".webp";
-        let badOutcomePercentage = randomInteger(15,30);
-        outcomeText = "Uh oh! Run away! (Lost " +badOutcomePercentage+ "% of Energy)";
-        outcomeNumber = badOutcomePercentage;
+    
+    if (specialBox) {
+        let randomSpecial = randomInteger(2,6);
+        outcomeNumber = randomInteger(5,15);
+        adventure(10);
+        boxOutcome.src = `./assets/event/verygood-${randomSpecial}.webp`;
+        outcomeText = specialText[randomSpecial-2];
+    } else {
+        let boxChance = randomInteger(1,101);
+        if (goldenNutUnlocked === true && boxChance >= 90) {
+            outcomeNumber = randomInteger(5,15);
+            boxOutcome.src = "./assets/icon/goldenNut.webp";
+            outcomeText = `Oh! It had Golden Nuts!`;
+        } else if (boxChance >= 60) {
+            outcomeNumber = randomInteger(40,60);
+            boxOutcome.src = "./assets/icon/primogemLarge.webp";
+            outcomeText = "The box contained primogems!";
+        } else if (boxChance >= 25) {
+            let goodOutcome = randomInteger(1,8);
+            boxOutcome.src = "./assets/event/good-" + goodOutcome + ".webp";
+            outcomeText = "Oh, it had a gemstone! (+Power for " +boxElement[goodOutcome]+ " characters)";
+            outcomeNumber = 5009.1 + goodOutcome;
+        } else if (boxChance >= 15) {
+            boxOutcome.src = "./assets/event/bad-" + randomInteger(1,6) + ".webp";
+            outcomeText = "Uh oh, an enemy was hiding in the box!";
+        } else if (boxChance >= 5) {
+            boxOutcome.src = "./assets/event/verygood-1.webp";
+            outcomeText = "It had a precious gemstone!! (+Power for all characters)";
+            outcomeNumber = 5002.1;
+        }  else {
+            boxOutcome.src = "./assets/event/verybad-" + randomInteger(1,5) + ".webp";
+            let badOutcomePercentage = randomInteger(70,85);
+            outcomeText = "Uh oh! Run away!! (Lost " +(100 - badOutcomePercentage)+ "% of Energy)";
+            outcomeNumber = badOutcomePercentage;
+        }
     }
 
+    eventOutcome(outcomeText,eventBackdrop,"box",outcomeNumber);
     boxOuterNew.appendChild(boxOutcome);
-    eventOutcome(outcomeText,eventBackdrop,"box",outcomeNumber)
     setTimeout(()=> {
         boxOuterNew.remove();
         eventBackdrop.remove();
@@ -1051,6 +1070,8 @@ function minesweeperEvent() {
                 }
                 if (cellsLeft <= 0) {
                     let randomPrimo = randomInteger(200,400);
+                    adventure(10);
+                    newPop(1);
                     eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop, "primogem", randomPrimo);
                 }
             });
@@ -1063,11 +1084,14 @@ function minesweeperEvent() {
 }
 
 let weaselCount = 0;
+let goldWeaselCount = 0;
 // EVENT 5 (WHACK-A-MOLE)
-function weaselEvent() {
+function weaselEvent(specialWeasel) {
     stopSpawnEvents = true;
     let weaselElement = 18;
     weaselCount = 0;
+    goldWeaselCount = 0;
+
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","event-dark","flex-row","event-dark-row");
     let weaselBack = document.createElement("div");
@@ -1085,7 +1109,7 @@ function weaselEvent() {
 
     let delay = 2000;
     setTimeout(()=>{
-        addWeasel(weaselBack,delay);
+        addWeasel(weaselBack,delay,specialWeasel);
         weaselBurrow.load();
         weaselBurrow.play();
     },2000)
@@ -1109,7 +1133,11 @@ function weaselEvent() {
     weaselTimerImage.classList.add("weasel-sand");
     weaselTimerImage.addEventListener("animationend",()=> {
         let eventText = `You caught ${weaselCount} weasel thieves!`;
-        eventOutcome(eventText,eventBackdrop,"weasel",weaselCount);
+        if (goldWeaselCount > 0) {
+            eventOutcome(eventText,eventBackdrop,"weasel",weaselCount,goldWeaselCount);
+        } else {
+            eventOutcome(eventText,eventBackdrop,"weasel",weaselCount);
+        }
     })
 
     weaselTimer.append(weaselTimerImage,weaselTimerOutline,weaselCountText);
@@ -1124,15 +1152,21 @@ function weaselEvent() {
     mainBody.append(eventBackdrop);
 }
 
-function addWeasel(weaselBack,delay) {
+function addWeasel(weaselBack,delay,specialWeasel) {
     let weaselDiv = weaselBack.children;
     let realWeasel = randomInteger(0,18);
+    let specialWeaselSpawns = false;
+    if (specialWeasel) {specialWeaselSpawns = randomIntegerWrapper(luckRate*6,200)}
 
     for (let i=0, len=weaselDiv.length; i < len; i++) {
         let weaselImage = weaselDiv[i].querySelector('img');
         if (i === realWeasel) {
-            let realWeasel = randomInteger(2,4);
-            weaselImage.src = "./assets/event/weasel-"+realWeasel+".webp";
+            if (specialWeaselSpawns) {
+                weaselImage.src = "./assets/event/weasel-1.webp";
+            } else {
+                let realWeasel = randomInteger(2,4);
+                weaselImage.src = "./assets/event/weasel-"+realWeasel+".webp";
+            }
 
             let springInterval = (randomInteger(20,25) / 100);
             weaselImage.classList.add("spring");
@@ -1141,12 +1175,14 @@ function addWeasel(weaselBack,delay) {
                 mailElement.load();
                 mailElement.playbackRate = 1.35;
                 mailElement.play();
+
                 delay *= 0.65;
-                if (delay <= 450) {
-                    delay = 450;
-                }
-                clearWeasel(weaselBack,delay);
+                if (delay <= 450) {delay = 450}
+
+                clearWeasel(weaselBack,delay,specialWeasel);
                 weaselCount++;
+                if (specialWeaselSpawns) {goldWeaselCount++}
+
                 let weaselCountText = document.getElementById("visible-weasel-count");
                 weaselCountText.innerText = weaselCount;
             })
@@ -1168,6 +1204,7 @@ function addWeasel(weaselBack,delay) {
         if ((combination[j] - 1) === realWeasel) {continue}
         let weaselImage = weaselDiv[combination[j] - 1].querySelector('img');
         let fakeWeasel = randomInteger(5,7);
+        if (specialWeasel) {fakeWeasel = randomInteger(4,7)}
         weaselImage.src = "./assets/event/weasel-"+fakeWeasel+".webp";
 
         let springInterval = (randomInteger(15,35) / 100)
@@ -1179,12 +1216,12 @@ function addWeasel(weaselBack,delay) {
             setTimeout(()=>{fakeWeaselAlert.style.animation = "fadeOutWeasel 3s linear forwards"},10)
             weaselDecoy.load();
             weaselDecoy.play();
-            clearWeasel(weaselBack,delay);
+            clearWeasel(weaselBack,delay,specialWeasel);
         })
     }
 }
 
-function clearWeasel(weaselBack,delay) {
+function clearWeasel(weaselBack,delay,specialWeasel) {
     let weaselDiv = weaselBack.children;
     for (let i=0, len=weaselDiv.length; i < len; i++) {
         let weaselImage = weaselDiv[i].querySelector('img');
@@ -1197,7 +1234,7 @@ function clearWeasel(weaselBack,delay) {
     }
 
     setTimeout(()=>{
-        addWeasel(weaselBack,delay);
+        addWeasel(weaselBack,delay,specialWeasel);
         weaselBurrow.load();
         weaselBurrow.play();
     },delay)
@@ -1309,7 +1346,7 @@ function rainEvent() {
 }
 
 // EVENT OUTCOME (BLACK BAR THAT APPEARS IN THE MIDDLE OF SCREEN)
-function eventOutcome(innerText,eventBackdrop,type,amount) {
+function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
     stopSpawnEvents = false;
     let removeClick = document.createElement("div");
     let boxText = document.createElement("div");
@@ -1321,26 +1358,36 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
     boxText.classList.add("event-rain-text");
     boxText.id = "outcome-text";
     if (type == "weasel") {
+        outcomeDelay = 0;
         let weaselCount = amount;
+        let innerTextTemp;
         boxText.style.height = "13%";
+
         if (weaselCount >= 10) {
-            innerText += `\n You received some items!`;
+            innerTextTemp = `\n You received some items!`;
             adventure(10);
             adventure(10);
             newPop(1);
             amount = randomInteger(80,140);
         } else if (weaselCount >= 7) {
-            innerText += `\n You received a few items!`;
+            innerTextTemp = `\n You received a few items!`;
             adventure(10);
             newPop(1);
             amount = randomInteger(40,100);
         } else if (weaselCount >= 4) {
-            innerText += `\n You received a few primogems!`;
+            innerTextTemp = `\n You received a few primogems!`;
             amount = randomInteger(20,60);
         } else {
-            innerText += `\n Catch more to get a reward!`;
+            innerTextTemp = `\n Catch more to get a reward!`;
             amount = 0;
         }
+
+        if (amount2 > 0) {
+            amount2 *= 2;
+            innerTextTemp = `\n Some of them were carrying Golden Nuts!`;
+        }
+
+        innerText += innerTextTemp;
     } else if (type == "reaction") {
         outcomeDelay = 0;
     }
@@ -1359,16 +1406,21 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
                 if (type === "primogem") {
                     currencyPopUp("primogem",amount);
                 } else if (type === "weasel") {
-                    if (amount > 0) {currencyPopUp("primogem",amount)}
-                } else if (type === "box") {
-                    if (amount < 10 && amount > 0) {
-                        currencyPopUp("nuts",amount);
-                    } else if (amount < 30) {
-                        amount = (100 - amount)/100;
-                        saveValues.energy = Math.floor(saveValues.energy * amount);
-                    } else if (amount >= 30 && amount <= 200) {
+                    if (amount2 > 0 && amount > 0) {
+                        currencyPopUp("primogem",amount,"nuts",amount2)
+                    } else if (amount > 0) {
                         currencyPopUp("primogem",amount);
-                    } else if (amount > 200) {
+                    } else if (amount2 > 0) {
+                        currencyPopUp("nuts",amount2);
+                    }
+                } else if (type === "box") {
+                    if (amount < 40 && amount > 0) {
+                        currencyPopUp("nuts",amount);
+                    } else if (amount >= 40 && amount <= 60) {
+                        currencyPopUp("primogem",amount);
+                    } else if (amount > 60 && amount <= 100) {
+                        saveValues.energy = Math.floor(saveValues.energy * amount / 100);
+                    } else if (amount > 100) {
                         itemUse(amount.toString())
                     }
                 } else if (type === "reaction") {
@@ -1382,7 +1434,7 @@ function eventOutcome(innerText,eventBackdrop,type,amount) {
     },outcomeDelay);
 
     setTimeout(()=> {
-        eventBackdrop.remove()
+        eventBackdrop.remove();
     },4000)
 }
 
@@ -2121,7 +2173,12 @@ function costMultiplier(multi) {
 
     let i = WISHHEROMAX;
     while (i--) {
-        if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
+        if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
+            i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
+            continue;
+        }
+        if (upgradeDict[i] == undefined) continue;
+        if (upgradeDict[i].Locked === true) continue;
         if (upgradeDict[i]["Purchased"] > 0) {
             let buttID = "but-" + upgradeDict[i].Row;
             refresh(buttID, upgradeDict[i]["BaseCost"], i);
@@ -2134,10 +2191,11 @@ function dimHeroButton() {
     let i = WISHHEROMAX;
     while (i--) {
         if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
-            i -= WISHHEROMIN - NONWISHHEROMAX;
-            i += 2;
+            i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
             continue;
         }
+        if (upgradeDict[i] == undefined) continue;
+        if (upgradeDict[i].Locked === true) continue;
         if (upgradeDict[i]["Purchased"] < 0) continue;
 
         let checkPrice;
@@ -2245,6 +2303,7 @@ function itemUse(itemUniqueId) {
     if (itemID >= 1001 && itemID < WEAPONMAX){
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
+            if (upgradeDict[i].Locked === true) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
@@ -2263,6 +2322,7 @@ function itemUse(itemUniqueId) {
     } else if (itemID >= 2001 && itemID < ARTIFACTMAX){
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
+            if (upgradeDict[i].Locked === true) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
@@ -2295,6 +2355,7 @@ function itemUse(itemUniqueId) {
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
+            if (upgradeDict[i].Locked === true) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
@@ -2322,6 +2383,7 @@ function itemUse(itemUniqueId) {
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
+            if (upgradeDict[i].Locked === true) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
             if (upgradeDict[i].Purchased > 0) {
                 if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
@@ -2344,6 +2406,7 @@ function itemUse(itemUniqueId) {
         power = nationBuffPercent[Inventory[itemID].Star]
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
+            if (upgradeDict[i].Locked === true) continue;
             if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
             if (upgradeDict[i].Purchased > 0){
                 if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
@@ -2392,6 +2455,7 @@ function foodButton(type) {
         container.innerHTML = '';
         foodCooldown = countdownText(foodCooldown, 2);
         foodCooldown.addEventListener("animationend",() => {
+            stopClickEvent();
             foodCooldown.remove();
         });
         container.appendChild(foodCooldown);
@@ -2488,6 +2552,7 @@ function adventure(type) {
                 }
                 break;
             default:
+                console.log("Invalid item spawned");
                 break;
         }
         sortList("table2");
@@ -2688,6 +2753,7 @@ function wishUnlock() {
 
 // DRAWS/WISH FOR SPECIAL HEROS
 function drawWish() {
+    goldenNutUnlocked = true;
     var wishButton = document.createElement("div");
     wishButton.classList += " wish-button";
     wishButton.id = "wishButton"
@@ -2709,8 +2775,7 @@ function drawWish() {
         wishUnlock();
         stopWish();
         wishMultiplier = saveValues["wishCounterSaved"];
-    } else if (saveValues["wishUnlocked"] == true) {
-        goldenNutUnlocked = true;
+    } else if (saveValues["wishUnlocked"] === true) {
         wishUnlock();
         wishMultiplier = saveValues["wishCounterSaved"];
     } 
@@ -2760,8 +2825,8 @@ function wish() {
         // SCARAMOUCHE WILL ALWAYS BE THE FIRST WISH HERO
         while (wishCounter) {
             let randomWishHero;
-            if (upgradeDict[100].Purchased === -10) {
-                randomWishHero = 100;
+            if (upgradeDict[800].Purchased === -10) {
+                randomWishHero = 800;
                 unlockExpedition(5,expeditionDict);
                 clearExped();
                 newPop(2);
@@ -2872,7 +2937,7 @@ function popAchievement(achievement,loading) {
             scoreAchievement[4]++;
             break;
         default:
-            console.log("No more Achievements left! Good job!");
+            console.log("No more Achievements left!");
             return;
     }
 
@@ -3330,6 +3395,7 @@ function createShopItems(shopDiv, i, inventoryNumber) {
             shopCost = Math.round(randomInteger(600,750)/ 5) * 5;
             break;
         default:
+            console.log("Invalid shop cost");
             break;
     }
 
