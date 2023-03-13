@@ -3,8 +3,8 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2.BETA-12-3";
-const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. HoYoverse and Genshin Impact \n are trademarks, services marks, or registered trademarks of HoYoverse.";
+const VERSIONNUMBER = "v0.2-3-130";
+const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN 
@@ -137,6 +137,10 @@ copyrightText.classList.add("copyright-text");
 let versionText = document.getElementById("vers-number");
 versionText.innerText = VERSIONNUMBER;
 versionText.classList.add("version-text");
+
+let versionTextStart = document.getElementById("vers-number-start");
+versionTextStart.innerText = `[${VERSIONNUMBER}] \n ${COPYRIGHT}`;
+versionText.classList.add("version-text-start");
 //------------------------------------------------------------------------POST SETUP------------------------------------------------------------------------//
 function startGame(firstGame) {
 drawUI.preloadFolders(upgradeInfo);
@@ -573,7 +577,7 @@ function specialValuesUpgrade(loading, valueUpdate) {
                 additionalDefense = (1 + persistentValues.upgrade11.Purchased/10).toFixed(3);
                 break;
             default:
-                console.log('Invalid value to update');
+                console.error('Upgrade error: Invalid value to update');
                 break;
         }
     }
@@ -666,11 +670,11 @@ function clickedEvent(aranaraNumber) {
     eventDropdownText.classList.add("flex-column","event-dropdown-text");
 
     let eventDropdownImage = document.createElement("div");
-    eventDropdownImage.style.background = "url(./assets/tutorial/aranara-"+ (aranaraNumber) +".webp)";
+    eventDropdownImage.style.background = "url(./assets/tutorial/aranara-"+(aranaraNumber)+".webp)";
+    eventDropdownImage.style.backgroundPosition = "center";
     eventDropdownImage.style.backgroundSize = "contain";
     eventDropdownImage.style.backgroundRepeat = "no-repeat";
     eventDropdownImage.classList.add("event-dropdown-image");
-
     
     eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
     eventDropdown.addEventListener("animationend", () => {
@@ -703,7 +707,7 @@ function chooseEvent(type,specialMode) {
             rainEvent();
             break;
         default:
-            console.log("Invalid event");
+            console.error("Event error: Invalid event");
             break;
     }
 }
@@ -1879,54 +1883,44 @@ function createFilter() {
         }
     })
 
-    const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','BREAK','Sword','Claymore','Catalyst','Polearm','Bow','BREAK','Sumeru','Mond','Liyue','Inazuma'];
-    const invOptions = ['Artifact','Food','Level','Gemstone','Talent','BREAK','Sword','Claymore','Catalyst','Polearm','Bow'];
+    const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','Sword','Claymore','Catalyst','Polearm','Bow','Sumeru','Mond','Liyue','Inazuma'];
+    const invOptions = ['Artifact','Food','Level','Gemstone','Talent','Sword','Claymore','Catalyst','Polearm','Bow'];
     for (let i=0,len=heroOptions.length; i < len; i++) {
         let filterPicture;
-        if (heroOptions[i] === 'BREAK') {
-            filterPicture = document.createElement("div");
-            filterPicture.classList.add("flex-break");
-        } else {
-            filterPicture = document.createElement("button");
-            filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +heroOptions[i]+ ".webp)";
-            filterPicture.classList.add("background-image-cover")
+        filterPicture = document.createElement("button");
+        filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +heroOptions[i]+ ".webp)";
+        filterPicture.classList.add("background-image-cover")
 
-            filterPicture.addEventListener("click",()=> {
-                if (filterPicture.classList.contains("dim-filter")) {
-                    filterPicture.classList.remove("dim-filter");
-                    filterHeroes(heroOptions[i]);
-                } else {
-                    filterPicture.classList.add("dim-filter");
-                    filterHeroes(heroOptions[i]);
-                }
-                updateFilter(filteredHeroes);
-            })
-        }
+        filterPicture.addEventListener("click",()=> {
+            if (filterPicture.classList.contains("dim-filter")) {
+                filterPicture.classList.remove("dim-filter");
+                filterHeroes(heroOptions[i]);
+            } else {
+                filterPicture.classList.add("dim-filter");
+                filterHeroes(heroOptions[i]);
+            }
+            updateFilter(filteredHeroes);
+        })
 
         filterMenuOne.appendChild(filterPicture);
     }
 
     for (let i=0,len=invOptions.length; i < len; i++) {
         let filterPicture;
-        if (invOptions[i] === 'BREAK') {
-            filterPicture = document.createElement("div");
-            filterPicture.classList.add("flex-break");
-        } else {
-            filterPicture = document.createElement("button");
-            filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +invOptions[i]+ ".webp)";
-            filterPicture.classList.add("background-image-cover")
+        filterPicture = document.createElement("button");
+        filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +invOptions[i]+ ".webp)";
+        filterPicture.classList.add("background-image-cover")
 
-            filterPicture.addEventListener("click",()=> {
-                if (filterPicture.classList.contains("dim-filter")) {
-                    filterPicture.classList.remove("dim-filter");
-                    filterInv(invOptions[i]);
-                } else {
-                    filterPicture.classList.add("dim-filter");
-                    filterInv(invOptions[i]);
-                }
-                updateFilter(filteredInv);
-            })
-        }
+        filterPicture.addEventListener("click",()=> {
+            if (filterPicture.classList.contains("dim-filter")) {
+                filterPicture.classList.remove("dim-filter");
+                filterInv(invOptions[i]);
+            } else {
+                filterPicture.classList.add("dim-filter");
+                filterInv(invOptions[i]);
+            }
+            updateFilter(filteredInv);
+        })
         filterMenuTwo.appendChild(filterPicture);
     }
     
@@ -2552,7 +2546,7 @@ function adventure(type) {
                 }
                 break;
             default:
-                console.log("Invalid item spawned");
+                console.error("Inventory error: Invalid item spawned");
                 break;
         }
         sortList("table2");
@@ -3395,7 +3389,7 @@ function createShopItems(shopDiv, i, inventoryNumber) {
             shopCost = Math.round(randomInteger(600,750)/ 5) * 5;
             break;
         default:
-            console.log("Invalid shop cost");
+            console.error("Shop error: Invalid shop cost");
             break;
     }
 

@@ -1,4 +1,38 @@
 /*/////////////////////////////// MOBILE CSS  ///////////////////////////////*/
+@media (max-width: 768px) {
+    html {
+      touch-action: manipulation;
+    }
+}
+
+#start-image {
+    width: 80%;
+}
+
+#start-screen > button {
+    width: 50%;
+    top: 0
+}
+
+#start-idle-nahida {
+    bottom: 0;
+    right: 2%;
+    height: 30%;
+}
+
+#start-idle-dori {
+    bottom: 25%;
+    left: 5%;
+    height: 30%;
+}
+
+#start-idle-scara {
+    bottom: 2%;
+    left: 2%;
+    height: 30%;
+}
+
+
 body {
     width: 100%;
     height: 100%;
@@ -26,21 +60,43 @@ body {
     left: 0;
     top: 0%;
     flex-direction: row;
+    justify-content: space-around;
 }
 
 .energy-primo-container {
-    width: 15%;
+    width: 25%;
+    column-gap: 5%;
     left: 0;
     flex-direction: row;
+}
+
+.pill-value {
+    height: 70%;
+    border-radius: 2em;
+}
+
+.pill-value > span {
+    font-size: 1.4em;
+}
+
+.pill-value > img {
+    transform: scale(1.3);
 }
 
 .temp-buff {
     width: 30%;
     top: 0;
+    flex-direction: row;
+}
+
+.temp-buff > div {
+    height: 100%;
+    width: auto;
+    aspect-ratio: 1;
 }
 
 .multiplier-button-container {
-    width: 60%;
+    width: 40%;
     padding-right: 1%;
     box-sizing: border-box;
     position: relative;
@@ -76,6 +132,21 @@ body {
     height: 65%;
 }
 
+.settings-menu {
+    left: 10%;
+    width: 80%;
+}
+
+.pop-new {
+    width: 55%;
+    right: -15%;
+}
+
+.pop-new-corner {
+    width: auto;
+    height: 25%;
+}
+
 /* MOBILE CSS FOR TABLES */
 .right-area {
     z-index: 3;
@@ -97,6 +168,7 @@ body {
     height: 70%;
     overflow-x: scroll;
     flex-direction: row;
+    justify-content:initial;
 }
 
 .inventory-selected {
@@ -117,7 +189,7 @@ body {
 
 .tooltipEXPED {
     width: 55%;
-    height: 70%;
+    height: 60%;
     font-size: 0.95em;
 }
 
@@ -164,10 +236,11 @@ body {
 
 .toolImgContainer {
     height: 20%;
+    width: auto;
 }
 
 .tool-tip-extraimg {
-    width: 15%;
+    width: auto;
     height: 20%;
     flex-direction: column;
 }
@@ -179,6 +252,7 @@ body {
 
 .tool-tip-extraimg > img {
     height: 50%;
+    width: 100%;
     object-fit: contain;
 }
 
@@ -196,6 +270,11 @@ body {
     aspect-ratio: 1;
 }
 
+.wish-img {
+    width: 90%;
+    height: auto;
+}
+
 .table5-Image {
     width: 70%;
 }
@@ -204,58 +283,102 @@ body {
     width: 65%;
 }
 
-#table7 {
-    flex-direction: row;
-    justify-content: center;
-}
-
 #table7 > img {
-    height: 37%;
+    height: 70%;
 }
 
-.store-timer {
-    width: 40%;
-    height: 20%;
+#table7 > div {
+    left: 5%;
 }
 
 .store-div {
-    width: 55%;
-    height: 70%;
-    position: relative;
-    top: -5%;
-}
-
-.store-div > div {
+    width: 70%;
     height: 45%;
+    overflow-x: scroll;
+    flex-wrap: nowrap;
+    justify-content:unset;
+    padding-left: 1%;
+    padding-right: 1%;
+    box-sizing: border-box;
+}
+
+.store-timer {
+    height: 15%;
+    background-image: url(./assets/frames/dori-deals-long.webp);
+}
+
+.shop-button {
+    height: 80%;
     width: 15%;
+    flex: 0 0 auto;
 }
 
-#table7 >:nth-child(2) {
-    top: -35%;
-}
-
-.shop-button-container > img {
-    height: 100%;
-    object-fit: contain;
-}
-
-#table7 >:nth-child(4) {
-    position: absolute;
-    top: 30%;
-    left: 1%;
-    width: 39%;
-    height: 35%;
-    font-size: 0.9em;
-}
-
-.store-buy {
-    width: 35%;
-    position: relative;
-    right: 1%;
+.store-dialog {
+    height: 30%;
+    left: 0%;
+    width: 65%;
+    border: 0.2em solid #756F60;
 }
 
 /* EVENTS MOBILE CSS */
-.wish-img {
-    width: 90%;
-    height: auto;
+.event-dropdown {
+    width: 80%;
+    left: 10%;
+}
+
+.event-dropdown-text {
+    padding-left: 5%;
+    box-sizing: border-box;
+}
+
+.raining-image {
+    width: 15%;
+}
+
+.currency-pop {
+    top: 6%;
+    left: 6%;
+    width: 14%;
+    height: 9%;
+    font-size: 1.1em;
+}
+
+#reaction-image {
+    width: 55%;
+}
+
+#reaction-button {
+    width: 55%;
+}
+
+.box-outer-div {
+    top: 15%;
+    left: 10%;
+    width: 80%;
+    height: 70%;
+    flex-direction: row-reverse;
+}
+
+.box-image-div {
+    width: 50%;
+    height: 25%;
+}
+
+.event-mine-bg {
+    left: 0;
+    top: 0;
+    left: 0;
+    height: 60%;
+    width: auto;
+    aspect-ratio: 1;
+}
+
+#mine-info {
+    position: relative;
+    height: 30%;
+    width: auto;
+}
+
+.weasel-back {
+    height: 60%;
 }

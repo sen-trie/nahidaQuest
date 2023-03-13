@@ -186,10 +186,10 @@ function buildGame(mainBody) {
     energyPrimoContainer.classList.add("flex-column","energy-primo-container");
     let energyContainer = document.createElement("div");
     energyContainer.classList.add("pill-value");
-    energyContainer.innerHTML = "<img class='pill' alt='' src='./assets/frames/pill.webp'><img class='icon' alt='Energy Icon' src='./assets/icon/energyIcon.webp'><span id='energy'>0</span>";
+    energyContainer.innerHTML = "<img class='icon' alt='Energy Icon' src='./assets/icon/energyIcon.webp'><span id='energy'>0</span>";
     let primoContainer = document.createElement("div");
     primoContainer.classList.add("pill-value");
-    primoContainer.innerHTML = `<img class="pill" alt="" src="./assets/frames/pill.webp"><img class="primogem icon" alt="Primogem Icon" src="./assets/icon/primogemIcon.webp"><span id="primogem">0</span>`;
+    primoContainer.innerHTML = `<img class="primogem icon" alt="Primogem Icon" src="./assets/icon/primogemIcon.webp"><span id="primogem">0</span>`;
     energyPrimoContainer.append(energyContainer,primoContainer)
 
     let tempBuffDiv = document.createElement("div");
