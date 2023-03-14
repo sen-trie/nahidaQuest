@@ -3,7 +3,7 @@ import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getH
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2-3-130";
+const VERSIONNUMBER = "v0.2-3-140";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -166,7 +166,7 @@ let wishMultiplier = 0;
 let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
-const EVENTCOOLDOWN = 80;
+const EVENTCOOLDOWN = 70;
 const SHOPCOOLDOWN = 30;
 const SHOP_THRESHOLD = 600;
 
@@ -283,8 +283,8 @@ let adventureElement = new Audio("./assets/sfx/adventure.mp3");
 let shopElement = new Audio("./assets/sfx/dori-buy.mp3");
 let sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement,reactionStartElement,reactionCorrectElement,weaselBurrow,weaselDecoy,adventureElement,shopElement];
 
-var timerLoad = setInterval(timerEventsLoading,50);
-var timer = setInterval(timerEvents,1000000);
+let timerLoad = setInterval(timerEventsLoading,50);
+let timer;
 const timeRatio = 500;
 var timerSeconds = 0;
 createFilter();
@@ -306,22 +306,11 @@ function timerEvents() {
     saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff;
     refresh();
     dimHeroButton();
-    addNewRow();
+    addNewRow(true);
     randomEventTimer(timerSeconds);
     timerSave(timerSeconds);
     shopCheck();
     shopTimerFunction();
-}
-
-// SHOP TIMER
-function shopTimerFunction() {
-    if (shopTimerElement != null) {
-        let time_passed = Math.floor(getTime() - parseInt(shopTime));
-        shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
-        if (time_passed >= SHOPCOOLDOWN) {
-            refreshShop(getTime());
-        }
-    }
 }
 
 // TEMPORARY TIMER
@@ -486,15 +475,21 @@ demoContainer.addEventListener("mouseup", () => {
             newCritText.critValue = oldValue
             newCritText.addEventListener('animationend', ()=>{newCritText.remove()});
         } else {
-            demoContainer = floatText(leftDiv,abbrNum(clickEarn,2,true),randomInteger(30,70),60,true,clickEarn);
+            demoContainer = floatText(clickerEvent,leftDiv,abbrNum(clickEarn,2,true),randomInteger(30,70),60,"crit",clickEarn);
         }
     } else {
-        demoContainer = floatText(leftDiv,abbrNum(clickEarn,2,true),randomInteger(20,80),randomInteger(50,70));
+        demoContainer = floatText(clickerEvent,leftDiv,abbrNum(clickEarn,2,true),randomInteger(20,80),randomInteger(50,70),settingsValues.combineFloatText,0,abbrNum);
     }
-    let number = randomInteger(2,6);
-    let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`;
 
     spawnFallingNut();
+});
+
+drawUI.demoFunction(demoContainer,demoImg);
+demoContainer.appendChild(demoImg);
+
+function spawnFallingNut() {
+    let number = randomInteger(2,6);
+    let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`;
     let img = document.createElement("img");
     img.src = "./assets/icon/nut.webp";
     img.style.left = `${randomInteger(0,100)}%`
@@ -502,13 +497,6 @@ demoContainer.addEventListener("mouseup", () => {
     img.addEventListener('animationend', () => {img.remove();});
     img.classList.add("falling-image");
     leftDiv.appendChild(img);
-});
-
-drawUI.demoFunction(demoContainer,demoImg);
-demoContainer.appendChild(demoImg);
-
-function spawnFallingNut() {
-    return;
 }
 
 // ROLL FOR ENERGY
@@ -2067,11 +2055,15 @@ function loadRow() {
 }
 
 // ADD NEW HEROES TO TABLE1
-function addNewRow() {
+function addNewRow(onlyOnce) {
     for (let i = 0, len=WISHHEROMAX; i < len; i++) {
-        if (i < WISHHEROMIN && i > NONWISHHEROMAX || upgradeDict[i] == undefined) continue;
+        if (upgradeDict[i] === undefined) continue;
+        if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
+            i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
+            continue;
+        };
         if (upgradeDict[i].Row != -1) continue;
-        if (saveValues["realScore"] >= upgradeDict[i]["Level"] && upgradeDict[i].Purchased == -1){
+        if (saveValues["realScore"] >= upgradeDict[i]["Level"] && upgradeDict[i].Purchased === -1) {
             upgradeDict[i].Row = saveValues["rowCount"];
             upgradeDict[i].Purchased = 0;
 
@@ -2103,6 +2095,8 @@ function addNewRow() {
             });
             heroButtonContainer.innerText = heroText;
             table1.appendChild(heroButtonContainer);
+
+            if(onlyOnce) {return};
         }
     }
 }
@@ -2285,7 +2279,8 @@ function inventoryAdd(idNum, type) {
 const weaponBuffPercent =   [0, 1.1, 1.3, 1.7, 2.1, 2.7, 4.6];
 const artifactBuffPercent = [0, 1.05, 1.15, 1.35, 1.55, 1.85];
 const foodBuffPercent =     [0, 1.4, 2.0, 3.1, 4.4, 6.2];
-const nationBuffPercent =   [0, 0, 1.2, 1.5, 1.8]
+const nationBuffPercent =   [0, 0, 1.2, 1.5, 1.8];
+const energyBuffPercent =   [0, 0, 0, 100, 300, 700];
 function itemUse(itemUniqueId) {
     let itemID;
     if (typeof itemUniqueId === 'string') {
@@ -2298,7 +2293,10 @@ function itemUse(itemUniqueId) {
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
             if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
+                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
+                continue;
+            };
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
                 if (upgradeInfo[i].Type == Inventory[itemID].Type){
@@ -2317,7 +2315,10 @@ function itemUse(itemUniqueId) {
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
             if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
+                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
+                continue;
+            };
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
                 let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (artifactBuffPercent[Inventory[itemID].Star] - 1));
@@ -2337,9 +2338,12 @@ function itemUse(itemUniqueId) {
     } else if (itemID >= 4001 && itemID < XPMAX){
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         refresh();
+    } else if (itemID >= 4011 && itemID < 4014){
+        saveValues["energy"] += energyBuffPercent[Inventory[itemID].Star];
+        refresh();
     } else if (itemID === 4010) {
         saveValues["mailCore"]++;
-    } else if (itemID === 5001 || itemID === 5002) {
+    } else if (itemID === 5001 || itemID === 5002){
         let power = 1;
         if (Inventory[itemID].Star === 5) {
             power = 1.9;
@@ -2350,7 +2354,10 @@ function itemUse(itemUniqueId) {
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
             if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
+                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
+                continue;
+            };
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
                 let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
@@ -2378,7 +2385,10 @@ function itemUse(itemUniqueId) {
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
             if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX) continue;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
+                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
+                continue;
+            };
             if (upgradeDict[i].Purchased > 0) {
                 if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
                     let upgradeDictTemp = upgradeDict[i];
@@ -2401,7 +2411,10 @@ function itemUse(itemUniqueId) {
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
             if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) continue;
+            if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) {
+                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
+                continue;
+            };
             if (upgradeDict[i].Purchased > 0){
                 if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
                     let upgradeDictTemp = upgradeDict[i];
@@ -2509,41 +2522,52 @@ function adventure(type) {
                 inventoryDraw("food", 2, 3);
                 inventoryDraw("artifact", 1, 3);
                 inventoryDraw("weapon", 1, 3);
+
+                if (randomDraw == 1) {
+                    inventoryDraw("food", 1, 3);
+                }
                 break;
             case 3:
                 inventoryDraw("xp", 3, 3);
-                inventoryDraw("xp", 2, 2);
+                inventoryDraw("xp", 2, 3);
+                inventoryDraw("artifact", 2, 4);
+                inventoryDraw("weapon", 2, 4);
+                inventoryDraw("talent", 2, 4);
+                inventoryDraw("food", 2, 4);
 
                 if (randomDraw == 1) {
-                    inventoryDraw("artifact", 2, 4);
-                    inventoryDraw("weapon", 2, 4);
-                } else {
-                    inventoryDraw("talent", 2, 4);
-                    inventoryDraw("food", 2, 4);
+                    inventoryDraw("talent", 2, 3);
+                    inventoryDraw("talent", 2, 3);
                 }
                 break;
             case 4:
-                inventoryDraw("xp", 3, 3);
+                inventoryDraw("xp", 3, 4);
+                inventoryDraw("xp", 2, 3);
+                inventoryDraw("artifact", 3, 4);
+                inventoryDraw("weapon", 3, 4);
+                inventoryDraw("food", 3, 5);
+                inventoryDraw("gem", 4, 5);
+
                 if (randomDraw == 1) {
-                    inventoryDraw("weapon", 3, 4);
-                    inventoryDraw("xp", 2, 3);
-                } else {
-                    inventoryDraw("talent", 3, 4);
-                    inventoryDraw("food", 3, 5);
+                    inventoryDraw("artifact", 2, 3);
+                    inventoryDraw("artifact", 2, 3);
                 }
-                inventoryDraw("gem", 4, 4);
+                
                 break;
             case 5:
                 inventoryDraw("xp", 4, 4);
+                inventoryDraw("xp", 4, 4);
+                inventoryDraw("weapon", 4, 5);
+                inventoryDraw("talent", 4, 4);
+                inventoryDraw("artifact", 4, 5);  
+                inventoryDraw("gem", 4, 5);
+                inventoryDraw("food", 4, 5);
+
                 if (randomDraw == 1) {
-                    inventoryDraw("artifact", 4, 5);
-                    inventoryDraw("weapon", 4, 5);
-                    inventoryDraw("xp", 3, 4);
-                } else {
+                    inventoryDraw("weapon", 4, 4);
                     inventoryDraw("talent", 4, 4);
-                    inventoryDraw("food", 4, 5);
-                    inventoryDraw("gem", 4, 5)
-                }
+                } 
+
                 break;
             default:
                 console.error("Inventory error: Invalid item spawned");
@@ -3166,7 +3190,7 @@ function tooltipFunction() {
 }
 
 //------------------------------------------------------------------------TABLE 7 (STORE)------------------------------------------------------------------------//
-// CHECK PRIMOGEMS
+// CHECK PRIMOGEMS TO SPAWN SHOP
 function shopCheck() {
     if (localStorage.getItem("storeInventory") === null) {
         if (saveValues["primogem"] > SHOP_THRESHOLD) {
@@ -3179,6 +3203,17 @@ function shopCheck() {
             // IT IS PERSISENT TO LOCALSTORAGE
             newPop(5);
             newPop(13);
+        }
+    }
+}
+
+// SHOP TIMER
+function shopTimerFunction() {
+    if (shopTimerElement != null) {
+        let time_passed = Math.floor(getTime() - parseInt(shopTime));
+        shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
+        if (time_passed >= SHOPCOOLDOWN) {
+            refreshShop(getTime());
         }
     }
 }
@@ -3223,20 +3258,21 @@ function setShop() {
     let i=10;
     while (i--) {
         let inventoryNumber;
-        if (i >= 6 && i <= 9) {
+        if (i >= 7 && i <= 9) {
             inventoryNumber = inventoryDraw("talent", 2,4, "shop");
-        } else if (i >= 2 && i <= 4) {
-            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+        } else if (i === 6) {
+            inventoryNumber = randomInteger(4011,4014);
         } else if (i === 5) {
             if (saveValues["wishUnlocked"] === true) {
                 inventoryNumber = 4010;
             } else {
                 inventoryNumber = inventoryDraw("gem", 4,6, "shop");
             }
+        } else if (i >= 2 && i <= 4) {
+            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
         } else {
             inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
         }
-        
         createShopItems(shopDiv, i, inventoryNumber);
     }
 
@@ -3313,12 +3349,20 @@ function refreshShop(minutesPassed) {
     let i=10;
     while (i--) {
         let inventoryNumber;
-        if (i >= 6 && i <= 10) {
+        if (i >= 7 && i <= 9) {
             inventoryNumber = inventoryDraw("talent", 2,4, "shop");
-        } else if (i >= 2 && i <= 5) {
+        } else if (i === 6) {
+            inventoryNumber = randomInteger(4011,4014);
+        } else if (i === 5) {
+            if (saveValues["wishUnlocked"] === true) {
+                inventoryNumber = 4010;
+            } else {
+                inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+            }
+        } else if (i >= 2 && i <= 4) {
             inventoryNumber = inventoryDraw("gem", 4,6, "shop");
         } else {
-            inventoryNumber = inventoryDraw("weapon", 4,6, "shop")
+            inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
         }
         createShopItems(shopContainer, i, inventoryNumber);
     }

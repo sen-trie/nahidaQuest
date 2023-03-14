@@ -157,6 +157,7 @@ body {
 
 .upgrade {
     height: 25%;
+    max-height: 25%;
 }
 
 #table3 {
@@ -199,7 +200,7 @@ body {
 }
 
 #tool-tip-button {
-    width: 35%;
+    height: 20%;
 }
 
 #exped-row-1 {

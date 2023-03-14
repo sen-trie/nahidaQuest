@@ -1420,10 +1420,11 @@ input[type="range"]:focus::-moz-range-thumb{
     background-color: transparent;
     background-size:contain;
     background-repeat: no-repeat;
+    transition: 0.2s ease;
 }
 
 .settings-bottom-right > button:hover {
-    filter: drop-shadow(0 0 0.6em #474d45);
+    filter: drop-shadow(0.3em 0.3em #474d45b9)
 }
 
 .setting-info {
@@ -1532,10 +1533,20 @@ input[type="range"]:focus::-moz-range-thumb{
     pointer-events: none;
 }
 
+.floatingTextLow {
+    font-size: 1.5em;
+    color: #022107;
+    text-shadow: 0 0 0.25em #ffffff, 0 0 0.25em #ffffff, 0 0 0.15em #ffffff;
+    position: absolute;
+    animation: fadeOutCritOpacity 2.0s ease-out forwards;
+    z-index: 13;
+    pointer-events: none;
+}
+
 .floatingCritText {
     font-size: 1.75em;
     color: #032509;
-    text-shadow: 0 0 0.25em #ffffff, 0 0 0.35em #ffffff, 0 0 0.15em #ffffff, 0 0 0.15em #ffffff;
+    text-shadow: 0 0 0.25em #ffffffa2, 0 0 0.35em #ffffff9a, 0 0 0.15ergba(255, 255, 255, 0.666)ff, 0 0 0.15em #ffffff8e;
     position: absolute;
     animation: fadeOutCritOpacity 2.0s ease-out forwards;
     z-index: 15;
@@ -2455,10 +2466,15 @@ input[type="range"]:focus::-moz-range-thumb{
 
 #tool-tip-button {
     position: absolute;
-    bottom:4%;
-    background-image: url(./assets/tooltips/tooltip-button.webp);
-    aspect-ratio: 2.3;
-    width: 87%;
+    bottom:1%;
+    /* background-image: url(./assets/tooltips/tooltip-button.webp);
+    background-size: cover; */
+    background-color: #867256;
+    border-top: 0.2em solid #51432f;
+    border-bottom: 0.4em solid #51432f;
+    box-sizing: border-box;
+    height: 12%;
+    width: 92.5%;
     z-index: 5;
     font-family: gi-font;
     font-size: 1.4em;
@@ -2521,8 +2537,8 @@ input[type="range"]:focus::-moz-range-thumb{
 
 .shop-button {
     border: 0.2em groove #867357;
-    width: 16.5%;
-    height: 45%;
+    width: 17%;
+    height: 40%;
 }
 
 .shop-button-container > img {

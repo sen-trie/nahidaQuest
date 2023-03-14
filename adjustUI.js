@@ -21,15 +21,33 @@ function inventoryAddButton(buttonInv, Item) {
 }
 
 // ADDS FLOATING TEXT UPON CLICKING ON DEMO BUTTON
-function floatText(leftDiv,clickFactor,XrandNum1,YrandNum2,crit,clickEarn) {
+function floatText(clickerEvent,leftDiv,clickFactor,XrandNum1,YrandNum2,type,clickEarn,abbrNum) {
     let clickCountAppear = document.createElement("div");
     clickCountAppear.innerText = "+" + clickFactor;
-    if (crit === true) {
+    if (type === "crit") {
         clickCountAppear.classList.add("floatingCritText");
         clickCountAppear.id = "crit-text";
         clickCountAppear.critValue = clickEarn;
+    } else if (type === true) {
+        if (document.getElementById("float-text")) {
+            let oldNumberText = document.getElementById("float-text");
+            let oldValue = oldNumberText.nutValue + clickFactor;
+            oldNumberText.innerText = `+${abbrNum(oldValue,2,true)}`;
+
+            let newNumberText = oldNumberText.cloneNode(true);
+            oldNumberText.parentNode.replaceChild(newNumberText, oldNumberText);
+            newNumberText.nutValue = oldValue;
+            newNumberText.addEventListener('animationend', ()=>{newNumberText.remove()});
+            return;
+        } else {
+            clickCountAppear.id = "float-text";
+            clickCountAppear.nutValue = clickFactor;
+            clickCountAppear.classList.add("floatingTextLow");
+            if (clickerEvent) {clickCountAppear.style.color = "#0c1327"}
+        }
     } else {
         clickCountAppear.classList.add("floatingText");
+        if (clickerEvent) {clickCountAppear.style.color = "#0c1327"}
     }
     clickCountAppear.style.position = "absolute";
     clickCountAppear.style.left = XrandNum1 + "%";
