@@ -61,6 +61,11 @@ body {
     top: 0%;
     flex-direction: row;
     justify-content: space-around;
+    border: 0;
+    border-top: 0.2em solid #1c2441;
+    border-bottom: 0.2em solid #1c2441;
+    box-sizing: border-box;
+    background-image: url(./assets/frames/bar-horizontal.webp);
 }
 
 .energy-primo-container {
@@ -172,9 +177,19 @@ body {
     justify-content:initial;
 }
 
+.button-container {
+    aspect-ratio: 13/17;
+    flex-basis: 18%;
+}
+
+.flex-container-INVENTORY {
+    gap: 4% 2%;
+}
+
 .inventory-selected {
-    border: 0.25em inset #867357;
+    border: 0.35em inset #867357;
     border-radius: 1em;
+    transform: scale(1.10);
 }
 
 .inventory-selected :first-child {
@@ -192,6 +207,7 @@ body {
     width: 55%;
     height: 60%;
     font-size: 0.95em;
+    /* background-image: url(./assets/frames/tooltipEXPED-mobile.webp); */
 }
 
 #adventure-button {
@@ -259,6 +275,7 @@ body {
 
 .table-with-tooltip {
     height: 85%;
+    padding: 1%;
 }
 
 .filter-row {
@@ -295,12 +312,23 @@ body {
 .store-div {
     width: 70%;
     height: 45%;
+    scrollbar-width: 0.1vw;
+    scrollbar-color: #6a513a #B3967B;
     overflow-x: scroll;
     flex-wrap: nowrap;
     justify-content:unset;
     padding-left: 1%;
     padding-right: 1%;
     box-sizing: border-box;
+}
+
+.store-div::-webkit-scrollbar {
+    height: 1.5vh;
+    background-color: #947c6676;
+}
+
+.store-div::-webkit-scrollbar-thumb {
+    background-color: #362515;
 }
 
 .store-timer {

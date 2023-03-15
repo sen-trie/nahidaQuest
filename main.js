@@ -1,13 +1,14 @@
 import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades } from "./defaultData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper } from "./functions.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
+import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2-3-140";
+const VERSIONNUMBER = "v0.2-3-150";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
-// START SCREEN 
+// START SCREEN
 let mainBody = document.getElementById("game");   
 let startText = document.getElementById("start-screen"); 
 let startAlready = true;
@@ -123,7 +124,6 @@ function deleteConfirmButton(confirmed) {
 let cache = document.createElement("div");
 cache.id = "cache";
 mainBody.appendChild(cache);
-drawUI.preloadLib(cache,'load',upgradeInfo);
 
 setTimeout(()=>{
     mainBody = drawUI.buildGame(mainBody);
@@ -141,9 +141,10 @@ versionText.classList.add("version-text");
 let versionTextStart = document.getElementById("vers-number-start");
 versionTextStart.innerText = `[${VERSIONNUMBER}] \n ${COPYRIGHT}`;
 versionText.classList.add("version-text-start");
+
+let preloadStart = Preload();
 //------------------------------------------------------------------------POST SETUP------------------------------------------------------------------------//
 function startGame(firstGame) {
-drawUI.preloadFolders(upgradeInfo);
 
 // GLOBAL VARIABLES
 var saveValues;
@@ -167,7 +168,7 @@ let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 const EVENTCOOLDOWN = 70;
-const SHOPCOOLDOWN = 30;
+const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
 // SPECIAL UPGRADE VARIABLES
@@ -1435,11 +1436,18 @@ function loadingAnimation() {
     var siteWidth = 1080;
     var scale = screen.width / (siteWidth);
     document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
-    setTimeout(() => {removeLoading()}, 5000);
+
+    let preloadArray = drawUI.preloadMinimumArray(upgradeInfo);
+    preloadStart.fetch(preloadArray).then(() => {
+        setTimeout(() => {removeLoading()}, 3000);
+    });
+
+    preloadStart.onerror = item => {
+        console.error(`Error preloading '${item.url}'`);
+    }
 }
 
 function removeLoading() {
-    dimHeroButton();
     setTimeout(() => {
         let overlay = document.getElementById("loading");
         let idleAmount = 0;
@@ -2533,11 +2541,10 @@ function adventure(type) {
                 inventoryDraw("artifact", 2, 4);
                 inventoryDraw("weapon", 2, 4);
                 inventoryDraw("talent", 2, 4);
-                inventoryDraw("food", 2, 4);
+                inventoryDraw("talent", 2, 4);
 
                 if (randomDraw == 1) {
-                    inventoryDraw("talent", 2, 3);
-                    inventoryDraw("talent", 2, 3);
+                    inventoryDraw("food", 2, 4);
                 }
                 break;
             case 4:
@@ -2545,12 +2552,12 @@ function adventure(type) {
                 inventoryDraw("xp", 2, 3);
                 inventoryDraw("artifact", 3, 4);
                 inventoryDraw("weapon", 3, 4);
-                inventoryDraw("food", 3, 5);
+                inventoryDraw("artifact", 2, 3);
+                inventoryDraw("artifact", 2, 3);
                 inventoryDraw("gem", 4, 5);
 
                 if (randomDraw == 1) {
-                    inventoryDraw("artifact", 2, 3);
-                    inventoryDraw("artifact", 2, 3);
+                    inventoryDraw("food", 3, 5);
                 }
                 
                 break;
@@ -2561,11 +2568,12 @@ function adventure(type) {
                 inventoryDraw("talent", 4, 4);
                 inventoryDraw("artifact", 4, 5);  
                 inventoryDraw("gem", 4, 5);
-                inventoryDraw("food", 4, 5);
+                inventoryDraw("weapon", 4, 4);
+                inventoryDraw("talent", 4, 4);
+                
 
                 if (randomDraw == 1) {
-                    inventoryDraw("weapon", 4, 4);
-                    inventoryDraw("talent", 4, 4);
+                    inventoryDraw("food", 4, 5);
                 } 
 
                 break;
@@ -2878,7 +2886,7 @@ function wish() {
 function wishAnimation(randomWishHero) {
     stopSpawnEvents = true;
     let nameTemp = upgradeInfo[randomWishHero].Name;
-    drawUI.preloadLib(cache,'single',`tooltips/letter-${nameTemp}`);
+    preloadStart.fetch([`./assets/tooltips/letter-${nameTemp}.webp`])
     setTimeout(()=>{
         let wishBackdropDark = document.createElement("div");
         wishBackdropDark.classList.add("cover-all","flex-column","tutorial-dark");
@@ -3472,7 +3480,11 @@ function nutCost(id) {
 
 // ADDS ACCESS BUTTON AFTER 1 NUT
 function addNutStore() {
-    drawUI.preloadLib(cache,'folder',`tooltips/nut-shop-`,7);
+    let preloadArray = [];
+    for (let i=1; i < 8; i++) {
+        preloadArray.push(`./assets/tooltips/nut-shop-${1}.webp`);
+    }
+    preloadStart.fetch(preloadArray)
 
     let mainTable = rightDiv.childNodes[1];
     let nutStoreTable = document.createElement("div");
@@ -3592,7 +3604,7 @@ function nutPopUp() {
     } else {
         saveValues.goldenTutorial = true;
         stopSpawnEvents = true;
-        drawUI.preloadLib(cache,'folder',`tutorial/goldenNut-`,4);
+        // drawUI.preloadLib(cache,'folder',`tutorial/goldenNut-`,4);
 
         setTimeout(()=>{
             addNutStore();

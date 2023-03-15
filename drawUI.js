@@ -22,110 +22,33 @@ const numberedFileArray = {
     "event/weasel-":9
 }
 
-async function preloadLib(cache,type,path,number) {
-    let images = [];
-    if (type === 'load') {
-        let img = new Image();
-        let urlOne = filePath + "loading.webp";
-        img.src = urlOne;
-        let promise = new Promise((resolve, reject) => {
-            img.onload = () => {
-                resolve(img);
-                cache.appendChild(img);
-            };
-            img.onerror = reject;
-        });
-        images.push({urlOne, promise});
-
-        for (let key in uniqueFileArray) {
-            for (let i=0, len=uniqueFileArray[key].length; i < len; i++) {
-                let img = new Image();
-                let url = filePath + key + uniqueFileArray[key][i] + ".webp";
-                img.src = url;
-                let promise = new Promise((resolve, reject) => {
-                    img.onload = () => {
-                        resolve(img);
-                        cache.appendChild(img);
-                    };
-                    img.onerror = reject;
-                });
-                images.push({url, promise});
-            }
-        }
-        for (const key in numberedFileArray) {
-            for (let i=1, len=numberedFileArray[key] + 1; i < len; i++) {
-                let img = new Image();
-                let url = filePath + key + i + ".webp";
-                img.src = url;
-                let promise = new Promise((resolve, reject) => {
-                    img.onload = () => {
-                        resolve(img);
-                        cache.appendChild(img);
-                    };
-                    img.onerror = reject;
-                });
-                images.push({url, promise});
-            }
-        }
-        for (let key in path) {
-            let upgradeName = path[key].Name;
-            let imgOne = new Image();
-            let urlOne = filePath + "nameplates/" + upgradeName + ".webp";
-            imgOne.src = urlOne;
-            let promise = new Promise((resolve, reject) => {
-                imgOne.onload = () => {
-                    resolve(imgOne);
-                    cache.appendChild(imgOne);
-                };
-                imgOne.onerror = reject;
-            });
-            images.push({urlOne, promise});
-
-            let imgTwo = new Image();
-            let urlTwo = filePath + "tooltips/hero/" + upgradeName + ".webp";
-            imgTwo.src = urlTwo;
-            let promiseTwo = new Promise((resolve, reject) => {
-                imgTwo.onload = () => {
-                    resolve(imgTwo);
-                    cache.appendChild(imgTwo);
-                };
-                imgTwo.onerror = reject;
-            });
-            images.push({urlTwo, promiseTwo});
-        }
-    // PRELOAD SINGLE IMAGES
-    } else if (type === 'single') {
-        let img = new Image();
-        let url = filePath + path + ".webp";
-        img.src = url;
-        let promise = new Promise((resolve, reject) => {
-            img.onload = () => {
-                resolve(img);
-                cache.appendChild(img);
-            };
-            img.onerror = reject;
-        });
-        images.push({url, promise});
-    // PRELOAD MULTIPLE IMAGES
-    } else if (type === 'folder') {
-        for (let i = 1; i < (number + 1); i++) {
-            let img = new Image();
-            let url = filePath + path + i + ".webp";
-            img.src = url;
-            let promise = new Promise((resolve, reject) => {
-                img.onload = () => {
-                    resolve(img);
-                    cache.appendChild(img);
-                };
-                img.onerror = reject;
-            });
-            images.push({url, promise});
+function preloadMinimumArray(upgradeInfo) {
+    let array = [];
+    for (let key in uniqueFileArray) {
+        for (let i=0, len=uniqueFileArray[key].length; i < len; i++) {
+            let url = filePath + key + uniqueFileArray[key][i] + ".webp";
+            array.push(url);
         }
     }
-    
-    await Promise.all(images.map(i => i.promise));
-    return cache;
+
+    for (let key in numberedFileArray) {
+        for (let i=1, len=numberedFileArray[key] + 1; i < len; i++) {
+            let url = filePath + key + i + ".webp";
+            array.push(url);
+        }
+    }
+
+    for (let key in upgradeInfo) {
+        let upgradeName = upgradeInfo[key].Name;
+
+        let urlOne = filePath + "nameplates/" + upgradeName + ".webp";
+        let urlTwo = filePath + "tooltips/hero/" + upgradeName + ".webp";
+        array.push(urlOne,urlTwo);
+    }
+
+    return array;
 }
+
 
 function preloadFolders() {
     let filePath = "./assets/";
@@ -177,10 +100,6 @@ function buildGame(mainBody) {
     let midDiv = document.createElement("div");
     midDiv.id = "mid-div";
     midDiv.classList.add("middle-area");
-    let midDivImg = document.createElement("img");
-    midDivImg.src = "./assets/frames/bar.webp";
-    midDivImg.alt = "Middle of the Screen";
-    midDivImg.classList.add("middle-bar");
 
     let energyPrimoContainer = document.createElement("div");
     energyPrimoContainer.classList.add("flex-column","energy-primo-container");
@@ -199,7 +118,7 @@ function buildGame(mainBody) {
     let appTwo = document.createElement("div");
     appTwo.id = "app2";
     tempBuffDiv.append(appOne,appTwo);
-    midDiv.append(midDivImg,energyPrimoContainer,tempBuffDiv)
+    midDiv.append(energyPrimoContainer,tempBuffDiv)
 
     let rightDiv = document.createElement("div");
     rightDiv.id = "right-div";
@@ -312,10 +231,6 @@ function createHeroButtonContainer(heroID) {
 }
 
 function createExpedTable(expedDiv) {
-    let expedTableImg = document.createElement("img");
-    expedTableImg.classList.add("cover-all","exped-table-img");
-    expedTableImg.src = "./assets/frames/tooltipEXPED.webp";
-
     let expedTable = document.createElement("div");
     expedTable.classList.add("flex-column","tooltipTABLEEXPED");
     let expedRow1 = document.createElement("div");
@@ -326,7 +241,7 @@ function createExpedTable(expedDiv) {
     expedRow2.id = "exped-row-2";
 
     expedTable.append(expedRow1,expedRowImg,expedRow2)
-    expedDiv.append(expedTableImg,expedTable);
+    expedDiv.append(expedTable);
 }
 
 function createAchievement(achievementText,achievementDesc) {
@@ -401,4 +316,4 @@ function drawMailTable(table4) {
     return table4;
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadFolders,preloadImage,preloadLib }
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadMinimumArray }

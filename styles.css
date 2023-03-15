@@ -199,7 +199,7 @@ img {
 /*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
     scrollbar-width: 0.9vw;
-    scrollbar-color: #E1DBD0 #68563d;;
+    scrollbar-color: #E1DBD0 #68563d;
     margin: 0;
     padding: 0;
     border: 0;
@@ -334,13 +334,13 @@ table, button {
     position: absolute;
     display:flex;
     flex-direction: column;
-    box-shadow: inset 1em 1em gold;
-}
-
-.middle-bar {
-    height: 100%;
-    width: 100%;
-    position: absolute;
+    border-left: 0.25em solid #1c2441;
+    border-right: 0.25em solid #1c2441;
+    box-sizing: border-box;
+    background-image: url(./assets/frames/bar.webp);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
     z-index: 5;
 }
 
@@ -2059,6 +2059,8 @@ input[type="range"]:focus::-moz-range-thumb{
     color: white;
     text-shadow: 0.1em 0.1em 0.25em #000000;
     font-size: inherit;
+    background-color: #3E4659;
+    border: 0.2em solid #8B857C;
 }
 
 .exped-table-img {
