@@ -21,39 +21,67 @@ function inventoryAddButton(buttonInv, Item) {
 }
 
 // ADDS FLOATING TEXT UPON CLICKING ON DEMO BUTTON
-function floatText(clickerEvent,leftDiv,clickFactor,XrandNum1,YrandNum2,type,clickEarn,abbrNum) {
+function floatText(clickType,combineText,leftDiv,clickFactor,Xlocation,Ylocation,abbrNum,clickerEvent) {
     let clickCountAppear = document.createElement("div");
-    clickCountAppear.innerText = "+" + clickFactor;
-    if (type === "crit") {
-        clickCountAppear.classList.add("floatingCritText");
-        clickCountAppear.id = "crit-text";
-        clickCountAppear.critValue = clickEarn;
-    } else if (type === true) {
-        if (document.getElementById("float-text")) {
-            let oldNumberText = document.getElementById("float-text");
+    if (clickType === "crit") {
+        if (document.getElementById("crit-text")) {
+            let oldNumberText = document.getElementById("crit-text");
             let oldValue = oldNumberText.nutValue + clickFactor;
             oldNumberText.innerText = `+${abbrNum(oldValue,2,true)}`;
+
+            if (clickerEvent === "scara") {
+                oldNumberText.style.color = "#0c1327";
+            } else {
+                oldNumberText.style.color = "#022107"
+            }
 
             let newNumberText = oldNumberText.cloneNode(true);
             oldNumberText.parentNode.replaceChild(newNumberText, oldNumberText);
             newNumberText.nutValue = oldValue;
             newNumberText.addEventListener('animationend', ()=>{newNumberText.remove()});
-            return;
         } else {
-            clickCountAppear.id = "float-text";
+            clickCountAppear.classList.add("floatingCritText");
+            clickCountAppear.id = "crit-text";
             clickCountAppear.nutValue = clickFactor;
-            clickCountAppear.classList.add("floatingTextLow");
-            if (clickerEvent) {clickCountAppear.style.color = "#0c1327"}
+            clickCountAppear.innerText = "+" + abbrNum(clickFactor,2,true);
         }
-    } else {
-        clickCountAppear.classList.add("floatingText");
-        if (clickerEvent) {clickCountAppear.style.color = "#0c1327"}
-    }
-    clickCountAppear.style.position = "absolute";
-    clickCountAppear.style.left = XrandNum1 + "%";
-    clickCountAppear.style.top = YrandNum2 + "%";
-    clickCountAppear.addEventListener('animationend', ()=>{clickCountAppear.remove()});
+    } if (clickType === "normal") {
+        if (combineText) {
+            if (document.getElementById("float-text")) {
+                let oldNumberText = document.getElementById("float-text");
+                let oldValue = oldNumberText.nutValue + clickFactor;
+                oldNumberText.innerText = `+${abbrNum(oldValue,2,true)}`;
 
+                if (clickerEvent === "scara") {
+                    oldNumberText.style.color = "#0c1327";
+                } else {
+                    oldNumberText.style.color = "#022107"
+                }
+
+                let newNumberText = oldNumberText.cloneNode(true);
+                oldNumberText.parentNode.replaceChild(newNumberText, oldNumberText);
+                newNumberText.nutValue = oldValue;
+                newNumberText.addEventListener('animationend', ()=>{newNumberText.remove()});
+            } else {
+                clickCountAppear.classList.add("floatingTextLow");
+                clickCountAppear.id = "float-text";
+                clickCountAppear.nutValue = clickFactor;
+                clickCountAppear.innerText = "+" + abbrNum(clickFactor,2,true);
+            }
+        } else {
+            clickCountAppear.classList.add("floatingText");
+            clickCountAppear.innerText = "+" + abbrNum(clickFactor,2,true);
+        }
+    }
+
+    if (clickerEvent === "scara") {
+        clickCountAppear.style.color = "#0c1327";
+    }
+
+    clickCountAppear.style.position = "absolute";
+    clickCountAppear.style.left = Xlocation + "%";
+    clickCountAppear.style.top = Ylocation + "%";
+    clickCountAppear.addEventListener('animationend', ()=>{clickCountAppear.remove()});
     leftDiv.appendChild(clickCountAppear);
     return leftDiv;
 }

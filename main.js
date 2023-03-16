@@ -4,7 +4,7 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2-3-150";
+const VERSIONNUMBER = "v0.2-3-160";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -67,7 +67,9 @@ let confirmationBox = document.createElement("div");
 confirmationBox.classList.add("confirm-box");
 confirmationBox.style.zIndex = -1;
 confirmationBox.id = "confirm-box";
-confirmationBox.innerText = "Are you sure? Deleting your save cannot be undone.";
+
+let textBox = document.createElement('p');
+textBox.innerText = "Are you sure? Deleting your save cannot be undone.";
 
 let confirmationBoxButton = document.createElement("div");
 confirmationBoxButton.classList.add("confirm-button-div");
@@ -79,7 +81,7 @@ cancelDeleteButton.innerText = "Cancel";
 cancelDeleteButton.addEventListener("click",()=>deleteConfirmButton(false));
 
 confirmationBoxButton.append(confirmDeleteButton,cancelDeleteButton);
-confirmationBox.appendChild(confirmationBoxButton);
+confirmationBox.append(textBox,confirmationBoxButton);
 mainBody.appendChild(confirmationBox);
 
 let deleteType;
@@ -112,8 +114,8 @@ function deleteConfirmButton(confirmed) {
             localStorage.clear();
             setTimeout(()=>{
                 location.reload();
-            });
-        }
+            },200);
+        } 
     }
         
     let deleteBox = document.getElementById("confirm-box");
@@ -149,7 +151,7 @@ function startGame(firstGame) {
 // GLOBAL VARIABLES
 var saveValues;
 const ENERGYCHANCE = 500;
-let persistentValues;
+var persistentValues;
 const COSTRATIO = 1.15;
 let clickDelay = 10;
 
@@ -167,7 +169,8 @@ let wishMultiplier = 0;
 let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
-const EVENTCOOLDOWN = 70;
+let preventSave = false;
+const EVENTCOOLDOWN = 10;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
@@ -198,7 +201,7 @@ let achievementData = {
 let scoreAchievement = [1,101,201,301,401];
 
 let foodBuff = 1;
-let clickerEvent = false;
+let clickerEvent = "none";
 let shopTime = 1e20;
 let shopTimerElement = null;
 let filteredHeroes = [];
@@ -420,7 +423,6 @@ function loadSaveData() {
         updateObjectKeys(persistentValues,persistentValuesDefault);
     }
 
-
     specialValuesUpgrade(true);
     if (saveValues.goldenTutorial === true) {
         addNutStore();
@@ -439,17 +441,24 @@ demoContainer.addEventListener("mouseup", () => {
     let clickEarn;
     let crit = false;
     saveValues["clickCount"] += 1;
-    if (clickerEvent === false) {
-        let critRole = randomInteger(1,100);
-        if (critRole <= clickCritRate) {
+
+    let critRole = randomInteger(1,100);
+    if (critRole <= clickCritRate) {
+        crit = true;
+        clickDelay -= 5;
+        if (clickerEvent !== "none") {
+            clickEarn = Math.ceil(currentClick * clickCritDmg);
+            clickDelay -= 10;
+        } else {
             clickEarn = Math.ceil(specialClick * saveValues["clickFactor"] * clickCritDmg);
-            crit = true;
+        }
+    } else {
+        if (clickerEvent !== "none") {
+            clickEarn = currentClick;
+            clickDelay -= 10;
         } else {
             clickEarn = Math.ceil(specialClick * saveValues["clickFactor"]);
         }
-    } else {
-        clickEarn = currentClick;
-        clickDelay -= 10;
     }
 
     saveValues["realScore"] += clickEarn;
@@ -465,21 +474,14 @@ demoContainer.addEventListener("mouseup", () => {
         }
     }
 
-    if (crit === true) {
-        if (document.getElementById("crit-text")) {
-            let oldCritText = document.getElementById("crit-text");
-            let oldValue = oldCritText.critValue + clickEarn;
-            oldCritText.innerText = `+${abbrNum(oldValue,2,true)}`;
-
-            let newCritText = oldCritText.cloneNode(true);
-            oldCritText.parentNode.replaceChild(newCritText, oldCritText);
-            newCritText.critValue = oldValue
-            newCritText.addEventListener('animationend', ()=>{newCritText.remove()});
-        } else {
-            demoContainer = floatText(clickerEvent,leftDiv,abbrNum(clickEarn,2,true),randomInteger(30,70),60,"crit",clickEarn);
-        }
+    if (crit) {
+        floatText("crit",true,leftDiv,clickEarn,randomInteger(40,55),60,abbrNum,clickerEvent);
     } else {
-        demoContainer = floatText(clickerEvent,leftDiv,abbrNum(clickEarn,2,true),randomInteger(20,80),randomInteger(50,70),settingsValues.combineFloatText,0,abbrNum);
+        if (settingsValues.combineFloatText) {
+            floatText("normal",true,leftDiv,clickEarn,43,43,abbrNum,clickerEvent);
+        } else {
+            floatText("normal",false,leftDiv,clickEarn,randomInteger(30,70),randomInteger(50,70),abbrNum,clickerEvent);
+        }
     }
 
     spawnFallingNut();
@@ -618,8 +620,7 @@ function startRandomEvent() {
         clickedEvent(aranaraNumber);
         eventPicture.remove();
         toggleSettings(true);
-        let deleteBox = document.getElementById("confirm-box");
-        if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+        deleteConfirmMenu("close","loaded");
     });
 
     setTimeout(() => {eventPicture.remove()}, 8000);
@@ -708,7 +709,7 @@ function clickEvent(wandererMode) {
     let button = document.getElementById("demo-main-img");
     if (clickEventDelay !== null) {clearTimeout(clickEventDelay)};
     
-    clickerEvent = true;
+    clickerEvent = wandererMode === true ? "scara" : "event";
     currentClick = 15 * (saveValues["dps"] + 1) * specialClick;
 
     if (wandererMode === true) {
@@ -753,7 +754,7 @@ function stopClickEvent() {
         if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")};
     }
 
-    clickerEvent = false;
+    clickerEvent = "none";
     clickEventDelay = null;
     stopSpawnEvents = false;
 }
@@ -1439,7 +1440,7 @@ function loadingAnimation() {
 
     let preloadArray = drawUI.preloadMinimumArray(upgradeInfo);
     preloadStart.fetch(preloadArray).then(() => {
-        setTimeout(() => {removeLoading()}, 3000);
+        setTimeout(() => {removeLoading()}, 2000);
     });
 
     preloadStart.onerror = item => {
@@ -1553,9 +1554,10 @@ function tutorial(idleAmount) {
     }
 }
 
-function saveData() {
+function saveData(skip) {
+    if (preventSave) {return};
     saveValues["currentTime"] = getTime();
-    if (!document.getElementById("currently-saving")) {
+    if (!document.getElementById("currently-saving") && skip != true) {
         let saveCurrently = document.createElement("img");
         saveCurrently.src = "./assets/settings/saving.webp";
         saveCurrently.id = "currently-saving";
@@ -1563,14 +1565,9 @@ function saveData() {
             saveCurrently.remove();
         });
         mainBody.append(saveCurrently);
-    }
+    }    
 
-    let settingsSaved = {
-        bgmVolume:bgmElement.volume,
-        sfxVolume:tabElement.volume,
-    }
-
-    localStorage.setItem("settingsValues", JSON.stringify(settingsSaved));
+    localStorage.setItem("settingsValues", JSON.stringify(settingsValues));
     localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
     localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
     localStorage.setItem("expeditionDictSave", JSON.stringify(expeditionDict));
@@ -1705,6 +1702,7 @@ function tabChange(x) {
 
 // SETTINGS MENU - SAVES & VOLUME CONTROL
 function settings() {
+    toggleClipboard("create");
     // JUST THE BUTTON FOR SETTING MENU
     let settingButton = document.createElement("button");
     settingButton.classList.add("settings-button");
@@ -1753,15 +1751,14 @@ function settings() {
     volumeScrollerSFXText.appendChild(volumeScrollerSFXTextImage)
     volumeScrollerSFXContainer.append(volumeScrollerSFXText,volumeScrollerSFX);
     volumeScrollerContainer.append(volumeScrollerBGMContainer,volumeScrollerSFXContainer)
-
+    
     let settingsBottom = document.createElement("div");
     settingsBottom.classList.add("flex-row","settings-bottom");
-    let settingsBottomLeft = document.createElement("div");
-    settingsBottomLeft.classList.add("settings-bottom-left");
+
+    // BOTTOM RIGHT OF SETTINGS
     let settingsBottomRight = document.createElement("div");
     settingsBottomRight.classList.add("settings-bottom-right");
 
-    // BOTTOM RIGHT OF SETTINGS
     let infoSetting = document.createElement("button");
     infoSetting.classList.add("setting-info");
     infoSetting.addEventListener("click", ()=> {
@@ -1776,22 +1773,53 @@ function settings() {
 
     let saveSetting = document.createElement("button");
     saveSetting.classList.add("setting-save");
-    saveSetting.addEventListener("click",() => {saveData();})
+    saveSetting.addEventListener("click",() => {saveData()})
 
     let clearSetting = document.createElement("button");
     clearSetting.classList.add("setting-clear");
     clearSetting.addEventListener("click",() => {deleteConfirmMenu("toggle","loaded")})
 
     // BOTTOM LEFT OF SETTINGS
-    let exportSaveSetting = document.createElement("button");
-    // copy(JSON.stringify(localStorage));
-    let importSaveSetting = document.createElement("button");
-    // var data = JSON.parse(/*paste stringified JSON from clipboard*/);
-    // Object.keys(data).forEach(function (k) {
-    // localStorage.setItem(k, JSON.stringify(data[k]));
-    // });
+    let settingsBottomLeft = document.createElement("div");
+    settingsBottomLeft.classList.add("settings-bottom-left");
 
-    settingsBottomRight.append(infoSetting,saveSetting,clearSetting);
+    let label = document.createElement("label");
+    label.innerText = "Combine Click Counts";
+    label.classList.add("switch");
+    
+    let input = document.createElement("input");
+    input.type = "checkbox";
+    input.name = "color";
+    input.value = "red";
+
+    let slider = document.createElement("span");
+    slider.classList.add("slider")
+    if (settingsValues.combineFloatText === true) {
+        input.checked = true;
+    }
+
+    input.addEventListener("change", function() {
+        if (input.checked) {
+            settingsValues.combineFloatText = true;
+        } else {
+            settingsValues.combineFloatText = false;
+        }
+    });
+
+    label.append(input,slider);
+    settingsBottomLeft.appendChild(label);
+
+    let exportSaveSetting = document.createElement("div");
+    exportSaveSetting.innerText = "Export Save";
+    exportSaveSetting.classList.add("flex-row");
+    exportSaveSetting.addEventListener("click",()=>{toggleClipboard("toggle")})
+
+    let importSaveSetting = document.createElement("div");
+    importSaveSetting.innerText = "Import Save";
+    importSaveSetting.classList.add("flex-row");
+    importSaveSetting.addEventListener("click",importClipboard)
+
+    settingsBottomRight.append(importSaveSetting,exportSaveSetting,infoSetting,saveSetting,clearSetting);
     settingsBottom.append(settingsBottomLeft,settingsBottomRight);
     settingsMenu.append(settingsText, volumeScrollerContainer, settingsBottom);
     mainBody.appendChild(settingsMenu);
@@ -1806,6 +1834,7 @@ function settings() {
 
 let settingsOpen = false;
 function toggleSettings(closeOnly) {
+    toggleClipboard("close");
     let settingsMenu = document.getElementById("settings-menu");
     if (settingsOpen == true) {
         settingsMenu.style.zIndex = -1;
@@ -1823,15 +1852,93 @@ function settingsVolume() {
     let bgmAudio = document.getElementById('bgm');
     volumeScroller.addEventListener("change", function() {
         bgmElement.volume = this.value / 100;
+        settingsValues.bgmVolume = this.value / 100;
     });
 
     let sfxScroller = document.getElementById('volume-scroller-sfx');
     sfxScroller.addEventListener("change", function() {
         for (let i=0,len=sfxArray.length; i < len; i++) {
             sfxArray[i].volume = this.value / 100;
+            settingsValues.sfxVolume = this.value / 100;
         }
     });
 }
+
+function toggleClipboard(type) {
+    if (type == "create") {
+        let textBoxDiv = document.createElement("div");
+        textBoxDiv.classList.add("text-box");
+        textBoxDiv.id = "text-box";
+        textBoxDiv.style.zIndex = -1;
+
+        let textBox = document.createElement("textarea");
+        let cancelButton = document.createElement("button");
+        cancelButton.addEventListener("click",()=>{
+            textBoxDiv.style.zIndex = -1;
+        })
+
+        let copyButton = document.createElement("button");
+        copyButton.innerText = "Copy to Clipboard";
+        copyButton.addEventListener("click",()=>{
+            let text = JSON.stringify(localStorage);
+            navigator.clipboard
+            .writeText(text)
+            .then(()=>{
+                alert(`Copied save data to clipboard.`)
+            })
+            .catch(() => {
+                alert(`Failed to copy to clipboard.`)
+            });
+        })
+        
+        textBoxDiv.append(textBox,cancelButton,copyButton);
+        mainBody.appendChild(textBoxDiv);
+    } else if (type == "toggle") {
+        let textBox = document.getElementById("text-box");
+        if (textBox.style.zIndex == -1) {
+            textBox.children[0].value = JSON.stringify(localStorage);
+            textBox.style.zIndex = 10000;
+        } else {
+            textBox.style.zIndex = -1;
+        }
+    } else if (type == "close") {
+        let textBox = document.getElementById("text-box");
+        if (textBox.style.zIndex != -1) {
+            textBox.style.zIndex = -1;
+        }
+    }
+}
+
+function importClipboard() {
+    let promptSave = prompt("Import Save:", "Paste Save Data");
+    if (promptSave != null) {
+        let localStorageTemp = tryParseJSONObject(promptSave);
+
+        preventSave = true;
+        if (localStorageTemp === false) {
+            alert("Invalid save data.")
+            console.error("Invalid save data.");
+        } else {
+            localStorage.clear(); 
+            for (let key in localStorageTemp) {
+                localStorage.setItem(key, localStorageTemp[key]);
+            }
+            location.reload();
+        }
+        preventSave = false;
+    }
+}
+
+function tryParseJSONObject(jsonString) {
+    try {
+        let o = JSON.parse(jsonString);
+        if (o && typeof o === "object") {
+            return o;
+        }
+    }
+    catch (e) { }
+    return false;
+};
 
 function createMultiplierButton() {
     multiplierButtonContainer = document.createElement("div");
@@ -1879,7 +1986,7 @@ function createFilter() {
         }
     })
 
-    const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','Sword','Claymore','Catalyst','Polearm','Bow','Sumeru','Mond','Liyue','Inazuma'];
+    const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','Sword','Claymore','Catalyst','Polearm','Bow','Sumeru','Mondstadt','Liyue','Inazuma'];
     const invOptions = ['Artifact','Food','Level','Gemstone','Talent','Sword','Claymore','Catalyst','Polearm','Bow'];
     for (let i=0,len=heroOptions.length; i < len; i++) {
         let filterPicture;
@@ -2288,7 +2395,7 @@ const weaponBuffPercent =   [0, 1.1, 1.3, 1.7, 2.1, 2.7, 4.6];
 const artifactBuffPercent = [0, 1.05, 1.15, 1.35, 1.55, 1.85];
 const foodBuffPercent =     [0, 1.4, 2.0, 3.1, 4.4, 6.2];
 const nationBuffPercent =   [0, 0, 1.2, 1.5, 1.8];
-const energyBuffPercent =   [0, 0, 0, 100, 300, 700];
+const energyBuffPercent =   [0, 0, 0, 125, 300, 650];
 function itemUse(itemUniqueId) {
     let itemID;
     if (typeof itemUniqueId === 'string') {
@@ -2975,6 +3082,7 @@ function popAchievement(achievement,loading) {
 
     if (loading != true) {
         saveValues["primogem"] += Math.round(20 * additionalPrimo);
+        saveValues["achievementCount"]++;
 
         if (timerSeconds !== 0) {
             var achievementPopUp = drawUI.createAchievement(achievementText,achievementDesc);
@@ -3480,6 +3588,7 @@ function nutCost(id) {
 
 // ADDS ACCESS BUTTON AFTER 1 NUT
 function addNutStore() {
+    createTranscendMenu();
     let preloadArray = [];
     for (let i=1; i < 8; i++) {
         preloadArray.push(`./assets/tooltips/nut-shop-${1}.webp`);
@@ -3501,15 +3610,15 @@ function addNutStore() {
     shopHeader.src = "./assets/tooltips/store-header.webp";
     let nutShopDiv = document.createElement("div");
     nutShopDiv.id = "nut-shop-div";
+    let nutTranscend = document.createElement("div");
+    nutTranscend.id = "nut-shop-transcend";
     let nutAscend = document.createElement("button");
     nutAscend.innerText = "Transcend";
-
-    nutStoreTable.append(shopHeader,nutShopDiv,nutAscend,nutStoreCurrency);
-    mainTable.appendChild(nutStoreTable);
 
     let nutStoreButton = document.createElement("button");
     nutStoreButton.classList = "nut-store-access";
     nutStoreButton.addEventListener("click",()=>{
+        calculateGoldenCore();
         if (nutStoreTable.style.display == "flex") {
             nutStoreTable.style.display = "none";
         } else {
@@ -3566,6 +3675,131 @@ function addNutStore() {
         nutShopItem.append(nutShopTitle,nutShopLevel,nutShopImg,nutShopDesc,nutShopButton);
         nutShopDiv.appendChild(nutShopItem);
     }
+
+    nutShopDiv.style.display = "flex";
+    nutAscend.addEventListener("click",()=>{
+        if (nutShopDiv.style.display === "flex") {
+            nutTranscend.style.display = "flex";
+            nutShopDiv.style.display = "none";
+            nutAscend.innerText = "Upgrade";
+        } else {
+            nutTranscend.style.display = "none";
+            nutShopDiv.style.display = "flex";
+            nutAscend.innerText = "Transcend";
+        }
+    })
+
+    nutTranscend.classList.add("nut-transcend","flex-column");
+    let titleText = document.createElement("p");
+    titleText.innerText = "Do you wish to turn \n back time and transcend?";
+
+    let bodyText = document.createElement("div");
+    bodyText.classList.add("flex-row")
+    let bodyTextLeft = document.createElement("p");
+    bodyTextLeft.innerText = `You lose: \n\n All Nuts, \n All Items, \n Energy, \n Primogems, \n Achievements`;
+    bodyTextLeft.classList.add("flex-column");
+    let bodyTextRight = document.createElement("p");
+    bodyTextRight.id = "transcend-display";
+    bodyTextRight.classList.add("flex-column");
+    bodyText.append(bodyTextLeft,bodyTextRight);
+
+    let bodyTextBottom = document.createElement("p");
+    bodyTextBottom.innerText = "Gain more by upgrading heroes, getting achievements \n & getting  more nuts (golden or otherwise).";
+
+    let trascendButton = document.createElement("button");
+    trascendButton.innerText = "Yes";
+    trascendButton.addEventListener("click",()=>{
+        toggleTranscendMenu();
+    })
+    nutTranscend.append(titleText,bodyText,bodyTextBottom,trascendButton);
+
+    nutStoreTable.append(shopHeader,nutTranscend,nutShopDiv,nutAscend,nutStoreCurrency);
+    mainTable.appendChild(nutStoreTable);
+    calculateGoldenCore();
+}
+
+function calculateGoldenCore(type) {
+    let goldenNutValue = Math.round((saveValues.heroesPurchased/100) + Math.log(saveValues.realScore) + saveValues.goldenNut + saveValues.achievementCount);
+    goldenNutValue = goldenNutValue**2;
+    if (goldenNutValue < 10000) {
+        goldenNutValue = 1;
+    }
+
+    if (type == "formula") {
+        return goldenNutValue;
+    } else {
+        let transcendValue = document.getElementById("transcend-display");
+        transcendValue.innerHTML = `You gain:<br><br> ${abbrNum(goldenNutValue)} 
+                                             <br><img class="transcendLogo" src="./assets/icon/core.webp">`;
+        return goldenNutValue;
+    }
+}
+
+function createTranscendMenu() {
+    let deleteMenu = document.getElementById("confirm-box")
+    let transcendMenu = deleteMenu.cloneNode(true);
+    transcendMenu.firstChild.innerText = "Are you sure? Transcending cannot be undone.";
+    transcendMenu.id = "transcend-menu";
+
+    transcendMenu.children[1].children[0].addEventListener("click",()=>{
+        transcendFunction();
+    })
+    transcendMenu.children[1].children[1].addEventListener("click",()=>{
+        transcendMenu.style.zIndex = -1;
+    })
+
+    mainBody.appendChild(transcendMenu)
+}
+
+function toggleTranscendMenu(forceClose) {
+    toggleSettings(true);
+    deleteConfirmMenu("close","loaded");
+    let transcendMenu = document.getElementById("transcend-menu");
+
+    if (transcendMenu.style.zIndex == -1) {
+        transcendMenu.style.zIndex = 200;
+        setTimeout(()=>{
+            if (transcendMenu.style.zIndex != -1) transcendMenu.style.zIndex = -1;
+        },6000);
+    } else {
+        transcendMenu.style.zIndex = -1;
+    }
+}
+
+function transcendFunction() {
+    let forceStop = true; 
+
+    if (forceStop) {
+        preventSave = true;
+        forceStop = false; 
+        saveData(true);
+
+        localStorage.clear();
+        console.log(localStorage.length)
+        let overlay = document.getElementById("loading");
+        overlay.style.zIndex = 100000;
+        overlay.children[0].style.backgroundImage = "url(./assets/bg/wood.webp";
+
+        let oldGif = overlay.children[0].children[0];
+        let newGif = oldGif.cloneNode(true);
+        oldGif.parentNode.replaceChild(newGif, oldGif);
+        newGif.src = "./assets/loading.webp";
+        newGif.classList.add("overlay-tutorial")
+
+        persistentValues.goldenCore += calculateGoldenCore("formula");
+        
+        localStorage.setItem("settingsValues", JSON.stringify(settingsValues));
+        localStorage.setItem("persistentValues", JSON.stringify(persistentValues));
+
+        let newSaveValues = saveValuesDefault;
+        newSaveValues.goldenTutorial = true;
+        localStorage.setItem("saveValuesSave", JSON.stringify(newSaveValues));
+        console.log(localStorage.length)
+        
+        setTimeout(()=>{
+            location.reload();
+        },3000);
+    }
 }
 
 function nutPurchase(fullId) {
@@ -3604,7 +3838,6 @@ function nutPopUp() {
     } else {
         saveValues.goldenTutorial = true;
         stopSpawnEvents = true;
-        // drawUI.preloadLib(cache,'folder',`tutorial/goldenNut-`,4);
 
         setTimeout(()=>{
             addNutStore();

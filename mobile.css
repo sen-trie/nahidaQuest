@@ -32,6 +32,10 @@
     height: 30%;
 }
 
+.overlay-tutorial {
+    width: 95%;
+    object-fit: contain;
+}
 
 body {
     width: 100%;

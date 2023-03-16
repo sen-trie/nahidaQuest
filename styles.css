@@ -254,7 +254,7 @@ body {
     justify-content: center;
 }
 
-table, button {
+table, button, label {
     cursor: url(./assets/icon/cursor.webp), auto;
 }
 
@@ -488,8 +488,8 @@ table, button {
 }
 
 .overlay-tutorial {
-    width: 50%;
-    height: 55%;
+    width: 50% !important; 
+    height: 55% !important;
     object-fit: contain;
 }
 
@@ -612,9 +612,9 @@ table, button {
     width: 50%;
     height: 20%;
     position: absolute;
-    top: -5%;
+    top: -7.5%;
     left: 25%;
-    z-index: 150;
+    z-index: 250;
     opacity: 1;
     font-size: 1em;
     text-align: center;
@@ -1233,27 +1233,81 @@ table, button {
 .settings-menu {
     position: absolute;
     left: 26%;
-    top: 25%;
+    top: 20.5%;
     width: 48%;
-    height: 45%;
+    height: 65%;
     row-gap: 2%;
     border: 0.3em outset #8fa77e;
     border-radius: 1em;
     background-color: #DEE3BA;
     z-index: -1;
+    justify-content: space-around;
+    filter: drop-shadow(0.3em 0.3em 0.2em #474d45);
 }
 
 .settings-text {
     position: relative;
     width: 90%;
-    height: 20%;
+    height: 15%;
     z-index: 201;
     object-fit: contain;
 }
 
+.text-box {
+    position: absolute;
+    left: 15%;
+    top: 10%;
+    width: 70%;
+    height: 45%;
+    z-index: -1;
+    border: 0.25em outset #6a8458;
+    filter: drop-shadow(0.3em 0.3em 0.2em #474d45) drop-shadow(0.3em 0.3em 0.1em #474d45);
+}
+
+.text-box > textarea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    word-break:break-all;
+    overflow-wrap: break-word;
+    resize: none;
+}
+
+.text-box > button:first-of-type {
+    position: absolute;
+    bottom: 97%;
+    left: 98%;
+    height:10%;
+    aspect-ratio: 1;
+    background-color: transparent;
+    background-image: url(./assets/icon/cancel.webp);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.text-box > button:nth-of-type(2) {
+    font: inherit;
+    position: absolute;
+    top: 102%;
+    left: 0;
+    height:20%;
+    aspect-ratio: 4.61;
+    color: #1c2f0e;
+    background-color: transparent;
+    background-image: url(./assets/tutorial/buttonBox.webp);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
 .confirm-box {
     position: absolute;
-    top: 2.5%;
+    top: 0.5%;
     height: 18%;
     width: 40%;
     left: 30%;
@@ -1293,11 +1347,10 @@ table, button {
     background-position: center;
 }
 
-
 .volume-scroller-container {
     position: relative;
     width: 100%;
-    height: 40%;
+    height: 30%;
     z-index: 201;
 }
 
@@ -1325,14 +1378,12 @@ input[type="range"]:focus {
 }
 
 /******** Chrome, Safari, Opera and Edge Chromium styles ********/
-/* slider track */
 input[type="range"]::-webkit-slider-runnable-track {
     background-color: #99b390;
     border-radius: 0.5em;
     height: 15%;
 }
 
-/* slider thumb */
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none; /* Override default look */
     appearance: none;
@@ -1349,14 +1400,12 @@ input[type="range"]:focus::-webkit-slider-thumb {
 }
 
 /*********** Firefox styles ***********/
-/* slider track */
 input[type="range"]::-moz-range-track {
     background-color: #99b390;
     border-radius: 0.5em;
     height: 15%;
 }
 
-/* slider thumb */
 input[type="range"]::-moz-range-thumb {
     appearance: none;
     margin-top: -3.5%; /* Centers thumb on the track */
@@ -1393,11 +1442,11 @@ input[type="range"]:focus::-moz-range-thumb{
 
 .settings-bottom {
     width: 95%;
-    height: 30%;
+    height: 45%;
     display: flex;
     z-index: 201;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
 }
 
 .settings-bottom-left {
@@ -1410,13 +1459,27 @@ input[type="range"]:focus::-moz-range-thumb{
     height: 100%;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-around;
     align-items: center;
 }
 
+.settings-bottom-right > div {
+    width: 70%;
+    aspect-ratio: 4.6;
+    color: #1d2e18;
+    background-image: url(./assets/tutorial/buttonBox.webp);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    transition: 0.1s ease;
+}
+
 .settings-bottom-right > button {
-    width: 27%;
+    width: 28%;
     aspect-ratio: 1;
+    margin-left: 2%;
+    margin-right: 2%;
     background-color: transparent;
     background-size:contain;
     background-repeat: no-repeat;
@@ -1424,7 +1487,11 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .settings-bottom-right > button:hover {
-    filter: drop-shadow(0.3em 0.3em #474d45b9)
+    filter: drop-shadow(0.3em 0.3em #474d45b9);
+}
+
+.settings-bottom-right > div:hover {
+    filter: drop-shadow(0.15em 0.15em #474d45b9)
 }
 
 .setting-info {
@@ -1462,6 +1529,57 @@ input[type="range"]:focus::-moz-range-thumb{
     background-color: transparent;
     background-image: url(./assets/settings/Delete.webp);
     background-size:contain;
+}
+
+.switch {
+    position: relative;
+    display: flex;
+    height: 13%;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    column-gap: 1%;
+    color: #20301c;
+}
+  
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: relative;
+    width: 15%;
+    height: 100%;
+    background-color: #bfc99b;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border: 0.1em solid #576430;
+    box-sizing: border-box;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #64753a;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(100%);
+    -ms-transform: translateX(100%);
+    transform: translateX(100%);
 }
 
 .multiplier-button-container {
@@ -1544,9 +1662,9 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .floatingCritText {
-    font-size: 1.75em;
+    font-size: 2em;
     color: #032509;
-    text-shadow: 0 0 0.25em #ffffffa2, 0 0 0.35em #ffffff9a, 0 0 0.15ergba(255, 255, 255, 0.666)ff, 0 0 0.15em #ffffff8e;
+    text-shadow: 0 0 0.25em #ffffffa2, 0 0 0.35em #ffffff9a, 0 0 0.15em #ffffff8e, 0 0 0.15em #ffffff8e;
     position: absolute;
     animation: fadeOutCritOpacity 2.0s ease-out forwards;
     z-index: 15;
@@ -1915,7 +2033,7 @@ input[type="range"]:focus::-moz-range-thumb{
 
 .filter-row div:nth-child(2) {
     position: absolute;
-    top: -400%;
+    top: -300%;
     height: 280%;
     width: 90%;
     background-color: #423624;
@@ -2875,4 +2993,64 @@ input[type="range"]:focus::-moz-range-thumb{
     position: relative;
     left:2.5%;
     filter: drop-shadow(0 0 0.2em #b7a81e);
+}
+
+#nut-shop-transcend {
+    justify-content: space-evenly;
+}
+
+.nut-transcend > div {
+    width: 90%;
+    height: 50%;
+    justify-content: space-evenly;
+}
+
+.nut-transcend > p {
+    font-size: 1.6em;
+    color: white;
+    text-align: center;
+    text-shadow: var(--text-shadow-075);
+}
+
+.nut-transcend > p:nth-child(3) {
+    font-size: 1em;
+    color: #254620;
+    text-shadow:none;
+}
+
+.nut-transcend > div > p {
+    width: 45%;
+    height: 100%;
+    text-align: center;
+    font-size: 1.2em;
+    background-color: #AAD4A5;
+    border: 0.2em solid #6e9168;
+    box-sizing: border-box;
+    border-radius: 0 0 1em 1em;
+    color: #254620;
+    filter: drop-shadow(0 0 0.2em #3f6139ea);
+}
+
+.nut-transcend > button {
+    height: 15%;
+    width: 60%;
+    font: inherit;
+    font-size: 1.2em;
+    color: white;
+    text-shadow: var(--text-shadow-075);
+    background-color: transparent;
+    background-image: url("./assets/tutorial/buttonBox.webp");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.nut-transcend > button:hover {
+    filter: drop-shadow(0 0 0.2em #5e7e5b) drop-shadow(0 0 0.1em #556f52);
+}
+
+.transcendLogo {
+    width: 20%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.2em #31522e) drop-shadow(0 0 0.2em #314f2f);
 }
