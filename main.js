@@ -4,7 +4,7 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2-3-160";
+const VERSIONNUMBER = "v0.2-3-180";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -101,20 +101,56 @@ function deleteConfirmMenu(type,location) {
     }
 }
 
+let currentlyClearing = false;
+function clearLocalStorage(forceReload) {
+    if (currentlyClearing != true) {
+        currentlyClearing = true;
+        let clearPromise = new Promise(function(myResolve, myReject) {
+            localStorage.clear();
+
+            if(localStorage.length === 0) {
+                myResolve(); 
+            } else {
+                myReject();
+            }
+        });
+        
+        clearPromise.then(
+            function(value) {
+                if (forceReload) {
+                    setTimeout(location.reload(),200)
+                }
+            },
+            function(error) {console.error("Error clearing local data")}
+        ); 
+    } 
+}
+
 function deleteConfirmButton(confirmed) {
     if (confirmed == true) {
         if (deleteType === "intro") {
             if (!startAlready) {
-                startAlready = true;    
-                localStorage.clear();
-                startGame(true);
-                setTimeout(()=>startText.remove(),200);
+                startAlready = true;
+                let clearPromise = new Promise(function(myResolve, myReject) {
+                    localStorage.clear();
+        
+                    if(localStorage.length === 0) {
+                        myResolve(); 
+                    } else {
+                        myReject();
+                    }
+                });
+                
+                clearPromise.then(
+                    function(value) {
+                        startGame(true);
+                        setTimeout(()=>startText.remove(),200);
+                    },
+                    function(error) {console.error("Error clearing local data")}
+                ); 
             }
         } else if (deleteType === "loaded") {
-            localStorage.clear();
-            setTimeout(()=>{
-                location.reload();
-            },200);
+            clearLocalStorage(true);
         } 
     }
         
@@ -170,7 +206,7 @@ let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
-const EVENTCOOLDOWN = 10;
+const EVENTCOOLDOWN = 50;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
@@ -307,7 +343,7 @@ function timerEvents() {
     timerSeconds += timeRatioTemp;
     
     checkAchievement();
-    saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff;
+    saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff;console.log
     refresh();
     dimHeroButton();
     addNewRow(true);
@@ -771,6 +807,9 @@ function reactionEvent() {
     let reactionImage = document.createElement("div");
     reactionImage.id = "reaction-image";
 
+    let eventDescription = document.createElement("p");
+    eventDescription.innerText = "Click the button just \n when the clock stops ticking.";
+    eventDescription.classList.add("event-description");
     let reactionImageBottom = document.createElement("img");
     reactionImageBottom.src = "./assets/event/clock-back.webp";
     reactionImageBottom.id = "reaction-image-bot";
@@ -817,7 +856,7 @@ function reactionEvent() {
     },randomTime);
     
     reactionImage.append(reactionImageBottom,reactionImageArrow,reactionImageTop)
-    eventBackdrop.append(reactionImage,reactionButton);
+    eventBackdrop.append(eventDescription,reactionImage,reactionButton);
     mainBody.append(eventBackdrop);
 }
 
@@ -934,11 +973,23 @@ function minesweeperEvent() {
     stopSpawnEvents = true;
     var mines = randomInteger(6,8);
     let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
-    let mineInfo = document.createElement("img");
-    mineInfo.src = "./assets/event/mine-info.webp"
-    mineInfo.id = "mine-info";
+    eventBackdrop.classList.add("cover-all","flex-row","event-dark","minesweeper-backdrop");
+    eventBackdrop.style.flexWrap = "wrap";
+    eventBackdrop.style.columnGap = "1%";
 
+    let eventDescription = document.createElement("p");
+    eventDescription.innerText = "Reveal all the tiles \n without whopperflowers!";
+    eventDescription.classList.add("event-description");
+
+    let mineInfo = document.createElement("div");
+    mineInfo.id = "mine-info";
+    mineInfo.classList.add("flex-column")
+    let mineInfoTop = new Image();
+    mineInfoTop.src = "./assets/event/minesweeper-top.webp";
+    let mineInfoBot = new Image();
+    mineInfoBot.src = "./assets/event/minesweeper-bot.webp";
+    mineInfo.append(mineInfoTop,mineInfoBot)
+    
     let mineBackground = document.createElement("table");
     let board;
     let firstClick = true;
@@ -1066,14 +1117,26 @@ function minesweeperEvent() {
                     let randomPrimo = randomInteger(200,400);
                     adventure(10);
                     newPop(1);
-                    eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop, "primogem", randomPrimo);
+                    eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop);
+                    setTimeout(()=>{currencyPopUp("items",0,"primogem", randomPrimo)},4000)
                 }
             });
             tr.appendChild(td);
         }
-    mineBackground.appendChild(tr);
+        mineBackground.appendChild(tr);
     }
-    eventBackdrop.append(mineBackground,mineInfo)
+
+    let cancelBox = document.createElement("button");
+    cancelBox.classList.add("cancel-event");
+    cancelBox.innerText = "Give Up...";
+    cancelBox.addEventListener("click",()=>{
+        if (eventBackdrop != null) {
+            eventBackdrop.remove();
+            stopSpawnEvents = false;
+        }
+    })
+
+    eventBackdrop.append(eventDescription,mineBackground,mineInfo,cancelBox);
     mainBody.append(eventBackdrop);
 }
 
@@ -1088,6 +1151,13 @@ function weaselEvent(specialWeasel) {
 
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","event-dark","flex-row","event-dark-row");
+    eventBackdrop.style.flexWrap = "wrap";
+    let eventDescription = document.createElement("p");
+    eventDescription.innerText = "Catch the glowing weasel!";
+    eventDescription.classList.add("event-description");
+    eventDescription.style.width = "100%";
+    eventDescription.style.position = "relative";
+    eventDescription.style.top = "5%";
     let weaselBack = document.createElement("div");
     weaselBack.classList.add("flex-row","weasel-back");
 
@@ -1142,7 +1212,7 @@ function weaselEvent(specialWeasel) {
     fakeWeaselAlert.classList.add("flex-row");
     fakeWeaselAlert.innerText = "Beware of the fake weasel thieves!";
 
-    eventBackdrop.append(weaselBack,weaselTimerDiv,fakeWeaselAlert);
+    eventBackdrop.append(eventDescription,weaselBack,weaselTimerDiv,fakeWeaselAlert);
     mainBody.append(eventBackdrop);
 }
 
@@ -1259,6 +1329,13 @@ function rainEvent() {
     let rainTextBackground = document.createElement("div");
     let rainTextDiv = document.createElement("p");
 
+    let eventDescription = document.createElement("p");
+    eventDescription.innerText = "Catch the falling nuts!";
+    eventDescription.classList.add("event-description");
+    eventDescription.style.position = "absolute";
+    eventDescription.style.top = "1%";
+    eventBackdrop.append(eventDescription)
+
     rainText.classList.add("event-rain-text");
     let dpsMultiplier = (saveValues.dps + 1)* 10;
     let tempScore = 0;
@@ -1359,13 +1436,10 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
 
         if (weaselCount >= 10) {
             innerTextTemp = `\n You received some items!`;
-            adventure(10);
-            adventure(10);
             newPop(1);
             amount = randomInteger(80,140);
         } else if (weaselCount >= 7) {
             innerTextTemp = `\n You received a few items!`;
-            adventure(10);
             newPop(1);
             amount = randomInteger(40,100);
         } else if (weaselCount >= 4) {
@@ -1419,7 +1493,7 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
                     }
                 } else if (type === "reaction") {
                     if (amount != 0) {
-                        currencyPopUp("primogem",amount);
+                        currencyPopUp("items",0,"primogem",amount);
                     }
                 }
                 removeClick.remove();
@@ -1428,7 +1502,9 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
     },outcomeDelay);
 
     setTimeout(()=> {
-        eventBackdrop.remove();
+        if (eventBackdrop != null) {
+            eventBackdrop.remove();
+        }
     },4000)
 }
 
@@ -1440,7 +1516,7 @@ function loadingAnimation() {
 
     let preloadArray = drawUI.preloadMinimumArray(upgradeInfo);
     preloadStart.fetch(preloadArray).then(() => {
-        setTimeout(() => {removeLoading()}, 2000);
+        setTimeout(() => {removeLoading()}, 300);
     });
 
     preloadStart.onerror = item => {
@@ -1458,6 +1534,7 @@ function removeLoading() {
         if (persistentValues.upgrade6.Purchased > 0) {
             idleAmount = idleCheck(idleAmount);
         }
+
         tutorial(idleAmount);
     }, 200);
 }
@@ -1527,6 +1604,7 @@ function tutorial(idleAmount) {
         if (idleAmount != 0) {
             let tutorialIdle = document.createElement("div");
             tutorialIdle.classList.add("flex-row","idle-dark");
+            tutorialIdle.id = "idle-nuts-div";
             let idleAmountText = document.createElement("p");
             idleAmountText.innerText = `+${abbrNum(idleAmount)}`;
             let idleNuts = document.createElement("img");
@@ -1546,7 +1624,10 @@ function tutorial(idleAmount) {
             timer = setInterval(timerEvents,timeRatio);
             currentBGM = playAudio();
             settingsVolume();
-            setTimeout(()=>{saveValues.realScore += idleAmount},250)
+            setTimeout(()=>{
+                if (document.getElementById('idle-nuts-div')) {document.getElementById('idle-nuts-div').remove()}
+                saveValues.realScore += idleAmount;
+            },250)
         });
 
         tutorialDark.appendChild(playButton);
@@ -1702,6 +1783,7 @@ function tabChange(x) {
 
 // SETTINGS MENU - SAVES & VOLUME CONTROL
 function settings() {
+    importClipboard("create");
     toggleClipboard("create");
     // JUST THE BUTTON FOR SETTING MENU
     let settingButton = document.createElement("button");
@@ -1817,11 +1899,19 @@ function settings() {
     let importSaveSetting = document.createElement("div");
     importSaveSetting.innerText = "Import Save";
     importSaveSetting.classList.add("flex-row");
-    importSaveSetting.addEventListener("click",importClipboard)
+    importSaveSetting.addEventListener("click",()=>{importClipboard("toggle")})
+
+    let cancelButton = document.createElement("button");
+    cancelButton.classList.add("cancel-button");
+    cancelButton.addEventListener("click",()=>{
+        settingsMenu.style.zIndex = -1;
+        settingsOpen = false;
+        deleteConfirmMenu("close","loaded");
+    })
 
     settingsBottomRight.append(importSaveSetting,exportSaveSetting,infoSetting,saveSetting,clearSetting);
     settingsBottom.append(settingsBottomLeft,settingsBottomRight);
-    settingsMenu.append(settingsText, volumeScrollerContainer, settingsBottom);
+    settingsMenu.append(settingsText, volumeScrollerContainer, settingsBottom,cancelButton);
     mainBody.appendChild(settingsMenu);
 
     settingButton.addEventListener("click", () => {
@@ -1835,6 +1925,7 @@ function settings() {
 let settingsOpen = false;
 function toggleSettings(closeOnly) {
     toggleClipboard("close");
+    importClipboard("close");
     let settingsMenu = document.getElementById("settings-menu");
     if (settingsOpen == true) {
         settingsMenu.style.zIndex = -1;
@@ -1896,6 +1987,7 @@ function toggleClipboard(type) {
     } else if (type == "toggle") {
         let textBox = document.getElementById("text-box");
         if (textBox.style.zIndex == -1) {
+            importClipboard("close");
             textBox.children[0].value = JSON.stringify(localStorage);
             textBox.style.zIndex = 10000;
         } else {
@@ -1909,23 +2001,71 @@ function toggleClipboard(type) {
     }
 }
 
-function importClipboard() {
-    let promptSave = prompt("Import Save:", "Paste Save Data");
-    if (promptSave != null) {
-        let localStorageTemp = tryParseJSONObject(promptSave);
+function importClipboard(type) {
+    if (type == "create") {
+        let textBoxDiv = document.createElement("div");
+        textBoxDiv.classList.add("text-box");
+        textBoxDiv.id = "import-box";
+        textBoxDiv.style.zIndex = -1;
 
-        preventSave = true;
-        if (localStorageTemp === false) {
-            alert("Invalid save data.")
-            console.error("Invalid save data.");
-        } else {
-            localStorage.clear(); 
-            for (let key in localStorageTemp) {
-                localStorage.setItem(key, localStorageTemp[key]);
+        let textBox = document.createElement("textarea");
+        textBox.value = "Paste save data here.";
+        let cancelButton = document.createElement("button");
+        cancelButton.addEventListener("click",()=>{
+            textBoxDiv.style.zIndex = -1;
+        })
+
+        let copyButton = document.createElement("button");
+        copyButton.innerText = "Import Data";
+        copyButton.addEventListener("click",()=>{
+            let promptSave = textBox.value;
+            if (promptSave != null) {
+                let localStorageTemp = tryParseJSONObject(promptSave);
+        
+                preventSave = true;
+                if (localStorageTemp === false) {
+                    alert("Invalid save data.")
+                    console.error("Invalid save data.");
+                } else {
+                    let clearPromise = new Promise(function(myResolve, myReject) {
+                        localStorage.clear();
+            
+                        if(localStorage.length === 0) {
+                            myResolve(); 
+                        } else {
+                            myReject();
+                        }
+                    });
+                    
+                    clearPromise.then(
+                        function(value) {
+                            for (let key in localStorageTemp) {
+                                localStorage.setItem(key, localStorageTemp[key]);
+                            }
+                            setTimeout(()=>location.reload(),200);
+                        },
+                        function(error) {console.error("Error clearing local data")}
+                    ); 
+                }
+                preventSave = false;
             }
-            location.reload();
+        })
+        
+        textBoxDiv.append(textBox,cancelButton,copyButton);
+        mainBody.appendChild(textBoxDiv);
+    } else if (type == "toggle") {
+        let textBox = document.getElementById("import-box");
+        if (textBox.style.zIndex == -1) {
+            toggleClipboard("close");
+            textBox.style.zIndex = 10000;
+        } else {
+            textBox.style.zIndex = -1;
         }
-        preventSave = false;
+    } else if (type == "close") {
+        let textBox = document.getElementById("import-box");
+        if (textBox.style.zIndex != -1) {
+            textBox.style.zIndex = -1;
+        }
     }
 }
 
@@ -2593,7 +2733,9 @@ function adventure(type) {
             adventureElement.load();
             adventureElement.play();
             if (type === 5 && goldenNutUnlocked === true && expeditionDict[type].Locked !== '1') {
-                currencyPopUp("nuts",randomInteger(5,10))
+                currencyPopUp("items",0,"nuts",randomInteger(5,10))
+            } else {
+                currencyPopUp("items")
             }
         } else {
             weaselDecoy.load();
@@ -3191,7 +3333,11 @@ function changeTooltip(dict, type, number) {
         tooltipInterval = null;
     }
     tooltipName.innerText = dict.Name;
-    tooltipLore.innerText = dict.Lore;
+    let lore = dict.Lore;
+    lore = lore.replaceAll("[s]",`<span style='color:#A97803'>`)
+    lore = lore.replaceAll("[/s]",`</span>`)
+    lore = lore.replaceAll("\n",`<br>`)
+    tooltipLore.innerHTML = lore;
 
     if (type == "hero") {
         let tooltipTextLocal = "Level: " + upgradeDict[number]["Purchased"] + 
@@ -3534,26 +3680,26 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     let shopCost = 0;
     switch (inventoryTemp.Star) {
         case 2:
-            shopCost = Math.round(randomInteger(35,55)/ 5) * 5;
+            shopCost = Math.round(randomInteger(35,55) * costDiscount / 5) * 5;
             break;
         case 3: 
-            shopCost = Math.round(randomInteger(70,100)/ 5) * 5;
+            shopCost = Math.round(randomInteger(70,100) * costDiscount / 5) * 5;
             break;
         case 4:
-            shopCost = Math.round(randomInteger(140,210)/ 5) * 5;
+            shopCost = Math.round(randomInteger(140,210) * costDiscount / 5) * 5;
             break;
         case 5:
-            shopCost = Math.round(randomInteger(300,400)/ 5) * 5;
+            shopCost = Math.round(randomInteger(300,400) * costDiscount / 5) * 5;
             break;
         case 6:
-            shopCost = Math.round(randomInteger(600,750)/ 5) * 5;
+            shopCost = Math.round(randomInteger(600,750) * costDiscount / 5) * 5;
             break;
         default:
             console.error("Shop error: Invalid shop cost");
             break;
     }
 
-    shopCost *= costDiscount;
+    shopCost ;
     let shopButtonPrimo = document.createElement("img");
     shopButtonPrimo.classList.add("shop-button-primo");
     shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
@@ -3579,9 +3725,9 @@ function nutCost(id) {
     let cost;
 
     if (scaleCeiling === 50) {
-        cost = Math.ceil(1.5**(amount))
+        cost = Math.ceil((amount)**2)
     } else if (scaleCeiling === 25) {
-        cost = Math.ceil(2**(amount))
+        cost = Math.ceil((amount)**3)
     }
     return cost;
 }
@@ -3704,11 +3850,12 @@ function addNutStore() {
     bodyText.append(bodyTextLeft,bodyTextRight);
 
     let bodyTextBottom = document.createElement("p");
-    bodyTextBottom.innerText = "Gain more by upgrading heroes, getting achievements \n & getting  more nuts (golden or otherwise).";
+    bodyTextBottom.innerText = "Gain more by upgrading heroes, getting achievements, \n primogems & nuts (golden or otherwise).";
 
     let trascendButton = document.createElement("button");
     trascendButton.innerText = "Yes";
     trascendButton.addEventListener("click",()=>{
+        calculateGoldenCore();
         toggleTranscendMenu();
     })
     nutTranscend.append(titleText,bodyText,bodyTextBottom,trascendButton);
@@ -3719,11 +3866,9 @@ function addNutStore() {
 }
 
 function calculateGoldenCore(type) {
-    let goldenNutValue = Math.round((saveValues.heroesPurchased/100) + Math.log(saveValues.realScore) + saveValues.goldenNut + saveValues.achievementCount);
-    goldenNutValue = goldenNutValue**2;
-    if (goldenNutValue < 10000) {
-        goldenNutValue = 1;
-    }
+    let calculateNuts = 0;
+    if( saveValues.realScore > 1e6) {calculateNuts = Math.log(saveValues.realScore)}
+    let goldenNutValue = Math.round(((saveValues.heroesPurchased/25))*2 + calculateNuts + saveValues.primogem/10 + saveValues.goldenNut + saveValues.achievementCount * 3);
 
     if (type == "formula") {
         return goldenNutValue;
@@ -3751,6 +3896,7 @@ function createTranscendMenu() {
     mainBody.appendChild(transcendMenu)
 }
 
+let transcendDelay = null;
 function toggleTranscendMenu(forceClose) {
     toggleSettings(true);
     deleteConfirmMenu("close","loaded");
@@ -3758,7 +3904,10 @@ function toggleTranscendMenu(forceClose) {
 
     if (transcendMenu.style.zIndex == -1) {
         transcendMenu.style.zIndex = 200;
-        setTimeout(()=>{
+
+        if(transcendDelay != null) {clearTimeout(transcendDelay)};
+        transcendDelay = setTimeout(()=>{
+            transcendDelay = null;
             if (transcendMenu.style.zIndex != -1) transcendMenu.style.zIndex = -1;
         },6000);
     } else {
@@ -3773,32 +3922,47 @@ function transcendFunction() {
         preventSave = true;
         forceStop = false; 
         saveData(true);
+        drawUI.preloadImage(1,"transcend",true);
 
-        localStorage.clear();
-        console.log(localStorage.length)
-        let overlay = document.getElementById("loading");
-        overlay.style.zIndex = 100000;
-        overlay.children[0].style.backgroundImage = "url(./assets/bg/wood.webp";
-
-        let oldGif = overlay.children[0].children[0];
-        let newGif = oldGif.cloneNode(true);
-        oldGif.parentNode.replaceChild(newGif, oldGif);
-        newGif.src = "./assets/loading.webp";
-        newGif.classList.add("overlay-tutorial")
-
-        persistentValues.goldenCore += calculateGoldenCore("formula");
-        
-        localStorage.setItem("settingsValues", JSON.stringify(settingsValues));
-        localStorage.setItem("persistentValues", JSON.stringify(persistentValues));
-
-        let newSaveValues = saveValuesDefault;
-        newSaveValues.goldenTutorial = true;
-        localStorage.setItem("saveValuesSave", JSON.stringify(newSaveValues));
-        console.log(localStorage.length)
-        
         setTimeout(()=>{
-            location.reload();
-        },3000);
+            let clearPromise = new Promise(function(myResolve, myReject) {
+                localStorage.clear();
+
+                if(localStorage.length === 0) {
+                    myResolve(); 
+                } else {
+                    myReject();
+                }
+            });
+            
+            clearPromise.then(
+                function(value) {
+                    let overlay = document.getElementById("loading");
+                    overlay.style.zIndex = 100000;
+                    overlay.children[0].style.backgroundImage = "url(./assets/bg/wood.webp";
+
+                    let oldGif = overlay.children[0].children[0];
+                    let newGif = oldGif.cloneNode(true);
+                    oldGif.parentNode.replaceChild(newGif, oldGif);
+                    newGif.src = "./assets/transcend.webp";
+                    newGif.classList.add("overlay-tutorial")
+
+                    persistentValues.goldenCore += calculateGoldenCore("formula");
+                    
+                    localStorage.setItem("settingsValues", JSON.stringify(settingsValues));
+                    localStorage.setItem("persistentValues", JSON.stringify(persistentValues));
+
+                    let newSaveValues = saveValuesDefault;
+                    newSaveValues.goldenTutorial = true;
+                    localStorage.setItem("saveValuesSave", JSON.stringify(newSaveValues));
+                    
+                    setTimeout(()=>{
+                        location.reload();
+                    },3000);
+                },
+                function(error) {console.error("Error clearing local data")}
+            ); 
+        },500);
     }
 }
 
@@ -4003,6 +4167,10 @@ function currencyPopUp(type1, amount1, type2, amount2) {
         currencyPopFirstImg.src = "./assets/icon/mailLogo.webp";
         currencyPopFirstImg.classList.add("icon","primogem");
         saveValues.mailCore += amount1;
+    } else if (type1 === "items") {
+        currencyPopFirst.innerText = "Items";
+        currencyPopFirstImg.src = "./assets/icon/item.webp";
+        currencyPopFirstImg.classList.add("icon","primogem");
     }
 
     currencyPopFirst.append(currencyPopFirstImg);

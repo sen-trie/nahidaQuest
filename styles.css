@@ -668,7 +668,7 @@ table, button, label {
 
 .event-dark {
     z-index: 10000;
-    row-gap: 3%;
+    row-gap: 2%;
 }
 
 .event-dark-row {
@@ -685,6 +685,33 @@ table, button, label {
     bottom: 0;
     left: 0;
     opacity: 0.95;
+}
+
+.event-description {
+    font: inherit;
+    font-size: 2em;
+    text-align: center;
+    color: white;
+    z-index: 10001;
+    text-shadow: var(--text-shadow-075);
+    pointer-events: none;
+    position: relative;
+    top: 1%;
+}
+
+.cancel-event {
+    position: absolute;
+    top:1%;
+    right:1%;
+    width: 15%;
+    aspect-ratio: 4.6;
+    font: inherit;
+    color: #710c12;
+    background-image: url(./assets/tutorial/exitBox.webp);
+    background-size: contain; 
+    background-color: transparent;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .event-rain-text {
@@ -748,7 +775,7 @@ table, button, label {
 #reaction-image {
     position: relative;
     z-index: 10001;
-    width: 30%;
+    height: 50%;
     aspect-ratio: 1;
 }
 
@@ -858,7 +885,7 @@ table, button, label {
     position: relative;
     left: 4%;
     width: 70%;
-    height: 90%;
+    height: 80%;
     background-image: url(./assets/event/weasel-back.webp);
     background-size: contain;
     display: flex;
@@ -1062,11 +1089,13 @@ table, button, label {
     0% {opacity: 1}
     100% {opacity: 0}
 }
+
+.minesweeper-backdrop > p {
+    flex-basis: 100%;
+}
   
 .event-mine-bg {
-    position: relative;
-    left: -4%;
-    width: 50%;
+    height: 85%;
     aspect-ratio: 1;
     z-index: 101;
     background-repeat: no-repeat;
@@ -1076,9 +1105,16 @@ table, button, label {
 }
 
 #mine-info {
-    position: absolute;
-    right: 3%;
-    width: 23%;
+    width: 30%;
+    z-index: 101;
+    height: 85%;
+    row-gap: 2%;
+}
+
+#mine-info > img {
+    height: auto;
+    
+    width: 100%;
     object-fit: contain;
 }
 
@@ -1245,6 +1281,19 @@ table, button, label {
     filter: drop-shadow(0.3em 0.3em 0.2em #474d45);
 }
 
+.cancel-button {
+    position: absolute;
+    bottom: 97%;
+    left: 98%;
+    height:10%;
+    aspect-ratio: 1;
+    background-color: transparent;
+    background-image: url(./assets/icon/cancel.webp);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
 .settings-text {
     position: relative;
     width: 90%;
@@ -1332,7 +1381,8 @@ table, button, label {
 }
 
 .confirm-button-div :first-child {
-    filter: contrast(135%) hue-rotate(250deg);
+    background-image: url(./assets/tutorial/exitBox.webp);
+    color: #651418;
 }
 
 .confirm-button-div > button {
@@ -2507,7 +2557,7 @@ input:checked + .slider:before {
     flex-direction: column;
     gap: 0.5%;
     align-items: center;
-    color: #43351c;
+    color: #5c461f;
 }
 
 #table6 > div {

@@ -354,6 +354,10 @@ body {
 }
 
 /* EVENTS MOBILE CSS */
+.event-dark {
+    row-gap: 1%;
+}
+
 .event-dropdown {
     width: 80%;
     left: 10%;
@@ -377,7 +381,7 @@ body {
 }
 
 #reaction-image {
-    width: 55%;
+    height: 60%;
 }
 
 #reaction-button {
@@ -397,21 +401,50 @@ body {
     height: 25%;
 }
 
+.minesweeper-backdrop {
+    flex-direction: column;
+}
+
+.minesweeper-backdrop > p {
+    height: auto;
+    width: 100%;
+    flex-basis: 0;
+}
+
 .event-mine-bg {
     left: 0;
     top: 0;
     left: 0;
     height: 60%;
-    width: auto;
     aspect-ratio: 1;
+}
+
+.event-mine-bg > tr > td {
+    width: 12%;
+    height: 12%;
+    background-size: cover;
 }
 
 #mine-info {
     position: relative;
-    height: 30%;
-    width: auto;
+    flex-direction: row;
+    height: 20%;
+    width: 90%;
+}
+
+#mine-info > img {
+    height: 100%;
+    width: 50%;
+    object-fit: contain;
 }
 
 .weasel-back {
-    height: 60%;
+    height: 70%;
+    width: 80%;
+    left: 0;
+}
+
+.weasel-timer-div {
+    left: 0;
+    height: auto;
 }

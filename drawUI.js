@@ -49,17 +49,6 @@ function preloadMinimumArray(upgradeInfo) {
     return array;
 }
 
-
-function preloadFolders() {
-    let filePath = "./assets/";
-    let m = 0;
-    while (m < 5) {
-        let imgOne = new Image();
-        imgOne.src = filePath + "achievement/" + (m * 100) + ".webp";
-        m++;
-    }
-}
-
 function preloadImage(max,path,single) {
     let filePath = "./assets/";
     let i = 1;
@@ -316,4 +305,4 @@ function drawMailTable(table4) {
     return table4;
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadMinimumArray }
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadMinimumArray,preloadImage }
