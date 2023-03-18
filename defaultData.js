@@ -2,7 +2,7 @@ let saveValuesDefault = {
     clickCount:0,
     clickFactor:1,
     dps:0,
-    realScore:1e12,
+    realScore:0,
     freeLevels:0,
     primogem:0,
     energy:100,
@@ -40,7 +40,7 @@ let SettingsDefault = {
 
 let permUpgrades = {
     1:{Name:"Blessing of Vitality",        Effect:10,  Max:50,   Cap:false,   Description:"Increases Energy gained by clicking Big Nahida."},
-    2:{Name:"Blessing of Technique",       Effect:10,  Max:50,   Cap:false,   Description:"Increase Nuts gained by clicking Big Nahida."},
+    2:{Name:"Blessing of Technique",       Effect:15,  Max:50,   Cap:false,   Description:"Increase Nuts gained by clicking Big Nahida."},
     3:{Name:"Blessing of Wanderlust",      Effect:2,   Max:50,   Cap:true,   Description:"Increases base power of Wish characters."},
     4:{Name:"Blessing of Concession",      Effect:2,   Max:25,   Cap:true,   Description:"Decreases price of Dori's Shop items."},
     5:{Name:"Blessing of Might",           Effect:1,   Max:50,   Cap:true,   Description:"Increases critical hit amount and chance.",   zeroDescription:"Enables critical hits for clicking Big Nahida."},

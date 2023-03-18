@@ -33,8 +33,12 @@
 }
 
 .overlay-tutorial {
-    width: 95%;
+    width: 95% !important;
     object-fit: contain;
+}
+
+.tutorial-screen {
+    width: 90%;
 }
 
 body {
@@ -132,18 +136,19 @@ body {
 }
 
 .score-container {
-    top: 2%;
+    top: 0;
     height: 18%;
 }
 
 #demo-container {
-    top: 5%;
-    height: 65%;
+    top: 0%;
+    height: 64%;
 }
 
 .settings-menu {
     left: 10%;
     width: 80%;
+    font-size: 1.2em;
 }
 
 .pop-new {
@@ -156,7 +161,76 @@ body {
     height: 25%;
 }
 
-/* MOBILE CSS FOR TABLES */
+.achieve {
+    bottom: 3%;
+    height: 15%;
+    width: auto;
+    aspect-ratio: 7;
+    z-index: 10;
+}
+
+.confirm-box {
+    font-size: 1.15em;
+    width: 70%;
+    left:15%;
+}
+
+.nut-store-access {
+    right: 2%;
+    bottom: 7%;
+    height: 25%;
+}
+
+.nut-store-table > div {
+    height: 65%;
+    width: 80%;
+    top: 20%;
+}
+
+.nut-shop-button {
+    height: 60%;
+    width: 87%;
+}
+
+.nut-store-table > :last-child {
+    height: 10%;
+    top: 10%;
+    left: 12%;
+}
+
+.nut-store-table > img {
+    height: 19%;
+}
+
+.nut-store-table > button {
+    height: 12%;
+}
+
+#nut-shop-transcend {
+    justify-content: unset;
+    row-gap: 3%;
+}
+
+.nut-transcend > p {
+    height: auto;
+    font-size: 1.4em;
+}
+
+.nut-transcend > div > p {
+    font-size: 1em;
+}
+
+.nut-transcend > div {
+    height: 80%;
+}
+
+.nut-transcend > button {
+    height: unset;
+    min-width: 50%;
+    aspect-ratio: 4.6;
+}
+
+/*/////////////////////////////////// MOBILE CSS FOR TABLES ///////////////////////////////////////*/
 .right-area {
     z-index: 3;
 }
@@ -165,8 +239,7 @@ body {
 }
 
 .upgrade {
-    height: 25%;
-    max-height: 25%;
+    max-height: 24%;
 }
 
 #table3 {
@@ -174,7 +247,7 @@ body {
 }
 
 #expedDiv {
-    width:40%;
+    width:45%;
     height: 70%;
     overflow-x: scroll;
     flex-direction: row;
@@ -208,10 +281,18 @@ body {
 }
 
 .tooltipEXPED {
-    width: 55%;
+    width: 50%;
     height: 60%;
+    right: 1%;
     font-size: 0.95em;
     /* background-image: url(./assets/frames/tooltipEXPED-mobile.webp); */
+}
+
+#adventure-tutorial {
+    right: 1%;
+    top: 2%;
+    height: 12%;
+    z-index: 30;
 }
 
 #adventure-button {
@@ -223,13 +304,34 @@ body {
     height: 20%;
 }
 
+.tool-tip-lore {
+    height: 45%;
+    font-size: 1em;
+}
+
 #exped-row-1 {
     align-items: center;
 }
 
+#exped-row-1 > img {
+    height: 65%;
+}
+
 .wish-button {
-    height: 25%;
-    bottom: 1%;
+    top: unset;
+    width: 50%;
+    bottom: -25%;
+}
+
+#wish-tutorial {
+    height: 15%;
+}
+
+#wish-tutorial-text {
+    padding: 1.5%;
+    bottom: 30%;
+    font-size: 1.1em;
+    border: 0.2em solid #876547;
 }
 
 #wish-counter-display {
@@ -256,13 +358,12 @@ body {
 }
 
 .toolImgContainer {
-    height: 20%;
     width: auto;
 }
 
 .tool-tip-extraimg {
     width: auto;
-    height: 20%;
+    height: 23%;
     flex-direction: column;
 }
 
@@ -305,6 +406,10 @@ body {
     width: 65%;
 }
 
+#table7 {
+    justify-content: center;
+}
+
 #table7 > img {
     height: 70%;
 }
@@ -336,7 +441,8 @@ body {
 }
 
 .store-timer {
-    height: 15%;
+    height: 17%;
+    width: 90%;
     background-image: url(./assets/frames/dori-deals-long.webp);
 }
 
@@ -353,7 +459,12 @@ body {
     border: 0.2em solid #756F60;
 }
 
-/* EVENTS MOBILE CSS */
+/*////////////////////////// EVENTS MOBILE CSS //////////////////////////*/
+.event-description {
+    top: -1%;
+}
+
+
 .event-dark {
     row-gap: 1%;
 }
@@ -439,12 +550,22 @@ body {
 }
 
 .weasel-back {
-    height: 70%;
+    aspect-ratio: 1.23;
+    max-height: 70%;
+    height: unset;
     width: 80%;
     left: 0;
+    top: -5%;
 }
 
 .weasel-timer-div {
     left: 0;
     height: auto;
+    top: -5%;
+}
+
+#fake-weasel-alert {
+    width: 70%;
+    height: 8%;
+    font-size: 1.5em;
 }

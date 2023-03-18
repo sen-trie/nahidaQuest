@@ -1927,7 +1927,9 @@ input:checked + .slider:before {
 
     color: white;
     width: 98%;
-    height: 14%;
+    height: auto;
+    max-height: 13%;
+    aspect-ratio: 6.25;
     font-size: 0.85em;
     position: relative;
     transition: 0.4s ease;
@@ -2183,10 +2185,11 @@ input:checked + .slider:before {
 #wish-tutorial-text {
     z-index: 15;
     position: absolute;
-    bottom: 5%;
-    width: 80%;
-    height: 20%;
-    font-size: inherit;
+    bottom: 25%;
+    padding: 2%;
+    width: auto;
+    height: auto;
+    font-size: 1.2em;
     text-align: center;
     display: none;
     justify-content: center;
@@ -2271,8 +2274,9 @@ input:checked + .slider:before {
     box-sizing: border-box;
     top: -2%;
     font-size: 1em;
-    height: 50%;
+    height: 60%;
     align-items: flex-start;
+    overflow-y: auto;
 }
 
 .after-icon {
@@ -2297,8 +2301,9 @@ input:checked + .slider:before {
     font-family: gi-font;
     position: absolute;
     top: 100%;
-    height: 18%;
     width: 70%;
+    height: unset;
+    aspect-ratio: 4.3;
     font-size: inherit;
     color: #F8E8C7;
     text-shadow: #73603D 0.15em 0.15em 0.1em;
@@ -2351,9 +2356,9 @@ input:checked + .slider:before {
 
 #wish-tutorial {
     position: absolute;
-    bottom: -15%;
-    left: -2%;
-    height: 11%;
+    bottom: 2%;
+    left: 2%;
+    height: 7%;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0.15em 0.15em 0.07em #e6b880a1);
@@ -2549,7 +2554,8 @@ input:checked + .slider:before {
 /*/////////////////////////////// TOOLTIP UI (TABLE6) CSS ///////////////////////////////*/
 #table6 {
     padding-top: 1.5%;
-    font-size: inherit;
+    font: inherit;
+    font-size: 1.08em;
     position: relative;
     width: 30%;
     height: 100%;
@@ -2562,7 +2568,6 @@ input:checked + .slider:before {
 
 #table6 > div {
     z-index: 5;
-    max-width: 86%;
 }
 
 .toolImg {
@@ -2609,15 +2614,24 @@ input:checked + .slider:before {
     font-size: 1.0;
     text-align: center;
     max-height: 10%;
+    width: 100%;
 }
 
 .tool-tip-text {
-    font-size:  0.9em;
+    font-size:  0.8em;
     text-align: center;
 }
 
 .tool-tip-lore {
-    font-size: 0.85em;
+    font-size: 0.9em;
+    margin-left: 7%;
+    margin-right: 7%;
+    overflow-y: scroll;
+    height: 38%;
+}
+
+.tool-tip-lore::-webkit-scrollbar {
+    width: 0.3vw;
 }
 
 .tool-tip-extraimg {

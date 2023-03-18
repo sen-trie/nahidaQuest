@@ -206,7 +206,7 @@ let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
-const EVENTCOOLDOWN = 70;
+const EVENTCOOLDOWN = 10;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
@@ -3022,7 +3022,8 @@ function wishUnlock() {
     wishCurrencyImage.src = "./assets/icon/mailLogo.webp";
     
     wishCurrencyCounter.appendChild(wishCurrencyImage);
-    wishContainer.append(wishTutorial,wishHelpText,wishNpsDisplay,wishCurrencyCounter);
+    wishContainer.append(wishNpsDisplay,wishCurrencyCounter);
+    wishContainer.parentNode.append(wishTutorial,wishHelpText)
     updateWishDisplay();
 }
 
@@ -3291,9 +3292,10 @@ function checkAchievement() {
 function createTooltip() {
     tooltipName = document.createElement("div");
     tooltipName.classList += " tool-tip-name";
-
+    
     toolImgContainer = document.createElement("div");
     toolImgContainer.classList.add("toolImgContainer","background-image-cover");
+    toolImgContainer.style.display = "none";
     toolImg = document.createElement("img");
     toolImg.src = "./assets/tooltips/Empty.webp";
     toolImg.classList.add("toolImg");
@@ -3339,6 +3341,10 @@ function changeTooltip(dict, type, number) {
     lore = lore.replaceAll("\n",`<br>`)
     tooltipLore.innerHTML = lore;
 
+    if (toolImgContainer.style.display != "block") {
+        toolImgContainer.style.display = "block";
+    }
+
     if (type == "hero") {
         let tooltipTextLocal = "Level: " + upgradeDict[number]["Purchased"] + 
                                 "\n Free Levels: " + saveValues["freeLevels"] + 
@@ -3382,6 +3388,7 @@ function changeTooltip(dict, type, number) {
             tooltipElementImg.style.display = "none";
             tooltipElementImg.style.margin = "0";
         }
+
         return;
     }
 }
@@ -3399,6 +3406,7 @@ function clearTooltip() {
 
         tooltipText.innerText = "";
         tooltipLore.innerText = "";
+        toolImgContainer.style.display = "none";
         tooltipWeaponImg.src = "./assets/tooltips/Empty.webp";
         tooltipWeaponImg.style.display = "none"
         tooltipElementImg.src = "./assets/tooltips/Empty.webp";
