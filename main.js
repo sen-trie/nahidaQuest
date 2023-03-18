@@ -4,7 +4,7 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.2-3-180";
+const VERSIONNUMBER = "v0.3-3-180";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -206,7 +206,7 @@ let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
-const EVENTCOOLDOWN = 50;
+const EVENTCOOLDOWN = 70;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
@@ -3699,7 +3699,7 @@ function createShopItems(shopDiv, i, inventoryNumber) {
             break;
     }
 
-    shopCost ;
+    shopCost;
     let shopButtonPrimo = document.createElement("img");
     shopButtonPrimo.classList.add("shop-button-primo");
     shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
@@ -4103,7 +4103,7 @@ function refresh() {
 
 // POP UPS FOR EXPEDITIONS UNLOCKS
 // NUMBER OF UPGRADES NEEDED TO UNLOCK EXPEDITIONS vvvv
-let heroUnlockLevels = [1e6,1e12,1e18];
+let heroUnlockLevels = [1e6,1e9,1e12];
 let expeditionCounter = 0;
 function checkExpeditionUnlock(heroesPurchasedNumber) {
     if (heroUnlockLevels.length == 0) {
