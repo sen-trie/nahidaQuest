@@ -79,12 +79,15 @@ function buildGame(mainBody) {
     leftDiv.classList.add("flex-column");
     leftDiv.id = "left-div";
     leftDiv.classList.add("left-area");
+    let screenTips = document.createElement("p");
+    screenTips.classList.add("screen-tips","flex-column");
+    screenTips.id = "screen-tips";
     let scoreDiv = document.createElement("div");
     scoreDiv.classList.add("score-container");
     scoreDiv.innerHTML = "<span id='score'>0</span><span id='dps'>0</span>"
     let demoContainer = document.createElement("div");
     demoContainer.id = "demo-container";
-    leftDiv.append(scoreDiv,demoContainer)
+    leftDiv.append(screenTips,scoreDiv,demoContainer)
 
     let midDiv = document.createElement("div");
     midDiv.id = "mid-div";

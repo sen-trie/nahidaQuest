@@ -145,6 +145,13 @@ body {
     height: 64%;
 }
 
+.screen-tips {
+    max-width: 22%;
+    left: 0;
+    top: 18%;
+    max-height: 25%;
+}
+
 .settings-menu {
     left: 10%;
     width: 80%;

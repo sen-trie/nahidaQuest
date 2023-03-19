@@ -51,6 +51,7 @@ let permUpgrades = {
     10:{Name:"Blessing of Strength",       Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
     11:{Name:"Blessing of Fortification",  Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
 }
+
 let upgradeDictDefault = {
     0:  {Row:-1,        Purchased: -1,   "Contribution": 0, "Level": 1, "BaseCost":20, Factor:1  },
     1:  {Row:-1,        Purchased: -1,    },
@@ -818,6 +819,48 @@ let expeditionDictDefault = {
     9:{Text:"Not enough Energy "                     ,Locked:"1" ,Lore:"Obtain more before going on Expeditions!"            },
 }
 
+let screenLoreDict = {
+    0:"Exploring the world of Teyvat can be dangerous, make sure to keep your party well-equipped with weapons and artifacts.",
+    1:"Don't forget to visit Dori's shop to buy new items.",
+    2:"Travelers who complete achievements can earn primogems and other rewards.",
+    3:"Thanks to the efforts of the Akademiya, the Akasha has now become a vault in which knowledge may be collected.",
+    4:"It is said that a Nara who helps many Aranara fulfill their wishes can gain rich rewards from the owner of the 'treasure chest'...",
+    5:"Somewhere in Vanarana, you can pick up a picture that appears like a postcard.",
+    6:"Aranara often give small flowers to people, a sign of the Aranara's precious friendship.",
+    7:"Aranara know no concept of gender nor family in the normal sense. However, some Aranara have gained this knowledge due to prior contact with humans.",
+    8:"Aranara can use their songs to control the weather in the Apam Woods.",
+    9:"The full name of Vanarana is 'Mahavanaranapna.' Even the Aranara find it to be too long, however.",
+    10:"The main task of the Forest Watchers and Forest Rangers is to observe the state of the rainforest and protect travelers.",
+    11:`The vast desert in the western part of Sumeru is known as the Great Red Sand.`,
+    12:`"Nahida" is also the name used for a genus of butterflies.`,
+    /// EXPEDITION LVL 3
+    13:`Perceive the world through illusory dreams, and nothing but the truth is revealed.`,
+    14:`Every little creature in the world has their own piece of paradise.`,
+    15:`Let colorful imagination in endless dreams inspire, and explore all possibilities of the universe.`,
+    16:`Plants take root in the boundless earth, and their leaves grow toward the stars. Until the branches bear fruit, containing the sky and the sea, wisdom and imagination.`,
+    17:`A caged bird secluded within the confines of the Sanctuary of Surasthana, who can only see the world in her dreams.`,
+    18:'Legend tells of an ancient tree whose roots reach every corner of the world...',
+    19:"Artifacts derive power from their original bearers' ambitions and memories.",
+    20:`The Aranara are Greater Lord Rukkhadevata's creations. Like Nara, they are the people of the forest.`,
+    21:`Nara seems to mean 'human'. Even if they know a human's name, the Aranara will append 'Nara-' as a prefix to it.`,
+    22:`On your adventure, you will encounter people who seem to be in dire need of help. Talk to these people, and they'll often have something for you to assist with.`,
+    /// EXPEDITION LVL 4
+    23:`We ask questions and receive replies in our dreams. When a myriad of dreams descends on the world, then it is time to say goodbye.`,
+    24:`"May the new dreams never experience Marana's corruption."`,
+    25:'There are mutated plants in this world that have intelligence and can manipulate the elements. Whopperflowers are able to use their mimetic flowers to trick their prey...',
+    26:'Weasel Thieves are creatures captured and trained by the Treasure Hoarders. From the contents of their bags, it seems like they have nicked some loose change.',
+    27:`Between canyons of the Desert of Hadramaveth, there are often camps of wandering tribes and desert bandits.`,
+    /// EXPEDITION LVL 5
+    28:`"The forest will remember."`,
+    29:`People often pray for a safe journey before embarking on a long trip. But if the wind really listened to others, why would it still wander the world?`,
+    30:"Food and potions cannot be consumed within the Spiral Abyss. Those seeking to conquer the Abyssal Moon Spire and Corridor must rely on their strength and courage alone.",
+    31:'Wherever you go, whatever life throws at you... In Teyvat, the stars in the sky will always have a place for you.',
+    32:'If humanity is measued by having a heart, then he cannot be deemed as such. If one without a heart experiences emotion, then he shall be a puppet most alike to humanity.',
+    33:'"Wanderer" is how he believes he be best described — having no home, kin nor destination. Like the breeze, he lives in this world, and he walks its length and breadth.',
+    34:`In the early days when Tatarasuna was still a prosperous place, the Wanderer walked amongst its people, going by the name 'Kabukimono'.`,
+    35:`Searching and seeking for an illusory obsession through countless nights. With melancholy and misery as company, malevolent winds mean naught to the Wanderer.`,
+}
+
 let achievementListDefault = {
     1: {Name:"Nut Collector",                         Description:"Collect 100 nuts"                            },
     2: {Name:"Fan of Nuts",                           Description:"Collect 10,000 nuts"                          },
@@ -854,11 +897,11 @@ let achievementListDefault = {
     113: {Name:"Bound by Fate",                       Description:"Reach 1 quintillion NpS"                    },
     114: {Name:"One for All",                         Description:"Reach 100 quintillion NpS"                  },
     115: {Name:"The Forest Will Remember",            Description:"Reach 1 sextillion NpS"                     },
-    116: {Name:"Champion of Tevyat",                  Description:"Reach 100 sextillion NpS"                     },
+    116: {Name:"Champion of Tevyat",                  Description:"Reach 100 sextillion NpS"                   },
     117: {Name:"Windborne Bard",                      Description:"Reach 1 septillion NpS"                     },
-    118: {Name:"Vago Mundo",                          Description:"Reach 100 septillion NpS"                     },
+    118: {Name:"Vago Mundo",                          Description:"Reach 100 septillion NpS"                   },
     119: {Name:"Plane of Euthymia",                   Description:"Reach 1 octtillion NpS"                     },
-    120: {Name:"The Physic of Purity",                Description:"Reach 100 octtillion NpS"                     },
+    120: {Name:"The Physic of Purity",                Description:"Reach 100 octtillion NpS"                   },
     201: {Name:"Welcome to Sumeru",                   Description:"Click 10 times"                             },
     202: {Name:"Just Getting Started",                Description:"Click 100 times"                            },
     203: {Name:"Into the Forest",                     Description:"Click 500 times"                            },
@@ -901,4 +944,4 @@ let achievementListDefault = {
     410: {Name:"A Golden Experience",                 Description:"Obtain 1000 Golden Nuts"                     },
 }
 
-export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades };
+export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict };

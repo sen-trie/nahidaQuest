@@ -1,12 +1,11 @@
-import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades } from "./defaultData.js"
+import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict } from "./defaultData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper } from "./functions.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.3-3-180";
+const VERSIONNUMBER = "v0.3-3-191";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
-
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
 let mainBody = document.getElementById("game");   
@@ -206,7 +205,7 @@ let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
-const EVENTCOOLDOWN = 10;
+const EVENTCOOLDOWN = 70;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
@@ -343,7 +342,7 @@ function timerEvents() {
     timerSeconds += timeRatioTemp;
     
     checkAchievement();
-    saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff;console.log
+    saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff;
     refresh();
     dimHeroButton();
     addNewRow(true);
@@ -524,7 +523,7 @@ demoContainer.addEventListener("mouseup", () => {
 });
 
 drawUI.demoFunction(demoContainer,demoImg);
-demoContainer.appendChild(demoImg);
+demoContainer.append(demoImg);
 
 function spawnFallingNut() {
     let number = randomInteger(2,6);
@@ -548,6 +547,33 @@ function energyRoll() {
             clickDelay = 20;
         }
     }
+}
+
+// SCREEN TIPS
+function screenTips() {
+    let screenTips = document.getElementById("screen-tips");
+    let maxInt = 13;
+    if (expeditionDict[5].Locked !== '1') {
+        maxInt = 36;
+    } else if (expeditionDict[4].Locked !== '1') {
+        maxInt = 28;
+    } else if (expeditionDict[3].Locked !== '1') {
+        maxInt = 23;
+    } 
+
+    screenTips.style.animation = "textFadeOut 2s ease-in-out";
+    setTimeout(() => {
+        let changeText = screenLoreDict[randomInteger(0,maxInt)];
+        while (screenTips.innerText == changeText) {
+            changeText = screenLoreDict[randomInteger(0,maxInt)];
+        }
+        screenTips.innerText = changeText;
+        
+    },1000);
+    screenTips.addEventListener('animationend',()=>{
+        screenTips.style.animation = "none";
+        void screenTips.offsetWidth;
+    })
 }
 
 // UPDATES VALUES WITH PERSISTENT VALUES
@@ -1525,6 +1551,11 @@ function loadingAnimation() {
 }
 
 function removeLoading() {
+    let screenTipsDiv = document.getElementById("screen-tips");
+    screenTipsDiv.innerText = screenLoreDict[0];
+    let screenTipsInterval = setInterval(()=>{
+        screenTips();
+    },30000);
     setTimeout(() => {
         let overlay = document.getElementById("loading");
         let idleAmount = 0;
