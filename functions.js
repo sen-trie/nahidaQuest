@@ -79,11 +79,11 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
         if (upgradeDict[i].Locked === true) {continue}
         let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero-1)*1.25)));
         let baseLevel = Math.round(0.75 * baseCost);
-        upgradeDict[i]["BaseCost"] = Number(baseCost.toPrecision(3));
-        upgradeDict[i]["Level"] = baseLevel;
+        upgradeDict[i]["BaseCost"] = Number(baseCost.toPrecision(3)).toExponential(3);
+        upgradeDict[i]["Level"] = baseLevel.toExponential(3);
         
         let baseATK = Math.round(initATKCost * (multiplierATKCost **((currentHero-1)*3.2)));
-        upgradeDict[i]["Factor"] = Number(baseATK.toPrecision(3));
+        upgradeDict[i]["Factor"] = Number(baseATK.toPrecision(3)).toExponential(3);
         upgradeDict[i]["Contribution"] = 0;
         currentHero++;
     }
@@ -121,7 +121,7 @@ function unlockExpedition(i,expeditionDict) {
     let unlockButton = document.getElementById(expedID);
     let backgroundImage = "url(./assets/expedbg/exped" + i + ".webp) center center / contain no-repeat";
 
-    expeditionDict[i].Locked = 0;
+    expeditionDict[i] = 0;
     unlockButton.style.background = backgroundImage;
 }
 
@@ -141,6 +141,11 @@ function updateObjectKeys(savedObject,referenceObject) {
         }
     }
     return savedObject;
+}
+
+// UPDATES VERSION SAVE
+function updateSave() {
+
 }
 
 export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper};

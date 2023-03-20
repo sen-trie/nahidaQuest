@@ -1,10 +1,10 @@
-import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict } from "./defaultData.js"
+import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict,expeditionDictInfo } from "./defaultData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper } from "./functions.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.3-3-191";
+const VERSIONNUMBER = "v0.3-3-200";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
@@ -29,7 +29,6 @@ if (localStorage.getItem("settingsValues") !== null) {
         let startIdle = document.createElement("img");
         startIdle.src = "./assets/icon/scara-start.webp";
         startIdle.id = "start-idle-scara";
-        startText.style.backgroundImage = "url(./assets/start-night.webp)";
         startText.append(startIdle);
     }
 
@@ -157,10 +156,6 @@ function deleteConfirmButton(confirmed) {
     if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
     return;
 }
-
-let cache = document.createElement("div");
-cache.id = "cache";
-mainBody.appendChild(cache);
 
 setTimeout(()=>{
     mainBody = drawUI.buildGame(mainBody);
@@ -341,8 +336,8 @@ function timerEvents() {
     let timeRatioTemp = timeRatio / 1000;
     timerSeconds += timeRatioTemp;
     
-    checkAchievement();
     saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff;
+    checkAchievement();
     refresh();
     dimHeroButton();
     addNewRow(true);
@@ -410,10 +405,6 @@ function loadSaveData() {
     Inventory = InventoryDefault;
     if (localStorage.getItem("InventorySave") == null) {
         InventoryMap = new Map();
-        let i = 10000;
-        while (i--) {
-            InventoryMap.set(i,0);
-        }
     } else {
         let InventoryTemp = localStorage.getItem("InventorySave");
         InventoryMap = new Map(JSON.parse(InventoryTemp));
@@ -432,9 +423,8 @@ function loadSaveData() {
     achievementList = achievementListDefault;
     if (localStorage.getItem("achievementListSave") == null) {
         achievementMap = new Map();
-        let i = 1000;
-        while (i--) {
-            achievementMap.set(i,false);
+        for (let key in achievementListDefault) {
+            achievementMap.set(parseInt(key),false);
         }
     } else {
         let achievementListTemp = localStorage.getItem("achievementListSave");
@@ -553,11 +543,11 @@ function energyRoll() {
 function screenTips() {
     let screenTips = document.getElementById("screen-tips");
     let maxInt = 13;
-    if (expeditionDict[5].Locked !== '1') {
-        maxInt = 36;
-    } else if (expeditionDict[4].Locked !== '1') {
-        maxInt = 28;
-    } else if (expeditionDict[3].Locked !== '1') {
+    if (expeditionDict[5] !== '1') {
+        maxInt = 38;
+    } else if (expeditionDict[4] !== '1') {
+        maxInt = 30;
+    } else if (expeditionDict[3] !== '1') {
         maxInt = 23;
     } 
 
@@ -570,11 +560,18 @@ function screenTips() {
         screenTips.innerText = changeText;
         
     },1000);
-    screenTips.addEventListener('animationend',()=>{
-        screenTips.style.animation = "none";
-        void screenTips.offsetWidth;
-    })
+    resetAnimationListener(screenTips);
 }
+
+function resetAnimationListener(elem) {
+    elem.addEventListener('animationend',resetAnimation)
+    function resetAnimation() {
+        elem.style.animation = "none";
+        void elem.offsetWidth;
+        elem.removeEventListener('animationend',resetAnimation);
+    }
+}
+
 
 // UPDATES VALUES WITH PERSISTENT VALUES
 function specialValuesUpgrade(loading, valueUpdate) {
@@ -671,7 +668,7 @@ function startRandomEvent() {
     let eventPicture = document.createElement("div");
     let aranaraNumber;
     // HARD EVENTS ARE LOCKED TO 4TH EXPEDITION UNLOCK
-    if (expeditionDict[4].Locked !== '1') {
+    if (expeditionDict[4] !== '1') {
         aranaraNumber = randomInteger(1,7);
     } else {
         aranaraNumber = randomInteger(1,4);
@@ -834,7 +831,7 @@ function reactionEvent() {
     reactionImage.id = "reaction-image";
 
     let eventDescription = document.createElement("p");
-    eventDescription.innerText = "Click the button just \n when the clock stops ticking.";
+    eventDescription.innerText = "Click the button just \n when the clock stops ticking!";
     eventDescription.classList.add("event-description");
     let reactionImageBottom = document.createElement("img");
     reactionImageBottom.src = "./assets/event/clock-back.webp";
@@ -937,7 +934,7 @@ function boxFunction(specialBox) {
 }
 
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
-const specialText = ["Oh! It's Bongo-Head!","'Thank you for releasing Arapacati!'","Woah, a treasure-seeking Seelie!","Woah, a shikigami was trapped inside!"];
+const specialText = ["Ah! It's Bongo-Head!","'Thank you for releasing Arapacati!'","Woah, a treasure-seeking Seelie!","Woah, a shikigami was trapped inside!"];
 function boxOpen(eventBackdrop,specialBox) {
     let boxOuter = document.getElementById("box-outer-div")
     let boxOuterNew = boxOuter.cloneNode(true);
@@ -2504,10 +2501,10 @@ function dimHeroButton() {
 // LOAD SAVED INVENTORY
 function inventoryload() {
     for (let i = 1000, len=10000; i < len; i++) {
-        if (InventoryMap.get(i) === 0) {
-            continue;
-        } else {
+        if (InventoryMap.has(i)) {
             inventoryAdd(i, "load");
+        } else {
+            continue;
         }
     }
 }
@@ -2517,7 +2514,10 @@ function inventoryAdd(idNum, type) {
     let itemUniqueID;
     idNum = parseInt(idNum);
     if (type != "load") {
-        let currentValue = InventoryMap.get(idNum);
+        let currentValue = 0;
+        if (InventoryMap.has(idNum)) {
+            currentValue = InventoryMap.get(idNum);
+        }
         currentValue++;
         InventoryMap.set(idNum,currentValue);
         if (currentValue > 1) {
@@ -2760,7 +2760,7 @@ function foodButton(type) {
 const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
 function adventure(type) {
     if (type !== 10 && saveValues["energy"] >= ADVENTURECOSTS[type]) {
-        if (expeditionDict[type].Locked !== '1') {
+        if (expeditionDict[type] != '1') {
             adventureElement.load();
             adventureElement.play();
             if (type === 5 && goldenNutUnlocked === true && expeditionDict[type].Locked !== '1') {
@@ -2775,19 +2775,19 @@ function adventure(type) {
     }
 
     if (type === 10) {
-        if (expeditionDict[5].Locked !== '1') {
+        if (expeditionDict[5] != '1') {
             type = 5;
         }
-        else if (expeditionDict[4].Locked !== '1') {
+        else if (expeditionDict[4] != '1') {
             type = 4;
         }
-        else if (expeditionDict[3].Locked !== '1') {
+        else if (expeditionDict[3] != '1') {
             type = 3;
         } else {
             type = 2;
         }
         saveValues["energy"] += ADVENTURECOSTS[type];
-    } else if (expeditionDict[type].Locked === '1'){
+    } else if (expeditionDict[type] == '1'){
         return;  
     }
 
@@ -2909,7 +2909,7 @@ function createExpedition() {
         let expedButton = document.createElement("button");
         let backgroundImg;
         
-        if (expeditionDict[i]["Locked"] == 1){
+        if (expeditionDict[i] == 1){
             backgroundImg = "url(./assets/expedbg/exped6.webp)";
         } else {
             backgroundImg = "url(./assets/expedbg/exped" + i + ".webp)";
@@ -2986,21 +2986,21 @@ function expedInfo(butId) {
     
     i = butId.split("-")[1];
 
-    if (expeditionDict[i]["Locked"] == 0 || i == 7) {
+    if (expeditionDict[i] == 0 || i == 7) {
         let advButton = document.getElementById("adventure-button");
         if (!advButton.classList.contains("expedition-selected")) {
             advButton.classList.add("expedition-selected");
         }
-        expedRow1.innerText = expeditionDict[i]["Text"];
-        expedRow2.innerText = expeditionDict[i]["Lore"];
+        expedRow1.innerText = expeditionDictInfo[i]["Text"];
+        expedRow2.innerText = expeditionDictInfo[i]["Lore"];
         expedRow1.appendChild(afterEnergyIcon);
     } else if (i == 8 || i == 9) {
-        expedRow1.innerText = expeditionDict[i]["Text"];
-        expedRow2.innerText = expeditionDict[i]["Lore"];
+        expedRow1.innerText = expeditionDictInfo[i]["Text"];
+        expedRow2.innerText = expeditionDictInfo[i]["Lore"];
         expedRow1.appendChild(afterEnergyIcon);
     } else {
-        expedRow1.innerText = expeditionDict[6]["Text"];
-        expedRow2.innerText = expeditionDict[6]["Lore"];
+        expedRow1.innerText = expeditionDictInfo[6]["Text"];
+        expedRow2.innerText = expeditionDictInfo[6]["Lore"];
     }
 
     if (i == 7) {
@@ -3188,23 +3188,24 @@ function wishAnimation(randomWishHero) {
 //------------------------------------------------------------------------TABLE 5 (ACHIEVEMENTS)------------------------------------------------------------------------//
 // ACHIEVEMENTS
 function achievementListload() {
-    for (let i = 1, len=getHighestKey(achievementList); i < len; i++) {
-        if (achievementMap.get(i) === false) {
-            continue;
-        } else {
-            if (i < 40) {
+    for (let key in achievementListDefault) {
+        key = parseInt(key)
+        if (achievementMap.has(key) === false) {
+            achievementMap.set(key,false)
+        } else if (achievementMap.get(key) === true){
+            if (key < 40) {
                 popAchievement("score",true);
                 achievementData["achievementTypeRawScore"].shift();
-            } else if (i > 100 && i < 140) {
+            } else if (key > 100 && key < 140) {
                 popAchievement("dps",true);
                 achievementData["achievementTypeRawDPS"].shift();
-            } else if (i > 200 && i < 240) {
+            } else if (key > 200 && key < 240) {
                 popAchievement("click",true);
                 achievementData["achievementTypeRawClick"].shift();
-            } else if (i > 300 && i < 320) {
+            } else if (key > 300 && key < 320) {
                 popAchievement("collection",true);
                 achievementData["achievementTypeRawCollection"].shift();
-            } else if (i > 400 && i < 420) {
+            } else if (key > 400 && key < 420) {
                 popAchievement("golden",true);
                 achievementData["achievementTypeGolden"].shift();
             }
@@ -4148,7 +4149,7 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
     if (heroUnlockLevels.length == 0) {
         return;
     } else if (heroesPurchasedNumber >= heroUnlockLevels[0]) {
-        if (expeditionDict[expeditionCounter + 3].Locked == 1) {
+        if (expeditionDict[expeditionCounter + 3] == 1) {
             if (heroUnlockLevels.length != 1) {
                 unlockExpedition(expeditionCounter + 3,expeditionDict);
                 clearExped();
@@ -4246,7 +4247,9 @@ function currencyPopUp(type1, amount1, type2, amount2) {
 
     setTimeout(()=> {
         currencyPop.style.animation = "fadeOut 2s cubic-bezier(.93,-0.24,.93,.81) forwards";
-        currencyPop.addEventListener("animationend",()=>{currencyPop.remove()})
+        currencyPop.addEventListener("animationend",()=>{
+            currencyPop.remove();
+        })
     },1000)
     mainBody.appendChild(currencyPop);
 }

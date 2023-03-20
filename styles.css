@@ -389,12 +389,14 @@ table, button, label {
 
 #start-screen {
     z-index: 1000;
-    background-image: url(./assets/start.webp);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     flex-wrap: wrap;
     gap: 4%;
+}
+
+#start-screen :first-child {
+    position: absolute;
+    top: 0;
+    object-fit: cover;
 }
 
 #start-image {
@@ -1728,6 +1730,11 @@ input:checked + .slider:before {
     100% {  opacity: 0.25}
 }
 
+@keyframes fadeOut {
+    0% {opacity: 1}
+    100% {opacity: 0}
+}
+
 .falling-image {
     position: absolute;
     z-Index: 2;
@@ -2576,6 +2583,8 @@ fadeIn
 /*/////////////////////////////// TOOLTIP UI (TABLE6) CSS ///////////////////////////////*/
 #table6 {
     padding-top: 1.5%;
+    padding-left: 1%;
+    padding-right: 1%;
     font: inherit;
     font-size: 1.08em;
     position: relative;
@@ -2646,8 +2655,8 @@ fadeIn
 
 .tool-tip-lore {
     font-size: 0.9em;
-    margin-left: 7%;
-    margin-right: 7%;
+    margin-left: 2%;
+    margin-right: 2%;
     overflow-y: scroll;
     height: 38%;
 }
@@ -2673,14 +2682,12 @@ fadeIn
 #tool-tip-button {
     position: absolute;
     bottom:1%;
-    /* background-image: url(./assets/tooltips/tooltip-button.webp);
-    background-size: cover; */
     background-color: #867256;
     border-top: 0.2em solid #51432f;
     border-bottom: 0.4em solid #51432f;
     box-sizing: border-box;
     height: 12%;
-    width: 92.5%;
+    width: 97%;
     z-index: 5;
     font-family: gi-font;
     font-size: 1.4em;

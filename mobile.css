@@ -6,12 +6,14 @@
 }
 
 #start-image {
-    width: 80%;
+    width: 85%;
 }
 
 #start-screen > button {
-    width: 50%;
-    top: 0
+    width: 70%;
+    max-width: 500px;
+    top: 0;
+    font-size: 1.6em;
 }
 
 #start-idle-nahida {
@@ -21,9 +23,10 @@
 }
 
 #start-idle-dori {
-    bottom: 25%;
+    bottom: 8%;
     left: 5%;
     height: 30%;
+    z-index: 10001;
 }
 
 #start-idle-scara {
@@ -365,16 +368,23 @@ body {
 }
 
 .toolImgContainer {
-    width: auto;
+    width: 30%;
+    height: auto;
 }
 
 .tool-tip-extraimg {
-    width: auto;
-    height: 23%;
+    width: 15%;
+    height: auto;
     flex-direction: column;
 }
 
+.toolImgOverlay {
+    left: 2.5%;
+    top: 4px;
+}
+
 .tool-tip-text {
+    width: auto;
     font-size: 0.9em;
     text-align: center;
 }

@@ -808,15 +808,27 @@ let eventText = {
 }
 
 let expeditionDictDefault = {
-    1:{Text:"Explore Teyvat | 100 "                  ,Locked:"0" ,Lore:"The legend of the Golden Nut is from a bygone era. Some on-the-ground research is certainly needed if you wanted even a slither of a chance to find the mythical fruit."},
-    2:{Text:"Ask the Adventurers' Guild | 250 "      ,Locked:"0" ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
-    3:{Text:"Challenge Domains | 500 "               ,Locked:"1" ,Lore:"Clues about the origin of the Golden Nut are said to have been hidden deep inside some mysterious domain. Exploring it will likely be the next step in unravelling the fruit's location."},
-    4:{Text:"Hunt Boss Enemies | 750 "               ,Locked:"1" ,Lore:"The last confirmed sighting of the Golden Nut was in the heart of the woods, which is currently being guarded by a ferocious beast. It may well be the only stone left unturned."},
-    5:{Text:"Abyss Diving | 1000 "                   ,Locked:"1" ,Lore:"All trails seem to end here. With nowhere else to go, the Abyss is the sole place left where the fruit is likely to be. Search through the floors with the help of an unlikely ally."},
-    6:{Text:"Locked"                                 ,Locked:"0" ,Lore:"Perhaps this path will open after you get stronger..."            },
-    7:{Text:"Select an Expedition"                   ,Locked:"0" ,Lore:"Go on Expeditions to get items to upgrade your characters!"            },
-    8:{Text:"Expeditions Use Energy "                ,Locked:"1" ,Lore:"Energy can be obtained by clicking Big Nahida"            },
-    9:{Text:"Not enough Energy "                     ,Locked:"1" ,Lore:"Obtain more before going on Expeditions!"            },
+    1:"0",
+    2:"0",
+    3:"1",
+    4:"1",
+    5:"1",
+    6:"1",
+    7:"0",
+    8:"0",
+    9:"1",
+}
+
+let expeditionDictInfo = {
+    1:{Text:"Explore Teyvat | 100 "                  ,Lore:"The legend of the Golden Nut is from a bygone era. Some on-the-ground research is certainly needed if you wanted even a slither of a chance to find the mythical fruit."},
+    2:{Text:"Ask the Adventurers' Guild | 250 "      ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
+    3:{Text:"Challenge Domains | 500 "               ,Lore:"Clues about the origin of the Golden Nut are said to have been hidden deep inside some mysterious domain. Exploring it will likely be the next step in unravelling the fruit's location."},
+    4:{Text:"Hunt Boss Enemies | 750 "               ,Lore:"The last confirmed sighting of the Golden Nut was in the heart of the woods, which is currently being guarded by a ferocious beast. It may well be the only stone left unturned."},
+    5:{Text:"Abyss Diving | 1000 "                   ,Lore:"All trails seem to end here. With nowhere else to go, the Abyss is the sole place left where the fruit is likely to be. Search through the floors with the help of an unlikely ally."},
+    6:{Text:"Locked"                                 ,Lore:"Perhaps this path will open after you get stronger..."            },
+    7:{Text:"Select an Expedition"                   ,Lore:"Go on Expeditions to get items to upgrade your characters!"            },
+    8:{Text:"Expeditions use Energy "                ,Lore:"Energy can be obtained by clicking Big Nahida"            },
+    9:{Text:"Not enough Energy "                     ,Lore:"Obtain more before going on Expeditions!"            },
 }
 
 let screenLoreDict = {
@@ -832,7 +844,7 @@ let screenLoreDict = {
     9:"The full name of Vanarana is 'Mahavanaranapna.' Even the Aranara find it to be too long, however.",
     10:"The main task of the Forest Watchers and Forest Rangers is to observe the state of the rainforest and protect travelers.",
     11:`The vast desert in the western part of Sumeru is known as the Great Red Sand.`,
-    12:`"Nahida" is also the name used for a genus of butterflies.`,
+    12:`'Nahida' is also the name used for a genus of butterflies.`,
     /// EXPEDITION LVL 3
     13:`Perceive the world through illusory dreams, and nothing but the truth is revealed.`,
     14:`Every little creature in the world has their own piece of paradise.`,
@@ -841,24 +853,26 @@ let screenLoreDict = {
     17:`A caged bird secluded within the confines of the Sanctuary of Surasthana, who can only see the world in her dreams.`,
     18:'Legend tells of an ancient tree whose roots reach every corner of the world...',
     19:"Artifacts derive power from their original bearers' ambitions and memories.",
-    20:`The Aranara are Greater Lord Rukkhadevata's creations. Like Nara, they are the people of the forest.`,
+    20:`The Aranara are The Dendro Archon's creations. Like Nara, they are the people of the forest.`,
     21:`Nara seems to mean 'human'. Even if they know a human's name, the Aranara will append 'Nara-' as a prefix to it.`,
-    22:`On your adventure, you will encounter people who seem to be in dire need of help. Talk to these people, and they'll often have something for you to assist with.`,
+    22:`On your adventure, you may encounter people who seem to be in dire need of help. Talk to these people, and they'll often have something for you to assist with.`,
     /// EXPEDITION LVL 4
-    23:`We ask questions and receive replies in our dreams. When a myriad of dreams descends on the world, then it is time to say goodbye.`,
-    24:`"May the new dreams never experience Marana's corruption."`,
+    23:`"We ask questions and receive replies in our dreams. When a myriad of dreams descends on the world, then it is time to say goodbye."`,
+    24:`May the new dreams never experience Marana's corruption.`,
     25:'There are mutated plants in this world that have intelligence and can manipulate the elements. Whopperflowers are able to use their mimetic flowers to trick their prey...',
     26:'Weasel Thieves are creatures captured and trained by the Treasure Hoarders. From the contents of their bags, it seems like they have nicked some loose change.',
     27:`Between canyons of the Desert of Hadramaveth, there are often camps of wandering tribes and desert bandits.`,
+    28:'Wherever you go, whatever life throws at you... In Teyvat, the stars in the sky will always have a place for you.',
+    29:`"Let me be a little firefly taking a rest on that leaf. When night falls, all the stars in the sky will adorn your dreams."`,
     /// EXPEDITION LVL 5
-    28:`"The forest will remember."`,
-    29:`People often pray for a safe journey before embarking on a long trip. But if the wind really listened to others, why would it still wander the world?`,
-    30:"Food and potions cannot be consumed within the Spiral Abyss. Those seeking to conquer the Abyssal Moon Spire and Corridor must rely on their strength and courage alone.",
-    31:'Wherever you go, whatever life throws at you... In Teyvat, the stars in the sky will always have a place for you.',
+    30:`People often pray for a safe journey before embarking on a long trip. But if the wind really listened to others, why would it still wander the world?`,
+    31:"Food and potions cannot be consumed within the Spiral Abyss. Those seeking to conquer the Abyssal Moon Spire and Corridor must rely on their strength and courage alone.",
     32:'If humanity is measued by having a heart, then he cannot be deemed as such. If one without a heart experiences emotion, then he shall be a puppet most alike to humanity.',
-    33:'"Wanderer" is how he believes he be best described — having no home, kin nor destination. Like the breeze, he lives in this world, and he walks its length and breadth.',
+    33:`'Wanderer' is how he believes he be best described — having no home, kin nor destination. Like the breeze, he lives in this world, and he walks its length and breadth.`,
     34:`In the early days when Tatarasuna was still a prosperous place, the Wanderer walked amongst its people, going by the name 'Kabukimono'.`,
     35:`Searching and seeking for an illusory obsession through countless nights. With melancholy and misery as company, malevolent winds mean naught to the Wanderer.`,
+    36:`"The forest will remember."`,
+    37:`Many years ago, back when he still harbored the wish to become human, he prayed that he would one day be able to lead a normal life.`,
 }
 
 let achievementListDefault = {
@@ -944,4 +958,4 @@ let achievementListDefault = {
     410: {Name:"A Golden Experience",                 Description:"Obtain 1000 Golden Nuts"                     },
 }
 
-export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict };
+export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict,expeditionDictInfo };
