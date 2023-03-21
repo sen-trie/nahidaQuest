@@ -4,7 +4,7 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.3-3-201";
+const VERSIONNUMBER = "v0.3-3-202";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
@@ -2502,6 +2502,7 @@ function dimHeroButton() {
 function inventoryload() {
     for (let i = 1000, len=10000; i < len; i++) {
         if (InventoryMap.has(i)) {
+            if(Inventory[i] == undefined) {return}
             inventoryAdd(i, "load");
         } else {
             continue;
