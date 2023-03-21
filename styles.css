@@ -395,7 +395,6 @@ table, button, label {
 
 #start-screen :first-child {
     position: absolute;
-    top: 0;
     object-fit: cover;
 }
 
