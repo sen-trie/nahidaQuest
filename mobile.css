@@ -1,7 +1,7 @@
 /*/////////////////////////////// MOBILE CSS  ///////////////////////////////*/
-@media (max-width: 768px) {
+@media (max-width: 468px) {
     html {
-      touch-action: manipulation;
+        touch-action: manipulation;
     }
 }
 
@@ -48,7 +48,6 @@ body {
     width: 100%;
     height: 100%;
     margin: 0;
-    font-size: 2.0vw;
     border: 0;
 }
 
@@ -80,7 +79,7 @@ body {
 }
 
 .energy-primo-container {
-    width: 25%;
+    width: 30%;
     column-gap: 5%;
     left: 0;
     flex-direction: row;
@@ -96,13 +95,13 @@ body {
 }
 
 .pill-value > img {
-    transform: scale(1.3);
+    transform: scale(1.2);
 }
 
 .temp-buff {
-    width: 30%;
+    width: 25%;
     top: 0;
-    flex-direction: row;
+    flex-direction: row-reverse;
 }
 
 .temp-buff > div {
@@ -112,13 +111,14 @@ body {
 }
 
 .multiplier-button-container {
-    width: 40%;
+    width: fit-content;
     padding-right: 1%;
     box-sizing: border-box;
     position: relative;
     flex-direction: row-reverse;
     flex-wrap: wrap;
     justify-content: flex-start;
+    flex-grow: 1;
 }
 
 .multiplier-button-container > button {
@@ -140,7 +140,7 @@ body {
 
 .score-container {
     top: 0;
-    height: 18%;
+    height: 16%;
 }
 
 #demo-container {
@@ -149,16 +149,29 @@ body {
 }
 
 .screen-tips {
-    max-width: 22%;
+    padding: 0.2%;
+    font-size: 0.9em;
+    max-width: 20%;
     left: 0;
-    top: 18%;
-    max-height: 25%;
+    top: 16%;
+    height: fit-content;
 }
 
 .settings-menu {
-    left: 10%;
-    width: 80%;
+    left: 5%;
+    top: 24%;
+    width: 85%;
+    max-height: 60%;
+    aspect-ratio: 1.18;
     font-size: 1.2em;
+}
+
+.settings-bottom {
+    width: 100%;
+}
+
+.switch {
+    font-size: 0.8em;
 }
 
 .pop-new {
@@ -181,8 +194,11 @@ body {
 
 .confirm-box {
     font-size: 1.15em;
-    width: 70%;
-    left:15%;
+    width: 90%;
+    left:5%;
+    height: fit-content;
+    padding-top: 1%;
+    padding-bottom: 1%;
 }
 
 .nut-store-access {
@@ -252,16 +268,21 @@ body {
     max-height: 24%;
 }
 
-#table3 {
-    flex-wrap: wrap;
-}
-
 #expedDiv {
-    width:45%;
+    position: relative;
+    left: -15%;
+    border-radius: 0;
+    width: 65%;
     height: 70%;
     overflow-x: scroll;
     flex-direction: row;
     justify-content:initial;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+}
+
+#expedDiv::-webkit-scrollbar {
+    height: 1.5vh;
 }
 
 .button-container {
@@ -285,14 +306,20 @@ body {
 
 .expedition {
     flex: 0 0 auto;
-    height: 100%;
+    height: 95%;
     width: 33%;
     background-position: center;
+    background-size: cover;
+}
+
+#expedDiv > .expedition-selected {
+    border-top: 0.3em solid #816355;
+    border-bottom: 0.3em solid #816355;
 }
 
 .tooltipEXPED {
-    width: 50%;
-    height: 60%;
+    width: 90%;
+    height: 50%;
     right: 1%;
     font-size: 0.95em;
     /* background-image: url(./assets/frames/tooltipEXPED-mobile.webp); */
@@ -306,17 +333,12 @@ body {
 }
 
 #adventure-button {
-    top:1%;
+    position: absolute;
+    bottom:45%;
+    width: 30%;
+    aspect-ratio: 4.56;
+    right: 2%;
     height: 18%;
-}
-
-#tool-tip-button {
-    height: 20%;
-}
-
-.tool-tip-lore {
-    height: 45%;
-    font-size: 1em;
 }
 
 #exped-row-1 {
@@ -358,9 +380,15 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     align-content: flex-start;
-    padding-left: 2%;
-    padding-right: 2%;
+    padding-left: 1.5%;
+    padding-right: 1.5%;
     column-gap: 2%;
+}
+
+.toolInfo {
+    width: 100%;
+    height: fit-content;
+    flex-direction: row;
 }
 
 .tool-tip-name {
@@ -368,13 +396,23 @@ body {
 }
 
 .toolImgContainer {
-    width: 30%;
-    height: auto;
+    aspect-ratio: 1;
+    width: 25%;
+}
+
+#tool-tip-button {
+    height: 20%;
+}
+
+.tool-tip-lore {
+    height: 40%;
+    font-size: 1em;
 }
 
 .tool-tip-extraimg {
-    width: 15%;
-    height: auto;
+    width: 13%;
+    gap:1%;
+    aspect-ratio: 0.5;
     flex-direction: column;
 }
 
@@ -390,7 +428,7 @@ body {
 }
 
 .tool-tip-extraimg > img {
-    height: 50%;
+    height: 40%;
     width: 100%;
     object-fit: contain;
 }
@@ -413,14 +451,6 @@ body {
 .wish-img {
     width: 90%;
     height: auto;
-}
-
-.table5-Image {
-    width: 70%;
-}
-
-.flex-container-ACHIEVEMENT {
-    width: 65%;
 }
 
 #table7 {
@@ -503,7 +533,10 @@ body {
 .currency-pop {
     top: 6%;
     left: 6%;
-    width: 14%;
+    width: fit-content;
+    padding-left: 1%;
+    padding-right: 1%;
+    max-width: 20%;
     height: 9%;
     font-size: 1.1em;
 }

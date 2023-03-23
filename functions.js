@@ -119,10 +119,10 @@ function sortList(table) {
 function unlockExpedition(i,expeditionDict) {
     let expedID = "exped-" + i;
     let unlockButton = document.getElementById(expedID);
-    let backgroundImage = "url(./assets/expedbg/exped" + i + ".webp) center center / contain no-repeat";
+    let backgroundImage = "url(./assets/expedbg/exped" + i + ".webp)";
 
     expeditionDict[i] = 0;
-    unlockButton.style.background = backgroundImage;
+    unlockButton.style.backgroundImage = backgroundImage;
 }
 
 // INNER HTML FOR FOOD BUFFS

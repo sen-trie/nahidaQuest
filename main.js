@@ -4,8 +4,9 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.3-3-202";
+const VERSIONNUMBER = "v0.3-3-203";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
+const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
 let mainBody = document.getElementById("game");   
@@ -416,8 +417,14 @@ function loadSaveData() {
         expeditionDict = expeditionDictDefault;
     } else {
         let expeditionDictTemp = localStorage.getItem("expeditionDictSave");
-        expeditionDict = JSON.parse(expeditionDictTemp)
-        updateObjectKeys(expeditionDict,expeditionDictDefault)
+        expeditionDictTemp = JSON.parse(expeditionDictTemp);
+        // FOR SAVE DATA 0.3.0 
+        if (typeof(expeditionDictTemp[1] === "object")) {
+            expeditionDict = expeditionDictDefault;
+        } else {
+            expeditionDict = expeditionDictTemp;
+        }
+        updateObjectKeys(expeditionDict,expeditionDictDefault);
     }
     // LOAD ACHIEVEMENT DATA
     achievementList = achievementListDefault;
@@ -1666,6 +1673,7 @@ function tutorial(idleAmount) {
 function saveData(skip) {
     if (preventSave) {return};
     saveValues["currentTime"] = getTime();
+    saveValues["versNumber"] = DBNUBMER;
     if (!document.getElementById("currently-saving") && skip != true) {
         let saveCurrently = document.createElement("img");
         saveCurrently.src = "./assets/settings/saving.webp";
@@ -2525,6 +2533,7 @@ function inventoryAdd(idNum, type) {
             let newIcon = document.createElement("img");
             newIcon.classList.add("new-item");
             newIcon.src = "./assets/icon/new-item.webp";
+            if (!document.getElementById(idNum)) {return}
             let updatedButton = document.getElementById(idNum);
             updatedButton.appendChild(newIcon);
             updatedButton.addEventListener("click",()=>{newIcon.remove()})
@@ -3326,6 +3335,8 @@ function createTooltip() {
     tooltipName = document.createElement("div");
     tooltipName.classList += " tool-tip-name";
     
+    let toolInfo = document.createElement("div");
+    toolInfo.classList.add("flex-column","toolInfo");
     toolImgContainer = document.createElement("div");
     toolImgContainer.classList.add("toolImgContainer","background-image-cover");
     toolImgContainer.style.display = "none";
@@ -3335,7 +3346,7 @@ function createTooltip() {
     toolImgOverlay = document.createElement("img");
     toolImgOverlay.src = "./assets/tooltips/Empty.webp";
     toolImgOverlay.classList.add("toolImgOverlay");
-    toolImgContainer.append(toolImg,toolImgOverlay)
+    toolImgContainer.append(toolImg,toolImgOverlay);
     
     tooltipText = document.createElement("div");
     tooltipText.classList += " tool-tip-text";
@@ -3358,7 +3369,8 @@ function createTooltip() {
     table6Background = document.createElement("img");
     table6Background.src = "./assets/tooltips/background.webp"
     table6Background.classList.add("table6-background");
-    table6.append(tooltipName,toolImgContainer,tooltipText,tooltipExtraImg,tooltipLore,table6Background,tooltipButton);
+    toolInfo.append(toolImgContainer,tooltipText,tooltipExtraImg);
+    table6.append(tooltipName,toolInfo,tooltipLore,table6Background,tooltipButton);
 }
 
 var tooltipInterval = null;

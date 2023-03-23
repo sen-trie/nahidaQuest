@@ -181,20 +181,107 @@ img {
 
 @media (max-aspect-ratio: 19/9) {
     body {
+        font-size: 1.5vw;
         width: 100%;
         height: 100%;
         margin: 0;
-        font-size: 1.4vw;
         border: 0;
     }
 }
 
-@media screen and (max-width: 767px) {
+@media (max-aspect-ratio: 14/9) {
     body {
-      height: 100%;
-      overflow: hidden;
+        font-size: 1.4vw;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: 0;
     }
 }
+
+@media (max-aspect-ratio: 11.5/9) {
+    body {
+        touch-action: manipulation;
+        font-size: 1.9vw;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: 0;
+    }
+}
+
+@media (max-aspect-ratio: 9.5/9) {
+    body {
+        touch-action: manipulation;
+        font-size: 2.2vw;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: 0;
+    }
+}
+
+ @media (max-aspect-ratio: 8/9){
+    body {
+        font-size: 2.6vw;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: 0;
+    }
+} 
+
+@media (max-aspect-ratio: 4/9){
+    body {
+        font-size: 3vw;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: 0;
+    }
+} 
+
+@media (max-aspect-ratio: 3.9/9){
+    .unsupported {
+        z-index: 999999999 !important;
+    }
+} 
+
+.unsupported {
+    position: absolute;
+    z-index: -1;
+    height: 100%;
+    row-gap: 2%;
+}
+
+.unsupported::before {
+    content: "";
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.949);
+}
+
+.unsupported > img {
+    z-index: 9999999;
+    width: 90%;
+    aspect-ratio: 1;
+    box-sizing: border-box;
+    border: 0.5em solid #59BD8C;
+    border-radius: 1em;
+}
+
+.unsupported > p {
+    z-index: 9999999;
+    width: 85%;
+    text-align: center;
+    font: inherit;
+    font-size: 2.8em;
+    color: white;
+}
+
 
 /*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
@@ -1355,9 +1442,10 @@ table, button, label {
 .confirm-box {
     position: absolute;
     top: 0.5%;
-    height: 18%;
-    width: 40%;
-    left: 30%;
+    aspect-ratio: 5;
+    width: 50%;
+    max-height: 15%;
+    left: 25%;
     z-index: -1;
     display: flex;
     flex-direction: column;
@@ -1369,9 +1457,16 @@ table, button, label {
     color: #4b613c;
 }
 
+.confirm-box > p {
+    height: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .confirm-button-div {
     width: 100%;
-    height: 50%;
+    height: 60%;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -1384,7 +1479,8 @@ table, button, label {
 }
 
 .confirm-button-div > button {
-    width: 45%;
+    width: 49%;
+    height: 100%;
     font: inherit;
     color: #2b401e;
     aspect-ratio: 4.6;
@@ -1868,6 +1964,7 @@ input:checked + .slider:before {
 
 .play-button {
     width: auto;
+    max-width: 90%;
     height: 12%;
     object-fit: contain;
     z-index: 200;
@@ -2167,7 +2264,7 @@ input:checked + .slider:before {
 /*/////////////////////////////// EXPEDITION (TABLE3) CSS ///////////////////////////////*/
 .expedition-selected {
     transition: 0.4s ease;
-    filter: drop-shadow(0.15em 0.15em 0.07em #6f453273);
+    border-radius: 1em;
     opacity: 1 !important;
 }
 
@@ -2235,6 +2332,9 @@ input:checked + .slider:before {
     height: 100%;
     transition: 0.2s ease;
     opacity: 0.25;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
 }
 
 /*/////////////////////////////// EXPEDITION TOOLTIP CSS ///////////////////////////////*/
@@ -2602,6 +2702,12 @@ fadeIn
     z-index: 5;
 }
 
+.toolInfo {
+    width: 100%;
+    height: fit-content;
+    gap: 2%;
+}
+
 .toolImg {
     position: absolute;
     top: 2.5%;
@@ -2615,8 +2721,8 @@ fadeIn
 
 .toolImgContainer {
     position: relative;
-    width: auto;
-    height: 23%;
+    width: 50%;
+    aspect-ratio: 1;
     background-image:url(./assets/tooltips/border.webp);
 }
 
@@ -2643,21 +2749,20 @@ fadeIn
 }
 
 .tool-tip-name {
-    font-size: 1.0;
+    font-size: inherit;
     text-align: center;
-    max-height: 10%;
+    height: fit-content;
     width: 100%;
 }
 
 .tool-tip-text {
     font-size:  0.8em;
     text-align: center;
+    height: fit-content;
 }
 
 .tool-tip-lore {
     font-size: 0.9em;
-    margin-left: 2%;
-    margin-right: 2%;
     overflow-y: scroll;
     height: 38%;
 }
@@ -2672,12 +2777,13 @@ fadeIn
     flex-direction: row;
     align-items: center;
     z-index: 5;
-    width: 38%;
+    width: 40%;
+    aspect-ratio: 12;
 }
 
-.tool-tip-extraimg > img{
-    flex-basis: 50%;
-    width: 47.5%;
+.tool-tip-extraimg > img {
+    width: 49%;
+    aspect-ratio: 1;
 }
 
 #tool-tip-button {
@@ -2688,7 +2794,7 @@ fadeIn
     border-bottom: 0.4em solid #51432f;
     box-sizing: border-box;
     height: 12%;
-    width: 97%;
+    width: 98%;
     z-index: 5;
     font-family: gi-font;
     font-size: 1.4em;

@@ -89,10 +89,7 @@ function floatText(clickType,combineText,leftDiv,clickFactor,Xlocation,Ylocation
 // ADJUSTS EXPED BUTTON FOR EXPEDITION UI
 function expedButtonAdjust(expedButton, backgroundImg, i) {
     expedButton.id = "exped-" + i;
-    expedButton.style.background = backgroundImg;
-    expedButton.style['background-repeat'] = "no-repeat";
-    expedButton.style['background-size'] = "contain"
-    expedButton.style['background-position'] = "center";
+    expedButton.style.backgroundImage = backgroundImg;
     expedButton.classList += " expedition";
     return expedButton;
 }

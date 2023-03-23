@@ -1,4 +1,5 @@
 let saveValuesDefault = {
+    versNumber:0,
     clickCount:0,
     clickFactor:1,
     dps:0,
@@ -50,6 +51,18 @@ let permUpgrades = {
     9:{Name:"Blessing of Riches",          Effect:10,  Max:25,   Cap:true,   Description:"Increases Primogems gained from Events/Achievements."},
     10:{Name:"Blessing of Strength",       Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
     11:{Name:"Blessing of Fortification",  Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
+}
+
+let expeditionDictDefault = {
+    1:"0",
+    2:"0",
+    3:"1",
+    4:"1",
+    5:"1",
+    6:"1",
+    7:"0",
+    8:"0",
+    9:"1",
 }
 
 let upgradeDictDefault = {
@@ -805,18 +818,6 @@ let eventText = {
     4: "A whopperflower infestation has occured in the area - please help to identify them!",
     5: "Weasel thieves has been hoarding the Ajilenakh Nuts for themselves, we need to catch them!",
     6: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
-}
-
-let expeditionDictDefault = {
-    1:"0",
-    2:"0",
-    3:"1",
-    4:"1",
-    5:"1",
-    6:"1",
-    7:"0",
-    8:"0",
-    9:"1",
 }
 
 let expeditionDictInfo = {
