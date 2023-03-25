@@ -6,7 +6,7 @@ let saveValuesDefault = {
     realScore:0,
     freeLevels:0,
     primogem:0,
-    energy:100,
+    energy:111100,
     rowCount:0,
     heroesPurchased:0,
     mailCore:0,

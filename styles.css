@@ -2337,6 +2337,208 @@ input:checked + .slider:before {
     background-position: center;
 }
 
+/*/////////////////////////////// ADVENTURE CSS ///////////////////////////////*/
+.adventure-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url(./assets/bg/wood.webp) no-repeat;
+    background-size: cover;
+    background-position: center;
+    gap: 1%;
+}
+
+.adventure-video {
+    position: relative;
+    width: 60%;
+    height: 55%;
+    border: 0.2em ridge #AEDF7D;
+    justify-content: space-around;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    column-gap: 0.5%;
+}
+
+#adventure-health {
+    position: absolute;
+    height: 9%;
+    width: 75%;
+    background-color: #376D50;
+    top: 2.5%;
+    justify-content: space-between;
+    border-left: 0.1em solid #376D50;
+}
+
+#adventure-health > img {
+    z-index: 504;
+    filter: none;
+    height: 100%;
+    object-fit: contain;
+    flex-grow: 1;
+    border-right: 0.1em solid #376D50;
+}
+
+.adventure-health {
+    position: absolute;
+    top:5%;
+    left:0;
+    width: 100%;
+    height: 90%;
+    background-color: #ceeeab;
+    transition: 0.2s ease-out;
+}
+
+.adventure-video > div {
+    width: 25%;
+    height: 85%;
+    position: relative;
+    bottom: -8%;
+}
+
+.enemyImg {
+    width: 100%;
+    height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.3em rgba(255, 255, 255, 0.463));
+}
+
+.atk-indicator {
+    width: 100%;
+    height: 13%;
+    object-fit: contain;
+    filter: none;
+    position: absolute;
+    bottom: 10%;
+}
+
+@keyframes atk-delay {
+    0% {
+        filter: brightness(0);
+        transform: scale(1);
+    }
+    90% {
+        filter: brightness(0.7);
+        transform: scale(1);
+    }
+    91% {
+        filter: brightness(1) drop-shadow(0 0 0.2em #ffffff) drop-shadow(0 0 0.3em #ffffff);
+        transform: scale(1.2);
+    }
+    100% {
+        filter: brightness(1) drop-shadow(0 0 0.2em #ffffff) drop-shadow(0 0 0.3em #ffffff);
+        transform: scale(1.2);
+    }
+  }
+
+
+.health-bar {
+    position: relative;
+    width: 100%;
+    height: 5%;
+    background-color: #AEDF7D;
+    border: 0.1em outset #2E510C;
+    box-sizing: border-box;
+    border-radius: 0.2em;
+    transition: width 0.1s ease-in-out;
+}
+
+.adventure-text {
+    position: relative;
+    width: 40%;
+    height: 40%;
+    flex-wrap: wrap;
+}
+
+
+#adventure-encounter {
+    height: 100%;
+    z-index: 502;
+    text-align: center;
+    gap: 1%;
+    aspect-ratio: 1.88;
+}
+
+#adventure-encounter > p {
+    height: 50%;
+    padding-top: 2%;
+    box-sizing: border-box;
+    color: #442d10;
+    font-size: 1.2em;
+}
+
+#adventure-encounter > button {
+    width: 100%;
+    height: 10%;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    height: fit-content;
+    color: white;
+    font: inherit;
+    text-shadow: 0 0 0.2em black, 0 0 0.3em black, 0 0 0.4em black;
+    box-sizing: border-box;
+    background-color: #24303F;
+    border: 0.2em solid #6d7884;
+    border-radius: 2em;
+    transition: 0.3s ease;
+}
+
+#adventure-encounter > button:hover {
+    background-color: #6c7e90;
+}
+
+.adventure-fight {
+    z-index: 502;
+    height: 100%;
+    justify-content: space-around;
+    aspect-ratio: 1.88;
+}
+
+.adventure-fight > img {
+    width: 24%;
+    aspect-ratio: 1;
+    transition: 0.3s ease;
+}
+
+.adventure-fight > img:hover {
+    transform: translate(-0.3em,-0.3em);
+    filter:drop-shadow(0.2em 0.2em 0 #376C51) drop-shadow(0.3em 0.3em 0 #1d432f);
+}
+
+.adventure-text > img {
+    position: relative;
+    z-index: 501;
+    position: absolute;
+    aspect-ratio: 2.08;
+    height: 102%;
+    object-fit: contain;
+}
+
+#adventure-gif {
+    z-index: 503;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: 15%;
+    aspect-ratio: unset;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+@keyframes flipIn {
+    0% {
+        transform: scaleX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scaleX(1);
+        opacity: 1;
+    }
+}
+
 /*/////////////////////////////// EXPEDITION TOOLTIP CSS ///////////////////////////////*/
 .tooltipEXPED {
     text-align: center;
@@ -2600,8 +2802,6 @@ input:checked + .slider:before {
         text-shadow: 0 0 0.2em rgba(0, 0, 0, 0.758), 0 0 0.2em rgba(0, 0, 0, 0.751), 0 0 0.2em black;
     }
 }
-
-fadeIn
 
 .achieve:hover {
     transition: 0.4s ease;

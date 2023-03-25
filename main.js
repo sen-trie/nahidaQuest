@@ -4,7 +4,7 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.3-3-203";
+const VERSIONNUMBER = "v0.3-3-250";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -252,6 +252,7 @@ let multiplierButtonContainer;
 
 // MAIN BODY VARIABLES
 drawUI.drawMainBody();
+createAdventure();
 
 let table1 = document.getElementById("table1");
 let table2 = document.getElementById("table2");
@@ -302,7 +303,8 @@ createTooltip();
 settings();
 var settingsValues;
 var currentBGM;
-var bgmElement;           
+var bgmElement;
+let fightBgmElement = new Audio();
 
 let tabElement = new Audio("./assets/sfx/tab-change.mp3");
 let demoElement = new Audio("./assets/sfx/click.mp3");
@@ -316,7 +318,17 @@ let weaselBurrow = new Audio("./assets/sfx/weasel-pop.mp3");
 let weaselDecoy = new Audio("./assets/sfx/weasel-decoy.mp3");
 let adventureElement = new Audio("./assets/sfx/adventure.mp3");
 let shopElement = new Audio("./assets/sfx/dori-buy.mp3");
-let sfxArray = [tabElement,demoElement,upgradeElement,mailElement,achievementElement,eventElement,reactionStartElement,reactionCorrectElement,weaselBurrow,weaselDecoy,adventureElement,shopElement];
+let fightWinElement = new Audio("./assets/sfx/battle-success.mp3");
+let fightLoseElement = new Audio("./assets/sfx/battle-failure.mp3");
+let fightEnemyDownElement = new Audio("./assets/sfx/battle-enemyDown.mp3");
+let fightEncounter = new Audio("./assets/sfx/battle-encounter.mp3");
+let sfxArray = [
+    tabElement,demoElement,upgradeElement,mailElement,
+    achievementElement,eventElement,reactionStartElement,
+    reactionCorrectElement,weaselBurrow,weaselDecoy,
+    adventureElement,shopElement,
+    fightEncounter,fightEnemyDownElement,fightLoseElement,fightWinElement
+];
 
 let timerLoad = setInterval(timerEventsLoading,50);
 let timer;
@@ -477,17 +489,17 @@ demoContainer.addEventListener("mouseup", () => {
     let critRole = randomInteger(1,100);
     if (critRole <= clickCritRate) {
         crit = true;
-        clickDelay -= 5;
+        clickDelay -= 3;
         if (clickerEvent !== "none") {
+            clickDelay -= 2;
             clickEarn = Math.ceil(currentClick * clickCritDmg);
-            clickDelay -= 10;
         } else {
             clickEarn = Math.ceil(specialClick * saveValues["clickFactor"] * clickCritDmg);
         }
     } else {
         if (clickerEvent !== "none") {
+            clickDelay -= 2;
             clickEarn = currentClick;
-            clickDelay -= 10;
         } else {
             clickEarn = Math.ceil(specialClick * saveValues["clickFactor"]);
         }
@@ -1979,6 +1991,7 @@ function settingsVolume() {
     let bgmAudio = document.getElementById('bgm');
     volumeScroller.addEventListener("change", function() {
         bgmElement.volume = this.value / 100;
+        fightBgmElement.volume = this.value / 100;
         settingsValues.bgmVolume = this.value / 100;
     });
 
@@ -2508,10 +2521,13 @@ function dimHeroButton() {
 //------------------------------------------------------------------------TABLE 2 (INVENTORY)------------------------------------------------------------------------//
 // LOAD SAVED INVENTORY
 function inventoryload() {
-    for (let i = 1000, len=10000; i < len; i++) {
+    for (let i = 0; i < 10000; i++) {
         if (InventoryMap.has(i)) {
-            if(Inventory[i] == undefined) {return}
-            inventoryAdd(i, "load");
+            if (Inventory[i] == undefined) {continue}
+            let x = InventoryMap.get(i);
+            if (x > 0) {
+                inventoryAdd(i, "load")
+            }
         } else {
             continue;
         }
@@ -2566,7 +2582,7 @@ function inventoryAdd(idNum, type) {
         buttonInv.addEventListener("click",()=>{newIcon.remove()})
     }
 
-    buttonInv = inventoryAddButton(buttonInv,Inventory[idNum])
+    buttonInv = inventoryAddButton(buttonInv,Inventory[idNum]);
     table2.appendChild(buttonInv);
 }
 
@@ -2860,7 +2876,6 @@ function adventure(type) {
                 inventoryDraw("gem", 4, 5);
                 inventoryDraw("weapon", 4, 4);
                 inventoryDraw("talent", 4, 4);
-                
 
                 if (randomDraw == 1) {
                     inventoryDraw("food", 4, 5);
@@ -2873,10 +2888,312 @@ function adventure(type) {
         }
         sortList("table2");
         newPop(1);
+        // drawAdventure(5);
     } else {
         expedInfo("exped-9");
     }
-}   
+} 
+
+// ADVENTURE SEGMENT DRAW
+function createAdventure() {
+    let adventureArea = document.createElement("div");
+    adventureArea.id = "adventure-area";
+    adventureArea.style.zIndex = -1;
+    adventureArea.classList.add("adventure-area","flex-column");
+
+    let adventureVideo = document.createElement("div");
+    adventureVideo.id = "adventure-video";
+    adventureVideo.classList.add("adventure-video","flex-row");
+    adventureVideo.style.backgroundImage = "url(./assets/expedbg/1-B-1-Scene.png)";
+
+    let adventureTextBox = document.createElement("div");
+    adventureTextBox.id = "adventure-text";
+    adventureTextBox.classList.add("adventure-text","flex-row");
+
+    let adventureTextBG = new Image();
+    adventureTextBG.src = "./assets/expedbg/table.webp";
+    let adventureHealth = document.createElement("div");
+    adventureHealth.id = "adventure-health";
+    adventureHealth.classList.add("flex-row");
+    adventureHealth.style.opacity = 0;
+    let adventureHealthbarDiv = document.createElement("div");
+    adventureHealthbarDiv.id = "health-bar";
+    
+    adventureHealth.append(adventureHealthbarDiv);
+    let adventureGif = new Image();
+    adventureGif.id = "adventure-gif";
+    adventureGif.src = "./assets/expedbg/exped-Nahida.webp";
+    adventureVideo.append(adventureGif,adventureHealth);
+
+    let adventureEncounter = document.createElement("div");
+    adventureEncounter.id = "adventure-encounter";
+    adventureEncounter.classList.add("flex-column");
+    adventureEncounter.style.display = "flex";
+    let adventureHeading = document.createElement("p");
+    adventureHeading.id = "adventure-header";
+    let adventureChoiceOne = document.createElement("button");
+    adventureChoiceOne.innerText = "Fight!";
+    adventureChoiceOne.id = "adv-button-one";
+    let adventureChoiceTwo = document.createElement("button");
+    adventureChoiceTwo.id = "adv-button-two";
+
+    let adventureFight = document.createElement("div");
+    adventureFight.id = "adventure-fight";
+    adventureFight.classList.add("flex-row","adventure-fight");
+    adventureFight.style.display = "none";
+    let adventureFightDodge = document.createElement("img");
+    adventureFightDodge.src = "./assets/expedbg/battle-dodge.webp"
+    let adventureFightSkill = document.createElement("img");
+    adventureFightSkill.src = "./assets/expedbg/battle-skill.webp"
+    let adventureFightBurst = document.createElement("img");
+    adventureFightBurst.src = "./assets/expedbg/battle-burst.webp";
+    adventureFight.append(adventureFightDodge,adventureFightSkill,adventureFightBurst)
+    adventureFight.style.display = "none";
+
+    adventureChoiceOne.addEventListener("click",()=>{
+        triggerFight();
+        adventureEncounter.style.display = "none";
+        adventureFight.style.display = "flex";
+        adventureChoiceOne.style.opacity = 0;
+    })
+    adventureEncounter.append(adventureHeading,adventureChoiceOne,adventureChoiceTwo);
+
+    adventureTextBox.append(adventureTextBG,adventureEncounter,adventureFight)
+    adventureArea.append(adventureVideo,adventureTextBox)
+    mainBody.append(adventureArea);
+}
+
+// ADVENTURE PROCESS
+let adventureScene = false;
+let enemyAmount = 0;
+function drawAdventure(amount) {
+    if (adventureScene) {return}
+    adventureScene = true;
+    enemyAmount = amount;
+    
+    let adventureChoiceOne = document.getElementById("adv-button-one");
+    adventureChoiceOne.style.opacity = 1;
+    let adventureChoiceTwo = document.getElementById("adv-button-two");
+    adventureChoiceTwo.innerText = "Run away...";
+    let adventureArea = document.getElementById("adventure-area");
+    adventureArea.style.zIndex = 500;
+    let adventureTextBox = document.getElementById("adventure-text");
+    let adventureVideo = document.getElementById("adventure-video");
+    adventureVideo = spawnMob(adventureVideo,amount)
+    
+    function textFadeIn() {
+        adventureTextBox.style.animation = "";
+        let adventureHeading = document.getElementById("adventure-header");
+        adventureHeading.innerText = "You encounter a bunch of hostile fungi.";
+        adventureHeading.style.animation = "fadeOut 1.4s ease-out reverse";
+        adventureTextBox.removeEventListener("animationend", textFadeIn);
+    }
+
+    adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
+    adventureTextBox.addEventListener("animationend",textFadeIn);
+    bgmElement.pause();
+    fightEncounter.load();
+    fightEncounter.play();
+}
+
+function spawnMob(adventureVideo,amount) {
+    for (let i = 0; i < amount; i++) {
+        let mobDiv = document.createElement("div");
+        let mobImg = new Image();
+        mobImg.src = "./assets/expedbg/leaderMob1.webp";
+        mobImg.classList.add("enemyImg");
+        mobDiv.classList.add("enemy");
+        mobDiv.append(mobImg);
+        adventureVideo.append(mobDiv);
+    }
+    return adventureVideo;
+}
+
+let fightSceneOn = false;
+function triggerFight() {
+    if (!adventureScene) {return}
+    fightSceneOn = true;
+    let currentSong = randomInteger(1,4);
+    fightBgmElement.src = `./assets/sfx/battleTheme-${currentSong}.mp3`;
+    fightBgmElement.volume = settingsValues.bgmVolume;
+    fightBgmElement.load();
+    fightBgmElement.play();
+    fightBgmElement.addEventListener("ended",()=>{
+        fightBgmElement.load();
+        fightBgmElement.play();
+    })
+
+    let healthDiv = document.getElementById("adventure-health");
+    healthDiv.style.opacity = 1;
+    let healthBar = document.getElementById("health-bar");
+    healthBar.maxHealth = 15;
+    healthBar.currentWidth = 100;
+    healthBar.classList.add("adventure-health");
+    healthBar.style.width = "100%";
+
+    for (let i = 0; i < healthBar.maxHealth; i++) {
+        let health = new Image();
+        health.src = "./assets/icon/health.webp";
+        healthDiv.append(health);
+    }
+
+    let adventureVideo = document.getElementById("adventure-video");
+    let adventureVideoChildren = adventureVideo.children;
+    for (let i = 0; i < adventureVideoChildren.length; i++) {
+        let mobDiv = adventureVideoChildren[i];
+        if (mobDiv.tagName != 'DIV') {continue}
+        if (mobDiv.id == 'adventure-health') {continue}
+        mobDiv.children[0].style.animation = `vibrate ${randomInteger(600,1200)/100}s linear infinite both`;
+
+        let mobHealth = document.createElement("div");
+        mobHealth.classList.add("health-bar");
+        mobHealth.health = 100;
+        mobHealth.dead = false;
+        let mobAtkIndicator = document.createElement("img");
+        mobAtkIndicator.classList.add("atk-indicator");
+        mobAtkIndicator.src = "./assets/icon/atkIndicator.webp";
+        mobAtkIndicator.style.animation = `atk-delay ${randomInteger(60,90)/10}s linear infinite`;
+
+        mobDiv.beingAttacked = mobAtkIndicator.addEventListener('animationiteration', ()=>{
+            loseHP(mobDiv.beingAttacked)
+        })
+        mobDiv.children[0].addEventListener("click",()=>{
+            if (!fightSceneOn) {return}
+            if (mobHealth.dead) {return}
+            mobHealth.health -= 13;
+            if (mobHealth.health <= 0) {
+                mobHealth.dead = true;
+                enemyAmount--;
+
+                mobDiv.children[0].style.animation = "";
+                mobDiv.style.filter = "grayscale(80%) brightness(30%)";
+                fightEnemyDownElement.load();
+                fightEnemyDownElement.play();
+                mobHealth.remove();
+
+                let mobChildArray = mobDiv.children;
+                while (mobChildArray.length > 1) {
+                    mobChildArray[mobChildArray.length - 1].remove();
+                }
+                if (enemyAmount === 0) {
+                    winAdventure();
+                }
+            }
+            mobHealth.style.width = `${mobHealth.health}%`
+            
+        })
+        mobDiv.append(mobHealth,mobAtkIndicator);
+    }
+}
+
+function loseHP(beingAttacked) {
+    if (!fightSceneOn) {
+        return;
+    }
+
+    let healthBar = document.getElementById('health-bar');
+    let hpInterval = (100/healthBar.maxHealth);
+    healthBar.currentWidth -= hpInterval;
+
+    if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
+    healthBar.style.width = `${healthBar.currentWidth}%`
+    if (healthBar.currentWidth <= 0) {
+        loseAdventure();
+    }
+}
+
+function loseAdventure() {
+    if (!fightSceneOn) {return}
+    fightSceneOn = false;
+
+    let adventureHeading = document.getElementById("adventure-header");
+    adventureHeading.innerText = "You passed out...";
+    let adventureChoiceTwo = document.getElementById("adv-button-two");
+    adventureChoiceTwo.innerText = "Leave";
+    adventureChoiceTwo.addEventListener("click",()=>{
+        quitAdventure();
+        let newAdventureChoiceTwo = adventureChoiceTwo.cloneNode(true);
+        adventureChoiceTwo.parentNode.replaceChild(newAdventureChoiceTwo, adventureChoiceTwo);
+    })
+
+    let adventureVideo = document.getElementById("adventure-video");
+    let targetElements = adventureVideo.querySelectorAll('.atk-indicator');
+    let len = targetElements.length;
+    for (let i = 0; i < len; i++) {
+        targetElements[i].remove()
+    }
+
+    let adventureFight = document.getElementById("adventure-fight");
+    adventureFight.style.display = "none";
+    let adventureEncounter = document.getElementById("adventure-encounter");
+    adventureEncounter.style.display = "flex";
+    let imageGif = document.getElementById("adventure-gif");
+    imageGif.src = "./assets/expedbg/exped-Nahida-loss.webp";
+
+    setTimeout(()=>{
+        fightBgmElement.pause();
+        fightLoseElement.load();
+        fightLoseElement.play();
+        fightLoseElement.addEventListener('ended',()=>{
+            setTimeout(()=>{bgmElement.play()},300)
+        })
+    },300)
+    
+}
+
+function winAdventure() {
+    if (!fightSceneOn) {return}
+    fightSceneOn = false;
+
+    let adventureHeading = document.getElementById("adventure-header");
+    adventureHeading.innerText = "You won!";
+    let adventureChoiceTwo = document.getElementById("adv-button-two");
+    adventureChoiceTwo.innerText = "Leave";
+    adventureChoiceTwo.addEventListener("click",()=>{
+        quitAdventure();
+        let newAdventureChoiceTwo = adventureChoiceTwo.cloneNode(true);
+        adventureChoiceTwo.parentNode.replaceChild(newAdventureChoiceTwo, adventureChoiceTwo);
+    })
+    let adventureFight = document.getElementById("adventure-fight");
+    adventureFight.style.display = "none";
+    let adventureEncounter = document.getElementById("adventure-encounter");
+    adventureEncounter.style.display = "flex";
+
+    setTimeout(()=>{
+        fightBgmElement.pause();
+        fightWinElement.load();
+        fightWinElement.play();
+        fightWinElement.addEventListener('ended',()=>{
+            setTimeout(()=>{bgmElement.play()},300)
+        })
+    },300)
+}
+
+function quitAdventure() {
+    let adventureArea = document.getElementById("adventure-area");
+    adventureArea.style.zIndex = -1;
+    adventureScene = false;
+
+    let adventureHeading = document.getElementById("adventure-header");
+    adventureHeading.innerText = "";
+    let imageGif = document.getElementById("adventure-gif");
+    imageGif.src = "./assets/expedbg/exped-Nahida.webp";
+
+    let adventureVideo = document.getElementById("adventure-video");
+    let enemyElements = adventureVideo.getElementsByClassName("enemy");
+    while (enemyElements.length > 0) {
+        enemyElements[0].remove();
+    }
+
+    let adventureHealth = document.getElementById("adventure-health");
+    adventureHealth.style.opacity = 0;
+    let healthElements = adventureHealth.getElementsByTagName("IMG");
+    while (healthElements.length > 0) {
+        healthElements[0].remove();
+    }
+    let adventureHealthbarDiv = document.createElement("div");
+    adventureHealthbarDiv.style.width = "100%";
+}
 
 // DRAWS FOR RANDOM INVENTORY LOOT 
 function inventoryDraw(itemType, min, max, type){
