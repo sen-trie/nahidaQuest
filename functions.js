@@ -121,7 +121,7 @@ function unlockExpedition(i,expeditionDict) {
     let unlockButton = document.getElementById(expedID);
     let backgroundImage = "url(./assets/expedbg/exped" + i + ".webp)";
 
-    expeditionDict[i] = 0;
+    expeditionDict[i] = '0';
     unlockButton.style.backgroundImage = backgroundImage;
 }
 

@@ -6,7 +6,7 @@ let saveValuesDefault = {
     realScore:0,
     freeLevels:0,
     primogem:0,
-    energy:111100,
+    energy:100,
     rowCount:0,
     heroesPurchased:0,
     mailCore:0,
@@ -31,6 +31,7 @@ let persistentValuesDefault = {
     upgrade9:{Purchased: 0},
     upgrade10:{Purchased: 0},
     upgrade11:{Purchased: 0},
+    upgrade12:{Purchased: 0},
 }
 
 let SettingsDefault = {
@@ -51,6 +52,7 @@ let permUpgrades = {
     9:{Name:"Blessing of Riches",          Effect:10,  Max:25,   Cap:true,   Description:"Increases Primogems gained from Events/Achievements."},
     10:{Name:"Blessing of Strength",       Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
     11:{Name:"Blessing of Fortification",  Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
+    12:{Name:"Blessing of Determination",  Effect:1,  Max:50,   Cap:false,   Description:"Decreases cooldown between going on Expeditions."},
 }
 
 let expeditionDictDefault = {
@@ -63,6 +65,86 @@ let expeditionDictDefault = {
     7:"0",
     8:"0",
     9:"1",
+}
+
+const waveArray = [5,6,6,6,8];
+let enemyInfo = {
+    getRandomWave(type,randomInteger) {
+        let waveType = `${type}-Wave-${randomInteger(1,waveArray[type-1]+1)}`;
+        return enemyInfo[waveType];
+    },
+    // LVL 1
+    "1-Wave-1":{Wave:[101,102,101],         BG:[1,4]},
+    "1-Wave-2":{Wave:[102,102],             BG:[1,4]},
+    "1-Wave-3":{Wave:[111,111,111],         BG:[3,6]},
+    "1-Wave-4":{Wave:[111,112],             BG:[3,6]},
+    "1-Wave-5":{Wave:[113,113],             BG:[6,7]},
+    101:{Class:"Mob",       Variation:4,   Type:"Fungi",       HP:70,    ATK:0.5,   AtkCooldownLower:40,   AtkCooldownUpper:60},
+    102:{Class:"Leader",    Variation:2,   Type:"Fungi",       HP:120,   ATK:1,     AtkCooldownLower:60,   AtkCooldownUpper:80},
+    111:{Class:"Mob",       Variation:4,   Type:"Hilichurl",   HP:100,   ATK:0.5,   AtkCooldownLower:60,   AtkCooldownUpper:80},
+    112:{Class:"Leader",    Variation:3,   Type:"Hilichurl",   HP:140,   ATK:1,     AtkCooldownLower:60,   AtkCooldownUpper:80},
+    113:{Class:"Mob",       Variation:3,   Type:"Automaton",   HP:200,   ATK:1,     AtkCooldownLower:80,   AtkCooldownUpper:100},
+    // LVL 2
+    "2-Wave-1":{Wave:[201,202,201],         BG:[1,5]},
+    "2-Wave-2":{Wave:[202,202],             BG:[1,5]},
+    "2-Wave-3":{Wave:[212,211,212],         BG:[2,4]},
+    "2-Wave-4":{Wave:[211,211,211,211],     BG:[4,6]},
+    "2-Wave-5":{Wave:[222,222],             BG:[6,7]},
+    "2-Wave-6":{Wave:[221,221,221,221],     BG:[6,7]},
+    201:{Class:"Mob",       Variation:2,   Type:"Eremite",     HP:100,   ATK:0.5,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    202:{Class:"Leader",    Variation:3,   Type:"Eremite",     HP:200,   ATK:1.5,   AtkCooldownLower:60,   AtkCooldownUpper:60},
+    211:{Class:"Mob",       Variation:5,   Type:"Fatui",       HP:200,   ATK:0.5,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    212:{Class:"Leader",    Variation:3,   Type:"Fatui",       HP:300,   ATK:1,     AtkCooldownLower:60,   AtkCooldownUpper:60},
+    221:{Class:"Mob",       Variation:3,   Type:"Automaton",   HP:200,   ATK:0.5,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    222:{Class:"Leader",    Variation:2,   Type:"Automaton",   HP:200,   ATK:1.5,   AtkCooldownLower:60,   AtkCooldownUpper:80},
+    // LVL 3
+    "3-Wave-1":{Wave:[301,301,301,301],     BG:[1,4]},
+    "3-Wave-2":{Wave:[302,301,302],         BG:[1,4]},
+    "3-Wave-3":{Wave:[311,311,312,311],     BG:[2,5]},
+    "3-Wave-4":{Wave:[312,311,312],         BG:[2,5]},
+    "3-Wave-5":{Wave:[321,322,322,321],     BG:[4,6]},
+    "3-Wave-6":{Wave:[322,322,322],         BG:[4,6]},
+    301:{Class:"Mob",       Variation:2,   Type:"Eremite",     HP:500,   ATK:1,   AtkCooldownLower:60,   AtkCooldownUpper:60},
+    302:{Class:"Leader",    Variation:3,   Type:"Eremite",     HP:500,   ATK:2,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    311:{Class:"Mob",       Variation:5,   Type:"Fatui",       HP:500,   ATK:1,   AtkCooldownLower:60,   AtkCooldownUpper:60},
+    312:{Class:"Leader",    Variation:3,   Type:"Fatui",       HP:500,   ATK:2,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    321:{Class:"Mob",       Variation:4,   Type:"Hilichurl",   HP:500,   ATK:1,   AtkCooldownLower:60,   AtkCooldownUpper:80},
+    322:{Class:"Leader",    Variation:3,   Type:"Hilichurl",   HP:500,   ATK:2,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    // LVL 4
+    "4-Wave-1":{Wave:[402,402,402],         BG:[1,2]},
+    "4-Wave-2":{Wave:[401,403,401],         BG:[1,2]},
+    "4-Wave-3":{Wave:[412,413,411],         BG:[3,4]},
+    "4-Wave-4":{Wave:[413,413],             BG:[3,4]},
+    "4-Wave-5":{Wave:[421],                 BG:[4,6]},
+    "4-Wave-6":{Wave:[431],                 BG:[2,3]},
+    401:{Class:"Mob",       Variation:4,   Type:"Fungi",       HP:700,    ATK:1.5,   AtkCooldownLower:60,   AtkCooldownUpper:80},
+    402:{Class:"Leader",    Variation:2,   Type:"Fungi",       HP:700,    ATK:2,     AtkCooldownLower:60,   AtkCooldownUpper:80},
+    403:{Class:"Boss",      Variation:1,   Type:"Fungi",       HP:700,    ATK:2.5,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    411:{Class:"Mob",       Variation:4,   Type:"Hilichurl",   HP:700,    ATK:1.5,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    412:{Class:"Leader",    Variation:3,   Type:"Hilichurl",   HP:700,    ATK:2,     AtkCooldownLower:60,   AtkCooldownUpper:80},
+    413:{Class:"Boss",      Variation:2,   Type:"Hilichurl",   HP:1200,   ATK:2.5,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    421:{Class:"Superboss", Variation:1,   Type:"Fatui",       HP:2666,   ATK:3.5,   AtkCooldownLower:40,   AtkCooldownUpper:60},
+    431:{Class:"Superboss", Variation:2,   Type:"Automaton",   HP:2700,   ATK:3.5,   AtkCooldownLower:40,   AtkCooldownUpper:60},
+    // LVL 5
+    "5-Wave-1":{Wave:[502,502,502],         BG:[3,6]},
+    "5-Wave-2":{Wave:[501,503,501],         BG:[3,6]},
+    "5-Wave-3":{Wave:[504],                 BG:[3,6]},
+    "5-Wave-4":{Wave:[511,512,512,511],     BG:[3,6]},
+    "5-Wave-5":{Wave:[522,522,522],         BG:[1,2]},
+    "5-Wave-6":{Wave:[521,523,521],         BG:[1,2]},
+    "5-Wave-7":{Wave:[532,532,532],         BG:[2,3]},
+    "5-Wave-8":{Wave:[531,532,532,531],     BG:[2,3]},
+    501:{Class:"Mob",       Variation:2,   Type:"WAbyss",      HP:1000,   ATK:1.5,   AtkCooldownLower:40,   AtkCooldownUpper:60},
+    502:{Class:"Leader",    Variation:2,   Type:"WAbyss",      HP:1500,   ATK:2,     AtkCooldownLower:60,   AtkCooldownUpper:80},
+    503:{Class:"Boss",      Variation:1,   Type:"WAbyss",      HP:2000,   ATK:2.5,   AtkCooldownLower:80,   AtkCooldownUpper:100},
+    504:{Class:"Superboss", Variation:1,   Type:"WAbyss",      HP:3000,   ATK:4,     AtkCooldownLower:40,   AtkCooldownUpper:50},
+    511:{Class:"Mob",       Variation:3,   Type:"HAbyss",      HP:1000,   ATK:1.5,   AtkCooldownLower:40,   AtkCooldownUpper:60},
+    512:{Class:"Leader",    Variation:2,   Type:"HAbyss",      HP:1750,   ATK:2,     AtkCooldownLower:60,   AtkCooldownUpper:90},
+    521:{Class:"Mob",       Variation:3,   Type:"Automaton",   HP:1000,   ATK:1.5,   AtkCooldownLower:40,   AtkCooldownUpper:60},
+    522:{Class:"Leader",    Variation:3,   Type:"Automaton",   HP:1500,   ATK:2,     AtkCooldownLower:70,   AtkCooldownUpper:90},
+    523:{Class:"Boss",      Variation:1,   Type:"Automaton",   HP:2000,   ATK:2.5,   AtkCooldownLower:60,   AtkCooldownUpper:80},
+    531:{Class:"Leader",    Variation:3,   Type:"Eremite",     HP:1250,   ATK:1.5,   AtkCooldownLower:60,   AtkCooldownUpper:80},
+    532:{Class:"Boss",      Variation:2,   Type:"Eremite",     HP:1500,   ATK:2,     AtkCooldownLower:40,   AtkCooldownUpper:60},
 }
 
 let upgradeDictDefault = {
@@ -779,15 +861,15 @@ let InventoryDefault = {
     
 
 // SHOP ITEMS vvv
-    5001: {File:"any5",          Name:"Brilliant Diamond Gemstone",                  Lore:"A shiny mystical gem that increases power of [s]all[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",                       Star:6,       Type:"Gemstone",           element:"Any"          },
+    5001: {File:"any5",          Name:"Brilliant Diamond Gemstone",                  Lore:"A shiny spectral gem that increases power of [s]all[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",                       Star:6,       Type:"Gemstone",           element:"Any"          },
     5002: {File:"any4",          Name:"Brilliant Diamond Chunck",                    Lore:"A shiny mystical gem that increases power of [s]all[/s] characters by at least [s]90%[/s]. \n\n (Only characters currently purchased count.)",                        Star:5,        Type:"Gemstone",         element:"Any"          },
-    5003: {File:"pyro5",         Name:"Agnidus Agate Gemstone",                      Lore:"A mystical red gem that increases power of [s]Pyro[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",      Star:5,        Type:"Gemstone",            element:"Pyro"         },
-    5004: {File:"hydro5",        Name:"Varunada Lazurite Gemstone",                  Lore:"A mystical blue gem that increases power of [s]Hydro[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",       Star:5,       Type:"Gemstone",             element:"Hydro"         },
-    5005: {File:"dendro5",       Name:"Nagadus Emerald Gemstone",                    Lore:"A mystical dark green gem that increases power of [s]Dendro[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",        Star:5,      Type:"Gemstone",              element:"Dendro"         },
-    5006: {File:"electro5",      Name:"Vajrada Amethyst Gemstone",                   Lore:"A mystical purple gem that increases power of [s]Electro[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",         Star:5,      Type:"Gemstone",               element:"Electro"         },
-    5007: {File:"anemo5",        Name:"Vayuda Turquoise Gemstone",                   Lore:"A mystical green gem that increases power of [s]Anemo[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",       Star:5,        Type:"Gemstone",              element:"Anemo"         },
-    5008: {File:"cryo5",         Name:"Shivada Jade",                                Lore:"A mystical light blue gem that increases power of [s]Cryo[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",      Star:5,         Type:"Gemstone",              element:"Cryo"         },
-    5009: {File:"geo5",          Name:"Prithiva Topaz",                              Lore:"A mystical yellowish brown gem that increases power of [s]Geo[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",     Star:5,          Type:"Gemstone",              element:"Geo"         },
+    5003: {File:"pyro5",         Name:"Agnidus Agate Gemstone",                      Lore:"A spectral red gem that increases power of [s]Pyro[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",      Star:5,        Type:"Gemstone",            element:"Pyro"         },
+    5004: {File:"hydro5",        Name:"Varunada Lazurite Gemstone",                  Lore:"A spectral blue gem that increases power of [s]Hydro[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",       Star:5,       Type:"Gemstone",             element:"Hydro"         },
+    5005: {File:"dendro5",       Name:"Nagadus Emerald Gemstone",                    Lore:"A spectral dark green gem that increases power of [s]Dendro[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",        Star:5,      Type:"Gemstone",              element:"Dendro"         },
+    5006: {File:"electro5",      Name:"Vajrada Amethyst Gemstone",                   Lore:"A spectral purple gem that increases power of [s]Electro[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",         Star:5,      Type:"Gemstone",               element:"Electro"         },
+    5007: {File:"anemo5",        Name:"Vayuda Turquoise Gemstone",                   Lore:"A spectral green gem that increases power of [s]Anemo[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",       Star:5,        Type:"Gemstone",              element:"Anemo"         },
+    5008: {File:"cryo5",         Name:"Shivada Jade",                                Lore:"A spectral light blue gem that increases power of [s]Cryo[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",      Star:5,         Type:"Gemstone",              element:"Cryo"         },
+    5009: {File:"geo5",          Name:"Prithiva Topaz",                              Lore:"A spectral yellowish brown gem that increases power of [s]Geo[/s] characters by at least [s]200%[/s]. \n\n (Only characters currently purchased count.)",     Star:5,          Type:"Gemstone",              element:"Geo"         },
     5010: {File:"pyro4",         Name:"Agnidus Agate Chunk",                         Lore:"A mystical red gem that increases power of [s]Pyro[/s] characters by at least [s]120%[/s]. \n\n (Only characters currently purchased count.)",      Star:4,          Type:"Gemstone",             element:"Pyro"      },
     5011: {File:"hydro4",        Name:"Varunada Lazurite Chunk",                     Lore:"A mystical blue gem that increases power of [s]Hydro[/s] characters by at least [s]120%[/s]. \n\n (Only characters currently purchased count.)",       Star:4,         Type:"Gemstone",            element:"Hydro"      },
     5012: {File:"dendro4",       Name:"Nagadus Emerald Chunk",                       Lore:"A mystical dark green gem that increases power of [s]Dendro[/s] characters by at least [s]120%[/s]. \n\n (Only characters currently purchased count.)",        Star:4,        Type:"Gemstone",              element:"Dendro"      },
@@ -959,4 +1041,4 @@ let achievementListDefault = {
     410: {Name:"A Golden Experience",                 Description:"Obtain 1000 Golden Nuts"                     },
 }
 
-export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict,expeditionDictInfo };
+export { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,enemyInfo,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict,expeditionDictInfo };

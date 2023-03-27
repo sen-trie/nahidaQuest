@@ -2362,6 +2362,19 @@ input:checked + .slider:before {
     column-gap: 0.5%;
 }
 
+.adventure-scara-health {
+    background-color:#333553 !important; 
+    border-left: 0.1em solid #333553 !important;
+}
+
+.adventure-scara-barHealth {
+    background-color: #a8acd9 !important;
+}
+
+.adventure-scara-health > img {
+    border-right: 0.1em solid #333553 !important;
+}
+
 #adventure-health {
     position: absolute;
     height: 9%;
@@ -2419,11 +2432,11 @@ input:checked + .slider:before {
         filter: brightness(0);
         transform: scale(1);
     }
-    90% {
+    80% {
         filter: brightness(0.7);
         transform: scale(1);
     }
-    91% {
+    80.1% {
         filter: brightness(1) drop-shadow(0 0 0.2em #ffffff) drop-shadow(0 0 0.3em #ffffff);
         transform: scale(1.2);
     }
@@ -2433,6 +2446,44 @@ input:checked + .slider:before {
     }
   }
 
+.select-indicator {
+    position: absolute;
+    object-fit: contain;
+    width: 20%;
+    height: auto;
+    top: 5%;
+    left: 40%;
+    animation: glow 0.8s linear infinite forwards;
+    filter: drop-shadow(0 0 0.3em #ffffff);
+}
+
+.staggered {
+    filter: grayscale(1) brightness(0.8) sepia(1) hue-rotate(90deg) saturate(2.5);
+}
+
+.damaged {
+    filter: grayscale(1) hue-rotate(90deg) brightness(0.7);
+}
+
+.battle-selected {
+    filter: drop-shadow(0.2em 0.2em 0em #386E4E)  
+            drop-shadow(-0.1em -0.1em 0em #386E4E)  
+            drop-shadow(-0.1em 0.1em 0em #386E4E)  
+            drop-shadow(0.1em -0.1em 0em #386E4E);
+}
+
+.battle-selected-scara {
+    filter: drop-shadow(0.2em 0.2em 0em #333455)  
+            drop-shadow(-0.1em -0.1em 0em #333455)  
+            drop-shadow(-0.1em 0.1em 0em #333455)  
+            drop-shadow(0.1em -0.1em 0em #333455);
+}
+
+@keyframes glow {
+    0% {transform: translateY(0)}
+    50% {transform: translateY(-40%)}
+    100% {transform: translateY(0)}
+}
 
 .health-bar {
     position: relative;
@@ -2445,13 +2496,28 @@ input:checked + .slider:before {
     transition: width 0.1s ease-in-out;
 }
 
+.health-bar-scara {
+    position: relative;
+    width: 100%;
+    height: 5%;
+    background-color: #C0C5ED;
+    border: 0.1em outset #333455;
+    box-sizing: border-box;
+    border-radius: 0.2em;
+    transition: width 0.1s ease-in-out;
+}
+
+.scara-bar {
+    background-color: #a2a6dd;
+    border: 0.1em outset #333553;
+}
+
 .adventure-text {
     position: relative;
     width: 40%;
     height: 40%;
     flex-wrap: wrap;
 }
-
 
 #adventure-encounter {
     height: 100%;
@@ -2502,9 +2568,14 @@ input:checked + .slider:before {
     transition: 0.3s ease;
 }
 
-.adventure-fight > img:hover {
+.fight-button:hover {
     transform: translate(-0.3em,-0.3em);
     filter:drop-shadow(0.2em 0.2em 0 #376C51) drop-shadow(0.3em 0.3em 0 #1d432f);
+}
+
+.fight-scara:hover {
+    transform: translate(-0.3em,-0.3em);
+    filter:drop-shadow(0.2em 0.2em 0 #42456c) drop-shadow(0.3em 0.3em 0 #22233c);
 }
 
 .adventure-text > img {

@@ -1,10 +1,10 @@
-import { upgradeDictDefault,SettingsDefault,InventoryDefault,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict,expeditionDictInfo } from "./defaultData.js"
+import { upgradeDictDefault,SettingsDefault,InventoryDefault,enemyInfo,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict,expeditionDictInfo } from "./defaultData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper } from "./functions.js"
 import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.3-3-250";
+const VERSIONNUMBER = "v0.3-3-270";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -322,12 +322,15 @@ let fightWinElement = new Audio("./assets/sfx/battle-success.mp3");
 let fightLoseElement = new Audio("./assets/sfx/battle-failure.mp3");
 let fightEnemyDownElement = new Audio("./assets/sfx/battle-enemyDown.mp3");
 let fightEncounter = new Audio("./assets/sfx/battle-encounter.mp3");
+let parrySuccess = new Audio("./assets/sfx/battle-parry-success.mp3");
+let parryFailure = new Audio("./assets/sfx/battle-parry-fail.mp3");
 let sfxArray = [
     tabElement,demoElement,upgradeElement,mailElement,
     achievementElement,eventElement,reactionStartElement,
     reactionCorrectElement,weaselBurrow,weaselDecoy,
     adventureElement,shopElement,
-    fightEncounter,fightEnemyDownElement,fightLoseElement,fightWinElement
+    fightEncounter,fightEnemyDownElement,fightLoseElement,fightWinElement,
+    parrySuccess,parryFailure
 ];
 
 let timerLoad = setInterval(timerEventsLoading,50);
@@ -431,7 +434,7 @@ function loadSaveData() {
         let expeditionDictTemp = localStorage.getItem("expeditionDictSave");
         expeditionDictTemp = JSON.parse(expeditionDictTemp);
         // FOR SAVE DATA 0.3.0 
-        if (typeof(expeditionDictTemp[1] === "object")) {
+        if (typeof(expeditionDictTemp[1]) != "string") {
             expeditionDict = expeditionDictDefault;
         } else {
             expeditionDict = expeditionDictTemp;
@@ -562,11 +565,11 @@ function energyRoll() {
 function screenTips() {
     let screenTips = document.getElementById("screen-tips");
     let maxInt = 13;
-    if (expeditionDict[5] !== '1') {
+    if (expeditionDict[5] != '1') {
         maxInt = 38;
-    } else if (expeditionDict[4] !== '1') {
+    } else if (expeditionDict[4] != '1') {
         maxInt = 30;
-    } else if (expeditionDict[3] !== '1') {
+    } else if (expeditionDict[3] != '1') {
         maxInt = 23;
     } 
 
@@ -687,7 +690,7 @@ function startRandomEvent() {
     let eventPicture = document.createElement("div");
     let aranaraNumber;
     // HARD EVENTS ARE LOCKED TO 4TH EXPEDITION UNLOCK
-    if (expeditionDict[4] !== '1') {
+    if (expeditionDict[4] != '1') {
         aranaraNumber = randomInteger(1,7);
     } else {
         aranaraNumber = randomInteger(1,4);
@@ -1479,11 +1482,11 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
         if (weaselCount >= 10) {
             innerTextTemp = `\n You received some items!`;
             newPop(1);
-            amount = randomInteger(80,140);
+            amount = randomInteger(100,140);
         } else if (weaselCount >= 7) {
             innerTextTemp = `\n You received a few items!`;
             newPop(1);
-            amount = randomInteger(40,100);
+            amount = randomInteger(60,100);
         } else if (weaselCount >= 4) {
             innerTextTemp = `\n You received a few primogems!`;
             amount = randomInteger(20,60);
@@ -1516,13 +1519,24 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
                 if (type === "primogem") {
                     currencyPopUp("primogem",amount);
                 } else if (type === "weasel") {
-                    if (amount2 > 0 && amount > 0) {
-                        currencyPopUp("primogem",amount,"nuts",amount2)
-                    } else if (amount > 0) {
-                        currencyPopUp("primogem",amount);
-                    } else if (amount2 > 0) {
+                    if (amount == 0 && amount2 == 0) {
+                        void(0);
+                    } else if (amount == 0 && amount2 > 0) {
                         currencyPopUp("nuts",amount2);
-                    }
+                    } else if (amount < 60 && amount2 > 0) {
+                        currencyPopUp("primogem",amount,"nuts",amount2);
+                    }  else if (amount < 100 && amount2 > 0) {
+                        currencyPopUp("items",0,"nuts",amount2);
+                    }  else if (amount < 140 && amount2 > 0) {
+                        currencyPopUp("items",0,"nuts",amount2);
+                    } else if (amount < 60) {
+                        currencyPopUp("primogem",amount);
+                    }  else if (amount < 100) {
+                        currencyPopUp("primogem",amount,"items",0);
+                    }  else if (amount < 140) {
+                        currencyPopUp("primogem",amount,"items",0);
+                    } 
+
                 } else if (type === "box") {
                     if (amount < 40 && amount > 0) {
                         currencyPopUp("nuts",amount);
@@ -1694,7 +1708,7 @@ function saveData(skip) {
             saveCurrently.remove();
         });
         mainBody.append(saveCurrently);
-    }    
+    }
 
     localStorage.setItem("settingsValues", JSON.stringify(settingsValues));
     localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
@@ -2789,11 +2803,12 @@ function adventure(type) {
         if (expeditionDict[type] != '1') {
             adventureElement.load();
             adventureElement.play();
-            if (type === 5 && goldenNutUnlocked === true && expeditionDict[type].Locked !== '1') {
+            if (type === 5 && goldenNutUnlocked === true && expeditionDict[type].Locked != '1') {
                 currencyPopUp("items",0,"nuts",randomInteger(5,10))
             } else {
-                currencyPopUp("items")
+                currencyPopUp("items");
             }
+            // drawAdventure(type);
         } else {
             weaselDecoy.load();
             weaselDecoy.play();
@@ -2880,7 +2895,6 @@ function adventure(type) {
                 if (randomDraw == 1) {
                     inventoryDraw("food", 4, 5);
                 } 
-
                 break;
             default:
                 console.error("Inventory error: Invalid item spawned");
@@ -2888,7 +2902,6 @@ function adventure(type) {
         }
         sortList("table2");
         newPop(1);
-        // drawAdventure(5);
     } else {
         expedInfo("exped-9");
     }
@@ -2904,7 +2917,6 @@ function createAdventure() {
     let adventureVideo = document.createElement("div");
     adventureVideo.id = "adventure-video";
     adventureVideo.classList.add("adventure-video","flex-row");
-    adventureVideo.style.backgroundImage = "url(./assets/expedbg/1-B-1-Scene.png)";
 
     let adventureTextBox = document.createElement("div");
     adventureTextBox.id = "adventure-text";
@@ -2942,22 +2954,40 @@ function createAdventure() {
     adventureFight.classList.add("flex-row","adventure-fight");
     adventureFight.style.display = "none";
     let adventureFightDodge = document.createElement("img");
-    adventureFightDodge.src = "./assets/expedbg/battle-dodge.webp"
-    let adventureFightSkill = document.createElement("img");
-    adventureFightSkill.src = "./assets/expedbg/battle-skill.webp"
-    let adventureFightBurst = document.createElement("img");
-    adventureFightBurst.src = "./assets/expedbg/battle-burst.webp";
-    adventureFight.append(adventureFightDodge,adventureFightSkill,adventureFightBurst)
-    adventureFight.style.display = "none";
+    adventureFightDodge.src = "./assets/expedbg/battle1.webp";
+    adventureFightDodge.id = "battle-toggle";
 
+    adventureFightDodge.addEventListener("click",()=>{
+        dodgeOn("toggle");
+    })
+    
+    let adventureFightSkill = document.createElement("img");
+    adventureFightSkill.src = "./assets/expedbg/battle2.webp";
+    let adventureFightBurst = document.createElement("img");
+    adventureFightBurst.src = "./assets/expedbg/battle3.webp";
+
+    adventureFightBurst.addEventListener("click",()=>{
+        attackAll();
+    })
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "1") {
+            dodgeOn("toggle");
+        } else if (event.key === "3") {
+            attackAll();
+        }
+    })
+
+    adventureFight.append(adventureFightDodge,adventureFightSkill,adventureFightBurst);
+    adventureFight.style.display = "none";
     adventureChoiceOne.addEventListener("click",()=>{
         triggerFight();
         adventureEncounter.style.display = "none";
         adventureFight.style.display = "flex";
-        adventureChoiceOne.style.opacity = 0;
+        adventureChoiceOne.style.display = "none";
     })
-    adventureEncounter.append(adventureHeading,adventureChoiceOne,adventureChoiceTwo);
 
+    adventureEncounter.append(adventureHeading,adventureChoiceOne,adventureChoiceTwo);
     adventureTextBox.append(adventureTextBG,adventureEncounter,adventureFight)
     adventureArea.append(adventureVideo,adventureTextBox)
     mainBody.append(adventureArea);
@@ -2965,21 +2995,43 @@ function createAdventure() {
 
 // ADVENTURE PROCESS
 let adventureScene = false;
+let adventureScaraText = "";
 let enemyAmount = 0;
-function drawAdventure(amount) {
+function drawAdventure(advType) {
+    adventureScaraText = "";
     if (adventureScene) {return}
     adventureScene = true;
-    enemyAmount = amount;
+    if (advType == 5) {
+        adventureScaraText = "-scara";
+    };
+
+    let waveType = enemyInfo.getRandomWave(advType,randomInteger);
+    enemyAmount = waveType.Wave.length;
+    let imageGif = document.getElementById("adventure-gif");
+    let adventureFightImg = document.getElementById("adventure-fight").children;
+    if (adventureScaraText) {
+        imageGif.src = `./assets/expedbg/exped${adventureScaraText}.webp`;
+        for (let i = 0; i < adventureFightImg.length; i++) {
+            adventureFightImg[i].src = `./assets/expedbg/scara${i+1}.webp`;
+            adventureFightImg[i].classList.add("fight-scara")
+        }
+    } else {
+        for (let i = 0; i < adventureFightImg.length; i++) {
+            adventureFightImg[i].src = `./assets/expedbg/battle${i+1}.webp`;
+            adventureFightImg[i].classList.add("fight-button")
+        }
+    }
     
     let adventureChoiceOne = document.getElementById("adv-button-one");
-    adventureChoiceOne.style.opacity = 1;
+    adventureChoiceOne.style.display = "block";
     let adventureChoiceTwo = document.getElementById("adv-button-two");
     adventureChoiceTwo.innerText = "Run away...";
     let adventureArea = document.getElementById("adventure-area");
     adventureArea.style.zIndex = 500;
     let adventureTextBox = document.getElementById("adventure-text");
     let adventureVideo = document.getElementById("adventure-video");
-    adventureVideo = spawnMob(adventureVideo,amount)
+    adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.png)`;
+    adventureVideo = spawnMob(adventureVideo,waveType.Wave);
     
     function textFadeIn() {
         adventureTextBox.style.animation = "";
@@ -2996,12 +3048,15 @@ function drawAdventure(amount) {
     fightEncounter.play();
 }
 
-function spawnMob(adventureVideo,amount) {
-    for (let i = 0; i < amount; i++) {
+function spawnMob(adventureVideo,waveType) {
+    for (let i = 0; i < waveType.length; i++) {
+        let singleEnemyInfo = enemyInfo[waveType[i]];
         let mobDiv = document.createElement("div");
         let mobImg = new Image();
-        mobImg.src = "./assets/expedbg/leaderMob1.webp";
+        mobImg.src = `./assets/expedbg/enemy/${singleEnemyInfo.Type}-${singleEnemyInfo.Class}-${randomInteger(1,singleEnemyInfo.Variation+1)}.webp`;
         mobImg.classList.add("enemyImg");
+
+        mobDiv.enemyID = singleEnemyInfo;
         mobDiv.classList.add("enemy");
         mobDiv.append(mobImg);
         adventureVideo.append(mobDiv);
@@ -3013,7 +3068,23 @@ let fightSceneOn = false;
 function triggerFight() {
     if (!adventureScene) {return}
     fightSceneOn = true;
-    let currentSong = randomInteger(1,4);
+
+    let adventureVideo = document.getElementById("adventure-video");
+    let adventureVideoChildren = adventureVideo.children;
+    let currentSong;
+    if (adventureScaraText) {
+        currentSong = 4;
+    } else {
+        let mobDiv = adventureVideoChildren[2];
+        if (mobDiv.enemyID.HP == 2666) {
+            currentSong = 4;
+        } else {
+            currentSong = randomInteger(1,4);
+        }
+        
+    }
+    
+    bgmElement.pause();
     fightBgmElement.src = `./assets/sfx/battleTheme-${currentSong}.mp3`;
     fightBgmElement.volume = settingsValues.bgmVolume;
     fightBgmElement.load();
@@ -3030,43 +3101,125 @@ function triggerFight() {
     healthBar.currentWidth = 100;
     healthBar.classList.add("adventure-health");
     healthBar.style.width = "100%";
+    if (adventureScaraText) {
+        healthDiv.classList.add("adventure-scara-health");
+        healthBar.classList.add("adventure-scara-barHealth");
+    } else {
+        if (healthDiv.classList.contains("adventure-scara-health")) {healthDiv.classList.remove("adventure-scara-health")}
+        if (healthBar.classList.contains("adventure-scara-barHealth")) {healthBar.classList.remove("adventure-scara-barHealth")}
+    };
 
     for (let i = 0; i < healthBar.maxHealth; i++) {
         let health = new Image();
-        health.src = "./assets/icon/health.webp";
+        health.src = `./assets/icon/health${adventureScaraText}.webp`;
         healthDiv.append(health);
     }
-
-    let adventureVideo = document.getElementById("adventure-video");
-    let adventureVideoChildren = adventureVideo.children;
+    
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         let mobDiv = adventureVideoChildren[i];
         if (mobDiv.tagName != 'DIV') {continue}
         if (mobDiv.id == 'adventure-health') {continue}
         mobDiv.children[0].style.animation = `vibrate ${randomInteger(600,1200)/100}s linear infinite both`;
 
+        let singleEnemyInfo = mobDiv.enemyID;
         let mobHealth = document.createElement("div");
-        mobHealth.classList.add("health-bar");
-        mobHealth.health = 100;
+        mobHealth.classList.add(`health-bar${adventureScaraText}`);
+        
+        mobHealth.maxHP = singleEnemyInfo.HP;
+        mobHealth.health = singleEnemyInfo.HP;
+        mobHealth.atk = singleEnemyInfo.ATK;
+        mobHealth.class = singleEnemyInfo.Class;
         mobHealth.dead = false;
+        
+        let animationTime = randomInteger(singleEnemyInfo.AtkCooldownLower * 10,singleEnemyInfo.AtkCooldownUpper * 10)/100;
+        mobDiv.attackTime = animationTime;
         let mobAtkIndicator = document.createElement("img");
-        mobAtkIndicator.classList.add("atk-indicator");
-        mobAtkIndicator.src = "./assets/icon/atkIndicator.webp";
-        mobAtkIndicator.style.animation = `atk-delay ${randomInteger(60,90)/10}s linear infinite`;
+        let canvas = document.createElement("canvas");
+        canvas.classList.add("atk-indicator");
+        mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+        if (mobHealth.class == "Superboss") {
+            mobAtkIndicator.src = `./assets/icon/atkIndicator-boss.webp`;
+        }
 
-        mobDiv.beingAttacked = mobAtkIndicator.addEventListener('animationiteration', ()=>{
-            loseHP(mobDiv.beingAttacked)
-        })
+        canvas.brightness = 0 - 0.1 * (i * randomInteger(1,adventureVideoChildren.length) - 2);
+        mobAtkIndicator.onload = ()=> {
+            canvas.width = mobAtkIndicator.naturalWidth;
+            canvas.height = mobAtkIndicator.naturalHeight;
+
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(mobAtkIndicator, 0, 0);
+            let brightnessIncrement = Math.round(1 / animationTime * 100)/10000;
+            let maxBrightness = 1;
+
+            canvas.style.filter = `brightness(0)`;
+            canvas.style.transform = ``;
+            canvas.attackState = false;
+            increaseBrightness();
+
+            function increaseBrightness() {
+                if (!fightSceneOn) {return}
+                if (mobHealth.dead) {return}
+                canvas.brightness += brightnessIncrement;
+                if (canvas.attackState) {
+                    loseHP(mobHealth.atk)
+                    canvas.attackState = false;
+                }
+
+                if (canvas.brightness > 0.8) {
+                    if (canvas.style.transform == ``) {
+                        canvas.style.transform = `scale(1.2)`;
+                        canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
+                        canvas.classList.add("attack-ready");
+                    }
+                } else {
+                    canvas.style.filter = `brightness(${canvas.brightness})`;
+                }
+
+                if (canvas.brightness > maxBrightness) {
+                    canvas.attackState = true;
+                    if (canvas.classList.contains("attack-ready")) {canvas.classList.remove("attack-ready")}
+                    canvas.brightness = 0;
+                    canvas.style.transform = ``;
+                    canvas.style.filter = `brightness(0)`;
+                }
+                window.requestAnimationFrame(increaseBrightness);
+        }
+    }
+
         mobDiv.children[0].addEventListener("click",()=>{
             if (!fightSceneOn) {return}
             if (mobHealth.dead) {return}
+            if (mobDiv.children[3] != undefined) {
+                if (mobDiv.children[3].id === "select-indicator") {
+                    if (canvas.classList.contains("attack-ready") && mobHealth.class != "Superboss") {
+                        canvas.attackState = false;
+                        canvas.classList.remove("attack-ready")
+                        mobDiv.children[0].classList.add("staggered");
+                        setTimeout(()=>{mobDiv.children[0].classList.remove("staggered")},animationTime * 150);
+                        parrySuccess.load();
+                        parrySuccess.play();
+                        
+                        canvas.brightness  = 0;
+                        canvas.style.transform = ``;
+                        canvas.style.filter = `brightness(0)`;
+                    } else {
+                        mobDiv.children[0].classList.add("damaged");
+                        setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},animationTime * 150);
+                        parryFailure.load();
+                        parryFailure.play();
+                    }
+                    mobHealth.health -= 13;
+                    dodgeOn("close");
+                }
+            }
+            
             mobHealth.health -= 13;
             if (mobHealth.health <= 0) {
                 mobHealth.dead = true;
                 enemyAmount--;
 
                 mobDiv.children[0].style.animation = "";
-                mobDiv.style.filter = "grayscale(80%) brightness(30%)";
+                mobDiv.style.filter = "grayscale(100%) brightness(20%)";
                 fightEnemyDownElement.load();
                 fightEnemyDownElement.play();
                 mobHealth.remove();
@@ -3079,26 +3232,142 @@ function triggerFight() {
                     winAdventure();
                 }
             }
-            mobHealth.style.width = `${mobHealth.health}%`
+            mobHealth.style.width = `${Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100}%`
             
         })
-        mobDiv.append(mobHealth,mobAtkIndicator);
+        mobDiv.append(mobHealth,canvas);
     }
 }
 
-function loseHP(beingAttacked) {
+function loseHP(ATK) {
     if (!fightSceneOn) {
         return;
     }
 
     let healthBar = document.getElementById('health-bar');
     let hpInterval = (100/healthBar.maxHealth);
-    healthBar.currentWidth -= hpInterval;
+    healthBar.currentWidth -= (hpInterval * ATK);
 
     if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
     healthBar.style.width = `${healthBar.currentWidth}%`
     if (healthBar.currentWidth <= 0) {
         loseAdventure();
+    }
+}
+
+let dodgeAppearance = false;
+function dodgeOn(type) {
+    if (type === "toggle") {
+        if (dodgeAppearance) {
+            let adventureVideo = document.getElementById("adventure-video");
+            let adventureVideoChildren = adventureVideo.children;
+            for (let i = 0; i < adventureVideoChildren.length; i++) {
+                let mobDiv = adventureVideoChildren[i];
+                if (mobDiv.tagName != 'DIV') {continue};
+                if (mobDiv.id == 'adventure-health') {continue};
+                if (mobDiv.children[1] == undefined) {continue};
+
+                if (mobDiv.children[3]) {
+                    if (mobDiv.children[3].id == "select-indicator") {
+                        mobDiv.children[3].remove();
+                    }
+                }
+            }
+
+            let button = document.getElementById("battle-toggle");
+            if (button.classList.contains("battle-selected")) {button.classList.remove("battle-selected")}
+            if (button.classList.contains("battle-selected-scara")) {button.classList.remove("battle-selected-scara")}
+            dodgeAppearance = false;
+        } else {
+            let adventureVideo = document.getElementById("adventure-video");
+            let adventureVideoChildren = adventureVideo.children;
+            for (let i = 0; i < adventureVideoChildren.length; i++) {
+                let mobDiv = adventureVideoChildren[i];
+                if (mobDiv.tagName != 'DIV') {continue};
+                if (mobDiv.id == 'adventure-health') {continue};
+                if (mobDiv.children[1] == undefined) {continue};
+
+                let mobAtkIndicator = document.createElement("img");
+                mobAtkIndicator.classList.add("select-indicator");
+                mobAtkIndicator.id = "select-indicator";
+                mobAtkIndicator.src = `./assets/icon/selectIndicator${adventureScaraText}.webp`
+                mobDiv.appendChild(mobAtkIndicator);
+            }
+
+            let button = document.getElementById("battle-toggle");
+            button.classList.add(`battle-selected${adventureScaraText}`);
+            dodgeAppearance = true;
+        }
+    } else if (type === "close") {
+        let adventureVideo = document.getElementById("adventure-video");
+        let adventureVideoChildren = adventureVideo.children;
+        for (let i = 0; i < adventureVideoChildren.length; i++) {
+            let mobDiv = adventureVideoChildren[i];
+            if (mobDiv.tagName != 'DIV') {continue};
+            if (mobDiv.id == 'adventure-health') {continue};
+            if (mobDiv.children[1] == undefined) {continue};
+            if (mobDiv.children[3] == undefined) {continue};
+            if (mobDiv.children[3].id == "select-indicator") {
+                mobDiv.children[3].remove();
+                continue;
+            }
+        }
+
+        let button = document.getElementById("battle-toggle");
+        if (button.classList.contains("battle-selected")) {button.classList.remove("battle-selected")}
+        if (button.classList.contains("battle-selected-scara")) {button.classList.remove("battle-selected-scara")}
+        dodgeAppearance = false;
+    }
+}
+
+function attackAll() {
+    let adventureVideo = document.getElementById("adventure-video");
+    let adventureVideoChildren = adventureVideo.children;
+    let cooldownTime;
+
+    parryFailure.load();
+    parryFailure.play();
+    for (let i = 0; i < adventureVideoChildren.length; i++) {
+        let mobDiv = adventureVideoChildren[i];
+        if (mobDiv.tagName != 'DIV') {continue};
+        if (mobDiv.id == 'adventure-health') {continue};
+        if (!mobDiv.children[1]) {continue};
+
+        let mobHealth = mobDiv.children[1];
+        mobHealth.health -= 13;
+        if (!cooldownTime) {cooldownTime = mobDiv.attackTime * 150}
+        if (mobHealth.class != "Superboss") {
+            mobDiv.children[0].classList.add("staggered");
+            setTimeout(()=>{mobDiv.children[0].classList.remove("staggered")},cooldownTime);
+        } else {
+            mobDiv.children[0].classList.add("damaged");
+            setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},cooldownTime);
+        }
+        
+        if (mobHealth.health <= 0) {
+            mobHealth.dead = true;
+            enemyAmount--;
+
+            mobDiv.children[0].style.animation = "";
+            mobDiv.style.filter = "grayscale(100%) brightness(20%)";
+            mobHealth.remove();
+
+            let mobChildArray = mobDiv.children;
+            while (mobChildArray.length > 1) {
+                mobChildArray[mobChildArray.length - 1].remove();
+            }
+            if (enemyAmount === 0) {
+                winAdventure();
+            }
+        }
+
+        mobHealth.style.width = `${Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100}%`;
+        if (mobHealth.class != "Superboss") {
+            let canvas = mobDiv.children[2];
+            canvas.brightness = 0 - 0.1 * (i * randomInteger(1,adventureVideoChildren.length) - 2);
+            canvas.style.transform = ``;
+            canvas.style.filter = `brightness(0)`;
+        }
     }
 }
 
@@ -3120,7 +3389,7 @@ function loseAdventure() {
     let targetElements = adventureVideo.querySelectorAll('.atk-indicator');
     let len = targetElements.length;
     for (let i = 0; i < len; i++) {
-        targetElements[i].remove()
+        targetElements[i].remove();
     }
 
     let adventureFight = document.getElementById("adventure-fight");
@@ -3128,9 +3397,14 @@ function loseAdventure() {
     let adventureEncounter = document.getElementById("adventure-encounter");
     adventureEncounter.style.display = "flex";
     let imageGif = document.getElementById("adventure-gif");
-    imageGif.src = "./assets/expedbg/exped-Nahida-loss.webp";
-
+    if (adventureScaraText) {
+        imageGif.src = "./assets/expedbg/exped-scara-loss.webp"} 
+    else {
+        imageGif.src = "./assets/expedbg/exped-Nahida-loss.webp";
+    }
+    
     setTimeout(()=>{
+        dodgeOn("close");
         fightBgmElement.pause();
         fightLoseElement.load();
         fightLoseElement.play();
@@ -3193,6 +3467,7 @@ function quitAdventure() {
     }
     let adventureHealthbarDiv = document.createElement("div");
     adventureHealthbarDiv.style.width = "100%";
+    adventureScaraText = "";
 }
 
 // DRAWS FOR RANDOM INVENTORY LOOT 
@@ -3236,7 +3511,7 @@ function createExpedition() {
         let expedButton = document.createElement("button");
         let backgroundImg;
         
-        if (expeditionDict[i] == 1){
+        if (expeditionDict[i] == '1'){
             backgroundImg = "url(./assets/expedbg/exped6.webp)";
         } else {
             backgroundImg = "url(./assets/expedbg/exped" + i + ".webp)";
@@ -4340,6 +4615,8 @@ function nutPurchase(fullId) {
     let id = fullId.split("-")[2];
     let cost = nutCost(id);
     if (persistentValues.goldenCore >= cost) {
+        upgradeElement.load();
+        upgradeElement.play();
         persistentValues["upgrade"+id].Purchased++;
         persistentValues.goldenCore -= cost;
         let childArray = document.getElementById(fullId).children;
