@@ -4,7 +4,7 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.3-3-270";
+const VERSIONNUMBER = "v0.3-3-290";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -268,6 +268,138 @@ let table7 = document.getElementById("table7");
 let TABS = [table1,table2, table3, table4, table5Container,table7];
 let tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,tooltipWeaponImg,tooltipElementImg,table6Background;
 
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        tooltipFunction();
+    }
+})
+
+// let advImageDiv = document.createElement("div");
+// let advImage = document.createElement("div");
+// advImageDiv.classList.add("adventure-map")
+// advImageDiv.appendChild(advImage)
+// table3.appendChild(advImageDiv)
+
+// let lastX = 0;
+// let lastY = 0;
+// let x = 0;
+// let y = 0;
+// let maxX;
+// let maxY;
+
+// let img = new Image();
+// img.src = "./assets/expedbg/adventureMap.webp";
+// img.onload = function() {
+//     advImage.style.width = "unset";
+//     advImage.style.height = this.naturalHeight  + "px";
+//     advImage.style.aspectRatio = `${this.naturalWidth / this.naturalHeight}`;
+//     advImage.classList.add('adventure-image');
+
+//     maxX = this.naturalWidth / 3;
+//     maxY = this.naturalHeight / 2.5;
+// }
+
+// let imgKey = {
+//     1:{Left:"76",Top:"24",Level:10},
+//     2:{Left:"85",Top:"9",Level:1},
+//     3:{Left:"59",Top:"19",Level:1},
+//     4:{Left:"64",Top:"49",Level:1},
+//     5:{Left:"44",Top:"47",Level:1},
+//     6:{Left:"46",Top:"61",Level:2},
+//     7:{Left:"80",Top:"59",Level:2},
+//     8:{Left:"72",Top:"49",Level:3},
+//     9:{Left:"64",Top:"36",Level:3},
+//     10:{Left:"22",Top:"68",Level:3},
+//     11:{Left:"31",Top:"26",Level:3},
+//     12:{Left:"20",Top:"32",Level:4},
+//     13:{Left:"51",Top:"18",Level:4},
+//     14:{Left:"88",Top:"45",Level:4},
+//     15:{Left:"84",Top:"86",Level:5},
+// }
+
+// for (let key in imgKey) {
+//     let button = document.createElement("button");
+//     button.classList.add("adv-image-btn");
+//     button.style.left = imgKey[key].Left + "%";
+//     button.style.top = imgKey[key].Top + "%";
+//     button.level = imgKey[key].Level;
+
+//     let level = imgKey[key].Level
+//     if (level === 10) {
+//         button.style.backgroundImage = "url(./assets/icon/questLocation-guild.webp)"
+//     } else if (level === 5) {
+//         button.style.backgroundImage = "url(./assets/icon/questLocation-scara.webp)"
+//     }
+//     button.addEventListener("click",()=>{
+//         if (adventureType === level) {
+//             adventureType = 0;
+//             expedInfo("exped-7");
+//             let advButton = document.getElementById("adventure-button");
+//             if (advButton.classList.contains("expedition-selected")) {
+//                 advButton.classList.remove("expedition-selected");
+//             }
+//         } else {
+//             clearExped();
+//             adventureType = level;
+//             expedInfo(`exped-${level}`);
+//         }  
+//     })
+//     advImage.appendChild(button);
+// }
+
+// advImageDiv.addEventListener("mousedown", handleMouseDown);
+// advImageDiv.addEventListener("touchstart", handleTouchStart, { passive: true });
+
+// advImageDiv.addEventListener("mousemove", handleMouseMove);
+// advImageDiv.addEventListener("touchmove", handleTouchMove, { passive: true });
+
+// function handleMouseDown(e) {
+//   lastX = e.clientX;
+//   lastY = e.clientY;
+// }
+
+// function handleTouchStart(e) {
+//   lastX = e.touches[0].clientX;
+//   lastY = e.touches[0].clientY;
+// }
+
+// function handleMouseMove(e) {
+//   if (e.buttons === 1) {
+//     x += e.clientX - lastX;
+//     y += e.clientY - lastY;
+
+//     checkBounds();
+
+//     advImage.style.transform = `translate(${x}px, ${y}px)`;
+//     lastX = e.clientX;
+//     lastY = e.clientY;
+//   }
+// }
+
+// function handleTouchMove(e) {
+//   if (e.touches.length === 1) {
+//     e.preventDefault();
+
+//     x += e.touches[0].clientX - lastX;
+//     y += e.touches[0].clientY - lastY;
+
+//     checkBounds();
+
+//     advImage.style.transform = `translate(${x}px, ${y}px)`;
+//     lastX = e.touches[0].clientX;
+//     lastY = e.touches[0].clientY;
+//   }
+// }
+
+// function checkBounds() {
+//     if (x > maxX) {x = maxX}
+//     if (y > maxY) {y = maxY}
+
+//     if (x < -maxX) {x = -maxX}
+//     if (y < -maxY) {y = -maxY}
+// }
+
 // INITIAL LOADING
 var InventoryMap;
 var achievementMap;
@@ -337,8 +469,12 @@ let timerLoad = setInterval(timerEventsLoading,50);
 let timer;
 const timeRatio = 500;
 var timerSeconds = 0;
+
+let milestoneCount = 0;
+milestoneHeroAdd();
 createFilter();
 createTabs();
+updateMilestoneNumber();
 tabChange(1);
 
 //------------------------------------------------------------------------GAME FUNCTIONS------------------------------------------------------------------------//
@@ -484,7 +620,8 @@ demoImg.src = "./assets/nahida.webp";
 demoImg.classList.add("demo-img");
 demoImg.id = "demo-main-img";
 
-demoContainer.addEventListener("mouseup", () => {
+demoContainer.addEventListener("mouseup",touchDemo);
+function touchDemo() {
     let clickEarn;
     let crit = false;
     saveValues["clickCount"] += 1;
@@ -532,7 +669,7 @@ demoContainer.addEventListener("mouseup", () => {
     }
 
     spawnFallingNut();
-});
+};
 
 drawUI.demoFunction(demoContainer,demoImg);
 demoContainer.append(demoImg);
@@ -1782,10 +1919,17 @@ function tabChange(x) {
     }
 
     if (heroTooltip !== -1) {
-        heroTooltip = upgradeDict[heroTooltip].Row;
-        let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
-        if (removeActiveHero.classList.contains("active-hero")) {
-            removeActiveHero.classList.remove("active-hero");
+        if (upgradeDict[heroTooltip] != undefined) {
+            heroTooltip = upgradeDict[heroTooltip].Row;
+            let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
+            if (removeActiveHero.classList.contains("active-hero")) {
+                removeActiveHero.classList.remove("active-hero");
+            }
+        } else if (document.getElementById(`milestone-${heroTooltip}`)) {
+            let oldMilestoneButton = document.getElementById(`milestone-${heroTooltip}`);
+            if (oldMilestoneButton.classList.contains("milestone-selected")) {
+                oldMilestoneButton.classList.remove("milestone-selected");
+            }
         }
     } else if (heroTooltip !== -2) {
         if (document.getElementById(itemTooltip)) { 
@@ -1806,6 +1950,10 @@ function tabChange(x) {
     if (filterMenuOne.style.display !== "none") {filterMenuOne.style.display = "none"};
     let filterMenuTwo = document.getElementById("filter-menu-two");
     if (filterMenuTwo.style.display !== "none") {filterMenuTwo.style.display = "none"};
+    if (document.getElementById('upgrade-menu-button')) {
+        document.getElementById('upgrade-menu-button').style.display = "none";
+    }
+
     if (document.getElementById("nut-store-table")) {
         let nutStoreTemp = document.getElementById("nut-store-table");
         if (nutStoreTemp.style.display === "flex") {nutStoreTemp.style.display = "none"}
@@ -1819,6 +1967,9 @@ function tabChange(x) {
         if (document.getElementById("tool-tip-button")) {
             let tooltipButtonText = document.getElementById("tool-tip-button");
             tooltipButtonText.innerText = "Purchase";
+        }
+        if (document.getElementById('upgrade-menu-button')) {
+            document.getElementById('upgrade-menu-button').style.display = "block";
         }
     } else if (x == 1){
         if (filterDiv.style.display !== "flex") {filterDiv.style.display = "flex"};
@@ -2163,6 +2314,12 @@ function createMultiplierButton() {
     midDiv.appendChild(multiplierButtonContainer)
 }
 
+function updateMilestoneNumber() {
+    if (!document.getElementById("upgrade-menu-button")) {return};
+    let milestoneButton = document.getElementById("upgrade-menu-button");
+    milestoneButton.innerText = `Upgrades: (${milestoneCount})`
+}
+
 function createFilter() {
     let filterButton = document.createElement("button");
     filterButton.innerText = "Filter:";
@@ -2172,6 +2329,9 @@ function createFilter() {
     filterMenuOne.id = "filter-menu-one";
     let filterMenuTwo = document.createElement("div");
     filterMenuTwo.id = "filter-menu-two";
+    let upgradeMenu = document.createElement("button");
+    upgradeMenu.id = "upgrade-menu-button";
+    upgradeMenu.innerText = `Upgrades:`
     
     filterButton.addEventListener("click",()=>{
         if (table1.style.display == "flex") {
@@ -2187,6 +2347,26 @@ function createFilter() {
                 filterMenuTwo.style.display = "flex";
             }
         }
+    })
+
+    upgradeMenu.addEventListener("click",()=>{
+        milestoneToggle("toggle");
+        if (heroTooltip !== -1) {
+            if (upgradeDict[heroTooltip] != undefined) {
+                heroTooltip = upgradeDict[heroTooltip].Row;
+                let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
+                if (removeActiveHero.classList.contains("active-hero")) {
+                    removeActiveHero.classList.remove("active-hero");
+                }
+            } else if (document.getElementById(`milestone-${heroTooltip}`)) {
+                let milestoneButton = document.getElementById(`milestone-${heroTooltip}`);
+                if (milestoneButton.classList.contains("milestone-selected")) {
+                    milestoneButton.classList.remove("milestone-selected");
+                }
+                
+            }
+        }
+        clearTooltip();
     })
 
     const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','Sword','Claymore','Catalyst','Polearm','Bow','Sumeru','Mondstadt','Liyue','Inazuma'];
@@ -2230,7 +2410,7 @@ function createFilter() {
         filterMenuTwo.appendChild(filterPicture);
     }
     
-    filterDiv.append(filterButton,filterMenuOne,filterMenuTwo,filterCurrently);
+    filterDiv.append(filterButton,filterMenuOne,filterMenuTwo,filterCurrently,upgradeMenu);
 }
 
 
@@ -2393,7 +2573,6 @@ function addNewRow(onlyOnce) {
             } else {
                 heroText = "Call for " + upgradeInfo[i].Name + "'s help... (" + abbrNum(upgradeDict[i]["BaseCost"],2) + ")";
             }
-
             
             let heroID = "but-" + saveValues["rowCount"];
             let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
@@ -2462,6 +2641,7 @@ function upgrade(clicked_id) {
         saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
         checkExpeditionUnlock(saveValues["dps"]);                                        
         refresh(butIdArray, upgradeDictTemp["BaseCost"], clicked_id);
+        milestoneCheck(clicked_id,upgradeDictTemp.Purchased)
             
         changeTooltip(upgradeInfo[clicked_id],"hero",clicked_id);                   
         saveValues["realScore"] = realScoreCurrent;
@@ -2477,6 +2657,17 @@ function costMultiplier(multi) {
         currentMultiplier = multi;
     }
 
+    if (document.getElementById("tool-tip-button")) {
+        let tooltipButtonText = document.getElementById("tool-tip-button");
+        if (milestoneOn) {
+            tooltipButtonText.innerText = `Buy`;
+        } else if (currentMultiplier == 1) {
+            tooltipButtonText.innerText = `Purchase`;
+        } else {
+            tooltipButtonText.innerText = `Purchase ${currentMultiplier}`;
+        }
+    }
+
     let i = WISHHEROMAX;
     while (i--) {
         if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
@@ -2490,6 +2681,222 @@ function costMultiplier(multi) {
             refresh(buttID, upgradeDict[i]["BaseCost"], i);
         }
     } 
+}
+
+// MILESTONE UPGRADES
+function milestoneHeroAdd() {
+    let upgradeDictTemp = upgradeDict;
+    let i = WISHHEROMAX;
+    while (i--) {
+        if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
+            i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
+            continue;
+        }
+        if (upgradeDictTemp[i] == undefined) continue;
+        if (upgradeDictTemp[i].Locked === true) continue;
+        if (upgradeDictTemp[i].milestone === undefined) {
+            let mileStoneUpgrades = {
+                10:false, 25:false, 50:false, 75:false, 100:false, 150:false, 200:false,250:false,300:false,350:false,400:false,450:false,500:false
+            };
+            upgradeDictTemp[i].milestone = mileStoneUpgrades;
+        } else {
+            let mileStoneUpgrades = {
+                10:false, 25:false, 50:false, 75:false, 100:false, 150:false, 200:false,250:false,300:false,350:false,400:false,450:false,500:false
+            };
+            upgradeDictTemp[i].milestone = updateObjectKeys(upgradeDictTemp[i].milestone,mileStoneUpgrades)
+        }
+
+        
+    }
+    upgradeDict = upgradeDictTemp;
+    milestoneLoad();
+}
+
+function milestoneLoad() {
+    for (let key in upgradeDict) {
+        let upgradeHeroTemp = upgradeDict[key];
+        if (upgradeHeroTemp.Locked === true) continue;
+        if (upgradeHeroTemp.Purchased === -10) continue;
+        for (let secondKey in upgradeHeroTemp.milestone) {
+            if (upgradeHeroTemp.milestone[secondKey] === false) {
+                if (upgradeHeroTemp.Purchased >= secondKey) {
+                    milestoneAdd(secondKey,key);
+                }
+            }
+        }
+    }
+}
+
+const elemItemID = {
+    "Pyro":1,
+    "Hydro":2,
+    "Dendro":3,
+    "Electro":4,
+    "Anemo":5,
+    "Cryo":6,
+    "Geo":7,
+}
+
+function milestoneBuy(heroTooltip) {
+    if (document.getElementById(`milestone-${heroTooltip}`).classList.contains("milestone-selected")) {document.getElementById(`milestone-${heroTooltip}`).classList.remove("milestone-selected")}
+    let heroID = heroTooltip.split("-")[0];
+    let level = heroTooltip.split("-")[1];
+    let cost = (4 * upgradeDict[heroID]["BaseCost"] * (COSTRATIO ** (level - 1)));
+
+    let itemID = 5002;
+    let itemArray = [];
+    let buff = 0.5;
+    let itemStar = -1;
+    if (level >= 350) {
+        itemStar = 0;
+        buff = 2;
+    } else if (level >= 200) {
+        itemStar = 1;
+        buff = 1.5;
+    } else if (level >= 75) {
+        itemStar = 2;
+        buff = 1;
+    }
+
+    if (itemStar != -1) {
+        if (upgradeInfo[heroID].Ele == "Any") {
+            for (let i = 1; i < 8; i++) {
+                if (InventoryMap.get(itemID + i + 7 * itemStar) > 0) {
+                    itemArray.push(itemID + i + 7 * itemStar)
+                }
+            }
+        } else {
+            for (let key in elemItemID) {
+                if (key == upgradeInfo[heroID].Ele) {
+                    itemID += (elemItemID[key] + 7 * itemStar);
+                    break;
+                }
+            }    
+        }
+    }
+    
+    if (saveValues.realScore >= cost) {
+        if (itemArray.length > 0) {
+            let tempID = itemArray[randomInteger(0,itemArray.length+1)];
+            if (!InventoryMap.has(tempID)) {return}
+            let inventoryCount = InventoryMap.get(tempID);
+            if (inventoryCount <= 0) {return}
+
+            inventoryCount--;
+            InventoryMap.set(tempID,inventoryCount)
+
+            let buttonID = document.getElementById(tempID);
+            if (inventoryCount <= 0) {buttonID.remove()}
+        } else if (itemID != 5002) {
+            if (!InventoryMap.has(itemID)) {return}
+            let inventoryCount = InventoryMap.get(itemID);
+            if (inventoryCount <= 0) {return}
+
+            inventoryCount--;
+            InventoryMap.set(itemID,inventoryCount);
+
+            let buttonID = document.getElementById(itemID);
+            if (inventoryCount <= 0) {buttonID.remove()}
+        }
+        
+        let upgradeDictTemp = upgradeDict[heroID];
+        let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * buff);
+        if (heroID != 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
+        
+        upgradeDict[heroID]["Contribution"] += additionPower;
+        upgradeDict[heroID]["Factor"] = Math.ceil(upgradeDictTemp["Factor"] * (buff + 1));
+
+        document.getElementById(`milestone-${heroTooltip}`).remove();
+        refresh("hero", heroID);
+        updatedHero(heroID);
+
+
+        saveValues.realScore -= cost;
+        milestoneCount--;
+        clearTooltip();
+        updateMilestoneNumber();
+        console.log(upgradeDict)
+    }
+}
+
+function milestoneCheck(heroID,level) {
+    let upgradeHeroTemp = upgradeDict[heroID];
+    if (upgradeHeroTemp.milestone === undefined) {
+        upgradeHeroTemp.milestone = mileStoneUpgrades;
+    }
+
+    for (let key in upgradeHeroTemp.milestone) {
+        if (upgradeHeroTemp.milestone[key] === false) {
+            if (level > key) {
+                milestoneAdd(key,heroID);
+            }
+        }
+    }
+}
+
+function milestoneAdd(lowestKey,heroID) {
+    if (document.getElementById(`milestone-${heroID}-${lowestKey}`)) {return}
+    let milestoneButton = document.createElement("div");
+    milestoneButton.id = `milestone-${heroID}-${lowestKey}`
+    milestoneButton.classList.add("milestone-upgrade","flex-row");
+    milestoneButton.style.display = "none";
+
+    if (lowestKey >= 350) {
+        milestoneButton.style.backgroundColor = "#684052";
+        milestoneButton.style.border = "0.2em solid #B17B94";
+    } else if (lowestKey >= 200) {
+        milestoneButton.style.backgroundColor = "#685E19";
+        milestoneButton.style.border = "0.2em solid #ADA346";
+    } else if (lowestKey >= 75) {
+        milestoneButton.style.backgroundColor = "#2c2c4c";
+        milestoneButton.style.border = "0.2em solid #777898";
+    }
+
+    let milestoneImg = new Image();
+    milestoneImg.src = `./assets/tooltips/milestone/${upgradeInfo[heroID].Name}.webp`;
+
+    milestoneButton.append(milestoneImg);
+    milestoneButton.addEventListener("click",()=>{
+        if (document.getElementById(`milestone-${heroTooltip}`)) {
+            let oldMilestoneButton = document.getElementById(`milestone-${heroTooltip}`);
+            if (oldMilestoneButton.classList.contains("milestone-selected")) {
+                oldMilestoneButton.classList.remove("milestone-selected");
+            }
+        }
+
+        heroTooltip = heroID + "-" + lowestKey;
+        changeTooltip(upgradeInfo[heroID],"milestone",lowestKey);
+        milestoneButton.classList.add("milestone-selected");
+    })
+    table1.appendChild(milestoneButton);
+    milestoneCount++;
+    updateMilestoneNumber();
+}
+
+let milestoneOn = false;
+function milestoneToggle(type) {
+    if (type == "toggle") {
+        let heroChildren = table1.querySelectorAll(".upgrade");
+        for (let i = 0; i < heroChildren.length; i++) {
+            if (milestoneOn) {heroChildren[i].style.display = "flex"}
+            else {heroChildren[i].style.display = "none"}
+        }
+
+        let milestoneChildren = table1.querySelectorAll(".milestone-upgrade");
+        for (let i = 0; i < milestoneChildren.length; i++) {
+            if (!milestoneOn) {milestoneChildren[i].style.display = "flex"}
+            else {milestoneChildren[i].style.display = "none"}
+        }
+
+        let tooltipButtonText = document.getElementById("tool-tip-button");
+        if (!milestoneOn) {tooltipButtonText.innerText = `Buy`;
+        } else {
+            tooltipButtonText.innerText = `Purchase ${currentMultiplier}`}
+            if (currentMultiplier == 1) {tooltipButtonText.innerText = `Purchase`}
+
+        if (milestoneOn) {milestoneOn = false}
+        else {milestoneOn = true}
+    }
 }
 
 // CHECK IF PRICE IS LOWER THAN CURRENT SCORE
@@ -2704,6 +3111,8 @@ function itemUse(itemUniqueId) {
         let elem = Inventory[itemID].element;
         if (Inventory[itemID].Star === 4) {
             power = 2.2;
+        } else if (Inventory[itemID].Star === 4) {
+            power = 1.6;
         } else {
             power = 3;
         }
@@ -2808,7 +3217,7 @@ function adventure(type) {
             } else {
                 currencyPopUp("items");
             }
-            // drawAdventure(type);
+            //  drawAdventure(type);
         } else {
             weaselDecoy.load();
             weaselDecoy.play();
@@ -2972,8 +3381,10 @@ function createAdventure() {
 
     document.addEventListener("keydown", function(event) {
         if (event.key === "1") {
+            event.preventDefault();
             dodgeOn("toggle");
         } else if (event.key === "3") {
+            event.preventDefault();
             attackAll();
         }
     })
@@ -3359,6 +3770,8 @@ function attackAll() {
             if (enemyAmount === 0) {
                 winAdventure();
             }
+
+            continue;
         }
 
         mobHealth.style.width = `${Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100}%`;
@@ -3477,7 +3890,7 @@ function inventoryDraw(itemType, min, max, type){
         "artifact": ARTIFACTMAX, 
         "food": FOODMAX, 
         "xp": XPMAX,
-        "gem": 5017,
+        "gem": 5025,
         "talent": 6013,
     }
     let lowerInventoryType = {
@@ -3565,6 +3978,7 @@ function clearExped() {
     if (adventureType != 0) {
         let id = "exped-" + adventureType;
         let old_exped = document.getElementById(id);
+        if (!old_exped) {return}
         if (old_exped.classList.contains("expedition-selected")) {
             old_exped.classList.remove("expedition-selected");
         }
@@ -3596,7 +4010,7 @@ function expedInfo(butId) {
         expedRow1.innerText = expeditionDictInfo[i]["Text"];
         expedRow2.innerText = expeditionDictInfo[i]["Lore"];
         expedRow1.appendChild(afterEnergyIcon);
-    } else if (i == 8 || i == 9) {
+    } else if (i == 8 || i == 9 || i == 10) {
         expedRow1.innerText = expeditionDictInfo[i]["Text"];
         expedRow2.innerText = expeditionDictInfo[i]["Lore"];
         expedRow1.appendChild(afterEnergyIcon);
@@ -3605,7 +4019,7 @@ function expedInfo(butId) {
         expedRow2.innerText = expeditionDictInfo[6]["Lore"];
     }
 
-    if (i == 7) {
+    if (i == 7 || i == 10) {
         let afterEnergyRemove = document.getElementById("afterEnergyIcon");
         afterEnergyRemove.remove();
     }
@@ -3983,11 +4397,11 @@ function changeTooltip(dict, type, number) {
     }
 
     if (type == "hero") {
+        toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
         let tooltipTextLocal = "Level: " + upgradeDict[number]["Purchased"] + 
                                 "\n Free Levels: " + saveValues["freeLevels"] + 
                                 "\n" + abbrNum(upgradeDict[number]["Contribution"],2) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
-        toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
-
+        
         tooltipElementImg.src = "./assets/tooltips/elements/" +dict.Ele+ ".webp";
         if (tooltipElementImg.style.display != "block") {
             tooltipElementImg.style.display = "block";
@@ -3998,6 +4412,40 @@ function changeTooltip(dict, type, number) {
         }
         
         tooltipText.innerText = tooltipTextLocal;
+    } else if (type == "milestone") {
+        toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
+
+        let upgradeLevel = 50;
+        let extraText = "";
+        if (number >= 350) {
+            upgradeLevel = 200;
+            extraText = `& a 5-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
+            if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 5-Star Gem`}
+        } else if (number >= 200) {
+            upgradeLevel = 150;
+            extraText = `& a 4-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
+            if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 4-Star Gem`}
+        } else if (number >= 75) {
+            upgradeLevel = 100;
+            extraText = `& a 3-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
+            if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 3-Star Gem`}
+        }
+
+        tooltipText.innerHTML = `Level ${number} Upgrade`;
+        tooltipLore.innerHTML = `${dict.Name} becomes ${upgradeLevel}% more efficient at gathering nuts.
+                                <br><br> Cost: <span style='color:#A97803'> ${abbrNum((4 * upgradeDict[heroTooltip.split("-")[0]]["BaseCost"] * (COSTRATIO ** (number - 1))),2)} </span> Nuts
+                                ${extraText}`;
+
+        tooltipElementImg.src = "./assets/tooltips/elements/" +dict.Ele+ ".webp";
+        if (tooltipElementImg.style.display != "block") {
+            tooltipElementImg.style.display = "block";
+        }
+        tooltipWeaponImg.src = "./assets/tooltips/elements/" +dict.Type+ ".webp";
+        if (tooltipWeaponImg.style.display != "block") {
+            tooltipWeaponImg.style.display = "block";
+        }
+
+        
     } else if (type == "item") {
         toolImg.src = "./assets/frames/background-" + dict.Star + ".webp";
         toolImgOverlay.src = "./assets/tooltips/inventory/" + dict.File + ".webp";
@@ -4057,7 +4505,12 @@ function clearTooltip() {
 function tooltipFunction() {
     if (tooltipTable == 1) {
         if (heroTooltip === -1) {return}
-        upgrade(heroTooltip);
+        if (milestoneOn) {
+            milestoneBuy(heroTooltip)
+        } else {
+            upgrade(heroTooltip);
+        }
+        
         if (timerSeconds !== 0) {
             upgradeElement.load();
             upgradeElement.play();
@@ -4264,10 +4717,10 @@ function refreshShop(minutesPassed) {
             if (saveValues["wishUnlocked"] === true) {
                 inventoryNumber = 4010;
             } else {
-                inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+                inventoryNumber = inventoryDraw("gem", 3,6, "shop");
             }
         } else if (i >= 2 && i <= 4) {
-            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+            inventoryNumber = inventoryDraw("gem", 3,6, "shop");
         } else {
             inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
         }
@@ -4727,6 +5180,7 @@ function refresh() {
             let upgradedHeroButton = document.getElementById(arguments[0]);
             upgradedHeroButton.innerText = heroTextFirst;
             upgradedHeroButton.style = `background:url("./assets/nameplates/${upgradeInfoTemp.Name}.webp");  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;`;
+            if (milestoneOn) {upgradedHeroButton.style.display = "none"}
         }
         else if (arguments[0] == "hero") { // REFRESH FOR ARTIFACTS
             let hero = upgradeDict[arguments[1]];
@@ -4843,6 +5297,10 @@ function currencyPopUp(type1, amount1, type2, amount2) {
             persistentValues.goldenCore += amount2;
             updateCoreCounter();
             nutPopUp();
+        } else if (type2 === "items") {
+            currencyPopSecond.innerText = "Items";
+            currencyPopSecondImg.src = "./assets/icon/item.webp";
+            currencyPopSecondImg.classList.add("icon","primogem");
         }
 
         currencyPop.style.height = "13%"

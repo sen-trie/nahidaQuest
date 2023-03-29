@@ -204,15 +204,25 @@ function drawMainBody() {
 }
 
 function demoFunction(demoContainer,demoImg) {
-    demoContainer.onmousedown = function() {
+    demoContainer.addEventListener("mousedown",()=>{
         demoImg.style.width = "94%";
         demoImg.style.height = "94%";
-    }
-    
-    window.onmouseup = function () {
+    });
+
+    demoContainer.addEventListener("touchstart",()=>{
+        demoImg.style.width = "94%";
+        demoImg.style.height = "94%";
+    }, { passive: true });
+
+    window.addEventListener("mouseup",()=>{
         demoImg.style.width = "100%";
         demoImg.style.height = "100%";
-    };
+    });
+
+    window.addEventListener("touchend",()=>{
+        demoImg.style.width = "100%";
+        demoImg.style.height = "100%";
+    });
 }
 
 function createHeroButtonContainer(heroID) {

@@ -375,24 +375,16 @@ body {
 }
 
 #table6 {
+    height: 81%;
     width: 50%;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: flex-start;
     padding-left: 1.5%;
     padding-right: 1.5%;
-    column-gap: 2%;
 }
 
 .toolInfo {
     width: 100%;
     height: fit-content;
     flex-direction: row;
-}
-
-.tool-tip-name {
-    flex-basis: 100%;
 }
 
 .toolImgContainer {
@@ -405,7 +397,8 @@ body {
 }
 
 .tool-tip-lore {
-    height: 40%;
+    overflow-y: scroll;
+    height: auto;
     font-size: 1em;
 }
 
@@ -439,7 +432,7 @@ body {
 }
 
 .filter-row {
-    width: 56.5%;
+    width: 58%;
     height: 15%;
 }
 
