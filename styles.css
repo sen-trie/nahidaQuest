@@ -498,6 +498,25 @@ table, button, label {
     gap: 4%;
 }
 
+.link {
+    position: absolute;
+    left: 0.5%;
+    bottom: 0;
+    text-decoration: none;
+    color: #cee0d4;
+    filter: drop-shadow(0 0 0.1em black) drop-shadow(0 0 0.05em black);
+}
+
+.link:hover { 
+    color: #71e696;
+    filter: drop-shadow(0 0 0.1em black) drop-shadow(0 0 0.05em black);
+    transform: scale(1.05);
+}
+
+.link:visited { 
+    color: #cee0d4;
+}
+
 #start-screen :first-child {
     position: absolute;
     object-fit: cover;

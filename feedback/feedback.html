@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NQ Feedback</title>
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    <style>
+        html {
+            font-size: 1vw;
+            background-image: url(../assets/bg/bg.webp);
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        html, body {
+            min-width: 100%;
+            min-height: 100%;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            font-size: 1em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1%;
+        }
+
+        div {
+            width: 50vw;
+            height: 18vh;
+            position: relative;
+        }
+
+        div > img:nth-of-type(1) {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        div > img:nth-of-type(2) {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            object-fit: contain;
+            left: 50%;
+            transform: translate(-50%,25%);
+        }
+      
+        form {
+            width: 50vw;
+            flex-grow: 1;
+            max-height: 75vh;
+            background-color: #b7d885;
+            border: 0.25em solid #356E50;
+            border-radius: 1em;
+            box-sizing: border-box;
+            padding: 0.5% 1% 0.5% 1%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1%;
+        }
+
+        form > input:nth-of-type(1) {
+            max-height: 0.1vh;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 0.1em solid #ccc;
+            border-radius: 0.5em;
+            resize: none;
+            flex-grow: 1;
+            word-wrap: break-word;
+            font-size: 1em;
+            font: inherit;
+        }
+
+        input[type=text] {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-height: 5%;
+            box-sizing: border-box;
+            border: 0.1em solid #ccc;
+            border-radius: 0.5em;
+            resize: none;
+            font-size: 1em;
+            font: inherit;
+        }
+
+        label {
+            text-align: left;
+            width: 100%;
+            max-height: 5%;
+            color: #29400C;
+            font-size: 1.2em;
+        }
+
+        button {
+            background-color: #376C51;
+            color: white;
+            border-radius: 0.5em;
+            width: 25%;
+            height: 5%;
+            max-height: 10%;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        button:hover {
+            transition: 0.5s ease;
+            background-color: #77c09a;
+            color: black;
+        }
+
+        @media (max-aspect-ratio: 14/9) {
+            form {
+                width: 90%;
+                font-size: 2vh;
+            }
+
+            button {
+                height: 8%;
+                width: 30%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script type="text/javascript">var submitted=false;</script>
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {alert('Thank you for the feedback! Redirecting to nahidaQuest.com.'); window.location.href = `../index.html`;}"></iframe>
+    <div>
+        <img src="../assets/icon/nahida-start.webp">
+        <img src="../assets/settings/nahidaQuest.webp">
+    </div> 
+    <form method="post" action="https://docs.google.com/forms/d/e/1FAIpQLSc-BiFNhC0crA_rBYafrapiA9tMlOdGHGNlJGHFGHNJ5BmQkw/formResponse" target="hidden_iframe" onsubmit="submitted=true;">
+        <label>Type of Feedback</label>
+        <input type="text" name="entry.147690499"/>
+        <label>Feedback/Suggestions</label>
+        <textarea rows="4" cols="50" name="entry.1683911296"></textarea>
+        
+        <button type="submit" value="Submit">Submit</button>
+    </form>
+</body>
+</html>
+
+
