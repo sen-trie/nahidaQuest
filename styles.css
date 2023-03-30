@@ -111,6 +111,22 @@ img {
         #3C3C3C 0.078em -0.098em 0,
         #3C3C3C 0.095em -0.076em 0, 
         #3C3C3C 0.137em -0.039em 0;
+    --text-shadow-050:
+        #3C3C3C 0.1005em 0.032em 0, 
+        #3C3C3C 0.057em 0.076em 0,
+        #3C3C3C 0.02475em 0.091em 0, 
+        #3C3C3C 0.057em 0.086em 0, 
+        #3C3C3C -0.04045em 0.099em 0, 
+        #3C3C3C -0.07em 0.0725em 0, 
+        #3C3C3C -0.1045em 0.01295em 0, 
+        #3C3C3C -0.103em -0.01865em 0,
+        #3C3C3C -0.069em -0.069em 0, 
+        #3C3C3C -0.04em -0.0795em 0, 
+        #3C3C3C -0.0082em -0.0825em 0, 
+        #3C3C3C 0.02675em -0.0795em 0, 
+        #3C3C3C 0.059em -0.074em 0, 
+        #3C3C3C 0.0635em -0.051em 0, 
+        #3C3C3C 0.0915em -0.0262em 0;
     --text-shadow-125: 
         #3C3C3C 0.266em 0 0, 
         #3C3C3C 0.251em 0.08em 0, 
@@ -563,7 +579,7 @@ table, button, label {
     z-index: 1010;
     font-family: 'gi-font';
     font-size: 1.4em;
-    text-shadow: #3C3C3C 0.21375em 0 0, #3C3C3C 0.20102554875em 0.06442056725em 0, #3C3C3C 0.16545309125em 0.125256034375em 0, #3C3C3C 0.114100525em 0.17245005em 0, #3C3C3C 0.0495299125em 0.1929347625em 0, #3C3C3C -0.020926788125em 0.1987703525em 0, #3C3C3C -0.08683835em 0.182958245em 0, #3C3C3C -0.140307092em 0.145025515em 0, #3C3C3C -0.18035769em 0.09045148em 0, #3C3C3C -0.209242475em 0.025948895em 0, #3C3C3C -0.20681056375em -0.0373652975em 0, #3C3C3C -0.18052885375em -0.0934511275em 0, #3C3C3C -0.1379573405em -0.138057635em 0, #3C3C3C -0.0800555925em -0.159165915em 0, #3C3C3C -0.0164290525em -0.165675565em 0, #3C3C3C 0.0535315125em -0.1594206825em 0, #3C3C3C 0.1188833225em -0.1486998625em 0, #3C3C3C 0.15738429125em -0.102757115em 0, #3C3C3C 0.1825355875em -0.05246907125em 0;
+    text-shadow: var(--text-shadow-075);
     color:white;
     width: 30%;
     aspect-ratio: 6.1;
@@ -2486,17 +2502,41 @@ input:checked + .slider:before {
     width: 75%;
     background-color: #376D50;
     top: 2.5%;
-    justify-content: space-between;
     border-left: 0.1em solid #376D50;
+    left: 50%;
+    transform: translate(-55%,0);
+    display: flex;
+    flex-direction: row;
 }
 
-#adventure-health > img {
+#combo-number {
+    position: absolute;
+    top: 2%;
+    right: 1.5%;
+    text-align: center;
+    color: white;
+    filter: drop-shadow(0 0 0.1em black) drop-shadow(0 0 0.05em black) drop-shadow(0 0 0.1em black);
+}
+
+@keyframes tallyCount {
+    0% {transform: scale(1.15)}
+    100% {transform: scale(1)}
+}
+
+.heart-bit {
     z-index: 504;
-    filter: none;
+    width: 100%;
     height: 100%;
-    object-fit: contain;
-    flex-grow: 1;
+    flex-shrink: 1;
     border-right: 0.1em solid #376D50;
+}
+
+.heart-bit > img {
+    z-index: 504;
+    width: 100%;
+    height: 100%;
+    flex-shrink: 1;
+    object-fit: contain;
 }
 
 .adventure-health {
@@ -2521,6 +2561,9 @@ input:checked + .slider:before {
     height: 90%;
     object-fit: contain;
     filter: drop-shadow(0 0 0.3em rgba(255, 255, 255, 0.463));
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 .atk-indicator {
@@ -2622,6 +2665,15 @@ input:checked + .slider:before {
     width: 40%;
     height: 40%;
     flex-wrap: wrap;
+}
+
+.skill-mark {
+    position: absolute;
+    height: 25%;
+    aspect-ratio: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 #adventure-encounter {

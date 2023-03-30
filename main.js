@@ -4,7 +4,7 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.3-3-290";
+const VERSIONNUMBER = "v0.3-3-291";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -268,12 +268,7 @@ let table7 = document.getElementById("table7");
 let TABS = [table1,table2, table3, table4, table5Container,table7];
 let tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,tooltipWeaponImg,tooltipElementImg,table6Background;
 
-document.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        tooltipFunction();
-    }
-})
+let spaceDelay = false;
 
 // let advImageDiv = document.createElement("div");
 // let advImage = document.createElement("div");
@@ -1994,6 +1989,50 @@ function tabChange(x) {
     updateWishDisplay();
 }
 
+document.addEventListener("keydown", function(event) {
+    if (!stopSpawnEvents) {
+        if (event.key === "1") {
+            tabChange(1);
+        } else if (event.key === "2") {
+            tabChange(2);
+        } else if (event.key === "3") {
+            tabChange(3);
+        } else if (event.key === "4") {
+            tabChange(4);
+        } else if (event.key === "5") {
+            tabChange(5);
+        } else if (event.key === "6") {
+            if (table7.innerHTML != "") {
+                tabChange(6)
+            }
+        } else if (event.key === "Escape") {
+            toggleSettings();
+            if (document.getElementById("confirm-box")) {
+                let deleteBox = document.getElementById("confirm-box");
+                if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+            }
+        } else if (event.key === " ") {
+            if (!spaceDelay) {
+                touchDemo();
+                spaceDelay = true;
+                setTimeout(()=>{spaceDelay = false},500)
+            }
+        } else if (event.key === "Enter") {
+            if (table4.style.display === "flex") {
+                let wishButton = document.getElementById("wishButton");
+                if (!wishButton.locked) {
+                    wish();
+                    updateWishDisplay();
+                }
+            } else {
+                event.preventDefault();
+                tooltipFunction();
+            }
+        }
+    };
+    
+})
+
 // SETTINGS MENU - SAVES & VOLUME CONTROL
 function settings() {
     importClipboard("create");
@@ -2331,7 +2370,8 @@ function createFilter() {
     filterMenuTwo.id = "filter-menu-two";
     let upgradeMenu = document.createElement("button");
     upgradeMenu.id = "upgrade-menu-button";
-    upgradeMenu.innerText = `Upgrades:`
+    upgradeMenu.innerText = `Upgrades:`;
+    upgradeMenu.style.filter = "brightness(1)";
     
     filterButton.addEventListener("click",()=>{
         if (table1.style.display == "flex") {
@@ -2350,6 +2390,8 @@ function createFilter() {
     })
 
     upgradeMenu.addEventListener("click",()=>{
+        upgradeMenu.style.filter == "brightness(1)" ? upgradeMenu.style.filter = "brightness(0.4)" : upgradeMenu.style.filter = "brightness(1)";
+        
         milestoneToggle("toggle");
         if (heroTooltip !== -1) {
             if (upgradeDict[heroTooltip] != undefined) {
@@ -2645,6 +2687,11 @@ function upgrade(clicked_id) {
             
         changeTooltip(upgradeInfo[clicked_id],"hero",clicked_id);                   
         saveValues["realScore"] = realScoreCurrent;
+        upgradeElement.load();
+        upgradeElement.play();
+    } else {
+        weaselDecoy.load();
+        weaselDecoy.play();
     }
 }
 
@@ -2685,6 +2732,9 @@ function costMultiplier(multi) {
 
 // MILESTONE UPGRADES
 function milestoneHeroAdd() {
+    let mileStoneReference = {
+        10:false, 25:false, 50:false, 75:false, 100:false, 150:false, 200:false,250:false,300:false,350:false,400:false,450:false,500:false
+    };
     let upgradeDictTemp = upgradeDict;
     let i = WISHHEROMAX;
     while (i--) {
@@ -2700,13 +2750,8 @@ function milestoneHeroAdd() {
             };
             upgradeDictTemp[i].milestone = mileStoneUpgrades;
         } else {
-            let mileStoneUpgrades = {
-                10:false, 25:false, 50:false, 75:false, 100:false, 150:false, 200:false,250:false,300:false,350:false,400:false,450:false,500:false
-            };
-            upgradeDictTemp[i].milestone = updateObjectKeys(upgradeDictTemp[i].milestone,mileStoneUpgrades)
+            upgradeDictTemp[i].milestone = updateObjectKeys(upgradeDictTemp[i].milestone,mileStoneReference)
         }
-
-        
     }
     upgradeDict = upgradeDictTemp;
     milestoneLoad();
@@ -2778,9 +2823,16 @@ function milestoneBuy(heroTooltip) {
     if (saveValues.realScore >= cost) {
         if (itemArray.length > 0) {
             let tempID = itemArray[randomInteger(0,itemArray.length+1)];
-            if (!InventoryMap.has(tempID)) {return}
+            if (!InventoryMap.has(tempID)) {
+                weaselDecoy.load();
+                weaselDecoy.play();
+                return;
+            }
             let inventoryCount = InventoryMap.get(tempID);
-            if (inventoryCount <= 0) {return}
+            if (inventoryCount <= 0) {
+                weaselDecoy.load();
+                weaselDecoy.play();
+            }
 
             inventoryCount--;
             InventoryMap.set(tempID,inventoryCount)
@@ -2788,9 +2840,17 @@ function milestoneBuy(heroTooltip) {
             let buttonID = document.getElementById(tempID);
             if (inventoryCount <= 0) {buttonID.remove()}
         } else if (itemID != 5002) {
-            if (!InventoryMap.has(itemID)) {return}
+            if (!InventoryMap.has(itemID)) {
+                weaselDecoy.load();
+                weaselDecoy.play();
+                return;
+            }
             let inventoryCount = InventoryMap.get(itemID);
-            if (inventoryCount <= 0) {return}
+            if (inventoryCount <= 0) {
+                weaselDecoy.load();
+                weaselDecoy.play();
+                return;
+            }
 
             inventoryCount--;
             InventoryMap.set(itemID,inventoryCount);
@@ -2798,10 +2858,10 @@ function milestoneBuy(heroTooltip) {
             let buttonID = document.getElementById(itemID);
             if (inventoryCount <= 0) {buttonID.remove()}
         }
-        
+
         let upgradeDictTemp = upgradeDict[heroID];
         let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * buff);
-        if (heroID != 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
+        if (heroID != 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
         
         upgradeDict[heroID]["Contribution"] += additionPower;
         upgradeDict[heroID]["Factor"] = Math.ceil(upgradeDictTemp["Factor"] * (buff + 1));
@@ -2810,12 +2870,15 @@ function milestoneBuy(heroTooltip) {
         refresh("hero", heroID);
         updatedHero(heroID);
 
-
         saveValues.realScore -= cost;
         milestoneCount--;
         clearTooltip();
         updateMilestoneNumber();
-        console.log(upgradeDict)
+        upgradeElement.load();
+        upgradeElement.play();
+    } else {
+        weaselDecoy.load();
+        weaselDecoy.play();
     }
 }
 
@@ -2889,13 +2952,14 @@ function milestoneToggle(type) {
         }
 
         let tooltipButtonText = document.getElementById("tool-tip-button");
-        if (!milestoneOn) {tooltipButtonText.innerText = `Buy`;
+        if (!milestoneOn) {
+            tooltipButtonText.innerText = `Buy`;
         } else {
-            tooltipButtonText.innerText = `Purchase ${currentMultiplier}`}
-            if (currentMultiplier == 1) {tooltipButtonText.innerText = `Purchase`}
+            tooltipButtonText.innerText = `Purchase ${currentMultiplier}`
+        }
 
-        if (milestoneOn) {milestoneOn = false}
-        else {milestoneOn = true}
+        if (currentMultiplier == 1) {tooltipButtonText.innerText = `Purchase`}
+        milestoneOn ? milestoneOn = false : milestoneOn = true;
     }
 }
 
@@ -3217,7 +3281,7 @@ function adventure(type) {
             } else {
                 currencyPopUp("items");
             }
-            //  drawAdventure(type);
+            // drawAdventure(type);
         } else {
             weaselDecoy.load();
             weaselDecoy.play();
@@ -3365,27 +3429,34 @@ function createAdventure() {
     let adventureFightDodge = document.createElement("img");
     adventureFightDodge.src = "./assets/expedbg/battle1.webp";
     adventureFightDodge.id = "battle-toggle";
-
     adventureFightDodge.addEventListener("click",()=>{
         dodgeOn("toggle");
     })
     
     let adventureFightSkill = document.createElement("img");
     adventureFightSkill.src = "./assets/expedbg/battle2.webp";
+    adventureFightSkill.addEventListener("click",()=>{
+        skillUse();
+    })
+
+
     let adventureFightBurst = document.createElement("img");
     adventureFightBurst.src = "./assets/expedbg/battle3.webp";
 
     adventureFightBurst.addEventListener("click",()=>{
-        attackAll();
+        attackAll(adventureFightBurst);
     })
 
     document.addEventListener("keydown", function(event) {
-        if (event.key === "1") {
+        if (event.key === "z" || event.key === "q") {
             event.preventDefault();
             dodgeOn("toggle");
-        } else if (event.key === "3") {
+        } else if (event.key === "x" || event.key === "w") {
             event.preventDefault();
-            attackAll();
+            skillUse();
+        } else if (event.key === "c" || event.key === "e") {
+            event.preventDefault();
+            attackAll(adventureFightBurst);
         }
     })
 
@@ -3459,13 +3530,40 @@ function drawAdventure(advType) {
     fightEncounter.play();
 }
 
+function comboHandler(type,ele) {
+    if (type == "create") {
+        let comboNumber = document.createElement("p");
+        comboNumber.id = "combo-number";
+        comboNumber.combo = 0;
+        comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
+        ele.appendChild(comboNumber);
+        return ele;
+    } else if (type == "add") {
+        let comboNumber = document.getElementById("combo-number");
+        comboNumber.combo++;
+        comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
+
+        comboNumber.style.animation = "";
+        void comboNumber.offsetWidth;
+        comboNumber.style.animation = "tallyCount 1s ease";
+    } else if (type == "reset") {
+        let comboNumber = document.getElementById("combo-number");
+        comboNumber.combo = 0;
+        comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
+
+        comboNumber.style.animation = "";
+        void comboNumber.offsetWidth;
+        comboNumber.style.animation = "tallyCount 1s ease";
+    }
+}
+
 function spawnMob(adventureVideo,waveType) {
     for (let i = 0; i < waveType.length; i++) {
         let singleEnemyInfo = enemyInfo[waveType[i]];
         let mobDiv = document.createElement("div");
-        let mobImg = new Image();
-        mobImg.src = `./assets/expedbg/enemy/${singleEnemyInfo.Type}-${singleEnemyInfo.Class}-${randomInteger(1,singleEnemyInfo.Variation+1)}.webp`;
+        let mobImg =  document.createElement("div");
         mobImg.classList.add("enemyImg");
+        mobImg.style.backgroundImage = `url(./assets/expedbg/enemy/${singleEnemyInfo.Type}-${singleEnemyInfo.Class}-${randomInteger(1,singleEnemyInfo.Variation+1)}.webp)`;
 
         mobDiv.enemyID = singleEnemyInfo;
         mobDiv.classList.add("enemy");
@@ -3481,6 +3579,7 @@ function triggerFight() {
     fightSceneOn = true;
 
     let adventureVideo = document.getElementById("adventure-video");
+    adventureVideo = comboHandler("create",adventureVideo);
     let adventureVideoChildren = adventureVideo.children;
     let currentSong;
     if (adventureScaraText) {
@@ -3492,7 +3591,6 @@ function triggerFight() {
         } else {
             currentSong = randomInteger(1,4);
         }
-        
     }
     
     bgmElement.pause();
@@ -3521,8 +3619,11 @@ function triggerFight() {
     };
 
     for (let i = 0; i < healthBar.maxHealth; i++) {
-        let health = new Image();
-        health.src = `./assets/icon/health${adventureScaraText}.webp`;
+        let health = document.createElement("div");
+        health.classList.add("heart-bit","flex-column");
+        let healthImg = new Image();
+        healthImg.src = `./assets/icon/health${adventureScaraText}.webp`;
+        health.appendChild(healthImg)
         healthDiv.append(health);
     }
     
@@ -3572,7 +3673,7 @@ function triggerFight() {
                 if (mobHealth.dead) {return}
                 canvas.brightness += brightnessIncrement;
                 if (canvas.attackState) {
-                    loseHP(mobHealth.atk)
+                    loseHP(mobHealth.atk,"normal");
                     canvas.attackState = false;
                 }
 
@@ -3594,30 +3695,44 @@ function triggerFight() {
                     canvas.style.filter = `brightness(0)`;
                 }
                 window.requestAnimationFrame(increaseBrightness);
+            }
         }
-    }
 
         mobDiv.children[0].addEventListener("click",()=>{
             if (!fightSceneOn) {return}
             if (mobHealth.dead) {return}
             if (mobDiv.children[3] != undefined) {
                 if (mobDiv.children[3].id === "select-indicator") {
-                    if (canvas.classList.contains("attack-ready") && mobHealth.class != "Superboss") {
-                        canvas.attackState = false;
-                        canvas.classList.remove("attack-ready")
-                        mobDiv.children[0].classList.add("staggered");
-                        setTimeout(()=>{mobDiv.children[0].classList.remove("staggered")},animationTime * 150);
+                    if (canvas.classList.contains("attack-ready")) {
+                        if (mobHealth.class != "Superboss") {
+                            canvas.attackState = false;
+                            canvas.classList.remove("attack-ready");
+                            mobDiv.children[0].classList.add("staggered");
+                            setTimeout(()=>{mobDiv.children[0].classList.remove("staggered")},animationTime * 150);
+
+                            canvas.brightness  = 0;
+                            canvas.style.transform = ``;
+                            canvas.style.filter = `brightness(0)`;
+                        } else {
+                            mobDiv.children[0].classList.add("damaged");
+                            setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},animationTime * 150);
+                        }
+
+                        if (mobDiv.children[0].children[0]) {
+                            mobHealth.health -= 36;
+                            mobDiv.children[0].children[0].remove();
+                            loseHP(mobHealth.atk * 2,"inverse");
+                        }
+
                         parrySuccess.load();
                         parrySuccess.play();
-                        
-                        canvas.brightness  = 0;
-                        canvas.style.transform = ``;
-                        canvas.style.filter = `brightness(0)`;
+                        comboHandler("add");
                     } else {
                         mobDiv.children[0].classList.add("damaged");
                         setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},animationTime * 150);
                         parryFailure.load();
                         parryFailure.play();
+                        comboHandler("reset");
                     }
                     mobHealth.health -= 13;
                     dodgeOn("close");
@@ -3650,17 +3765,21 @@ function triggerFight() {
     }
 }
 
-function loseHP(ATK) {
-    if (!fightSceneOn) {
-        return;
-    }
+function loseHP(ATK,type) {
+    if (!fightSceneOn) {return}
 
     let healthBar = document.getElementById('health-bar');
     let hpInterval = (100/healthBar.maxHealth);
-    healthBar.currentWidth -= (hpInterval * ATK);
 
-    if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
-    healthBar.style.width = `${healthBar.currentWidth}%`
+    if (type == "inverse") {
+        healthBar.currentWidth += (hpInterval * ATK);
+        if (healthBar.currentWidth > 100) {healthBar.currentWidth = 100}
+    } else {
+        healthBar.currentWidth -= (hpInterval * ATK);
+        if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
+    }
+
+    healthBar.style.width = `${healthBar.currentWidth}%`;
     if (healthBar.currentWidth <= 0) {
         loseAdventure();
     }
@@ -3731,7 +3850,50 @@ function dodgeOn(type) {
     }
 }
 
-function attackAll() {
+function skillUse() {
+    let adventureVideo = document.getElementById("adventure-video");
+    let adventureVideoChildren = adventureVideo.children;
+    let skillCooldownTime;
+
+    for (let i = 0; i < adventureVideoChildren.length; i++) {
+        let mobDiv = adventureVideoChildren[i];
+        if (mobDiv.tagName != 'DIV') {continue};
+        if (mobDiv.id == 'adventure-health') {continue};
+        if (!mobDiv.children[1]) {continue};
+
+        let skillMark = new Image();
+        skillMark.src = "./assets/icon/mark.webp";
+
+        if (mobDiv.children[0].children[0]) {
+            mobDiv.children[0].children[0].remove();
+        };
+
+        let canvas = document.createElement("canvas");
+        mobDiv.children[0].appendChild(canvas);
+        canvas.classList.add("skill-mark");
+        canvas.brightness = 1;
+        skillMark.onload = ()=> {
+            canvas.width = skillMark.naturalWidth;
+            canvas.height = skillMark.naturalHeight;
+
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(skillMark, 0, 0);
+            let brightnessIncrement = 0.001;
+            let maxBrightness = 1;
+
+            canvas.style.filter = "drop-shadow(0 0 0.2em #ADDE7D)";
+            increaseGlow();
+
+            function increaseGlow() {
+                if (!fightSceneOn) {return}
+                canvas.brightness += brightnessIncrement;
+                window.requestAnimationFrame(increaseGlow);
+            }
+        }
+    }
+}
+
+function attackAll(adventureFightBurst) {
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
     let cooldownTime;
@@ -3788,6 +3950,7 @@ function loseAdventure() {
     if (!fightSceneOn) {return}
     fightSceneOn = false;
 
+    document.getElementById("combo-number").remove();
     let adventureHeading = document.getElementById("adventure-header");
     adventureHeading.innerText = "You passed out...";
     let adventureChoiceTwo = document.getElementById("adv-button-two");
@@ -3838,6 +4001,7 @@ function winAdventure() {
     adventureChoiceTwo.innerText = "Leave";
     adventureChoiceTwo.addEventListener("click",()=>{
         quitAdventure();
+        document.getElementById("combo-number").remove();
         let newAdventureChoiceTwo = adventureChoiceTwo.cloneNode(true);
         adventureChoiceTwo.parentNode.replaceChild(newAdventureChoiceTwo, adventureChoiceTwo);
     })
@@ -3874,13 +4038,14 @@ function quitAdventure() {
 
     let adventureHealth = document.getElementById("adventure-health");
     adventureHealth.style.opacity = 0;
-    let healthElements = adventureHealth.getElementsByTagName("IMG");
+    let healthElements = adventureHealth.getElementsByClassName("heart-bit");
     while (healthElements.length > 0) {
         healthElements[0].remove();
     }
     let adventureHealthbarDiv = document.createElement("div");
     adventureHealthbarDiv.style.width = "100%";
     adventureScaraText = "";
+
 }
 
 // DRAWS FOR RANDOM INVENTORY LOOT 
@@ -4036,6 +4201,7 @@ function wishUnlock() {
     
     wishButtonText.innerText = "Write for help | " +WISHCOST;
     wishButtonText.append(wishButtonPrimo);
+    wishButton.locked = false;
     wishButton.addEventListener("click",() => {
         wish();
         updateWishDisplay();
@@ -4079,7 +4245,8 @@ function drawWish() {
     goldenNutUnlocked = true;
     var wishButton = document.createElement("div");
     wishButton.classList += " wish-button";
-    wishButton.id = "wishButton"
+    wishButton.id = "wishButton";
+    wishButton.locked = true;
     let wishButtonText = document.createElement("div");
     wishButtonText.id = "wishButtonText";
     wishButtonText.classList += " flex-row wish-button-text";
@@ -4121,6 +4288,7 @@ function stopWish() {
     let wishButton = document.getElementById("wishButton");
     let wishButtonText = document.getElementById("wishButtonText");
     wishButtonText.innerText = "Closed";
+    wishButton.locked = true;
 
     let wishNpsDisplay = document.getElementById("wish-nps-display");
     wishNpsDisplay.innerText = "All Wish Heroes obtained!";
@@ -4177,6 +4345,9 @@ function wish() {
                 break;
             }
         }
+    } else {
+        weaselDecoy.load();
+        weaselDecoy.play();
     }
 }
 
@@ -4506,15 +4677,11 @@ function tooltipFunction() {
     if (tooltipTable == 1) {
         if (heroTooltip === -1) {return}
         if (milestoneOn) {
-            milestoneBuy(heroTooltip)
+            milestoneBuy(heroTooltip);
         } else {
             upgrade(heroTooltip);
         }
         
-        if (timerSeconds !== 0) {
-            upgradeElement.load();
-            upgradeElement.play();
-        }
         return;
     } else if (tooltipTable == 2) {
         if (itemTooltip === -1) {return}
