@@ -77,7 +77,7 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
     for (let i = 1; i < NONWISHHEROMAX + 1; i++) {
         if (upgradeDict[i] === undefined) {continue}
         if (upgradeDict[i].Locked === true) {continue}
-        let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero-1)*1.25)));
+        let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero-1)*1.28)));
         let baseLevel = Math.round(0.75 * baseCost);
         upgradeDict[i]["BaseCost"] = Number(baseCost.toPrecision(3)).toExponential(3);
         upgradeDict[i]["Level"] = baseLevel.toExponential(3);
@@ -115,16 +115,6 @@ function sortList(table) {
     }
 }
 
-// UNLOCKS EXPEDITION (REQUIRES PASSING OF EXPEDITION DICT AS WELL)
-function unlockExpedition(i,expeditionDict) {
-    let expedID = "exped-" + i;
-    let unlockButton = document.getElementById(expedID);
-    let backgroundImage = "url(./assets/expedbg/exped" + i + ".webp)";
-
-    expeditionDict[i] = '0';
-    unlockButton.style.backgroundImage = backgroundImage;
-}
-
 // INNER HTML FOR FOOD BUFFS
 function countdownText(foodCooldown, int) {
     foodCooldown.classList.add("countdown-number");
@@ -143,9 +133,4 @@ function updateObjectKeys(savedObject,referenceObject) {
     return savedObject;
 }
 
-// UPDATES VERSION SAVE
-function updateSave() {
-
-}
-
-export { abbrNum,randomInteger,sortList,generateHeroPrices,unlockExpedition,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper};
+export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper};

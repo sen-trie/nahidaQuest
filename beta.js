@@ -4,7 +4,7 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "v0.3-3-292";
+const VERSIONNUMBER = "BETA.3-3-292";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -291,7 +291,7 @@ addNewRow();
 saveValues["realScore"]--;
 
 createMultiplierButton();
-// createExpMap();
+createExpMap();
 createExpedition();
 drawUI.createExpedTable(expedTooltip);
 table3.appendChild(expedTooltip);
@@ -3158,7 +3158,7 @@ function adventure(type) {
             } else {
                 currencyPopUp("items");
             }
-            // drawAdventure(type);
+            drawAdventure(type);
         } else {
             weaselDecoy.load();
             weaselDecoy.play();
@@ -3561,7 +3561,7 @@ function createExpMap() {
         if (expeditionDict[button.level] == 1) {
             button.style.zIndex = -1;
             button.locked = true;
-        } else {
+        } else if (button.level != 10){
             button.addEventListener("click",()=>{
                 if (adventureType === level) {
                     adventureType = 0;

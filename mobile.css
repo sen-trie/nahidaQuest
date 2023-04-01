@@ -341,6 +341,10 @@ body {
     height: 18%;
 }
 
+.adventure-map {
+    height: 98%;
+}
+
 #exped-row-1 {
     align-items: center;
 }

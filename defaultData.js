@@ -65,7 +65,7 @@ let expeditionDictDefault = {
     7:"0",
     8:"0",
     9:"1",
-    10:"0"
+    10:"0",
 }
 
 const waveArray = [5,6,6,5,8];
