@@ -4,7 +4,7 @@ import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScroller
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
-const VERSIONNUMBER = "BETA.3-3-292";
+const VERSIONNUMBER = "BETA.3-3-293";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
