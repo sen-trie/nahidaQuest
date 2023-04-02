@@ -851,9 +851,9 @@ let InventoryDefault = {
     3090: {Name:"Teyvat Fried Egg",             File:"teyvatFriedEgg",              Lore:"Decent food that [s]temporarily[/s] boosts NpS by at least [s]30%[/s].",        Star:1 ,      Type:"Food"                             },
 
 // LEVEL ITEMS + SPECIAL ITEMS
-    4001: {File:"heroEXP",                 Name:"Hero's Wit",                        Lore:"Comprehensive papers that provide many [s]free levels[/s].\n \n (Free Levels do not cost Nuts to purchase.)",               Star:4,  Type:"Level",   BuffLvlLow:10,BuffLvlHigh:15, },
-    4002: {File:"adventureEXP",            Name:"Adventurer's Experience",           Lore:"Elaborate papers that provide some [s]free levels[/s].\n \n (Free Levels do not cost Nuts to purchase.)",                   Star:3,  Type:"Level",   BuffLvlLow:4,BuffLvlHigh:9,  },
-    4003: {File:"wandererEXP",             Name:"Wanderer's Advice",                 Lore:"A detailed paper that provides a few [s]free levels[/s].\n \n (Free Levels do not cost Nuts to purchase.)",                 Star:2,  Type:"Level",   BuffLvlLow:1,BuffLvlHigh:3,  },
+    4001: {File:"heroEXP",                 Name:"Hero's Wit",                        Lore:"Comprehensive papers that provide many [s]free levels[/s].\n \n (Free Levels do not cost Nuts to purchase.)",               Star:4,  Type:"Level",   BuffLvlLow:6,BuffLvlHigh:8, },
+    4002: {File:"adventureEXP",            Name:"Adventurer's Experience",           Lore:"Elaborate papers that provide some [s]free levels[/s].\n \n (Free Levels do not cost Nuts to purchase.)",                   Star:3,  Type:"Level",   BuffLvlLow:2,BuffLvlHigh:4,  },
+    4003: {File:"wandererEXP",             Name:"Wanderer's Advice",                 Lore:"A detailed paper that provides a few [s]free levels[/s].\n \n (Free Levels do not cost Nuts to purchase.)",                 Star:2,  Type:"Level",   BuffLvlLow:1,BuffLvlHigh:2,  },
     4010: {File:"mailLarge",               Name:"Enchanted Courier",                 Lore:"A magical letter that automatically seeks its recipient, no matter where they may be.",                                     Star:5,  Type:"Level" },
     4011: {File:"sanctifyingOil",           Name:"Sanctifying Oil",                   Lore:"A rejuvenating potion that restores a [s]modest[/s] amount of [s]Energy[/s].",                                             Star:3,  Type:"Food"  },
     4012: {File:"sanctifyingUnction",       Name:"Sanctifying Unction",               Lore:"A rejuvenating concotion that restores a [s]considerable[/s] amount of [s]Energy[/s].",                                    Star:4,  Type:"Food"  },
@@ -908,7 +908,7 @@ let eventText = {
 }
 
 let expeditionDictInfo = {
-    10:{Text:"Visit the Adventurers' Guild"           ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
+    10:{Text:"Visit the Adventurers' Guild"          ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
     1:{Text:"Explore Teyvat | 100 "                  ,Lore:"The legend of the Golden Nut is from a bygone era. Some on-the-ground research is certainly needed if you wanted even a slither of a chance to find the mythical fruit."},
     2:{Text:"Complete World Quests | 250 "           ,Lore:"World Quests give insight into the various locations and stories of the world. Perhaps the Golden Nut has crossed paths with someone along the way?"},
     3:{Text:"Challenge Domains | 500 "               ,Lore:"Clues about the origin of the Golden Nut are said to have been hidden deep inside some mysterious domain. Exploring it will likely be the next step in unravelling the fruit's location."},
