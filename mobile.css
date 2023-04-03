@@ -317,21 +317,21 @@ body {
     border-bottom: 0.3em solid #816355;
 }
 
-.tooltipEXPED {
+/* .tooltipEXPED {
     width: 90%;
     height: 50%;
     right: 1%;
     font-size: 0.95em;
     /* background-image: url(./assets/frames/tooltipEXPED-mobile.webp); */
-}
 
-#adventure-tutorial {
+
+/* #adventure-tutorial {
     right: 1%;
     top: 2%;
     height: 12%;
     z-index: 30;
-}
-
+} */
+/* 
 #adventure-button {
     position: absolute;
     bottom:45%;
@@ -339,7 +339,7 @@ body {
     aspect-ratio: 4.56;
     right: 2%;
     height: 18%;
-}
+} */
 
 .adventure-map {
     height: 98%;
@@ -401,7 +401,7 @@ body {
 }
 
 .tool-tip-lore {
-    overflow-y: scroll;
+    overflow-y: auto;
     height: auto;
     font-size: 1em;
 }
@@ -466,7 +466,7 @@ body {
     width: 70%;
     height: 45%;
     scrollbar-width: 0.1vw;
-    scrollbar-color: #6a513a #B3967B;
+    scrollbar-color: #9b744f #cda682;
     overflow-x: scroll;
     flex-wrap: nowrap;
     justify-content:unset;

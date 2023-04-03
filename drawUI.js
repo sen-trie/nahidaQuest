@@ -12,7 +12,6 @@ const numberedFileArray = {
     "achievement/":20,
     "event/box-":7,
     "event/good-":7,
-    "expedbg/exped":6,
     "frames/background-":6,
     "frames/rarity-":6,
     "tutorial/aranara-":6,

@@ -908,7 +908,6 @@ let eventText = {
 }
 
 let expeditionDictInfo = {
-    10:{Text:"Visit the Adventurers' Guild"          ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
     1:{Text:"Explore Teyvat | 100 "                  ,Lore:"The legend of the Golden Nut is from a bygone era. Some on-the-ground research is certainly needed if you wanted even a slither of a chance to find the mythical fruit."},
     2:{Text:"Complete World Quests | 250 "           ,Lore:"World Quests give insight into the various locations and stories of the world. Perhaps the Golden Nut has crossed paths with someone along the way?"},
     3:{Text:"Challenge Domains | 500 "               ,Lore:"Clues about the origin of the Golden Nut are said to have been hidden deep inside some mysterious domain. Exploring it will likely be the next step in unravelling the fruit's location."},
@@ -916,8 +915,10 @@ let expeditionDictInfo = {
     5:{Text:"Abyss Diving | 1000 "                   ,Lore:"All trails seem to end here. With nowhere else to go, the Abyss is the sole place left where the fruit is likely to be. Search through the floors with the help of an unlikely ally."},
     6:{Text:"Locked"                                 ,Lore:"Perhaps this path will open after you get stronger..."            },
     7:{Text:"Select an Expedition"                   ,Lore:"Go on Expeditions to get items to upgrade your characters!"            },
-    8:{Text:"Expeditions use Energy "                ,Lore:"Energy can be obtained by clicking Big Nahida"            },
-    9:{Text:"Not enough Energy "                     ,Lore:"Obtain more before going on Expeditions!"            },
+    8:{Text:"Expeditions use Energy"                ,Lore:"Energy can be obtained by clicking Big Nahida"            },
+    9:{Text:"Not enough Energy"                     ,Lore:"Obtain more before going on Expeditions!"            },
+    10:{Text:"Visit the Adventurers' Guild"          ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
+    11:{Text:"No Party Leader selected"               ,Lore:"Please select one before going on Expeditions."            },
 }
 
 let screenLoreDict = {

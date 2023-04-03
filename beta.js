@@ -239,6 +239,15 @@ let filteredHeroes = [];
 let filteredInv = [];
 let rowTempDict = [];
 let milestoneOn = false;
+let activeLeader;
+const upgradeThreshold = [0,0,64,113,160];
+const charLoreObj = {
+    0:{Name:"Nahida",     Desc:"20%+ HP in Combat"},
+    1:{Name:"Paimon",     Desc:"10%+ Energy Refund"},
+    2:{Name:"Venti",      Desc:"20%+ Combo Damage"},
+    3:{Name:"Zhongli",    Desc:"15%+ Skill Healing"},
+    4:{Name:"Ei",         Desc:"35%+ Counter DMG"},
+}
 
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");
@@ -268,7 +277,6 @@ let table6 = document.getElementById("table6");
 let table7 = document.getElementById("table7");
 let TABS = [table1,table2, table3, table4, table5Container,table7];
 let tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,tooltipWeaponImg,tooltipElementImg,table6Background;
-
 
 // INITIAL LOADING
 var InventoryMap;
@@ -1870,15 +1878,6 @@ function tabChange(x) {
             document.getElementById("adventure-map").style.zIndex = -1;
         }
     }
-    // {
-    //     if ()) {
-    //        
-    //     } 
-    // } else {
-    //     if (document.getElementById("adventure-area")) {
-    //         document.getElementById.style.zIndex = -1;
-    //     }
-    // }
 }
 
 document.addEventListener("keydown", function(event) {
@@ -2179,9 +2178,9 @@ function importClipboard(type) {
                     clearPromise.then(
                         function(value) {
                             for (let key in localStorageTemp) {
-                                localStorage.setItem(key, localStorageTemp[key]);
+                                 localStorage.setItem(key, localStorageTemp[key]);
                             }
-                            setTimeout(()=>location.reload(),200);
+                            location.reload();
                         },
                         function(error) {console.error("Error clearing local data")}
                     ); 
@@ -2242,7 +2241,11 @@ function createMultiplierButton() {
 function updateMilestoneNumber() {
     if (!document.getElementById("upgrade-menu-button")) {return};
     let milestoneButton = document.getElementById("upgrade-menu-button");
-    milestoneButton.innerText = `Upgrades: (${milestoneCount})`
+    if (milestoneCount == 0) {
+        milestoneButton.innerText = `No Upgrades Available`;
+    } else {
+        milestoneButton.innerText = `${milestoneCount} Upgrades Available!`;
+    }
 }
 
 function createFilter() {
@@ -2291,7 +2294,6 @@ function createFilter() {
                 if (milestoneButton.classList.contains("milestone-selected")) {
                     milestoneButton.classList.remove("milestone-selected");
                 }
-                
             }
         }
         clearTooltip();
@@ -2449,17 +2451,24 @@ function loadRow() {
                 heroTextLoad = "Call for " + upgradeInfo[loadedHeroID].Name + "'s help... (" + abbrNum(formatCost,2) + ")";
             }
         }
-
        
         let heroID = "but-" + j;
         let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
         heroButtonContainer.addEventListener("click", () => {
             changeTooltip(upgradeInfo[loadedHeroID], "hero",loadedHeroID);
             if (heroTooltip !== -1) {
-                heroTooltip = upgradeDict[heroTooltip].Row;
-                let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
-                if (removeActiveHero.classList.contains("active-hero")) {
-                    removeActiveHero.classList.remove("active-hero");
+                
+                if (upgradeDict[heroTooltip] != undefined) {
+                    heroTooltip = upgradeDict[heroTooltip].Row;
+                    let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
+                    if (removeActiveHero.classList.contains("active-hero")) {
+                        removeActiveHero.classList.remove("active-hero");
+                    }
+                } else if (document.getElementById(`milestone-${heroTooltip}`)) {
+                    let milestoneButton = document.getElementById(`milestone-${heroTooltip}`);
+                    if (milestoneButton.classList.contains("milestone-selected")) {
+                        milestoneButton.classList.remove("milestone-selected");
+                    }
                 }
             }
             heroTooltip = loadedHeroID;
@@ -2509,10 +2518,17 @@ function addNewRow(onlyOnce) {
             heroButtonContainer.addEventListener("click", () => {
                 changeTooltip(upgradeInfo[i], "hero",i);
                 if (heroTooltip !== -1) {
-                    heroTooltip = upgradeDict[heroTooltip].Row;
-                    let removeActiveHero = document.getElementById(`but-${heroTooltip}`)
-                    if (removeActiveHero.classList.contains("active-hero")) {
-                        removeActiveHero.classList.remove("active-hero");
+                    if (upgradeDict[heroTooltip] != undefined) {
+                        heroTooltip = upgradeDict[heroTooltip].Row;
+                        let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
+                        if (removeActiveHero.classList.contains("active-hero")) {
+                            removeActiveHero.classList.remove("active-hero");
+                        }
+                    } else if (document.getElementById(`milestone-${heroTooltip}`)) {
+                        let milestoneButton = document.getElementById(`milestone-${heroTooltip}`);
+                        if (milestoneButton.classList.contains("milestone-selected")) {
+                            milestoneButton.classList.remove("milestone-selected");
+                        }
                     }
                 }
                 heroTooltip = i;
@@ -2681,10 +2697,10 @@ function milestoneBuy(heroTooltip) {
     let itemStar = -1;
     if (level >= 350) {
         itemStar = 0;
-        buff = 2;
+        buff = 3;
     } else if (level >= 200) {
         itemStar = 1;
-        buff = 1.5;
+        buff = 2;
     } else if (level >= 75) {
         itemStar = 2;
         buff = 1;
@@ -3342,7 +3358,6 @@ function createAdventure() {
         skillUse();
     })
 
-
     let adventureFightBurst = document.createElement("img");
     adventureFightBurst.src = "./assets/expedbg/battle3.webp";
 
@@ -3352,13 +3367,10 @@ function createAdventure() {
 
     document.addEventListener("keydown", function(event) {
         if (event.key === "z" || event.key === "q") {
-            event.preventDefault();
             dodgeOn("toggle");
         } else if (event.key === "x" || event.key === "w") {
-            event.preventDefault();
             skillUse();
         } else if (event.key === "c" || event.key === "e") {
-            event.preventDefault();
             attackAll(adventureFightBurst);
         }
     })
@@ -3416,17 +3428,14 @@ function inventoryDraw(itemType, min, max, type){
 
 // CREATING EXPEDITION UI
 function createExpedition() {
-    let charSelect = document.createElement("div");
-    charSelect.innerText = "Select Party Leader";
-    charSelect.classList.add("flex-row","char-select");
-    charSelect.style.opacity = 0;
-    table3.appendChild(charSelect)
-
     let expedTable = document.createElement("div");
     expedTable.classList.add("flex-column","tooltipTABLEEXPED");
+    let expedBottom = document.createElement("div");
+    expedBottom.classList.add("flex-row","exped-bottom");
     let expedContainer = document.createElement("div");
     expedContainer.id = "exped-container";
     expedContainer.classList.add("exped-container","flex-row");
+
     let expedLoot = document.createElement("div");
     expedLoot.id = "exped-loot";
     expedLoot.classList.add("exped-loot","flex-column");
@@ -3441,43 +3450,12 @@ function createExpedition() {
     expedText.id = "exped-text";
     expedText.classList.add("flex-row");
     expedImgDiv.classList.add("flex-row","exped-text");
-    expedImgDiv.append(expedImg,expedText)
+    expedImgDiv.append(expedImg,expedText);
 
-    expedTable.append(expedImgDiv,expedLore,expedContainer,expedLoot)
+    expedBottom.append(expedContainer,expedLoot)
+    expedTable.append(expedImgDiv,expedLore,expedBottom)
     expedTooltip.append(expedTable);
-
-    // drawUI.createExpedTable(expedTooltip);
     table3.appendChild(expedTooltip);
-    // for (let i = 1; i < 6; i++) {
-    //     let expedButton = document.createElement("button");
-    //     let backgroundImg;
-        
-    //     if (expeditionDict[i] == '1'){
-    //         backgroundImg = "url(./assets/expedbg/exped6.webp)";
-    //     } else {
-    //         backgroundImg = "url(./assets/expedbg/exped" + i + ".webp)";
-    //     }
-
-    //     expedButton = expedButtonAdjust(expedButton, backgroundImg, i)
-    //     expedButton.addEventListener("click", () => {
-    //         if (adventureType === i) {
-    //             expedButton.classList.remove("expedition-selected");
-    //             adventureType = 0;
-    //             expedInfo("exped-7");
-    //             let advButton = document.getElementById("adventure-button");
-    //             if (advButton.classList.contains("expedition-selected")) {
-    //                 advButton.classList.remove("expedition-selected");
-    //             }
-    //         } else {
-    //             clearExped();
-    //             adventureType = i;
-    //             expedButton.classList.add("expedition-selected");
-    //             expedInfo(expedButton.id);
-    //         }  
-    //     });
-    //     expedDiv.appendChild(expedButton);
-    // }
-
     expedDiv.remove();
 
     let charMorale = document.createElement("img");
@@ -3525,12 +3503,12 @@ function clearExped() {
     }
 }
 
-const waveHeads = [3,3,3,3,5];
-const waveLoot = ["Artifacts & Weapons (Lvl 1-2) \n Talent Books (Lvl 2)   \n Food (Lvl 1-2)",
-                  "Artifacts & Weapons (Lvl 1-3) \n Talent Books (Lvl 2-3) \n Food (Lvl 1-3)",
-                  "Artifacts & Weapons (Lvl 2-4) \n Talent Books (Lvl 2-3) \n Talents (Lvl 2-4)",
-                  "Artifacts & Weapons (Lvl 2-4) \n Talent Books (Lvl 2-4) \n Gems (Lvl 3-5)",
-                  "Artifacts & Weapons (Lvl 4-5) \n Talent Books (Lvl 4)   \n Gems & Talents (Lvl 4-5)"]
+const waveHeads = [3,3,3,3,4];
+const waveLoot = ["Lvl 1-2. Artifacts & Weapons \n Lvl 2.   XP Books \n Lvl 1-2. Food",
+                  "Lvl 1-3. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 1-3. Food",
+                  "Lvl 2-4. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 2-4. Talents",
+                  "Lvl 2-4. Artifacts & Weapons \n Lvl 2-4. XP Books \n Lvl 3-5. Gems",
+                  "Lvl 4-5. Artifacts & Weapons \n Lvl 4.   XP Books \n Lvl 4-5. Gems & Talents"]
 
 function expedInfo(butId) {
     let expedRow1 = document.getElementById("exped-text");
@@ -3547,15 +3525,13 @@ function expedInfo(butId) {
         }
         expedRow1.innerHTML = `<p>${expeditionDictInfo[i]["Text"]}</p>`;
         expedRow2.innerText = expeditionDictInfo[i]["Lore"];
-    } else if (i == 8 || i == 9 || i == 10) {
+    } else if (i >= 8 && i <= 11) {
         expedRow1.innerHTML =  `<p>${expeditionDictInfo[i]["Text"]}</p>`;
         expedRow2.innerText = expeditionDictInfo[i]["Lore"];
     } else {
         expedRow1.innerHTML = `<p>${expeditionDictInfo[6]["Text"]}</p>`;
         expedRow2.innerText = expeditionDictInfo[6]["Lore"];
     }
-
-    console.log(i)
 
     let enemyInfo = document.getElementById("exped-container");
     let lootInfo = document.getElementById("exped-loot");
@@ -3568,21 +3544,21 @@ function expedInfo(butId) {
     } 
 
     if (i < 6 && i > 0) {
-    expedRow1.innerHTML += `<img class="icon primogem" src="./assets/icon/energyIcon.webp"></img>`
+    expedRow1.innerHTML += `<img class="icon primogem" src="./assets/icon/energyIcon.webp"></img>`;
         for (let j = 0; j < waveHeads[i-1]; j++) {
             let img = new Image();
             img.classList.add("enemy-head");
             img.src = `./assets/expedbg/heads/${i}-${j+1}.webp`;
             enemyInfo.appendChild(img);
         }
-        lootInfo.innerText = `Possible Loot: \n ${waveLoot[i-1]}`;
+        lootInfo.innerText = `Possible Reward: \n\n ${waveLoot[i-1]}`;
         expedImg.src = `./assets/expedbg/header/${id}.webp`;
         expedRow2.style.borderBottom = "0.2em solid #8B857C";
-        enemyInfo.style.borderBottom = "0.2em solid #8B857C";
+        enemyInfo.style.borderRight = "0.2em solid #8B857C";
     } else {
         expedImg.src = `./assets/expedbg/header/0.webp`;
         expedRow2.style.borderBottom = "none";
-        enemyInfo.style.borderBottom = "none";
+        enemyInfo.style.borderRight = "none";
     }
     enemyInfo.currentWave = id;
 }
@@ -3595,10 +3571,64 @@ function createExpMap() {
     advImageDiv.id = "adventure-map";
     advImageDiv.style.zIndex = -1;
 
+    let charSelect = document.createElement("div");
+    charSelect.id = "char-selected";
+    charSelect.innerText = "Select Party Leader";
+    charSelect.classList.add("flex-row","char-select");
+    charSelect.currentHero = 0;
+    charSelect.addEventListener("click",()=>{
+        if (charMenu.style.display == "none") {
+            charMenu.style.display = "flex";
+        } else {
+            charMenu.style.display = "none";
+        }
+    })
+
+    
+    let charMenu = document.createElement("div");
+    let activeChar;
+    charMenu.classList.add("flex-column","char-menu");
+    charMenu.style.display = "none";
+    for (let k = 0; k < 5; k++) {
+        let charImg = new Image();
+        charImg.src = `./assets/expedbg/leader-${k}.webp`;
+        let charLore = document.createElement("p");
+        charLore.classList.add("flex-column");
+        charLore.innerText = `${charLoreObj[k].Name} \n ${charLoreObj[k].Desc}`;
+
+        let charDiv = document.createElement("div");
+        charDiv.id = `char-select-${k}`;
+        charDiv.classList.add("flex-row");
+        charDiv.locked = false;
+
+        if (k > 1) {
+            if (upgradeDict[upgradeThreshold[k]].Purchased <= 0) {
+                charDiv.locked = true;
+                charLore.innerText = `???`;
+                charImg.src = `./assets/expedbg/leader-none.webp`;
+            }
+        }
+    
+        charDiv.addEventListener("click",()=>{
+            if (!charDiv.locked) {
+                charSelect.innerText = "";
+                charSelect.style.backgroundImage = `url(./assets/expedbg/leader-${k}.webp)`;
+
+                activeLeader = charLoreObj[k].Name;
+                if (activeChar) {activeChar.classList.remove("char-selected");}
+                charDiv.classList.add("char-selected");
+                activeChar = charDiv;
+            }
+        })
+        charDiv.append(charImg,charLore);
+        charMenu.append(charDiv);
+    }
+
     let dragIcon = new Image();
     dragIcon.classList.add("drag-icon");
     dragIcon.src = "./assets/expedbg/drag.webp";
-    advImageDiv.append(advImage,dragIcon);
+
+    advImageDiv.append(advImage,dragIcon,charSelect,charMenu);
     leftDiv.appendChild(advImageDiv);
 
     let lastX = 0;
@@ -3660,7 +3690,14 @@ function createExpMap() {
         } else if (button.level != 10){
             button.addEventListener("click",()=>{
                 let advButton = document.getElementById("adventure-button");
-                if (adventureType === level && advButton.key == key) {
+                if (!activeLeader) {
+                    adventureType = 0;
+                    advButton.key = 0;
+                    expedInfo("exped-11");
+                    if (advButton.classList.contains("expedition-selected")) {
+                        advButton.classList.remove("expedition-selected");
+                    }
+                } else if (adventureType === level && advButton.key == key) {
                     adventureType = 0;
                     advButton.key = 0;
                     expedInfo("exped-7");
@@ -3729,15 +3766,23 @@ function createExpMap() {
     }
 }
 
+function charScan() {
+    for (let i = 2; i < 5; i++) {
+        let charDiv = document.getElementById(`char-select-${i}`);
+        if (charDiv.locked) {
+            if (upgradeDict[upgradeThreshold[i]].Purchased > 0) {
+                charDiv.locked = false;
+                charDiv.children[0].src = `./assets/expedbg/leader-${i}.webp`;
+                charDiv.children[1].innerText = `${charLoreObj[i].Name} \n ${charLoreObj[i].Desc}`;
+                break;
+            }
+        }
+    }
+}
+
 // UNLOCKS EXPEDITION (REQUIRES PASSING OF EXPEDITION DICT AS WELL)
 function unlockExpedition(i,expeditionDict) {
-    // let expedID = "exped-" + i;
-    // let unlockButton = document.getElementById(expedID);
-    // let backgroundImage = "url(./assets/expedbg/exped" + i + ".webp)";
-
     expeditionDict[i] = '0';
-    // unlockButton.style.backgroundImage = backgroundImage;
-    
     let advButtonDiv = document.getElementById("adventure-map").children[0];
     for (let j = 0; j < advButtonDiv.children.length; j++) {
         let button = advButtonDiv.children[j];
@@ -3757,12 +3802,11 @@ function unlockExpedition(i,expeditionDict) {
                     } else {
                         clearExped();
                         adventureType = button.level;
-                        expedInfo(`exped-${button.level}`);
+                        expedInfo(`exped-${button.level}-${j+1}`);
                     }  
                 })
             }
         }
-        
     }
 }
 
@@ -4293,6 +4337,7 @@ function winAdventure() {
     adventureChoiceTwo.innerText = "Leave";
     adventureChoiceTwo.addEventListener("click",()=>{
         quitAdventure();
+        charScan();
         document.getElementById("combo-number").remove();
         let newAdventureChoiceTwo = adventureChoiceTwo.cloneNode(true);
         adventureChoiceTwo.parentNode.replaceChild(newAdventureChoiceTwo, adventureChoiceTwo);
@@ -4738,11 +4783,11 @@ function changeTooltip(dict, type, number) {
         let upgradeLevel = 50;
         let extraText = "";
         if (number >= 350) {
-            upgradeLevel = 200;
+            upgradeLevel = 300;
             extraText = `& a 5-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 5-Star Gem`}
         } else if (number >= 200) {
-            upgradeLevel = 150;
+            upgradeLevel = 200;
             extraText = `& a 4-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 4-Star Gem`}
         } else if (number >= 75) {

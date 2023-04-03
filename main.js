@@ -3526,11 +3526,11 @@ function clearExped() {
 }
 
 const waveHeads = [3,3,3,3,5];
-const waveLoot = ["Artifacts & Weapons (Lvl 1-2) \n Talent Books (Lvl 2)   \n Food (Lvl 1-2)",
-                  "Artifacts & Weapons (Lvl 1-3) \n Talent Books (Lvl 2-3) \n Food (Lvl 1-3)",
-                  "Artifacts & Weapons (Lvl 2-4) \n Talent Books (Lvl 2-3) \n Talents (Lvl 2-4)",
-                  "Artifacts & Weapons (Lvl 2-4) \n Talent Books (Lvl 2-4) \n Gems (Lvl 3-5)",
-                  "Artifacts & Weapons (Lvl 4-5) \n Talent Books (Lvl 4)   \n Gems & Talents (Lvl 4-5)"]
+const waveLoot = ["Artifacts & Weapons (Lvl 1-2), Talent Books (Lvl 2), Food (Lvl 1-2)",
+                  "Artifacts & Weapons (Lvl 1-3), Talent Books (Lvl 2-3), Food (Lvl 1-3)",
+                  "Artifacts & Weapons (Lvl 2-4), Talent Books (Lvl 2-3), Talents (Lvl 2-4)",
+                  "Artifacts & Weapons (Lvl 2-4), Talent Books (Lvl 2-4), Gems (Lvl 3-5)",
+                  "Artifacts & Weapons (Lvl 4-5), Talent Books (Lvl 4), Gems & Talents (Lvl 4-5)"]
 
 function expedInfo(butId) {
     let expedRow1 = document.getElementById("exped-text");
