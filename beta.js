@@ -1,6 +1,7 @@
-import { upgradeDictDefault,SettingsDefault,InventoryDefault,enemyInfo,expeditionDictDefault,achievementListDefault,saveValuesDefault,eventText,upgradeInfo,persistentValuesDefault,permUpgrades,screenLoreDict,expeditionDictInfo } from "./defaultData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper } from "./functions.js"
-import { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
+import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault } from "./defaultData.js"
+import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText } from "./dictData.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray } from "./functions.js"
+import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./drawUI.js"
 
@@ -240,6 +241,8 @@ let filteredInv = [];
 let rowTempDict = [];
 let milestoneOn = false;
 let activeLeader;
+
+let bountyArray = [];
 const upgradeThreshold = [0,0,64,113,160];
 const charLoreObj = {
     0:{Name:"Nahida",     Desc:"20%+ HP in Combat"},
@@ -247,6 +250,31 @@ const charLoreObj = {
     2:{Name:"Venti",      Desc:"20%+ Combo Damage"},
     3:{Name:"Zhongli",    Desc:"15%+ Skill Healing"},
     4:{Name:"Ei",         Desc:"35%+ Counter DMG"},
+}
+const imgKey = {
+    1:{Left:"76",   Top:"24",   Level:10,   Wave:[],                Heads:[]},
+    2:{Left:"85",   Top:"9",    Level:1,    Wave:[1,2,5],           Heads:[1,2]},
+    3:{Left:"59",   Top:"19",   Level:1,    Wave:[1,2,3,4,5],       Heads:[1,2,3]},
+    4:{Left:"64",   Top:"49",   Level:1,    Wave:[1,3,4],           Heads:[1,3]},
+    5:{Left:"40",   Top:"48",   Level:1,    Wave:[3,4,6],           Heads:[3,4]},
+    6:{Left:"46",   Top:"61",   Level:2,    Wave:[1,2,7],           Heads:[4,5]},
+    7:{Left:"80",   Top:"59",   Level:2,    Wave:[1,2,5,6],         Heads:[5,9]},
+    8:{Left:"77",   Top:"40",   Level:2,    Wave:[3,4],             Heads:[6,7]},
+    9:{Left:"52",   Top:"50",   Level:2,    Wave:[4,5,6],           Heads:[6,9]},
+    10:{Left:"70",   Top:"47",  Level:3,    Wave:[1,2],             Heads:[5,14]},
+    11:{Left:"64",   Top:"35",  Level:3,    Wave:[2,5,6],           Heads:[3,8,14]},
+    12:{Left:"22",  Top:"68",   Level:3,    Wave:[5,6,7],           Heads:[3,8,10]},
+    13:{Left:"31",  Top:"26",   Level:3,    Wave:[3,4],             Heads:[6,7]},
+    14:{Left:"20",  Top:"32",   Level:4,    Wave:[2,3,5],           Heads:[8,12,19]},
+    15:{Left:"51",  Top:"18",   Level:4,    Wave:[1],               Heads:[11,13]},
+    16:{Left:"88",  Top:"45",   Level:4,    Wave:[2,3,5],           Heads:[19,12]},
+    17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,3,4,5,6,7,8], Heads:[15,16,17,18,20]},
+    18:{Left:"53",  Top:"38",   Level:12,    Scene:["1-A-1","1-A-2","1-C-2"]},
+    19:{Left:"80",  Top:"18",   Level:12,    Scene:["1-C-2","1-C-3"]},
+    20:{Left:"77",  Top:"53",   Level:12,    Scene:["1-C-1","1-C-2","2-C-2"]},
+    21:{Left:"33",  Top:"82",   Level:12,    Scene:["3-C-2","3-C-3","2-A-1","2-C-4"]},
+    22:{Left:"44",  Top:"71",   Level:12,    Scene:["3-C-1","3-C-2","3-C-4","2-C-3"]},
+    23:{Left:"55",  Top:"21",   Level:12,    Scene:["3-A-1"]},
 }
 
 let demoContainer = document.getElementById("demo-container");
@@ -275,12 +303,13 @@ let table5 = document.getElementById("table5");
 let table5Container = document.getElementById("table5-container");
 let table6 = document.getElementById("table6");
 let table7 = document.getElementById("table7");
-let TABS = [table1,table2, table3, table4, table5Container,table7];
+let TABS = [table1,table2,table3,table4,table5Container,table7];
 let tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,tooltipWeaponImg,tooltipElementImg,table6Background;
 
 // INITIAL LOADING
 var InventoryMap;
 var achievementMap;
+let advDict;
 loadSaveData();
 loadingAnimation();
 var upgradeDict;
@@ -439,7 +468,6 @@ function loadSaveData() {
         InventoryMap = new Map(JSON.parse(InventoryTemp));
         inventoryload();
     }
-    
     // LOAD EXPEDITION DATA
     if (localStorage.getItem("expeditionDictSave") == null) {
         expeditionDict = expeditionDictDefault;
@@ -453,6 +481,14 @@ function loadSaveData() {
             expeditionDict = expeditionDictTemp;
         }
         updateObjectKeys(expeditionDict,expeditionDictDefault);
+    }
+    // LOAD ADVENTURE DATA
+    if (localStorage.getItem("advDictSave") == null) {
+        advDict = advDictDefault;
+    } else {
+        let advDictTemp = localStorage.getItem("advDictSave");
+        advDict = JSON.parse(advDictTemp);
+        updateObjectKeys(advDict,advDictDefault);
     }
     // LOAD ACHIEVEMENT DATA
     achievementList = achievementListDefault;
@@ -1731,6 +1767,7 @@ function saveData(skip) {
     localStorage.setItem("InventorySave", JSON.stringify(Array.from(InventoryMap)));
     localStorage.setItem("achievementListSave", JSON.stringify(Array.from(achievementMap)));
     localStorage.setItem("persistentValues", JSON.stringify(persistentValues));
+    localStorage.setItem("advDictSave", JSON.stringify(advDict));
 
     if (table7.innerHTML != "") {
         let savedTable7 = (table7.innerHTML).replace('shadow-pop-tr','')
@@ -1903,6 +1940,7 @@ document.addEventListener("keydown", function(event) {
                 if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
             }
         } else if (event.key === "Enter") {
+            event.preventDefault();
             if (table4.style.display === "flex") {
                 let wishButton = document.getElementById("wishButton");
                 if (!wishButton.locked) {
@@ -1910,7 +1948,6 @@ document.addEventListener("keydown", function(event) {
                     updateWishDisplay();
                 }
             } else {
-                event.preventDefault();
                 tooltipFunction();
             }
         }
@@ -2697,10 +2734,10 @@ function milestoneBuy(heroTooltip) {
     let itemStar = -1;
     if (level >= 350) {
         itemStar = 0;
-        buff = 3;
+        buff = 5;
     } else if (level >= 200) {
         itemStar = 1;
-        buff = 2;
+        buff = 2.5;
     } else if (level >= 75) {
         itemStar = 2;
         buff = 1;
@@ -2725,7 +2762,7 @@ function milestoneBuy(heroTooltip) {
     
     if (saveValues.realScore >= cost) {
         if (itemArray.length > 0) {
-            let tempID = itemArray[randomInteger(0,itemArray.length+1)];
+            let tempID = rollArray(itemArray,0)
             if (!InventoryMap.has(tempID)) {
                 weaselDecoy.load();
                 weaselDecoy.play();
@@ -2997,7 +3034,7 @@ const weaponBuffPercent =   [0, 1.1, 1.3, 1.7, 2.1, 2.7, 4.6];
 const artifactBuffPercent = [0, 1.05, 1.15, 1.35, 1.55, 1.85];
 const foodBuffPercent =     [0, 1.4, 2.0, 3.1, 4.4, 6.2];
 const nationBuffPercent =   [0, 0, 1.2, 1.5, 1.8];
-const energyBuffPercent =   [0, 0, 0, 125, 300, 650];
+const energyBuffPercent =   [0, 0, 0, 200, 500, 1000];
 function itemUse(itemUniqueId) {
     let itemID;
     if (typeof itemUniqueId === 'string') {
@@ -3191,7 +3228,10 @@ function foodButton(type) {
 //-------------------------------------------------------------TABLE 3 (EXPEDITION + TOOLTIPS)----------------------------------------------------------//
 // EXPEDITION MECHANICS
 const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
-function adventure(type) {
+function adventure(advType) {
+    let type = parseInt(advType.split("-")[0]);
+    let wave = rollArray(JSON.parse(advType.split("-")[1]),0);
+
     if (type !== 10 && saveValues["energy"] >= ADVENTURECOSTS[type]) {
         if (expeditionDict[type] != '1') {
             adventureElement.load();
@@ -3201,7 +3241,7 @@ function adventure(type) {
             } else {
                 currencyPopUp("items");
             }
-            // drawAdventure(type);
+            // drawAdventure(type,wave);
         } else {
             weaselDecoy.load();
             weaselDecoy.play();
@@ -3452,8 +3492,8 @@ function createExpedition() {
     expedImgDiv.classList.add("flex-row","exped-text");
     expedImgDiv.append(expedImg,expedText);
 
-    expedBottom.append(expedContainer,expedLoot)
-    expedTable.append(expedImgDiv,expedLore,expedBottom)
+    expedBottom.append(expedContainer,expedLoot);
+    expedTable.append(expedImgDiv,expedLore,expedBottom);
     expedTooltip.append(expedTable);
     table3.appendChild(expedTooltip);
     expedDiv.remove();
@@ -3461,14 +3501,22 @@ function createExpedition() {
     let charMorale = document.createElement("img");
     charMorale.src = "./assets/expedbg/morale-4.webp";
     charMorale.classList.add("char-morale");
+    let guildTable = createGuild();
 
     let advButton = document.createElement("div");
     advButton.id = "adventure-button";
     advButton.classList.add("background-image-cover");
     advButton.innerText = "Adventure!"
     advButton.addEventListener("click",() => {
+        
         if (adventureType != 0) {
-            adventure(adventureType);
+            if (adventureType == "10-[]") {
+                guildTable.toggle();
+            } else {
+                gainXP(15)
+                expedPop()
+                adventure(adventureType);
+            }
         }
     })
 
@@ -3486,7 +3534,105 @@ function createExpedition() {
     table3.append(charMorale,advButton,advTutorial);
 }
 
+function createGuild() {
+    let guildTable = document.createElement("div");
+    guildTable.activeTable = 0;
+    guildTable.id = "guild-table";
+    guildTable.classList.add("flex-row","guild-table","cover-all");
+    guildTable.style.display = "none";
+    guildTable.toggle = function() {
+        if (this.style.display == "none") {
+            this.style.display = "flex";
+        } else {
+            this.style.display = "none";
+        }
+    }
+
+    guildTable.close = function() {
+        if (this.style.display == "flex") {
+            this.style.display = "none";
+        }
+    }
+
+    let bountyMenu = document.createElement("div");
+    bountyMenu.classList.add("flex-row","bounty-menu");
+    buildBounty(bountyMenu);
+
+    let rankMenu = document.createElement("div");
+    rankMenu.classList.add("flex-row","rank-menu")
+    for (let i = 1; i < 21; i++) {
+        let rankButton = document.createElement("div");
+        rankButton.innerText = `Level ${i}.  \n  ${advDict.rankDict[i].Desc}`;
+        rankMenu.appendChild(rankButton);
+    }
+
+    let tradingMenu = document.createElement("div");
+    const guildArray = [bountyMenu,rankMenu,tradingMenu];
+    const buttonArray = ["Bounties","Adventure Rank","Trading"]
+
+    for (let i = 0; i < 2; i++) {
+        let menuButton = document.createElement("div");
+        menuButton.innerText = buttonArray[i];
+        menuButton.classList.add("flex-column","guild-button");
+        menuButton.addEventListener("click",()=>{
+            if (guildTable.activeTable) {guildArray[guildTable.activeTable - 1].style.display = "none"};
+            guildArray[i].style.display = "flex";
+            guildTable.activeTable = i + 1;
+            buildBounty(bountyMenu);
+        })
+        guildTable.appendChild(menuButton)
+    }
+
+    for (let i = 0; i < 3; i++) {
+        guildArray[i].style.display = "none";
+        guildArray[i].classList.add("flex-row","guild-menu");
+        guildTable.appendChild(guildArray[i]);
+    }
+    table3.appendChild(guildTable);
+    return guildTable;
+}
+
+function buildBounty(bountyMenu) {
+    while (bountyMenu.firstChild) {
+        bountyMenu.removeChild(bountyMenu.lastChild);
+    }
+
+    bountyArray = [];
+    let bountyTimer = document.createElement("p");
+    bountyTimer.innerText = "Bounty resets at Midnight UTC (GMT+0)";
+    bountyMenu.appendChild(bountyTimer);
+
+    let bountyDict = enemyInfo.bountyKey;
+    for (let i = 1; i < 7; i++) {
+        let bountyButton = document.createElement("div");
+        bountyButton.classList.add("flex-column","bounty-button");
+        let bountyWave = bountyDict[i-1];
+        let randomEnemy = rollArray(bountyWave,0);
+
+        let bountyStar = document.createElement("div");
+        bountyStar.classList.add("flex-column");
+        bountyStar.innerText = i;
+        let bountyImg = document.createElement("img");
+        let bountyPath;
+
+        do {
+            bountyPath = `${randomEnemy.split(".")[0]}-${randomInteger(1, parseInt(randomEnemy.split(".")[1]) + 1)}`;
+        } while (
+            bountyArray.includes(bountyPath)
+        );
+
+        bountyArray.push(bountyPath);
+        bountyImg.src = `./assets/expedbg/enemy/${bountyPath}.webp`;
+
+        bountyButton.append(bountyStar,bountyImg)
+        bountyMenu.appendChild(bountyButton);
+    }
+}
+
 function clearExped() {
+    let guildTable = document.getElementById("guild-table");
+    guildTable.close();
+
     if (adventureType != 0) {
         let id = "exped-" + adventureType;
         let old_exped = document.getElementById(id);
@@ -3503,7 +3649,6 @@ function clearExped() {
     }
 }
 
-const waveHeads = [3,3,3,3,4];
 const waveLoot = ["Lvl 1-2. Artifacts & Weapons \n Lvl 2.   XP Books \n Lvl 1-2. Food",
                   "Lvl 1-3. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 1-3. Food",
                   "Lvl 2-4. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 2-4. Talents",
@@ -3513,21 +3658,20 @@ const waveLoot = ["Lvl 1-2. Artifacts & Weapons \n Lvl 2.   XP Books \n Lvl 1-2.
 function expedInfo(butId) {
     let expedRow1 = document.getElementById("exped-text");
     let expedRow2 = document.getElementById("exped-lore");
-    let i = 0;
-    
-    i = butId.split("-")[1];
+
+    let level = butId.split("-")[1];
     let id = butId.split("-")[2];
 
-    if (expeditionDict[i] == 0 || i == 7) {
+    if (expeditionDict[level] == 0 || level == 7) {
         let advButton = document.getElementById("adventure-button");
         if (!advButton.classList.contains("expedition-selected")) {
             advButton.classList.add("expedition-selected");
         }
-        expedRow1.innerHTML = `<p>${expeditionDictInfo[i]["Text"]}</p>`;
-        expedRow2.innerText = expeditionDictInfo[i]["Lore"];
-    } else if (i >= 8 && i <= 11) {
-        expedRow1.innerHTML =  `<p>${expeditionDictInfo[i]["Text"]}</p>`;
-        expedRow2.innerText = expeditionDictInfo[i]["Lore"];
+        expedRow1.innerHTML = `<p>${expeditionDictInfo[level]["Text"]}</p>`;
+        expedRow2.innerText = expeditionDictInfo[level]["Lore"];
+    } else if (level >= 8 && level <= 11) {
+        expedRow1.innerHTML =  `<p>${expeditionDictInfo[level]["Text"]}</p>`;
+        expedRow2.innerText = expeditionDictInfo[level]["Lore"];
     } else {
         expedRow1.innerHTML = `<p>${expeditionDictInfo[6]["Text"]}</p>`;
         expedRow2.innerText = expeditionDictInfo[6]["Lore"];
@@ -3543,18 +3687,23 @@ function expedInfo(butId) {
         lootInfo.innerText = "";
     } 
 
-    if (i < 6 && i > 0) {
-    expedRow1.innerHTML += `<img class="icon primogem" src="./assets/icon/energyIcon.webp"></img>`;
-        for (let j = 0; j < waveHeads[i-1]; j++) {
+    if (level < 6 && level > 0) {
+        expedRow1.innerHTML += `<img class="icon primogem" src="./assets/icon/energyIcon.webp"></img>`;
+        let heads = imgKey[id].Heads;
+        for (let j = 0; j < heads.length; j++) {
             let img = new Image();
             img.classList.add("enemy-head");
-            img.src = `./assets/expedbg/heads/${i}-${j+1}.webp`;
+            img.src = `./assets/expedbg/heads/${heads[j]}.webp`;
             enemyInfo.appendChild(img);
         }
-        lootInfo.innerText = `Possible Reward: \n\n ${waveLoot[i-1]}`;
+        lootInfo.innerText = `Possible Reward: \n\n ${waveLoot[level-1]}`;
         expedImg.src = `./assets/expedbg/header/${id}.webp`;
         expedRow2.style.borderBottom = "0.2em solid #8B857C";
         enemyInfo.style.borderRight = "0.2em solid #8B857C";
+    } else if (level == 10) {
+        expedImg.src = `./assets/expedbg/header/1.webp`;
+        expedRow2.style.borderBottom = "none";
+        enemyInfo.style.borderRight = "none";
     } else {
         expedImg.src = `./assets/expedbg/header/0.webp`;
         expedRow2.style.borderBottom = "none";
@@ -3571,6 +3720,26 @@ function createExpMap() {
     advImageDiv.id = "adventure-map";
     advImageDiv.style.zIndex = -1;
 
+    let expedXP = document.createElement("div");
+    expedXP.classList.add("flex-column","exped-xpbar");
+    let expedXPBar = document.createElement("div");
+    expedXPBar.id = "exped-xp-bar"
+    expedXPBar.maxXP = advDict.adventureRank * 100;
+    expedXPBar.currentXP = advDict.advXP;
+    expedXPBar.style.width = `${Math.round((advDict.advXP / expedXPBar.maxXP))}%`;
+    expedXPBar.classList.add("xpbar-bar","cover-all");
+    let expedXPInfo = document.createElement("p");
+    expedXPInfo.id = "exped-xp";
+    expedXPInfo.innerText = `Level ${advDict.adventureRank}`;
+    expedXPInfo.classList.add("flex-row");
+    expedXP.append(expedXPBar,expedXPInfo);
+
+    let expedMesgDiv = document.createElement("div");
+    expedMesgDiv.classList.add("flex-column","exped-mesg-div");
+    expedMesgDiv.id = "exped-mesg-div";
+    expedMesgDiv.style.display = "none";
+    expedMesgDiv.timer = null;
+
     let charSelect = document.createElement("div");
     charSelect.id = "char-selected";
     charSelect.innerText = "Select Party Leader";
@@ -3583,7 +3752,6 @@ function createExpMap() {
             charMenu.style.display = "none";
         }
     })
-
     
     let charMenu = document.createElement("div");
     let activeChar;
@@ -3628,7 +3796,7 @@ function createExpMap() {
     dragIcon.classList.add("drag-icon");
     dragIcon.src = "./assets/expedbg/drag.webp";
 
-    advImageDiv.append(advImage,dragIcon,charSelect,charMenu);
+    advImageDiv.append(advImage,dragIcon,charSelect,expedMesgDiv,charMenu,expedXP);
     leftDiv.appendChild(advImageDiv);
 
     let lastX = 0;
@@ -3650,44 +3818,23 @@ function createExpMap() {
         maxY = this.naturalHeight / 3;
     }
 
-    let imgKey = {
-        1:{Left:"76",Top:"24",Level:10},
-        2:{Left:"85",Top:"9",Level:1},
-        3:{Left:"59",Top:"19",Level:1},
-        4:{Left:"64",Top:"49",Level:1},
-        5:{Left:"40",Top:"48",Level:1},
-        6:{Left:"46",Top:"61",Level:2},
-        7:{Left:"80",Top:"59",Level:2},
-        8:{Left:"72",Top:"49",Level:3},
-        9:{Left:"64",Top:"36",Level:3},
-        10:{Left:"22",Top:"68",Level:3},
-        11:{Left:"31",Top:"26",Level:3},
-        12:{Left:"20",Top:"32",Level:4},
-        13:{Left:"51",Top:"18",Level:4},
-        14:{Left:"88",Top:"45",Level:4},
-        15:{Left:"84",Top:"86",Level:5},
-    }
-
     for (let key in imgKey) {
         let button = document.createElement("button");
         button.classList.add("adv-image-btn");
         button.style.left = imgKey[key].Left + "%";
         button.style.top = imgKey[key].Top + "%";
         button.level = imgKey[key].Level;
+        button.wave = imgKey[key].Wave;
 
         let level = imgKey[key].Level;
-        if (level === 10) {
-            button.style.backgroundImage = "url(./assets/expedbg/adv-0.webp)";
-            button.style.opacity = 0;
-        } else {
-            button.style.backgroundImage = `url(./assets/expedbg/adv-${level}.webp)`;
-        }
-
+        let wave = imgKey[key].Wave;
+        button.style.backgroundImage = `url(./assets/expedbg/adv-${level}.webp)`;
         button.locked = false;
-        if (expeditionDict[button.level] == 1) {
+
+        if (expeditionDict[button.level] == 1 && level != 12) {
             button.style.zIndex = -1;
             button.locked = true;
-        } else if (button.level != 10){
+        } else {
             button.addEventListener("click",()=>{
                 let advButton = document.getElementById("adventure-button");
                 if (!activeLeader) {
@@ -3697,16 +3844,17 @@ function createExpMap() {
                     if (advButton.classList.contains("expedition-selected")) {
                         advButton.classList.remove("expedition-selected");
                     }
-                } else if (adventureType === level && advButton.key == key) {
+                } else if (adventureType == `${level}-[${wave}]`) {
                     adventureType = 0;
                     advButton.key = 0;
+                    clearExped();
                     expedInfo("exped-7");
                     if (advButton.classList.contains("expedition-selected")) {
                         advButton.classList.remove("expedition-selected");
                     }
                 } else {
                     clearExped();
-                    adventureType = level;
+                    adventureType = `${level}-[${wave}]`;
                     advButton.key = key;
                     expedInfo(`exped-${level}-${key}`);
                 }  
@@ -3766,6 +3914,38 @@ function createExpMap() {
     }
 }
 
+function gainXP(xpAmount) {
+    let xpBar = document.getElementById('exped-xp-bar');
+    xpBar.maxXP = advDict.adventureRank * 100;
+
+    xpBar.currentXP = parseInt(xpBar.currentXP);
+    xpBar.currentXP += xpAmount;
+
+    console.log(advDict.advXP / xpBar.maxXP)
+
+    if (xpBar.currentXP >= xpBar.maxXP) {
+        xpBar.currentXP -= xpBar.maxXP;
+        advDict.advXP = xpBar.currentXP;
+        advDict.adventureRank++;
+        xpBar.maxXP = advDict.adventureRank * 100;
+        xpBar.style.width = `${Math.round((advDict.advXP / xpBar.maxXP)*100)}%`;
+    } else {
+        advDict.advXP = xpBar.currentXP;
+        xpBar.style.width = `${Math.round((advDict.advXP / xpBar.maxXP)*100)}%`;
+    }
+}
+
+function expedPop() {
+    let expedMesg = document.getElementById('exped-mesg-div');
+    expedMesg.style.display = "flex";
+    expedMesg.innerText = "+15 XP";
+    if (expedMesg.timer != null) {clearTimeout(expedMesg.timer)}
+    expedMesg.timer = setTimeout(function() {
+        expedMesg.style.display = "none";
+        expedMesg.timer = null;
+    }, 4000);
+}
+
 function charScan() {
     for (let i = 2; i < 5; i++) {
         let charDiv = document.getElementById(`char-select-${i}`);
@@ -3792,7 +3972,7 @@ function unlockExpedition(i,expeditionDict) {
                 button.style.zIndex = 6; 
                 button.locked = false;
                 button.addEventListener("click",()=>{
-                    if (adventureType === button.level) {
+                    if (adventureType == `${button.level}-[${button.wave}]`) {
                         adventureType = 0;
                         expedInfo("exped-7");
                         let advButton = document.getElementById("adventure-button");
@@ -3801,7 +3981,7 @@ function unlockExpedition(i,expeditionDict) {
                         }
                     } else {
                         clearExped();
-                        adventureType = button.level;
+                        adventureType = `${button.level}-[${button.wave}]`;
                         expedInfo(`exped-${button.level}-${j+1}`);
                     }  
                 })
@@ -3814,7 +3994,7 @@ function unlockExpedition(i,expeditionDict) {
 let adventureScene = false;
 let adventureScaraText = "";
 let enemyAmount = 0;
-function drawAdventure(advType) {
+function drawAdventure(advType,wave) {
     adventureScaraText = "";
     if (adventureScene) {return}
     adventureScene = true;
@@ -3822,7 +4002,7 @@ function drawAdventure(advType) {
         adventureScaraText = "-scara";
     };
 
-    let waveType = enemyInfo.getRandomWave(advType,randomInteger);
+    let waveType = enemyInfo[`${advType}-Wave-${wave}`];
     enemyAmount = waveType.Wave.length;
     let imageGif = document.getElementById("adventure-gif");
     let adventureFightImg = document.getElementById("adventure-fight").children;
@@ -3847,7 +4027,7 @@ function drawAdventure(advType) {
     adventureArea.style.zIndex = 500;
     let adventureTextBox = document.getElementById("adventure-text");
     let adventureVideo = document.getElementById("adventure-video");
-    adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.png)`;
+    adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp)`;
     adventureVideo = spawnMob(adventureVideo,waveType.Wave);
     
     function textFadeIn() {
@@ -3898,7 +4078,10 @@ function spawnMob(adventureVideo,waveType) {
         let mobDiv = document.createElement("div");
         let mobImg =  document.createElement("div");
         mobImg.classList.add("enemyImg");
-        mobImg.style.backgroundImage = `url(./assets/expedbg/enemy/${singleEnemyInfo.Type}-${singleEnemyInfo.Class}-${randomInteger(1,singleEnemyInfo.Variation+1)}.webp)`;
+
+        let randMob = `${singleEnemyInfo.Type}-${singleEnemyInfo.Class}-${randomInteger(1,singleEnemyInfo.Variation+1)}`;
+        mobImg.style.backgroundImage = `url(./assets/expedbg/enemy/${randMob}.webp)`;
+        mobDiv.enemyType = randMob;
 
         mobDiv.enemyID = singleEnemyInfo;
         mobDiv.classList.add("enemy");
@@ -4783,11 +4966,11 @@ function changeTooltip(dict, type, number) {
         let upgradeLevel = 50;
         let extraText = "";
         if (number >= 350) {
-            upgradeLevel = 300;
+            upgradeLevel = 500;
             extraText = `& a 5-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 5-Star Gem`}
         } else if (number >= 200) {
-            upgradeLevel = 200;
+            upgradeLevel = 250;
             extraText = `& a 4-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 4-Star Gem`}
         } else if (number >= 75) {

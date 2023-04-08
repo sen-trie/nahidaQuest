@@ -133,4 +133,9 @@ function updateObjectKeys(savedObject,referenceObject) {
     return savedObject;
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper};
+// ROLLS RANDOM INT IN AN ARRAY
+function rollArray(array,startingPos) {
+    return array[randomInteger(startingPos,array.length)]
+}
+
+export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray};

@@ -304,7 +304,7 @@ img {
 /*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
     scrollbar-width: 0.9vw;
-    scrollbar-color: #E1DBD0 #68563d;
+    scrollbar-color: #d8c5ac #68563d;
     margin: 0;
     padding: 0;
     border: 0;
@@ -375,7 +375,7 @@ table, button, label {
     width: 100%;
     height: 9.25%;
     background-color: rgba(0, 0, 0, 0.727);
-    z-index: 4;
+    z-index: 11;
     font-size: inherit;
 }
 
@@ -483,7 +483,7 @@ table, button, label {
     height: 92%;
     box-sizing: border-box;
     padding: 1.5%;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .table-without-tooltip {
@@ -1431,7 +1431,7 @@ table, button, label {
     height: 45%;
     z-index: -1;
     border: 0.25em outset #6a8458;
-    filter: drop-shadow(0.3em 0.3em 0.2em #474d45) drop-shadow(0.3em 0.3em 0.1em #474d45);
+    filter: drop-shadow(0.1em 0.2em 0.1em #474d45);
 }
 
 .text-box > textarea {
@@ -1440,7 +1440,7 @@ table, button, label {
     left: 0;
     width: 100%;
     height: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     word-break:break-all;
     overflow-wrap: break-word;
@@ -1552,12 +1552,10 @@ input[type="range"] {
     background: transparent;
 }
 
-/* Removes default focus */
 input[type="range"]:focus {
     outline: none;
 }
 
-/******** Chrome, Safari, Opera and Edge Chromium styles ********/
 input[type="range"]::-webkit-slider-runnable-track {
     background-color: #99b390;
     border-radius: 0.5em;
@@ -1565,9 +1563,9 @@ input[type="range"]::-webkit-slider-runnable-track {
 }
 
 input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; /* Override default look */
+    -webkit-appearance: none;
     appearance: none;
-    margin-top: -3.5%; /* Centers thumb on the track */
+    margin-top: -3.5%;
     background-color: #374931;
     border-radius: 1em;
     height: 400%;
@@ -1579,7 +1577,6 @@ input[type="range"]:focus::-webkit-slider-thumb {
     outline-offset: 0.125em;
 }
 
-/*********** Firefox styles ***********/
 input[type="range"]::-moz-range-track {
     background-color: #99b390;
     border-radius: 0.5em;
@@ -1588,12 +1585,11 @@ input[type="range"]::-moz-range-track {
 
 input[type="range"]::-moz-range-thumb {
     appearance: none;
-    margin-top: -3.5%; /* Centers thumb on the track */
+    margin-top: -3.5%; 
     border: none;
     background-color: #374931;
     border-radius: 1em;
-    height: 400%;
-    aspect-ratio: 0.25;
+    height: 65%;
 }
 
 input[type="range"]:focus::-moz-range-thumb{
@@ -1645,8 +1641,8 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .settings-bottom-right > div {
-    width: 70%;
-    aspect-ratio: 4.6;
+    height: 25%;
+    width: 100%;
     color: #1d2e18;
     background-image: url(./assets/tutorial/buttonBox.webp);
     background-position: center;
@@ -1656,13 +1652,14 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .settings-bottom-right > button {
+    height: 45%;
     width: 28%;
-    aspect-ratio: 1;
     margin-left: 2%;
     margin-right: 2%;
     background-color: transparent;
-    background-size:contain;
+    background-size: contain;
     background-repeat: no-repeat;
+    background-position: center;
     transition: 0.2s ease;
 }
 
@@ -1827,7 +1824,7 @@ input:checked + .slider:before {
     text-shadow: 0 0 0.25em #ffffff, 0 0 0.25em #ffffff, 0 0 0.15em #ffffff;
     position: absolute;
     animation: fadeOutOpacity 2.0s cubic-bezier(.02,.97,.91,.14) forwards;
-    z-index: 13;
+    z-index: 10;
     pointer-events: none;
 }
 
@@ -1837,7 +1834,7 @@ input:checked + .slider:before {
     text-shadow: 0 0 0.25em #ffffff, 0 0 0.25em #ffffff, 0 0 0.15em #ffffff;
     position: absolute;
     animation: fadeOutCritOpacity 2.0s ease-out forwards;
-    z-index: 13;
+    z-index: 10;
     pointer-events: none;
 }
 
@@ -1847,7 +1844,7 @@ input:checked + .slider:before {
     text-shadow: 0 0 0.25em #ffffffa2, 0 0 0.35em #ffffff9a, 0 0 0.15em #ffffff8e, 0 0 0.15em #ffffff8e;
     position: absolute;
     animation: fadeOutCritOpacity 2.0s ease-out forwards;
-    z-index: 15;
+    z-index: 11;
     pointer-events: none;
 }
 
@@ -1870,7 +1867,6 @@ input:checked + .slider:before {
 
 .falling-image {
     position: absolute;
-    z-Index: 2;
     width: 7%;
     aspect-ratio: 1;
 }
@@ -1878,11 +1874,9 @@ input:checked + .slider:before {
 @keyframes fall {
     from {
         transform: translate(0,-1em);
-        opacity: 0.7;
     }
     to {
         transform: translate(0,40em);
-        opacity: 0;
     }
 }
 
@@ -2068,7 +2062,7 @@ input:checked + .slider:before {
     align-content: flex-start;
     align-items: stretch;
     gap: 1%;
-    overflow-y: scroll;  
+    overflow-y: auto;  
     overflow-x: hidden;
     font-size: inherit;
 }
@@ -2274,6 +2268,8 @@ input:checked + .slider:before {
     padding-right: 2%;
     position: absolute;
     right: 1.5%;
+    background-color: #AEC378;
+    border: 0.15em solid #4d693b;
 }
 
 .filter-row > button:hover {
@@ -2443,14 +2439,62 @@ input:checked + .slider:before {
     object-fit: contain;
     width: auto;
     filter: drop-shadow(0 0 0.2em #442e1e) drop-shadow(0 0 0.1em #3b271a);
+}
 
+.exped-xpbar {
+    position: absolute;
+    width: 85%;
+    height: 6%;
+    bottom: 1%;
+    left: 1%;
+    border: 0.1em solid #1d572e;
+    box-sizing: border-box;
+    background-color: #153d26;
+}
+
+.exped-xpbar > p {
+    z-index: 3;
+    width: auto;
+    height: auto;
+    background-color: rgba(0, 0, 0, 0.78);
+    padding: 1%;
+    border-radius: 0.25em;
+    color: white;
+}
+
+.exped-mesg-div {
+    position: absolute;
+    bottom: 10%;
+    background-color: yellow;
+    width: 90%;
+    height: auto;
+    z-index: 8;
+    animation: pop-up-animation 0.5s ease-in-out;
+}
+
+@keyframes pop-up-animation {
+  0% {
+    transform:translateX(-1em);
+    opacity: 0;
+  }
+  100% {
+    transform:translateX(0);
+    opacity: 1;
+  }
+}
+
+.xpbar-bar {
+    left: 0;
+    background-color: #ade17f;
+    z-index: 2;
+    transition: width 0.2s ease-in-out;
 }
 
 .tooltipEXPED {
     text-align: center;
     width: 100%;
     max-width: 100%;
-    height: 75%;
+    height: 80%;
     position: relative;
     display: flex;
     justify-content: center;
@@ -2466,7 +2510,7 @@ input:checked + .slider:before {
 }
 
 .tooltipTABLEEXPED {
-    z-index: 200;
+    z-index: 20;
     width: 100%;
 }
 
@@ -2488,7 +2532,7 @@ input:checked + .slider:before {
 .exped-text {
     position: relative;
     font-size: 1.4em;
-    height: 20%;
+    height: 22%;
     align-items: flex-end;
     column-gap: 1%;
     background-color: yellow;
@@ -2511,24 +2555,44 @@ input:checked + .slider:before {
 
 .exped-lore {
     font-size: 1.1em;
-    flex-grow: 1;
+    height: 32%;
     align-items: flex-start;
     overflow-y: auto;
     justify-content: flex-start !important;
-    padding: 1% 2% 1% 2%;
+    padding: 2%;
     box-sizing: border-box;
-    border-bottom: 0.2em solid #8B857C;
+    border-top: 0.2em solid rgb(139, 133, 124);
+}
+
+.exped-bottom {
+    flex-grow: 1;
 }
 
 .exped-container {
-    height: 25%;
+    width: 50%;
+    height: 100%;
     gap: 2%;
-    border-bottom: 0.2em solid #8B857C;
     box-sizing: border-box;
+    flex-wrap: wrap;
+    align-content: center;
+    border-right: 0.2em solid rgb(139, 133, 124);
+}
+
+.enemy-head {
+    max-width: 25%;
+    height: auto;
+    border: 0.15em solid #826147;
+    border-radius: 1em;
+    background-color: #F2D2B9;
 }
 
 .exped-loot {
-    height: 25%;
+    width: 50%;
+    height: 100%;
+    text-align: left;
+    padding: 1%;
+    box-sizing: border-box;
+    align-items: flex-start;
 }
 
 .after-icon {
@@ -2538,12 +2602,101 @@ input:checked + .slider:before {
     filter: drop-shadow(0 0 0.075em #ffefef);
 }
 
-.enemy-head {
-    width: 13%;
+.guild-table {
+    top:0;
+    left:0;
+    z-index: 112;
+    background-image: url(./assets/bg/exped-bg.webp);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 1%;
+    padding: 1%;
+}
+
+.guild-table::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left:0; 
+    background-color: #00000028;
+    pointer-events: none;
+}
+
+.guild-button {
+    border: 0.1em solid black;
+    box-sizing: border-box;
+    width: auto;
+    height: 10%;
+    padding: 1.5%;
+    text-align: center;
+    background-color: yellow;
+}
+
+.guild-menu {
+    position: relative;
+    top: -1%;
+    width: 90%;
+    height: 85%;
     max-height: 85%;
-    border: 0.15em solid #826147;
-    border-radius: 1em;
-    background-color: #F2D2B9;
+    background-color: rgba(1, 1, 1, 0.612);
+}
+
+.bounty-menu {
+    padding: 1% 0.5% 1% 0.5%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    gap: 1%;
+    overflow-y:auto;
+}
+
+.bounty-menu > p {
+    height: 5%;
+    width: 100%;
+    text-align: center;
+    color:white;
+}
+
+.bounty-button {
+    width: 31%;
+    height: 43%;
+    background-color: rgb(140, 219, 36);
+    justify-content: space-between;
+}
+
+.bounty-button > div {
+    height: 20%;
+    width: 100%;
+    background-color: rgb(219, 18, 65);
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.bounty-button > img {
+    height: 80%;
+    object-fit: contain;
+    width: 100%;
+}
+
+.rank-menu {
+    padding: 2%;
+    box-sizing: border-box;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1%;
+    overflow-y:auto;
+}
+
+.rank-menu > div {
+    padding: 1%;
+    box-sizing: border-box;
+    width: 49%;
+    height: 25%;
+    background-color: rgb(140, 219, 36);
 }
 
 /*/////////////////////////////// ADVENTURE CSS ///////////////////////////////*/
@@ -2565,12 +2718,79 @@ input:checked + .slider:before {
     z-index: 11;
 }
 
+.char-select {
+    position: absolute;
+    background-color: transparent;
+    text-align: center;
+    aspect-ratio: 1;
+    width: auto;
+    height: 10%;
+    left: 1%;
+    top: 1%;
+    box-sizing: border-box;
+    background-position: center;
+    background-size: contain;
+    background-color: #73879C;
+    border: 0.2em solid #334a63;
+    color: #112338;
+    font-size: 0.8em;
+}
+
+.char-menu {
+    z-index: 6;
+    position: absolute;
+    width: 65%;
+    height: auto;
+    aspect-ratio: 1;
+    top: 13%;
+    left: 2%;
+    background-color: #71788A;
+    border: 0.15em solid #3F4658;
+}
+
+.char-selected {
+    color: #2a2a2a;
+    text-shadow: 0.1em 0.1em 0.25em #ffffff7b;
+    background-color: #5f9030;
+}
+
+.char-menu > div {
+    width: 100%;
+    height: 20%;
+    gap: 2%;
+    box-sizing: border-box;
+    border-bottom: 0.15em solid #3F4658;
+    
+    color: #e7eeff;
+    text-shadow: 0.1em 0.1em 0.25em #000000;
+    transition: 0.15s ease;
+}
+
+.char-menu > div:hover {
+    color: #ffffff;
+    background-color: #38415B;
+}
+
+.char-menu > div > img {
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+}
+
+.char-menu > div > p {
+    flex-grow: 1;
+    height: 100%;
+    object-fit: contain;
+    font-size: 0.9em;
+    align-items: flex-start;
+}
+
 .drag-icon {
     position: absolute;
     bottom: 1%;
     right: 1%;
     touch-action: none;
-    height: 5%;
+    height: 6%;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 0 0.2em #2a653d);
@@ -2584,6 +2804,7 @@ input:checked + .slider:before {
     background-color: transparent;
     z-index: 6;
     pointer-events: all;
+    color: white;
 }
 
 .adventure-image {
@@ -2915,7 +3136,6 @@ input:checked + .slider:before {
         opacity: 1;
     }
 }
-
 
 /*/////////////////////////////// WISH (TABLE4) CSS ///////////////////////////////*/
 .wish-counter {
@@ -3271,7 +3491,7 @@ input:checked + .slider:before {
 
 .tool-tip-lore {
     font-size: 0.9em;
-    overflow-y: scroll;
+    overflow-y: auto;
     flex-grow: 1;
 }
 
@@ -3560,7 +3780,7 @@ input:checked + .slider:before {
     width: 90%;
     gap: 1%;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     justify-content: unset;
@@ -3572,7 +3792,7 @@ input:checked + .slider:before {
     background-size: cover;
     background-repeat: no-repeat;
     filter: drop-shadow(0.2em 0.2em 0.2em #9ac57c);
-    scrollbar-color: #E1DBD0 #88AD83;
+    scrollbar-color: #d3e4d1 #60895a;
 }
 
 .nut-store-table > div::-webkit-scrollbar-thumb {
