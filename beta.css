@@ -2664,22 +2664,56 @@ input:checked + .slider:before {
 .bounty-button {
     width: 31%;
     height: 43%;
-    background-color: rgb(140, 219, 36);
+    background-color: #E1D9C8;
     justify-content: space-between;
+    position: relative;
 }
 
-.bounty-button > div {
+.bounty-button > :first-child {
     height: 20%;
     width: 100%;
-    background-color: rgb(219, 18, 65);
+    color: #F4D9A9;
+    background-color: #95412d;
     text-align: center;
     font-size: 0.9em;
+}
+
+.bounty-button > :first-child > img {
+    width: 15%;
+    max-height: 90%;
+    object-fit: contain;
 }
 
 .bounty-button > img {
     height: 80%;
     object-fit: contain;
     width: 100%;
+    filter: grayscale(0.5) sepia(0.7)  contrast(0.8) drop-shadow(0 0 0.2em black);
+}
+
+.bounty-button > button {
+    position: absolute;
+    height:  auto;
+    width: auto;
+    top: 50%;
+    left: 50%;
+    padding: 2% 10% 2% 10%;
+    font: inherit;
+    color: #f3e4cb;
+    border: 0.2em solid #954434;
+    border-radius: 1.5em;
+    background-color: #B75B48;
+    transform: translate(-50%, -50%);
+}
+
+.bounty-button > img:nth-of-type(2) {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 30%;
+    object-fit: contain;
+    width: auto;
+    filter: grayscale(0.5) sepia(0.4) drop-shadow(0 0 0.1em black);
 }
 
 .rank-menu {
@@ -2694,9 +2728,11 @@ input:checked + .slider:before {
 .rank-menu > div {
     padding: 1%;
     box-sizing: border-box;
-    width: 49%;
-    height: 25%;
-    background-color: rgb(140, 219, 36);
+    aspect-ratio: 2.7;
+    flex-basis: 49%;
+    color: #423126;
+    background-color: #ECE4DA;
+    border: 0.2em solid #c8b697;
 }
 
 /*/////////////////////////////// ADVENTURE CSS ///////////////////////////////*/

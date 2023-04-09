@@ -203,6 +203,7 @@ let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
 const EVENTCOOLDOWN = 70;
+const BOUNTYCOOLDOWN = 60;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
@@ -242,7 +243,7 @@ let rowTempDict = [];
 let milestoneOn = false;
 let activeLeader;
 
-let bountyArray = [];
+let bountyObject = {};
 const upgradeThreshold = [0,0,64,113,160];
 const charLoreObj = {
     0:{Name:"Nahida",     Desc:"20%+ HP in Combat"},
@@ -403,6 +404,7 @@ function timerEvents() {
     timerSave(timerSeconds);
     shopCheck();
     shopTimerFunction();
+    checkTimerBounty();
 }
 
 // TEMPORARY TIMER
@@ -3241,7 +3243,7 @@ function adventure(advType) {
             } else {
                 currencyPopUp("items");
             }
-            // drawAdventure(type,wave);
+            drawAdventure(type,wave);
         } else {
             weaselDecoy.load();
             weaselDecoy.play();
@@ -3513,8 +3515,6 @@ function createExpedition() {
             if (adventureType == "10-[]") {
                 guildTable.toggle();
             } else {
-                gainXP(15)
-                expedPop()
                 adventure(adventureType);
             }
         }
@@ -3556,6 +3556,7 @@ function createGuild() {
 
     let bountyMenu = document.createElement("div");
     bountyMenu.classList.add("flex-row","bounty-menu");
+    bountyMenu.id = "bounty-menu";
     buildBounty(bountyMenu);
 
     let rankMenu = document.createElement("div");
@@ -3578,7 +3579,6 @@ function createGuild() {
             if (guildTable.activeTable) {guildArray[guildTable.activeTable - 1].style.display = "none"};
             guildArray[i].style.display = "flex";
             guildTable.activeTable = i + 1;
-            buildBounty(bountyMenu);
         })
         guildTable.appendChild(menuButton)
     }
@@ -3596,37 +3596,157 @@ function buildBounty(bountyMenu) {
     while (bountyMenu.firstChild) {
         bountyMenu.removeChild(bountyMenu.lastChild);
     }
-
-    bountyArray = [];
-    let bountyTimer = document.createElement("p");
-    bountyTimer.innerText = "Bounty resets at Midnight UTC (GMT+0)";
-    bountyMenu.appendChild(bountyTimer);
-
-    let bountyDict = enemyInfo.bountyKey;
-    for (let i = 1; i < 7; i++) {
-        let bountyButton = document.createElement("div");
-        bountyButton.classList.add("flex-column","bounty-button");
-        let bountyWave = bountyDict[i-1];
-        let randomEnemy = rollArray(bountyWave,0);
-
-        let bountyStar = document.createElement("div");
-        bountyStar.classList.add("flex-column");
-        bountyStar.innerText = i;
-        let bountyImg = document.createElement("img");
-        let bountyPath;
-
-        do {
-            bountyPath = `${randomEnemy.split(".")[0]}-${randomInteger(1, parseInt(randomEnemy.split(".")[1]) + 1)}`;
-        } while (
-            bountyArray.includes(bountyPath)
-        );
-
-        bountyArray.push(bountyPath);
-        bountyImg.src = `./assets/expedbg/enemy/${bountyPath}.webp`;
-
-        bountyButton.append(bountyStar,bountyImg)
-        bountyMenu.appendChild(bountyButton);
+    
+    let timeLeft;
+    if (advDict.bountyTime == 0) {
+        advDict.bountyTime = getTime();
+        timeLeft = BOUNTYCOOLDOWN;
+        resetBounty(bountyMenu,"create");
+    } else {
+        timeLeft = Math.round(BOUNTYCOOLDOWN - (getTime() - advDict.bountyTime));
+        if (timeLeft <= 0) {
+            resetBounty(bountyMenu,"create");
+            timeLeft = BOUNTYCOOLDOWN;
+            advDict.bountyTime = getTime();
+        } else {
+            resetBounty(bountyMenu,"load");
+        }
     }
+
+    let bountyTimer = document.createElement("p");
+    bountyTimer.innerText = `Bounty board resets in ${timeLeft} minutes`;
+    bountyTimer.id = "bounty-time";
+    bountyMenu.prepend(bountyTimer);
+}
+
+function checkTimerBounty() {
+    let timeLeft = Math.round(BOUNTYCOOLDOWN - (getTime() - advDict.bountyTime));
+    if (timeLeft <= 0) {
+        let bountyMenu = document.getElementById("bounty-menu");
+        while (bountyMenu.firstChild) {
+            bountyMenu.removeChild(bountyMenu.lastChild);
+        }
+        resetBounty(bountyMenu,"create");
+        timeLeft = BOUNTYCOOLDOWN;
+        advDict.bountyTime = getTime();
+
+        let bountyTimer = document.createElement("p");
+        bountyTimer.innerText = `Bounty board resets in ${timeLeft} minutes`;
+        bountyTimer.id = "bounty-time";
+        bountyMenu.prepend(bountyTimer);
+    } else {
+        let bountyTimer = document.getElementById("bounty-time");
+        bountyTimer.innerText = `Bounty board resets in ${timeLeft} minutes`;
+    }
+}
+
+function resetBounty(bountyMenu,type) {
+    if (type == "load") {
+        bountyObject = {};
+        bountyObject = advDict.bounty;
+        for (let i = 1; i < 7; i++) {
+            let bountyButton = document.createElement("div");
+            bountyButton.classList.add("flex-column","bounty-button");
+            let bountyStar = document.createElement("div");
+            bountyStar.classList.add("flex-row");
+            for (let j = 0; j < i; j++) {
+                let starImg = new Image();
+                starImg.src = "./assets/expedbg/bountyStar.webp";
+                bountyStar.appendChild(starImg);
+            }
+
+            let bountyImg = document.createElement("img");
+            let path;
+            for (let key in bountyObject) {
+                if (bountyObject[key].Level == i) {
+                    bountyImg.src = `./assets/expedbg/enemy/${key}.webp`;
+                    path = key;
+                    break;
+                }
+            }
+
+            bountyButton.id = `bounty-${path}`;
+            bountyButton.append(bountyStar,bountyImg);
+            bountyMenu.appendChild(bountyButton);
+            if (bountyObject[path].Completed == true) {
+                bountyImg.style.filter = "grayscale(0.9) brightness(0.1)";
+                completeBounty(path,"load",bountyButton);
+            } else if (bountyObject[path].Completed == "claimed") {
+                bountyImg.style.filter = "grayscale(0.9) brightness(0.1)";
+                let markImg = new Image();
+                markImg.src = "./assets/expedbg/bountyDone.webp"
+                bountyButton.appendChild(markImg);
+                bountyButton.style.backgroundColor =  "#b2a17e";
+            }
+        }
+    } else if (type == "create") {
+        let bountyDict = enemyInfo.bountyKey;
+        bountyObject = {};
+        for (let i = 1; i < 7; i++) {
+            let bountyButton = document.createElement("div");
+            bountyButton.classList.add("flex-column","bounty-button");
+
+            let bountyStar = document.createElement("div");
+            bountyStar.classList.add("flex-row");
+            for (let j = 0; j < i; j++) {
+                let starImg = new Image();
+                starImg.src = "./assets/expedbg/bountyStar.webp";
+                bountyStar.appendChild(starImg);
+            }
+
+            let bountyImg = document.createElement("img");
+            let randomEnemy = rollArray(bountyDict[i-1],0);
+            let bountyPath;
+    
+            do {
+                bountyPath = `${randomEnemy.split(".")[0]}-${randomInteger(1, parseInt(randomEnemy.split(".")[1]) + 1)}`;
+            } while (
+                bountyObject.hasOwnProperty(bountyPath)
+            );
+    
+            bountyObject[bountyPath] = {primoReward: (10 * i), xpReward: (5 * i), Completed: false, Level: i};
+            bountyImg.src = `./assets/expedbg/enemy/${bountyPath}.webp`;
+            bountyButton.id = `bounty-${bountyPath}`;
+            bountyButton.append(bountyStar,bountyImg);
+            bountyMenu.appendChild(bountyButton);
+        }
+        advDict.bounty = bountyObject;
+    }
+}
+
+function completeBounty(bountyID,type,ele) {
+    let button;
+    if (type == "load") {
+        button = ele;
+    } else {
+        if (bountyObject[bountyID].Completed == "claimed") {return}
+        if (bountyObject[bountyID].Completed != true) {
+            button = document.getElementById(`bounty-${bountyID}`);
+            bountyObject[bountyID].Completed = true;
+       }
+    }
+
+    let img = button.children[1];
+    img.style.filter = "grayscale(0.9) brightness(0.1)";
+    button.style.backgroundColor =  "#b2a17e";
+    
+    let claim = document.createElement("button");
+    claim.innerText = "Claim Reward";
+    claim.primoReward = bountyObject[bountyID].primoReward;
+    claim.xpReward = bountyObject[bountyID].xpReward;
+
+    claim.addEventListener("click",()=>{
+        currencyPopUp("primogem",claim.primoReward);
+        gainXP(claim.xpReward);
+        bountyObject[bountyID].Completed = "claimed";
+        claim.remove();
+
+        let markImg = new Image();
+        markImg.src = "./assets/expedbg/bountyDone.webp"
+        button.appendChild(markImg)
+    })
+
+    button.appendChild(claim);
 }
 
 function clearExped() {
@@ -3920,8 +4040,7 @@ function gainXP(xpAmount) {
 
     xpBar.currentXP = parseInt(xpBar.currentXP);
     xpBar.currentXP += xpAmount;
-
-    console.log(advDict.advXP / xpBar.maxXP)
+    expedPop("xp",xpAmount)
 
     if (xpBar.currentXP >= xpBar.maxXP) {
         xpBar.currentXP -= xpBar.maxXP;
@@ -3935,10 +4054,14 @@ function gainXP(xpAmount) {
     }
 }
 
-function expedPop() {
+function expedPop(type,text) {
     let expedMesg = document.getElementById('exped-mesg-div');
     expedMesg.style.display = "flex";
-    expedMesg.innerText = "+15 XP";
+
+    if (type == "xp") {
+        expedMesg.innerText += `+${text} XP \n`;
+    }
+    
     if (expedMesg.timer != null) {clearTimeout(expedMesg.timer)}
     expedMesg.timer = setTimeout(function() {
         expedMesg.style.display = "none";
@@ -4262,6 +4385,9 @@ function triggerFight() {
             if (mobHealth.health <= 0) {
                 mobHealth.dead = true;
                 enemyAmount--;
+                console.log(bountyObject)
+                console.log(mobDiv.enemyType)
+                if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {completeBounty(mobDiv.enemyType)}
 
                 mobDiv.children[0].style.animation = "";
                 mobDiv.style.filter = "grayscale(100%) brightness(20%)";
@@ -4438,6 +4564,9 @@ function attackAll(adventureFightBurst) {
         
         if (mobHealth.health <= 0) {
             mobHealth.dead = true;
+            console.log(bountyObject)
+                console.log(mobDiv.enemyType)
+            if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {completeBounty(mobDiv.enemyType)}
             enemyAmount--;
 
             mobDiv.children[0].style.animation = "";
