@@ -81,7 +81,7 @@ let permUpgrades = {
     9:{Name:"Blessing of Riches",          Effect:10,  Max:25,   Cap:true,   Description:"Increases Primogems gained from Events/Achievements."},
     10:{Name:"Blessing of Strength",       Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
     11:{Name:"Blessing of Fortification",  Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
-    12:{Name:"Blessing of Determination",  Effect:1,  Max:50,   Cap:false,   Description:"Decreases cooldown between Expeditions attempts."},
+    12:{Name:"Blessing of Determination",  Effect:0.5,  Max:50,   Cap:false,   Description:"Increase XP gain from Expeditions attempts."},
 }
 
 let expeditionDictDefault = {

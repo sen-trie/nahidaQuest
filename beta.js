@@ -458,7 +458,6 @@ function loadSaveData() {
     } else {
         let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
         upgradeDict = JSON.parse(upgradeDictTemp);
-        updateObjectKeys(upgradeDict,upgradeDictDefault);
         setTimeout(loadRow,1000);
     }
     // LOAD INVENTORY DATA
@@ -3243,6 +3242,7 @@ function adventure(advType) {
             } else {
                 currencyPopUp("items");
             }
+            gainXP(15)
             drawAdventure(type,wave);
         } else {
             weaselDecoy.load();
@@ -3560,16 +3560,43 @@ function createGuild() {
     buildBounty(bountyMenu);
 
     let rankMenu = document.createElement("div");
-    rankMenu.classList.add("flex-row","rank-menu")
+    rankMenu.classList.add("flex-column","rank-menu");
+    let rankDiv = document.createElement("div");
+    rankDiv.classList.add("flex-row","rank-div");
+    rankDiv.activeLevel;
+    let rankLore = document.createElement("div");
+    rankLore.classList.add("flex-column");
+    rankLore.innerText = `Select a level to get more information!`;
+    let rankClaim = document.createElement("button");
+    rankClaim.classList.add("flex-row");
+
+    rankMenu.append(rankDiv,rankLore,rankClaim)
     for (let i = 1; i < 21; i++) {
         let rankButton = document.createElement("div");
-        rankButton.innerText = `Level ${i}.  \n  ${advDict.rankDict[i].Desc}`;
-        rankMenu.appendChild(rankButton);
+        rankButton.classList.add("rank-button","flex-column");
+        let rankText = document.createElement("p");
+        let rankImg = new Image();
+        rankImg.src = "./assets/expedbg/rankImg.webp";
+        rankText.innerText = i;
+        rankButton.append(rankImg,rankText);
+        
+        rankButton.addEventListener("click",()=>{
+            rankLore.innerText = `${advDict.rankDict[i].Desc}`;
+
+            if (rankDiv.activeLevel != undefined) {
+                rankDiv.activeLevel.classList.remove("active-rank");
+            }
+
+            rankButton.classList.add("active-rank");
+            rankDiv.activeLevel = rankButton;
+        })
+
+        rankDiv.appendChild(rankButton);
     }
 
     let tradingMenu = document.createElement("div");
     const guildArray = [bountyMenu,rankMenu,tradingMenu];
-    const buttonArray = ["Bounties","Adventure Rank","Trading"]
+    const buttonArray = ["Bounties","Adventure Rank","Trading"];
 
     for (let i = 0; i < 2; i++) {
         let menuButton = document.createElement("div");
@@ -3585,7 +3612,7 @@ function createGuild() {
 
     for (let i = 0; i < 3; i++) {
         guildArray[i].style.display = "none";
-        guildArray[i].classList.add("flex-row","guild-menu");
+        guildArray[i].classList.add("guild-menu");
         guildTable.appendChild(guildArray[i]);
     }
     table3.appendChild(guildTable);
@@ -3614,6 +3641,7 @@ function buildBounty(bountyMenu) {
     }
 
     let bountyTimer = document.createElement("p");
+    bountyTimer.classList.add("flex-column");
     bountyTimer.innerText = `Bounty board resets in ${timeLeft} minutes`;
     bountyTimer.id = "bounty-time";
     bountyMenu.prepend(bountyTimer);
@@ -3631,6 +3659,7 @@ function checkTimerBounty() {
         advDict.bountyTime = getTime();
 
         let bountyTimer = document.createElement("p");
+        bountyTimer.classList.add("flex-column");
         bountyTimer.innerText = `Bounty board resets in ${timeLeft} minutes`;
         bountyTimer.id = "bounty-time";
         bountyMenu.prepend(bountyTimer);
@@ -3670,16 +3699,18 @@ function resetBounty(bountyMenu,type) {
             bountyMenu.appendChild(bountyButton);
             if (bountyObject[path].Completed == true) {
                 bountyImg.style.filter = "grayscale(0.9) brightness(0.1)";
+                notifPop("add","bounty",path);
                 completeBounty(path,"load",bountyButton);
             } else if (bountyObject[path].Completed == "claimed") {
                 bountyImg.style.filter = "grayscale(0.9) brightness(0.1)";
                 let markImg = new Image();
                 markImg.src = "./assets/expedbg/bountyDone.webp"
                 bountyButton.appendChild(markImg);
-                bountyButton.style.backgroundColor =  "#b2a17e";
+                bountyButton.style.backgroundColor = "rgb(152 132 91)";
             }
         }
     } else if (type == "create") {
+        notifPop("clearAll","bounty");
         let bountyDict = enemyInfo.bountyKey;
         bountyObject = {};
         for (let i = 1; i < 7; i++) {
@@ -3726,9 +3757,11 @@ function completeBounty(bountyID,type,ele) {
        }
     }
 
+    if (button == undefined) {return}
     let img = button.children[1];
     img.style.filter = "grayscale(0.9) brightness(0.1)";
-    button.style.backgroundColor =  "#b2a17e";
+    button.style.backgroundColor =  "rgb(152 132 91)";
+    notifPop("add","bounty",bountyID);
     
     let claim = document.createElement("button");
     claim.innerText = "Claim Reward";
@@ -3736,6 +3769,7 @@ function completeBounty(bountyID,type,ele) {
     claim.xpReward = bountyObject[bountyID].xpReward;
 
     claim.addEventListener("click",()=>{
+        notifPop("clear","bounty",bountyID);
         currencyPopUp("primogem",claim.primoReward);
         gainXP(claim.xpReward);
         bountyObject[bountyID].Completed = "claimed";
@@ -3846,19 +3880,17 @@ function createExpMap() {
     expedXPBar.id = "exped-xp-bar"
     expedXPBar.maxXP = advDict.adventureRank * 100;
     expedXPBar.currentXP = advDict.advXP;
-    expedXPBar.style.width = `${Math.round((advDict.advXP / expedXPBar.maxXP))}%`;
+    expedXPBar.style.width = `${Math.round((advDict.advXP / expedXPBar.maxXP)*100)}%`;
     expedXPBar.classList.add("xpbar-bar","cover-all");
     let expedXPInfo = document.createElement("p");
     expedXPInfo.id = "exped-xp";
-    expedXPInfo.innerText = `Level ${advDict.adventureRank}`;
+    expedXPInfo.innerText = `Level ${advDict.adventureRank} (${advDict.advXP}/${expedXPBar.maxXP} XP)`;
     expedXPInfo.classList.add("flex-row");
     expedXP.append(expedXPBar,expedXPInfo);
 
     let expedMesgDiv = document.createElement("div");
     expedMesgDiv.classList.add("flex-column","exped-mesg-div");
     expedMesgDiv.id = "exped-mesg-div";
-    expedMesgDiv.style.display = "none";
-    expedMesgDiv.timer = null;
 
     let charSelect = document.createElement("div");
     charSelect.id = "char-selected";
@@ -3872,6 +3904,12 @@ function createExpMap() {
             charMenu.style.display = "none";
         }
     })
+
+    let notifSelect = document.createElement("div");
+    notifSelect.id = "notif-selected";
+    notifSelect.bountyArray = [];
+    notifSelect.rankArray = [];
+    notifSelect.classList.add("flex-column","notif-select");
     
     let charMenu = document.createElement("div");
     let activeChar;
@@ -3916,7 +3954,7 @@ function createExpMap() {
     dragIcon.classList.add("drag-icon");
     dragIcon.src = "./assets/expedbg/drag.webp";
 
-    advImageDiv.append(advImage,dragIcon,charSelect,expedMesgDiv,charMenu,expedXP);
+    advImageDiv.append(advImage,dragIcon,charSelect,notifSelect,expedMesgDiv,charMenu,expedXP);
     leftDiv.appendChild(advImageDiv);
 
     let lastX = 0;
@@ -4052,21 +4090,87 @@ function gainXP(xpAmount) {
         advDict.advXP = xpBar.currentXP;
         xpBar.style.width = `${Math.round((advDict.advXP / xpBar.maxXP)*100)}%`;
     }
+
+    let expedXPInfo = document.getElementById('exped-xp');
+    expedXPInfo.innerText = `Level ${advDict.adventureRank} (${advDict.advXP}/${xpBar.maxXP} XP)`;
 }
 
 function expedPop(type,text) {
     let expedMesg = document.getElementById('exped-mesg-div');
-    expedMesg.style.display = "flex";
+    let mesgPop = document.createElement("p");
+    mesgPop.classList.add('flex-row');
+    mesgPop.style.animation = 'pop-up-animation 0.5s ease-in-out';
 
     if (type == "xp") {
-        expedMesg.innerText += `+${text} XP \n`;
+        mesgPop.innerText = `+${text} XP`;
     }
     
-    if (expedMesg.timer != null) {clearTimeout(expedMesg.timer)}
-    expedMesg.timer = setTimeout(function() {
-        expedMesg.style.display = "none";
-        expedMesg.timer = null;
-    }, 4000);
+    mesgPop.addEventListener("animationend",()=>{
+        setTimeout(function() {
+            mesgPop.remove();
+        }, 4000);
+    })
+    expedMesg.appendChild(mesgPop);
+}
+
+function notifPop(type,icon,count) {
+    let notifSelect = document.getElementById('notif-selected');
+    if (type == "add") {
+        let notifDiv = document.createElement("div");
+        notifDiv.classList.add("flex-column");
+        let notifContainer = document.createElement("div");
+        notifContainer.classList.add("flex-row","notif-div");
+        let notifImg = new Image();
+        let notifText = document.createElement("p");
+
+        if (icon == "bounty") {
+            notifImg.src = "./assets/icon/bountyComplete.webp";
+            notifText.innerText = "Bounty Rewards";
+            notifDiv.id = "bounty-notif";
+            notifSelect.bountyArray.push(count);
+        } else if (icon == "rank") {
+            notifImg.src = "./assets/icon/advRank.webp";
+            notifText.innerText = "Adv. Rank \n Rewards";
+            notifDiv.id = "rank-notif";
+            notifSelect.rankArray.push(count)
+        }
+
+        if (document.getElementById(notifDiv.id)) {return};
+        notifContainer.append(notifText,notifImg)
+        notifDiv.append(notifContainer);
+        notifSelect.append(notifDiv);
+    } else if (type == "clear") {
+        let array;
+        let eleId;
+        if (icon == "bounty") {
+            array = "bountyArray";
+            eleId = "bounty-notif";
+        } else if (icon == "rank") {
+            array = "rankArray";
+            eleId = "rank-notif";
+        }
+
+        let index = notifSelect[array].indexOf(count);
+        notifSelect[array].splice(index, 1);
+        if (notifSelect[array].length <= 0) {
+            let ele = document.getElementById(eleId);
+            if(ele) {ele.remove()};
+        }
+    } else if (type == "clearAll") {
+        let array;
+        let eleId;
+        if (icon == "bounty") {
+            array = "bountyArray";
+            eleId = "bounty-notif";
+        } else if (icon == "rank") {
+            array = "rankArray";
+            eleId = "rank-notif";
+        }
+
+        notifSelect[array] = [];
+        let ele = document.getElementById(eleId);
+        if (ele) {ele.remove()};
+    }
 }
 
 function charScan() {
@@ -4387,7 +4491,7 @@ function triggerFight() {
                 enemyAmount--;
                 console.log(bountyObject)
                 console.log(mobDiv.enemyType)
-                if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {completeBounty(mobDiv.enemyType)}
+                if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
 
                 mobDiv.children[0].style.animation = "";
                 mobDiv.style.filter = "grayscale(100%) brightness(20%)";
@@ -4566,7 +4670,7 @@ function attackAll(adventureFightBurst) {
             mobHealth.dead = true;
             console.log(bountyObject)
                 console.log(mobDiv.enemyType)
-            if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {completeBounty(mobDiv.enemyType)}
+            if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
             enemyAmount--;
 
             mobDiv.children[0].style.animation = "";
