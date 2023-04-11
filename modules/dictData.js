@@ -577,12 +577,35 @@ let expeditionDictInfo = {
     4:{Text:"Hunt Boss Enemies | 750 "               ,Lore:"The last confirmed sighting of the Golden Nut was in the posession of some ferocious beasts. Their power may have stemmed from their ancestors consuming these fruits. It may well be the only stone left unturned."},
     5:{Text:"Abyss Diving | 1000 "                   ,Lore:"All trails seem to end here. With nowhere else to go, the Abyss is the sole place left where the fruit is likely to be. Search through the floors with the help of an unlikely ally."},
     6:{Text:"Locked"                                 ,Lore:"Perhaps this path will open after you get stronger..."            },
-    7:{Text:"Select an Expedition"                   ,Lore:"Go on Expeditions to get items to upgrade your characters!"            },
+    7:{Text:"Select an Expedition"                   ,Lore:"Go on Expeditions to get items to upgrade your characters! <br><br> [currentStats]"},
     8:{Text:"Expeditions use Energy"                ,Lore:"Expeditions use Energy which can be obtained by clicking Big Nahida. Beware! You may encounter unexpected obstacles in your journey."},
     9:{Text:"Not enough Energy..."                     ,Lore:"Obtain more by clicking Big Nahida!"            },
     10:{Text:"Visit the Adventurers' Guild"          ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
     11:{Text:"No Party Leader selected"               ,Lore:"Please select one at the top left of the map before going on Expeditions."            },
     12:{Text:"Random World Quest"                    ,Lore:"These quests are random encounters that the you can run into while roaming around the world of Teyvat."            },
+}
+
+let advInfo = {
+    1:{Desc:"Unlock Parry Attack <br><br>"},
+    2:{Desc:"Begin fights with Parry Attack charged. <br><br> Battle Stats also increase <br> [hp]"},
+    3:{Desc:"Reduce the ambush rate from enemies."},
+    4:{Desc:"Successful expeditions reward more items. <br><br> Battle Stats also increase <br> [hp]"},
+    5:{Desc:"Unlock Skill Attack"},
+    6:{Desc:"Party has a 5% chance to evade enemy attacks. <br><br> Battle Stats also increase <br> [hp]"},
+    7:{Desc:"Skill Attack has a 40% chance to end its cooldown (Can only occur every 10s)."},
+    8:{Desc:"Defeating enemies immediately regenerates 5% of HP. <br><br> Battle Stats also increase <br> [hp]"},
+    9:{Desc:"Nullify ambushes from enemies."},
+    10:{Desc:"Unlock Burst Attack <br><br> Battle Stats also increase <br> [hp]"},
+    11:{Desc:"Increase the chance of getting a preemptive strike on foes."},
+    12:{Desc:"Successful expeditions reward even more items. <br><br> Battle Stats also increase <br> [hp]"},
+    13:{Desc:"Evasion rate is increased to 10%."},
+    14:{Desc:"Skill Attack has a 70% chance to end its cooldown (Can only occur every 10s). <br><br> Battle Stats also increase <br> [hp]"},
+    15:{Desc:"Burst Attack regenerate 5% of HP."},
+    16:{Desc:"Increase the charge rate of Burst Attack by 10%. <br><br> Battle Stats also increase <br> [hp]"},
+    17:{Desc:"Increase the chance of getting a preemptive strike on foes even further."},
+    18:{Desc:"An additional Burst Attack can be stored. <br><br> Battle Stats also increase <br> [hp]"},
+    19:{Desc:"Evasion rate is further increased to 15%."},
+    20:{Desc:"Once per battle, survive a lethal blow with 1 HP. <br><br> Battle Stats also increase <br> [hp]"},
 }
 
 // RMB TO UPDATE MAX CONSTANTS
@@ -830,4 +853,4 @@ let eventText = {
     6: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
 }
 
-export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText}
+export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo}

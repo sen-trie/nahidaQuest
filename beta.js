@@ -1,11 +1,11 @@
-import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault } from "./defaultData.js"
-import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText } from "./dictData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray } from "./functions.js"
-import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./adjustUI.js"
+import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault } from "./modules/defaultData.js"
+import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo } from "./modules/dictData.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray } from "./modules/functions.js"
+import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
-import * as drawUI from "./drawUI.js"
+import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "BETA.3-3-293";
+const VERSIONNUMBER = "BETA.3-4-110";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -3473,6 +3473,7 @@ function createExpedition() {
     let expedTable = document.createElement("div");
     expedTable.classList.add("flex-column","tooltipTABLEEXPED");
     let expedBottom = document.createElement("div");
+    expedBottom.id = "exped-bottom";
     expedBottom.classList.add("flex-row","exped-bottom");
     let expedContainer = document.createElement("div");
     expedContainer.id = "exped-container";
@@ -3574,17 +3575,50 @@ function createGuild() {
     for (let i = 1; i < 21; i++) {
         let rankButton = document.createElement("div");
         rankButton.classList.add("rank-button","flex-column");
+        rankButton.id = `rank-button-${i}`;
         let rankText = document.createElement("p");
         let rankImg = new Image();
         rankImg.src = "./assets/expedbg/rankImg.webp";
         rankText.innerText = i;
         rankButton.append(rankImg,rankText);
+
+        if (advDict.rankDict[i].Locked == true) {
+            let rankIco = new Image();
+            rankIco.classList.add("rank-ico");
+            rankIco.src = "./assets/icon/lock.webp";
+            rankButton.append(rankIco);
+        } else if (advDict.rankDict[i].Locked == false) {
+            let rankIco = new Image();
+            rankIco.classList.add("rank-ico");
+            rankIco.src = "./assets/icon/tick.webp";
+            rankButton.append(rankIco);
+        } else {
+            notifPop("add","rank",i);
+        }
         
         rankButton.addEventListener("click",()=>{
-            rankLore.innerText = `${advDict.rankDict[i].Desc}`;
-
-            if (rankDiv.activeLevel != undefined) {
-                rankDiv.activeLevel.classList.remove("active-rank");
+            let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:5%;white-space: nowrap;' class='flex-row'>
+                                                          +1 HP <img style="height: 100%;margin-right:20%" src=./assets/icon/health.webp> 
+                                                          +2 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>          
+            </div>`);
+            rankLore.innerHTML = `${loreHTML}`;
+            if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
+            rankClaim.buttonLevel = i;
+            if (advDict.rankDict[i].Locked == true) {
+                rankClaim.innerText = "Locked";
+                rankClaim.available = false;
+                rankClaim.classList.add("rank-button-claimed");
+                if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
+            } else if (advDict.rankDict[i].Locked == false) {
+                rankClaim.innerText = "Rank Claimed";
+                rankClaim.available = false;
+                rankClaim.classList.add("rank-button-claimed");
+                if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
+            } else {
+                rankClaim.innerText = "Claim Rank";
+                rankClaim.available = true;
+                rankClaim.classList.add("rank-button-available");
+                if (rankClaim.classList.contains("rank-button-claimed")) {rankClaim.classList.remove("rank-button-claimed")}
             }
 
             rankButton.classList.add("active-rank");
@@ -3594,9 +3628,27 @@ function createGuild() {
         rankDiv.appendChild(rankButton);
     }
 
+    rankDiv.children[0].click();
+    rankClaim.addEventListener("click",()=>{
+        if (rankClaim.available) {
+            rankClaim.innerText = "Rank Claimed";
+            rankClaim.available = false;
+            rankClaim.classList.add("rank-button-claimed");
+            if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
+            advDict.rankDict[rankClaim.buttonLevel].Locked = false;
+
+            let rankButton = document.getElementById(`rank-button-${rankClaim.buttonLevel}`);
+            let rankIco = new Image();
+            rankIco.classList.add("rank-ico");
+            rankIco.src = "./assets/icon/tick.webp";
+            rankButton.append(rankIco);
+            notifPop("clear","rank",rankClaim.buttonLevel);
+        }
+    })
+
     let tradingMenu = document.createElement("div");
-    const guildArray = [bountyMenu,rankMenu,tradingMenu];
-    const buttonArray = ["Bounties","Adventure Rank","Trading"];
+    const guildArray = [rankMenu,bountyMenu,tradingMenu];
+    const buttonArray = ["Adventure Rank","Bounties","Trading"];
 
     for (let i = 0; i < 2; i++) {
         let menuButton = document.createElement("div");
@@ -3699,7 +3751,6 @@ function resetBounty(bountyMenu,type) {
             bountyMenu.appendChild(bountyButton);
             if (bountyObject[path].Completed == true) {
                 bountyImg.style.filter = "grayscale(0.9) brightness(0.1)";
-                notifPop("add","bounty",path);
                 completeBounty(path,"load",bountyButton);
             } else if (bountyObject[path].Completed == "claimed") {
                 bountyImg.style.filter = "grayscale(0.9) brightness(0.1)";
@@ -3803,15 +3854,16 @@ function clearExped() {
     }
 }
 
-const waveLoot = ["Lvl 1-2. Artifacts & Weapons \n Lvl 2.   XP Books \n Lvl 1-2. Food",
-                  "Lvl 1-3. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 1-3. Food",
-                  "Lvl 2-4. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 2-4. Talents",
-                  "Lvl 2-4. Artifacts & Weapons \n Lvl 2-4. XP Books \n Lvl 3-5. Gems",
-                  "Lvl 4-5. Artifacts & Weapons \n Lvl 4.   XP Books \n Lvl 4-5. Gems & Talents"]
+const waveLoot = ["(Recommended Level: 1) \n\n Lvl 1-2. Artifacts & Weapons \n Lvl 2.   XP Books \n Lvl 1-2. Food",
+                  "(Recommended Level: 4) \n\n Lvl 1-3. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 1-3. Food",
+                  "(Recommended Level: 7) \n\n Lvl 2-4. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 2-4. Talents",
+                  "(Recommended Level: 10) \n\n Lvl 2-4. Artifacts & Weapons \n Lvl 2-4. XP Books \n Lvl 3-5. Gems",
+                  "(Recommended Level: 15) \n\n Lvl 4-5. Artifacts & Weapons \n Lvl 4.   XP Books \n Lvl 4-5. Gems & Talents"]
 
 function expedInfo(butId) {
     let expedRow1 = document.getElementById("exped-text");
     let expedRow2 = document.getElementById("exped-lore");
+    let expedBottom = document.getElementById("exped-bottom");
 
     let level = butId.split("-")[1];
     let id = butId.split("-")[2];
@@ -3822,13 +3874,22 @@ function expedInfo(butId) {
             advButton.classList.add("expedition-selected");
         }
         expedRow1.innerHTML = `<p>${expeditionDictInfo[level]["Text"]}</p>`;
-        expedRow2.innerText = expeditionDictInfo[level]["Lore"];
+        let textHTML = expeditionDictInfo[level]["Lore"].replace("[currentStats]",`<div style='height:1.4em;gap:2%;white-space: nowrap;' class='flex-row'>
+                                                                Current HP: ${5 + Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;margin-right:10%' src=./assets/icon/health.webp>
+                                                                Current ATK: ${10 + 2 * Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>
+        </div>`);
+        expedRow2.innerHTML = textHTML;
+
+        
+
+
+
     } else if (level >= 8 && level <= 11) {
         expedRow1.innerHTML =  `<p>${expeditionDictInfo[level]["Text"]}</p>`;
-        expedRow2.innerText = expeditionDictInfo[level]["Lore"];
+        expedRow2.innerHTML = expeditionDictInfo[level]["Lore"];
     } else {
         expedRow1.innerHTML = `<p>${expeditionDictInfo[6]["Text"]}</p>`;
-        expedRow2.innerText = expeditionDictInfo[6]["Lore"];
+        expedRow2.innerHTML = expeditionDictInfo[6]["Lore"];
     }
 
     let enemyInfo = document.getElementById("exped-container");
@@ -3850,18 +3911,21 @@ function expedInfo(butId) {
             img.src = `./assets/expedbg/heads/${heads[j]}.webp`;
             enemyInfo.appendChild(img);
         }
-        lootInfo.innerText = `Possible Reward: \n\n ${waveLoot[level-1]}`;
+        lootInfo.innerText = `${waveLoot[level-1]}`;
         expedImg.src = `./assets/expedbg/header/${id}.webp`;
         expedRow2.style.borderBottom = "0.2em solid #8B857C";
         enemyInfo.style.borderRight = "0.2em solid #8B857C";
+        expedBottom.style.display = "flex";
     } else if (level == 10) {
         expedImg.src = `./assets/expedbg/header/1.webp`;
         expedRow2.style.borderBottom = "none";
         enemyInfo.style.borderRight = "none";
+        expedBottom.style.display = "none";
     } else {
         expedImg.src = `./assets/expedbg/header/0.webp`;
         expedRow2.style.borderBottom = "none";
         enemyInfo.style.borderRight = "none";
+        expedBottom.style.display = "none";
     }
     enemyInfo.currentWave = id;
 }
@@ -4084,6 +4148,12 @@ function gainXP(xpAmount) {
         xpBar.currentXP -= xpBar.maxXP;
         advDict.advXP = xpBar.currentXP;
         advDict.adventureRank++;
+
+        advDict.rankDict[advDict.adventureRank].Locked = "unclaimed";
+        let rankButton = document.getElementById(`rank-button-${advDict.adventureRank}`);
+        rankButton.lastChild.remove();
+        notifPop("add","rank",advDict.adventureRank);
+       
         xpBar.maxXP = advDict.adventureRank * 100;
         xpBar.style.width = `${Math.round((advDict.advXP / xpBar.maxXP)*100)}%`;
     } else {
@@ -4322,6 +4392,7 @@ let fightSceneOn = false;
 function triggerFight() {
     if (!adventureScene) {return}
     fightSceneOn = true;
+    let currentATK = 10 + 2 * Math.floor(advDict.adventureRank / 2);
 
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
@@ -4351,7 +4422,8 @@ function triggerFight() {
     let healthDiv = document.getElementById("adventure-health");
     healthDiv.style.opacity = 1;
     let healthBar = document.getElementById("health-bar");
-    healthBar.maxHealth = 15;
+    healthBar.maxHealth = 5 + Math.floor(advDict.adventureRank / 2);
+    if (activeLeader == "Nahida") {healthBar.maxHealth = Math.round(1.2 * healthBar.maxHealth)}
     healthBar.currentWidth = 100;
     healthBar.classList.add("adventure-health");
     healthBar.style.width = "100%";
@@ -4465,7 +4537,7 @@ function triggerFight() {
                         }
 
                         if (mobDiv.children[0].children[0]) {
-                            mobHealth.health -= 36;
+                            mobHealth.health -= (currentATK);
                             mobDiv.children[0].children[0].remove();
                             loseHP(mobHealth.atk * 2,"inverse");
                         }
@@ -4480,17 +4552,15 @@ function triggerFight() {
                         parryFailure.play();
                         comboHandler("reset");
                     }
-                    mobHealth.health -= 13;
+                    mobHealth.health -= (currentATK * 2);
                     dodgeOn("close");
                 }
             }
             
-            mobHealth.health -= 13;
+            mobHealth.health -= (currentATK / 6);
             if (mobHealth.health <= 0) {
                 mobHealth.dead = true;
                 enemyAmount--;
-                console.log(bountyObject)
-                console.log(mobDiv.enemyType)
                 if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
 
                 mobDiv.children[0].style.animation = "";
@@ -4610,7 +4680,7 @@ function skillUse() {
         if (!mobDiv.children[1]) {continue};
 
         let skillMark = new Image();
-        skillMark.src = "./assets/icon/mark.webp";
+        skillMark.src = `./assets/icon/mark${adventureScaraText}.webp`;
 
         if (mobDiv.children[0].children[0]) {
             mobDiv.children[0].children[0].remove();
@@ -4642,6 +4712,7 @@ function skillUse() {
 }
 
 function attackAll(adventureFightBurst) {
+    let currentATK = 10 + 2 * Math.floor(advDict.adventureRank / 2);
     if (!fightSceneOn) {return}
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
@@ -4656,7 +4727,7 @@ function attackAll(adventureFightBurst) {
         if (!mobDiv.children[1]) {continue};
 
         let mobHealth = mobDiv.children[1];
-        mobHealth.health -= 13;
+        mobHealth.health -= (currentATK * 5);
         if (!cooldownTime) {cooldownTime = mobDiv.attackTime * 150}
         if (mobHealth.class != "Superboss") {
             mobDiv.children[0].classList.add("staggered");
@@ -4668,8 +4739,6 @@ function attackAll(adventureFightBurst) {
         
         if (mobHealth.health <= 0) {
             mobHealth.dead = true;
-            console.log(bountyObject)
-                console.log(mobDiv.enemyType)
             if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
             enemyAmount--;
 
@@ -5267,7 +5336,7 @@ function clearTooltip() {
         }
 
         if (table2.style.display !== "none") {
-            tooltipName.innerText = "Go on expeditions to get items!";
+            tooltipName.innerHTML = `Go on Expeditions to get items!`;
         }
 
         tooltipText.innerText = "";

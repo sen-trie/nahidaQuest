@@ -65,15 +65,6 @@ function preloadImage(max,path,single) {
 
 // GAME GUI
 function buildGame(mainBody) {
-    let loadingDiv = document.createElement("div");
-    loadingDiv.id = "loading";
-    loadingDiv.classList.add("cover-all","flex-row","overlay");
-    let loadingGif = document.createElement("img");
-    loadingGif.src = "./assets/loading.webp";
-    loadingGif.alt = "Nahida Quest Loading Screen";
-    loadingGif.classList.add("overlay-tutorial");
-    loadingDiv.appendChild(loadingGif);
-
     let leftDiv = document.createElement("div");
     leftDiv.classList.add("flex-column");
     leftDiv.id = "left-div";
@@ -115,7 +106,7 @@ function buildGame(mainBody) {
     rightDiv.id = "right-div";
     rightDiv.classList.add("right-area");
 
-    mainBody.append(loadingDiv,leftDiv,midDiv,rightDiv);
+    mainBody.append(leftDiv,midDiv,rightDiv);
     return mainBody;
 }
 
