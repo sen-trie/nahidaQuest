@@ -98,6 +98,21 @@ let expeditionDictDefault = {
     12:"0",
 }
 
+let storeInventoryDefault = {
+    active:false,
+    storedTime:0,
+    1:{Purchased:false, Item:0, Cost:0},
+    2:{Purchased:false, Item:0, Cost:0},
+    3:{Purchased:false, Item:0, Cost:0},
+    4:{Purchased:false, Item:0, Cost:0},
+    5:{Purchased:false, Item:0, Cost:0},
+    6:{Purchased:false, Item:0, Cost:0},
+    7:{Purchased:false, Item:0, Cost:0},
+    8:{Purchased:false, Item:0, Cost:0},
+    9:{Purchased:false, Item:0, Cost:0},
+    10:{Purchased:false, Item:0, Cost:0},
+}
+
 let enemyInfo = {
     bountyKey: {
         0:["Fungi-Mob.4","Specter-Mob.5","Hilichurl-Mob.4","Hoarder-Mob.4"],
@@ -251,4 +266,4 @@ let upgradeDictDefault = {
     812: {Row:-1,    "Level": 0, Purchased: -10,   },
 };
 
-export { upgradeDictDefault,SettingsDefault,expeditionDictDefault,saveValuesDefault,enemyInfo,persistentValuesDefault,permUpgrades,advDictDefault };
+export { upgradeDictDefault,SettingsDefault,expeditionDictDefault,saveValuesDefault,enemyInfo,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault };

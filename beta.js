@@ -1,11 +1,11 @@
-import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault } from "./modules/defaultData.js"
+import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo } from "./modules/dictData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "BETA.3-4-110";
+const VERSIONNUMBER = "BETA.3-4-121";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -311,6 +311,7 @@ let tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,
 var InventoryMap;
 var achievementMap;
 let advDict;
+let storeInventory;
 loadSaveData();
 loadingAnimation();
 var upgradeDict;
@@ -475,7 +476,7 @@ function loadSaveData() {
     } else {
         let expeditionDictTemp = localStorage.getItem("expeditionDictSave");
         expeditionDictTemp = JSON.parse(expeditionDictTemp);
-        // FOR SAVE DATA 0.3.0 
+        // FOR SAVE DATA BELOW 0.3.0
         if (typeof(expeditionDictTemp[1]) != "string") {
             expeditionDict = expeditionDictDefault;
         } else {
@@ -504,20 +505,31 @@ function loadSaveData() {
         achievementListload();
     }
     // LOAD STORE DATA
-    if (localStorage.getItem("storeInventory") != null) {
-        let localStore = localStorage.getItem("storeInventory");
-        let currentMin = localStorage.getItem("shopStartMinute");
-        localStore = JSON.stringify(localStore);
-        shopTime = currentMin;
-        loadShop();
+    if (localStorage.getItem("storeInventory") == null) {
+        storeInventory = storeInventoryDefault;
+    } else {
+        // FOR SAVE DATA BELOW 0.3.411
+        if (parseInt(saveValues.versNumber) < 34112) {
+            storeInventory = storeInventoryDefault;
+        } else {
+            let localStoreTemp = localStorage.getItem("storeInventory");
+            storeInventory = JSON.parse(localStoreTemp);
+            if (storeInventory.active == true) {
+                setShop("load");
+            }
+        }
     }
     // LOAD PERSISTENT VALUES 
-    if (localStorage.getItem("persistentValues") === null) {
+    if (localStorage.getItem("persistentValues") == null) {
         persistentValues = persistentValuesDefault;
     } else {
         let persistentDictTemp = localStorage.getItem("persistentValues");
-        persistentValues = JSON.parse(persistentDictTemp);
-        updateObjectKeys(persistentValues,persistentValuesDefault);
+        if (persistentDictTemp == "undefined") {
+            persistentValues = persistentValuesDefault;
+        } else {
+            persistentValues = JSON.parse(persistentDictTemp);
+            updateObjectKeys(persistentValues,persistentValuesDefault);
+        }
     }
 
     specialValuesUpgrade(true);
@@ -1769,11 +1781,7 @@ function saveData(skip) {
     localStorage.setItem("achievementListSave", JSON.stringify(Array.from(achievementMap)));
     localStorage.setItem("persistentValues", JSON.stringify(persistentValues));
     localStorage.setItem("advDictSave", JSON.stringify(advDict));
-
-    if (table7.innerHTML != "") {
-        let savedTable7 = (table7.innerHTML).replace('shadow-pop-tr','')
-        localStorage.setItem("storeInventory",JSON.stringify(savedTable7));
-    }
+    localStorage.setItem("storeInventory", JSON.stringify(storeInventory));
 }
 
 //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
@@ -1796,7 +1804,7 @@ function createTabs() {
         tabFlex.appendChild(tabButton);
     }
 
-    if (localStorage.getItem("storeInventory") != null) {
+    if (storeInventory.active == true) {
         addShop();
     }
 }
@@ -3649,6 +3657,7 @@ function createGuild() {
     let tradingMenu = document.createElement("div");
     const guildArray = [rankMenu,bountyMenu,tradingMenu];
     const buttonArray = ["Adventure Rank","Bounties","Trading"];
+    guildTable.activeButton;
 
     for (let i = 0; i < 2; i++) {
         let menuButton = document.createElement("div");
@@ -3658,6 +3667,15 @@ function createGuild() {
             if (guildTable.activeTable) {guildArray[guildTable.activeTable - 1].style.display = "none"};
             guildArray[i].style.display = "flex";
             guildTable.activeTable = i + 1;
+
+            if (guildTable.activeButton != undefined) {
+                if (guildTable.activeButton.classList.contains("guild-selected")) {
+                    guildTable.activeButton.classList.remove("guild-selected");
+                }
+            }
+
+            menuButton.classList.add("guild-selected");
+            guildTable.activeButton = menuButton;
         })
         guildTable.appendChild(menuButton)
     }
@@ -5398,14 +5416,14 @@ function tooltipFunction() {
 //------------------------------------------------------------------------TABLE 7 (STORE)------------------------------------------------------------------------//
 // CHECK PRIMOGEMS TO SPAWN SHOP
 function shopCheck() {
-    if (localStorage.getItem("storeInventory") === null) {
+    if (storeInventory.active == false) {
         if (saveValues["primogem"] > SHOP_THRESHOLD) {
             // GENERATING A LOCAL SHOP
             addShop();
             shopTime = getTime();
-            localStorage.setItem("shopStartMinute",shopTime);
-            setShop();
-            setTimeout(()=>saveData(),1000)
+            storeInventory.storedTime = getTime();
+            storeInventory.active = true;
+            setShop("add");
             // IT IS PERSISENT TO LOCALSTORAGE
             newPop(5);
             newPop(13);
@@ -5416,7 +5434,7 @@ function shopCheck() {
 // SHOP TIMER
 function shopTimerFunction() {
     if (shopTimerElement != null) {
-        let time_passed = Math.floor(getTime() - parseInt(shopTime));
+        let time_passed = Math.floor(getTime() - parseInt(storeInventory.storedTime));
         shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
         if (time_passed >= SHOPCOOLDOWN) {
             refreshShop(getTime());
@@ -5444,74 +5462,66 @@ function addShop() {
     tabFlex.appendChild(tabButton);
 }
 
-function setShop() {
+function setShop(type) {
     table7.classList.add("table-without-tooltip");
     let shopImg = document.createElement("img");
     shopImg.src = "./assets/icon/shop-start.webp";
 
     shopTimerElement = document.createElement("div");
-    shopTimerElement.classList.add("flex-column");
-    shopTimerElement.classList.add("store-timer");
-    shopTimerElement.classList.add("background-image-cover");
-    shopTimerElement.id = "shop-timer"
-    let currentMin = localStorage.getItem("shopStartMinute");
+    shopTimerElement.classList.add("flex-column","store-timer","background-image-cover");
+    shopTimerElement.id = "shop-timer";
     let minutesPassed = (getTime() / (1000 * 60));
-    shopTimerElement.innerText = "Inventory resets in: " + (SHOPCOOLDOWN - (currentMin - minutesPassed)) + " minutes";
+    shopTimerElement.innerText = "Inventory resets in: " + (SHOPCOOLDOWN - (storeInventory.storedTime - minutesPassed)) + " minutes";
 
     let shopDiv = document.createElement("div");
     shopDiv.classList.add("store-div");
     shopDiv.id = "shop-container";
-    let i=10;
-    while (i--) {
-        let inventoryNumber;
-        if (i >= 7 && i <= 9) {
-            inventoryNumber = inventoryDraw("talent", 2,4, "shop");
-        } else if (i === 6) {
-            inventoryNumber = randomInteger(4011,4014);
-        } else if (i === 5) {
-            if (saveValues["wishUnlocked"] === true) {
-                inventoryNumber = 4010;
-            } else {
-                inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+
+    if (type === "load") {
+        for (let key in storeInventory) {
+            if (!isNaN(key)) {
+                loadShopItems(shopDiv, key, storeInventory[key]);
             }
-        } else if (i >= 2 && i <= 4) {
-            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
-        } else {
-            inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
         }
-        createShopItems(shopDiv, i, inventoryNumber);
+    } else if (type === "add") {
+        storeInventory.storedTime = getTime();
+        let i=10;
+        while (i--) {
+            let inventoryNumber;
+            if (i >= 7 && i <= 9) {
+                inventoryNumber = inventoryDraw("talent", 2,4, "shop");
+            } else if (i === 6) {
+                inventoryNumber = randomInteger(4011,4014);
+            } else if (i === 5) {
+                if (saveValues["wishUnlocked"] === true) {
+                    inventoryNumber = 4010;
+                } else {
+                    inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+                }
+            } else if (i >= 2 && i <= 4) {
+                inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+            } else {
+                inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
+            }
+
+            createShopItems(shopDiv, i, inventoryNumber);
+        }
+        saveData(true)
     }
 
     let shopDialogueDiv = document.createElement("div");
-    shopDialogueDiv.classList.add("flex-row");
-    shopDialogueDiv.classList.add("store-dialog");
+    shopDialogueDiv.classList.add("flex-row","store-dialog");
 
     let shopDialogueButton = document.createElement("div");
-    shopDialogueButton.classList.add("flex-row");
-    shopDialogueButton.classList.add("store-buy");
+    shopDialogueButton.classList.add("flex-row","store-buy");
     shopDialogueButton.innerText = "Confirm Purchase";
     shopDialogueButton.id = "shop-confirm";
     let shopDialogueText = document.createElement("div");
     shopDialogueText.classList.add("flex-column");
     shopDialogueText.id = "table7-text";
 
-    shopDialogueDiv.append(shopDialogueText,shopDialogueButton)
+    shopDialogueDiv.append(shopDialogueText,shopDialogueButton);
     table7.append(shopImg,shopTimerElement,shopDiv,shopDialogueDiv);
-    saveData();
-}
-
-function loadShop() {
-    let shopTemp = localStorage.getItem("storeInventory");
-    shopTemp = JSON.parse(shopTemp);
-    table7.innerHTML = shopTemp;
-    shopTimerElement = document.getElementById("shop-timer");
-
-    let shopButtons = (document.getElementById("shop-container")).children;
-    for (let i=0,len=shopButtons.length; i < len; i++) {
-         shopButtons[i].addEventListener("click", function() {
-            buyShop(shopButtons[i].id,shopButtons[i].id.split("-")[3])
-        });
-    }
 }
 
 var shopId = null;
@@ -5550,6 +5560,9 @@ function buyShop(id,shopCost) {
 }
 
 function refreshShop(minutesPassed) {
+    shopTime = minutesPassed;
+    shopId = null;
+
     let shopContainer = document.getElementById("shop-container");
     shopContainer.innerHTML = "";
     let i=10;
@@ -5572,21 +5585,18 @@ function refreshShop(minutesPassed) {
         }
         createShopItems(shopContainer, i, inventoryNumber);
     }
-
-    shopId = null;
-    shopTime = minutesPassed;
-    localStorage.setItem("shopStartMinute",minutesPassed)
+    storeInventory.storedTime = getTime();
 }
 
 function confirmPurchase(shopCost,id) {
     let mainButton = document.getElementById(id);
     let dialog = document.getElementById("table7-text");
     if (saveValues.primogem >= shopCost) {
-        id = id.split("-")[2];
-        shopElement.load();
-        shopElement.play();
+        let saveId = id.split("-")[1];
+        let itemId = id.split("-")[2];
+        
         newPop(1);
-        inventoryAdd(id);
+        inventoryAdd(itemId);
         sortList("table2");
         mainButton.classList.remove("shadow-pop-tr");
         mainButton.classList.add("purchased");
@@ -5595,7 +5605,11 @@ function confirmPurchase(shopCost,id) {
         let confirmButton = document.getElementById("shop-confirm");
         let confirmButtonNew = confirmButton.cloneNode(true);
         confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
-        dialog.innerText = "Hehe, you've got good eyes."
+        dialog.innerText = "Hehe, you've got good eyes.";
+
+        shopElement.load();
+        shopElement.play();
+        storeInventory[parseInt(saveId)+1].Purchased = true;
     } else {
         dialog.innerText = "Hmph, come back when you're a little richer."
         return;
@@ -5604,8 +5618,7 @@ function confirmPurchase(shopCost,id) {
 
 function createShopItems(shopDiv, i, inventoryNumber) {
     let shopButton = document.createElement("div");
-    shopButton.classList.add("flex-column");
-    shopButton.classList.add("shop-button");
+    shopButton.classList.add("flex-column","shop-button");
     let inventoryTemp = Inventory[inventoryNumber];
 
     let shopButtonImage = document.createElement("img");
@@ -5643,7 +5656,6 @@ function createShopItems(shopDiv, i, inventoryNumber) {
             break;
     }
 
-    shopCost;
     let shopButtonPrimo = document.createElement("img");
     shopButtonPrimo.classList.add("shop-button-primo");
     shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
@@ -5654,6 +5666,52 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopButton.addEventListener("click", function() {
         buyShop(shopButton.id,shopCost)
     })
+    
+    shopButtonImageContainer.appendChild(shopButtonImage);
+    shopButton.append(shopButtonImageContainer,shopButtonText);
+    shopDiv.append(shopButton);
+
+    storeInventory[i+1].Item = inventoryNumber;
+    storeInventory[i+1].Cost = shopCost;
+
+    return shopDiv;
+}
+
+function loadShopItems(shopDiv, i, inventoryArray) {
+    let purchased = inventoryArray.Purchased;
+    let shopCost = inventoryArray.Cost;
+    let inventoryNumber = inventoryArray.Item;
+
+    let shopButton = document.createElement("div");
+    shopButton.classList.add("flex-column");
+    shopButton.classList.add("shop-button");
+    let inventoryTemp = Inventory[inventoryNumber];
+
+    let shopButtonImage = document.createElement("img");
+    shopButtonImage.src = "./assets/tooltips/inventory/"+ inventoryTemp.File+ ".webp";
+
+    let shopButtonImageContainer = document.createElement("div");
+    shopButtonImageContainer.classList.add("flex-column","shop-button-container");
+    shopButtonImageContainer.style.background = "url(./assets/frames/background-" +inventoryTemp.Star+ ".webp)";
+    shopButtonImageContainer.style.backgroundSize = "cover";
+    shopButtonImageContainer.style.backgroundPosition = "center center";
+    shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
+    
+    let shopButtonText = document.createElement("div");
+    shopButtonText.classList.add("flex-row","shop-button-text");
+
+    let shopButtonPrimo = document.createElement("img");
+    shopButtonPrimo.classList.add("shop-button-primo");
+    shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
+    shopButtonText.innerText = shopCost;
+    shopButtonText.appendChild(shopButtonPrimo);
+
+    shopButton.id = ("shop-" + i + "-" + inventoryNumber + "-" + shopCost);
+    if (purchased == false) {
+        shopButton.addEventListener("click", function() {
+            buyShop(shopButton.id,shopCost)
+        })
+    }
     
     shopButtonImageContainer.appendChild(shopButtonImage);
     shopButton.append(shopButtonImageContainer,shopButtonText);

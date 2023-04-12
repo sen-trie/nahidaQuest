@@ -2426,7 +2426,6 @@ input:checked + .slider:before {
     background-position: center;
 }
 
-
 /*/////////////////////////////// EXPEDITION TOOLTIP CSS ///////////////////////////////*/
 .char-select {
     height: 9%;
@@ -2643,13 +2642,19 @@ input:checked + .slider:before {
 }
 
 .guild-button {
-    border: 0.1em solid black;
     box-sizing: border-box;
     width: auto;
     height: 10%;
     padding: 1.5%;
     text-align: center;
-    background-color: yellow;
+    background-color: #5B656D;
+    border: 0.2em solid #2C3742;
+    color: rgb(255, 255, 255);
+    transition: background-color 0.3s ease;
+}
+
+.guild-selected {
+    background-color: #2C3742;
 }
 
 .guild-menu {

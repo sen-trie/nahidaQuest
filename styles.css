@@ -620,7 +620,7 @@ table, button, label {
 }
 
 #score {
-    font-size: 1.6em;
+    font-size: 1.5em;
 }
 
 #dps {
@@ -1478,10 +1478,10 @@ table, button, label {
 .confirm-box {
     position: absolute;
     top: 0.5%;
-    aspect-ratio: 5;
-    width: 50%;
-    max-height: 15%;
-    left: 25%;
+    aspect-ratio: 2;
+    width: 40%;
+    max-height: 18%;
+    left: 30%;
     z-index: -1;
     display: flex;
     flex-direction: column;
@@ -1495,6 +1495,8 @@ table, button, label {
 
 .confirm-box > p {
     height: 40%;
+    padding: 2%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1502,7 +1504,7 @@ table, button, label {
 
 .confirm-button-div {
     width: 100%;
-    height: 60%;
+    height: 50%;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -2424,7 +2426,6 @@ input:checked + .slider:before {
     background-position: center;
 }
 
-
 /*/////////////////////////////// EXPEDITION TOOLTIP CSS ///////////////////////////////*/
 .char-select {
     height: 9%;
@@ -2456,20 +2457,33 @@ input:checked + .slider:before {
     z-index: 3;
     width: auto;
     height: auto;
-    background-color: rgba(0, 0, 0, 0.78);
+    background-color: #94d25e;
+    border: 0.1em solid #1d572e;
+    box-sizing: border-box;
+    color: #153d26;
     padding: 1%;
     border-radius: 0.25em;
-    color: white;
 }
 
 .exped-mesg-div {
     position: absolute;
     bottom: 10%;
-    background-color: yellow;
-    width: 90%;
+    left: 10%;
+    width: auto;
     height: auto;
+    gap: 1%;
     z-index: 8;
-    animation: pop-up-animation 0.5s ease-in-out;
+    flex-direction: column-reverse;
+}
+
+.exped-mesg-div > p {
+    color: white;
+    background-color: #000000e3;
+    box-sizing: border-box;
+    padding: 3%;
+    border-radius: 0.2em;
+    white-space: nowrap;
+    justify-content: flex-start;
 }
 
 @keyframes pop-up-animation {
@@ -2555,7 +2569,7 @@ input:checked + .slider:before {
 
 .exped-lore {
     font-size: 1.1em;
-    height: 32%;
+    flex-grow: 1;
     align-items: flex-start;
     overflow-y: auto;
     justify-content: flex-start !important;
@@ -2565,7 +2579,7 @@ input:checked + .slider:before {
 }
 
 .exped-bottom {
-    flex-grow: 1;
+    height: 45%;
 }
 
 .exped-container {
@@ -2628,13 +2642,19 @@ input:checked + .slider:before {
 }
 
 .guild-button {
-    border: 0.1em solid black;
     box-sizing: border-box;
     width: auto;
     height: 10%;
     padding: 1.5%;
     text-align: center;
-    background-color: yellow;
+    background-color: #5B656D;
+    border: 0.2em solid #2C3742;
+    color: rgb(255, 255, 255);
+    transition: background-color 0.3s ease;
+}
+
+.guild-selected {
+    background-color: #2C3742;
 }
 
 .guild-menu {
@@ -2643,7 +2663,7 @@ input:checked + .slider:before {
     width: 90%;
     height: 85%;
     max-height: 85%;
-    background-color: rgba(1, 1, 1, 0.612);
+    background-color: rgba(1, 1, 1, 0.75);
 }
 
 .bounty-menu {
@@ -2652,51 +2672,160 @@ input:checked + .slider:before {
     flex-wrap: wrap;
     gap: 1%;
     overflow-y:auto;
+    border: 0.5em inset #7b5629;
+    background-image: url(./assets/bg/wood.webp);
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .bounty-menu > p {
     height: 5%;
-    width: 100%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    width: 80%;
     text-align: center;
-    color:white;
+    color:#F4D9A9;
+    background-color: #95412d;
 }
 
 .bounty-button {
+    border: 0.2em solid #542619;
+    box-sizing: border-box;
     width: 31%;
     height: 43%;
-    background-color: rgb(140, 219, 36);
+    background-color: #E1D9C8;
     justify-content: space-between;
+    position: relative;
 }
 
-.bounty-button > div {
+.bounty-button > :first-child {
     height: 20%;
     width: 100%;
-    background-color: rgb(219, 18, 65);
+    color: #F4D9A9;
+    background-color: #95412d;
     text-align: center;
     font-size: 0.9em;
+}
+
+.bounty-button > :first-child > img {
+    width: 15%;
+    max-height: 90%;
+    object-fit: contain;
 }
 
 .bounty-button > img {
     height: 80%;
     object-fit: contain;
     width: 100%;
+    filter: grayscale(0.5) sepia(0.7)  contrast(0.8) drop-shadow(0 0 0.2em black);
+}
+
+.bounty-button > button {
+    position: absolute;
+    height:  auto;
+    width: auto;
+    top: 50%;
+    left: 50%;
+    padding: 2% 10% 2% 10%;
+    font: inherit;
+    color: #f3e4cb;
+    border: 0.2em solid #954434;
+    border-radius: 1.5em;
+    background-color: #B75B48;
+    transform: translate(-50%, -50%);
+}
+
+.bounty-button > img:nth-of-type(2) {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 30%;
+    object-fit: contain;
+    width: auto;
+    filter: drop-shadow(0 0 0.1em black);
 }
 
 .rank-menu {
     padding: 2%;
     box-sizing: border-box;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 1%;
-    overflow-y:auto;
+    gap: 5%;
+    color: white;
 }
 
-.rank-menu > div {
-    padding: 1%;
+.rank-menu > :first-child {
+    justify-content: flex-start;
+    gap: 1%;
+    height: 30%;
+    width: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+.rank-button {
+    position: relative;
+    height: 100%;
+    flex-basis: 15%;
+    aspect-ratio: 0.9;
+    transition: 0.4s ease;
+}
+
+.active-rank {
+    transform:scale(1.1) translateY(-0.1em);
+}
+
+.rank-button > :first-child {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.rank-ico {
+    position: absolute;
+    bottom: 7%;
+    height: 20%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.2em black);
+}
+
+.rank-button > p {
+    position: absolute;
+    color: white;
+    font-size: 2.3em;
+    filter: drop-shadow(0 0 0.4em #3556B0) drop-shadow(0 0 0.4em #3556B0);
+}
+
+.rank-menu > :nth-child(2) {
+    color: #423126;
+    background-color: #ECE4DA;
+    border: 0.2em solid #c8b697;
+    height: 45%;
+    width: 100%;
+    overflow-y: auto;
+    text-align: center;
+    font-size: 1.4em;
+    padding: 2%;
     box-sizing: border-box;
-    width: 49%;
-    height: 25%;
-    background-color: rgb(140, 219, 36);
+}
+
+.rank-menu > :last-child {
+    border-radius: 2em;
+    height: auto;
+    width: auto;
+    padding: 2% 5% 2% 5%;
+    box-sizing: border-box;
+    font: inherit;
+}
+
+.rank-button-claimed {
+    color: #c1c1c1;
+    background-color: #2D3743;
+    border: 0.2em solid #757D83;
+}
+
+.rank-button-available {
+    color: #2f4e27;
+    background-color: #A6D19A;
+    border: 0.2em solid #5B8550;
 }
 
 /*/////////////////////////////// ADVENTURE CSS ///////////////////////////////*/
@@ -2720,7 +2849,6 @@ input:checked + .slider:before {
 
 .char-select {
     position: absolute;
-    background-color: transparent;
     text-align: center;
     aspect-ratio: 1;
     width: auto;
@@ -2734,6 +2862,58 @@ input:checked + .slider:before {
     border: 0.2em solid #334a63;
     color: #112338;
     font-size: 0.8em;
+}
+
+.notif-select {
+    position: absolute;
+    background-color: transparent;
+    text-align: center;
+    aspect-ratio: 3.12;
+    width: auto;
+    height: 8%;
+    right: 3%;
+    top: 1%;
+    box-sizing: border-box;
+    font-size: 0.8em;
+    pointer-events: none;
+}
+
+.notif-select > div {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: #000000cb;
+    border-radius: 0.5em 0 0 0.5em;
+}
+
+.notif-select > div:nth-child(2) {
+    position: absolute;
+    top: 105%;
+}
+
+.notif-div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 1%;
+}
+
+.notif-div > img {
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.6em rgba(255, 255, 255, 0.648));
+}
+
+.notif-div > p {
+    flex-grow: 1;
+    border-radius: 0.5em 0 0 0.5em ;
+    color: white;
 }
 
 .char-menu {
@@ -2805,6 +2985,11 @@ input:checked + .slider:before {
     z-index: 6;
     pointer-events: all;
     color: white;
+    transition: 0.1s ease;
+}
+
+.adv-image-btn:hover {
+    transform: scale(1.2);
 }
 
 .adventure-image {

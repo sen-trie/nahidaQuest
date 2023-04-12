@@ -1,11 +1,11 @@
-import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault } from "./modules/defaultData.js"
-import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText } from "./modules/dictData.js"
+import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
+import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo } from "./modules/dictData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "0.3-4-080";
+const VERSIONNUMBER = "0.3-4-121";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -203,6 +203,7 @@ let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
 const EVENTCOOLDOWN = 70;
+const BOUNTYCOOLDOWN = 60;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
@@ -242,7 +243,7 @@ let rowTempDict = [];
 let milestoneOn = false;
 let activeLeader;
 
-let bountyArray = [];
+let bountyObject = {};
 const upgradeThreshold = [0,0,64,113,160];
 const charLoreObj = {
     0:{Name:"Nahida",     Desc:"20%+ HP in Combat"},
@@ -252,7 +253,7 @@ const charLoreObj = {
     4:{Name:"Ei",         Desc:"35%+ Counter DMG"},
 }
 const imgKey = {
-    // 1:{Left:"76",   Top:"24",   Level:10,   Wave:[],                Heads:[]},
+    1:{Left:"76",   Top:"24",   Level:10,   Wave:[],                Heads:[]},
     2:{Left:"85",   Top:"9",    Level:1,    Wave:[1,2,5],           Heads:[1,2]},
     3:{Left:"59",   Top:"19",   Level:1,    Wave:[1,2,3,4,5],       Heads:[1,2,3]},
     4:{Left:"64",   Top:"49",   Level:1,    Wave:[1,3,4],           Heads:[1,3]},
@@ -310,6 +311,7 @@ let tooltipName,toolImgContainer,toolImg,toolImgOverlay,tooltipText,tooltipLore,
 var InventoryMap;
 var achievementMap;
 let advDict;
+let storeInventory;
 loadSaveData();
 loadingAnimation();
 var upgradeDict;
@@ -403,6 +405,7 @@ function timerEvents() {
     timerSave(timerSeconds);
     shopCheck();
     shopTimerFunction();
+    checkTimerBounty();
 }
 
 // TEMPORARY TIMER
@@ -456,7 +459,6 @@ function loadSaveData() {
     } else {
         let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
         upgradeDict = JSON.parse(upgradeDictTemp);
-        updateObjectKeys(upgradeDict,upgradeDictDefault);
         setTimeout(loadRow,1000);
     }
     // LOAD INVENTORY DATA
@@ -474,7 +476,7 @@ function loadSaveData() {
     } else {
         let expeditionDictTemp = localStorage.getItem("expeditionDictSave");
         expeditionDictTemp = JSON.parse(expeditionDictTemp);
-        // FOR SAVE DATA 0.3.0 
+        // FOR SAVE DATA BELOW 0.3.0
         if (typeof(expeditionDictTemp[1]) != "string") {
             expeditionDict = expeditionDictDefault;
         } else {
@@ -503,20 +505,31 @@ function loadSaveData() {
         achievementListload();
     }
     // LOAD STORE DATA
-    if (localStorage.getItem("storeInventory") != null) {
-        let localStore = localStorage.getItem("storeInventory");
-        let currentMin = localStorage.getItem("shopStartMinute");
-        localStore = JSON.stringify(localStore);
-        shopTime = currentMin;
-        loadShop();
+    if (localStorage.getItem("storeInventory") == null) {
+        storeInventory = storeInventoryDefault;
+    } else {
+        // FOR SAVE DATA BELOW 0.3.411
+        if (parseInt(saveValues.versNumber) < 34112) {
+            storeInventory = storeInventoryDefault;
+        } else {
+            let localStoreTemp = localStorage.getItem("storeInventory");
+            storeInventory = JSON.parse(localStoreTemp);
+            if (storeInventory.active == true) {
+                setShop("load");
+            }
+        }
     }
     // LOAD PERSISTENT VALUES 
-    if (localStorage.getItem("persistentValues") === null) {
+    if (localStorage.getItem("persistentValues") == null) {
         persistentValues = persistentValuesDefault;
     } else {
         let persistentDictTemp = localStorage.getItem("persistentValues");
-        persistentValues = JSON.parse(persistentDictTemp);
-        updateObjectKeys(persistentValues,persistentValuesDefault);
+        if (persistentDictTemp == "undefined") {
+            persistentValues = persistentValuesDefault;
+        } else {
+            persistentValues = JSON.parse(persistentDictTemp);
+            updateObjectKeys(persistentValues,persistentValuesDefault);
+        }
     }
 
     specialValuesUpgrade(true);
@@ -1768,11 +1781,7 @@ function saveData(skip) {
     localStorage.setItem("achievementListSave", JSON.stringify(Array.from(achievementMap)));
     localStorage.setItem("persistentValues", JSON.stringify(persistentValues));
     localStorage.setItem("advDictSave", JSON.stringify(advDict));
-
-    if (table7.innerHTML != "") {
-        let savedTable7 = (table7.innerHTML).replace('shadow-pop-tr','')
-        localStorage.setItem("storeInventory",JSON.stringify(savedTable7));
-    }
+    localStorage.setItem("storeInventory", JSON.stringify(storeInventory));
 }
 
 //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
@@ -1795,7 +1804,7 @@ function createTabs() {
         tabFlex.appendChild(tabButton);
     }
 
-    if (localStorage.getItem("storeInventory") != null) {
+    if (storeInventory.active == true) {
         addShop();
     }
 }
@@ -3241,6 +3250,7 @@ function adventure(advType) {
             } else {
                 currencyPopUp("items");
             }
+            gainXP(15)
             // drawAdventure(type,wave);
         } else {
             weaselDecoy.load();
@@ -3471,6 +3481,7 @@ function createExpedition() {
     let expedTable = document.createElement("div");
     expedTable.classList.add("flex-column","tooltipTABLEEXPED");
     let expedBottom = document.createElement("div");
+    expedBottom.id = "exped-bottom";
     expedBottom.classList.add("flex-row","exped-bottom");
     let expedContainer = document.createElement("div");
     expedContainer.id = "exped-container";
@@ -3554,19 +3565,99 @@ function createGuild() {
 
     let bountyMenu = document.createElement("div");
     bountyMenu.classList.add("flex-row","bounty-menu");
+    bountyMenu.id = "bounty-menu";
     buildBounty(bountyMenu);
 
     let rankMenu = document.createElement("div");
-    rankMenu.classList.add("flex-row","rank-menu")
+    rankMenu.classList.add("flex-column","rank-menu");
+    let rankDiv = document.createElement("div");
+    rankDiv.classList.add("flex-row","rank-div");
+    rankDiv.activeLevel;
+    let rankLore = document.createElement("div");
+    rankLore.classList.add("flex-column");
+    rankLore.innerText = `Select a level to get more information!`;
+    let rankClaim = document.createElement("button");
+    rankClaim.classList.add("flex-row");
+
+    rankMenu.append(rankDiv,rankLore,rankClaim)
     for (let i = 1; i < 21; i++) {
         let rankButton = document.createElement("div");
-        rankButton.innerText = `Level ${i}.  \n  ${advDict.rankDict[i].Desc}`;
-        rankMenu.appendChild(rankButton);
+        rankButton.classList.add("rank-button","flex-column");
+        rankButton.id = `rank-button-${i}`;
+        let rankText = document.createElement("p");
+        let rankImg = new Image();
+        rankImg.src = "./assets/expedbg/rankImg.webp";
+        rankText.innerText = i;
+        rankButton.append(rankImg,rankText);
+
+        if (advDict.rankDict[i].Locked == true) {
+            let rankIco = new Image();
+            rankIco.classList.add("rank-ico");
+            rankIco.src = "./assets/icon/lock.webp";
+            rankButton.append(rankIco);
+        } else if (advDict.rankDict[i].Locked == false) {
+            let rankIco = new Image();
+            rankIco.classList.add("rank-ico");
+            rankIco.src = "./assets/icon/tick.webp";
+            rankButton.append(rankIco);
+        } else {
+            notifPop("add","rank",i);
+        }
+        
+        rankButton.addEventListener("click",()=>{
+            let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:5%;white-space: nowrap;' class='flex-row'>
+                                                          +1 HP <img style="height: 100%;margin-right:20%" src=./assets/icon/health.webp> 
+                                                          +2 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>          
+            </div>`);
+            rankLore.innerHTML = `${loreHTML}`;
+            if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
+            rankClaim.buttonLevel = i;
+            if (advDict.rankDict[i].Locked == true) {
+                rankClaim.innerText = "Locked";
+                rankClaim.available = false;
+                rankClaim.classList.add("rank-button-claimed");
+                if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
+            } else if (advDict.rankDict[i].Locked == false) {
+                rankClaim.innerText = "Rank Claimed";
+                rankClaim.available = false;
+                rankClaim.classList.add("rank-button-claimed");
+                if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
+            } else {
+                rankClaim.innerText = "Claim Rank";
+                rankClaim.available = true;
+                rankClaim.classList.add("rank-button-available");
+                if (rankClaim.classList.contains("rank-button-claimed")) {rankClaim.classList.remove("rank-button-claimed")}
+            }
+
+            rankButton.classList.add("active-rank");
+            rankDiv.activeLevel = rankButton;
+        })
+
+        rankDiv.appendChild(rankButton);
     }
 
+    rankDiv.children[0].click();
+    rankClaim.addEventListener("click",()=>{
+        if (rankClaim.available) {
+            rankClaim.innerText = "Rank Claimed";
+            rankClaim.available = false;
+            rankClaim.classList.add("rank-button-claimed");
+            if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
+            advDict.rankDict[rankClaim.buttonLevel].Locked = false;
+
+            let rankButton = document.getElementById(`rank-button-${rankClaim.buttonLevel}`);
+            let rankIco = new Image();
+            rankIco.classList.add("rank-ico");
+            rankIco.src = "./assets/icon/tick.webp";
+            rankButton.append(rankIco);
+            notifPop("clear","rank",rankClaim.buttonLevel);
+        }
+    })
+
     let tradingMenu = document.createElement("div");
-    const guildArray = [bountyMenu,rankMenu,tradingMenu];
-    const buttonArray = ["Bounties","Adventure Rank","Trading"]
+    const guildArray = [rankMenu,bountyMenu,tradingMenu];
+    const buttonArray = ["Adventure Rank","Bounties","Trading"];
+    guildTable.activeButton;
 
     for (let i = 0; i < 2; i++) {
         let menuButton = document.createElement("div");
@@ -3576,14 +3667,22 @@ function createGuild() {
             if (guildTable.activeTable) {guildArray[guildTable.activeTable - 1].style.display = "none"};
             guildArray[i].style.display = "flex";
             guildTable.activeTable = i + 1;
-            buildBounty(bountyMenu);
+
+            if (guildTable.activeButton != undefined) {
+                if (guildTable.activeButton.classList.contains("guild-selected")) {
+                    guildTable.activeButton.classList.remove("guild-selected");
+                }
+            }
+
+            menuButton.classList.add("guild-selected");
+            guildTable.activeButton = menuButton;
         })
         guildTable.appendChild(menuButton)
     }
 
     for (let i = 0; i < 3; i++) {
         guildArray[i].style.display = "none";
-        guildArray[i].classList.add("flex-row","guild-menu");
+        guildArray[i].classList.add("guild-menu");
         guildTable.appendChild(guildArray[i]);
     }
     table3.appendChild(guildTable);
@@ -3594,37 +3693,163 @@ function buildBounty(bountyMenu) {
     while (bountyMenu.firstChild) {
         bountyMenu.removeChild(bountyMenu.lastChild);
     }
-
-    bountyArray = [];
-    let bountyTimer = document.createElement("p");
-    bountyTimer.innerText = "Bounty resets at Midnight UTC (GMT+0)";
-    bountyMenu.appendChild(bountyTimer);
-
-    let bountyDict = enemyInfo.bountyKey;
-    for (let i = 1; i < 7; i++) {
-        let bountyButton = document.createElement("div");
-        bountyButton.classList.add("flex-column","bounty-button");
-        let bountyWave = bountyDict[i-1];
-        let randomEnemy = rollArray(bountyWave,0);
-
-        let bountyStar = document.createElement("div");
-        bountyStar.classList.add("flex-column");
-        bountyStar.innerText = i;
-        let bountyImg = document.createElement("img");
-        let bountyPath;
-
-        do {
-            bountyPath = `${randomEnemy.split(".")[0]}-${randomInteger(1, parseInt(randomEnemy.split(".")[1]) + 1)}`;
-        } while (
-            bountyArray.includes(bountyPath)
-        );
-
-        bountyArray.push(bountyPath);
-        bountyImg.src = `./assets/expedbg/enemy/${bountyPath}.webp`;
-
-        bountyButton.append(bountyStar,bountyImg)
-        bountyMenu.appendChild(bountyButton);
+    
+    let timeLeft;
+    if (advDict.bountyTime == 0) {
+        advDict.bountyTime = getTime();
+        timeLeft = BOUNTYCOOLDOWN;
+        resetBounty(bountyMenu,"create");
+    } else {
+        timeLeft = Math.round(BOUNTYCOOLDOWN - (getTime() - advDict.bountyTime));
+        if (timeLeft <= 0) {
+            resetBounty(bountyMenu,"create");
+            timeLeft = BOUNTYCOOLDOWN;
+            advDict.bountyTime = getTime();
+        } else {
+            resetBounty(bountyMenu,"load");
+        }
     }
+
+    let bountyTimer = document.createElement("p");
+    bountyTimer.classList.add("flex-column");
+    bountyTimer.innerText = `Bounty board resets in ${timeLeft} minutes`;
+    bountyTimer.id = "bounty-time";
+    bountyMenu.prepend(bountyTimer);
+}
+
+function checkTimerBounty() {
+    let timeLeft = Math.round(BOUNTYCOOLDOWN - (getTime() - advDict.bountyTime));
+    if (timeLeft <= 0) {
+        let bountyMenu = document.getElementById("bounty-menu");
+        while (bountyMenu.firstChild) {
+            bountyMenu.removeChild(bountyMenu.lastChild);
+        }
+        resetBounty(bountyMenu,"create");
+        timeLeft = BOUNTYCOOLDOWN;
+        advDict.bountyTime = getTime();
+
+        let bountyTimer = document.createElement("p");
+        bountyTimer.classList.add("flex-column");
+        bountyTimer.innerText = `Bounty board resets in ${timeLeft} minutes`;
+        bountyTimer.id = "bounty-time";
+        bountyMenu.prepend(bountyTimer);
+    } else {
+        let bountyTimer = document.getElementById("bounty-time");
+        bountyTimer.innerText = `Bounty board resets in ${timeLeft} minutes`;
+    }
+}
+
+function resetBounty(bountyMenu,type) {
+    if (type == "load") {
+        bountyObject = {};
+        bountyObject = advDict.bounty;
+        for (let i = 1; i < 7; i++) {
+            let bountyButton = document.createElement("div");
+            bountyButton.classList.add("flex-column","bounty-button");
+            let bountyStar = document.createElement("div");
+            bountyStar.classList.add("flex-row");
+            for (let j = 0; j < i; j++) {
+                let starImg = new Image();
+                starImg.src = "./assets/expedbg/bountyStar.webp";
+                bountyStar.appendChild(starImg);
+            }
+
+            let bountyImg = document.createElement("img");
+            let path;
+            for (let key in bountyObject) {
+                if (bountyObject[key].Level == i) {
+                    bountyImg.src = `./assets/expedbg/enemy/${key}.webp`;
+                    path = key;
+                    break;
+                }
+            }
+
+            bountyButton.id = `bounty-${path}`;
+            bountyButton.append(bountyStar,bountyImg);
+            bountyMenu.appendChild(bountyButton);
+            if (bountyObject[path].Completed == true) {
+                bountyImg.style.filter = "grayscale(0.9) brightness(0.1)";
+                completeBounty(path,"load",bountyButton);
+            } else if (bountyObject[path].Completed == "claimed") {
+                bountyImg.style.filter = "grayscale(0.9) brightness(0.1)";
+                let markImg = new Image();
+                markImg.src = "./assets/expedbg/bountyDone.webp"
+                bountyButton.appendChild(markImg);
+                bountyButton.style.backgroundColor = "rgb(152 132 91)";
+            }
+        }
+    } else if (type == "create") {
+        notifPop("clearAll","bounty");
+        let bountyDict = enemyInfo.bountyKey;
+        bountyObject = {};
+        for (let i = 1; i < 7; i++) {
+            let bountyButton = document.createElement("div");
+            bountyButton.classList.add("flex-column","bounty-button");
+
+            let bountyStar = document.createElement("div");
+            bountyStar.classList.add("flex-row");
+            for (let j = 0; j < i; j++) {
+                let starImg = new Image();
+                starImg.src = "./assets/expedbg/bountyStar.webp";
+                bountyStar.appendChild(starImg);
+            }
+
+            let bountyImg = document.createElement("img");
+            let randomEnemy = rollArray(bountyDict[i-1],0);
+            let bountyPath;
+    
+            do {
+                bountyPath = `${randomEnemy.split(".")[0]}-${randomInteger(1, parseInt(randomEnemy.split(".")[1]) + 1)}`;
+            } while (
+                bountyObject.hasOwnProperty(bountyPath)
+            );
+    
+            bountyObject[bountyPath] = {primoReward: (10 * i), xpReward: (5 * i), Completed: false, Level: i};
+            bountyImg.src = `./assets/expedbg/enemy/${bountyPath}.webp`;
+            bountyButton.id = `bounty-${bountyPath}`;
+            bountyButton.append(bountyStar,bountyImg);
+            bountyMenu.appendChild(bountyButton);
+        }
+        advDict.bounty = bountyObject;
+    }
+}
+
+function completeBounty(bountyID,type,ele) {
+    let button;
+    if (type == "load") {
+        button = ele;
+    } else {
+        if (bountyObject[bountyID].Completed == "claimed") {return}
+        if (bountyObject[bountyID].Completed != true) {
+            button = document.getElementById(`bounty-${bountyID}`);
+            bountyObject[bountyID].Completed = true;
+       }
+    }
+
+    if (button == undefined) {return}
+    let img = button.children[1];
+    img.style.filter = "grayscale(0.9) brightness(0.1)";
+    button.style.backgroundColor =  "rgb(152 132 91)";
+    notifPop("add","bounty",bountyID);
+    
+    let claim = document.createElement("button");
+    claim.innerText = "Claim Reward";
+    claim.primoReward = bountyObject[bountyID].primoReward;
+    claim.xpReward = bountyObject[bountyID].xpReward;
+
+    claim.addEventListener("click",()=>{
+        notifPop("clear","bounty",bountyID);
+        currencyPopUp("primogem",claim.primoReward);
+        gainXP(claim.xpReward);
+        bountyObject[bountyID].Completed = "claimed";
+        claim.remove();
+
+        let markImg = new Image();
+        markImg.src = "./assets/expedbg/bountyDone.webp"
+        button.appendChild(markImg)
+    })
+
+    button.appendChild(claim);
 }
 
 function clearExped() {
@@ -3647,15 +3872,16 @@ function clearExped() {
     }
 }
 
-const waveLoot = ["Lvl 1-2. Artifacts & Weapons \n Lvl 2.   XP Books \n Lvl 1-2. Food",
-                  "Lvl 1-3. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 1-3. Food",
-                  "Lvl 2-4. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 2-4. Talents",
-                  "Lvl 2-4. Artifacts & Weapons \n Lvl 2-4. XP Books \n Lvl 3-5. Gems",
-                  "Lvl 4-5. Artifacts & Weapons \n Lvl 4.   XP Books \n Lvl 4-5. Gems & Talents"]
+const waveLoot = ["(Recommended Level: 1) \n\n Lvl 1-2. Artifacts & Weapons \n Lvl 2.   XP Books \n Lvl 1-2. Food",
+                  "(Recommended Level: 4) \n\n Lvl 1-3. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 1-3. Food",
+                  "(Recommended Level: 7) \n\n Lvl 2-4. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 2-4. Talents",
+                  "(Recommended Level: 10) \n\n Lvl 2-4. Artifacts & Weapons \n Lvl 2-4. XP Books \n Lvl 3-5. Gems",
+                  "(Recommended Level: 15) \n\n Lvl 4-5. Artifacts & Weapons \n Lvl 4.   XP Books \n Lvl 4-5. Gems & Talents"]
 
 function expedInfo(butId) {
     let expedRow1 = document.getElementById("exped-text");
     let expedRow2 = document.getElementById("exped-lore");
+    let expedBottom = document.getElementById("exped-bottom");
 
     let level = butId.split("-")[1];
     let id = butId.split("-")[2];
@@ -3666,13 +3892,22 @@ function expedInfo(butId) {
             advButton.classList.add("expedition-selected");
         }
         expedRow1.innerHTML = `<p>${expeditionDictInfo[level]["Text"]}</p>`;
-        expedRow2.innerText = expeditionDictInfo[level]["Lore"];
+        let textHTML = expeditionDictInfo[level]["Lore"].replace("[currentStats]",`<div style='height:1.4em;gap:2%;white-space: nowrap;' class='flex-row'>
+                                                                Current HP: ${5 + Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;margin-right:10%' src=./assets/icon/health.webp>
+                                                                Current ATK: ${10 + 2 * Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>
+        </div>`);
+        expedRow2.innerHTML = textHTML;
+
+        
+
+
+
     } else if (level >= 8 && level <= 11) {
         expedRow1.innerHTML =  `<p>${expeditionDictInfo[level]["Text"]}</p>`;
-        expedRow2.innerText = expeditionDictInfo[level]["Lore"];
+        expedRow2.innerHTML = expeditionDictInfo[level]["Lore"];
     } else {
         expedRow1.innerHTML = `<p>${expeditionDictInfo[6]["Text"]}</p>`;
-        expedRow2.innerText = expeditionDictInfo[6]["Lore"];
+        expedRow2.innerHTML = expeditionDictInfo[6]["Lore"];
     }
 
     let enemyInfo = document.getElementById("exped-container");
@@ -3694,18 +3929,21 @@ function expedInfo(butId) {
             img.src = `./assets/expedbg/heads/${heads[j]}.webp`;
             enemyInfo.appendChild(img);
         }
-        lootInfo.innerText = `Possible Reward: \n\n ${waveLoot[level-1]}`;
+        lootInfo.innerText = `${waveLoot[level-1]}`;
         expedImg.src = `./assets/expedbg/header/${id}.webp`;
         expedRow2.style.borderBottom = "0.2em solid #8B857C";
         enemyInfo.style.borderRight = "0.2em solid #8B857C";
+        expedBottom.style.display = "flex";
     } else if (level == 10) {
         expedImg.src = `./assets/expedbg/header/1.webp`;
         expedRow2.style.borderBottom = "none";
         enemyInfo.style.borderRight = "none";
+        expedBottom.style.display = "none";
     } else {
         expedImg.src = `./assets/expedbg/header/0.webp`;
         expedRow2.style.borderBottom = "none";
         enemyInfo.style.borderRight = "none";
+        expedBottom.style.display = "none";
     }
     enemyInfo.currentWave = id;
 }
@@ -3724,19 +3962,17 @@ function createExpMap() {
     expedXPBar.id = "exped-xp-bar"
     expedXPBar.maxXP = advDict.adventureRank * 100;
     expedXPBar.currentXP = advDict.advXP;
-    expedXPBar.style.width = `${Math.round((advDict.advXP / expedXPBar.maxXP))}%`;
+    expedXPBar.style.width = `${Math.round((advDict.advXP / expedXPBar.maxXP)*100)}%`;
     expedXPBar.classList.add("xpbar-bar","cover-all");
     let expedXPInfo = document.createElement("p");
     expedXPInfo.id = "exped-xp";
-    expedXPInfo.innerText = `Level ${advDict.adventureRank}`;
+    expedXPInfo.innerText = `Level ${advDict.adventureRank} (${advDict.advXP}/${expedXPBar.maxXP} XP)`;
     expedXPInfo.classList.add("flex-row");
     expedXP.append(expedXPBar,expedXPInfo);
 
     let expedMesgDiv = document.createElement("div");
     expedMesgDiv.classList.add("flex-column","exped-mesg-div");
     expedMesgDiv.id = "exped-mesg-div";
-    expedMesgDiv.style.display = "none";
-    expedMesgDiv.timer = null;
 
     let charSelect = document.createElement("div");
     charSelect.id = "char-selected";
@@ -3750,6 +3986,12 @@ function createExpMap() {
             charMenu.style.display = "none";
         }
     })
+
+    let notifSelect = document.createElement("div");
+    notifSelect.id = "notif-selected";
+    notifSelect.bountyArray = [];
+    notifSelect.rankArray = [];
+    notifSelect.classList.add("flex-column","notif-select");
     
     let charMenu = document.createElement("div");
     let activeChar;
@@ -3794,7 +4036,7 @@ function createExpMap() {
     dragIcon.classList.add("drag-icon");
     dragIcon.src = "./assets/expedbg/drag.webp";
 
-    advImageDiv.append(advImage,dragIcon,charSelect,expedMesgDiv,charMenu,expedXP);
+    advImageDiv.append(advImage,dragIcon,charSelect,notifSelect,expedMesgDiv,charMenu,expedXP);
     leftDiv.appendChild(advImageDiv);
 
     let lastX = 0;
@@ -3918,30 +4160,105 @@ function gainXP(xpAmount) {
 
     xpBar.currentXP = parseInt(xpBar.currentXP);
     xpBar.currentXP += xpAmount;
-
-    console.log(advDict.advXP / xpBar.maxXP)
+    expedPop("xp",xpAmount)
 
     if (xpBar.currentXP >= xpBar.maxXP) {
         xpBar.currentXP -= xpBar.maxXP;
         advDict.advXP = xpBar.currentXP;
         advDict.adventureRank++;
+
+        advDict.rankDict[advDict.adventureRank].Locked = "unclaimed";
+        let rankButton = document.getElementById(`rank-button-${advDict.adventureRank}`);
+        rankButton.lastChild.remove();
+        notifPop("add","rank",advDict.adventureRank);
+       
         xpBar.maxXP = advDict.adventureRank * 100;
         xpBar.style.width = `${Math.round((advDict.advXP / xpBar.maxXP)*100)}%`;
     } else {
         advDict.advXP = xpBar.currentXP;
         xpBar.style.width = `${Math.round((advDict.advXP / xpBar.maxXP)*100)}%`;
     }
+
+    let expedXPInfo = document.getElementById('exped-xp');
+    expedXPInfo.innerText = `Level ${advDict.adventureRank} (${advDict.advXP}/${xpBar.maxXP} XP)`;
 }
 
-function expedPop() {
+function expedPop(type,text) {
     let expedMesg = document.getElementById('exped-mesg-div');
-    expedMesg.style.display = "flex";
-    expedMesg.innerText = "+15 XP";
-    if (expedMesg.timer != null) {clearTimeout(expedMesg.timer)}
-    expedMesg.timer = setTimeout(function() {
-        expedMesg.style.display = "none";
-        expedMesg.timer = null;
-    }, 4000);
+    let mesgPop = document.createElement("p");
+    mesgPop.classList.add('flex-row');
+    mesgPop.style.animation = 'pop-up-animation 0.5s ease-in-out';
+
+    if (type == "xp") {
+        mesgPop.innerText = `+${text} XP`;
+    }
+    
+    mesgPop.addEventListener("animationend",()=>{
+        setTimeout(function() {
+            mesgPop.remove();
+        }, 4000);
+    })
+    expedMesg.appendChild(mesgPop);
+}
+
+function notifPop(type,icon,count) {
+    let notifSelect = document.getElementById('notif-selected');
+    if (type == "add") {
+        let notifDiv = document.createElement("div");
+        notifDiv.classList.add("flex-column");
+        let notifContainer = document.createElement("div");
+        notifContainer.classList.add("flex-row","notif-div");
+        let notifImg = new Image();
+        let notifText = document.createElement("p");
+
+        if (icon == "bounty") {
+            notifImg.src = "./assets/icon/bountyComplete.webp";
+            notifText.innerText = "Bounty Rewards";
+            notifDiv.id = "bounty-notif";
+            notifSelect.bountyArray.push(count);
+        } else if (icon == "rank") {
+            notifImg.src = "./assets/icon/advRank.webp";
+            notifText.innerText = "Adv. Rank \n Rewards";
+            notifDiv.id = "rank-notif";
+            notifSelect.rankArray.push(count)
+        }
+
+        if (document.getElementById(notifDiv.id)) {return};
+        notifContainer.append(notifText,notifImg)
+        notifDiv.append(notifContainer);
+        notifSelect.append(notifDiv);
+    } else if (type == "clear") {
+        let array;
+        let eleId;
+        if (icon == "bounty") {
+            array = "bountyArray";
+            eleId = "bounty-notif";
+        } else if (icon == "rank") {
+            array = "rankArray";
+            eleId = "rank-notif";
+        }
+
+        let index = notifSelect[array].indexOf(count);
+        notifSelect[array].splice(index, 1);
+        if (notifSelect[array].length <= 0) {
+            let ele = document.getElementById(eleId);
+            if(ele) {ele.remove()};
+        }
+    } else if (type == "clearAll") {
+        let array;
+        let eleId;
+        if (icon == "bounty") {
+            array = "bountyArray";
+            eleId = "bounty-notif";
+        } else if (icon == "rank") {
+            array = "rankArray";
+            eleId = "rank-notif";
+        }
+
+        notifSelect[array] = [];
+        let ele = document.getElementById(eleId);
+        if (ele) {ele.remove()};
+    }
 }
 
 function charScan() {
@@ -4093,6 +4410,7 @@ let fightSceneOn = false;
 function triggerFight() {
     if (!adventureScene) {return}
     fightSceneOn = true;
+    let currentATK = 10 + 2 * Math.floor(advDict.adventureRank / 2);
 
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
@@ -4122,7 +4440,8 @@ function triggerFight() {
     let healthDiv = document.getElementById("adventure-health");
     healthDiv.style.opacity = 1;
     let healthBar = document.getElementById("health-bar");
-    healthBar.maxHealth = 15;
+    healthBar.maxHealth = 5 + Math.floor(advDict.adventureRank / 2);
+    if (activeLeader == "Nahida") {healthBar.maxHealth = Math.round(1.2 * healthBar.maxHealth)}
     healthBar.currentWidth = 100;
     healthBar.classList.add("adventure-health");
     healthBar.style.width = "100%";
@@ -4236,7 +4555,7 @@ function triggerFight() {
                         }
 
                         if (mobDiv.children[0].children[0]) {
-                            mobHealth.health -= 36;
+                            mobHealth.health -= (currentATK);
                             mobDiv.children[0].children[0].remove();
                             loseHP(mobHealth.atk * 2,"inverse");
                         }
@@ -4251,15 +4570,16 @@ function triggerFight() {
                         parryFailure.play();
                         comboHandler("reset");
                     }
-                    mobHealth.health -= 13;
+                    mobHealth.health -= (currentATK * 2);
                     dodgeOn("close");
                 }
             }
             
-            mobHealth.health -= 13;
+            mobHealth.health -= (currentATK / 6);
             if (mobHealth.health <= 0) {
                 mobHealth.dead = true;
                 enemyAmount--;
+                if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
 
                 mobDiv.children[0].style.animation = "";
                 mobDiv.style.filter = "grayscale(100%) brightness(20%)";
@@ -4378,7 +4698,7 @@ function skillUse() {
         if (!mobDiv.children[1]) {continue};
 
         let skillMark = new Image();
-        skillMark.src = "./assets/icon/mark.webp";
+        skillMark.src = `./assets/icon/mark${adventureScaraText}.webp`;
 
         if (mobDiv.children[0].children[0]) {
             mobDiv.children[0].children[0].remove();
@@ -4410,6 +4730,7 @@ function skillUse() {
 }
 
 function attackAll(adventureFightBurst) {
+    let currentATK = 10 + 2 * Math.floor(advDict.adventureRank / 2);
     if (!fightSceneOn) {return}
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
@@ -4424,7 +4745,7 @@ function attackAll(adventureFightBurst) {
         if (!mobDiv.children[1]) {continue};
 
         let mobHealth = mobDiv.children[1];
-        mobHealth.health -= 13;
+        mobHealth.health -= (currentATK * 5);
         if (!cooldownTime) {cooldownTime = mobDiv.attackTime * 150}
         if (mobHealth.class != "Superboss") {
             mobDiv.children[0].classList.add("staggered");
@@ -4436,6 +4757,7 @@ function attackAll(adventureFightBurst) {
         
         if (mobHealth.health <= 0) {
             mobHealth.dead = true;
+            if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
             enemyAmount--;
 
             mobDiv.children[0].style.animation = "";
@@ -5032,7 +5354,7 @@ function clearTooltip() {
         }
 
         if (table2.style.display !== "none") {
-            tooltipName.innerText = "Go on expeditions to get items!";
+            tooltipName.innerHTML = `Go on Expeditions to get items!`;
         }
 
         tooltipText.innerText = "";
@@ -5094,14 +5416,14 @@ function tooltipFunction() {
 //------------------------------------------------------------------------TABLE 7 (STORE)------------------------------------------------------------------------//
 // CHECK PRIMOGEMS TO SPAWN SHOP
 function shopCheck() {
-    if (localStorage.getItem("storeInventory") === null) {
+    if (storeInventory.active == false) {
         if (saveValues["primogem"] > SHOP_THRESHOLD) {
             // GENERATING A LOCAL SHOP
             addShop();
             shopTime = getTime();
-            localStorage.setItem("shopStartMinute",shopTime);
-            setShop();
-            setTimeout(()=>saveData(),1000)
+            storeInventory.storedTime = getTime();
+            storeInventory.active = true;
+            setShop("add");
             // IT IS PERSISENT TO LOCALSTORAGE
             newPop(5);
             newPop(13);
@@ -5112,7 +5434,7 @@ function shopCheck() {
 // SHOP TIMER
 function shopTimerFunction() {
     if (shopTimerElement != null) {
-        let time_passed = Math.floor(getTime() - parseInt(shopTime));
+        let time_passed = Math.floor(getTime() - parseInt(storeInventory.storedTime));
         shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
         if (time_passed >= SHOPCOOLDOWN) {
             refreshShop(getTime());
@@ -5140,74 +5462,63 @@ function addShop() {
     tabFlex.appendChild(tabButton);
 }
 
-function setShop() {
+function setShop(type) {
     table7.classList.add("table-without-tooltip");
     let shopImg = document.createElement("img");
     shopImg.src = "./assets/icon/shop-start.webp";
 
     shopTimerElement = document.createElement("div");
-    shopTimerElement.classList.add("flex-column");
-    shopTimerElement.classList.add("store-timer");
-    shopTimerElement.classList.add("background-image-cover");
-    shopTimerElement.id = "shop-timer"
-    let currentMin = localStorage.getItem("shopStartMinute");
+    shopTimerElement.classList.add("flex-column","store-timer","background-image-cover");
+    shopTimerElement.id = "shop-timer";
     let minutesPassed = (getTime() / (1000 * 60));
-    shopTimerElement.innerText = "Inventory resets in: " + (SHOPCOOLDOWN - (currentMin - minutesPassed)) + " minutes";
+    shopTimerElement.innerText = "Inventory resets in: " + (SHOPCOOLDOWN - (storeInventory.storedTime - minutesPassed)) + " minutes";
 
     let shopDiv = document.createElement("div");
     shopDiv.classList.add("store-div");
     shopDiv.id = "shop-container";
-    let i=10;
-    while (i--) {
-        let inventoryNumber;
-        if (i >= 7 && i <= 9) {
-            inventoryNumber = inventoryDraw("talent", 2,4, "shop");
-        } else if (i === 6) {
-            inventoryNumber = randomInteger(4011,4014);
-        } else if (i === 5) {
-            if (saveValues["wishUnlocked"] === true) {
-                inventoryNumber = 4010;
-            } else {
-                inventoryNumber = inventoryDraw("gem", 4,6, "shop");
-            }
-        } else if (i >= 2 && i <= 4) {
-            inventoryNumber = inventoryDraw("gem", 4,6, "shop");
-        } else {
-            inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
+
+    if (type === "load") {
+        for (let i = 10; i > 0; i--) {
+            loadShopItems(shopDiv, i, storeInventory[i]);
         }
-        createShopItems(shopDiv, i, inventoryNumber);
+    } else if (type === "add") {
+        storeInventory.storedTime = getTime();
+        let i=10;
+        while (i--) {
+            let inventoryNumber;
+            if (i >= 7 && i <= 9) {
+                inventoryNumber = inventoryDraw("talent", 2,4, "shop");
+            } else if (i === 6) {
+                inventoryNumber = randomInteger(4011,4014);
+            } else if (i === 5) {
+                if (saveValues["wishUnlocked"] === true) {
+                    inventoryNumber = 4010;
+                } else {
+                    inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+                }
+            } else if (i >= 2 && i <= 4) {
+                inventoryNumber = inventoryDraw("gem", 4,6, "shop");
+            } else {
+                inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
+            }
+            createShopItems(shopDiv, i, inventoryNumber);
+        }
+        saveData(true)
     }
 
     let shopDialogueDiv = document.createElement("div");
-    shopDialogueDiv.classList.add("flex-row");
-    shopDialogueDiv.classList.add("store-dialog");
+    shopDialogueDiv.classList.add("flex-row","store-dialog");
 
     let shopDialogueButton = document.createElement("div");
-    shopDialogueButton.classList.add("flex-row");
-    shopDialogueButton.classList.add("store-buy");
+    shopDialogueButton.classList.add("flex-row","store-buy");
     shopDialogueButton.innerText = "Confirm Purchase";
     shopDialogueButton.id = "shop-confirm";
     let shopDialogueText = document.createElement("div");
     shopDialogueText.classList.add("flex-column");
     shopDialogueText.id = "table7-text";
 
-    shopDialogueDiv.append(shopDialogueText,shopDialogueButton)
+    shopDialogueDiv.append(shopDialogueText,shopDialogueButton);
     table7.append(shopImg,shopTimerElement,shopDiv,shopDialogueDiv);
-    saveData();
-}
-
-function loadShop() {
-    let shopTemp = localStorage.getItem("storeInventory");
-    shopTemp = JSON.parse(shopTemp);
-    table7.innerHTML = shopTemp;
-    shopTimerElement = document.getElementById("shop-timer");
-
-    let shopButtons = (document.getElementById("shop-container")).children;
-    for (let i=0,len=shopButtons.length; i < len; i++) {
-         shopButtons[i].addEventListener("click", function() {
-            buyShop(shopButtons[i].id,shopButtons[i].id.split("-")[3])
-        });
-    }
 }
 
 var shopId = null;
@@ -5246,6 +5557,9 @@ function buyShop(id,shopCost) {
 }
 
 function refreshShop(minutesPassed) {
+    shopTime = minutesPassed;
+    shopId = null;
+
     let shopContainer = document.getElementById("shop-container");
     shopContainer.innerHTML = "";
     let i=10;
@@ -5268,21 +5582,18 @@ function refreshShop(minutesPassed) {
         }
         createShopItems(shopContainer, i, inventoryNumber);
     }
-
-    shopId = null;
-    shopTime = minutesPassed;
-    localStorage.setItem("shopStartMinute",minutesPassed)
+    storeInventory.storedTime = getTime();
 }
 
 function confirmPurchase(shopCost,id) {
     let mainButton = document.getElementById(id);
     let dialog = document.getElementById("table7-text");
     if (saveValues.primogem >= shopCost) {
-        id = id.split("-")[2];
-        shopElement.load();
-        shopElement.play();
+        let saveId = id.split("-")[1];
+        let itemId = id.split("-")[2];
+        
         newPop(1);
-        inventoryAdd(id);
+        inventoryAdd(itemId);
         sortList("table2");
         mainButton.classList.remove("shadow-pop-tr");
         mainButton.classList.add("purchased");
@@ -5291,7 +5602,11 @@ function confirmPurchase(shopCost,id) {
         let confirmButton = document.getElementById("shop-confirm");
         let confirmButtonNew = confirmButton.cloneNode(true);
         confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
-        dialog.innerText = "Hehe, you've got good eyes."
+        dialog.innerText = "Hehe, you've got good eyes.";
+
+        shopElement.load();
+        shopElement.play();
+        storeInventory[parseInt(saveId)].Purchased = true;
     } else {
         dialog.innerText = "Hmph, come back when you're a little richer."
         return;
@@ -5300,8 +5615,7 @@ function confirmPurchase(shopCost,id) {
 
 function createShopItems(shopDiv, i, inventoryNumber) {
     let shopButton = document.createElement("div");
-    shopButton.classList.add("flex-column");
-    shopButton.classList.add("shop-button");
+    shopButton.classList.add("flex-column","shop-button");
     let inventoryTemp = Inventory[inventoryNumber];
 
     let shopButtonImage = document.createElement("img");
@@ -5339,7 +5653,6 @@ function createShopItems(shopDiv, i, inventoryNumber) {
             break;
     }
 
-    shopCost;
     let shopButtonPrimo = document.createElement("img");
     shopButtonPrimo.classList.add("shop-button-primo");
     shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
@@ -5350,6 +5663,53 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopButton.addEventListener("click", function() {
         buyShop(shopButton.id,shopCost)
     })
+    
+    shopButtonImageContainer.appendChild(shopButtonImage);
+    shopButton.append(shopButtonImageContainer,shopButtonText);
+    shopDiv.append(shopButton);
+
+    storeInventory[i+1].Item = inventoryNumber;
+    storeInventory[i+1].Cost = shopCost;
+
+    return shopDiv;
+}
+
+function loadShopItems(shopDiv, i, inventoryArray) {
+    let purchased = inventoryArray.Purchased;
+    let shopCost = inventoryArray.Cost;
+    let inventoryNumber = inventoryArray.Item;
+
+    let shopButton = document.createElement("div");
+    shopButton.classList.add("flex-column","shop-button");
+    let inventoryTemp = Inventory[inventoryNumber];
+
+    let shopButtonImage = document.createElement("img");
+    shopButtonImage.src = "./assets/tooltips/inventory/"+ inventoryTemp.File+ ".webp";
+
+    let shopButtonImageContainer = document.createElement("div");
+    shopButtonImageContainer.classList.add("flex-column","shop-button-container");
+    shopButtonImageContainer.style.background = "url(./assets/frames/background-" +inventoryTemp.Star+ ".webp)";
+    shopButtonImageContainer.style.backgroundSize = "cover";
+    shopButtonImageContainer.style.backgroundPosition = "center center";
+    shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
+    
+    let shopButtonText = document.createElement("div");
+    shopButtonText.classList.add("flex-row","shop-button-text");
+
+    let shopButtonPrimo = document.createElement("img");
+    shopButtonPrimo.classList.add("shop-button-primo");
+    shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
+    shopButtonText.innerText = shopCost;
+    shopButtonText.appendChild(shopButtonPrimo);
+
+    shopButton.id = ("shop-" + i + "-" + inventoryNumber + "-" + shopCost);
+    if (purchased == false) {
+        shopButton.addEventListener("click", function() {
+            buyShop(shopButton.id,shopCost)
+        })
+    } else {
+        shopButton.classList.add("purchased");
+    }
     
     shopButtonImageContainer.appendChild(shopButtonImage);
     shopButton.append(shopButtonImageContainer,shopButtonText);
