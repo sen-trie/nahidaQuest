@@ -222,6 +222,7 @@ let eventCooldownDecrease = 1;
 let additionalPrimo = 1;
 let additionalStrength = 1;
 let additionalDefense = 1;
+let additionalXP = 1;
 
 // ACHIEVEMENT THRESHOLDS
 let achievementData = {
@@ -674,6 +675,7 @@ function specialValuesUpgrade(loading, valueUpdate) {
         additionalPrimo = (1 + persistentValues.upgrade9.Purchased/10).toFixed(3);
         additionalStrength = (1 + persistentValues.upgrade10.Purchased/10).toFixed(3);
         additionalDefense = (1 + persistentValues.upgrade11.Purchased/10).toFixed(3);
+        additionalXP = (1 + persistentValues.upgrade12.Purchased/100).toFixed(3);
     } else if (loading == false) {
         switch (valueUpdate) {
             case 1:
@@ -710,6 +712,9 @@ function specialValuesUpgrade(loading, valueUpdate) {
                 break;
             case 11:
                 additionalDefense = (1 + persistentValues.upgrade11.Purchased/10).toFixed(3);
+                break;
+            case 12:
+                additionalXP = (1 + persistentValues.upgrade12.Purchased/100).toFixed(3);
                 break;
             default:
                 console.error('Upgrade error: Invalid value to update');
@@ -3395,33 +3400,39 @@ function createAdventure() {
     adventureFight.id = "adventure-fight";
     adventureFight.classList.add("flex-row","adventure-fight");
     adventureFight.style.display = "none";
-    let adventureFightDodge = document.createElement("img");
-    adventureFightDodge.src = "./assets/expedbg/battle1.webp";
+    let adventureFightDodge = document.createElement("div");
+    let adventureFightDodgeImg = new Image();
+    adventureFightDodgeImg.src = "./assets/expedbg/battle1.webp";
+    adventureFightDodge.append(adventureFightDodgeImg);
+
     adventureFightDodge.id = "battle-toggle";
     adventureFightDodge.addEventListener("click",()=>{
-        dodgeOn("toggle");
+        dodgeOn("toggle",adventureFightDodge);
     })
     
-    let adventureFightSkill = document.createElement("img");
-    adventureFightSkill.src = "./assets/expedbg/battle2.webp";
+    let adventureFightSkill = document.createElement("div");
+    let adventureFightSkillImg = new Image();
+    adventureFightSkillImg.src = "./assets/expedbg/battle2.webp";
+    adventureFightSkill.append(adventureFightSkillImg);
     adventureFightSkill.addEventListener("click",()=>{
         skillUse();
     })
 
-    let adventureFightBurst = document.createElement("img");
-    adventureFightBurst.src = "./assets/expedbg/battle3.webp";
-
+    let adventureFightBurst = document.createElement("div");
+    let adventureFightBurstImg = new Image();
+    adventureFightBurstImg.src = "./assets/expedbg/battle3.webp";
+    adventureFightBurst.append(adventureFightBurstImg)
     adventureFightBurst.addEventListener("click",()=>{
         attackAll(adventureFightBurst);
     })
 
     document.addEventListener("keydown", function(event) {
         if (event.key === "z" || event.key === "q") {
-            dodgeOn("toggle");
+            adventureFightDodge.click();
         } else if (event.key === "x" || event.key === "w") {
-            skillUse();
+            adventureFightSkill.click();
         } else if (event.key === "c" || event.key === "e") {
-            attackAll(adventureFightBurst);
+            adventureFightBurst.click();
         }
     })
 
@@ -3574,7 +3585,6 @@ function createGuild() {
     rankDiv.classList.add("flex-row","rank-div");
     rankDiv.activeLevel;
     let rankLore = document.createElement("div");
-    rankLore.classList.add("flex-column");
     rankLore.innerText = `Select a level to get more information!`;
     let rankClaim = document.createElement("button");
     rankClaim.classList.add("flex-row");
@@ -3605,10 +3615,12 @@ function createGuild() {
         }
         
         rankButton.addEventListener("click",()=>{
-            let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:5%;white-space: nowrap;' class='flex-row'>
-                                                          +1 HP <img style="height: 100%;margin-right:20%" src=./assets/icon/health.webp> 
+            let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:1%;white-space: nowrap;' class='flex-row'>
+                                                          +1 HP <img style="height: 100%;margin-right:10%" src=./assets/icon/health.webp> 
                                                           +2 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>          
             </div>`);
+            loreHTML = loreHTML.replaceAll("[s]",`<span style='color:#A97803'>`)
+            loreHTML = loreHTML.replaceAll("[/s]",`</span>`)
             rankLore.innerHTML = `${loreHTML}`;
             if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
             rankClaim.buttonLevel = i;
@@ -3892,10 +3904,9 @@ function expedInfo(butId) {
             advButton.classList.add("expedition-selected");
         }
         expedRow1.innerHTML = `<p>${expeditionDictInfo[level]["Text"]}</p>`;
-        let textHTML = expeditionDictInfo[level]["Lore"].replace("[currentStats]",`<div style='height:1.4em;gap:2%;white-space: nowrap;' class='flex-row'>
-                                                                Current HP: ${5 + Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;margin-right:10%' src=./assets/icon/health.webp>
-                                                                Current ATK: ${10 + 2 * Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>
-        </div>`);
+        let textHTML = expeditionDictInfo[level]["Lore"].replace("[currentStats]",`<div style='height:1.4em;gap:2%;white-space: nowrap;' class='flex-row'></div>`);
+        // Current HP: ${5 + Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;margin-right:10%' src=./assets/icon/health.webp>
+        // Current ATK: ${10 + 3 * Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>
         expedRow2.innerHTML = textHTML;
 
         
@@ -4155,6 +4166,7 @@ function createExpMap() {
 }
 
 function gainXP(xpAmount) {
+    xpAmount = Math.round(xpAmount * additionalXP * randomInteger(98,103) / 100);
     let xpBar = document.getElementById('exped-xp-bar');
     xpBar.maxXP = advDict.adventureRank * 100;
 
@@ -4317,21 +4329,19 @@ function drawAdventure(advType,wave) {
         adventureScaraText = "-scara";
     };
 
+    let removeEle = document.querySelectorAll('.adventure-atk-cooldown, .adventure-atk-cooldown-scara');
+    removeEle.forEach((element) => {
+        element.remove();
+    });
+
     let waveType = enemyInfo[`${advType}-Wave-${wave}`];
     enemyAmount = waveType.Wave.length;
     let imageGif = document.getElementById("adventure-gif");
     let adventureFightImg = document.getElementById("adventure-fight").children;
-    if (adventureScaraText) {
-        imageGif.src = `./assets/expedbg/exped${adventureScaraText}.webp`;
-        for (let i = 0; i < adventureFightImg.length; i++) {
-            adventureFightImg[i].src = `./assets/expedbg/scara${i+1}.webp`;
-            adventureFightImg[i].classList.add("fight-scara")
-        }
-    } else {
-        for (let i = 0; i < adventureFightImg.length; i++) {
-            adventureFightImg[i].src = `./assets/expedbg/battle${i+1}.webp`;
-            adventureFightImg[i].classList.add("fight-button")
-        }
+    if (adventureScaraText) {imageGif.src = `./assets/expedbg/exped${adventureScaraText}.webp`};
+    for (let i = 0; i < adventureFightImg.length; i++) {
+        if (adventureFightImg[i].classList.contains(`fight-button${!adventureScaraText}`)) {adventureFightImg[i].classList.remove(`fight-button${!adventureScaraText}`)};
+        adventureFightImg[i].classList.add(`fight-button${adventureScaraText}`);
     }
     
     let adventureChoiceOne = document.getElementById("adv-button-one");
@@ -4410,7 +4420,7 @@ let fightSceneOn = false;
 function triggerFight() {
     if (!adventureScene) {return}
     fightSceneOn = true;
-    let currentATK = 10 + 2 * Math.floor(advDict.adventureRank / 2);
+    let currentATK = 10 + 3 * Math.floor(advDict.adventureRank / 2);
 
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
@@ -4430,12 +4440,13 @@ function triggerFight() {
     bgmElement.pause();
     fightBgmElement.src = `./assets/sfx/battleTheme-${currentSong}.mp3`;
     fightBgmElement.volume = settingsValues.bgmVolume;
+    fightBgmElement.loop = true;
     fightBgmElement.load();
-    fightBgmElement.play();
-    fightBgmElement.addEventListener("ended",()=>{
-        fightBgmElement.load();
+    
+    fightBgmElement.addEventListener('canplaythrough', () => {
         fightBgmElement.play();
-    })
+      });
+
 
     let healthDiv = document.getElementById("adventure-health");
     healthDiv.style.opacity = 1;
@@ -4461,6 +4472,74 @@ function triggerFight() {
         healthImg.src = `./assets/icon/health${adventureScaraText}.webp`;
         health.appendChild(healthImg)
         healthDiv.append(health);
+    }
+
+    let adventureFightImg = document.getElementById("adventure-fight").children;
+    for (let i = 0; i < 3; i++) {
+        let advImage = adventureFightImg[i].children[0];
+        advImage.src = `./assets/expedbg/battle${adventureScaraText}${i+1}.webp`;
+        advImage.id = `adventure-image-${i+1}`;
+        if (advImage.classList.contains('dim-filter')) {advImage.classList.remove('dim-filter')}
+
+        let adventureAtkCooldown = document.createElement("div");
+        adventureAtkCooldown.classList.add(`adventure-atk-cooldown${adventureScaraText}`,"flex-row");
+
+        let normalAtkCooldown = document.createElement("div");
+        normalAtkCooldown.classList.add(`inner-cooldown${adventureScaraText}`);
+        normalAtkCooldown.id = `adventure-cooldown-${i+1}`;
+        normalAtkCooldown.amount = 0;
+        normalAtkCooldown.maxAmount = 1;
+        normalAtkCooldown.style.width = `${normalAtkCooldown.amount}%`
+        adventureAtkCooldown.appendChild(normalAtkCooldown);
+
+        let amountInterval = 0.3;
+        if (i == 0) {
+            amountInterval *= 3;
+            normalAtkCooldown.maxAmount = 2;
+        } else if (i == 2) {
+            amountInterval = 0;
+        }
+
+        for (let i=0; i < normalAtkCooldown.maxAmount; i++) {
+            let barBit = document.createElement("div");
+            barBit.classList.add(`cooldown-bit${adventureScaraText}`);
+            adventureAtkCooldown.appendChild(barBit)
+        }
+
+        let frames_per_second = 60;
+        let interval = Math.floor(1000 / frames_per_second);
+        let startTime = performance.now();
+        let previousTime = startTime;
+
+        let currentTime = 0;
+        let deltaTime = 0;
+
+        window.requestAnimationFrame(increaseCooldownBar);
+        function increaseCooldownBar(timestamp) {
+            if (!fightSceneOn) {return}
+            currentTime = timestamp;
+            deltaTime = currentTime - previousTime;
+          
+            if (deltaTime > interval) {
+                previousTime = currentTime - (deltaTime % interval);
+                normalAtkCooldown.amount += amountInterval;
+                normalAtkCooldown.style.width = `${normalAtkCooldown.amount / (normalAtkCooldown.maxAmount)}%`
+
+                if (normalAtkCooldown.amount > 100) {
+                    if (normalAtkCooldown.amount > (100 * normalAtkCooldown.maxAmount)) {
+                        normalAtkCooldown.amount = 100 * normalAtkCooldown.maxAmount;
+                        normalAtkCooldown.style.width = `${100}%`;
+                    }
+                    if (advImage.classList.contains('dim-filter')) {
+                        advImage.classList.remove('dim-filter')}
+                } else if (normalAtkCooldown.amount < 100){
+                    if (!advImage.classList.contains('dim-filter')) {
+                        advImage.classList.add('dim-filter')}
+                }
+            }
+            window.requestAnimationFrame(increaseCooldownBar)
+        }
+        adventureFightImg[i].appendChild(adventureAtkCooldown);
     }
     
     for (let i = 0; i < adventureVideoChildren.length; i++) {
@@ -4502,33 +4581,47 @@ function triggerFight() {
             canvas.style.filter = `brightness(0)`;
             canvas.style.transform = ``;
             canvas.attackState = false;
-            increaseBrightness();
+            window.requestAnimationFrame(increaseBrightness);
 
-            function increaseBrightness() {
+            let frames_per_second = 60;
+            let interval = Math.floor(1000 / frames_per_second);
+            let startTime = performance.now();
+            let previousTime = startTime;
+
+            let currentTime = 0;
+            let deltaTime = 0;
+
+            function increaseBrightness(timestamp) {
                 if (!fightSceneOn) {return}
                 if (mobHealth.dead) {return}
-                canvas.brightness += brightnessIncrement;
-                if (canvas.attackState) {
-                    loseHP(mobHealth.atk,"normal");
-                    canvas.attackState = false;
-                }
-
-                if (canvas.brightness > 0.8) {
-                    if (canvas.style.transform == ``) {
-                        canvas.style.transform = `scale(1.2)`;
-                        canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
-                        canvas.classList.add("attack-ready");
+                currentTime = timestamp;
+                deltaTime = currentTime - previousTime;
+              
+                if (deltaTime > interval) {
+                    previousTime = currentTime - (deltaTime % interval);
+                    canvas.brightness += brightnessIncrement;
+                    if (canvas.attackState) {
+                        loseHP(mobHealth.atk,"normal");
+                        canvas.attackState = false;
                     }
-                } else {
-                    canvas.style.filter = `brightness(${canvas.brightness})`;
-                }
 
-                if (canvas.brightness > maxBrightness) {
-                    canvas.attackState = true;
-                    if (canvas.classList.contains("attack-ready")) {canvas.classList.remove("attack-ready")}
-                    canvas.brightness = 0;
-                    canvas.style.transform = ``;
-                    canvas.style.filter = `brightness(0)`;
+                    if (canvas.brightness > 0.8) {
+                        if (canvas.style.transform == ``) {
+                            canvas.style.transform = `scale(1.2)`;
+                            canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
+                            canvas.classList.add("attack-ready");
+                        }
+                    } else {
+                        canvas.style.filter = `brightness(${canvas.brightness})`;
+                    }
+
+                    if (canvas.brightness > maxBrightness) {
+                        canvas.attackState = true;
+                        if (canvas.classList.contains("attack-ready")) {canvas.classList.remove("attack-ready")}
+                        canvas.brightness = 0;
+                        canvas.style.transform = ``;
+                        canvas.style.filter = `brightness(0)`;
+                    }
                 }
                 window.requestAnimationFrame(increaseBrightness);
             }
@@ -4563,13 +4656,21 @@ function triggerFight() {
                         parrySuccess.load();
                         parrySuccess.play();
                         comboHandler("add");
+                        let cooldown = document.getElementById('adventure-cooldown-3');
+                        cooldown.amount += 25;
                     } else {
                         mobDiv.children[0].classList.add("damaged");
                         setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},animationTime * 150);
                         parryFailure.load();
                         parryFailure.play();
                         comboHandler("reset");
+                        let cooldown = document.getElementById('adventure-cooldown-3');
+                        cooldown.amount += 10;
                     }
+
+                    let cooldown = document.getElementById('adventure-cooldown-1');
+                    cooldown.amount -= 100;
+
                     mobHealth.health -= (currentATK * 2);
                     dodgeOn("close");
                 }
@@ -4596,7 +4697,6 @@ function triggerFight() {
                 }
             }
             mobHealth.style.width = `${Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100}%`
-            
         })
         mobDiv.append(mobHealth,canvas);
     }
@@ -4620,9 +4720,11 @@ function loseHP(ATK,type) {
 }
 
 let dodgeAppearance = false;
-function dodgeOn(type) {
+function dodgeOn(type,parentEle) {
     if (!fightSceneOn) {return}
     if (type === "toggle") {
+        let cooldown = document.getElementById('adventure-cooldown-1')
+        if (cooldown.amount < 100) {return}
         if (dodgeAppearance) {
             let adventureVideo = document.getElementById("adventure-video");
             let adventureVideoChildren = adventureVideo.children;
@@ -4689,7 +4791,9 @@ function skillUse() {
     if (!fightSceneOn) {return}
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
-    let skillCooldownTime;
+    let cooldown = document.getElementById('adventure-cooldown-2');
+    if (cooldown.amount < 100) {return}
+    cooldown.amount -= 100;
 
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         let mobDiv = adventureVideoChildren[i];
@@ -4730,12 +4834,15 @@ function skillUse() {
 }
 
 function attackAll(adventureFightBurst) {
-    let currentATK = 10 + 2 * Math.floor(advDict.adventureRank / 2);
+    let currentATK = 10 + 3 * Math.floor(advDict.adventureRank / 2);
     if (!fightSceneOn) {return}
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
     let cooldownTime;
-
+    let cooldown = document.getElementById('adventure-cooldown-3');
+    if (cooldown.amount < 100) {return}
+    cooldown.amount -= 100;
+    
     parryFailure.load();
     parryFailure.play();
     for (let i = 0; i < adventureVideoChildren.length; i++) {
@@ -4824,7 +4931,7 @@ function loseAdventure() {
         fightLoseElement.load();
         fightLoseElement.play();
         fightLoseElement.addEventListener('ended',()=>{
-            setTimeout(()=>{bgmElement.play()},300)
+            setTimeout(()=>{if (!fightSceneOn) {bgmElement.play()}},300)
         })
     },300)
     
@@ -4855,7 +4962,7 @@ function winAdventure() {
         fightWinElement.load();
         fightWinElement.play();
         fightWinElement.addEventListener('ended',()=>{
-            setTimeout(()=>{bgmElement.play()},300)
+            setTimeout(()=>{if (!fightSceneOn) {bgmElement.play()}},300)
         })
     },300)
 }

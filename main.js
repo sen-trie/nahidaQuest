@@ -3574,7 +3574,6 @@ function createGuild() {
     rankDiv.classList.add("flex-row","rank-div");
     rankDiv.activeLevel;
     let rankLore = document.createElement("div");
-    rankLore.classList.add("flex-column");
     rankLore.innerText = `Select a level to get more information!`;
     let rankClaim = document.createElement("button");
     rankClaim.classList.add("flex-row");
@@ -3605,10 +3604,12 @@ function createGuild() {
         }
         
         rankButton.addEventListener("click",()=>{
-            let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:5%;white-space: nowrap;' class='flex-row'>
-                                                          +1 HP <img style="height: 100%;margin-right:20%" src=./assets/icon/health.webp> 
+            let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:1%;white-space: nowrap;' class='flex-row'>
+                                                          +1 HP <img style="height: 100%;margin-right:10%" src=./assets/icon/health.webp> 
                                                           +2 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>          
             </div>`);
+            loreHTML = loreHTML.replaceAll("[s]",`<span style='color:#A97803'>`)
+            loreHTML = loreHTML.replaceAll("[/s]",`</span>`)
             rankLore.innerHTML = `${loreHTML}`;
             if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
             rankClaim.buttonLevel = i;
