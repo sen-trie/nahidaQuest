@@ -1,4 +1,4 @@
-let screenLoreDict = {
+const screenLoreDict = {
     0:"Exploring the world of Teyvat can be dangerous, make sure to keep your party well-equipped with weapons and artifacts.",
     1:"Don't forget to visit Dori's shop to buy new items.",
     2:"Travelers who complete achievements can earn primogems and other rewards.",
@@ -42,7 +42,41 @@ let screenLoreDict = {
     37:`Many years ago, back when he still harbored the wish to become human, he prayed that he would one day be able to lead a normal life.`,
 }
 
-let upgradeInfo = {
+const charLoreObj = {
+    0:{Name:"Nahida",     Desc:"20%+ HP in Combat"},
+    1:{Name:"Paimon",     Desc:"10%+ Energy Refund"},
+    2:{Name:"Venti",      Desc:"20%+ Combo Damage"},
+    3:{Name:"Zhongli",    Desc:"15%+ Skill Healing"},
+    4:{Name:"Ei",         Desc:"35%+ Counter DMG"},
+}
+
+const imgKey = {
+    1:{Left:"76",   Top:"24",   Level:10,   Wave:[],                Heads:[]},
+    2:{Left:"85",   Top:"9",    Level:1,    Wave:[1,2,5],           Heads:[1,2]             ,Loot:{Artifact:2,  Catalyst:2,  Level: 2,      Food: 2}},
+    3:{Left:"59",   Top:"19",   Level:1,    Wave:[1,2,3,4,5],       Heads:[1,2,3]           ,Loot:{Artifact:2,  Sword:2,     Level: 2,      Food: 2}},
+    4:{Left:"64",   Top:"49",   Level:1,    Wave:[1,3,4],           Heads:[1,3]             ,Loot:{Artifact:2,  Bow:2,       Level: 2,      Food: 2}},
+    5:{Left:"40",   Top:"48",   Level:1,    Wave:[3,4,6],           Heads:[3,4]             ,Loot:{Artifact:2,  Polearm:2,   Level: 2,      Food: 2}},
+    6:{Left:"46",   Top:"61",   Level:2,    Wave:[1,2,7],           Heads:[4,5]             ,Loot:{Artifact:3,  Claymore:3,  Gemstone: 4,   Level: 3,   Food: 3}},
+    7:{Left:"80",   Top:"59",   Level:2,    Wave:[1,2,5,6],         Heads:[5,9]             ,Loot:{Artifact:3,  Bow:3,       Gemstone: 4,   Level: 3,   Food: 3}},
+    8:{Left:"77",   Top:"40",   Level:2,    Wave:[3,4],             Heads:[6,7]             ,Loot:{Artifact:3,  Polearm:3,   Gemstone: 4,   Level: 3,   Food: 3}},
+    9:{Left:"52",   Top:"50",   Level:2,    Wave:[4,5,6],           Heads:[6,9]             ,Loot:{Artifact:3,  Sword:3,     Gemstone: 4,   Level: 3,   Food: 3}},
+    10:{Left:"70",   Top:"47",  Level:3,    Wave:[1,2],             Heads:[5,14]            ,Loot:{Artifact:4,  Catalyst:4,  Sumeru: 4,     Level: 4,   Food: 4}},
+    11:{Left:"64",   Top:"35",  Level:3,    Wave:[2,5,6],           Heads:[3,8,14]          ,Loot:{Artifact:4,  Claymore:4,  Mondstadt: 4,  Level: 4,   Food: 4}},
+    12:{Left:"22",  Top:"68",   Level:3,    Wave:[5,6,7],           Heads:[3,8,10]          ,Loot:{Artifact:4,  Sword:4,     Inazuma: 4,    Level: 4,   Food: 4}},
+    13:{Left:"31",  Top:"26",   Level:3,    Wave:[3,4],             Heads:[6,7]             ,Loot:{Artifact:4,  Bow:4,       Liyue: 4,      Level: 4,   Food: 5}},
+    14:{Left:"20",  Top:"32",   Level:4,    Wave:[2,3,5],           Heads:[8,12,19]         ,Loot:{Artifact:4,  Polearm:4,   Gemstone: 5,   Level: 4,   Food: 5}},
+    15:{Left:"51",  Top:"18",   Level:4,    Wave:[1],               Heads:[11,13]           ,Loot:{Artifact:4,  Catalyst:4,  Gemstone: 5,   Level: 4,   Food: 5}},
+    16:{Left:"88",  Top:"45",   Level:4,    Wave:[2,3,5],           Heads:[19,12]           ,Loot:{Artifact:4,  Claymore:4,  Gemstone: 5,   Level: 4,   Food: 5}},
+    17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,3,4,5,6,7,8], Heads:[15,16,17,18,20]  ,Loot:{Artifact:5,  Weapon:5,    Gemstone: 6,   Talent: 4,  Level: 4,   Food: 5}},
+    // 18:{Left:"53",  Top:"38",   Level:12,    Scene:["1-A-1","1-A-2","1-C-2"]},
+    // 19:{Left:"80",  Top:"18",   Level:12,    Scene:["1-C-2","1-C-3"]},
+    // 20:{Left:"77",  Top:"53",   Level:12,    Scene:["1-C-1","1-C-2","2-C-2"]},
+    // 21:{Left:"33",  Top:"82",   Level:12,    Scene:["3-C-2","3-C-3","2-A-1","2-C-4"]},
+    // 22:{Left:"44",  Top:"71",   Level:12,    Scene:["3-C-1","3-C-2","3-C-4","2-C-3"]},
+    // 23:{Left:"55",  Top:"21",   Level:12,    Scene:["3-A-1"]},
+}
+
+const upgradeInfo = {
     0: {
         Name: "Nahida",
         Lore: "I've always dreamed of going out and seeing things for myself. Can you be my guide? I want to experience all your future tales first-hand.",
@@ -487,7 +521,7 @@ let upgradeInfo = {
     },
 }
 
-let achievementListDefault = {
+const achievementListDefault = {
     1: {Name:"Nut Collector",                         Description:"Collect 100 nuts"                            },
     2: {Name:"Fan of Nuts",                           Description:"Collect 10,000 nuts"                          },
     3: {Name:"Nut Gatherer",                          Description:"Collect 1 million nuts"                        },
@@ -570,7 +604,7 @@ let achievementListDefault = {
     410: {Name:"A Golden Experience",                 Description:"Obtain 1000 Golden Nuts"                     },
 }
 
-let expeditionDictInfo = {
+const expeditionDictInfo = {
     1:{Text:"Explore Teyvat | 100 "                  ,Lore:"The legend of the Golden Nut is from a bygone era. Some on-the-ground research is certainly needed if you wanted even a slither of a chance to find the mythical fruit."},
     2:{Text:"Complete World Quests | 250 "           ,Lore:"World Quests give insight into the various locations and stories of the world. Perhaps the Golden Nut has crossed paths with someone along the way?"},
     3:{Text:"Challenge Domains | 500 "               ,Lore:"Clues about the origin of the Golden Nut are said to have been hidden deep inside some mysterious domain. Exploring it will likely be the next step in unravelling the fruit's location."},
@@ -585,23 +619,23 @@ let expeditionDictInfo = {
     12:{Text:"Random World Quest"                    ,Lore:"These quests are random encounters that the you can run into while roaming around the world of Teyvat."            },
 }
 
-let advInfo = {
+const advInfo = {
     1:{Desc:"Unlock [s]Parry Attack[/s]. <br><br>"},
     2:{Desc:"Begin fights with [s]Parry Attack[/s] charged. <br><br> Battle Stats are also increased <br> [hp]"},
     3:{Desc:"Reduce the [s]ambush rate[/s] from enemies."},
     4:{Desc:"Successful expeditions reward [s]more items[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
     5:{Desc:"Unlock [s]Skill Attack[/s]. <br><br> Enemies can be marked with [s]`Seeds of Skandha`[/s], dealing additional DMG and provides healing upon [s]Parry Attack[/s]."},
     6:{Desc:"Party has a 5% chance to [s]evade[/s] enemy attacks. <br><br> Battle Stats are also increased <br> [hp]"},
-    7:{Desc:"[s]Skill Attack[/s] has a 40% chance to reset its cooldown (Can only occur every 10s)."},
+    7:{Desc:"[s]Skill Attack[/s] has a 20% chance to reset its cooldown (Can only occur every 12s)."},
     8:{Desc:"Defeating enemies immediately regenerates 5% of [s]HP[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
     9:{Desc:"[s]Nullify ambushes[/s] from enemies."},
     10:{Desc:"Unlock [s]Burst Attack[/s]. <br><br> Reset all enemies' attacks while dealing immense damage. <br><br> Battle Stats are also increased <br> [hp]"},
     11:{Desc:"Increase the chance of getting a [s]preemptive strike[/s] on foes."},
     12:{Desc:"Successful expeditions reward [s]even more items[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
     13:{Desc:"[s]Evasion rate[/s] is increased to 10%."},
-    14:{Desc:"[s]Skill Attack[/s] has a 70% chance to reset its cooldown (Can only occur every 10s). <br><br> Battle Stats are also increased <br> [hp]"},
+    14:{Desc:"[s]Skill Attack[/s] has a 50% chance to reset its cooldown (Can only occur every 12s). <br><br> Battle Stats are also increased <br> [hp]"},
     15:{Desc:"[s]Burst Attack[/s] has a 10% chance to crit, dealing 200% additional DMG."},
-    16:{Desc:"Increase the charge rate of [s]Burst Attack[/s] by 10%. <br><br> Battle Stats are also increased <br> [hp]"},
+    16:{Desc:"Increase the charge rate of [s]Parry Attack[/s] by 10%. <br><br> Battle Stats are also increased <br> [hp]"},
     17:{Desc:"Increase the chance of getting a [s]preemptive strike[/s] on foes even further."},
     18:{Desc:"[s]Burst Attack's[/s] crit rate is increased to 20%. <br><br> Battle Stats are also increased <br> [hp]"},
     19:{Desc:"[s]Evasion rate[/s] is further increased to 15%."},
@@ -609,7 +643,7 @@ let advInfo = {
 }
 
 // RMB TO UPDATE MAX CONSTANTS
-let InventoryDefault = {
+const InventoryDefault = {
     // 6 STAR WEAPON
         1001: {File:"amosBow",                 Name:"Amos' Bow",                         Lore:"An unstoppable weapon that increases power of [s]Bow[/s] characters by at least [s]360%[/s].  \n \n (Only characters currently purchased count.)",      Star:6,  Type:"Bow"      ,       },
         1002: {File:"aquaSimulacra",           Name:"Aqua Simulacra",                    Lore:"An unstoppable weapon that increases power of [s]Bow[/s] characters by at least [s]360%[/s].  \n \n (Only characters currently purchased count.)",      Star:6,  Type:"Bow"      ,        },
@@ -843,7 +877,7 @@ let InventoryDefault = {
         6012: {File:"inazumaTal2",   Name:"Teachings of Light",                          Lore:"Concise reading materials that increase power of [s]Inazuma[/s] characters by at least [s]20%[/s]. \n\n (Only characters currently purchased count.)",                Star:2,            Type:"Talent",          nation:"Inazuma"    },
 }
 
-let eventText = {
+const eventText = {
     1: "A surge of power courses through Nahida - She feels empowered!",
     1.5: `"Are you sure it has to be me? \n ...Fine, let's get this over with."`,
     2: "Let's play a game! When the clock stops ticking, we'll see who can press the button first!",
@@ -853,4 +887,4 @@ let eventText = {
     6: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
 }
 
-export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo}
+export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey}

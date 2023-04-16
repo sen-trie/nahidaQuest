@@ -2583,17 +2583,21 @@ input:checked + .slider:before {
 }
 
 .exped-container {
-    width: 50%;
+    width: 30%;
     height: 100%;
     gap: 2%;
     box-sizing: border-box;
     flex-wrap: wrap;
     align-content: center;
     border-right: 0.2em solid rgb(139, 133, 124);
+    overflow-y: auto;
+    padding: 1%;
+    box-sizing: border-box;
+    align-content: flex-start;
 }
 
 .enemy-head {
-    max-width: 25%;
+    max-width: 42%;
     height: auto;
     border: 0.15em solid #826147;
     border-radius: 1em;
@@ -2601,12 +2605,40 @@ input:checked + .slider:before {
 }
 
 .exped-loot {
-    width: 50%;
+    width: 70%;
     height: 100%;
     text-align: left;
     padding: 1%;
     box-sizing: border-box;
     align-items: flex-start;
+}
+
+.inv-div {
+    flex-grow: 1;
+    width: 100%;
+    overflow-y: auto;
+    gap: 2%;
+    padding: 1%;
+    box-sizing: border-box;
+    justify-content: flex-start;
+}
+
+.inv-div > div {
+    height: 100%;
+    aspect-ratio: 0.70;
+    flex-direction: column-reverse;
+}
+
+.inv-div > div > :first-child {
+    height: 20%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.inv-div > div > :nth-child(2) {
+    width: 100%;
+    flex-grow: 1;
+    object-fit: contain;
 }
 
 .after-icon {

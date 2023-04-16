@@ -1,5 +1,5 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
-import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo } from "./modules/dictData.js"
+import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey } from "./modules/dictData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
@@ -245,38 +245,6 @@ let activeLeader;
 
 let bountyObject = {};
 const upgradeThreshold = [0,0,64,113,160];
-const charLoreObj = {
-    0:{Name:"Nahida",     Desc:"20%+ HP in Combat"},
-    1:{Name:"Paimon",     Desc:"10%+ Energy Refund"},
-    2:{Name:"Venti",      Desc:"20%+ Combo Damage"},
-    3:{Name:"Zhongli",    Desc:"15%+ Skill Healing"},
-    4:{Name:"Ei",         Desc:"35%+ Counter DMG"},
-}
-const imgKey = {
-    1:{Left:"76",   Top:"24",   Level:10,   Wave:[],                Heads:[]},
-    2:{Left:"85",   Top:"9",    Level:1,    Wave:[1,2,5],           Heads:[1,2]},
-    3:{Left:"59",   Top:"19",   Level:1,    Wave:[1,2,3,4,5],       Heads:[1,2,3]},
-    4:{Left:"64",   Top:"49",   Level:1,    Wave:[1,3,4],           Heads:[1,3]},
-    5:{Left:"40",   Top:"48",   Level:1,    Wave:[3,4,6],           Heads:[3,4]},
-    6:{Left:"46",   Top:"61",   Level:2,    Wave:[1,2,7],           Heads:[4,5]},
-    7:{Left:"80",   Top:"59",   Level:2,    Wave:[1,2,5,6],         Heads:[5,9]},
-    8:{Left:"77",   Top:"40",   Level:2,    Wave:[3,4],             Heads:[6,7]},
-    9:{Left:"52",   Top:"50",   Level:2,    Wave:[4,5,6],           Heads:[6,9]},
-    10:{Left:"70",   Top:"47",  Level:3,    Wave:[1,2],             Heads:[5,14]},
-    11:{Left:"64",   Top:"35",  Level:3,    Wave:[2,5,6],           Heads:[3,8,14]},
-    12:{Left:"22",  Top:"68",   Level:3,    Wave:[5,6,7],           Heads:[3,8,10]},
-    13:{Left:"31",  Top:"26",   Level:3,    Wave:[3,4],             Heads:[6,7]},
-    14:{Left:"20",  Top:"32",   Level:4,    Wave:[2,3,5],           Heads:[8,12,19]},
-    15:{Left:"51",  Top:"18",   Level:4,    Wave:[1],               Heads:[11,13]},
-    16:{Left:"88",  Top:"45",   Level:4,    Wave:[2,3,5],           Heads:[19,12]},
-    17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,3,4,5,6,7,8], Heads:[15,16,17,18,20]},
-    // 18:{Left:"53",  Top:"38",   Level:12,    Scene:["1-A-1","1-A-2","1-C-2"]},
-    // 19:{Left:"80",  Top:"18",   Level:12,    Scene:["1-C-2","1-C-3"]},
-    // 20:{Left:"77",  Top:"53",   Level:12,    Scene:["1-C-1","1-C-2","2-C-2"]},
-    // 21:{Left:"33",  Top:"82",   Level:12,    Scene:["3-C-2","3-C-3","2-A-1","2-C-4"]},
-    // 22:{Left:"44",  Top:"71",   Level:12,    Scene:["3-C-1","3-C-2","3-C-4","2-C-3"]},
-    // 23:{Left:"55",  Top:"21",   Level:12,    Scene:["3-A-1"]},
-}
 
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");

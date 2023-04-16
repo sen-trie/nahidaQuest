@@ -1,5 +1,5 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
-import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo } from "./modules/dictData.js"
+import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey } from "./modules/dictData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
@@ -246,38 +246,6 @@ let activeLeader;
 
 let bountyObject = {};
 const upgradeThreshold = [0,0,64,113,160];
-const charLoreObj = {
-    0:{Name:"Nahida",     Desc:"20%+ HP in Combat"},
-    1:{Name:"Paimon",     Desc:"10%+ Energy Refund"},
-    2:{Name:"Venti",      Desc:"20%+ Combo Damage"},
-    3:{Name:"Zhongli",    Desc:"15%+ Skill Healing"},
-    4:{Name:"Ei",         Desc:"35%+ Counter DMG"},
-}
-const imgKey = {
-    1:{Left:"76",   Top:"24",   Level:10,   Wave:[],                Heads:[]},
-    2:{Left:"85",   Top:"9",    Level:1,    Wave:[1,2,5],           Heads:[1,2]},
-    3:{Left:"59",   Top:"19",   Level:1,    Wave:[1,2,3,4,5],       Heads:[1,2,3]},
-    4:{Left:"64",   Top:"49",   Level:1,    Wave:[1,3,4],           Heads:[1,3]},
-    5:{Left:"40",   Top:"48",   Level:1,    Wave:[3,4,6],           Heads:[3,4]},
-    6:{Left:"46",   Top:"61",   Level:2,    Wave:[1,2,7],           Heads:[4,5]},
-    7:{Left:"80",   Top:"59",   Level:2,    Wave:[1,2,5,6],         Heads:[5,9]},
-    8:{Left:"77",   Top:"40",   Level:2,    Wave:[3,4],             Heads:[6,7]},
-    9:{Left:"52",   Top:"50",   Level:2,    Wave:[4,5,6],           Heads:[6,9]},
-    10:{Left:"70",   Top:"47",  Level:3,    Wave:[1,2],             Heads:[5,14]},
-    11:{Left:"64",   Top:"35",  Level:3,    Wave:[2,5,6],           Heads:[3,8,14]},
-    12:{Left:"22",  Top:"68",   Level:3,    Wave:[5,6,7],           Heads:[3,8,10]},
-    13:{Left:"31",  Top:"26",   Level:3,    Wave:[3,4],             Heads:[6,7]},
-    14:{Left:"20",  Top:"32",   Level:4,    Wave:[2,3,5],           Heads:[8,12,19]},
-    15:{Left:"51",  Top:"18",   Level:4,    Wave:[1],               Heads:[11,13]},
-    16:{Left:"88",  Top:"45",   Level:4,    Wave:[2,3,5],           Heads:[19,12]},
-    17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,3,4,5,6,7,8], Heads:[15,16,17,18,20]},
-    18:{Left:"53",  Top:"38",   Level:12,    Scene:["1-A-1","1-A-2","1-C-2"]},
-    19:{Left:"80",  Top:"18",   Level:12,    Scene:["1-C-2","1-C-3"]},
-    20:{Left:"77",  Top:"53",   Level:12,    Scene:["1-C-1","1-C-2","2-C-2"]},
-    21:{Left:"33",  Top:"82",   Level:12,    Scene:["3-C-2","3-C-3","2-A-1","2-C-4"]},
-    22:{Left:"44",  Top:"71",   Level:12,    Scene:["3-C-1","3-C-2","3-C-4","2-C-3"]},
-    23:{Left:"55",  Top:"21",   Level:12,    Scene:["3-A-1"]},
-}
 
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");
@@ -3600,7 +3568,7 @@ function createGuild() {
         rankText.innerText = i;
         rankButton.append(rankImg,rankText);
 
-        if (advDict.rankDict[i].Locked == true) {
+        if (advDict.adventureRank < i && advDict.rankDict[i].Locked == true) {
             let rankIco = new Image();
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/lock.webp";
@@ -3611,6 +3579,7 @@ function createGuild() {
             rankIco.src = "./assets/icon/tick.webp";
             rankButton.append(rankIco);
         } else {
+            advDict.rankDict[i].Locked = "unclaimed";
             notifPop("add","rank",i);
         }
         
@@ -3884,11 +3853,11 @@ function clearExped() {
     }
 }
 
-const waveLoot = ["(Recommended Level: 1) \n\n Lvl 1-2. Artifacts & Weapons \n Lvl 2.   XP Books \n Lvl 1-2. Food",
-                  "(Recommended Level: 4) \n\n Lvl 1-3. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 1-3. Food",
-                  "(Recommended Level: 7) \n\n Lvl 2-4. Artifacts & Weapons \n Lvl 2-3. XP Books \n Lvl 2-4. Talents",
-                  "(Recommended Level: 10) \n\n Lvl 2-4. Artifacts & Weapons \n Lvl 2-4. XP Books \n Lvl 3-5. Gems",
-                  "(Recommended Level: 15) \n\n Lvl 4-5. Artifacts & Weapons \n Lvl 4.   XP Books \n Lvl 4-5. Gems & Talents"]
+const waveLoot = ["<span style='font-size:1.2em'>Recommended Level: 1</span>  <br> Potential Rewards: <br> [container]",
+                  "<span style='font-size:1.2em'>Recommended Level: 4</span>  <br> Potential Rewards: <br> [container]",
+                  "<span style='font-size:1.2em'>Recommended Level: 7</span>  <br> Potential Rewards: <br> [container]",
+                  "<span style='font-size:1.2em'>Recommended Level: 10</span> <br> Potential Rewards  <br> [container]",
+                  "<span style='font-size:1.2em'>Recommended Level: 15</span> <br> Potential Rewards: <br> [container]"]
 
 function expedInfo(butId) {
     let expedRow1 = document.getElementById("exped-text");
@@ -3940,7 +3909,25 @@ function expedInfo(butId) {
             img.src = `./assets/expedbg/heads/${heads[j]}.webp`;
             enemyInfo.appendChild(img);
         }
-        lootInfo.innerText = `${waveLoot[level-1]}`;
+
+        let lootHTML = waveLoot[level-1];
+        let lootTable = imgKey[id].Loot;
+        let invDiv = document.createElement("div");
+        invDiv.classList.add("inv-div","flex-row");
+        for (let key in lootTable) {
+            let lootDiv = document.createElement("div");
+            lootDiv.classList.add('flex-column');
+            let img = new Image();
+            img.src = `./assets/tooltips/elements/${key}.webp`;
+            let star = new Image();
+            star.src = `./assets/frames/star-${lootTable[key]}.webp`;
+
+            lootDiv.append(star,img);
+            invDiv.appendChild(lootDiv);
+        }
+        lootHTML = lootHTML.replace('[container]',invDiv.outerHTML);
+        lootInfo.innerHTML= `${lootHTML}`;
+
         expedImg.src = `./assets/expedbg/header/${id}.webp`;
         expedRow2.style.borderBottom = "0.2em solid #8B857C";
         enemyInfo.style.borderRight = "0.2em solid #8B857C";
@@ -4642,6 +4629,7 @@ function triggerFight() {
                             canvas.brightness  = 0;
                             canvas.style.transform = ``;
                             canvas.style.filter = `brightness(0)`;
+                            loseHP(mobHealth.atk,"inverse");
                         } else {
                             mobDiv.children[0].classList.add("damaged");
                             setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},animationTime * 150);
@@ -4650,7 +4638,6 @@ function triggerFight() {
                         if (mobDiv.children[0].children[0]) {
                             mobHealth.health -= (currentATK);
                             mobDiv.children[0].children[0].remove();
-                            loseHP(mobHealth.atk * 2,"inverse");
                         }
 
                         parrySuccess.load();
@@ -4713,6 +4700,7 @@ function loseHP(ATK,type) {
     } else {
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
+        comboHandler("reset");
     }
 
     healthBar.style.width = `${healthBar.currentWidth}%`;
@@ -4908,7 +4896,7 @@ function loseAdventure() {
     })
 
     let adventureVideo = document.getElementById("adventure-video");
-    let targetElements = adventureVideo.querySelectorAll('.atk-indicator');
+    let targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator');
     let len = targetElements.length;
     for (let i = 0; i < len; i++) {
         targetElements[i].remove();
