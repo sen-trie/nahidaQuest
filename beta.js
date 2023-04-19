@@ -3853,11 +3853,11 @@ function clearExped() {
     }
 }
 
-const waveLoot = ["<span style='font-size:1.2em'>Recommended Level: 1</span>  <br> Potential Rewards: <br> [container]",
-                  "<span style='font-size:1.2em'>Recommended Level: 4</span>  <br> Potential Rewards: <br> [container]",
-                  "<span style='font-size:1.2em'>Recommended Level: 7</span>  <br> Potential Rewards: <br> [container]",
-                  "<span style='font-size:1.2em'>Recommended Level: 10</span> <br> Potential Rewards  <br> [container]",
-                  "<span style='font-size:1.2em'>Recommended Level: 15</span> <br> Potential Rewards: <br> [container]"]
+const waveLoot = ["<span style='font-size:1.2em'>Recommended Level: 1</span>  <br> Max Potential Rewards: <br> [container]",
+                  "<span style='font-size:1.2em'>Recommended Level: 4</span>  <br> Max Potential Rewards: <br> [container]",
+                  "<span style='font-size:1.2em'>Recommended Level: 7</span>  <br> Max Potential Rewards: <br> [container]",
+                  "<span style='font-size:1.2em'>Recommended Level: 10</span> <br> Max Potential Rewards  <br> [container]",
+                  "<span style='font-size:1.2em'>Recommended Level: 15</span> <br> Max Potential Rewards: <br> [container]"]
 
 function expedInfo(butId) {
     let expedRow1 = document.getElementById("exped-text");
@@ -3877,11 +3877,6 @@ function expedInfo(butId) {
         // Current HP: ${5 + Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;margin-right:10%' src=./assets/icon/health.webp>
         // Current ATK: ${10 + 3 * Math.floor(advDict.adventureRank / 2)} <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>
         expedRow2.innerHTML = textHTML;
-
-        
-
-
-
     } else if (level >= 8 && level <= 11) {
         expedRow1.innerHTML =  `<p>${expeditionDictInfo[level]["Text"]}</p>`;
         expedRow2.innerHTML = expeditionDictInfo[level]["Lore"];
@@ -3914,19 +3909,46 @@ function expedInfo(butId) {
         let lootTable = imgKey[id].Loot;
         let invDiv = document.createElement("div");
         invDiv.classList.add("inv-div","flex-row");
+        invDiv.activeInfo = null;
+        invDiv.activeImg = null;
         for (let key in lootTable) {
             let lootDiv = document.createElement("div");
             lootDiv.classList.add('flex-column');
             let img = new Image();
-            img.src = `./assets/tooltips/elements/${key}.webp`;
+            img.src = `./assets/expedbg/loot/${key}.webp`;
+            img.addEventListener("click",()=>{
+                let popUpLoot = document.createElement("div");
+                popUpLoot.classList.add("flex-column",'pop-up-loot');
+                popUpLoot.innerText = lootTable[key][1];
+
+                if (invDiv.activeInfo != null) {
+                    if (invDiv.activeInfo.outerHTML == popUpLoot.outerHTML) {
+                        invDiv.activeInfo.remove();
+                        invDiv.activeInfo = null;
+    
+                        invDiv.activeImg.style.filter = "none";
+                        invDiv.activeImg = null;
+                        return
+                    } else {
+                        invDiv.activeImg.style.filter = "none";
+                        invDiv.activeInfo.remove();
+                    }
+                }
+
+                img.style.filter = "brightness(0.1)";
+                invDiv.activeImg = img;
+                lootDiv.appendChild(popUpLoot);
+                invDiv.activeInfo = popUpLoot;
+            })
             let star = new Image();
-            star.src = `./assets/frames/star-${lootTable[key]}.webp`;
+            star.src = `./assets/frames/star-${lootTable[key][0]}.webp`;
 
             lootDiv.append(star,img);
             invDiv.appendChild(lootDiv);
         }
-        lootHTML = lootHTML.replace('[container]',invDiv.outerHTML);
-        lootInfo.innerHTML= `${lootHTML}`;
+        lootHTML = lootHTML.replace('[container]','');
+        lootInfo.innerHTML = `${lootHTML}`;
+        lootInfo.appendChild(invDiv)
 
         expedImg.src = `./assets/expedbg/header/${id}.webp`;
         expedRow2.style.borderBottom = "0.2em solid #8B857C";
@@ -3964,7 +3986,7 @@ function createExpMap() {
     expedXPBar.classList.add("xpbar-bar","cover-all");
     let expedXPInfo = document.createElement("p");
     expedXPInfo.id = "exped-xp";
-    expedXPInfo.innerText = `Level ${advDict.adventureRank} (${advDict.advXP}/${expedXPBar.maxXP} XP)`;
+    expedXPInfo.innerText = `Rank ${advDict.adventureRank} (${advDict.advXP}/${expedXPBar.maxXP} XP)`;
     expedXPInfo.classList.add("flex-row");
     expedXP.append(expedXPBar,expedXPInfo);
 
@@ -4478,13 +4500,30 @@ function triggerFight() {
         normalAtkCooldown.maxAmount = 1;
         normalAtkCooldown.style.width = `${normalAtkCooldown.amount}%`
         adventureAtkCooldown.appendChild(normalAtkCooldown);
-
-        let amountInterval = 0.3;
+        let amountInterval = 0.2;
         if (i == 0) {
-            amountInterval *= 3;
+            amountInterval *= 4;
             normalAtkCooldown.maxAmount = 2;
+            if (!advDict.rankDict[9].Locked) {
+                normalAtkCooldown.maxAmount = 3;
+            }
+
+            if (!advDict.rankDict[2].Locked) {
+                normalAtkCooldown.amount = 100 * normalAtkCooldown.maxAmount;
+            }
+        } else if (i == 1) {
+            if (advDict.rankDict[5].Locked) {
+                advImage.classList.add('dim-filter')
+                continue;
+            }
         } else if (i == 2) {
-            amountInterval = 0;
+            if (advDict.rankDict[10].Locked) {
+                advImage.classList.add('dim-filter')
+                continue;
+            } else {
+                amountInterval = 0;
+            }
+            
         }
 
         for (let i=0; i < normalAtkCooldown.maxAmount; i++) {
@@ -4588,7 +4627,7 @@ function triggerFight() {
                     previousTime = currentTime - (deltaTime % interval);
                     canvas.brightness += brightnessIncrement;
                     if (canvas.attackState) {
-                        loseHP(mobHealth.atk,"normal");
+                        // loseHP(mobHealth.atk,"normal",mobHealth.class);
                         canvas.attackState = false;
                     }
 
@@ -4643,16 +4682,20 @@ function triggerFight() {
                         parrySuccess.load();
                         parrySuccess.play();
                         comboHandler("add");
-                        let cooldown = document.getElementById('adventure-cooldown-3');
-                        cooldown.amount += 25;
+                        if (!advDict.rankDict[10].Locked) {
+                            let cooldown = document.getElementById('adventure-cooldown-3');
+                            cooldown.amount += 25;
+                        }
                     } else {
                         mobDiv.children[0].classList.add("damaged");
                         setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},animationTime * 150);
                         parryFailure.load();
                         parryFailure.play();
                         comboHandler("reset");
-                        let cooldown = document.getElementById('adventure-cooldown-3');
-                        cooldown.amount += 10;
+                        if (!advDict.rankDict[10].Locked) {
+                            let cooldown = document.getElementById('adventure-cooldown-3');
+                            cooldown.amount += 10;
+                        }
                     }
 
                     let cooldown = document.getElementById('adventure-cooldown-1');
@@ -4689,7 +4732,7 @@ function triggerFight() {
     }
 }
 
-function loseHP(ATK,type) {
+function loseHP(ATK,type,mobClass) {
     if (!fightSceneOn) {return}
     let healthBar = document.getElementById('health-bar');
     let hpInterval = (100/healthBar.maxHealth);
@@ -4700,7 +4743,10 @@ function loseHP(ATK,type) {
     } else {
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
-        comboHandler("reset");
+
+        if (mobClass != "Superboss") {
+            comboHandler("reset");
+        }
     }
 
     healthBar.style.width = `${healthBar.currentWidth}%`;
@@ -4777,6 +4823,8 @@ function dodgeOn(type,parentEle) {
 
 function skillUse() {
     if (!fightSceneOn) {return}
+    if (advDict.rankDict[5].Locked) {return}
+
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
     let cooldown = document.getElementById('adventure-cooldown-2');
@@ -4822,8 +4870,10 @@ function skillUse() {
 }
 
 function attackAll(adventureFightBurst) {
-    let currentATK = 10 + 3 * Math.floor(advDict.adventureRank / 2);
     if (!fightSceneOn) {return}
+    if (!advDict.rankDict[10].Locked) {return}
+
+    let currentATK = 10 + 3 * Math.floor(advDict.adventureRank / 2);
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
     let cooldownTime;
