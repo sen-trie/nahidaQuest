@@ -2477,9 +2477,9 @@ input:checked + .slider:before {
 
 .exped-mesg-div > p {
     color: white;
-    background-color: #000000e3;
+    background-color: #000000d5;
     box-sizing: border-box;
-    padding: 3%;
+    padding: 5%;
     border-radius: 0.2em;
     white-space: nowrap;
     justify-content: flex-start;
@@ -2653,16 +2653,19 @@ input:checked + .slider:before {
 }
 
 .pop-up-loot {
+    z-index: 2;
     position: absolute;
-    top: 37.5%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     font-size: 0.8em;
     pointer-events: none;
     color: #cfc0ac;
-    filter: drop-shadow(0 0 0.2em black) drop-shadow(0 0 0.1em black);
     white-space: nowrap;
+    padding: 5%;
+    background-color: #000000ee;
+    border-radius: 0.5em;
 }
 
 .after-icon {
@@ -3094,6 +3097,7 @@ input:checked + .slider:before {
     background-repeat: no-repeat;
     background-position: center;
     column-gap: 0.5%;
+    overflow: hidden;
 }
 
 .adventure-scara-health {
@@ -3177,6 +3181,29 @@ input:checked + .slider:before {
     background-position: center;
     background-size: contain;
     background-repeat: no-repeat;
+}
+
+.battle-text {
+    position: absolute;
+    left: 20%;
+    bottom: 25%;
+    object-fit: contain;
+    height: 10%;
+    width: 60%;
+    filter: drop-shadow(0 0 0.2em black);
+    animation: battle-text 0.6s linear forwards;
+    pointer-events: none;
+}
+
+@keyframes battle-text {
+    15% { transform:translateY(0%); }
+    30% { transform:translateY(-35%); }
+    45% { transform:translateY(-15%); }
+    65% { transform:translateY(0%); }
+    80% { transform:translateY(-15%); }
+    90% { transform:translateY(0); }
+    95% { transform:translateY(-5%); }
+    100% { transform:translateY(0); }
 }
 
 .atk-indicator {
@@ -3264,6 +3291,7 @@ input:checked + .slider:before {
     width: 40%;
     height: 40%;
     flex-wrap: wrap;
+    color: #322a24;
 }
 
 .skill-mark {
@@ -3312,14 +3340,27 @@ input:checked + .slider:before {
 }
 
 .adventure-fight {
+    display: flex;
     z-index: 502;
     height: 100%;
     justify-content: space-around;
+    align-items: flex-start;
     aspect-ratio: 1.88;
+    flex-wrap: wrap;
+    padding: 1%;
+    box-sizing: border-box;
+}
+
+.adventure-fight > p {
+    position: relative;
+    width: 100%;
+    aspect-ratio: unset;
+    height: 30%;
 }
 
 .fight-button, .fight-button-scara {
     width: 25%;
+    max-height: 45%;
     aspect-ratio: 1;
     background-position: center;
     background-size: contain;
@@ -3437,6 +3478,82 @@ input:checked + .slider:before {
         transform: scaleX(1);
         opacity: 1;
     }
+}
+
+#quicktime-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.95);
+    animation: slide-out-bottom 0.1s linear reverse;
+}
+
+.quicktime-bar {
+    aspect-ratio: 7.15;
+    width: 95%;
+    position: relative;
+    overflow: hidden;
+}
+
+.quicktime-img {
+    position: absolute;
+    transition: 0.05s ease;
+    object-fit: contain;
+    width: 10%;
+}
+
+.text-overlay {
+    z-index: 600;
+    background-color: #F7F1E6;
+    height: 95%;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.text-overlay > p {
+    width: 100%;
+    height: 30%;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.text-overlay > img {
+    height: 50%;
+    width: auto;
+    aspect-ratio: 1;
+    position: relative;
+    top: -5%;
+    transition: 0.4s ease;
+}
+
+@keyframes puffOut {
+    0% {
+        transform: scale(1);
+        filter: blur(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        filter: blur(0.5em);
+        opacity: 0;
+    }
+}
+
+.text-overlay > img:hover {
+    transform: scale(1.1);
+}
+
+.quicktime-warning {
+    position: absolute;
+    top: 2%;
+    width: auto;
+    height: 20%;
+    object-fit: contain;
+    animation: vignette-animation 1s 3 linear forwards;
+    pointer-events: none;
 }
 
 /*/////////////////////////////// WISH (TABLE4) CSS ///////////////////////////////*/

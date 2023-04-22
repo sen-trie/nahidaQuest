@@ -3223,8 +3223,8 @@ function adventure(advType) {
             } else {
                 currencyPopUp("items");
             }
-            gainXP(15)
             drawAdventure(type,wave);
+            if (activeLeader == "Paimon") {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.1)}
         } else {
             weaselDecoy.load();
             weaselDecoy.play();
@@ -3366,8 +3366,14 @@ function createAdventure() {
 
     let adventureFight = document.createElement("div");
     adventureFight.id = "adventure-fight";
-    adventureFight.classList.add("flex-row","adventure-fight");
+    adventureFight.classList.add("adventure-fight");
     adventureFight.style.display = "none";
+
+    let fightTextbox = document.createElement("p");
+    fightTextbox.classList.add("flex-column")
+    fightTextbox.id = "fight-text";
+    fightTextbox.innerText = "Prepare for a fight!";
+
     let adventureFightDodge = document.createElement("div");
     let adventureFightDodgeImg = new Image();
     adventureFightDodgeImg.src = "./assets/expedbg/battle1.webp";
@@ -3404,7 +3410,7 @@ function createAdventure() {
         }
     })
 
-    adventureFight.append(adventureFightDodge,adventureFightSkill,adventureFightBurst);
+    adventureFight.append(fightTextbox,adventureFightDodge,adventureFightSkill,adventureFightBurst);
     adventureFight.style.display = "none";
     adventureChoiceOne.addEventListener("click",()=>{
         triggerFight();
@@ -3586,7 +3592,7 @@ function createGuild() {
         rankButton.addEventListener("click",()=>{
             let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:1%;white-space: nowrap;' class='flex-row'>
                                                           +1 HP <img style="height: 100%;margin-right:10%" src=./assets/icon/health.webp> 
-                                                          +2 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>          
+                                                          +6 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>          
             </div>`);
             loreHTML = loreHTML.replaceAll("[s]",`<span style='color:#A97803'>`)
             loreHTML = loreHTML.replaceAll("[/s]",`</span>`)
@@ -3928,7 +3934,7 @@ function expedInfo(butId) {
     
                         invDiv.activeImg.style.filter = "none";
                         invDiv.activeImg = null;
-                        return
+                        return;
                     } else {
                         invDiv.activeImg.style.filter = "none";
                         invDiv.activeInfo.remove();
@@ -4327,9 +4333,14 @@ function unlockExpedition(i,expeditionDict) {
 }
 
 // ADVENTURE PROCESS
+let quickType;
 let adventureScene = false;
 let adventureScaraText = "";
+let maxEnemyAmount = 0;
 let enemyAmount = 0;
+let quicktimeAttack = false;
+let skillCooldownReset;
+
 function drawAdventure(advType,wave) {
     adventureScaraText = "";
     if (adventureScene) {return}
@@ -4343,8 +4354,15 @@ function drawAdventure(advType,wave) {
         element.remove();
     });
 
+    if (advType >= 3 && advType < 6) {
+        quickType = enemyInfo.quicktimeDict[advType];
+    } else {
+        quickType = undefined;
+    }
+    
     let waveType = enemyInfo[`${advType}-Wave-${wave}`];
     enemyAmount = waveType.Wave.length;
+    maxEnemyAmount = waveType.Wave.length;
     let imageGif = document.getElementById("adventure-gif");
     let adventureFightImg = document.getElementById("adventure-fight").children;
     if (adventureScaraText) {imageGif.src = `./assets/expedbg/exped${adventureScaraText}.webp`};
@@ -4367,7 +4385,7 @@ function drawAdventure(advType,wave) {
     function textFadeIn() {
         adventureTextBox.style.animation = "";
         let adventureHeading = document.getElementById("adventure-header");
-        adventureHeading.innerText = "You encounter a bunch of hostile fungi.";
+        adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
         adventureHeading.style.animation = "fadeOut 1.4s ease-out reverse";
         adventureTextBox.removeEventListener("animationend", textFadeIn);
     }
@@ -4406,9 +4424,9 @@ function comboHandler(type,ele) {
     }
 }
 
-function spawnMob(adventureVideo,waveType) {
-    for (let i = 0; i < waveType.length; i++) {
-        let singleEnemyInfo = enemyInfo[waveType[i]];
+function spawnMob(adventureVideo,waveInfo) {
+    for (let i = 0; i < waveInfo.length; i++) {
+        let singleEnemyInfo = enemyInfo[waveInfo[i]];
         let mobDiv = document.createElement("div");
         let mobImg =  document.createElement("div");
         mobImg.classList.add("enemyImg");
@@ -4426,13 +4444,21 @@ function spawnMob(adventureVideo,waveType) {
 }
 
 let fightSceneOn = false;
+let pheonixMode = false;
 function triggerFight() {
     if (!adventureScene) {return}
     fightSceneOn = true;
-    let currentATK = 10 + 3 * Math.floor(advDict.adventureRank / 2);
+    skillCooldownReset = false;
+    if (!advDict.rankDict[20].Locked) {
+        pheonixMode = true;
+    } else {
+        pheonixMode = false;
+    }
 
+    let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
+    adventureVideo.quicktime = 0;
     let adventureVideoChildren = adventureVideo.children;
     let currentSong;
     if (adventureScaraText) {
@@ -4456,12 +4482,11 @@ function triggerFight() {
         fightBgmElement.play();
       });
 
-
     let healthDiv = document.getElementById("adventure-health");
     healthDiv.style.opacity = 1;
     let healthBar = document.getElementById("health-bar");
-    healthBar.maxHealth = 5 + Math.floor(advDict.adventureRank / 2);
-    if (activeLeader == "Nahida") {healthBar.maxHealth = Math.round(1.2 * healthBar.maxHealth)}
+    healthBar.maxHealth = 5 + Math.floor(advDict.adventureRank / 4);
+    if (activeLeader == "Nahida") {healthBar.maxHealth = Math.ceil(1.2 * healthBar.maxHealth)}
     healthBar.currentWidth = 100;
     healthBar.classList.add("adventure-health");
     healthBar.style.width = "100%";
@@ -4484,10 +4509,10 @@ function triggerFight() {
     }
 
     let adventureFightImg = document.getElementById("adventure-fight").children;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 1; i < 4; i++) {
         let advImage = adventureFightImg[i].children[0];
-        advImage.src = `./assets/expedbg/battle${adventureScaraText}${i+1}.webp`;
-        advImage.id = `adventure-image-${i+1}`;
+        advImage.src = `./assets/expedbg/battle${adventureScaraText}${i}.webp`;
+        advImage.id = `adventure-image-${i}`;
         if (advImage.classList.contains('dim-filter')) {advImage.classList.remove('dim-filter')}
 
         let adventureAtkCooldown = document.createElement("div");
@@ -4495,15 +4520,19 @@ function triggerFight() {
 
         let normalAtkCooldown = document.createElement("div");
         normalAtkCooldown.classList.add(`inner-cooldown${adventureScaraText}`);
-        normalAtkCooldown.id = `adventure-cooldown-${i+1}`;
+        normalAtkCooldown.id = `adventure-cooldown-${i}`;
         normalAtkCooldown.amount = 0;
         normalAtkCooldown.maxAmount = 1;
         normalAtkCooldown.style.width = `${normalAtkCooldown.amount}%`
         adventureAtkCooldown.appendChild(normalAtkCooldown);
         let amountInterval = 0.2;
-        if (i == 0) {
+        if (i == 1) {
             amountInterval *= 4;
             normalAtkCooldown.maxAmount = 2;
+            if (!advDict.rankDict[13].Locked) {
+                amountInterval *= 1.1;
+            }
+
             if (!advDict.rankDict[9].Locked) {
                 normalAtkCooldown.maxAmount = 3;
             }
@@ -4511,22 +4540,22 @@ function triggerFight() {
             if (!advDict.rankDict[2].Locked) {
                 normalAtkCooldown.amount = 100 * normalAtkCooldown.maxAmount;
             }
-        } else if (i == 1) {
+        } else if (i == 2) {
+            amountInterval *= 0.75;
             if (advDict.rankDict[5].Locked) {
-                advImage.classList.add('dim-filter')
+                advImage.classList.add('dim-filter');
                 continue;
             }
-        } else if (i == 2) {
+        } else if (i == 3) {
             if (advDict.rankDict[10].Locked) {
-                advImage.classList.add('dim-filter')
+                advImage.classList.add('dim-filter');
                 continue;
             } else {
                 amountInterval = 0;
             }
-            
         }
 
-        for (let i=0; i < normalAtkCooldown.maxAmount; i++) {
+        for (let j = 0; j < normalAtkCooldown.maxAmount; j++) {
             let barBit = document.createElement("div");
             barBit.classList.add(`cooldown-bit${adventureScaraText}`);
             adventureAtkCooldown.appendChild(barBit)
@@ -4548,7 +4577,10 @@ function triggerFight() {
           
             if (deltaTime > interval) {
                 previousTime = currentTime - (deltaTime % interval);
-                normalAtkCooldown.amount += amountInterval;
+                if (!quicktimeAttack) {
+                    normalAtkCooldown.amount += amountInterval;
+                }
+                
                 normalAtkCooldown.style.width = `${normalAtkCooldown.amount / (normalAtkCooldown.maxAmount)}%`
 
                 if (normalAtkCooldown.amount > 100) {
@@ -4623,11 +4655,32 @@ function triggerFight() {
                 currentTime = timestamp;
                 deltaTime = currentTime - previousTime;
               
+                // ATTACKS ARE FASTER WHEN MORE ENEMIES ARE DOWN
                 if (deltaTime > interval) {
                     previousTime = currentTime - (deltaTime % interval);
-                    canvas.brightness += brightnessIncrement;
+                    let speedUpFactor = 1 + (maxEnemyAmount - enemyAmount) * 0.75;
+                    if (!quicktimeAttack) {
+                        canvas.brightness += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
+                        adventureVideo.quicktime += (brightnessIncrement * speedUpFactor);
+                        quicktimeCheck();
+                    }
+
                     if (canvas.attackState) {
-                        // loseHP(mobHealth.atk,"normal",mobHealth.class);
+                        let evadeRoll = randomInteger(1,101);
+                        let evadeMax = 101;
+                        if (!advDict.rankDict[19].Locked) {
+                            evadeMax = 15;
+                        } else if (!advDict.rankDict[13].Locked) {
+                            evadeMax = 10;
+                        } else if (!advDict.rankDict[6].Locked) {
+                            evadeMax = 5;
+                        }
+
+                        if (evadeRoll <= evadeMax) {
+                            createBattleText("dodge",animationTime * 150 * 2,mobDiv)
+                        } else {
+                            loseHP(mobHealth.atk,"normal",mobHealth.class);
+                        }
                         canvas.attackState = false;
                     }
 
@@ -4656,6 +4709,7 @@ function triggerFight() {
         mobDiv.children[0].addEventListener("click",()=>{
             if (!fightSceneOn) {return}
             if (mobHealth.dead) {return}
+            if (quicktimeAttack) {return}
             if (mobDiv.children[3] != undefined) {
                 if (mobDiv.children[3].id === "select-indicator") {
                     if (canvas.classList.contains("attack-ready")) {
@@ -4663,9 +4717,12 @@ function triggerFight() {
                             canvas.attackState = false;
                             canvas.classList.remove("attack-ready");
                             mobDiv.children[0].classList.add("staggered");
-                            setTimeout(()=>{mobDiv.children[0].classList.remove("staggered")},animationTime * 150);
+                            createBattleText("counter",animationTime * 150 * 2,mobDiv)
+                            setTimeout(()=>{
+                                mobDiv.children[0].classList.remove("staggered");
+                            },animationTime * 150);
 
-                            canvas.brightness  = 0;
+                            canvas.brightness = 0;
                             canvas.style.transform = ``;
                             canvas.style.filter = `brightness(0)`;
                             loseHP(mobHealth.atk,"inverse");
@@ -4730,6 +4787,160 @@ function triggerFight() {
         })
         mobDiv.append(mobHealth,canvas);
     }
+
+    function quicktimeCheck() {
+        if (adventureVideo.quicktime >= (2.5 * maxEnemyAmount)) {
+            if (quickType != undefined) {
+                adventureVideo.quicktime = 0;
+                if (document.getElementById('warning-quicktime')) {return}
+
+                let warningImg = new Image();
+                warningImg.id = "warning-quicktime";
+                warningImg.src = "./assets/icon/warning.webp";
+                warningImg.classList.add("quicktime-warning");
+                adventureVideo.appendChild(warningImg);
+                warningImg.onload = ()=>{
+                    warningImg.addEventListener("animationend",()=>{
+                        quicktimeEvent(quickType[randomInteger(1,Object.keys(quickType).length)]);
+                        warningImg.remove();
+                    })
+                }
+            }
+        }
+    }
+}
+
+function createBattleText(text,timer,container) {
+    let textBox = document.createElement("img");
+    textBox.classList.add("flex-column","battle-text")
+    textBox.src = `./assets/expedbg/${text}.webp`;
+    setTimeout(()=>{textBox.remove()},timer);
+    container.append(textBox);
+    return container;
+}
+
+function quicktimeEvent(waveQuicktime) {
+    if (!fightSceneOn) {return}
+    quicktimeAttack = true;
+
+    let adventureVideo = document.getElementById('adventure-video');
+    let videoOverlay = document.createElement("div");
+    videoOverlay.id = "quicktime-overlay";
+    videoOverlay.classList.add("flex-column");
+
+    let adventureText = document.getElementById('adventure-text');
+    let textOverlay = document.createElement("div");
+    textOverlay.classList.add("text-overlay","cover-all","flex-row");
+
+    let textBox = document.createElement('p');
+    textBox.innerText = "Counter with the right type at the center to avoid taking damage!";
+    textOverlay.appendChild(textBox);
+
+    let maxBeat = waveQuicktime.length;
+    let currentBeat = 0;
+    let correctBeat = 0;
+    let removeBeat = false;
+    
+    let quicktimeBar = document.createElement("div");
+    quicktimeBar.id = "quicktime-bar";
+    quicktimeBar.state = null;
+    quicktimeBar.classList.add("flex-row","quicktime-bar");
+
+    let colorArray = ["Red","Green","Blue"];
+    for (let i = 0; i < 3; i++) {
+        let img = new Image();
+        img.src = `./assets/expedbg/${colorArray[i]}.webp`;
+        img.addEventListener("click",()=>{
+            if (quicktimeBar.state == colorArray[i]) {
+                correctBeat++;
+                currentBeat++;
+                quicktimeBar.state = null;
+                removeBeat = true;
+            } else if (quicktimeBar.state == "ready"){
+                currentBeat++;
+                quicktimeBar.state = null;
+                createBattleText("miss",2000,videoOverlay);
+                removeBeat = true;
+            }
+        })
+        textOverlay.appendChild(img);
+    }
+
+    let quickImg = new Image();
+    quickImg.src = "./assets/expedbg/quicktime.webp";
+    quickImg.classList.add("cover-all");
+    createBeat();
+    
+    function createBeat() {
+        let beatImage = new Image();
+        beatImage.classList.add("quicktime-img");
+        beatImage.color = rollArray(colorArray,0);
+        beatImage.src = `./assets/expedbg/${beatImage.color}.webp`;
+        beatImage.position = 0;
+        beatImage.style.left = "100%";
+        let brightnessIncrement = waveQuicktime[currentBeat] * randomInteger(90,110) / 100;
+    
+        beatImage.onload = ()=> {
+            let frames_per_second = 60;
+            let interval = Math.floor(1000 / frames_per_second);
+            let previousTime = performance.now();
+    
+            let currentTime = 0;
+            let deltaTime = 0;
+            window.requestAnimationFrame(increaseGlow);
+            function increaseGlow(timestamp) {
+                if (!fightSceneOn) {return}
+                if (removeBeat) {
+                    removeBeat = false;
+                    beatImage.style.animation = "puffOut 0.25s linear";
+                    beatImage.addEventListener("animationend",()=>{
+                        beatImage.remove();
+                        outcomeCheck();
+                    })
+                    return;
+                }
+                
+                currentTime = timestamp;
+                deltaTime = currentTime - previousTime;
+                
+                if (deltaTime > interval) {
+                    beatImage.position += brightnessIncrement;
+                    beatImage.style.left = `${100 - beatImage.position}%`;
+                    let leftPos = parseFloat(beatImage.style.left);
+                    if (leftPos <= 52 && leftPos > 35) {
+                        quicktimeBar.state = beatImage.color;
+                    } else if (leftPos < -15) {
+                        currentBeat++;
+                        quicktimeBar.state = null;
+                        createBattleText("miss",2000,videoOverlay);
+                        outcomeCheck();
+                        return;
+                    } else {
+                        quicktimeBar.state = "ready";
+                    }
+                }
+                window.requestAnimationFrame(increaseGlow);
+            }
+        }
+        quicktimeBar.append(quickImg,beatImage);
+    }
+
+    function outcomeCheck() {
+        if (currentBeat == maxBeat) {
+            textBox.innerHTML = `You successfully countered <span style='color:#A97803'>${correctBeat}</span> out of <span style='color:#A97803'>${maxBeat}</span> ranged attacks!`;
+            setTimeout(()=>{
+                videoOverlay.remove();
+                textOverlay.remove();
+                quicktimeAttack = false;
+            },2000)
+        } else if (currentBeat < maxBeat) {
+            createBeat();
+        }
+    }
+
+    videoOverlay.append(quicktimeBar);
+    adventureVideo.appendChild(videoOverlay);
+    adventureText.appendChild(textOverlay);
 }
 
 function loseHP(ATK,type,mobClass) {
@@ -4743,19 +4954,28 @@ function loseHP(ATK,type,mobClass) {
     } else {
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
-
         if (mobClass != "Superboss") {
             comboHandler("reset");
         }
     }
 
     healthBar.style.width = `${healthBar.currentWidth}%`;
-    if (healthBar.currentWidth <= 0) {loseAdventure()}
+    if (healthBar.currentWidth <= 0) {
+        if (pheonixMode == true) {
+            pheonixMode = false;
+            healthBar.currentWidth += (hpInterval * 3);
+            createBattleText("endure",2000,document.getElementById('adventure-video'));
+            healthBar.style.width = `${healthBar.currentWidth}%`;
+        } else {
+            loseAdventure();
+        }
+    }
 }
 
 let dodgeAppearance = false;
 function dodgeOn(type,parentEle) {
     if (!fightSceneOn) {return}
+    if (quicktimeAttack) {return}
     if (type === "toggle") {
         let cooldown = document.getElementById('adventure-cooldown-1')
         if (cooldown.amount < 100) {return}
@@ -4767,7 +4987,6 @@ function dodgeOn(type,parentEle) {
                 if (mobDiv.tagName != 'DIV') {continue};
                 if (mobDiv.id == 'adventure-health') {continue};
                 if (mobDiv.children[1] == undefined) {continue};
-
                 if (mobDiv.children[3]) {
                     if (mobDiv.children[3].id == "select-indicator") {
                         mobDiv.children[3].remove();
@@ -4803,14 +5022,12 @@ function dodgeOn(type,parentEle) {
         let adventureVideo = document.getElementById("adventure-video");
         let adventureVideoChildren = adventureVideo.children;
         for (let i = 0; i < adventureVideoChildren.length; i++) {
-            let mobDiv = adventureVideoChildren[i];
-            if (mobDiv.tagName != 'DIV') {continue};
-            if (mobDiv.id == 'adventure-health') {continue};
-            if (mobDiv.children[1] == undefined) {continue};
-            if (mobDiv.children[3] == undefined) {continue};
-            if (mobDiv.children[3].id == "select-indicator") {
-                mobDiv.children[3].remove();
-                continue;
+            let mobDivChild = adventureVideoChildren[i].children;
+            for (let j = 0; j < mobDivChild.length; j++) {
+                if (mobDivChild[j].id == "select-indicator") {
+                    mobDivChild[j].remove();
+                    continue;
+                }
             }
         }
 
@@ -4824,12 +5041,29 @@ function dodgeOn(type,parentEle) {
 function skillUse() {
     if (!fightSceneOn) {return}
     if (advDict.rankDict[5].Locked) {return}
-
+    if (quicktimeAttack) {return}
+    
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
     let cooldown = document.getElementById('adventure-cooldown-2');
     if (cooldown.amount < 100) {return}
-    cooldown.amount -= 100;
+
+    let resetChance = randomInteger(1,101);
+    let resetRoll = 101;
+    if (skillCooldownReset) {
+        resetRoll = 101;
+    } else if (!advDict.rankDict[14].Locked) {
+        resetRoll = 90;
+    } else if (!advDict.rankDict[7].Locked) {
+        resetRoll = 20;
+    }
+
+    if (resetChance <= resetRoll && skillCooldownReset == false) {
+        skillCooldownReset = true;
+    } else {
+        cooldown.amount -= 100;
+        skillCooldownReset = false;
+    }
 
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         let mobDiv = adventureVideoChildren[i];
@@ -4855,14 +5089,28 @@ function skillUse() {
             let ctx = canvas.getContext("2d");
             ctx.drawImage(skillMark, 0, 0);
             let brightnessIncrement = 0.001;
-            let maxBrightness = 1;
-
             canvas.style.filter = "drop-shadow(0 0 0.2em #ADDE7D)";
-            increaseGlow();
 
-            function increaseGlow() {
+            let frames_per_second = 60;
+            let interval = Math.floor(1000 / frames_per_second);
+            let previousTime = performance.now();
+
+            let currentTime = 0;
+            let deltaTime = 0;
+
+            window.requestAnimationFrame(increaseGlow);
+            function increaseGlow(timestamp) {
                 if (!fightSceneOn) {return}
-                canvas.brightness += brightnessIncrement;
+                currentTime = timestamp;
+                deltaTime = currentTime - previousTime;
+                
+                if (deltaTime > interval) {
+                    canvas.brightness += brightnessIncrement;
+                    if (canvas.brightness > 3) {
+                        canvas.remove();
+                        return;
+                    }
+                }
                 window.requestAnimationFrame(increaseGlow);
             }
         }
@@ -4871,11 +5119,13 @@ function skillUse() {
 
 function attackAll(adventureFightBurst) {
     if (!fightSceneOn) {return}
-    if (!advDict.rankDict[10].Locked) {return}
+    if (advDict.rankDict[10].Locked) {return}
+    if (quicktimeAttack) {return}
 
-    let currentATK = 10 + 3 * Math.floor(advDict.adventureRank / 2);
+    let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
+
     let cooldownTime;
     let cooldown = document.getElementById('adventure-cooldown-3');
     if (cooldown.amount < 100) {return}
@@ -4923,7 +5173,7 @@ function attackAll(adventureFightBurst) {
         mobHealth.style.width = `${Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100}%`;
         if (mobHealth.class != "Superboss") {
             let canvas = mobDiv.children[2];
-            canvas.brightness = 0 - 0.1 * (i * randomInteger(1,adventureVideoChildren.length) - 2);
+            canvas.brightness = 0 - 0.05 * (i * randomInteger(1,adventureVideoChildren.length) - 2);
             canvas.style.transform = ``;
             canvas.style.filter = `brightness(0)`;
         }
@@ -4986,6 +5236,7 @@ function winAdventure() {
     adventureChoiceTwo.addEventListener("click",()=>{
         quitAdventure();
         charScan();
+        gainXP(15);
         document.getElementById("combo-number").remove();
         let newAdventureChoiceTwo = adventureChoiceTwo.cloneNode(true);
         adventureChoiceTwo.parentNode.replaceChild(newAdventureChoiceTwo, adventureChoiceTwo);
@@ -5623,10 +5874,8 @@ function setShop(type) {
     shopDiv.id = "shop-container";
 
     if (type === "load") {
-        for (let key in storeInventory) {
-            if (!isNaN(key)) {
-                loadShopItems(shopDiv, key, storeInventory[key]);
-            }
+        for (let i = Object.keys(storeInventory).length - 2; i > 0; i--) {
+            loadShopItems(shopDiv, i, storeInventory[i]);
         }
     } else if (type === "add") {
         storeInventory.storedTime = getTime();
@@ -5754,7 +6003,7 @@ function confirmPurchase(shopCost,id) {
 
         shopElement.load();
         shopElement.play();
-        storeInventory[parseInt(saveId)+1].Purchased = true;
+        storeInventory[parseInt(saveId)].Purchased = true;
     } else {
         dialog.innerText = "Hmph, come back when you're a little richer."
         return;
@@ -5828,8 +6077,7 @@ function loadShopItems(shopDiv, i, inventoryArray) {
     let inventoryNumber = inventoryArray.Item;
 
     let shopButton = document.createElement("div");
-    shopButton.classList.add("flex-column");
-    shopButton.classList.add("shop-button");
+    shopButton.classList.add("flex-column","shop-button");
     let inventoryTemp = Inventory[inventoryNumber];
 
     let shopButtonImage = document.createElement("img");
@@ -5856,6 +6104,8 @@ function loadShopItems(shopDiv, i, inventoryArray) {
         shopButton.addEventListener("click", function() {
             buyShop(shopButton.id,shopCost)
         })
+    } else {
+        shopButton.classList.add("purchased");
     }
     
     shopButtonImageContainer.appendChild(shopButtonImage);
