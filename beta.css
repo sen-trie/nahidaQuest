@@ -2436,10 +2436,25 @@ input:checked + .slider:before {
     position: relative;
     right: -2%;
     height: 12%;
-    object-fit: contain;
+    aspect-ratio: 1;
     width: auto;
-    filter: drop-shadow(0 0 0.2em #442e1e) drop-shadow(0 0 0.1em #3b271a);
+    background-size: contain;
+    z-index: 20;
 }
+
+.char-morale > p {
+    position: absolute;
+    bottom: 115%;
+    filter: none;
+    border: 0.2em solid #60453D;
+    background-color: #A08167;
+    padding: 5%;
+    width: fit-content;
+    white-space: nowrap;
+    color: #36241e;
+    filter: drop-shadow(0 0 0.3em #5E453D);
+}
+
 
 .exped-xpbar {
     position: absolute;
@@ -3398,6 +3413,19 @@ input:checked + .slider:before {
             drop-shadow(-0.1em -0.1em 0em #333455)  
             drop-shadow(-0.1em 0.1em 0em #333455)  
             drop-shadow(0.1em -0.1em 0em #333455);
+}
+
+#battle-skill > :nth-child(3) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 101;
+    animation: 1.5s rotate linear;
+}
+
+@keyframes rotate {
+    0% {transform: rotate(0)}
+    100% {transform: rotate(360deg)}
 }
 
 .adventure-atk-cooldown {

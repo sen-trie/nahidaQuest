@@ -246,6 +246,12 @@ let activeLeader;
 
 let bountyObject = {};
 const upgradeThreshold = [0,0,64,113,160];
+const moraleLore = [
+    "Nahida is feeling [s]Really Happy[/s]! [mor]<br><br> XP gains are increased by 10% and party <br> deals 10% additional DMG in combat.",
+    "Nahida is feeling [s]Happy[/s]! [mor]<br><br> XP gains are increased by 5%.",
+    "Nahida feels [s]Neutral[/s] [mor]<br><br> No additional buffs to the party, <br> increase morale by eating food.",
+    "Nahida feels [s]Sad[/s]... [mor]<br><br> XP gains are reduced by 15%, recover party morale <br> by resting or completing expeditions successfully.",
+]
 
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");
@@ -714,6 +720,7 @@ function randomEventTimer(timerSeconds) {
             eventChance = 0;
             eventTimes++;
             startRandomEvent();
+            updateMorale("recover",15);
         }
         return;
     }
@@ -3071,6 +3078,7 @@ function itemUse(itemUniqueId) {
         foodButton(1);
         foodBuff = foodBuffPercent[Inventory[itemID].Star];
         foodBuff *= additionalDefense;
+        updateMorale("add",(Inventory[itemID].Star));
     } else if (itemID >= 4001 && itemID < XPMAX){
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         refresh();
@@ -3223,6 +3231,7 @@ function adventure(advType) {
             } else {
                 currencyPopUp("items");
             }
+            updateMorale("add",(randomInteger(3,6) * -1))
             drawAdventure(type,wave);
             if (activeLeader == "Paimon") {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.1)}
         } else {
@@ -3385,6 +3394,7 @@ function createAdventure() {
     })
     
     let adventureFightSkill = document.createElement("div");
+    adventureFightSkill.id = "battle-skill";
     let adventureFightSkillImg = new Image();
     adventureFightSkillImg.src = "./assets/expedbg/battle2.webp";
     adventureFightSkill.append(adventureFightSkillImg);
@@ -3494,11 +3504,22 @@ function createExpedition() {
     table3.appendChild(expedTooltip);
     expedDiv.remove();
 
-    let charMorale = document.createElement("img");
-    charMorale.src = "./assets/expedbg/morale-4.webp";
+    let charMorale = document.createElement("div");
+    charMorale.id = "char-morale";
     charMorale.classList.add("char-morale");
-    let guildTable = createGuild();
+    let moraleLore = document.createElement("p");
+    moraleLore.style.display = "none";
+    charMorale.append(moraleLore);
 
+    charMorale.addEventListener("click",()=>{
+        if (moraleLore.style.display == "none") {
+            moraleLore.style.display = "block";
+        } else {
+            moraleLore.style.display = "none";
+        }
+    })
+
+    let guildTable = createGuild();
     let advButton = document.createElement("div");
     advButton.id = "adventure-button";
     advButton.classList.add("background-image-cover");
@@ -3526,6 +3547,41 @@ function createExpedition() {
         }
     })
     table3.append(charMorale,advButton,advTutorial);
+    updateMorale("load");
+}
+
+function updateMorale(type,amount) {
+    let moraleEle = document.getElementById("char-morale");
+    if (type == "add") {
+        advDict.morale += amount;
+        if (advDict.morale >= 100) {
+            advDict.morale = 100;
+        } else if (advDict.morale < 0) {
+            advDict.morale = 0;
+        }
+    } else if (type == "recover") {
+        if (advDict.morale < 60) {
+            advDict.morale += amount;
+        }
+    }
+
+    let happinessNumber = 4;
+    let morale = advDict.morale;
+
+    if (morale > 80) {
+        happinessNumber = 1;
+    } else if (morale > 60) {
+        happinessNumber = 2;
+    } else if (morale > 30) {
+        happinessNumber = 3;
+    }
+
+    moraleEle.style.backgroundImage = `url(./assets/expedbg/morale-${happinessNumber}.webp)`;
+    let text = moraleLore[happinessNumber-1];
+    text = text.replaceAll('[mor]',`(Morale: ${Math.round(morale)})`);
+    text = text.replaceAll("[s]",`<span style='color:#ffe5d2'>`);
+    text = text.replaceAll("[/s]",`</span>`);
+    moraleEle.children[0].innerHTML = text;
 }
 
 function createGuild() {
@@ -3993,6 +4049,11 @@ function createExpMap() {
     let expedXPInfo = document.createElement("p");
     expedXPInfo.id = "exped-xp";
     expedXPInfo.innerText = `Rank ${advDict.adventureRank} (${advDict.advXP}/${expedXPBar.maxXP} XP)`;
+    if (advDict.adventureRank >= 20) {
+        expedXPInfo.innerText = "Level 20 (MAX)";
+        expedXPBar.maxXP = 1e20;
+        expedXPBar.style.width = "100%";
+    }
     expedXPInfo.classList.add("flex-row");
     expedXP.append(expedXPBar,expedXPInfo);
 
@@ -4181,10 +4242,20 @@ function createExpMap() {
 }
 
 function gainXP(xpAmount) {
-    xpAmount = Math.round(xpAmount * additionalXP * randomInteger(98,103) / 100);
+    xpAmount = (xpAmount * additionalXP * randomInteger(98,103) / 100);
     let xpBar = document.getElementById('exped-xp-bar');
     xpBar.maxXP = advDict.adventureRank * 100;
+    let morale = advDict.morale;
 
+    if (morale > 80) {
+        xpAmount *= 1.10;
+    } else if (morale > 60) {
+        xpAmount *= 1.05;
+    } else if (morale <= 30) {
+        xpAmount *= 0.85;
+    }
+
+    xpAmount = Math.round(xpAmount)
     xpBar.currentXP = parseInt(xpBar.currentXP);
     xpBar.currentXP += xpAmount;
     expedPop("xp",xpAmount)
@@ -4208,6 +4279,11 @@ function gainXP(xpAmount) {
 
     let expedXPInfo = document.getElementById('exped-xp');
     expedXPInfo.innerText = `Level ${advDict.adventureRank} (${advDict.advXP}/${xpBar.maxXP} XP)`;
+    if (advDict.adventureRank >= 20) {
+        expedXPInfo.innerText = "Level 20 (MAX)";
+        xpBar.maxXP = 1e20;
+        xpBar.style.width = "100%";
+    }
 }
 
 function expedPop(type,text) {
@@ -4355,7 +4431,7 @@ function drawAdventure(advType,wave) {
     });
 
     if (advType >= 3 && advType < 6) {
-        quickType = enemyInfo.quicktimeDict[advType];
+        quickType = [enemyInfo.quicktimeDict[advType],advType];
     } else {
         quickType = undefined;
     }
@@ -4421,6 +4497,10 @@ function comboHandler(type,ele) {
         comboNumber.style.animation = "";
         void comboNumber.offsetWidth;
         comboNumber.style.animation = "tallyCount 1s ease";
+    } else if (type == "check") {
+        let comboNumber = document.getElementById("combo-number");
+        let multiplierThreshold = Math.floor(comboNumber.combo / 3) * 0.25;
+        return (ele + multiplierThreshold);
     }
 }
 
@@ -4456,6 +4536,8 @@ function triggerFight() {
     }
 
     let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
+    if (advDict.morale > 80) {currentATK *= 1.10};
+
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
     adventureVideo.quicktime = 0;
@@ -4545,6 +4627,9 @@ function triggerFight() {
             if (advDict.rankDict[5].Locked) {
                 advImage.classList.add('dim-filter');
                 continue;
+            }
+            if (activeLeader == "Venti") {
+                amountInterval *= 1.10;
             }
         } else if (i == 3) {
             if (advDict.rankDict[10].Locked) {
@@ -4677,7 +4762,7 @@ function triggerFight() {
                         }
 
                         if (evadeRoll <= evadeMax) {
-                            createBattleText("dodge",animationTime * 150 * 2,mobDiv)
+                            createBattleText("dodge",animationTime * 150 * 2,mobDiv);
                         } else {
                             loseHP(mobHealth.atk,"normal",mobHealth.class);
                         }
@@ -4710,7 +4795,10 @@ function triggerFight() {
             if (!fightSceneOn) {return}
             if (mobHealth.dead) {return}
             if (quicktimeAttack) {return}
+            let attackMultiplier = 1;
+
             if (mobDiv.children[3] != undefined) {
+                // CHECK IF PARRY IS BEING USED
                 if (mobDiv.children[3].id === "select-indicator") {
                     if (canvas.classList.contains("attack-ready")) {
                         if (mobHealth.class != "Superboss") {
@@ -4731,14 +4819,18 @@ function triggerFight() {
                             setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},animationTime * 150);
                         }
 
+                        if (activeLeader == "Ei") {attackMultiplier = 1.35}
+                        // CHECKS IF SKILL MARKED
                         if (mobDiv.children[0].children[0]) {
-                            mobHealth.health -= (currentATK);
+                            mobHealth.health -= (currentATK * attackMultiplier);
                             mobDiv.children[0].children[0].remove();
                         }
 
                         parrySuccess.load();
                         parrySuccess.play();
                         comboHandler("add");
+                        mobHealth.health -= (currentATK * attackMultiplier);
+                        if (activeLeader == "Ei") {attackMultiplier = 1}
                         if (!advDict.rankDict[10].Locked) {
                             let cooldown = document.getElementById('adventure-cooldown-3');
                             cooldown.amount += 25;
@@ -4757,13 +4849,15 @@ function triggerFight() {
 
                     let cooldown = document.getElementById('adventure-cooldown-1');
                     cooldown.amount -= 100;
-
-                    mobHealth.health -= (currentATK * 2);
+                    mobHealth.health -= (currentATK);
                     dodgeOn("close");
                 }
             }
             
-            mobHealth.health -= (currentATK / 6);
+            attackMultiplier = comboHandler("check",attackMultiplier);
+            mobHealth.health -= ((currentATK * attackMultiplier)/ 6);
+            attackMultiplier = 1;
+
             if (mobHealth.health <= 0) {
                 mobHealth.dead = true;
                 enemyAmount--;
@@ -4791,6 +4885,9 @@ function triggerFight() {
     function quicktimeCheck() {
         if (adventureVideo.quicktime >= (2.5 * maxEnemyAmount)) {
             if (quickType != undefined) {
+                let quicktimeArray = quickType[0];
+                let atkValue = quickType[1];
+
                 adventureVideo.quicktime = 0;
                 if (document.getElementById('warning-quicktime')) {return}
 
@@ -4801,7 +4898,7 @@ function triggerFight() {
                 adventureVideo.appendChild(warningImg);
                 warningImg.onload = ()=>{
                     warningImg.addEventListener("animationend",()=>{
-                        quicktimeEvent(quickType[randomInteger(1,Object.keys(quickType).length)]);
+                        quicktimeEvent(quicktimeArray[randomInteger(1,Object.keys(quicktimeArray).length+1)],atkValue);
                         warningImg.remove();
                     })
                 }
@@ -4819,7 +4916,7 @@ function createBattleText(text,timer,container) {
     return container;
 }
 
-function quicktimeEvent(waveQuicktime) {
+function quicktimeEvent(waveQuicktime,advLevel) {
     if (!fightSceneOn) {return}
     quicktimeAttack = true;
 
@@ -4932,6 +5029,24 @@ function quicktimeEvent(waveQuicktime) {
                 videoOverlay.remove();
                 textOverlay.remove();
                 quicktimeAttack = false;
+
+                let atkNumber;
+                switch (advLevel) {
+                    case 5:
+                        atkNumber = 1.5;
+                        break;
+                    case 4:
+                        atkNumber = 1;
+                        break;
+                    case 3:
+                        atkNumber = 0.5;
+                        break;
+                }
+
+                atkNumber = atkNumber * (maxBeat - correctBeat);
+                if (atkNumber > 0) {
+                    loseHP(atkNumber,"normal","Quicktime");
+                }
             },2000)
         } else if (currentBeat < maxBeat) {
             createBeat();
@@ -5053,12 +5168,22 @@ function skillUse() {
     if (skillCooldownReset) {
         resetRoll = 101;
     } else if (!advDict.rankDict[14].Locked) {
-        resetRoll = 90;
+        resetRoll = 50;
     } else if (!advDict.rankDict[7].Locked) {
         resetRoll = 20;
     }
 
     if (resetChance <= resetRoll && skillCooldownReset == false) {
+        let resetButton = document.getElementById('battle-skill');
+        let img = new Image();
+        img.classList.add("cover-all");
+        img.src = "./assets/expedbg/refresh.webp";
+        img.onload = ()=>{
+            resetButton.appendChild(img);
+            img.addEventListener("animationend",()=>{
+                img.remove();
+            })
+        }
         skillCooldownReset = true;
     } else {
         cooldown.amount -= 100;
@@ -5123,6 +5248,9 @@ function attackAll(adventureFightBurst) {
     if (quicktimeAttack) {return}
 
     let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
+    if (activeLeader == "Zhongli") {currentATK *= 1.50};
+    if (advDict.morale > 80) {currentATK *= 1.10};
+
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
 
@@ -5140,7 +5268,21 @@ function attackAll(adventureFightBurst) {
         if (!mobDiv.children[1]) {continue};
 
         let mobHealth = mobDiv.children[1];
-        mobHealth.health -= (currentATK * 5);
+        let critRoll = randomInteger(1,101);
+        let critThreshold = 101;
+        if (!advDict.rankDict[18].Locked) {
+            critThreshold = 20;
+        } else if (!advDict.rankDict[15].Locked) {
+            critThreshold = 10;
+        }
+
+        if (critRoll > critThreshold) {
+            createBattleText("crit",2000,mobDiv);
+            mobHealth.health -= (currentATK * 5 * 1.5);
+        } else {
+            mobHealth.health -= (currentATK * 5);
+        }
+
         if (!cooldownTime) {cooldownTime = mobDiv.attackTime * 150}
         if (mobHealth.class != "Superboss") {
             mobDiv.children[0].classList.add("staggered");
@@ -5237,6 +5379,7 @@ function winAdventure() {
         quitAdventure();
         charScan();
         gainXP(15);
+        updateMorale("recover",randomInteger(5,8))
         document.getElementById("combo-number").remove();
         let newAdventureChoiceTwo = adventureChoiceTwo.cloneNode(true);
         adventureChoiceTwo.parentNode.replaceChild(newAdventureChoiceTwo, adventureChoiceTwo);
