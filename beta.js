@@ -720,7 +720,7 @@ function randomEventTimer(timerSeconds) {
             eventChance = 0;
             eventTimes++;
             startRandomEvent();
-            updateMorale("recover",15);
+            updateMorale("recover",5);
         }
         return;
     }
@@ -3078,7 +3078,7 @@ function itemUse(itemUniqueId) {
         foodButton(1);
         foodBuff = foodBuffPercent[Inventory[itemID].Star];
         foodBuff *= additionalDefense;
-        updateMorale("add",(Inventory[itemID].Star));
+        updateMorale("add",(Inventory[itemID].Star ** 2));
     } else if (itemID >= 4001 && itemID < XPMAX){
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         refresh();
@@ -3222,8 +3222,8 @@ function adventure(advType) {
     let type = parseInt(advType.split("-")[0]);
     let wave = rollArray(JSON.parse(advType.split("-")[1]),0);
 
-    if (type !== 10 && saveValues["energy"] >= ADVENTURECOSTS[type]) {
-        if (expeditionDict[type] != '1') {
+    if (type !== 10 && expeditionDict[type] != '1') {
+        if (saveValues["energy"] >= ADVENTURECOSTS[type]) {
             adventureElement.load();
             adventureElement.play();
             if (type === 5 && goldenNutUnlocked === true && expeditionDict[type].Locked != '1') {
@@ -3231,105 +3231,101 @@ function adventure(advType) {
             } else {
                 currencyPopUp("items");
             }
-            updateMorale("add",(randomInteger(3,6) * -1))
+
+            saveValues["energy"] -= ADVENTURECOSTS[type];
+            updateMorale("add",(randomInteger(7,10) * -1));
             drawAdventure(type,wave);
             if (activeLeader == "Paimon") {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.1)}
         } else {
+            expedInfo("exped-9");
             weaselDecoy.load();
             weaselDecoy.play();
         }
-    }
-
-    if (type === 10) {
+    } else if (type === 10) {
         if (expeditionDict[5] != '1') {
             type = 5;
-        }
-        else if (expeditionDict[4] != '1') {
+        } else if (expeditionDict[4] != '1') {
             type = 4;
-        }
-        else if (expeditionDict[3] != '1') {
+        } else if (expeditionDict[3] != '1') {
             type = 3;
         } else {
             type = 2;
         }
-        saveValues["energy"] += ADVENTURECOSTS[type];
-    } else if (expeditionDict[type] == '1'){
-        return;  
-    }
 
-    if (saveValues["energy"] >= ADVENTURECOSTS[type]){
-        saveValues["energy"] -= ADVENTURECOSTS[type];
-        refresh();
-        
-        let randomDraw = randomInteger(1,3);
-        switch (type) {
-            case 1:
-                inventoryDraw("artifact", 1, 2);
-                inventoryDraw("weapon", 1, 2);
-                inventoryDraw("xp", 2, 2);
-                inventoryDraw("food", 1, 2);
-                break;
-            case 2:
-                inventoryDraw("xp", 2, 2);
-                inventoryDraw("xp", 2, 3);
-                inventoryDraw("food", 2, 3);
-                inventoryDraw("artifact", 1, 3);
-                inventoryDraw("weapon", 1, 3);
-
-                if (randomDraw == 1) {
-                    inventoryDraw("food", 1, 3);
-                }
-                break;
-            case 3:
-                inventoryDraw("xp", 3, 3);
-                inventoryDraw("xp", 2, 3);
-                inventoryDraw("artifact", 2, 4);
-                inventoryDraw("weapon", 2, 4);
-                inventoryDraw("talent", 2, 4);
-                inventoryDraw("talent", 2, 4);
-
-                if (randomDraw == 1) {
-                    inventoryDraw("food", 2, 4);
-                }
-                break;
-            case 4:
-                inventoryDraw("xp", 3, 4);
-                inventoryDraw("xp", 2, 3);
-                inventoryDraw("artifact", 3, 4);
-                inventoryDraw("weapon", 3, 4);
-                inventoryDraw("artifact", 2, 3);
-                inventoryDraw("artifact", 2, 3);
-                inventoryDraw("gem", 3, 5);
-
-                if (randomDraw == 1) {
-                    inventoryDraw("food", 3, 5);
-                }
-                
-                break;
-            case 5:
-                inventoryDraw("xp", 4, 4);
-                inventoryDraw("xp", 4, 4);
-                inventoryDraw("weapon", 4, 5);
-                inventoryDraw("talent", 4, 4);
-                inventoryDraw("artifact", 4, 5);  
-                inventoryDraw("gem", 4, 5);
-                inventoryDraw("weapon", 4, 4);
-                inventoryDraw("talent", 4, 4);
-
-                if (randomDraw == 1) {
-                    inventoryDraw("food", 4, 5);
-                } 
-                break;
-            default:
-                console.error("Inventory error: Invalid item spawned");
-                break;
-        }
+        drawLoot(type);
         sortList("table2");
         newPop(1);
-    } else {
-        expedInfo("exped-9");
+    } else if (expeditionDict[type] == '1'){
+        console.error(`Invalid Expedition Type: ${type}`);
+        return;  
     }
 } 
+
+function drawLoot(type) {
+    let randomDraw = randomInteger(1,3);
+    switch (type) {
+        case 1:
+            inventoryDraw("artifact", 1, 2);
+            inventoryDraw("weapon", 1, 2);
+            inventoryDraw("xp", 2, 2);
+            inventoryDraw("food", 1, 2);
+            break;
+        case 2:
+            inventoryDraw("xp", 2, 2);
+            inventoryDraw("xp", 2, 3);
+            inventoryDraw("food", 2, 3);
+            inventoryDraw("artifact", 1, 3);
+            inventoryDraw("weapon", 1, 3);
+
+            if (randomDraw == 1) {
+                inventoryDraw("food", 1, 3);
+            }
+            break;
+        case 3:
+            inventoryDraw("xp", 3, 3);
+            inventoryDraw("xp", 2, 3);
+            inventoryDraw("artifact", 2, 4);
+            inventoryDraw("weapon", 2, 4);
+            inventoryDraw("talent", 2, 4);
+            inventoryDraw("talent", 2, 4);
+
+            if (randomDraw == 1) {
+                inventoryDraw("food", 2, 4);
+            }
+            break;
+        case 4:
+            inventoryDraw("xp", 3, 4);
+            inventoryDraw("xp", 2, 3);
+            inventoryDraw("artifact", 3, 4);
+            inventoryDraw("weapon", 3, 4);
+            inventoryDraw("artifact", 2, 3);
+            inventoryDraw("artifact", 2, 3);
+            inventoryDraw("gem", 3, 5);
+
+            if (randomDraw == 1) {
+                inventoryDraw("food", 3, 5);
+            }
+            
+            break;
+        case 5:
+            inventoryDraw("xp", 4, 4);
+            inventoryDraw("xp", 4, 4);
+            inventoryDraw("weapon", 4, 5);
+            inventoryDraw("talent", 4, 4);
+            inventoryDraw("artifact", 4, 5);  
+            inventoryDraw("gem", 4, 5);
+            inventoryDraw("weapon", 4, 4);
+            inventoryDraw("talent", 4, 4);
+
+            if (randomDraw == 1) {
+                inventoryDraw("food", 4, 5);
+            } 
+            break;
+        default:
+            console.error("Inventory error: Invalid item spawned");
+            break;
+    }
+}
 
 // ADVENTURE SEGMENT DRAW
 function createAdventure() {
@@ -3370,8 +3366,9 @@ function createAdventure() {
     let adventureChoiceOne = document.createElement("button");
     adventureChoiceOne.innerText = "Fight!";
     adventureChoiceOne.id = "adv-button-one";
-    let adventureChoiceTwo = document.createElement("button");
-    adventureChoiceTwo.id = "adv-button-two";
+    adventureChoiceOne.pressAllowed = false;
+    // let adventureChoiceTwo = document.createElement("button");
+    // adventureChoiceTwo.id = "adv-button-two";
 
     let adventureFight = document.createElement("div");
     adventureFight.id = "adventure-fight";
@@ -3423,13 +3420,16 @@ function createAdventure() {
     adventureFight.append(fightTextbox,adventureFightDodge,adventureFightSkill,adventureFightBurst);
     adventureFight.style.display = "none";
     adventureChoiceOne.addEventListener("click",()=>{
-        triggerFight();
-        adventureEncounter.style.display = "none";
-        adventureFight.style.display = "flex";
-        adventureChoiceOne.style.display = "none";
+        if (adventureChoiceOne.pressAllowed) {
+            adventureChoiceOne.pressAllowed = false;
+            triggerFight();
+            adventureEncounter.style.display = "none";
+            adventureFight.style.display = "flex";
+            adventureChoiceOne.style.display = "none";
+        }
     })
 
-    adventureEncounter.append(adventureHeading,adventureChoiceOne,adventureChoiceTwo);
+    adventureEncounter.append(adventureHeading,adventureChoiceOne);
     adventureTextBox.append(adventureTextBG,adventureEncounter,adventureFight)
     adventureArea.append(adventureVideo,adventureTextBox)
     mainBody.append(adventureArea);
@@ -3525,7 +3525,6 @@ function createExpedition() {
     advButton.classList.add("background-image-cover");
     advButton.innerText = "Adventure!"
     advButton.addEventListener("click",() => {
-        
         if (adventureType != 0) {
             if (adventureType == "10-[]") {
                 guildTable.toggle();
@@ -4449,25 +4448,29 @@ function drawAdventure(advType,wave) {
     
     let adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
-    let adventureChoiceTwo = document.getElementById("adv-button-two");
-    adventureChoiceTwo.innerText = "Run away...";
+    adventureChoiceOne.pressAllowed = false;
+    adventureChoiceOne.innerText = "Fight!"
+    // let adventureChoiceTwo = document.getElementById("adv-button-two");
+    // adventureChoiceTwo.innerText = "Run away...";
+    // adventureChoiceTwo.pressAllowed = false;
     let adventureArea = document.getElementById("adventure-area");
-    adventureArea.style.zIndex = 500;
     let adventureTextBox = document.getElementById("adventure-text");
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp)`;
     adventureVideo = spawnMob(adventureVideo,waveType.Wave);
-    
+
     function textFadeIn() {
         adventureTextBox.style.animation = "";
         let adventureHeading = document.getElementById("adventure-header");
         adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
         adventureHeading.style.animation = "fadeOut 1.4s ease-out reverse";
-        adventureTextBox.removeEventListener("animationend", textFadeIn);
+        adventureChoiceOne.pressAllowed = true;
+        adventureTextBox.removeEventListener("animationend", textFadeIn,true);
     }
 
+    adventureArea.style.zIndex = 500;
     adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
-    adventureTextBox.addEventListener("animationend",textFadeIn);
+    adventureTextBox.addEventListener("animationend",textFadeIn,true);
     bgmElement.pause();
     fightEncounter.load();
     fightEncounter.play();
@@ -4752,7 +4755,7 @@ function triggerFight() {
 
                     if (canvas.attackState) {
                         let evadeRoll = randomInteger(1,101);
-                        let evadeMax = 101;
+                        let evadeMax = -1;
                         if (!advDict.rankDict[19].Locked) {
                             evadeMax = 15;
                         } else if (!advDict.rankDict[13].Locked) {
@@ -5164,9 +5167,9 @@ function skillUse() {
     if (cooldown.amount < 100) {return}
 
     let resetChance = randomInteger(1,101);
-    let resetRoll = 101;
+    let resetRoll = -1;
     if (skillCooldownReset) {
-        resetRoll = 101;
+        resetRoll = -1;
     } else if (!advDict.rankDict[14].Locked) {
         resetRoll = 50;
     } else if (!advDict.rankDict[7].Locked) {
@@ -5177,6 +5180,7 @@ function skillUse() {
         let resetButton = document.getElementById('battle-skill');
         let img = new Image();
         img.classList.add("cover-all");
+        img.id = "refresh-icon";
         img.src = "./assets/expedbg/refresh.webp";
         img.onload = ()=>{
             resetButton.appendChild(img);
@@ -5269,14 +5273,14 @@ function attackAll(adventureFightBurst) {
 
         let mobHealth = mobDiv.children[1];
         let critRoll = randomInteger(1,101);
-        let critThreshold = 101;
+        let critThreshold = -1;
         if (!advDict.rankDict[18].Locked) {
             critThreshold = 20;
         } else if (!advDict.rankDict[15].Locked) {
             critThreshold = 10;
         }
 
-        if (critRoll > critThreshold) {
+        if (critRoll <= critThreshold) {
             createBattleText("crit",2000,mobDiv);
             mobHealth.health -= (currentATK * 5 * 1.5);
         } else {
@@ -5329,13 +5333,15 @@ function loseAdventure() {
     document.getElementById("combo-number").remove();
     let adventureHeading = document.getElementById("adventure-header");
     adventureHeading.innerText = "You passed out...";
-    let adventureChoiceTwo = document.getElementById("adv-button-two");
-    adventureChoiceTwo.innerText = "Leave";
-    adventureChoiceTwo.addEventListener("click",()=>{
+    let adventureChoiceOne = document.getElementById("adv-button-one");
+    adventureChoiceOne.style.display = "block";
+    adventureChoiceOne.innerText = "Leave";
+    adventureChoiceOne.addEventListener("click",quitButton);
+
+    function quitButton() {
         quitAdventure();
-        let newAdventureChoiceTwo = adventureChoiceTwo.cloneNode(true);
-        adventureChoiceTwo.parentNode.replaceChild(newAdventureChoiceTwo, adventureChoiceTwo);
-    })
+        adventureChoiceOne.removeEventListener("click",quitButton);
+    }
 
     let adventureVideo = document.getElementById("adventure-video");
     let targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator');
@@ -5371,19 +5377,25 @@ function winAdventure() {
     if (!fightSceneOn) {return}
     fightSceneOn = false;
 
+    let advButton = document.getElementById("adventure-button");
+    console.log(advButton.key)
+
     let adventureHeading = document.getElementById("adventure-header");
     adventureHeading.innerText = "You won!";
-    let adventureChoiceTwo = document.getElementById("adv-button-two");
-    adventureChoiceTwo.innerText = "Leave";
-    adventureChoiceTwo.addEventListener("click",()=>{
+    let adventureChoiceOne = document.getElementById("adv-button-one");
+    adventureChoiceOne.style.display = "block";
+    adventureChoiceOne.innerText = "Leave";
+    adventureChoiceOne.addEventListener("click",quitButton);
+
+    function quitButton() {
         quitAdventure();
         charScan();
         gainXP(15);
-        updateMorale("recover",randomInteger(5,8))
+        updateMorale("recover",randomInteger(1,5))
         document.getElementById("combo-number").remove();
-        let newAdventureChoiceTwo = adventureChoiceTwo.cloneNode(true);
-        adventureChoiceTwo.parentNode.replaceChild(newAdventureChoiceTwo, adventureChoiceTwo);
-    })
+        adventureChoiceOne.removeEventListener("click",quitButton);
+    }
+
     let adventureFight = document.getElementById("adventure-fight");
     adventureFight.style.display = "none";
     let adventureEncounter = document.getElementById("adventure-encounter");
@@ -5421,9 +5433,11 @@ function quitAdventure() {
     while (healthElements.length > 0) {
         healthElements[0].remove();
     }
+
     let adventureHealthbarDiv = document.createElement("div");
     adventureHealthbarDiv.style.width = "100%";
     adventureScaraText = "";
+    if (document.getElementById('refresh-icon')) {document.getElementById('refresh-icon').remove()};
 }
 
 //------------------------------------------------------------------------TABLE 4 (WISH)------------------------------------------------------------------------//

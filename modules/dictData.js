@@ -877,6 +877,139 @@ const InventoryDefault = {
         6012: {File:"inazumaTal2",   Name:"Teachings of Light",                          Lore:"Concise reading materials that increase power of [s]Inazuma[/s] characters by at least [s]20%[/s]. \n\n (Only characters currently purchased count.)",                Star:2,            Type:"Talent",          nation:"Inazuma"    },
 }
 
+const adventureLoot = {
+    "Level-1":{
+        Artifact:   ["artifact", 1, 2, "Any"],
+        XP:         ["xp", 2, 2, "Any"],
+        Food:       ["food", 1, 2, "Any"],
+    },
+    "Level-2":{
+        Artifact:   ["artifact", 2, 3, "Any"],
+        XP:         ["xp", 2, 3, "Any"],
+        XP2:        ["xp", 2, 2, "Any"],
+        Food:       ["food", 2, 3, "Any"],
+    },
+    "Level-3":{
+        Artifact:   ["artifact", 2, 4, "Any"],
+        Artifact2:  ["artifact", 2, 4, "Any"],
+        XP:         ["xp", 3, 3, "Any"],
+        Food:       ["food", 2, 4, "Any"],
+    },
+    "Level-4":{
+        Artifact:   ["artifact", 3, 4, "Any"],
+        Artifact:   ["artifact", 3, 3, "Any"],
+        XP:         ["xp", 3, 3, "Any"],
+        X2:         ["xp", 3, 4, "Any"],
+        Food:       ["food", 3, 5, "Any"],
+    },
+    "Level-5":{
+        Artifact:   ["artifact", 4, 5, "Any"],
+        Artifact2:  ["artifact", 4, 4, "Any"],
+        Weapon:     ["weapon", 4, 5, "Any"],
+        Weapon2:    ["weapon", 4, 4, "Any"],
+        Gem:        ["gem",4,5,"Any"],
+        XP:         ["xp", 4, 4, "Any"],
+        XP2:        ["xp", 4, 4, "Any"],
+        Food:       ["food", 4, 5, "Any"],
+        Talent:     ["talent", 4,4, "Any"],
+    },
+
+    2:{
+        Weapon: ["weapon", 1, 2, "Catalyst"],
+        Talent: ["talent", 2, 2, "Sumeru"],
+        Bonus:  ["talent", 2, 3, "Sumeru"],
+        Bonus2: ["artifact", 3, 3, "Any"],
+    },
+    3:{
+        Weapon: ["weapon", 1, 2, "Sword"],
+        Talent: ["talent", 2, 2, "Mondstadt"],
+        Bonus:  ["talent", 2, 3, "Mondstadt"],
+        Bonus2: ["artifact", 3, 3, "Any"],
+    },
+    4:{
+        Weapon: ["weapon", 1, 2, "Bow"],
+        Talent: ["talent", 2, 2, "Inazuma"],
+        Bonus:  ["talent", 2, 3, "Inazuma"],
+        Bonus2: ["artifact", 3, 3, "Any"],
+    },
+    5:{
+        Weapon: ["weapon", 1, 2, "Polearm"],
+        Talent: ["talent", 2, 2, "Liyue"],
+        Bonus:  ["talent", 2, 3, "Liyue"],
+        Bonus2: ["artifact", 3, 3, "Any"],
+    },
+    6:{
+        Weapon: ["weapon", 2, 3, "Claymore"],
+        Gem:    ["gem", 3, 3, ["Hydro","Pyro"]],
+        Bonus:  ["gem", 3, 4, ["Hydro","Pyro"]],
+        Bonus2: ["artifact", 3, 4, "Any"],
+    },
+    7:{
+        Weapon: ["weapon", 2, 3, "Bow"],
+        Gem:    ["gem", 3, 3, ["Electro","Cryo"]],
+        Bonus:  ["gem", 3, 4, ["Electro","Cryo"]],
+        Bonus2: ["artifact", 3, 4, "Any"],
+    },
+    8:{
+        Weapon: ["weapon", 2, 3, "Polearm"],
+        Gem:    ["gem", 3, 3, ["Dendro","Geo","Anemo"]],
+        Bonus:  ["gem", 3, 4, ["Dendro","Geo","Anemo"]],
+        Bonus2: ["artifact", 3, 4, "Any"],
+    },
+    9:{
+        Weapon: ["weapon", 2, 3, "Sword"],
+        Gem:    ["gem", 3, 3, "Any"],
+        Bonus:  ["gem", 3, 4, "Any"],
+        Bonus2: ["artifact", 3, 4, "Any"],
+    },
+    10:{
+        Weapon: ["weapon", 2, 4, "Catalyst"],
+        Talent: ["talent", 3, 4, "Sumeru"],
+        Bonus:  ["talent", 4, 4, "Sumeru"],
+        Bonus2: ["artifact", 4, 5, "Any"],
+    },
+    11:{
+        Weapon: ["weapon", 2, 4, "Claymore"],
+        Talent: ["talent", 3, 4, "Mondstadt"],
+        Bonus:  ["talent", 4, 4, "Mondstadt"],
+        Bonus2: ["artifact", 4, 5, "Any"],
+    },
+    12:{
+        Weapon: ["weapon", 2, 4, "Sword"],
+        Talent: ["talent", 3, 4, "Inazuma"],
+        Bonus:  ["talent", 4, 4, "Inazuma"],
+        Bonus2: ["artifact", 4, 5, "Any"],
+    },
+    13:{
+        Weapon: ["weapon", 2, 4, "Bow"],
+        Talent: ["talent", 3, 4, "Liyue"],
+        Bonus:  ["talent", 4, 4, "Liyue"],
+        Bonus2: ["artifact", 4, 5, "Any"],
+    },
+    14:{
+        Weapon: ["weapon", 3, 4, "Polearm"],
+        Gem:    ["gem", 4, 5, ["Hydro","Pyro"]],
+        Bonus:  ["gem", 5, 5, ["Hydro","Pyro"]],
+        Bonus2: ["weapon", 5, 5, "Any"],
+    },
+    15:{
+        Weapon: ["weapon", 3, 4, "Catalyst"],
+        Gem:    ["gem", 4, 5, ["Electro","Cryo"]],
+        Bonus:  ["gem", 5, 5, ["Electro","Cryo"]],
+        Bonus2: ["weapon", 5, 5, "Any"],
+    },
+    16:{
+        Weapon: ["weapon", 3, 4, "Claymore"],
+        Gem:    ["gem", 4, 5, ["Dendro","Geo","Anemo"]],
+        Bonus:  ["gem", 5, 5, ["Dendro","Geo","Anemo"]],
+        Bonus2: ["weapon", 5, 5, "Any"],
+    },
+    17:{
+        Bonus:  ["gem", 5, 6, "SpecialGem"],
+        Bonus2: ["weapon", 6, 6, "Any"],
+    },
+}
+
 const eventText = {
     1: "A surge of power courses through Nahida - She feels empowered!",
     1.5: `"Are you sure it has to be me? \n ...Fine, let's get this over with."`,

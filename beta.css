@@ -318,6 +318,7 @@ img {
     position: relative;
     margin: 0 auto;
     display: none;
+    overflow: hidden;
 }
 
 .overlay {
@@ -499,16 +500,16 @@ table, button, label {
 
 .link {
     position: absolute;
-    left: 0.5%;
-    bottom: 0;
+    left: 1%;
+    bottom: 1%;
+    padding: 0.2%;
+    border-radius: 0.5em;
     text-decoration: none;
     color: #cee0d4;
-    filter: drop-shadow(0 0 0.1em black) drop-shadow(0 0 0.05em black);
+    background-color: #17321c;
 }
 
 .link:hover { 
-    color: #71e696;
-    filter: drop-shadow(0 0 0.1em black) drop-shadow(0 0 0.05em black);
     transform: scale(1.05);
 }
 
@@ -520,7 +521,7 @@ table, button, label {
     position: absolute;
     object-fit: cover;
     height: 100%;
-    width: max-content;
+    width: 100%;
 }
 
 #start-image {
