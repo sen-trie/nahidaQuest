@@ -138,4 +138,12 @@ function rollArray(array,startingPos) {
     return array[randomInteger(startingPos,array.length)]
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray};
+// REPLACES TEXT FOR USE IN INNERHTML
+function textReplacer(dictReplace,originalText) {
+    for (let key in dictReplace) {
+        originalText = originalText.replaceAll(key,dictReplace[key]);
+    }
+    return originalText;
+}
+
+export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray, textReplacer};

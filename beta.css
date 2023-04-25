@@ -3323,16 +3323,79 @@ input:checked + .slider:before {
     height: 100%;
     z-index: 502;
     text-align: center;
-    gap: 1%;
+    gap: 4%;
     aspect-ratio: 1.88;
+    padding: 2% 0 1% 0;
+    box-sizing: border-box;
 }
 
 #adventure-encounter > p {
-    height: 50%;
-    padding-top: 2%;
+    position: relative;
+    height: auto;
     box-sizing: border-box;
     color: #442d10;
     font-size: 1.2em;
+}
+
+.adventure-rewards {
+    flex-grow: 1;
+    height: auto;
+    width: 100%;
+    flex-wrap: wrap;
+    /* background-color: yellow; */
+    overflow-y: auto;
+    justify-content: flex-start;
+    background-color: #1e2a35;
+    border-radius: 0.5em 0 0 0.5em;
+    border: 0.2em solid #5c6b78;
+    box-sizing: border-box;
+    scrollbar-color: #5c6b78;
+    gap: 5% 2%;
+    padding: 1%;
+    box-sizing: border-box;
+}
+
+.adventure-rewards::-webkit-scrollbar-thumb {
+    background-color: #5c6b78;
+    border-radius: 0;
+}
+
+.adventure-rewards > div {
+    background-position: center;
+    background-size: contain;
+    width: 20%;
+    height: auto;
+    aspect-ratio: 1;
+    flex-basis: 18%;
+    position: relative;
+    box-sizing: border-box;
+    border-radius: 0.2em;
+}
+
+.adventure-rewards > div > :first-child {
+    object-fit: cover;
+    filter: drop-shadow(0 0 0.2em black);
+}
+
+.adventure-rewards > div > :nth-child(2) {
+    position: absolute;
+    bottom: 0;
+    height: 20%;
+    object-fit: contain;
+    width: auto;
+    max-width: 100%;
+    filter: drop-shadow(0 0 0.1em black);
+}
+
+.adventure-rewards > div > :nth-child(3) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 20%;
+    object-fit: contain;
+    width: auto;
+    max-width: 100%;
+    filter: drop-shadow(0 0 0.2em black);
 }
 
 #adventure-encounter > button {

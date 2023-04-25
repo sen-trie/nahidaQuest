@@ -52,14 +52,14 @@ const charLoreObj = {
 
 const imgKey = {
     1:{Left:"76",   Top:"24",   Level:10,   Wave:[],                Heads:[]},
-    2:{Left:"85",   Top:"9",    Level:1,    Wave:[1,2,5],           Heads:[1,2]             ,Loot:{Artifact:[2,"2-Star \n Artifacts"],  Catalyst:[2,"2-Star \n Catalyst"],    Sumeru:           [2,"2-Star \n Sumeru    \n Talents"],           Level: [2,"2-Star \n Level \n Books"],                 Food: [2,"2-Star \n Food \n Item"]}},
-    3:{Left:"59",   Top:"19",   Level:1,    Wave:[1,2,3,4,5],       Heads:[1,2,3]           ,Loot:{Artifact:[2,"2-Star \n Artifacts"],  Sword:[2,"2-Star \n Sword"],          Mondstadt:        [2,"2-Star \n Mondstadt \n Talents"],           Level: [2,"2-Star \n Level \n Books"],                 Food: [2,"2-Star \n Food \n Item"]}},
-    4:{Left:"64",   Top:"49",   Level:1,    Wave:[1,3,4],           Heads:[1,3]             ,Loot:{Artifact:[2,"2-Star \n Artifacts"],  Bow:[2,"2-Star \n Bow"],              Inazuma:          [2,"2-Star \n Inazuma   \n Talents"],           Level: [2,"2-Star \n Level \n Books"],                 Food: [2,"2-Star \n Food \n Item"]}},
-    5:{Left:"40",   Top:"48",   Level:1,    Wave:[3,4,6],           Heads:[3,4]             ,Loot:{Artifact:[2,"2-Star \n Artifacts"],  Polearm:[2,"2-Star \n Polearm"],      Liyue:            [2,"2-Star \n Liyue     \n Talents"],           Level: [2,"2-Star \n Level \n Books"],                 Food: [2,"2-Star \n Food \n Item"]}},
+    2:{Left:"85",   Top:"9",    Level:1,    Wave:[1,2,5],           Heads:[1,2]             ,Loot:{Artifact:[2,"2-Star \n Artifacts"],  Catalyst:[2,"2-Star \n Catalyst"],    Sumeru:           [2,"2-Star \n Sumeru    \n Talents"],           Level: [2,"2-Star \n Level \n Books"],           Food: [2,"2-Star \n Food \n Item"]}},
+    3:{Left:"59",   Top:"19",   Level:1,    Wave:[1,2,3,4,5],       Heads:[1,2,3]           ,Loot:{Artifact:[2,"2-Star \n Artifacts"],  Sword:[2,"2-Star \n Sword"],          Mondstadt:        [2,"2-Star \n Mondstadt \n Talents"],           Level: [2,"2-Star \n Level \n Books"],           Food: [2,"2-Star \n Food \n Item"]}},
+    4:{Left:"64",   Top:"49",   Level:1,    Wave:[1,3,4],           Heads:[1,3]             ,Loot:{Artifact:[2,"2-Star \n Artifacts"],  Bow:[2,"2-Star \n Bow"],              Inazuma:          [2,"2-Star \n Inazuma   \n Talents"],           Level: [2,"2-Star \n Level \n Books"],           Food: [2,"2-Star \n Food \n Item"]}},
+    5:{Left:"40",   Top:"48",   Level:1,    Wave:[3,4,6],           Heads:[3,4]             ,Loot:{Artifact:[2,"2-Star \n Artifacts"],  Polearm:[2,"2-Star \n Polearm"],      Liyue:            [2,"2-Star \n Liyue     \n Talents"],           Level: [2,"2-Star \n Level \n Books"],           Food: [2,"2-Star \n Food \n Item"]}},
     6:{Left:"46",   Top:"61",   Level:2,    Wave:[1,2,7],           Heads:[4,5]             ,Loot:{Artifact:[3,"3-Star \n Artifacts"],  Claymore:[3,"3-Star \n Claymore"],    PyroHydro:        [3,"3-Star \n Hydro / Pyro \n Gem"],            Level: [3,"3-Star \n Level \n Books"],           Food: [3,"3-Star \n Food \n Item"]}},
     7:{Left:"80",   Top:"59",   Level:2,    Wave:[1,2,5,6],         Heads:[5,9]             ,Loot:{Artifact:[3,"3-Star \n Artifacts"],  Bow:[3,"3-Star \n Bow"],              ElectroCryo:      [3,"3-Star \n Electro / Cryo \n Gem"],          Level: [3,"3-Star \n Level \n Books"],           Food: [3,"3-Star \n Food \n Item"]}},
     8:{Left:"77",   Top:"40",   Level:2,    Wave:[3,4],             Heads:[6,7]             ,Loot:{Artifact:[3,"3-Star \n Artifacts"],  Polearm:[3,"3-Star \n Polearm"],      DendroGeoAnemo:   [3,"3-Star \n Dendro / Geo / Anemo \n Gem"],    Level: [3,"3-Star \n Level \n Books"],           Food: [3,"3-Star \n Food \n Item"]}},
-    9:{Left:"52",   Top:"50",   Level:2,    Wave:[4,5,6],           Heads:[6,9]             ,Loot:{Artifact:[3,"3-Star \n Artifacts"],  Sword:[3,"3-Star \n Sword"],          Gemstone:         [3,"Any \n 3-Star \n Gem"],                     Level: [3,"3-Star \n Level \n Books"],           Food: [3,"3-Star \n Food \n Item"]}},
+    9:{Left:"52",   Top:"50",   Level:2,    Wave:[4,5,6],           Heads:[6,9]             ,Loot:{Artifact:[3,"3-Star \n Artifacts"],  Sword:[3,"3-Star \n Sword"],          Gemstone:         [3,"3-Star \n Gem"],                            Level: [3,"3-Star \n Level \n Books"],           Food: [3,"3-Star \n Food \n Item"]}},
     10:{Left:"70",   Top:"47",  Level:3,    Wave:[1,2],             Heads:[5,14]            ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Catalyst:[4,"4-Star \n Catalyst"],    Sumeru:           [4,"4-Star \n Sumeru    \n Talents"],           Level: [4,"4-Star \n Level \n Books"],           Food: [4,"4-Star \n Food \n Item"]}},
     11:{Left:"64",   Top:"35",  Level:3,    Wave:[2,5,6],           Heads:[3,8,14]          ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Claymore:[4,"4-Star \n Claymore"],    Mondstadt:        [4,"4-Star \n Mondstadt \n Talents"],           Level: [4,"4-Star \n Level \n Books"],           Food: [4,"4-Star \n Food \n Item"]}},
     12:{Left:"22",  Top:"68",   Level:3,    Wave:[5,6,7],           Heads:[3,8,10]          ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Sword:[4,"4-Star \n Sword"],          Inazuma:          [4,"4-Star \n Inazuma   \n Talents"],           Level: [4,"4-Star \n Level \n Books"],           Food: [4,"4-Star \n Food \n Item"]}},
@@ -67,7 +67,7 @@ const imgKey = {
     14:{Left:"20",  Top:"32",   Level:4,    Wave:[2,3,5],           Heads:[8,12,19]         ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Polearm:[4,"4-Star \n Polearm"],      PyroHydro:        [5,"5-Star \n Hydro / Pyro \n Gem"],            Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
     15:{Left:"51",  Top:"18",   Level:4,    Wave:[1],               Heads:[11,13]           ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Catalyst:[4,"4-Star \n Catalyst"],    ElectroCryo:      [5,"5-Star \n Electro / Cryo \nGem"],           Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
     16:{Left:"88",  Top:"45",   Level:4,    Wave:[2,3,5],           Heads:[19,12]           ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Claymore:[4,"4-Star \n Claymore"],    DendroGeoAnemo:   [5,"5-Star \n Dendro / Geo / Anemo \n Gem"],    Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
-    17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,3,4,5,6,7,8], Heads:[15,16,17,18,20]  ,Loot:{Artifact:[5,"5-Star \n Artifacts"],  Weapon:[5,"Any \n 5-Star \n Weapon"], Talent:           [4,"Any \n 4-Star \n Talent"],                  Gemstone: [5,"Any \n 5-Star \n Gem"],      Level: [4,"4-Star \n Level \n Books"],   Food: [5,"5-Star \n Food \n Item"]}},
+    17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,3,4,5,6,7,8], Heads:[15,16,17,18,20]  ,Loot:{Artifact:[5,"5-Star \n Artifacts"],  Weapon:[5,"5-Star \n Weapon"],        Talent:           [4,"4-Star \n Talent"],                         Gemstone: [5,"5-Star \n Gem"],                   Level: [4,"4-Star \n Level \n Books"],   Food: [5,"5-Star \n Food \n Item"]}},
     // 18:{Left:"53",  Top:"38",   Level:12,    Scene:["1-A-1","1-A-2","1-C-2"]},
     // 19:{Left:"80",  Top:"18",   Level:12,    Scene:["1-C-2","1-C-3"]},
     // 20:{Left:"77",  Top:"53",   Level:12,    Scene:["1-C-1","1-C-2","2-C-2"]},
@@ -622,15 +622,15 @@ const expeditionDictInfo = {
 const advInfo = {
     1:{Desc:"Unlock [s]Parry Attack[/s]. <br><br>"},
     2:{Desc:"Begin fights with [s]Parry Attack[/s] charged."},
-    3:{Desc:"Bounty [s]rewards[/s] are more plentiful."},
+    3:{Desc:"Bounty rewards provide 5% more [s]XP[/s] and [s]Primogems[/s]."},
     4:{Desc:"Successful expeditions have a chance to reward [s]an additional item[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
     5:{Desc:"Unlock [s]Skill Attack[/s]. <br><br> Enemies can be marked with [s]`Seeds of Skandha`[/s], dealing additional DMG and provides healing upon [s]Parry Attack[/s]."},
     6:{Desc:"Party has a 5% chance to [s]evade[/s] enemy attacks."},
     7:{Desc:"[s]Skill Attack[/s] has a 20% chance to reset its cooldown (Cannot occur twice in a row)."},
-    8:{Desc:"Defeating enemies immediately regenerates 5% of [s]HP[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
+    8:{Desc:"Defeating enemies immediately [s]regenerates[/s] a bars of [s]HP[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
     9:{Desc:"An additional [s]Parry Attack[/s] can be stored."},
     10:{Desc:"Unlock [s]Burst Attack[/s]. <br><br> Reset all enemies' attacks while dealing immense damage."},
-    11:{Desc:"Bounty [s]rewards[/s] are even more plentiful."},
+    11:{Desc:"Bounty rewards provide 15% more [s]XP[/s] and [s]Primogems[/s]."},
     12:{Desc:"Successful expeditions have a higher chance to reward [s]an additional item[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
     13:{Desc:"[s]Evasion rate[/s] is increased to 10%."},
     14:{Desc:"[s]Skill Attack[/s] has a 50% chance to reset its cooldown (Cannot occur twice in a row)."},
@@ -1005,7 +1005,7 @@ const adventureLoot = {
         Bonus2: ["weapon", 5, 5, "Any"],
     },
     17:{
-        Bonus:  ["gem", 5, 6, "SpecialGem"],
+        Bonus:  ["gem", 5, 6, "Any"],
         Bonus2: ["weapon", 6, 6, "Any"],
     },
 }
@@ -1020,4 +1020,4 @@ const eventText = {
     6: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
 }
 
-export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey}
+export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot}

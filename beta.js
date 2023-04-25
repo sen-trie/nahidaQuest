@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
-import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey } from "./modules/dictData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray } from "./modules/functions.js"
+import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot } from "./modules/dictData.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
@@ -242,9 +242,12 @@ let filteredHeroes = [];
 let filteredInv = [];
 let rowTempDict = [];
 let milestoneOn = false;
+let currentDimMultiplier = 0;
+let currentMultiplier = 1;
 let activeLeader;
 
 let bountyObject = {};
+let lootArray = {};
 const upgradeThreshold = [0,0,64,113,160];
 const moraleLore = [
     "Nahida is feeling [s]Really Happy[/s]! [mor]<br><br> XP gains are increased by 10% and party <br> deals 10% additional DMG in combat.",
@@ -2624,8 +2627,6 @@ function upgrade(clicked_id) {
     }
 }
 
-var currentDimMultiplier = 0;
-var currentMultiplier = 1;
 function costMultiplier(multi) {
     if (currentMultiplier == multi) {
         currentMultiplier = 1;
@@ -2633,16 +2634,7 @@ function costMultiplier(multi) {
         currentMultiplier = multi;
     }
 
-    if (document.getElementById("tool-tip-button")) {
-        let tooltipButtonText = document.getElementById("tool-tip-button");
-        if (milestoneOn) {
-            tooltipButtonText.innerText = `Buy`;
-        } else if (currentMultiplier == 1) {
-            tooltipButtonText.innerText = `Purchase`;
-        } else {
-            tooltipButtonText.innerText = `Purchase ${currentMultiplier}`;
-        }
-    }
+    updatePurchaseText();
 
     let i = WISHHEROMAX;
     while (i--) {
@@ -2657,6 +2649,19 @@ function costMultiplier(multi) {
             refresh(buttID, upgradeDict[i]["BaseCost"], i);
         }
     } 
+}
+
+function updatePurchaseText() {
+    if (document.getElementById("tool-tip-button")) {
+        let tooltipButtonText = document.getElementById("tool-tip-button");
+        if (milestoneOn) {
+            tooltipButtonText.innerText = `Buy`;
+        } else if (currentMultiplier == 1) {
+            tooltipButtonText.innerText = `Purchase`;
+        } else {
+            tooltipButtonText.innerText = `Purchase ${currentMultiplier}`;
+        }
+    }
 }
 
 // MILESTONE UPGRADES
@@ -2719,17 +2724,17 @@ function milestoneBuy(heroTooltip) {
 
     let itemID = 5002;
     let itemArray = [];
-    let buff = 0.5;
+    let buff = 1;
     let itemStar = -1;
     if (level >= 350) {
         itemStar = 0;
-        buff = 5;
+        buff = 6;
     } else if (level >= 200) {
         itemStar = 1;
-        buff = 2.5;
+        buff = 3.5;
     } else if (level >= 75) {
         itemStar = 2;
-        buff = 1;
+        buff = 2;
     }
 
     if (itemStar != -1) {
@@ -2867,7 +2872,7 @@ function milestoneAdd(lowestKey,heroID) {
 }
 
 function milestoneToggle(type) {
-    if (type == "toggle") {
+    if (type === "toggle") {
         let heroChildren = table1.querySelectorAll(".upgrade");
         for (let i = 0; i < heroChildren.length; i++) {
             if (milestoneOn) {heroChildren[i].style.display = "flex"}
@@ -2880,16 +2885,15 @@ function milestoneToggle(type) {
             else {milestoneChildren[i].style.display = "none"}
         }
 
+        milestoneOn ? milestoneOn = false : milestoneOn = true;
         let tooltipButtonText = document.getElementById("tool-tip-button");
-        if (!milestoneOn) {
+        if (milestoneOn) {
             tooltipButtonText.innerText = `Buy`;
         } else {
             tooltipButtonText.innerText = `Purchase ${currentMultiplier}`;
+            if (currentMultiplier === 1) {tooltipButtonText.innerText = `Purchase`}
         }
-
-        if (currentMultiplier == 1) {tooltipButtonText.innerText = `Purchase`}
-        milestoneOn ? milestoneOn = false : milestoneOn = true;
-    } else if (type == "close") {
+    } else if (type === "close") {
         let heroChildren = table1.querySelectorAll(".upgrade");
         for (let i = 0; i < heroChildren.length; i++) {
             if (milestoneOn) {heroChildren[i].style.display = "flex"}
@@ -3226,11 +3230,11 @@ function adventure(advType) {
         if (saveValues["energy"] >= ADVENTURECOSTS[type]) {
             adventureElement.load();
             adventureElement.play();
-            if (type === 5 && goldenNutUnlocked === true && expeditionDict[type].Locked != '1') {
-                currencyPopUp("items",0,"nuts",randomInteger(5,10))
-            } else {
-                currencyPopUp("items");
-            }
+            // if (type === 5 && goldenNutUnlocked === true && expeditionDict[type].Locked != '1') {
+            //     currencyPopUp("items",0,"nuts",randomInteger(5,10))
+            // } else {
+            //     currencyPopUp("items");
+            // }
 
             saveValues["energy"] -= ADVENTURECOSTS[type];
             updateMorale("add",(randomInteger(7,10) * -1));
@@ -3361,8 +3365,12 @@ function createAdventure() {
     adventureEncounter.id = "adventure-encounter";
     adventureEncounter.classList.add("flex-column");
     adventureEncounter.style.display = "flex";
+
     let adventureHeading = document.createElement("p");
     adventureHeading.id = "adventure-header";
+    let adventureRewards = document.createElement("div");
+    adventureRewards.classList.add("adventure-rewards","flex-row");
+    adventureRewards.id = "adventure-rewards";
     let adventureChoiceOne = document.createElement("button");
     adventureChoiceOne.innerText = "Fight!";
     adventureChoiceOne.id = "adv-button-one";
@@ -3429,15 +3437,16 @@ function createAdventure() {
         }
     })
 
-    adventureEncounter.append(adventureHeading,adventureChoiceOne);
+    adventureEncounter.append(adventureHeading,adventureRewards,adventureChoiceOne);
     adventureTextBox.append(adventureTextBG,adventureEncounter,adventureFight)
     adventureArea.append(adventureVideo,adventureTextBox)
     mainBody.append(adventureArea);
 }
 
 
-// DRAWS FOR RANDOM INVENTORY LOOT 
-function inventoryDraw(itemType, min, max, type){
+// DRAWS FOR RANDOM INVENTORY LOOT
+function inventoryDraw(itemType, min, max, type, itemClass){
+    let attempts = 0;
     let upperInventoryType = {
         "weapon": WEAPONMAX, 
         "artifact": ARTIFACTMAX, 
@@ -3456,11 +3465,41 @@ function inventoryDraw(itemType, min, max, type){
     }
     let drawnItem = 0;
     while (true){
+        attempts++;
+        if (attempts >= 500) {
+            console.error(`Error drawing item with properties [${itemType},${itemClass}]. Please inform the developer using the feedback form :)`);
+            return;
+        }
+
         drawnItem = randomInteger(lowerInventoryType[itemType], upperInventoryType[itemType])
         if (Inventory[drawnItem] == undefined) {continue}
         if (Inventory[drawnItem].Star >= min && Inventory[drawnItem].Star < (max + 1)) {
             if (type === "shop") {
                 return drawnItem;
+            } else if (type.split("-")[0] === "adventure" || type === "Bonus" || type === "Bonus2"){
+                if (itemClass === "Any") {
+                    lootArray[type] = drawnItem;
+                } else {
+                    let checkedProperty = "Type";
+                    if (itemType === "talent") {
+                        checkedProperty = "nation";
+                    } else if (itemType === "gem") {
+                        checkedProperty = "element";
+                    }
+
+                    if (Array.isArray(itemClass)) {
+                        let randomEle = rollArray(itemClass,0);
+                        if (Inventory[drawnItem][checkedProperty] != randomEle) {
+                            continue;
+                        }
+                        lootArray[type] = drawnItem;
+                    } else {
+                        if (Inventory[drawnItem][checkedProperty] != itemClass) {
+                            continue;
+                        }
+                        lootArray[type] = drawnItem;
+                    }
+                }
             } else {
                 inventoryAdd(drawnItem);
             }
@@ -3577,10 +3616,11 @@ function updateMorale(type,amount) {
 
     moraleEle.style.backgroundImage = `url(./assets/expedbg/morale-${happinessNumber}.webp)`;
     let text = moraleLore[happinessNumber-1];
-    text = text.replaceAll('[mor]',`(Morale: ${Math.round(morale)})`);
-    text = text.replaceAll("[s]",`<span style='color:#ffe5d2'>`);
-    text = text.replaceAll("[/s]",`</span>`);
-    moraleEle.children[0].innerHTML = text;
+    moraleEle.children[0].innerHTML = textReplacer({
+        '[mor]':`(Morale: ${Math.round(morale)})`,
+        "[s]":`<span style='color:#ffe5d2'>`,
+        "[/s]":`</span>`,
+    },text);
 }
 
 function createGuild() {
@@ -3649,9 +3689,12 @@ function createGuild() {
                                                           +1 HP <img style="height: 100%;margin-right:10%" src=./assets/icon/health.webp> 
                                                           +6 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>          
             </div>`);
-            loreHTML = loreHTML.replaceAll("[s]",`<span style='color:#A97803'>`)
-            loreHTML = loreHTML.replaceAll("[/s]",`</span>`)
-            rankLore.innerHTML = `${loreHTML}`;
+
+            rankLore.innerHTML = textReplacer({
+                "[s]":`<span style='color:#A97803'>`,
+                "[/s]":`</span>`,
+            },loreHTML);
+
             if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
             rankClaim.buttonLevel = i;
             if (advDict.rankDict[i].Locked == true) {
@@ -3846,7 +3889,7 @@ function resetBounty(bountyMenu,type) {
                 bountyObject.hasOwnProperty(bountyPath)
             );
     
-            bountyObject[bountyPath] = {primoReward: (10 * i), xpReward: (5 * i), Completed: false, Level: i};
+            bountyObject[bountyPath] = {primoReward: (5 * (2**i)), xpReward: (10 * (i**2)), Completed: false, Level: i};
             bountyImg.src = `./assets/expedbg/enemy/${bountyPath}.webp`;
             bountyButton.id = `bounty-${bountyPath}`;
             bountyButton.append(bountyStar,bountyImg);
@@ -3879,10 +3922,18 @@ function completeBounty(bountyID,type,ele) {
     claim.primoReward = bountyObject[bountyID].primoReward;
     claim.xpReward = bountyObject[bountyID].xpReward;
 
+    if (!advDict.rankDict[11].Locked) {
+        claim.xpReward *= 1.15;
+        claim.primoReward *= 1.15;
+    } else if (!advDict.rankDict[3].Locked) {
+        claim.xpReward *= 1.05;
+        claim.primoReward *= 1.05;
+    }
+
     claim.addEventListener("click",()=>{
         notifPop("clear","bounty",bountyID);
-        currencyPopUp("primogem",claim.primoReward);
-        gainXP(claim.xpReward);
+        currencyPopUp("primogem",Math.round(claim.primoReward));
+        gainXP(Math.round(claim.xpReward));
         bountyObject[bountyID].Completed = "claimed";
         claim.remove();
 
@@ -4007,6 +4058,7 @@ function expedInfo(butId) {
             lootDiv.append(star,img);
             invDiv.appendChild(lootDiv);
         }
+
         lootHTML = lootHTML.replace('[container]','');
         lootInfo.innerHTML = `${lootHTML}`;
         lootInfo.appendChild(invDiv)
@@ -4241,7 +4293,7 @@ function createExpMap() {
 }
 
 function gainXP(xpAmount) {
-    xpAmount = (xpAmount * additionalXP * randomInteger(98,103) / 100);
+    xpAmount = (xpAmount * randomInteger(98,103) / 100);
     let xpBar = document.getElementById('exped-xp-bar');
     xpBar.maxXP = advDict.adventureRank * 100;
     let morale = advDict.morale;
@@ -4262,8 +4314,13 @@ function gainXP(xpAmount) {
     if (xpBar.currentXP >= xpBar.maxXP) {
         xpBar.currentXP -= xpBar.maxXP;
         advDict.advXP = xpBar.currentXP;
-        advDict.adventureRank++;
 
+        if (advDict.adventureRank >= 20) {
+            advDict.adventureRank = 20;
+            return;
+        }
+
+        advDict.adventureRank++;
         advDict.rankDict[advDict.adventureRank].Locked = "unclaimed";
         let rankButton = document.getElementById(`rank-button-${advDict.adventureRank}`);
         rankButton.lastChild.remove();
@@ -4279,6 +4336,7 @@ function gainXP(xpAmount) {
     let expedXPInfo = document.getElementById('exped-xp');
     expedXPInfo.innerText = `Level ${advDict.adventureRank} (${advDict.advXP}/${xpBar.maxXP} XP)`;
     if (advDict.adventureRank >= 20) {
+        advDict.adventureRank = 20;
         expedXPInfo.innerText = "Level 20 (MAX)";
         xpBar.maxXP = 1e20;
         xpBar.style.width = "100%";
@@ -4418,9 +4476,10 @@ let skillCooldownReset;
 
 function drawAdventure(advType,wave) {
     adventureScaraText = "";
+    lootArray = {};
     if (adventureScene) {return}
     adventureScene = true;
-    if (advType == 5) {
+    if (advType === 5) {
         adventureScaraText = "-scara";
     };
 
@@ -4450,6 +4509,8 @@ function drawAdventure(advType,wave) {
     adventureChoiceOne.style.display = "block";
     adventureChoiceOne.pressAllowed = false;
     adventureChoiceOne.innerText = "Fight!"
+    let adventureRewards = document.getElementById("adventure-rewards");
+    adventureRewards.style.opacity = "0";
     // let adventureChoiceTwo = document.getElementById("adv-button-two");
     // adventureChoiceTwo.innerText = "Run away...";
     // adventureChoiceTwo.pressAllowed = false;
@@ -4462,6 +4523,7 @@ function drawAdventure(advType,wave) {
     function textFadeIn() {
         adventureTextBox.style.animation = "";
         let adventureHeading = document.getElementById("adventure-header");
+        adventureHeading.style.top = "10%";
         adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
         adventureHeading.style.animation = "fadeOut 1.4s ease-out reverse";
         adventureChoiceOne.pressAllowed = true;
@@ -4704,7 +4766,7 @@ function triggerFight() {
         mobHealth.class = singleEnemyInfo.Class;
         mobHealth.dead = false;
         
-        let animationTime = randomInteger(singleEnemyInfo.AtkCooldownLower * 10,singleEnemyInfo.AtkCooldownUpper * 10)/100;
+        let animationTime = singleEnemyInfo.AtkCooldown * randomInteger(90,110) / 1000;
         mobDiv.attackTime = animationTime;
         let mobAtkIndicator = document.createElement("img");
         let canvas = document.createElement("canvas");
@@ -4858,7 +4920,7 @@ function triggerFight() {
             }
             
             attackMultiplier = comboHandler("check",attackMultiplier);
-            mobHealth.health -= ((currentATK * attackMultiplier)/ 6);
+            mobHealth.health -= ((currentATK * attackMultiplier)/ 5);
             attackMultiplier = 1;
 
             if (mobHealth.health <= 0) {
@@ -4872,6 +4934,9 @@ function triggerFight() {
                 fightEnemyDownElement.play();
                 mobHealth.remove();
 
+                if (!advDict.rankDict[8].Locked) {
+                    loseHP(1,"inverse");
+                }
                 let mobChildArray = mobDiv.children;
                 while (mobChildArray.length > 1) {
                     mobChildArray[mobChildArray.length - 1].remove();
@@ -5036,13 +5101,13 @@ function quicktimeEvent(waveQuicktime,advLevel) {
                 let atkNumber;
                 switch (advLevel) {
                     case 5:
-                        atkNumber = 1.5;
+                        atkNumber = 2;
                         break;
                     case 4:
-                        atkNumber = 1;
+                        atkNumber = 1.5;
                         break;
                     case 3:
-                        atkNumber = 0.5;
+                        atkNumber = 1;
                         break;
                 }
 
@@ -5282,9 +5347,9 @@ function attackAll(adventureFightBurst) {
 
         if (critRoll <= critThreshold) {
             createBattleText("crit",2000,mobDiv);
-            mobHealth.health -= (currentATK * 5 * 1.5);
+            mobHealth.health -= (currentATK * 4 * 1.5);
         } else {
-            mobHealth.health -= (currentATK * 5);
+            mobHealth.health -= (currentATK * 4);
         }
 
         if (!cooldownTime) {cooldownTime = mobDiv.attackTime * 150}
@@ -5332,6 +5397,7 @@ function loseAdventure() {
 
     document.getElementById("combo-number").remove();
     let adventureHeading = document.getElementById("adventure-header");
+    adventureHeading.style.top = "10%";
     adventureHeading.innerText = "You passed out...";
     let adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
@@ -5339,6 +5405,9 @@ function loseAdventure() {
     adventureChoiceOne.addEventListener("click",quitButton);
 
     function quitButton() {
+        let xp = 5*(2**(imgKey[keyNumber].Level)) * additionalXP;
+        gainXP(Math.round(xp));
+
         quitAdventure();
         adventureChoiceOne.removeEventListener("click",quitButton);
     }
@@ -5373,15 +5442,81 @@ function loseAdventure() {
     
 }
 
+const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
 function winAdventure() {
     if (!fightSceneOn) {return}
     fightSceneOn = false;
 
     let advButton = document.getElementById("adventure-button");
-    console.log(advButton.key)
-
+    let keyNumber = advButton.key;
     let adventureHeading = document.getElementById("adventure-header");
-    adventureHeading.innerText = "You won!";
+    adventureHeading.style.top = "0";
+    adventureHeading.innerText = "You won! You received some loot:";
+
+    let levelLoot = adventureLoot[`Level-${imgKey[keyNumber].Level}`];
+    let lootCounter = 0;
+    for (let key in adventureLoot[keyNumber]) {
+        levelLoot[key] = adventureLoot[keyNumber][key];
+    }
+
+    let itemFirstRoll = randomInteger(1,101);
+    let itemFirstThreshold = 101;
+    let itemSecondRoll = randomInteger(1,101);
+    let itemSecondThreshold = 101;
+
+    if (!advDict.rankDict[17].Locked) {
+        itemSecondThreshold = 70;
+        itemFirstThreshold = 65;
+    } else if (!advDict.rankDict[12].Locked) {
+        itemFirstThreshold = 70;
+    } else if (!advDict.rankDict[4].Locked) {
+        itemFirstThreshold = 90;
+    }
+
+    if (itemFirstRoll < itemFirstThreshold) {
+        delete levelLoot["Bonus"];
+    }
+    if (itemSecondRoll < itemSecondThreshold) {
+        delete levelLoot["Bonus2"];
+    }
+    
+    for (let key in levelLoot) {
+        if (key != "Bonus" && key != "Bonus2") {
+            levelLoot[key].splice(3, 0, `adventure-${lootCounter}`);
+            lootCounter++;
+        } else {
+            levelLoot[key].splice(3, 0, key);
+        }
+        inventoryDraw(...levelLoot[key]);
+    }
+
+    let adventureRewards = document.getElementById("adventure-rewards");
+    adventureRewards.style.opacity = "1";
+    for (let key in lootArray) {
+        let itemInfo = Inventory[lootArray[key]];
+        inventoryAdd(lootArray[key]);
+
+        let lootDiv = document.createElement("div");
+        lootDiv.classList.add("flex-column");
+        lootDiv.style.backgroundImage = `url(./assets/frames/background-${itemInfo.Star}.webp)`;
+        lootDiv.style.border = `0.15em solid ${itemFrameColors[itemInfo.Star-1]}`;
+
+        let lootImg = new Image();
+        lootImg.classList.add("cover-all");
+        lootImg.src = `./assets/tooltips/inventory/${itemInfo.File}.webp`;
+        let lootStar = new Image();
+        lootStar.src = `./assets/frames/star-${itemInfo.Star}.webp`;
+        lootDiv.append(lootImg,lootStar)
+
+        if (key === "Bonus" || key === "Bonus2") {
+            let bonus = new Image();
+            bonus.src = "./assets/expedbg/bonus.webp";
+            lootDiv.append(bonus)
+        }
+
+        adventureRewards.appendChild(lootDiv);
+    }
+
     let adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
     adventureChoiceOne.innerText = "Leave";
@@ -5390,10 +5525,21 @@ function winAdventure() {
     function quitButton() {
         quitAdventure();
         charScan();
-        gainXP(15);
-        updateMorale("recover",randomInteger(1,5))
+        updateMorale("recover",randomInteger(2,6));
+
+        let xp = 15*(2**(imgKey[keyNumber].Level)) * additionalXP;
+        gainXP(Math.round(xp));
+
         document.getElementById("combo-number").remove();
         adventureChoiceOne.removeEventListener("click",quitButton);
+
+        currencyPopUp("items");
+        newPop(1);
+        sortList("table2");
+        let rewardChildren = adventureRewards.children;
+        while (rewardChildren.length > 0) {
+            rewardChildren[0].remove();
+        }
     }
 
     let adventureFight = document.getElementById("adventure-fight");
@@ -5808,10 +5954,11 @@ function changeTooltip(dict, type, number) {
     }
     tooltipName.innerText = dict.Name;
     let lore = dict.Lore;
-    lore = lore.replaceAll("[s]",`<span style='color:#A97803'>`)
-    lore = lore.replaceAll("[/s]",`</span>`)
-    lore = lore.replaceAll("\n",`<br>`)
-    tooltipLore.innerHTML = lore;
+    tooltipLore.innerHTML = textReplacer({
+        "[s]":`<span style='color:#A97803'>`,
+        "[/s]":`</span>`,
+        "\n":`<br>`,
+    },lore);
 
     if (toolImgContainer.style.display != "block") {
         toolImgContainer.style.display = "block";
@@ -5836,18 +5983,18 @@ function changeTooltip(dict, type, number) {
     } else if (type == "milestone") {
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
 
-        let upgradeLevel = 50;
+        let upgradeLevel = 100;
         let extraText = "";
         if (number >= 350) {
-            upgradeLevel = 500;
+            upgradeLevel = 600;
             extraText = `& a 5-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 5-Star Gem`}
         } else if (number >= 200) {
-            upgradeLevel = 250;
+            upgradeLevel = 350;
             extraText = `& a 4-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 4-Star Gem`}
         } else if (number >= 75) {
-            upgradeLevel = 100;
+            upgradeLevel = 200;
             extraText = `& a 3-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 3-Star Gem`}
         }
@@ -5977,7 +6124,6 @@ function shopCheck() {
             storeInventory.storedTime = getTime();
             storeInventory.active = true;
             setShop("add");
-            // IT IS PERSISENT TO LOCALSTORAGE
             newPop(5);
             newPop(13);
         }
@@ -6222,6 +6368,7 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopButton.append(shopButtonImageContainer,shopButtonText);
     shopDiv.append(shopButton);
 
+    storeInventory[i+1].Purchased = false;
     storeInventory[i+1].Item = inventoryNumber;
     storeInventory[i+1].Cost = shopCost;
 

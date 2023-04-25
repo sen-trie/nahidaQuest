@@ -5637,6 +5637,7 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopButton.append(shopButtonImageContainer,shopButtonText);
     shopDiv.append(shopButton);
 
+    storeInventory[i+1].Purchased = false;
     storeInventory[i+1].Item = inventoryNumber;
     storeInventory[i+1].Cost = shopCost;
 
