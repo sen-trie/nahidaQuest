@@ -207,6 +207,15 @@ const BOUNTYCOOLDOWN = 60;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
+// ADVENTURE VARIABLES
+let quickType;
+let adventureScene = false;
+let adventureScaraText = "";
+let maxEnemyAmount = 0;
+let enemyAmount = 0;
+let quicktimeAttack = false;
+let skillCooldownReset;
+
 // SPECIAL UPGRADE VARIABLES
 let wishPower = 0;
 let upperEnergyRate = 35;
@@ -1742,6 +1751,33 @@ function tutorial(idleAmount) {
     }
 }
 
+// CUSTOM TUTORIALS
+function customTutorial(tutorialFile,maxSlide) {
+    let currentSlide = 1;
+    let customTutorialDiv = document.createElement("div");
+    customTutorialDiv.classList.add("cover-all","flex-column","tutorial-dark");
+
+    let tutorialImage = document.createElement("img");
+    tutorialImage.classList.add("tutorial-img");
+    tutorialImage.src = `./assets/tutorial/${tutorialFile}-1.webp`;
+    
+    let tutorialScreen = document.createElement("div");
+    tutorialScreen.classList.add("flex-column","tutorial-screen");
+    tutorialScreen.addEventListener("click",()=>{
+        if (currentSlide === maxSlide) {
+            customTutorialDiv.remove();
+            stopSpawnEvents = false;
+            return;
+        }
+        currentSlide++;
+        tutorialImage.src = `./assets/tutorial/${tutorialFile}-${currentSlide}.webp`;
+    })
+
+    tutorialScreen.append(tutorialImage);
+    customTutorialDiv.appendChild(tutorialScreen);
+    mainBody.appendChild(customTutorialDiv);
+}
+
 function saveData(skip) {
     if (preventSave) {return};
     saveValues["currentTime"] = getTime();
@@ -1794,6 +1830,7 @@ function createTabs() {
 
 // CHANGE TABS
 function tabChange(x) {
+    if (adventureScene) {return}
     if (timerSeconds !== 0) {
         tabElement.load();
         tabElement.play();
@@ -1923,7 +1960,7 @@ document.addEventListener("keydown", function(event) {
             tabChange(5);
         } else if (event.key === "6") {
             if (table7.innerHTML != "") {
-                tabChange(6)
+                tabChange(6);
             }
         } else if (event.key === "Escape") {
             toggleSettings();
@@ -3466,8 +3503,8 @@ function inventoryDraw(itemType, min, max, type, itemClass){
     let drawnItem = 0;
     while (true){
         attempts++;
-        if (attempts >= 500) {
-            console.error(`Error drawing item with properties [${itemType},${itemClass}]. Please inform the developer using the feedback form :)`);
+        if (attempts >= 2000) {
+            console.error(`Error drawing item with properties [${itemType},${itemClass},${type}]. Please inform the developer using the feedback form :)`);
             return;
         }
 
@@ -4118,7 +4155,8 @@ function createExpMap() {
     charSelect.classList.add("flex-row","char-select");
     charSelect.currentHero = 0;
     charSelect.addEventListener("click",()=>{
-        if (charMenu.style.display == "none") {
+        if (charMenu.style.display === "none") {
+            notifPop("clearAll","char");
             charMenu.style.display = "flex";
         } else {
             charMenu.style.display = "none";
@@ -4129,6 +4167,7 @@ function createExpMap() {
     notifSelect.id = "notif-selected";
     notifSelect.bountyArray = [];
     notifSelect.rankArray = [];
+    notifSelect.charArray = [];
     notifSelect.classList.add("flex-column","notif-select");
     
     let charMenu = document.createElement("div");
@@ -4371,31 +4410,39 @@ function notifPop(type,icon,count) {
         let notifImg = new Image();
         let notifText = document.createElement("p");
 
-        if (icon == "bounty") {
+        if (icon === "bounty") {
             notifImg.src = "./assets/icon/bountyComplete.webp";
             notifText.innerText = "Bounty Rewards";
             notifDiv.id = "bounty-notif";
             notifSelect.bountyArray.push(count);
-        } else if (icon == "rank") {
+        } else if (icon === "rank") {
             notifImg.src = "./assets/icon/advRank.webp";
             notifText.innerText = "Adv. Rank \n Rewards";
             notifDiv.id = "rank-notif";
-            notifSelect.rankArray.push(count)
+            notifSelect.rankArray.push(count);
+        } else if (icon === "char") {
+            notifImg.src = "./assets/icon/newChar.webp";
+            notifText.innerText = "New Leader \n Unlocked";
+            notifDiv.id = "char-notif";
+            notifSelect.charArray.push(count);
         }
 
         if (document.getElementById(notifDiv.id)) {return};
         notifContainer.append(notifText,notifImg)
         notifDiv.append(notifContainer);
         notifSelect.append(notifDiv);
-    } else if (type == "clear") {
+    } else if (type === "clear") {
         let array;
         let eleId;
-        if (icon == "bounty") {
+        if (icon === "bounty") {
             array = "bountyArray";
             eleId = "bounty-notif";
-        } else if (icon == "rank") {
+        } else if (icon === "rank") {
             array = "rankArray";
             eleId = "rank-notif";
+        } else if (icon === "char") {
+            array = "charArray";
+            eleId = "char-notif";
         }
 
         let index = notifSelect[array].indexOf(count);
@@ -4407,12 +4454,15 @@ function notifPop(type,icon,count) {
     } else if (type == "clearAll") {
         let array;
         let eleId;
-        if (icon == "bounty") {
+        if (icon === "bounty") {
             array = "bountyArray";
             eleId = "bounty-notif";
-        } else if (icon == "rank") {
+        } else if (icon === "rank") {
             array = "rankArray";
             eleId = "rank-notif";
+        } else if (icon === "char") {
+            array = "charArray";
+            eleId = "char-notif";
         }
 
         notifSelect[array] = [];
@@ -4426,6 +4476,7 @@ function charScan() {
         let charDiv = document.getElementById(`char-select-${i}`);
         if (charDiv.locked) {
             if (upgradeDict[upgradeThreshold[i]].Purchased > 0) {
+                notifPop("add","char",upgradeThreshold[i]);
                 charDiv.locked = false;
                 charDiv.children[0].src = `./assets/expedbg/leader-${i}.webp`;
                 charDiv.children[1].innerText = `${charLoreObj[i].Name} \n ${charLoreObj[i].Desc}`;
@@ -4466,14 +4517,6 @@ function unlockExpedition(i,expeditionDict) {
 }
 
 // ADVENTURE PROCESS
-let quickType;
-let adventureScene = false;
-let adventureScaraText = "";
-let maxEnemyAmount = 0;
-let enemyAmount = 0;
-let quicktimeAttack = false;
-let skillCooldownReset;
-
 function drawAdventure(advType,wave) {
     adventureScaraText = "";
     lootArray = {};
@@ -5474,19 +5517,28 @@ function winAdventure() {
     }
 
     if (itemFirstRoll < itemFirstThreshold) {
-        delete levelLoot["Bonus"];
+        if (levelLoot.hasOwnProperty("Bonus")) {
+            delete levelLoot["Bonus"];
+        }   
     }
+
     if (itemSecondRoll < itemSecondThreshold) {
-        delete levelLoot["Bonus2"];
-    }
-    
-    for (let key in levelLoot) {
-        if (key != "Bonus" && key != "Bonus2") {
-            levelLoot[key].splice(3, 0, `adventure-${lootCounter}`);
-            lootCounter++;
-        } else {
-            levelLoot[key].splice(3, 0, key);
+        if (levelLoot.hasOwnProperty("Bonus2")) {
+            delete levelLoot["Bonus2"];
         }
+    }
+
+    for (let key in levelLoot) {
+        if (key !== "Bonus" && key !== "Bonus2") {
+            if (levelLoot[key][3].split("-")[0] !== "adventure") {
+                levelLoot[key].splice(3, 0, `adventure-${lootCounter}`);
+            }
+        } else {
+            if (levelLoot[key][3] !== key) {
+                levelLoot[key].splice(3, 0, key);
+            }
+        }
+        lootCounter++;
         inventoryDraw(...levelLoot[key]);
     }
 
@@ -5533,7 +5585,12 @@ function winAdventure() {
         document.getElementById("combo-number").remove();
         adventureChoiceOne.removeEventListener("click",quitButton);
 
-        currencyPopUp("items");
+        if (imgKey[keyNumber].Level === 5) {
+            currencyPopUp("items",0,"nuts",(randomInteger(3,10)*3+advDict.adventureRank));
+        } else {
+            currencyPopUp("items");
+        }
+        
         newPop(1);
         sortList("table2");
         let rewardChildren = adventureRewards.children;
@@ -5843,7 +5900,7 @@ function popAchievement(achievement,loading) {
         saveValues["achievementCount"]++;
 
         if (timerSeconds !== 0) {
-            var achievementPopUp = drawUI.createAchievement(achievementText,achievementDesc);
+            let achievementPopUp = drawUI.createAchievement(achievementText,achievementDesc);
             achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
             achievementPopUp.addEventListener('animationend', () => {achievementPopUp.remove()});
             leftDiv.appendChild(achievementPopUp);
@@ -6572,7 +6629,7 @@ function calculateGoldenCore(type) {
     let goldenNutValue = Math.round(((saveValues.heroesPurchased/25))*2 + calculateNuts + saveValues.primogem/10 + saveValues.goldenNut + saveValues.achievementCount * 3);
     if (goldenNutValue < 100) {goldenNutValue = 0}
 
-    if (type == "formula") {
+    if (type === "formula") {
         return goldenNutValue;
     } else {
         let transcendValue = document.getElementById("transcend-display");
@@ -6709,29 +6766,7 @@ function nutPopUp() {
 
         setTimeout(()=>{
             addNutStore();
-            let currentSlide = 1;
-            let nutTutorialDark = document.createElement("div");
-            nutTutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
-
-            let tutorialImage = document.createElement("img");
-            tutorialImage.classList.add("tutorial-img");
-            tutorialImage.src = "./assets/tutorial/goldenNut-1.webp";
-            
-            let tutorialScreen = document.createElement("div");
-            tutorialScreen.classList.add("flex-column","tutorial-screen");
-            tutorialScreen.addEventListener("click",()=>{
-                if (currentSlide == 4) {
-                    nutTutorialDark.remove();
-                    stopSpawnEvents = false;
-                    return;
-                }
-                currentSlide++;
-                tutorialImage.src = "./assets/tutorial/goldenNut-"+currentSlide+".webp";
-            })
-
-            tutorialScreen.append(tutorialImage);
-            nutTutorialDark.appendChild(tutorialScreen);
-            mainBody.appendChild(nutTutorialDark);
+            customTutorial("goldenNut",4)
         },3000);
     }
 }

@@ -65,6 +65,8 @@ body {
 }
 
 .middle-area {
+    padding-left: 1%;
+    padding-right: 1%;
     width: 100%;
     height: 5%;
     left: 0;
@@ -188,6 +190,7 @@ body {
     bottom: 3%;
     height: 15%;
     width: auto;
+    max-width: 95%;
     aspect-ratio: 7;
     z-index: 10;
 }
@@ -317,30 +320,6 @@ body {
     border-bottom: 0.3em solid #816355;
 }
 
-/* .tooltipEXPED {
-    width: 90%;
-    height: 50%;
-    right: 1%;
-    font-size: 0.95em;
-    /* background-image: url(./assets/frames/tooltipEXPED-mobile.webp); */
-
-
-/* #adventure-tutorial {
-    right: 1%;
-    top: 2%;
-    height: 12%;
-    z-index: 30;
-} */
-/* 
-#adventure-button {
-    position: absolute;
-    bottom:45%;
-    width: 30%;
-    aspect-ratio: 4.56;
-    right: 2%;
-    height: 18%;
-} */
-
 .adventure-map {
     height: 98%;
 }
@@ -394,6 +373,10 @@ body {
 .toolImgContainer {
     aspect-ratio: 1;
     width: 25%;
+}
+
+#upgrade-menu-button {
+    right: 3%;
 }
 
 #tool-tip-button {
@@ -462,6 +445,14 @@ body {
     left: 5%;
 }
 
+#table7 > :last-child {
+    height: 20%;
+}
+
+.store-buy {
+    height: 80%;
+}
+
 .store-div {
     width: 70%;
     height: 45%;
@@ -507,7 +498,6 @@ body {
 .event-description {
     top: -1%;
 }
-
 
 .event-dark {
     row-gap: 1%;
@@ -615,4 +605,69 @@ body {
     width: 70%;
     height: 8%;
     font-size: 1.5em;
+}
+
+/*////////////////////////// ADVENTURE MOBILE CSS //////////////////////////*/
+.char-select {
+    height: 17%;
+}
+
+.char-menu {
+    max-height: 78%;
+    top: 18%;
+}
+
+.exped-xpbar,.drag-icon {
+    bottom: 3%;
+}
+
+.notif-select {
+    height: 13%;
+}
+
+.exped-loot {
+    overflow-y: auto;
+    justify-content: flex-start;
+}
+
+.inv-div {
+    flex-grow: 0;
+    height: 90%;
+    overflow-y: unset;
+}
+
+#adventure-button {
+    max-height: 17%;
+    height: auto;
+    flex-grow: 1;
+}
+
+.adventure-video {
+    width: 98%;
+}
+
+#adventure-health {
+    width: 95%;
+    height: 5%;
+    left: unset;
+    transform: none;
+}
+
+.adventure-text {
+    max-height: 43%;
+    height: auto;
+    width: 99%;
+}
+
+.adventure-fight {
+    aspect-ratio: unset;
+}
+
+.adventure-fight > p {
+    font-size: 1.7em;
+}
+
+#adventure-gif,#combo-number {
+    top: 8%;
+    font-size: 1.2em;
 }

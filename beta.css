@@ -215,6 +215,16 @@ img {
     }
 }
 
+@media (max-aspect-ratio: 12.5/9) {
+    body {
+        font-size: 1.7vw;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: 0;
+    }
+}
+
 @media (max-aspect-ratio: 11.5/9) {
     body {
         touch-action: manipulation;
@@ -509,11 +519,16 @@ table, button, label {
     background-color: #17321c;
 }
 
-.link:hover { 
+.second-link {
+    left: unset;
+    right: 1%;
+}
+
+.second-link:hover,.link:hover { 
     transform: scale(1.05);
 }
 
-.link:visited { 
+.second-link:visited,.link:visited { 
     color: #cee0d4;
 }
 
@@ -2575,11 +2590,16 @@ input:checked + .slider:before {
 }
 
 .exped-text > div {
+    height: auto;
     position: relative;
     z-index: 1;
     background-color: #000000de;
     padding: 1%;
     border-radius: 0.5em;
+}
+
+.exped-text > div > img {
+    height: 1em;
 }
 
 .exped-lore {
@@ -3304,10 +3324,19 @@ input:checked + .slider:before {
 
 .adventure-text {
     position: relative;
-    width: 40%;
-    height: 40%;
+    width: auto;
+    height: 43%;
+    aspect-ratio: 2.08;
     flex-wrap: wrap;
     color: #322a24;
+}
+
+.adventure-text > img {
+    position: absolute;
+    z-index: 501;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .skill-mark {
@@ -3538,15 +3567,6 @@ input:checked + .slider:before {
     flex-grow: 1;
     height: 100%;
     z-index: 2;
-}
-
-.adventure-text > img {
-    position: relative;
-    z-index: 501;
-    position: absolute;
-    aspect-ratio: 2.08;
-    height: 102%;
-    object-fit: contain;
 }
 
 #adventure-gif {
