@@ -41,6 +41,8 @@ let SettingsDefault = {
 }
 
 let advDictDefault = {
+    tutorialRanged: false,
+    tutorialBasic: false,
     adventureRank: 1,
     advXP: 0,
     bounty:[],

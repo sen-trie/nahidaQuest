@@ -215,6 +215,16 @@ img {
     }
 }
 
+@media (max-aspect-ratio: 12.5/9) {
+    body {
+        font-size: 1.7vw;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: 0;
+    }
+}
+
 @media (max-aspect-ratio: 11.5/9) {
     body {
         touch-action: manipulation;
@@ -318,6 +328,7 @@ img {
     position: relative;
     margin: 0 auto;
     display: none;
+    overflow: hidden;
 }
 
 .overlay {
@@ -499,20 +510,25 @@ table, button, label {
 
 .link {
     position: absolute;
-    left: 0.5%;
-    bottom: 0;
+    left: 1%;
+    bottom: 1%;
+    padding: 0.2%;
+    border-radius: 0.5em;
     text-decoration: none;
     color: #cee0d4;
-    filter: drop-shadow(0 0 0.1em black) drop-shadow(0 0 0.05em black);
+    background-color: #17321c;
 }
 
-.link:hover { 
-    color: #71e696;
-    filter: drop-shadow(0 0 0.1em black) drop-shadow(0 0 0.05em black);
+.second-link {
+    left: unset;
+    right: 1%;
+}
+
+.second-link:hover,.link:hover { 
     transform: scale(1.05);
 }
 
-.link:visited { 
+.second-link:visited,.link:visited { 
     color: #cee0d4;
 }
 
@@ -520,7 +536,7 @@ table, button, label {
     position: absolute;
     object-fit: cover;
     height: 100%;
-    width: max-content;
+    width: 100%;
 }
 
 #start-image {
@@ -1547,7 +1563,6 @@ input {
     cursor: url(./assets/icon/cursor.webp), auto;
 }
 
-/*********** Baseline, reset styles ***********/
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
@@ -2437,10 +2452,25 @@ input:checked + .slider:before {
     position: relative;
     right: -2%;
     height: 12%;
-    object-fit: contain;
+    aspect-ratio: 1;
     width: auto;
-    filter: drop-shadow(0 0 0.2em #442e1e) drop-shadow(0 0 0.1em #3b271a);
+    background-size: contain;
+    z-index: 20;
 }
+
+.char-morale > p {
+    position: absolute;
+    bottom: 115%;
+    filter: none;
+    border: 0.2em solid #60453D;
+    background-color: #A08167;
+    padding: 5%;
+    width: fit-content;
+    white-space: nowrap;
+    color: #36241e;
+    filter: drop-shadow(0 0 0.3em #5E453D);
+}
+
 
 .exped-xpbar {
     position: absolute;
@@ -2478,9 +2508,9 @@ input:checked + .slider:before {
 
 .exped-mesg-div > p {
     color: white;
-    background-color: #000000e3;
+    background-color: #000000d5;
     box-sizing: border-box;
-    padding: 3%;
+    padding: 5%;
     border-radius: 0.2em;
     white-space: nowrap;
     justify-content: flex-start;
@@ -2560,11 +2590,16 @@ input:checked + .slider:before {
 }
 
 .exped-text > div {
+    height: auto;
     position: relative;
     z-index: 1;
     background-color: #000000de;
     padding: 1%;
     border-radius: 0.5em;
+}
+
+.exped-text > div > img {
+    height: 1em;
 }
 
 .exped-lore {
@@ -2583,17 +2618,21 @@ input:checked + .slider:before {
 }
 
 .exped-container {
-    width: 50%;
+    width: 30%;
     height: 100%;
     gap: 2%;
     box-sizing: border-box;
     flex-wrap: wrap;
     align-content: center;
     border-right: 0.2em solid rgb(139, 133, 124);
+    overflow-y: auto;
+    padding: 1%;
+    box-sizing: border-box;
+    align-content: flex-start;
 }
 
 .enemy-head {
-    max-width: 25%;
+    max-width: 42%;
     height: auto;
     border: 0.15em solid #826147;
     border-radius: 1em;
@@ -2601,12 +2640,68 @@ input:checked + .slider:before {
 }
 
 .exped-loot {
-    width: 50%;
+    width: 70%;
     height: 100%;
     text-align: left;
     padding: 1%;
     box-sizing: border-box;
     align-items: flex-start;
+}
+
+.inv-div {
+    position: relative;
+    flex-grow: 1;
+    width: 100%;
+    overflow-y: auto;
+    gap: 2%;
+    padding: 1%;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    scrollbar-width: 0.5vw;
+}
+
+.inv-div::-webkit-scrollbar {
+    height: 0.5vw;
+}
+
+.inv-div > div {
+    position: relative;
+    height: 100%;
+    aspect-ratio: 0.70;
+    flex-direction: column-reverse;
+}
+
+.inv-div > div > :first-child {
+    height: 20%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.inv-div > div > :nth-child(2) {
+    width: 100%;
+    flex-grow: 1;
+    object-fit: contain;
+    transition: 0.1s ease;
+}
+
+.inv-div > div > :nth-child(2):hover {
+    transform: scale(1.1);
+}
+
+.pop-up-loot {
+    z-index: 2;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 0.8em;
+    pointer-events: none;
+    color: #cfc0ac;
+    white-space: nowrap;
+    padding: 5%;
+    background-color: #000000ee;
+    border-radius: 0.5em;
 }
 
 .after-icon {
@@ -2805,6 +2900,7 @@ input:checked + .slider:before {
     font-size: 1.4em;
     padding: 2%;
     box-sizing: border-box;
+    justify-content: flex-start;
 }
 
 .rank-menu > :last-child {
@@ -2919,13 +3015,14 @@ input:checked + .slider:before {
 .char-menu {
     z-index: 6;
     position: absolute;
-    width: 65%;
-    height: auto;
+    max-width: 90%;
+    max-height: 80%;
     aspect-ratio: 1;
     top: 13%;
     left: 2%;
     background-color: #71788A;
     border: 0.15em solid #3F4658;
+    overflow-y: auto;
 }
 
 .char-selected {
@@ -3036,6 +3133,7 @@ input:checked + .slider:before {
     background-repeat: no-repeat;
     background-position: center;
     column-gap: 0.5%;
+    overflow: hidden;
 }
 
 .adventure-scara-health {
@@ -3121,6 +3219,29 @@ input:checked + .slider:before {
     background-repeat: no-repeat;
 }
 
+.battle-text {
+    position: absolute;
+    left: 20%;
+    bottom: 25%;
+    object-fit: contain;
+    height: 10%;
+    width: 60%;
+    filter: drop-shadow(0 0 0.2em black);
+    animation: battle-text 0.6s linear forwards;
+    pointer-events: none;
+}
+
+@keyframes battle-text {
+    15% { transform:translateY(0%); }
+    30% { transform:translateY(-35%); }
+    45% { transform:translateY(-15%); }
+    65% { transform:translateY(0%); }
+    80% { transform:translateY(-15%); }
+    90% { transform:translateY(0); }
+    95% { transform:translateY(-5%); }
+    100% { transform:translateY(0); }
+}
+
 .atk-indicator {
     width: 100%;
     height: 13%;
@@ -3168,20 +3289,6 @@ input:checked + .slider:before {
     filter: grayscale(1) hue-rotate(90deg) brightness(0.7);
 }
 
-.battle-selected {
-    filter: drop-shadow(0.2em 0.2em 0em #386E4E)  
-            drop-shadow(-0.1em -0.1em 0em #386E4E)  
-            drop-shadow(-0.1em 0.1em 0em #386E4E)  
-            drop-shadow(0.1em -0.1em 0em #386E4E);
-}
-
-.battle-selected-scara {
-    filter: drop-shadow(0.2em 0.2em 0em #333455)  
-            drop-shadow(-0.1em -0.1em 0em #333455)  
-            drop-shadow(-0.1em 0.1em 0em #333455)  
-            drop-shadow(0.1em -0.1em 0em #333455);
-}
-
 @keyframes glow {
     0% {transform: translateY(0)}
     50% {transform: translateY(-40%)}
@@ -3217,9 +3324,19 @@ input:checked + .slider:before {
 
 .adventure-text {
     position: relative;
-    width: 40%;
-    height: 40%;
+    width: auto;
+    height: 43%;
+    aspect-ratio: 2.08;
     flex-wrap: wrap;
+    color: #322a24;
+}
+
+.adventure-text > img {
+    position: absolute;
+    z-index: 501;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .skill-mark {
@@ -3235,16 +3352,79 @@ input:checked + .slider:before {
     height: 100%;
     z-index: 502;
     text-align: center;
-    gap: 1%;
+    gap: 4%;
     aspect-ratio: 1.88;
+    padding: 2% 0 1% 0;
+    box-sizing: border-box;
 }
 
 #adventure-encounter > p {
-    height: 50%;
-    padding-top: 2%;
+    position: relative;
+    height: auto;
     box-sizing: border-box;
     color: #442d10;
     font-size: 1.2em;
+}
+
+.adventure-rewards {
+    flex-grow: 1;
+    height: auto;
+    width: 100%;
+    flex-wrap: wrap;
+    /* background-color: yellow; */
+    overflow-y: auto;
+    justify-content: flex-start;
+    background-color: #1e2a35;
+    border-radius: 0.5em 0 0 0.5em;
+    border: 0.2em solid #5c6b78;
+    box-sizing: border-box;
+    scrollbar-color: #5c6b78;
+    gap: 5% 2%;
+    padding: 1%;
+    box-sizing: border-box;
+}
+
+.adventure-rewards::-webkit-scrollbar-thumb {
+    background-color: #5c6b78;
+    border-radius: 0;
+}
+
+.adventure-rewards > div {
+    background-position: center;
+    background-size: contain;
+    width: 20%;
+    height: auto;
+    aspect-ratio: 1;
+    flex-basis: 18%;
+    position: relative;
+    box-sizing: border-box;
+    border-radius: 0.2em;
+}
+
+.adventure-rewards > div > :first-child {
+    object-fit: cover;
+    filter: drop-shadow(0 0 0.2em black);
+}
+
+.adventure-rewards > div > :nth-child(2) {
+    position: absolute;
+    bottom: 0;
+    height: 20%;
+    object-fit: contain;
+    width: auto;
+    max-width: 100%;
+    filter: drop-shadow(0 0 0.1em black);
+}
+
+.adventure-rewards > div > :nth-child(3) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 20%;
+    object-fit: contain;
+    width: auto;
+    max-width: 100%;
+    filter: drop-shadow(0 0 0.2em black);
 }
 
 #adventure-encounter > button {
@@ -3268,35 +3448,125 @@ input:checked + .slider:before {
 }
 
 .adventure-fight {
+    display: flex;
     z-index: 502;
     height: 100%;
     justify-content: space-around;
+    align-items: flex-start;
     aspect-ratio: 1.88;
+    flex-wrap: wrap;
+    padding: 1%;
+    box-sizing: border-box;
 }
 
-.adventure-fight > img {
-    width: 24%;
-    aspect-ratio: 1;
-    transition: 0.3s ease;
-}
-
-.fight-button:hover {
-    transform: translate(-0.3em,-0.3em);
-    filter:drop-shadow(0.2em 0.2em 0 #376C51) drop-shadow(0.3em 0.3em 0 #1d432f);
-}
-
-.fight-scara:hover {
-    transform: translate(-0.3em,-0.3em);
-    filter:drop-shadow(0.2em 0.2em 0 #42456c) drop-shadow(0.3em 0.3em 0 #22233c);
-}
-
-.adventure-text > img {
+.adventure-fight > p {
     position: relative;
-    z-index: 501;
-    position: absolute;
-    aspect-ratio: 2.08;
-    height: 102%;
+    width: 100%;
+    aspect-ratio: unset;
+    height: 30%;
+}
+
+.fight-button, .fight-button-scara {
+    width: 25%;
+    max-height: 45%;
+    aspect-ratio: 1;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.fight-button > img, .fight-button-scara > img {
+    transition: 0.3s ease;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+}
+
+.fight-button > div, .fight-button-scara > div {
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    height: 20%;
+}
+
+.fight-button > img:hover,.fight-button-scara > img:hover {
+    transform: scale(1.08);
+}
+
+.battle-selected > img {
+    filter: drop-shadow(0.2em 0.2em 0em #386E4E)  
+            drop-shadow(-0.1em -0.1em 0em #386E4E)  
+            drop-shadow(-0.1em 0.1em 0em #386E4E)  
+            drop-shadow(0.1em -0.1em 0em #386E4E);
+}
+
+.battle-selected-scara > img {
+    filter: drop-shadow(0.2em 0.2em 0em #333455)  
+            drop-shadow(-0.1em -0.1em 0em #333455)  
+            drop-shadow(-0.1em 0.1em 0em #333455)  
+            drop-shadow(0.1em -0.1em 0em #333455);
+}
+
+#battle-skill > :nth-child(3) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 101;
+    animation: 1.5s rotate linear;
+}
+
+@keyframes rotate {
+    0% {transform: rotate(0)}
+    100% {transform: rotate(360deg)}
+}
+
+.adventure-atk-cooldown {
+    border: 0.15em solid #386E4E;
+    background-color: #386E4E;
+    box-sizing: border-box;
+}
+
+.adventure-atk-cooldown-scara {
+    border: 0.15em solid #333455;
+    background-color: #333455;
+    box-sizing: border-box;
+}
+
+.inner-cooldown {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #AEDF7D;
+}
+
+.inner-cooldown-scara {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #acbbd6;
+}
+
+.adventure-atk-cooldown > :last-child, .adventure-atk-cooldown-scara > :last-child{
+    border-right: none;
+}
+
+.cooldown-bit {
+    border-right:0.15em solid #386E4E;
+    box-sizing: border-box;
+    flex-grow: 1;
+    height: 100%;
+    z-index: 2;
+}
+
+.cooldown-bit-scara {
+    border-right:0.15em solid #333455;
+    box-sizing: border-box;
+    flex-grow: 1;
+    height: 100%;
+    z-index: 2;
 }
 
 #adventure-gif {
@@ -3320,6 +3590,82 @@ input:checked + .slider:before {
         transform: scaleX(1);
         opacity: 1;
     }
+}
+
+#quicktime-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.95);
+    animation: slide-out-bottom 0.1s linear reverse;
+}
+
+.quicktime-bar {
+    aspect-ratio: 7.15;
+    width: 95%;
+    position: relative;
+    overflow: hidden;
+}
+
+.quicktime-img {
+    position: absolute;
+    transition: 0.05s ease;
+    object-fit: contain;
+    width: 10%;
+}
+
+.text-overlay {
+    z-index: 600;
+    background-color: #F7F1E6;
+    height: 95%;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.text-overlay > p {
+    width: 100%;
+    height: 30%;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.text-overlay > img {
+    height: 50%;
+    width: auto;
+    aspect-ratio: 1;
+    position: relative;
+    top: -5%;
+    transition: 0.4s ease;
+}
+
+@keyframes puffOut {
+    0% {
+        transform: scale(1);
+        filter: blur(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        filter: blur(0.5em);
+        opacity: 0;
+    }
+}
+
+.text-overlay > img:hover {
+    transform: scale(1.1);
+}
+
+.quicktime-warning {
+    position: absolute;
+    top: 2%;
+    width: auto;
+    height: 20%;
+    object-fit: contain;
+    animation: vignette-animation 1s 3 linear forwards;
+    pointer-events: none;
 }
 
 /*/////////////////////////////// WISH (TABLE4) CSS ///////////////////////////////*/
