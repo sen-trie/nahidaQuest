@@ -5,7 +5,8 @@ const uniqueFileArray = {
     "frames/":["achievement","achievement-temp","button","dori-deals","wishButton","tooltipEXPED","bar","top-bar","arrow"],
     "tooltips/elements/":["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"],
     "event/":["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"],
-    "icon/":["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","event-easy","event-hard"],    
+    "icon/":["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","event-easy","event-hard"],
+    "expedbg/":["break","counter","crit","dodge"]
 }
 
 const numberedFileArray = {
@@ -17,8 +18,9 @@ const numberedFileArray = {
     "tutorial/aranara-":6,
     "event/whopperflower-":3,
     "event/bad-":4,
-    "tutorial/tut-":4,
-    "event/weasel-":9
+    "tutorial/tut-":5,
+    "event/weasel-":9,
+    "expedbg/header/":17,
 }
 
 function preloadMinimumArray(upgradeInfo) {
@@ -39,12 +41,10 @@ function preloadMinimumArray(upgradeInfo) {
 
     for (let key in upgradeInfo) {
         let upgradeName = upgradeInfo[key].Name;
-
         let urlOne = filePath + "nameplates/" + upgradeName + ".webp";
         let urlTwo = filePath + "tooltips/hero/" + upgradeName + ".webp";
         array.push(urlOne,urlTwo);
     }
-
     return array;
 }
 

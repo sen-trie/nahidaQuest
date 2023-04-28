@@ -629,8 +629,16 @@ table, button, label {
     pointer-events: none;
 }
 
+#loading > p {
+    position: absolute;
+    bottom: 66.5%;
+    font-size: 2em;
+    color: #ACDE7E;
+    text-shadow: 0 0 0.2em black, 0 0 0.15em black, 0 0 0.1em black;
+}
+
 .overlay-tutorial {
-    width: 50% !important; 
+    width: auto!important; 
     height: 55% !important;
     object-fit: contain;
 }

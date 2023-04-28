@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "0.4-4-280";
+const VERSIONNUMBER = "0.4-4-281";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -1625,17 +1625,26 @@ function loadingAnimation() {
     var scale = screen.width / (siteWidth);
     document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
 
+    let loadingNumber = document.getElementById('loading-number');
+    let value = parseInt(loadingNumber.loadingValue);
     let preloadArray = drawUI.preloadMinimumArray(upgradeInfo);
     preloadStart.fetch(preloadArray).then(() => {
-        setTimeout(() => {removeLoading()}, 300);
+        setTimeout(() => {removeLoading(loadingNumber)}, 300);
     });
+
+    preloadStart.onprogress = event => {
+        if (value != event.progress) {
+            value = event.progress;
+            loadingNumber.innerText = `${value}%`;
+        }
+    }
 
     preloadStart.onerror = item => {
         console.error(`Error preloading '${item.url}'`);
     }
 }
 
-function removeLoading() {
+function removeLoading(loadingNumber) {
     let screenTipsDiv = document.getElementById("screen-tips");
     screenTipsDiv.innerText = screenLoreDict[0];
     let screenTipsInterval = setInterval(()=>{
@@ -1647,6 +1656,7 @@ function removeLoading() {
 
         overlay.removeChild(overlay.firstElementChild);
         overlay.classList.remove("overlay");
+        loadingNumber.remove();
         if (persistentValues.upgrade6.Purchased > 0) {
             idleAmount = idleCheck(idleAmount);
         }
@@ -1752,10 +1762,17 @@ function tutorial(idleAmount) {
 }
 
 // CUSTOM TUTORIALS
+const preloadTutorial = Preload();
 function customTutorial(tutorialFile,maxSlide,exitFunction) {
     let currentSlide = 1;
     let customTutorialDiv = document.createElement("div");
     customTutorialDiv.classList.add("cover-all","flex-column","tutorial-dark");
+
+    let slideArray = [];
+    for (let i = 0; i < maxSlide; i++) {
+        slideArray.push(`./assets/tutorial/${tutorialFile}-${i+1}.webp`);
+    }
+    preloadTutorial.fetch(slideArray);
 
     let tutorialImage = document.createElement("img");
     tutorialImage.classList.add("tutorial-img");
@@ -4481,6 +4498,7 @@ function unlockExpedition(i,expeditionDict) {
 }
 
 // ADVENTURE PROCESS
+const adventurePreload = new Preload();
 function drawAdventure(advType,wave) {
     adventureScaraText = "";
     lootArray = {};
@@ -4537,12 +4555,16 @@ function drawAdventure(advType,wave) {
         adventureTextBox.removeEventListener("animationend", textFadeIn,true);
     }
 
-    adventureArea.style.zIndex = 500;
-    adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
-    adventureTextBox.addEventListener("animationend",textFadeIn,true);
-    bgmElement.pause();
-    fightEncounter.load();
-    fightEncounter.play();
+    let preloadedImage = new Image();
+    preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp`;
+    preloadedImage.onload = ()=> {
+        adventureArea.style.zIndex = 500;
+        adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
+        adventureTextBox.addEventListener("animationend",textFadeIn,true);
+        bgmElement.pause();
+        fightEncounter.load();
+        fightEncounter.play();
+    }
 }
 
 function comboHandler(type,ele) {
@@ -4971,6 +4993,8 @@ function triggerFight() {
                 warningImg.src = "./assets/icon/warning.webp";
                 warningImg.classList.add("quicktime-warning");
                 adventureVideo.appendChild(warningImg);
+
+                adventurePreload.fetch(["./assets/expedbg/Blue.webp","./assets/expedbg/Red.webp","./assets/expedbg/Green.webp"])
                 warningImg.onload = ()=>{
                     warningImg.addEventListener("animationend",()=>{
                         quicktimeEvent(quicktimeArray[randomInteger(1,Object.keys(quicktimeArray).length+1)],atkValue);
