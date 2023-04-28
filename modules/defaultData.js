@@ -38,6 +38,7 @@ let SettingsDefault = {
     bgmVolume:0.5,
     sfxVolume:0.5,
     combineFloatText:false,
+    defaultZoom: 50,
 }
 
 let advDictDefault = {

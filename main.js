@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "0.4-4-270";
+const VERSIONNUMBER = "0.4-4-280";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -972,7 +972,7 @@ function reactionFunction(eventBackdrop) {
         outcomeText = "You missed!";
     } else if (reactionReady == true) {
         reactionCorrectElement.play();
-        adventure(10);
+        adventure("10-");
         primogem = randomInteger(40,60);
         outcomeText = "You did it!";
     }
@@ -1025,7 +1025,7 @@ function boxOpen(eventBackdrop,specialBox) {
     if (specialBox) {
         let randomSpecial = randomInteger(2,6);
         outcomeNumber = randomInteger(5,15);
-        adventure(10);
+        adventure("10-");
         boxOutcome.src = `./assets/event/verygood-${randomSpecial}.webp`;
         outcomeText = specialText[randomSpecial-2];
     } else {
@@ -1215,7 +1215,7 @@ function minesweeperEvent() {
                 }
                 if (cellsLeft <= 0) {
                     let randomPrimo = randomInteger(200,400);
-                    adventure(10);
+                    adventure("10-");
                     newPop(1);
                     eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop);
                     setTimeout(()=>{currencyPopUp("items",0,"primogem", randomPrimo)},4000)
@@ -4214,15 +4214,20 @@ function createExpMap() {
     dragIcon.classList.add("drag-icon");
     dragIcon.src = "./assets/expedbg/drag.webp";
 
-    advImageDiv.append(advImage,dragIcon,charSelect,notifSelect,expedMesgDiv,charMenu,expedXP);
+    let mapZoom = document.createElement("input");
+    mapZoom.id = "zoom-scroller";
+    mapZoom.setAttribute("type", "range");
+    mapZoom.min = 0;
+    mapZoom.max = 100;
+    if (isNaN(settingsValues.defaultZoom)) {settingsValues.defaultZoom = 25}
+    mapZoom.value = settingsValues.defaultZoom;
+
+    advImageDiv.append(advImage,dragIcon,charSelect,notifSelect,expedMesgDiv,charMenu,expedXP,mapZoom);
     leftDiv.appendChild(advImageDiv);
 
-    let lastX = 0;
-    let lastY = 0;
-    let x = 0;
-    let y = 0;
-    let maxX;
-    let maxY;
+    let mapInstance = Panzoom(advImage)
+    let zoomValue = 0.3 + (2/100) * settingsValues.defaultZoom;
+    mapInstance.zoom(zoomValue)
 
     let img = new Image();
     img.src = "./assets/expedbg/adventureMap.webp";
@@ -4231,9 +4236,6 @@ function createExpMap() {
         advImage.style.height = this.naturalHeight  + "px";
         advImage.style.aspectRatio = `${this.naturalWidth / this.naturalHeight}`;
         advImage.classList.add('adventure-image');
-
-        maxX = this.naturalWidth / 2.5;
-        maxY = this.naturalHeight / 3;
     }
 
     for (let key in imgKey) {
@@ -4280,56 +4282,17 @@ function createExpMap() {
         }
         advImage.appendChild(button);
     }
-
-    advImageDiv.addEventListener("mousedown", handleMouseDown);
-    advImageDiv.addEventListener("touchstart", handleTouchStart, { passive: true });
-    advImageDiv.addEventListener("mousemove", handleMouseMove);
-    advImageDiv.addEventListener("touchmove", handleTouchMove, { passive: true });
-
-    function handleMouseDown(e) {
-        lastX = e.clientX;
-        lastY = e.clientY;
+    
+    mapZoom.oninput = function() {
+        zoomValue = 0.3 + (2/100) * this.value;
+        settingsValues.defaultZoom = this.value;
+        mapInstance.zoom(zoomValue)
     }
 
-    function handleTouchStart(e) {
-        lastX = e.touches[0].clientX;
-        lastY = e.touches[0].clientY;
-    }
-
-    function handleMouseMove(e) {
-        if (e.buttons === 1) {
-            x += e.clientX - lastX;
-            y += e.clientY - lastY;
-
-            checkBounds();
-
-            advImage.style.transform = `translate(${x}px, ${y}px)`;
-            lastX = e.clientX;
-            lastY = e.clientY;
-        }
-    }
-
-    function handleTouchMove(e) {
-        if (e.touches.length === 1) {
-            e.preventDefault();
-
-            x += e.touches[0].clientX - lastX;
-            y += e.touches[0].clientY - lastY;
-
-            checkBounds();
-
-            advImage.style.transform = `translate(${x}px, ${y}px)`;
-            lastX = e.touches[0].clientX;
-            lastY = e.touches[0].clientY;
-        }
-    }
-
-    function checkBounds() {
-        if (x > maxX) {x = maxX}
-        if (y > maxY) {y = maxY}
-        if (x < -maxX) {x = -maxX}
-        if (y < -maxY) {y = -maxY}
-    }
+    dragIcon.addEventListener("click",()=>{
+        mapInstance.reset();
+        mapInstance.zoom(zoomValue)
+    })
 }
 
 function gainXP(xpAmount) {

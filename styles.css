@@ -1576,13 +1576,16 @@ input[type="range"]:focus {
 input[type="range"]::-webkit-slider-runnable-track {
     background-color: #99b390;
     border-radius: 0.5em;
-    height: 15%;
+    height: 20%;
 }
 
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    margin-top: -3.5%;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+
     background-color: #374931;
     border-radius: 1em;
     height: 400%;
@@ -1602,7 +1605,8 @@ input[type="range"]::-moz-range-track {
 
 input[type="range"]::-moz-range-thumb {
     appearance: none;
-    margin-top: -3.5%; 
+    position: relative;
+    
     border: none;
     background-color: #374931;
     border-radius: 1em;
@@ -2941,6 +2945,73 @@ input:checked + .slider:before {
     background-position: center;
     background-size: cover;
     z-index: 11;
+    pointer-events: none;
+}
+
+.adventure-map > * {
+    pointer-events: auto;
+}
+
+.adventure-map > input {
+    position: absolute;
+    left: 50%;
+    width: 90%;
+    height: auto;
+    aspect-ratio: 20;
+    transform: rotate(270deg);
+    writing-mode: vertical-lr;
+}
+
+.adventure-map > input::-webkit-slider-runnable-track {
+    background-color: #81a56ddd;
+    border-radius: 1em;
+    border: 0.3em solid #465B3D;
+    box-sizing: unset;
+    height: 100%;
+}
+
+.adventure-map > input::-webkit-slider-thumb {
+    background-color: transparent;
+    width: auto;
+    height: 200%;
+    aspect-ratio: 1;
+
+    margin: 0;
+    background: url(./assets/icon/zoom.webp) no-repeat center/cover;
+    cursor: grab;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+  }
+
+.adventure-map > input:focus::-webkit-slider-thumb {
+    outline: none;
+    outline-offset: none;
+}
+
+.adventure-map > input::-moz-range-track {
+    background-color: #99b390;
+    border-radius: 0.5em;
+    height: 100%;
+}
+  
+.adventure-map > input::-moz-range-thumb {
+    background-color: transparent;
+    width: auto;
+    height: 200%;
+    aspect-ratio: 1;
+
+    margin: 0;
+    background: url(./assets/icon/warning.webp) no-repeat center/cover;
+    cursor: grab;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.adventure-map > input:focus:focus::-moz-range-thumb{
+    outline: none;
+    outline-offset: none;
 }
 
 .char-select {
@@ -3092,7 +3163,6 @@ input:checked + .slider:before {
 .adventure-image {
     top: 0;
     left: 0;
-	pointer-events: none;
 	position: relative;
 	user-select: none;
     border: 0.2em solid #3B425E;
