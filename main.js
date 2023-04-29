@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "0.4-4-290";
+const VERSIONNUMBER = "0.4-4-291";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -2012,8 +2012,7 @@ document.addEventListener("keydown", function(event) {
 
 // SETTINGS MENU - SAVES & VOLUME CONTROL
 function settings() {
-    importClipboard("create");
-    toggleClipboard("create");
+    settingsBox("create");
     // JUST THE BUTTON FOR SETTING MENU
     let settingButton = document.createElement("button");
     settingButton.classList.add("settings-button");
@@ -2118,17 +2117,21 @@ function settings() {
     });
 
     label.append(input,slider);
-    settingsBottomLeft.appendChild(label);
+
+    let errorButton = document.createElement("div");
+    errorButton.innerText = "Error Log";
+    errorButton.addEventListener("click",()=>{settingsBox("toggle","error")})
+    settingsBottomLeft.append(label,errorButton);
 
     let exportSaveSetting = document.createElement("div");
     exportSaveSetting.innerText = "Export Save";
     exportSaveSetting.classList.add("flex-row");
-    exportSaveSetting.addEventListener("click",()=>{toggleClipboard("toggle")})
+    exportSaveSetting.addEventListener("click",()=>{settingsBox("toggle","export")})
 
     let importSaveSetting = document.createElement("div");
     importSaveSetting.innerText = "Import Save";
     importSaveSetting.classList.add("flex-row");
-    importSaveSetting.addEventListener("click",()=>{importClipboard("toggle")})
+    importSaveSetting.addEventListener("click",()=>{settingsBox("toggle","import");})
 
     let cancelButton = document.createElement("button");
     cancelButton.classList.add("cancel-button");
@@ -2153,12 +2156,11 @@ function settings() {
 
 let settingsOpen = false;
 function toggleSettings(closeOnly) {
-    toggleClipboard("close");
-    importClipboard("close");
     let settingsMenu = document.getElementById("settings-menu");
     if (settingsOpen == true) {
         settingsMenu.style.zIndex = -1;
         settingsOpen = false;
+        settingsBox("close");
     } else {
         if (closeOnly !== true) {
             settingsMenu.style.zIndex = 1000;
@@ -2185,64 +2187,47 @@ function settingsVolume() {
     });
 }
 
-function toggleClipboard(type) {
-    if (type == "create") {
-        let textBoxDiv = document.createElement("div");
-        textBoxDiv.classList.add("text-box");
-        textBoxDiv.id = "text-box";
-        textBoxDiv.style.zIndex = -1;
+const settingsID = ["export","import","error"];
+function settingsBox(type,eleId) {
+    if (type === "create") {
+        // EXPORT SAVE
+        let exportBoxDiv = document.createElement("div");
+        exportBoxDiv.classList.add("text-box");
+        exportBoxDiv.id = "export-box";
+        exportBoxDiv.style.zIndex = -1;
 
-        let textBox = document.createElement("textarea");
-        let cancelButton = document.createElement("button");
-        cancelButton.addEventListener("click",()=>{
-            textBoxDiv.style.zIndex = -1;
+        let exportBox = document.createElement("textarea");
+        exportBox.value = "Save your game to export it!"
+        let cancelExportButton = document.createElement("button");
+        cancelExportButton.addEventListener("click",()=>{
+            exportBoxDiv.style.zIndex = -1;
         })
 
-        let copyButton = document.createElement("button");
-        copyButton.innerText = "Copy to Clipboard";
-        copyButton.addEventListener("click",()=>{
+        let copyExportButton = document.createElement("button");
+        copyExportButton.innerText = "Download Save";
+        copyExportButton.addEventListener("click",()=>{
             let text = JSON.stringify(localStorage);
-            navigator.clipboard
-            .writeText(text)
-            .then(()=>{
-                alert(`Copied save data to clipboard.`)
-            })
-            .catch(() => {
-                alert(`Failed to copy to clipboard.`)
-            });
+            let blob = new Blob([text], {type: "text/plain"});
+            let link = document.createElement("a");
+            link.download = `NQ Save ${DBNUBMER}.txt`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
         })
         
-        textBoxDiv.append(textBox,cancelButton,copyButton);
-        mainBody.appendChild(textBoxDiv);
-    } else if (type == "toggle") {
-        let textBox = document.getElementById("text-box");
-        if (textBox.style.zIndex == -1) {
-            importClipboard("close");
-            textBox.children[0].value = JSON.stringify(localStorage);
-            textBox.style.zIndex = 10000;
-        } else {
-            textBox.style.zIndex = -1;
-        }
-    } else if (type == "close") {
-        let textBox = document.getElementById("text-box");
-        if (textBox.style.zIndex != -1) {
-            textBox.style.zIndex = -1;
-        }
-    }
-}
+        exportBoxDiv.append(exportBox,cancelExportButton,copyExportButton);
+        mainBody.appendChild(exportBoxDiv);
 
-function importClipboard(type) {
-    if (type == "create") {
-        let textBoxDiv = document.createElement("div");
-        textBoxDiv.classList.add("text-box");
-        textBoxDiv.id = "import-box";
-        textBoxDiv.style.zIndex = -1;
+        // IMPORT SAVE
+        let importBoxDiv = document.createElement("div");
+        importBoxDiv.classList.add("text-box");
+        importBoxDiv.id = "import-box";
+        importBoxDiv.style.zIndex = -1;
 
         let textBox = document.createElement("textarea");
         textBox.value = "Paste save data here.";
         let cancelButton = document.createElement("button");
         cancelButton.addEventListener("click",()=>{
-            textBoxDiv.style.zIndex = -1;
+            importBoxDiv.style.zIndex = -1;
         })
 
         let copyButton = document.createElement("button");
@@ -2280,21 +2265,48 @@ function importClipboard(type) {
                 preventSave = false;
             }
         })
+        importBoxDiv.append(textBox,cancelButton,copyButton);
+        mainBody.appendChild(importBoxDiv);
+
+        // ERROR LOG
+        let errorBoxDiv = document.createElement("div");
+        errorBoxDiv.classList.add("text-box");
+        errorBoxDiv.id = "error-box";
+        errorBoxDiv.style.zIndex = -1;
+
+        let errorBox = document.createElement("textarea");
+        errorBox.value = "Any errors or bugs will appear below this line! \nPlease report such errors to the developer through the feedback form at the starting page :) \n------------------------------------------------------------------------------------------\n"
+        errorBox.readOnly = true;
+
+        window.onerror = function(message, url, line, col, error) {
+            errorBox.value += `${error}\nLine:${line}, Column:${col}\n\n`;
+          };
+
+        let cancelErrorButton = document.createElement("button");
+        cancelErrorButton.addEventListener("click",()=>{
+            errorBoxDiv.style.zIndex = -1;
+        })
         
-        textBoxDiv.append(textBox,cancelButton,copyButton);
-        mainBody.appendChild(textBoxDiv);
-    } else if (type == "toggle") {
-        let textBox = document.getElementById("import-box");
+        errorBoxDiv.append(errorBox,cancelErrorButton);
+        mainBody.appendChild(errorBoxDiv);
+    } else if (type === "toggle") {
+        settingsBox("close");
+        let textBox = document.getElementById(`${eleId}-box`);
         if (textBox.style.zIndex == -1) {
-            toggleClipboard("close");
+            if (eleId === "export") {
+                textBox.children[0].value = JSON.stringify(localStorage);
+            }
             textBox.style.zIndex = 10000;
         } else {
             textBox.style.zIndex = -1;
         }
-    } else if (type == "close") {
-        let textBox = document.getElementById("import-box");
-        if (textBox.style.zIndex != -1) {
-            textBox.style.zIndex = -1;
+    } else if (type === "close") {
+        for (let i = 0; i < settingsID.length; i++) {
+            let eleId = settingsID[i];
+            let textBox = document.getElementById(`${eleId}-box`);
+            if (textBox.style.zIndex != -1) {
+                textBox.style.zIndex = -1;
+            }
         }
     }
 }
@@ -3483,12 +3495,14 @@ function createAdventure() {
     })
 
     document.addEventListener("keydown", function(event) {
-        if (event.key === "z" || event.key === "q") {
-            adventureFightDodge.click();
-        } else if (event.key === "x" || event.key === "w") {
-            adventureFightSkill.click();
-        } else if (event.key === "c" || event.key === "e") {
-            adventureFightBurst.click();
+        if (adventureScene) {
+            if (event.key === "z" || event.key === "q") {
+                adventureFightDodge.click();
+            } else if (event.key === "x" || event.key === "w") {
+                adventureFightSkill.click();
+            } else if (event.key === "c" || event.key === "e") {
+                adventureFightBurst.click();
+            }
         }
     })
 
@@ -3531,6 +3545,7 @@ function inventoryDraw(itemType, min, max, type, itemClass){
         "talent": 6001,
     }
     let drawnItem = 0;
+    console.log(`${itemType},${itemClass},${type}`)
     while (true){
         attempts++;
         if (attempts >= 2000) {
@@ -5549,18 +5564,13 @@ function winAdventure() {
         }
     }
 
+    // HACK FOR A WEIRD BUG WHERE LEVEL LOOT IS NOT CLEARED AFTER EXITING
     for (let key in levelLoot) {
-        if (key !== "Bonus" && key !== "Bonus2") {
-            if (levelLoot[key][3].split("-")[0] !== "adventure") {
-                levelLoot[key].splice(3, 0, `adventure-${lootCounter}`);
-            }
-        } else {
-            if (levelLoot[key][3] !== key) {
-                levelLoot[key].splice(3, 0, key);
-            }
+        if (levelLoot[key][3] == "adventure") {
+            levelLoot[key][3] = levelLoot[key][3] + `-${lootCounter}`;
         }
-        lootCounter++;
         inventoryDraw(...levelLoot[key]);
+        lootCounter++;
     }
 
     let adventureRewards = document.getElementById("adventure-rewards");
@@ -5577,8 +5587,8 @@ function winAdventure() {
             bonus.src = "./assets/expedbg/bonus.webp";
             lootDiv.append(bonus)
         }
-
         adventureRewards.appendChild(lootDiv);
+        delete lootArray[key];
     }
 
     let adventureChoiceOne = document.getElementById("adv-button-one");

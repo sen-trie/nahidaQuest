@@ -1421,6 +1421,7 @@ table, button, label {
     border: 0.3em outset #8fa77e;
     border-radius: 1em;
     background-color: #DEE3BA;
+    color: #1d2e18;
     z-index: -1;
     justify-content: space-around;
     filter: drop-shadow(0.1em 0.1em 0.2em #474d45);
@@ -1655,8 +1656,21 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .settings-bottom-left {
+    display: flex;
+    gap: 5%;
     width: 50%;
     height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-bottom-left > :last-child {
+    background-color: #99B589;
+    border: 0.15em solid #677D56;
+    border-radius: 1em;
+    width: fit-content;
+    padding: 1% 6% 1% 6%;
 }
 
 .settings-bottom-right {
@@ -1672,7 +1686,6 @@ input[type="range"]:focus::-moz-range-thumb{
 .settings-bottom-right > div {
     height: 25%;
     width: 100%;
-    color: #1d2e18;
     background-image: url(./assets/tutorial/buttonBox.webp);
     background-position: center;
     background-size: contain;
