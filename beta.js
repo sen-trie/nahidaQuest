@@ -1,11 +1,11 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot } from "./modules/dictData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "BETA.3-4-121";
+const VERSIONNUMBER = "BETA.4-4-290";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -265,6 +265,7 @@ const moraleLore = [
     "Nahida feels [s]Sad[/s]... [mor]<br><br> XP gains are reduced by 15%, recover party morale <br> by resting or completing expeditions successfully.",
 ]
 
+const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");
 let energyDisplay = document.getElementById("energy");
@@ -478,6 +479,12 @@ function loadSaveData() {
         let advDictTemp = localStorage.getItem("advDictSave");
         advDict = JSON.parse(advDictTemp);
         updateObjectKeys(advDict,advDictDefault);
+        // FOR SAVE DATA BELOW 0.4.4281
+        if (parseInt(saveValues.versNumber) < 44290) {
+            for (let key in advDict.rankDict) {
+                advDict.rankDict[key].Locked = true;
+            }
+        }
     }
     // LOAD ACHIEVEMENT DATA
     achievementList = achievementListDefault;
@@ -951,7 +958,7 @@ function reactionEvent() {
                     reactionButton.innerText = "Too Slow!";
                     reactionFunction(eventBackdrop);
                 }
-            }, 700)
+            }, 800 * randomInteger(90,110) / 100)
         }
     },randomTime);
     
@@ -972,7 +979,7 @@ function reactionFunction(eventBackdrop) {
         outcomeText = "You missed!";
     } else if (reactionReady == true) {
         reactionCorrectElement.play();
-        adventure(10);
+        adventure("10-");
         primogem = randomInteger(40,60);
         outcomeText = "You did it!";
     }
@@ -1025,7 +1032,7 @@ function boxOpen(eventBackdrop,specialBox) {
     if (specialBox) {
         let randomSpecial = randomInteger(2,6);
         outcomeNumber = randomInteger(5,15);
-        adventure(10);
+        adventure("10-");
         boxOutcome.src = `./assets/event/verygood-${randomSpecial}.webp`;
         outcomeText = specialText[randomSpecial-2];
     } else {
@@ -1215,7 +1222,7 @@ function minesweeperEvent() {
                 }
                 if (cellsLeft <= 0) {
                     let randomPrimo = randomInteger(200,400);
-                    adventure(10);
+                    adventure("10-");
                     newPop(1);
                     eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop);
                     setTimeout(()=>{currencyPopUp("items",0,"primogem", randomPrimo)},4000)
@@ -1625,17 +1632,26 @@ function loadingAnimation() {
     var scale = screen.width / (siteWidth);
     document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
 
+    let loadingNumber = document.getElementById('loading-number');
+    let value = parseInt(loadingNumber.loadingValue);
     let preloadArray = drawUI.preloadMinimumArray(upgradeInfo);
     preloadStart.fetch(preloadArray).then(() => {
-        setTimeout(() => {removeLoading()}, 300);
+        setTimeout(() => {removeLoading(loadingNumber)}, 300);
     });
+
+    preloadStart.onprogress = event => {
+        if (value != event.progress) {
+            value = event.progress;
+            loadingNumber.innerText = `${value}%`;
+        }
+    }
 
     preloadStart.onerror = item => {
         console.error(`Error preloading '${item.url}'`);
     }
 }
 
-function removeLoading() {
+function removeLoading(loadingNumber) {
     let screenTipsDiv = document.getElementById("screen-tips");
     screenTipsDiv.innerText = screenLoreDict[0];
     let screenTipsInterval = setInterval(()=>{
@@ -1647,6 +1663,7 @@ function removeLoading() {
 
         overlay.removeChild(overlay.firstElementChild);
         overlay.classList.remove("overlay");
+        loadingNumber.remove();
         if (persistentValues.upgrade6.Purchased > 0) {
             idleAmount = idleCheck(idleAmount);
         }
@@ -1752,10 +1769,17 @@ function tutorial(idleAmount) {
 }
 
 // CUSTOM TUTORIALS
-function customTutorial(tutorialFile,maxSlide) {
+const preloadTutorial = Preload();
+function customTutorial(tutorialFile,maxSlide,exitFunction) {
     let currentSlide = 1;
     let customTutorialDiv = document.createElement("div");
     customTutorialDiv.classList.add("cover-all","flex-column","tutorial-dark");
+
+    let slideArray = [];
+    for (let i = 0; i < maxSlide; i++) {
+        slideArray.push(`./assets/tutorial/${tutorialFile}-${i+1}.webp`);
+    }
+    preloadTutorial.fetch(slideArray);
 
     let tutorialImage = document.createElement("img");
     tutorialImage.classList.add("tutorial-img");
@@ -1767,6 +1791,8 @@ function customTutorial(tutorialFile,maxSlide) {
         if (currentSlide === maxSlide) {
             customTutorialDiv.remove();
             stopSpawnEvents = false;
+
+            if (exitFunction) {exitFunction()};
             return;
         }
         currentSlide++;
@@ -3267,16 +3293,20 @@ function adventure(advType) {
         if (saveValues["energy"] >= ADVENTURECOSTS[type]) {
             adventureElement.load();
             adventureElement.play();
-            // if (type === 5 && goldenNutUnlocked === true && expeditionDict[type].Locked != '1') {
-            //     currencyPopUp("items",0,"nuts",randomInteger(5,10))
-            // } else {
-            //     currencyPopUp("items");
-            // }
 
             saveValues["energy"] -= ADVENTURECOSTS[type];
             updateMorale("add",(randomInteger(7,10) * -1));
-            drawAdventure(type,wave);
             if (activeLeader == "Paimon") {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.1)}
+
+            if (!advDict.tutorialBasic) {
+                customTutorial("advTut",6,()=>{drawAdventure(type,wave)});
+                advDict.tutorialBasic = true;
+            } else if (type >= 3 && type < 6 && advDict.tutorialRanged != true) {
+                customTutorial("rangTut",2,()=>{drawAdventure(type,wave)});
+                advDict.tutorialRanged = true;
+            } else {
+                drawAdventure(type,wave);
+            }
         } else {
             expedInfo("exped-9");
             weaselDecoy.load();
@@ -3614,12 +3644,7 @@ function createExpedition() {
     advTutorial.src = "./assets/icon/help.webp";
     advTutorial.id = "adventure-tutorial";
     advTutorial.addEventListener("click", () => {
-        clearExped();
-        expedInfo("exped-8");
-        let advButton = document.getElementById("adventure-button");
-        if (advButton.classList.contains("expedition-selected")) {
-            advButton.classList.remove("expedition-selected");
-        }
+        customTutorial("advTut",6)
     })
     table3.append(charMorale,advButton,advTutorial);
     updateMorale("load");
@@ -3691,6 +3716,7 @@ function createGuild() {
     rankDiv.classList.add("flex-row","rank-div");
     rankDiv.activeLevel;
     let rankLore = document.createElement("div");
+    rankLore.classList.add("rank-lore");
     rankLore.innerText = `Select a level to get more information!`;
     let rankClaim = document.createElement("button");
     rankClaim.classList.add("flex-row");
@@ -3722,15 +3748,25 @@ function createGuild() {
         }
         
         rankButton.addEventListener("click",()=>{
+            rankLore.innerHTML = "";
+            if (advInfo[i].Item.length > 0) {
+                for (let j = 0; j < advInfo[i].Item.length; j++) {
+                    let rankInventoryRewards = document.createElement("div");
+                    rankInventoryRewards = inventoryFrame(rankInventoryRewards,Inventory[advInfo[i].Item[j]],itemFrameColors);
+                    rankLore.append(rankInventoryRewards);
+                }
+                rankLore.innerHTML += "<hr style='border-top: 0.2em solid #b9a47f;border-radius: 1em;margin-bottom: 2%;'>"
+            }
+
             let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:1%;white-space: nowrap;' class='flex-row'>
                                                           +1 HP <img style="height: 100%;margin-right:10%" src=./assets/icon/health.webp> 
-                                                          +6 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>          
-            </div>`);
-
-            rankLore.innerHTML = textReplacer({
+                                                          +6 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp></div>`);
+            rankLore.innerHTML += textReplacer({
                 "[s]":`<span style='color:#A97803'>`,
                 "[/s]":`</span>`,
             },loreHTML);
+
+            
 
             if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
             rankClaim.buttonLevel = i;
@@ -3761,18 +3797,30 @@ function createGuild() {
     rankDiv.children[0].click();
     rankClaim.addEventListener("click",()=>{
         if (rankClaim.available) {
+            let level = rankClaim.buttonLevel;
             rankClaim.innerText = "Rank Claimed";
             rankClaim.available = false;
             rankClaim.classList.add("rank-button-claimed");
             if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
-            advDict.rankDict[rankClaim.buttonLevel].Locked = false;
+            advDict.rankDict[level].Locked = false;
 
-            let rankButton = document.getElementById(`rank-button-${rankClaim.buttonLevel}`);
+            
+            let itemArray = advInfo[level].Item;
+            if (itemArray.length > 0) {
+                for (let i = 0; i < itemArray.length; i++) {
+                    inventoryAdd(itemArray[i]);
+                }
+                newPop(1);
+                currencyPopUp("items");
+            }
+            sortList("table2");
+
+            let rankButton = document.getElementById(`rank-button-${level}`);
             let rankIco = new Image();
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/tick.webp";
             rankButton.append(rankIco);
-            notifPop("clear","rank",rankClaim.buttonLevel);
+            notifPop("clear","rank",level);
         }
     })
 
@@ -4213,15 +4261,20 @@ function createExpMap() {
     dragIcon.classList.add("drag-icon");
     dragIcon.src = "./assets/expedbg/drag.webp";
 
-    advImageDiv.append(advImage,dragIcon,charSelect,notifSelect,expedMesgDiv,charMenu,expedXP);
+    let mapZoom = document.createElement("input");
+    mapZoom.id = "zoom-scroller";
+    mapZoom.setAttribute("type", "range");
+    mapZoom.min = 0;
+    mapZoom.max = 100;
+    if (isNaN(settingsValues.defaultZoom)) {settingsValues.defaultZoom = 25}
+    mapZoom.value = settingsValues.defaultZoom;
+
+    advImageDiv.append(advImage,dragIcon,charSelect,notifSelect,expedMesgDiv,charMenu,expedXP,mapZoom);
     leftDiv.appendChild(advImageDiv);
 
-    let lastX = 0;
-    let lastY = 0;
-    let x = 0;
-    let y = 0;
-    let maxX;
-    let maxY;
+    let mapInstance = Panzoom(advImage)
+    let zoomValue = 0.3 + (2/100) * settingsValues.defaultZoom;
+    mapInstance.zoom(zoomValue)
 
     let img = new Image();
     img.src = "./assets/expedbg/adventureMap.webp";
@@ -4230,9 +4283,6 @@ function createExpMap() {
         advImage.style.height = this.naturalHeight  + "px";
         advImage.style.aspectRatio = `${this.naturalWidth / this.naturalHeight}`;
         advImage.classList.add('adventure-image');
-
-        maxX = this.naturalWidth / 2.5;
-        maxY = this.naturalHeight / 3;
     }
 
     for (let key in imgKey) {
@@ -4279,56 +4329,17 @@ function createExpMap() {
         }
         advImage.appendChild(button);
     }
-
-    advImageDiv.addEventListener("mousedown", handleMouseDown);
-    advImageDiv.addEventListener("touchstart", handleTouchStart, { passive: true });
-    advImageDiv.addEventListener("mousemove", handleMouseMove);
-    advImageDiv.addEventListener("touchmove", handleTouchMove, { passive: true });
-
-    function handleMouseDown(e) {
-        lastX = e.clientX;
-        lastY = e.clientY;
+    
+    mapZoom.oninput = function() {
+        zoomValue = 0.3 + (2/100) * this.value;
+        settingsValues.defaultZoom = this.value;
+        mapInstance.zoom(zoomValue)
     }
 
-    function handleTouchStart(e) {
-        lastX = e.touches[0].clientX;
-        lastY = e.touches[0].clientY;
-    }
-
-    function handleMouseMove(e) {
-        if (e.buttons === 1) {
-            x += e.clientX - lastX;
-            y += e.clientY - lastY;
-
-            checkBounds();
-
-            advImage.style.transform = `translate(${x}px, ${y}px)`;
-            lastX = e.clientX;
-            lastY = e.clientY;
-        }
-    }
-
-    function handleTouchMove(e) {
-        if (e.touches.length === 1) {
-            e.preventDefault();
-
-            x += e.touches[0].clientX - lastX;
-            y += e.touches[0].clientY - lastY;
-
-            checkBounds();
-
-            advImage.style.transform = `translate(${x}px, ${y}px)`;
-            lastX = e.touches[0].clientX;
-            lastY = e.touches[0].clientY;
-        }
-    }
-
-    function checkBounds() {
-        if (x > maxX) {x = maxX}
-        if (y > maxY) {y = maxY}
-        if (x < -maxX) {x = -maxX}
-        if (y < -maxY) {y = -maxY}
-    }
+    dragIcon.addEventListener("click",()=>{
+        mapInstance.reset();
+        mapInstance.zoom(zoomValue)
+    })
 }
 
 function gainXP(xpAmount) {
@@ -4517,6 +4528,7 @@ function unlockExpedition(i,expeditionDict) {
 }
 
 // ADVENTURE PROCESS
+const adventurePreload = new Preload();
 function drawAdventure(advType,wave) {
     adventureScaraText = "";
     lootArray = {};
@@ -4573,12 +4585,16 @@ function drawAdventure(advType,wave) {
         adventureTextBox.removeEventListener("animationend", textFadeIn,true);
     }
 
-    adventureArea.style.zIndex = 500;
-    adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
-    adventureTextBox.addEventListener("animationend",textFadeIn,true);
-    bgmElement.pause();
-    fightEncounter.load();
-    fightEncounter.play();
+    let preloadedImage = new Image();
+    preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp`;
+    preloadedImage.onload = ()=> {
+        adventureArea.style.zIndex = 500;
+        adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
+        adventureTextBox.addEventListener("animationend",textFadeIn,true);
+        bgmElement.pause();
+        fightEncounter.load();
+        fightEncounter.play();
+    }
 }
 
 function comboHandler(type,ele) {
@@ -5007,6 +5023,8 @@ function triggerFight() {
                 warningImg.src = "./assets/icon/warning.webp";
                 warningImg.classList.add("quicktime-warning");
                 adventureVideo.appendChild(warningImg);
+
+                adventurePreload.fetch(["./assets/expedbg/Blue.webp","./assets/expedbg/Red.webp","./assets/expedbg/Green.webp"])
                 warningImg.onload = ()=>{
                     warningImg.addEventListener("animationend",()=>{
                         quicktimeEvent(quicktimeArray[randomInteger(1,Object.keys(quicktimeArray).length+1)],atkValue);
@@ -5362,6 +5380,8 @@ function attackAll(adventureFightBurst) {
     let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
     if (activeLeader == "Zhongli") {currentATK *= 1.50};
     if (advDict.morale > 80) {currentATK *= 1.10};
+    let attackMultiplier = comboHandler("check",attackMultiplier);
+    currentATK *= attackMultiplier;
 
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
@@ -5447,6 +5467,8 @@ function loseAdventure() {
     adventureChoiceOne.innerText = "Leave";
     adventureChoiceOne.addEventListener("click",quitButton);
 
+    let advButton = document.getElementById("adventure-button");
+    let keyNumber = advButton.key;
     function quitButton() {
         let xp = 5*(2**(imgKey[keyNumber].Level)) * additionalXP;
         gainXP(Math.round(xp));
@@ -5485,7 +5507,6 @@ function loseAdventure() {
     
 }
 
-const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
 function winAdventure() {
     if (!fightSceneOn) {return}
     fightSceneOn = false;
@@ -5549,16 +5570,7 @@ function winAdventure() {
         inventoryAdd(lootArray[key]);
 
         let lootDiv = document.createElement("div");
-        lootDiv.classList.add("flex-column");
-        lootDiv.style.backgroundImage = `url(./assets/frames/background-${itemInfo.Star}.webp)`;
-        lootDiv.style.border = `0.15em solid ${itemFrameColors[itemInfo.Star-1]}`;
-
-        let lootImg = new Image();
-        lootImg.classList.add("cover-all");
-        lootImg.src = `./assets/tooltips/inventory/${itemInfo.File}.webp`;
-        let lootStar = new Image();
-        lootStar.src = `./assets/frames/star-${itemInfo.Star}.webp`;
-        lootDiv.append(lootImg,lootStar)
+        lootDiv = inventoryFrame(lootDiv,itemInfo,itemFrameColors)
 
         if (key === "Bonus" || key === "Bonus2") {
             let bonus = new Image();

@@ -2853,9 +2853,9 @@ input:checked + .slider:before {
 }
 
 .rank-menu {
-    padding: 2%;
+    padding: 1.5%;
     box-sizing: border-box;
-    gap: 5%;
+    gap: 1%;
     color: white;
 }
 
@@ -2901,11 +2901,12 @@ input:checked + .slider:before {
     filter: drop-shadow(0 0 0.4em #3556B0) drop-shadow(0 0 0.4em #3556B0);
 }
 
-.rank-menu > :nth-child(2) {
+.rank-lore {
     color: #423126;
     background-color: #ECE4DA;
     border: 0.2em solid #c8b697;
-    height: 45%;
+    height: auto;
+    flex-grow: 1;
     width: 100%;
     overflow-y: auto;
     text-align: center;
@@ -2915,9 +2916,18 @@ input:checked + .slider:before {
     justify-content: flex-start;
 }
 
+.rank-lore > div {
+    height: 40%;
+    width: auto;
+    aspect-ratio: 1;
+    position: relative;
+    display: inline-flex;
+    margin-left: 1%;
+}
+
 .rank-menu > :last-child {
     border-radius: 2em;
-    height: auto;
+    height: 10%;
     width: auto;
     padding: 2% 5% 2% 5%;
     box-sizing: border-box;
@@ -3096,6 +3106,7 @@ input:checked + .slider:before {
     position: absolute;
     max-width: 90%;
     max-height: 80%;
+    width: 80%;
     aspect-ratio: 1;
     top: 13%;
     left: 2%;
@@ -3150,6 +3161,11 @@ input:checked + .slider:before {
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 0 0.2em #2a653d);
+    transition: 0.1s ease;
+}
+
+.drag-icon:hover {
+    transform: scale(1.2);
 }
 
 .adv-image-btn {
@@ -3467,7 +3483,7 @@ input:checked + .slider:before {
     border-radius: 0;
 }
 
-.adventure-rewards > div {
+.item-frame {
     background-position: center;
     background-size: contain;
     width: 20%;
@@ -3479,12 +3495,12 @@ input:checked + .slider:before {
     border-radius: 0.2em;
 }
 
-.adventure-rewards > div > :first-child {
+.item-frame > :first-child {
     object-fit: cover;
     filter: drop-shadow(0 0 0.2em black);
 }
 
-.adventure-rewards > div > :nth-child(2) {
+.item-frame > :nth-child(2) {
     position: absolute;
     bottom: 0;
     height: 20%;
@@ -3494,7 +3510,7 @@ input:checked + .slider:before {
     filter: drop-shadow(0 0 0.1em black);
 }
 
-.adventure-rewards > div > :nth-child(3) {
+.item-frame > :nth-child(3) {
     position: absolute;
     top: 0;
     right: 0;

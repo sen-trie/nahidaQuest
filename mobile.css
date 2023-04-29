@@ -618,16 +618,35 @@ body {
 }
 
 .char-menu {
-    max-height: 78%;
-    top: 18%;
+    height: 70%;
+    max-height: unset;
+    top: 20%;
+    width: auto;
 }
 
 .exped-xpbar,.drag-icon {
     bottom: 3%;
 }
 
+.drag-icon  {
+    height: 10%;
+}
+
+.exped-xpbar {
+    width: 40%;
+}
+
 .notif-select {
     height: 13%;
+}
+
+.adventure-map > input {
+    width: 40%;
+    height: 4.5%;
+    bottom: 4%;
+    left: 45%;
+    aspect-ratio: 20;
+    transform: none;
 }
 
 .exped-loot {
@@ -675,4 +694,9 @@ body {
 #adventure-gif,#combo-number {
     top: 8%;
     font-size: 1.2em;
+}
+
+.rank-button > p {
+    font-size: 1.6em;
+    filter: drop-shadow(0 0 0.2em #3556B0);
 }

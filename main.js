@@ -1,11 +1,11 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot } from "./modules/dictData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "0.4-4-281";
+const VERSIONNUMBER = "0.4-4-290";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -265,6 +265,7 @@ const moraleLore = [
     "Nahida feels [s]Sad[/s]... [mor]<br><br> XP gains are reduced by 15%, recover party morale <br> by resting or completing expeditions successfully.",
 ]
 
+const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");
 let energyDisplay = document.getElementById("energy");
@@ -478,6 +479,12 @@ function loadSaveData() {
         let advDictTemp = localStorage.getItem("advDictSave");
         advDict = JSON.parse(advDictTemp);
         updateObjectKeys(advDict,advDictDefault);
+        // FOR SAVE DATA BELOW 0.4.4281
+        if (parseInt(saveValues.versNumber) < 44290) {
+            for (let key in advDict.rankDict) {
+                advDict.rankDict[key].Locked = true;
+            }
+        }
     }
     // LOAD ACHIEVEMENT DATA
     achievementList = achievementListDefault;
@@ -951,7 +958,7 @@ function reactionEvent() {
                     reactionButton.innerText = "Too Slow!";
                     reactionFunction(eventBackdrop);
                 }
-            }, 700)
+            }, 800 * randomInteger(90,110) / 100)
         }
     },randomTime);
     
@@ -3709,6 +3716,7 @@ function createGuild() {
     rankDiv.classList.add("flex-row","rank-div");
     rankDiv.activeLevel;
     let rankLore = document.createElement("div");
+    rankLore.classList.add("rank-lore");
     rankLore.innerText = `Select a level to get more information!`;
     let rankClaim = document.createElement("button");
     rankClaim.classList.add("flex-row");
@@ -3740,15 +3748,25 @@ function createGuild() {
         }
         
         rankButton.addEventListener("click",()=>{
+            rankLore.innerHTML = "";
+            if (advInfo[i].Item.length > 0) {
+                for (let j = 0; j < advInfo[i].Item.length; j++) {
+                    let rankInventoryRewards = document.createElement("div");
+                    rankInventoryRewards = inventoryFrame(rankInventoryRewards,Inventory[advInfo[i].Item[j]],itemFrameColors);
+                    rankLore.append(rankInventoryRewards);
+                }
+                rankLore.innerHTML += "<hr style='border-top: 0.2em solid #b9a47f;border-radius: 1em;margin-bottom: 2%;'>"
+            }
+
             let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:1%;white-space: nowrap;' class='flex-row'>
                                                           +1 HP <img style="height: 100%;margin-right:10%" src=./assets/icon/health.webp> 
-                                                          +6 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp>          
-            </div>`);
-
-            rankLore.innerHTML = textReplacer({
+                                                          +6 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp></div>`);
+            rankLore.innerHTML += textReplacer({
                 "[s]":`<span style='color:#A97803'>`,
                 "[/s]":`</span>`,
             },loreHTML);
+
+            
 
             if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
             rankClaim.buttonLevel = i;
@@ -3779,18 +3797,30 @@ function createGuild() {
     rankDiv.children[0].click();
     rankClaim.addEventListener("click",()=>{
         if (rankClaim.available) {
+            let level = rankClaim.buttonLevel;
             rankClaim.innerText = "Rank Claimed";
             rankClaim.available = false;
             rankClaim.classList.add("rank-button-claimed");
             if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
-            advDict.rankDict[rankClaim.buttonLevel].Locked = false;
+            advDict.rankDict[level].Locked = false;
 
-            let rankButton = document.getElementById(`rank-button-${rankClaim.buttonLevel}`);
+            
+            let itemArray = advInfo[level].Item;
+            if (itemArray.length > 0) {
+                for (let i = 0; i < itemArray.length; i++) {
+                    inventoryAdd(itemArray[i]);
+                }
+                newPop(1);
+                currencyPopUp("items");
+            }
+            sortList("table2");
+
+            let rankButton = document.getElementById(`rank-button-${level}`);
             let rankIco = new Image();
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/tick.webp";
             rankButton.append(rankIco);
-            notifPop("clear","rank",rankClaim.buttonLevel);
+            notifPop("clear","rank",level);
         }
     })
 
@@ -5350,6 +5380,8 @@ function attackAll(adventureFightBurst) {
     let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
     if (activeLeader == "Zhongli") {currentATK *= 1.50};
     if (advDict.morale > 80) {currentATK *= 1.10};
+    let attackMultiplier = comboHandler("check",attackMultiplier);
+    currentATK *= attackMultiplier;
 
     let adventureVideo = document.getElementById("adventure-video");
     let adventureVideoChildren = adventureVideo.children;
@@ -5475,7 +5507,6 @@ function loseAdventure() {
     
 }
 
-const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
 function winAdventure() {
     if (!fightSceneOn) {return}
     fightSceneOn = false;
@@ -5539,16 +5570,7 @@ function winAdventure() {
         inventoryAdd(lootArray[key]);
 
         let lootDiv = document.createElement("div");
-        lootDiv.classList.add("flex-column");
-        lootDiv.style.backgroundImage = `url(./assets/frames/background-${itemInfo.Star}.webp)`;
-        lootDiv.style.border = `0.15em solid ${itemFrameColors[itemInfo.Star-1]}`;
-
-        let lootImg = new Image();
-        lootImg.classList.add("cover-all");
-        lootImg.src = `./assets/tooltips/inventory/${itemInfo.File}.webp`;
-        let lootStar = new Image();
-        lootStar.src = `./assets/frames/star-${itemInfo.Star}.webp`;
-        lootDiv.append(lootImg,lootStar)
+        lootDiv = inventoryFrame(lootDiv,itemInfo,itemFrameColors)
 
         if (key === "Bonus" || key === "Bonus2") {
             let bonus = new Image();

@@ -134,4 +134,20 @@ function volumeScrollerAdjust(volumeScroller) {
     return volumeScroller;
 }
 
-export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust };
+// CREATES A FRAME OF AN INVENTORY ITEM
+function inventoryFrame(ele,itemInfo,itemFrameColors) {
+    ele.classList.add("flex-column","item-frame");
+    ele.style.backgroundImage = `url(./assets/frames/background-${itemInfo.Star}.webp)`;
+    ele.style.border = `0.15em solid ${itemFrameColors[itemInfo.Star-1]}`;
+
+    let lootImg = new Image();
+    lootImg.classList.add("cover-all");
+    lootImg.src = `./assets/tooltips/inventory/${itemInfo.File}.webp`;
+    let lootStar = new Image();
+    lootStar.src = `./assets/frames/star-${itemInfo.Star}.webp`;
+    ele.append(lootImg,lootStar);
+
+    return ele;
+}
+
+export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame };

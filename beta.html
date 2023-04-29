@@ -35,6 +35,7 @@
     <div id="game" class="prevent-select">
         <div id="loading" class="cover-all flex-row overlay">
             <img src="./assets/loading.webp" alt="Nahida Quest Loading Screen" class="overlay-tutorial" importance="high" rel="preload">
+            <p id="loading-number" loadingValue="0">0%</p>
         </div>
     </div>
     <p id="vers-number"></p>
@@ -43,6 +44,7 @@
         <img alt="Unsupported image" src="./assets/error.webp">
         <p>Your device's screen is too narrow for nahidaQuest.</p>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js"></script>
     <script type="module" src="beta.js?v=3ab75ca481e65b426c80d6fea0eea2b9"></script>
 </body>
 </html>
