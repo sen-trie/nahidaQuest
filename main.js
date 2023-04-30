@@ -233,6 +233,21 @@ let additionalStrength = 1;
 let additionalDefense = 1;
 let additionalXP = 1;
 
+// ITEM VARIABLES
+const weaponBuffPercent =   [0, 1.1, 1.3, 1.7, 2.1, 2.7, 4.6];
+const artifactBuffPercent = [0, 1.05, 1.15, 1.35, 1.55, 1.85];
+const foodBuffPercent =     [0, 1.4, 2.0, 3.1, 4.4, 6.2];
+const nationBuffPercent =   [0, 0, 1.2, 1.5, 1.8];
+const energyBuffPercent =   [0, 0, 0, 200, 500, 1000];
+const elementBuffPercent =  [0, 0, 0, 1.6, 2.2, 3.0, 3.0];
+const buffLookUp = {
+    "[wBuff]":weaponBuffPercent,
+    "[aBuff]":artifactBuffPercent,
+    "[fBuff]":foodBuffPercent,
+    "[nBuff]":nationBuffPercent,
+    "[eBuff]":elementBuffPercent,
+}
+
 // ACHIEVEMENT THRESHOLDS
 let achievementData = {
     achievementTypeRawScore:      [100,1e4,1e6,1e8,1e9,1e11,1e12,1e14,1e15,1e17,1e18,1e20,1e21,1e23,1e24,1e26,1e27,1e29,1e30,1e32],
@@ -554,14 +569,14 @@ function touchDemo() {
             clickDelay -= 2;
             clickEarn = Math.ceil(currentClick * clickCritDmg);
         } else {
-            clickEarn = Math.ceil(specialClick * saveValues["clickFactor"] * clickCritDmg);
+            clickEarn = Math.ceil(saveValues["clickFactor"] * clickCritDmg);
         }
     } else {
         if (clickerEvent !== "none") {
             clickDelay -= 2;
             clickEarn = currentClick;
         } else {
-            clickEarn = Math.ceil(specialClick * saveValues["clickFactor"]);
+            clickEarn = Math.ceil(saveValues["clickFactor"]);
         }
     }
 
@@ -853,7 +868,7 @@ function clickEvent(wandererMode) {
     if (clickEventDelay !== null) {clearTimeout(clickEventDelay)};
     
     clickerEvent = wandererMode === true ? "scara" : "event";
-    currentClick = 15 * (saveValues["dps"] + 1) * specialClick;
+    currentClick = 15 * (saveValues["dps"] + 1);
 
     if (wandererMode === true) {
         leftDiv.style.animation = "none";
@@ -1973,6 +1988,14 @@ function tabChange(x) {
 }
 
 document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        toggleSettings();
+        if (document.getElementById("confirm-box")) {
+            let deleteBox = document.getElementById("confirm-box");
+            if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+        }
+    }
+
     if (!stopSpawnEvents) {
         if (event.key === "1") {
             tabChange(1);
@@ -1987,12 +2010,6 @@ document.addEventListener("keydown", function(event) {
         } else if (event.key === "6") {
             if (table7.innerHTML != "") {
                 tabChange(6);
-            }
-        } else if (event.key === "Escape") {
-            toggleSettings();
-            if (document.getElementById("confirm-box")) {
-                let deleteBox = document.getElementById("confirm-box");
-                if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
             }
         } else if (event.key === "Enter") {
             event.preventDefault();
@@ -2290,15 +2307,16 @@ function settingsBox(type,eleId) {
         errorBoxDiv.append(errorBox,cancelErrorButton);
         mainBody.appendChild(errorBoxDiv);
     } else if (type === "toggle") {
-        settingsBox("close");
         let textBox = document.getElementById(`${eleId}-box`);
         if (textBox.style.zIndex == -1) {
             if (eleId === "export") {
                 textBox.children[0].value = JSON.stringify(localStorage);
             }
+            settingsBox("close");
             textBox.style.zIndex = 10000;
         } else {
             textBox.style.zIndex = -1;
+            
         }
     } else if (type === "close") {
         for (let i = 0; i < settingsID.length; i++) {
@@ -3097,12 +3115,6 @@ function inventoryAdd(idNum, type) {
 }
 
 // INVENTORY FUNCTIONALITY
-// RMB TO UPDATE CONSTANTS
-const weaponBuffPercent =   [0, 1.1, 1.3, 1.7, 2.1, 2.7, 4.6];
-const artifactBuffPercent = [0, 1.05, 1.15, 1.35, 1.55, 1.85];
-const foodBuffPercent =     [0, 1.4, 2.0, 3.1, 4.4, 6.2];
-const nationBuffPercent =   [0, 0, 1.2, 1.5, 1.8];
-const energyBuffPercent =   [0, 0, 0, 200, 500, 1000];
 function itemUse(itemUniqueId) {
     let itemID;
     if (typeof itemUniqueId === 'string') {
@@ -3111,6 +3123,7 @@ function itemUse(itemUniqueId) {
         itemID = itemUniqueId;
     }
     
+    // WEAPON
     if (itemID >= 1001 && itemID < WEAPONMAX){
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
@@ -3133,6 +3146,7 @@ function itemUse(itemUniqueId) {
                 }
             }
         }
+    // ARTIFACT
     } else if (itemID >= 2001 && itemID < ARTIFACTMAX){
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
@@ -3153,23 +3167,27 @@ function itemUse(itemUniqueId) {
                 refresh("hero", i);
             }
         }
+    // FOOD
     } else if (itemID >= 3001 && itemID < FOODMAX){
         foodButton(1);
         foodBuff = foodBuffPercent[Inventory[itemID].Star];
         foodBuff *= additionalDefense;
         updateMorale("add",(Inventory[itemID].Star ** 2));
+    // LEVEL BOOKS
     } else if (itemID >= 4001 && itemID < XPMAX){
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         refresh();
+    // ENERGY POTS
     } else if (itemID >= 4011 && itemID < 4014){
         saveValues["energy"] += energyBuffPercent[Inventory[itemID].Star];
         refresh();
     } else if (itemID === 4010) {
         saveValues["mailCore"]++;
+    // ELEMENT GEMS
     } else if (itemID === 5001 || itemID === 5002){
         let power = 1;
         if (Inventory[itemID].Star === 5) {
-            power = 1.9;
+            power = 2;
         } else {
             power = 3;
         }
@@ -3196,16 +3214,10 @@ function itemUse(itemUniqueId) {
 
         clearTooltip();
         return;
+    // ELEMENT GEMS
     } else if (itemID >= 5001 && itemID < 5050){
-        let power;
+        let power = elementBuffPercent[Inventory[itemID].Star];
         let elem = Inventory[itemID].element;
-        if (Inventory[itemID].Star === 4) {
-            power = 2.2;
-        } else if (Inventory[itemID].Star === 4) {
-            power = 1.6;
-        } else {
-            power = 3;
-        }
 
         for (let i = 0, len=WISHHEROMAX; i < len; i++) {
             if (upgradeDict[i] == undefined) continue;
@@ -3229,6 +3241,7 @@ function itemUse(itemUniqueId) {
                 }
             }
         }
+    // NATION BOOKS
     } else if (itemID >= 6001 && itemID < 6050){
         let power;
         let nation = Inventory[itemID].nation;
@@ -3545,7 +3558,6 @@ function inventoryDraw(itemType, min, max, type, itemClass){
         "talent": 6001,
     }
     let drawnItem = 0;
-    console.log(`${itemType},${itemClass},${type}`)
     while (true){
         attempts++;
         if (attempts >= 2000) {
@@ -4994,7 +5006,13 @@ function triggerFight() {
             }
             
             attackMultiplier = comboHandler("check",attackMultiplier);
-            mobHealth.health -= ((currentATK * attackMultiplier)/ 5);
+            // NAHIDA UPGRADE CHECKER
+            let nahidaMultiplier = 0;
+            for (let key in upgradeDict[0]["milestone"]) {
+                if (upgradeDict[0]["milestone"][key]) {nahidaMultiplier += 3}
+            }
+
+            mobHealth.health -= (((currentATK + nahidaMultiplier) * attackMultiplier * specialClick)/ 5);
             attackMultiplier = 1;
 
             if (mobHealth.health <= 0) {
@@ -5395,7 +5413,8 @@ function attackAll(adventureFightBurst) {
     let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
     if (activeLeader == "Zhongli") {currentATK *= 1.50};
     if (advDict.morale > 80) {currentATK *= 1.10};
-    let attackMultiplier = comboHandler("check",attackMultiplier);
+    let attackMultiplier = 1;
+    attackMultiplier = comboHandler("check",attackMultiplier);
     currentATK *= attackMultiplier;
 
     let adventureVideo = document.getElementById("adventure-video");
@@ -5519,7 +5538,6 @@ function loseAdventure() {
             setTimeout(()=>{if (!fightSceneOn) {bgmElement.play()}},300)
         })
     },300)
-    
 }
 
 function winAdventure() {
@@ -5596,7 +5614,33 @@ function winAdventure() {
     adventureChoiceOne.innerText = "Leave";
     adventureChoiceOne.addEventListener("click",quitButton);
 
+    let adventureVideo = document.getElementById('adventure-video');
+    let nutReward = document.createElement('p');
+    nutReward.classList.add("adventure-currency");
+    nutReward.value = saveValues["dps"] * 60 * 3 * (1.5**(imgKey[keyNumber].Level)) * randomInteger(90,100) / 100;
+
+    if (imgKey[keyNumber].Level === 5) {
+        nutReward.gValue = randomInteger(3,10)*3+advDict.adventureRank;
+        nutReward.innerHTML = `Gained:<br> ${abbrNum(nutReward.value)} [s]Nuts[/s]<br> ${nutReward.gValue} [s]Golden Nuts[/s]`;
+
+        nutReward.style.color = '#333553';
+        nutReward.style.backgroundColor = '#a8acd9';
+        nutReward.style.border = '0.2em solid #494d81';
+    } else {
+        nutReward.innerHTML = `Gained:<br> ${abbrNum(nutReward.value)} [s]Nuts[/s]`;
+        nutReward.gValue = 0;
+    }
+
+    nutReward.innerHTML = textReplacer({
+    "[s]":`<span style='color:#A97803'>`,
+    "[/s]":`</span>`,
+    },nutReward.innerHTML)
+    adventureVideo.append(nutReward);
+
     function quitButton() {
+        saveValues["realScore"] += nutReward.value;
+        nutReward.remove();
+
         quitAdventure();
         charScan();
         updateMorale("recover",randomInteger(2,6));
@@ -5607,10 +5651,11 @@ function winAdventure() {
         document.getElementById("combo-number").remove();
         adventureChoiceOne.removeEventListener("click",quitButton);
 
-        if (imgKey[keyNumber].Level === 5) {
-            currencyPopUp("items",0,"nuts",(randomInteger(3,10)*3+advDict.adventureRank));
-        } else {
+        console.log( nutReward.gValue )
+        if (nutReward.gValue === 0) {
             currencyPopUp("items");
+        } else {
+            currencyPopUp("items",0,"nuts",(nutReward.gValue));
         }
         
         newPop(1);
@@ -6032,11 +6077,18 @@ function changeTooltip(dict, type, number) {
         tooltipInterval = null;
     }
     tooltipName.innerText = dict.Name;
+    
     let lore = dict.Lore;
     tooltipLore.innerHTML = textReplacer({
         "[s]":`<span style='color:#A97803'>`,
         "[/s]":`</span>`,
         "\n":`<br>`,
+        "[wBuff]":`${Math.round((buffLookUp["[wBuff]"][dict.Star] * 100 - 100) * additionalStrength)}%`,
+        "[aBuff]":`${Math.round((buffLookUp["[aBuff]"][dict.Star] * 100 - 100) * additionalStrength)}%`,
+        "[fBuff]":`${Math.round((buffLookUp["[fBuff]"][dict.Star] * 100 - 100) * additionalDefense)}%`,
+        "[nBuff]":`${Math.round((buffLookUp["[nBuff]"][dict.Star] * 100 - 100) * additionalDefense)}%`,
+        "[eBuff]":`${Math.round((buffLookUp["[eBuff]"][dict.Star] * 100 - 100) * additionalDefense)}%`,
+        "[4eBuff]":`${Math.round((2 * 100 - 100) * additionalDefense)}%`,
     },lore);
 
     if (toolImgContainer.style.display != "block") {
@@ -6078,8 +6130,13 @@ function changeTooltip(dict, type, number) {
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 3-Star Gem`}
         }
 
+        let nahidaText = "";
+        if (dict.Name === "Nahida") {
+            nahidaText = "<br><br> Also, adds <span style='color:#A97803'>3 ATK</span> to clicking DMG during Expedition combat.";
+        }
+
         tooltipText.innerHTML = `Level ${number} Upgrade`;
-        tooltipLore.innerHTML = `${dict.Name} becomes ${upgradeLevel}% more efficient at gathering nuts.
+        tooltipLore.innerHTML = `${dict.Name} becomes <span style='color:#A97803'>${upgradeLevel}%</span> more efficient at gathering nuts. ${nahidaText}
                                 <br><br> Cost: <span style='color:#A97803'> ${abbrNum((4 * upgradeDict[heroTooltip.split("-")[0]]["BaseCost"] * (COSTRATIO ** (number - 1))),2)} </span> Nuts
                                 ${extraText}`;
 
@@ -6505,7 +6562,7 @@ function nutCost(id) {
     let cost;
 
     if (scaleCeiling === 50) {
-        cost = Math.ceil((amount)**2) + 1;
+        cost = Math.ceil((amount)**2.3) + 1;
     } else if (scaleCeiling === 25) {
         cost = Math.ceil((amount)**3) + 1;
     }
@@ -6880,9 +6937,8 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
                 if (saveValues["wishUnlocked"] === true) {
                     return;
                 } else {
-                    newPop(1);
                     newPop(3);
-                    inventoryAdd(4010);
+                    itemUse(4010);
                     currencyPopUp("mail",1);
                     saveValues.mailCore--;
                     wishUnlock();

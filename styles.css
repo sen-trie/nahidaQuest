@@ -3243,6 +3243,18 @@ input:checked + .slider:before {
     overflow: hidden;
 }
 
+.adventure-currency {
+    position: absolute;
+    top: 12%;
+    color: #204933;
+    background-color: #ceeeab;
+    border: 0.2em solid #376D50;
+    border-radius: 0 0 1em 1em;
+    padding: 1% 2% 1% 2%;
+    animation: slidedown-pop 0.8s ease-in-out both;
+    text-align: left;
+}
+
 .adventure-scara-health {
     background-color:#333553 !important; 
     border-left: 0.1em solid #333553 !important;
@@ -3735,7 +3747,7 @@ input:checked + .slider:before {
 .text-overlay > p {
     width: 100%;
     height: 30%;
-    font-size: 1.2em;
+    font-size: 1.1em;
     text-align: center;
 }
 
