@@ -2361,6 +2361,7 @@ input:checked + .slider:before {
     align-items: center;
     box-sizing: border-box;
     column-gap: 0.5%;
+    z-index: 11;
 }
 
 .filter-row div:nth-child(3) > button {
@@ -4617,11 +4618,28 @@ input:checked + .slider:before {
     font-size: 1.2em;
     color: white;
     text-shadow: var(--text-shadow-075);
-    background-color: transparent;
-    background-image: url("./assets/tutorial/buttonBox.webp");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
+    background: transparent url("./assets/tutorial/buttonBox.webp") center/contain no-repeat;
+}
+
+.nut-transcend > :nth-last-child(2) {
+    position: absolute;
+    font-size: 1.2em;
+    background-color: #99B589;
+    border: 0.2em solid #5B7B49;
+    text-shadow: var(--text-shadow-075);
+    padding: 2%;
+    filter: drop-shadow(0 0 0.2em #5e7e5b) drop-shadow(0 0 0.1em #556f52);
+}
+
+.nut-transcend > :last-child {
+    position: absolute;
+    height: 10%;
+    width: auto;
+    aspect-ratio: 1;
+    top: 1%;
+    right:1%;
+    background: transparent url("./assets/icon/help.webp") center/contain no-repeat;
+
 }
 
 .nut-transcend > button:hover {

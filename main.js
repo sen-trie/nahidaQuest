@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "0.4-4-300";
+const VERSIONNUMBER = "0.4-4-310";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -462,6 +462,13 @@ function loadSaveData() {
     } else {
         let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
         upgradeDict = JSON.parse(upgradeDictTemp);
+
+        // FOR SAVE DATA BELOW 0.4.431 (WORKAROUND TO PREVENT EXPONENTIAL ITEM GROWTH)
+        if (parseInt(saveValues.versNumber) < 44310) {
+            for (let key in upgradeDict) {
+                upgradeDict[key]["BaseFactor"] = upgradeDict[key]["Factor"];
+            }
+        }
         setTimeout(loadRow,1000);
     }
     // LOAD INVENTORY DATA
@@ -479,7 +486,7 @@ function loadSaveData() {
     } else {
         let expeditionDictTemp = localStorage.getItem("expeditionDictSave");
         expeditionDictTemp = JSON.parse(expeditionDictTemp);
-        // FOR SAVE DATA BELOW 0.3.0
+        // FOR SAVE DATA BELOW 0.3.000
         if (typeof(expeditionDictTemp[1]) != "string") {
             expeditionDict = expeditionDictDefault;
         } else {
@@ -2891,7 +2898,8 @@ function milestoneBuy(heroTooltip) {
         if (heroID != 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
         
         upgradeDict[heroID]["Contribution"] += additionPower;
-        upgradeDict[heroID]["Factor"] = Math.ceil(upgradeDictTemp["Factor"] * (buff + 1));
+        upgradeDict[heroID]["BaseFactor"] = Math.ceil(upgradeDict[heroID]["BaseFactor"]) * (buff+1);
+        upgradeDict[heroID]["Factor"] = Math.ceil(upgradeDictTemp["Factor"] * (buff+1));
         upgradeDict[heroID].milestone[level] = true;
 
         document.getElementById(`milestone-${heroTooltip}`).remove();
@@ -3135,12 +3143,13 @@ function itemUse(itemUniqueId) {
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
                 if (upgradeInfo[i].Type == Inventory[itemID].Type){
-                    let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (weaponBuffPercent[Inventory[itemID].Star] - 1));
+                    let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (weaponBuffPercent[Inventory[itemID].Star] - 1));
                     additionPower = Math.round(additionPower * additionalStrength);
+
                     if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
-                    upgradeDictTemp["Factor"] *= weaponBuffPercent[Inventory[itemID].Star];
-                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
+                    upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+
                     refresh("hero", i);
                     updatedHero(i);
                 }
@@ -3157,13 +3166,13 @@ function itemUse(itemUniqueId) {
             };
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
-                let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (artifactBuffPercent[Inventory[itemID].Star] - 1));
+                let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (artifactBuffPercent[Inventory[itemID].Star] - 1));
                 additionPower = Math.round(additionPower * additionalDefense);
+
                 if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                 upgradeDict[i]["Contribution"] += additionPower;
+                upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
 
-                upgradeDictTemp["Factor"] *= artifactBuffPercent[Inventory[itemID].Star];
-                upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                 refresh("hero", i);
             }
         }
@@ -3201,13 +3210,13 @@ function itemUse(itemUniqueId) {
             };
             let upgradeDictTemp = upgradeDict[i];
             if (upgradeDictTemp.Purchased > 0){
-                let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
+                let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (power - 1));
                 additionPower = Math.round(additionPower * additionalDefense);
+
                 if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                 upgradeDict[i]["Contribution"] += additionPower;
+                upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
 
-                upgradeDictTemp["Factor"] *= power;
-                upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
                 refresh("hero", i);
             }
         }
@@ -3229,13 +3238,13 @@ function itemUse(itemUniqueId) {
             if (upgradeDict[i].Purchased > 0) {
                 if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
                     let upgradeDictTemp = upgradeDict[i];
-                    let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
+                    let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (power - 1));
                     additionPower = Math.round(additionPower * additionalDefense);
+    
                     if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
-
-                    upgradeDictTemp["Factor"] *= power;
-                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
+                    upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+    
                     refresh("hero", i);
                     updatedHero(i);
                 }
@@ -3256,13 +3265,13 @@ function itemUse(itemUniqueId) {
             if (upgradeDict[i].Purchased > 0){
                 if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
                     let upgradeDictTemp = upgradeDict[i];
-                    let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * (power - 1));
+                    let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (power - 1));
                     additionPower = Math.round(additionPower * additionalStrength);
+    
                     if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
-
-                    upgradeDictTemp["Factor"] *= power;
-                    upgradeDict[i]["Factor"] = Math.ceil(upgradeDictTemp["Factor"]);
+                    upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+    
                     refresh("hero", i);
                     updatedHero(i);
                 }
@@ -3312,9 +3321,10 @@ function foodButton(type) {
 const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
 function adventure(advType) {
     let type = parseInt(advType.split("-")[0]);
-    let wave = rollArray(JSON.parse(advType.split("-")[1]),0);
+    
 
     if (type !== 10 && expeditionDict[type] != '1') {
+        let wave = rollArray(JSON.parse(advType.split("-")[1]),0);
         if (saveValues["energy"] >= ADVENTURECOSTS[type]) {
             adventureElement.load();
             adventureElement.play();
@@ -3322,7 +3332,6 @@ function adventure(advType) {
             saveValues["energy"] -= ADVENTURECOSTS[type];
             updateMorale("add",(randomInteger(7,10) * -1));
             if (activeLeader == "Paimon") {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.1)}
-
             if (!advDict.tutorialBasic) {
                 customTutorial("advTut",6,()=>{drawAdventure(type,wave)});
                 advDict.tutorialBasic = true;
@@ -3570,28 +3579,30 @@ function inventoryDraw(itemType, min, max, type, itemClass){
         if (Inventory[drawnItem].Star >= min && Inventory[drawnItem].Star < (max + 1)) {
             if (type === "shop") {
                 return drawnItem;
-            } else if (type.split("-")[0] === "adventure" || type === "Bonus" || type === "Bonus2"){
-                if (itemClass === "Any") {
-                    lootArray[type] = drawnItem;
-                } else {
-                    let checkedProperty = "Type";
-                    if (itemType === "talent") {
-                        checkedProperty = "nation";
-                    } else if (itemType === "gem") {
-                        checkedProperty = "element";
-                    }
-
-                    if (Array.isArray(itemClass)) {
-                        let randomEle = rollArray(itemClass,0);
-                        if (Inventory[drawnItem][checkedProperty] != randomEle) {
-                            continue;
-                        }
+            } else if (typeof type === 'string') {
+                if (type.split("-")[0] === "adventure" || type === "Bonus" || type === "Bonus2"){
+                    if (itemClass === "Any") {
                         lootArray[type] = drawnItem;
                     } else {
-                        if (Inventory[drawnItem][checkedProperty] != itemClass) {
-                            continue;
+                        let checkedProperty = "Type";
+                        if (itemType === "talent") {
+                            checkedProperty = "nation";
+                        } else if (itemType === "gem") {
+                            checkedProperty = "element";
                         }
-                        lootArray[type] = drawnItem;
+
+                        if (Array.isArray(itemClass)) {
+                            let randomEle = rollArray(itemClass,0);
+                            if (Inventory[drawnItem][checkedProperty] != randomEle) {
+                                continue;
+                            }
+                            lootArray[type] = drawnItem;
+                        } else {
+                            if (Inventory[drawnItem][checkedProperty] != itemClass) {
+                                continue;
+                            }
+                            lootArray[type] = drawnItem;
+                        }
                     }
                 }
             } else {
@@ -4556,6 +4567,7 @@ function unlockExpedition(i,expeditionDict) {
 
 // ADVENTURE PROCESS
 const adventurePreload = new Preload();
+const adventureWorker = new Worker('./modules/workers.js');
 function drawAdventure(advType,wave) {
     adventureScaraText = "";
     lootArray = {};
@@ -4686,8 +4698,17 @@ function triggerFight() {
         pheonixMode = false;
     }
 
-    let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
-    if (advDict.morale > 80) {currentATK *= 1.10};
+    let currentATK;
+    adventureWorker.postMessage({
+        function: 'calculateDamage',
+        args:[advDict.adventureRank,advDict.morale]
+    })
+
+    adventureWorker.onmessage = function(event) {
+        if (event.data.function === 'calculateDamage') {
+            currentATK = event.data.result;
+        }
+    }
 
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
@@ -5651,7 +5672,6 @@ function winAdventure() {
         document.getElementById("combo-number").remove();
         adventureChoiceOne.removeEventListener("click",quitButton);
 
-        console.log( nutReward.gValue )
         if (nutReward.gValue === 0) {
             currencyPopUp("items");
         } else {
@@ -6689,13 +6709,30 @@ function addNutStore() {
     let bodyTextBottom = document.createElement("p");
     bodyTextBottom.innerText = "Gain more by upgrading heroes, getting achievements, \n primogems & nuts (golden or otherwise).";
 
+    let transendHelp = document.createElement("button");
+    let transcendHelpbox = document.createElement("p");
+    transcendHelpbox.style.display = "none";
+    transcendHelpbox.innerText = `What is the Golden Core amount affected by? \n 
+                                Character Levels (High Priority)
+                                Achievements (High Priority)
+                                Primogems (High Priority)\n
+                                Golden Nuts (Low Priority)
+                                Regular Nuts (Low Priority)`;
+    transendHelp.addEventListener("click",()=>{
+        if (transcendHelpbox.style.display == "none") {
+            transcendHelpbox.style.display = "block";
+        } else {
+            transcendHelpbox.style.display = "none";
+        }
+    });
+
     let trascendButton = document.createElement("button");
     trascendButton.innerText = "Yes";
     trascendButton.addEventListener("click",()=>{
         calculateGoldenCore();
         toggleTranscendMenu();
     })
-    nutTranscend.append(titleText,bodyText,bodyTextBottom,trascendButton);
+    nutTranscend.append(titleText,bodyText,bodyTextBottom,trascendButton,transcendHelpbox,transendHelp);
 
     nutStoreTable.append(shopHeader,nutTranscend,nutShopDiv,nutAscend,nutStoreCurrency);
     mainTable.appendChild(nutStoreTable);
@@ -6899,8 +6936,7 @@ function refresh() {
             upgradedHeroButton.innerText = heroTextFirst;
             upgradedHeroButton.style = `background:url("./assets/nameplates/${upgradeInfoTemp.Name}.webp");  background-size: 125%; background-position: 99% center; background-repeat: no-repeat;`;
             if (milestoneOn) {upgradedHeroButton.style.display = "none"}
-        }
-        else if (arguments[0] == "hero") { // REFRESH FOR ARTIFACTS
+        } else if (arguments[0] == "hero") { // REFRESH FOR ARTIFACTS
             let hero = upgradeDict[arguments[1]];
             let formatATK = hero["Factor"];
             let formatCost = hero["BaseCost"];

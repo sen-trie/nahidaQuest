@@ -84,6 +84,7 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
         
         let baseATK = Math.round(initATKCost * (multiplierATKCost **((currentHero-1)*3.2)));
         upgradeDict[i]["Factor"] = Number(baseATK.toPrecision(3)).toExponential(3);
+        upgradeDict[i]["BaseFactor"] = upgradeDict[i]["Factor"];
         upgradeDict[i]["Contribution"] = 0;
         currentHero++;
     }
