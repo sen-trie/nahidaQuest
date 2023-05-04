@@ -20,6 +20,8 @@ let saveValuesDefault = {
 
 let persistentValuesDefault = {
     goldenCore: 0,
+    tutorialRanged: false,
+    tutorialBasic: false,
     upgrade1:{Purchased: 0},
     upgrade2:{Purchased: 0},
     upgrade3:{Purchased: 0},
@@ -42,8 +44,6 @@ let SettingsDefault = {
 }
 
 let advDictDefault = {
-    tutorialRanged: false,
-    tutorialBasic: false,
     adventureRank: 1,
     advXP: 0,
     bounty:[],

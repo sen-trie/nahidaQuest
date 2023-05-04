@@ -147,4 +147,15 @@ function textReplacer(dictReplace,originalText) {
     return originalText;
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray, textReplacer};
+// TOGGLES CSS STYLE
+function universalStyleCheck(ele,styleCheck,paramOn,paramOff) {
+    if (ele.style[styleCheck] === paramOn) {
+        ele.style[styleCheck] = paramOff;
+    } else {
+        ele.style[styleCheck] = paramOn;
+    }
+
+    return ele;
+} 
+
+export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray, textReplacer,universalStyleCheck};

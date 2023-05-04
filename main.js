@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
-import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot } from "./modules/dictData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer } from "./modules/functions.js"
+import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo } from "./modules/dictData.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
@@ -89,11 +89,7 @@ function deleteConfirmMenu(type,location) {
     let deleteBox = document.getElementById("confirm-box");
     deleteType = location;
     if (type == "toggle") {
-        if (deleteBox.style.zIndex == -1) {
-            deleteBox.style.zIndex = 1000;
-        } else {
-            deleteBox.style.zIndex = -1;
-        }
+        universalStyleCheck(deleteBox,"zIndex",1000,-1)
     } else if (type === "close") {
         if (deleteBox.style.zIndex !== -1) {
             deleteBox.style.zIndex = -1;
@@ -1950,6 +1946,11 @@ function tabChange(x) {
         if (nutStoreTemp.style.display === "flex") {nutStoreTemp.style.display = "none"}
     }
 
+    if (document.getElementById("pet-table")) {
+        let petTemp = document.getElementById("pet-table");
+        if (petTemp.style.display === "flex") {petTemp.style.display = "none"}
+    }
+
     if (x == 0) {
         if (filterDiv.style.display !== "flex") {filterDiv.style.display = "flex"};
         if (table6.style.display !== "flex") {table6.style.display = "flex"};
@@ -2260,7 +2261,6 @@ function settingsBox(type,eleId) {
             let promptSave = textBox.value;
             if (promptSave != null) {
                 let localStorageTemp = tryParseJSONObject(promptSave);
-        
                 preventSave = true;
                 if (localStorageTemp === false) {
                     alert("Invalid save data.")
@@ -2317,7 +2317,11 @@ function settingsBox(type,eleId) {
         let textBox = document.getElementById(`${eleId}-box`);
         if (textBox.style.zIndex == -1) {
             if (eleId === "export") {
-                textBox.children[0].value = JSON.stringify(localStorage);
+                saveData(true);
+                setTimeout(()=>{
+                    textBox.children[0].value = JSON.stringify(localStorage);
+                },300)
+                
             }
             settingsBox("close");
             textBox.style.zIndex = 10000;
@@ -2393,17 +2397,9 @@ function createFilter() {
     
     filterButton.addEventListener("click",()=>{
         if (table1.style.display == "flex") {
-            if (filterMenuOne.style.display == "flex") {
-                filterMenuOne.style.display = "none";
-            } else {
-                filterMenuOne.style.display = "flex";
-            }
+            filterMenuOne = universalStyleCheck(filterMenuOne,"display","flex","none");
         } else if (table2.style.display == "flex") {
-            if (filterMenuTwo.style.display == "flex") {
-                filterMenuTwo.style.display = "none";
-            } else {
-                filterMenuTwo.style.display = "flex";
-            }
+            filterMenuTwo = universalStyleCheck(filterMenuTwo,"display","flex","none");
         }
     })
 
@@ -3321,8 +3317,6 @@ function foodButton(type) {
 const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
 function adventure(advType) {
     let type = parseInt(advType.split("-")[0]);
-    
-
     if (type !== 10 && expeditionDict[type] != '1') {
         let wave = rollArray(JSON.parse(advType.split("-")[1]),0);
         if (saveValues["energy"] >= ADVENTURECOSTS[type]) {
@@ -3332,12 +3326,12 @@ function adventure(advType) {
             saveValues["energy"] -= ADVENTURECOSTS[type];
             updateMorale("add",(randomInteger(7,10) * -1));
             if (activeLeader == "Paimon") {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.1)}
-            if (!advDict.tutorialBasic) {
+            if (!persistentValues.tutorialBasic) {
                 customTutorial("advTut",6,()=>{drawAdventure(type,wave)});
-                advDict.tutorialBasic = true;
-            } else if (type >= 3 && type < 6 && advDict.tutorialRanged != true) {
+                persistentValues.tutorialBasic = true;
+            } else if (type >= 3 && type < 6 && persistentValues.tutorialRanged != true) {
                 customTutorial("rangTut",2,()=>{drawAdventure(type,wave)});
-                advDict.tutorialRanged = true;
+                persistentValues.tutorialRanged = true;
             } else {
                 drawAdventure(type,wave);
             }
@@ -3446,6 +3440,7 @@ function createAdventure() {
     let adventureTextBox = document.createElement("div");
     adventureTextBox.id = "adventure-text";
     adventureTextBox.classList.add("adventure-text","flex-row");
+    adventureTextBox.questNumber = null;
 
     let adventureTextBG = new Image();
     adventureTextBG.src = "./assets/expedbg/table.webp";
@@ -3524,19 +3519,28 @@ function createAdventure() {
                 adventureFightSkill.click();
             } else if (event.key === "c" || event.key === "e") {
                 adventureFightBurst.click();
+         
             }
         }
+
+        // if (event.key === "l") {createPetShop()}
+
+        
     })
 
     adventureFight.append(fightTextbox,adventureFightDodge,adventureFightSkill,adventureFightBurst);
     adventureFight.style.display = "none";
     adventureChoiceOne.addEventListener("click",()=>{
         if (adventureChoiceOne.pressAllowed) {
-            adventureChoiceOne.pressAllowed = false;
-            triggerFight();
-            adventureEncounter.style.display = "none";
-            adventureFight.style.display = "flex";
-            adventureChoiceOne.style.display = "none";
+            if (adventureChoiceOne.advType != 12) {
+                adventureChoiceOne.pressAllowed = false;
+                triggerFight();
+                adventureEncounter.style.display = "none";
+                adventureFight.style.display = "flex";
+                adventureChoiceOne.style.display = "none";
+            } else {
+                continueQuest(adventureTextBox.questNumber);
+            }
         }
     })
 
@@ -3656,11 +3660,7 @@ function createExpedition() {
     charMorale.append(moraleLore);
 
     charMorale.addEventListener("click",()=>{
-        if (moraleLore.style.display == "none") {
-            moraleLore.style.display = "block";
-        } else {
-            moraleLore.style.display = "none";
-        }
+        universalStyleCheck(moraleLore,"display","block","none");
     })
 
     let guildTable = createGuild();
@@ -3672,6 +3672,8 @@ function createExpedition() {
         if (adventureType != 0) {
             if (adventureType == "10-[]") {
                 guildTable.toggle();
+            } else if (adventureType.split("-")[0] === "12") {
+                drawWorldQuest(adventureType);
             } else {
                 adventure(adventureType);
             }
@@ -3730,11 +3732,7 @@ function createGuild() {
     guildTable.classList.add("flex-row","guild-table","cover-all");
     guildTable.style.display = "none";
     guildTable.toggle = function() {
-        if (this.style.display == "none") {
-            this.style.display = "flex";
-        } else {
-            this.style.display = "none";
-        }
+        universalStyleCheck(this,"display","flex","none");
     }
 
     guildTable.close = function() {
@@ -4324,6 +4322,7 @@ function createExpMap() {
     }
 
     for (let key in imgKey) {
+        if (key > 17) {break}
         let button = document.createElement("button");
         button.classList.add("adv-image-btn");
         button.style.left = imgKey[key].Left + "%";
@@ -4571,6 +4570,7 @@ const adventureWorker = new Worker('./modules/workers.js');
 function drawAdventure(advType,wave) {
     adventureScaraText = "";
     lootArray = {};
+
     if (adventureScene) {return}
     adventureScene = true;
     if (advType === 5) {
@@ -4602,27 +4602,20 @@ function drawAdventure(advType,wave) {
     let adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
     adventureChoiceOne.pressAllowed = false;
-    adventureChoiceOne.innerText = "Fight!"
+    adventureChoiceOne.innerText = "Fight!";
+    adventureChoiceOne.advType = advType;
+
     let adventureRewards = document.getElementById("adventure-rewards");
     adventureRewards.style.opacity = "0";
-    // let adventureChoiceTwo = document.getElementById("adv-button-two");
-    // adventureChoiceTwo.innerText = "Run away...";
-    // adventureChoiceTwo.pressAllowed = false;
+    adventureRewards.style.flexGrow = "1";
+    let adventureHeading = document.getElementById("adventure-header");
+    adventureHeading.style.flexGrow = "0";
+
     let adventureArea = document.getElementById("adventure-area");
     let adventureTextBox = document.getElementById("adventure-text");
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp)`;
     adventureVideo = spawnMob(adventureVideo,waveType.Wave);
-
-    function textFadeIn() {
-        adventureTextBox.style.animation = "";
-        let adventureHeading = document.getElementById("adventure-header");
-        adventureHeading.style.top = "10%";
-        adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
-        adventureHeading.style.animation = "fadeOut 1.4s ease-out reverse";
-        adventureChoiceOne.pressAllowed = true;
-        adventureTextBox.removeEventListener("animationend", textFadeIn,true);
-    }
 
     let preloadedImage = new Image();
     preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp`;
@@ -4633,6 +4626,141 @@ function drawAdventure(advType,wave) {
         bgmElement.pause();
         fightEncounter.load();
         fightEncounter.play();
+    }
+
+    function textFadeIn() {
+        adventureHeading.style.top = "10%";
+        adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
+        adventureHeading.style.animation = "fadeOut 1s ease-out reverse";
+
+        adventureTextBox.style.animation = "";
+        adventureChoiceOne.pressAllowed = true;
+        adventureTextBox.removeEventListener("animationend", textFadeIn,true);
+    }
+}
+
+function drawWorldQuest(advType) {
+    let adventureChoiceOne = document.getElementById("adv-button-one");
+    adventureChoiceOne.style.display = "block";
+    adventureChoiceOne.pressAllowed = false;
+    adventureChoiceOne.innerText = "Next";
+    adventureChoiceOne.advType = advType.split("-")[0];
+
+    advType = advType.split("-")[1];
+    advType = advType.substring(1, advType.length-1).split(",");
+    advType = rollArray(advType,0);
+
+    let adventureArea = document.getElementById("adventure-area");
+    let adventureTextBox = document.getElementById("adventure-text");
+    adventureTextBox.questNumber = advType;
+    let adventureRewards = document.getElementById("adventure-rewards");
+    adventureRewards.style.opacity = "0";
+    adventureRewards.style.flexGrow = "0";
+
+    let adventureVideo = document.getElementById("adventure-video");
+    adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${advType}.webp`;
+    let adventureHeading = document.getElementById("adventure-header");
+    adventureHeading.style.flexGrow = "1";
+
+    let preloadedImage = new Image();
+    preloadedImage.src = `./assets/expedbg/choice/${advType}.webp`;
+    preloadedImage.onload = ()=> {
+        adventureArea.style.zIndex = 500;
+        adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
+        adventureTextBox.addEventListener("animationend",textFadeIn,true);
+    }
+    
+    function textFadeIn() {
+        adventureHeading.style.top = "10%";
+        adventureHeading.style.animation = "fadeOut 0.8s ease-out reverse";
+        adventureChoiceOne.pressAllowed = true;
+
+        let text = sceneInfo[advType].Lore;
+        adventureHeading.innerHTML = textReplacer({
+            "[s]":`<span style='color:#A97803'>`,
+            "[/s]":`</span>`,
+        },text)
+
+        adventureTextBox.style.animation = "";
+        adventureTextBox.removeEventListener("animationend", textFadeIn,true);
+    }
+}
+
+function continueQuest(advType) {
+    console.log(advType)
+    let infoDict = sceneInfo[advType];
+
+    if (infoDict.Type === "LuckCheck") {
+        let adventureVideo = document.getElementById("adventure-video");
+        let adventureHeading = document.getElementById("adventure-header");
+
+        let rollChance = randomInteger(1,101);
+        let rollOutcome;
+        if (rollChance < 70) {
+            rollOutcome = "Success";
+        } else {
+            rollOutcome = "Fail";
+        }
+
+        adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${advType}_${rollOutcome}.webp`;
+        let text = sceneInfo[`${advType}_${rollOutcome}`].Lore;
+        adventureHeading.innerHTML = textReplacer({
+            "[s]":`<span style='color:#A97803'>`,
+            "[/s]":`</span>`,
+        },text);
+
+        let adventureTextBox = document.getElementById("adventure-text");
+        adventureTextBox.questNumber = "0_Meeting";
+    } else if (infoDict.Type === "Meeting") {
+        quitQuest();
+    } else if (infoDict.Type === "Exploration") {
+        quitQuest();
+        if (advType === "17_A" || advType === "3_A") {
+            saveValues.energy += 250;
+            currencyPopUp("energy",250);
+        }
+    } else if (infoDict.Type === "Treasure") {
+        quitQuest();
+        if (advType === "10_A") {
+            adventure("10-");
+
+            currencyPopUp("items",0);
+            newPop(1);
+            sortList("table2");
+        } else if (advType === "7_A" || advType === "9_A") {
+            inventoryDraw("food", 2, 4);
+            inventoryDraw("food", 2, 4);
+
+            currencyPopUp("items",0);
+            newPop(1);
+            sortList("table2");
+        }
+    } else if (infoDict.Type === "Trade") {
+        let adventureVideo = document.getElementById("adventure-video")
+        adventureVideo.classList.add("transcend-dark");
+
+        let inventoryOffer = document.createElement("div");
+        inventoryOffer.id = "inventory-offer";
+        let offerCurrency = document.createElement("p");
+        offerCurrency.innerText = `Cost: \n 403 Primogems`;
+        
+        for (let i = 0; i < 3; i++) {
+            let offerItem = document.createElement("div");
+            offerItem = inventoryFrame(offerItem,Inventory[5003],itemFrameColors);
+            inventoryOffer.appendChild(offerItem)
+        }
+
+        inventoryOffer.appendChild(offerCurrency)
+        adventureVideo.appendChild(inventoryOffer);
+        // quitQuest();
+    }
+
+    function quitQuest() {
+        let adventureArea = document.getElementById("adventure-area");
+        adventureArea.style.zIndex = -1;
+        let adventureHeading = document.getElementById("adventure-header");
+        adventureHeading.innerHTML = "";
+        adventureHeading.style.animation = "";
     }
 }
 
@@ -5757,11 +5885,7 @@ function wishUnlock() {
     wishTutorial.id = "wish-tutorial";
     
     wishTutorial.addEventListener("click",()=>{
-        if (wishHelpText.style.display != "none") {
-            wishHelpText.style.display = "none";
-        } else {
-            wishHelpText.style.display = "flex";
-        }
+        universalStyleCheck(wishHelpText,"display","flex","none");
     });
 
     let wishNpsDisplay = document.createElement("div");
@@ -6356,10 +6480,9 @@ function setShop(type) {
             } else {
                 inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
             }
-
             createShopItems(shopDiv, i, inventoryNumber);
         }
-        saveData(true)
+        saveData(true);
     }
 
     let shopDialogueDiv = document.createElement("div");
@@ -6615,6 +6738,7 @@ function addNutStore() {
     nutShopDiv.id = "nut-shop-div";
     let nutTranscend = document.createElement("div");
     nutTranscend.id = "nut-shop-transcend";
+    nutTranscend.style.display = "none";
     let nutAscend = document.createElement("button");
     nutAscend.innerText = "Transcend";
 
@@ -6622,10 +6746,10 @@ function addNutStore() {
     nutStoreButton.classList = "nut-store-access";
     nutStoreButton.addEventListener("click",()=>{
         calculateGoldenCore();
-        if (nutStoreTable.style.display == "flex") {
-            nutStoreTable.style.display = "none";
-        } else {
-            nutStoreTable.style.display = "flex";
+        universalStyleCheck(nutStoreTable,"display","flex","none");
+        if (document.getElementById("pet-table")) {
+            let petTemp = document.getElementById("pet-table");
+            if (petTemp.style.display === "flex") {petTemp.style.display = "none"}
         }
     })
     leftDiv.appendChild(nutStoreButton);
@@ -6721,8 +6845,14 @@ function addNutStore() {
     transendHelp.addEventListener("click",()=>{
         if (transcendHelpbox.style.display == "none") {
             transcendHelpbox.style.display = "block";
+            if (!nutTranscend.classList.contains("transcend-dark")) {
+                nutTranscend.classList.add("transcend-dark");
+            }
         } else {
             transcendHelpbox.style.display = "none";
+            if (nutTranscend.classList.contains("transcend-dark")) {
+                nutTranscend.classList.remove("transcend-dark");
+            }
         }
     });
 
@@ -6792,7 +6922,6 @@ function toggleTranscendMenu(forceClose) {
 
 function transcendFunction() {
     let forceStop = true; 
-
     if (forceStop) {
         preventSave = true;
         forceStop = false; 
@@ -6802,8 +6931,7 @@ function transcendFunction() {
         setTimeout(()=>{
             let clearPromise = new Promise(function(myResolve, myReject) {
                 localStorage.clear();
-
-                if(localStorage.length === 0) {
+                if (localStorage.length === 0) {
                     myResolve(); 
                 } else {
                     myReject();
@@ -6823,12 +6951,13 @@ function transcendFunction() {
                     newGif.classList.add("overlay-tutorial")
 
                     persistentValues.goldenCore += calculateGoldenCore("formula");
-                    
                     localStorage.setItem("settingsValues", JSON.stringify(settingsValues));
                     localStorage.setItem("persistentValues", JSON.stringify(persistentValues));
+                    localStorage.setItem("advDictSave", JSON.stringify(advDict));
 
                     let newSaveValues = saveValuesDefault;
                     newSaveValues.goldenTutorial = true;
+                    newSaveValues.versNumber = DBNUBMER;
                     localStorage.setItem("saveValuesSave", JSON.stringify(newSaveValues));
                     
                     setTimeout(()=>{
@@ -6894,6 +7023,186 @@ function updateCoreCounter() {
     nutCounter.innerHTML = nutCounter.innerHTML.replace(/[^<]+</g, `${currentCount}<`);
 }
 
+//------------------------------------------------------------------------ PET  ----------------------------------------------------------------//
+function createPetShop() {
+    let petTable = document.createElement("div");
+    petTable.classList.add("table-without-tooltip","pet-table");
+    petTable.id = 'pet-table';
+
+    let mainTable = rightDiv.childNodes[1];
+    mainTable.appendChild(petTable);
+
+    let petButton = document.createElement("button");
+    petButton.classList.add("nut-store-access","pet-access");
+    petButton.addEventListener("click",()=>{
+        universalStyleCheck(petTable,"display","flex","none");
+        if (document.getElementById("nut-store-table")) {
+            let nutStoreTemp = document.getElementById("nut-store-table");
+            if (nutStoreTemp.style.display === "flex") {nutStoreTemp.style.display = "none"}
+        }
+    })
+    leftDiv.appendChild(petButton);
+
+    let stage = new Konva.Stage({
+        container: 'pet-table',
+        width: petTable.offsetWidth,
+        height: petTable.offsetHeight
+      });
+    
+    let layer = new Konva.Layer();
+    addPet(layer,stage,"icon/petShop");
+    addPet(layer,stage,"icon/petShop");
+    addPet(layer,stage,"icon/petShop");
+    addPet(layer,stage,"icon/petShop");
+    stage.add(layer);
+}
+
+function addPet(layer,stage,source) {
+    let imageObj = new Image();
+    imageObj.src = `/assets/${source}.webp`;
+    imageObj.onload = () => {
+        let pet = new Konva.Image({
+            image: imageObj,
+            x: stage.width() / 40 * randomInteger(1,31),
+            y: stage.height() / 40 * randomInteger(1,31),
+            width: stage.height() * 0.20,
+            height: stage.height() * 0.20 * imageObj.width / imageObj.height,
+            offsetX: stage.height() * 0.10,
+            offsetY: stage.height() * 0.10 * imageObj.width / imageObj.height,
+            draggable: true,
+            dragBoundFunc: function(pos) {
+                let newX = Math.max(this.width()/2, Math.min(stage.width() - this.width()/2, pos.x));
+                let newY = Math.max(this.height()/2, Math.min(stage.height() - this.height()/2, pos.y));
+                return {
+                    x: newX,
+                    y: newY
+                };
+            }
+        });
+        
+        const getRandomPositionWithinStage = () => {
+            const x = Math.random() * (stage.width() - pet.width());
+            const y = Math.random() * (stage.height() - pet.height());
+            return { x, y };
+        };
+
+        let randomPosition = getRandomPositionWithinStage();
+        let speed = randomInteger(25,35);
+        const calculateDisplacement = function(randomPosition,pet) {
+            return ((randomPosition.y - pet.y())**2 + (randomPosition.x - pet.x())**2);
+        }
+
+        const resetAnimation = function(time) {
+            do {
+                randomPosition = getRandomPositionWithinStage();
+            } while (calculateDisplacement(randomPosition,pet) < 100)
+            setTimeout(()=>{
+                speed = randomInteger(25,35);
+                animMove.start();
+            },time);
+        }
+
+        pet.on('dragstart', function() {
+            animMove.stop();
+        });
+
+        pet.on('dragend', function() {
+            rollAnim()
+        });
+
+        pet.on('dblclick', function() {
+            animMove.stop();
+            for (let i = 0; i < animArray.length; i++) {
+                if (animArray[i].isRunning()) {return};
+            } 
+            rollAnim();
+        });
+        
+        const animJello = new Konva.Animation((frame)=>{
+            let scale = 1 + (Math.sin(frame.time * 0.005) * 0.03);
+            pet.scale({
+                 x: scale, 
+                 y: scale,
+            });
+
+            if (frame.time > 2500) {
+                resetAnimation(100);
+                frame.time = 0;
+                animJello.stop();
+            }
+        })
+
+        let acceleration;
+        let velocity;
+        let Ydistance;
+        const animJump = new Konva.Animation((frame)=>{
+            Ydistance = velocity * frame.timeDiff;
+            velocity = velocity + acceleration * frame.timeDiff / 1000;
+
+            let newY = pet.y() - Ydistance;
+            pet.y(newY);
+
+            if (frame.time > 2000) {
+                resetAnimation(200);
+                frame.time = 0;
+                animJump.stop();
+            }
+        });
+       
+        const animRotate = new Konva.Animation((frame)=>{
+            let angleDiff = 288;
+            let angle = (frame.time * angleDiff) / 1000;
+            pet.rotation(angle);
+
+            if (frame.time > 2500) {
+                pet.rotation(0);
+                resetAnimation(200);
+                frame.time = 0;
+                animRotate.stop();
+            }
+        })
+
+        const animMove = new Konva.Animation((frame) => {
+            for (let i = 0; i < animArray.length; i++) {
+                if (animArray[i].isRunning()) {animMove.stop()}
+            } 
+            
+            // WHEN SWITCHING TABS, PETS MOVEMENT CONTINUES OUT OF BOUNDARIES AND THEN RETURNS AFTER SOME TIME
+            // IM NOT SURE WHAT CAUSES THIS PROBLEM SO WORKAROUND IS TO JUST RESPAWN POSITION
+            let distance = speed * frame.timeDiff / 1000;
+            if (pet.x() > stage.width() || pet.x() < 0 || pet.y() > stage.height() || pet.y() < 0) {
+                pet.x(stage.width() / 40 * randomInteger(1,31));
+                pet.y(stage.height() / 40 * randomInteger(1,31));
+            }
+
+            let angle = Math.atan2(randomPosition.y - pet.y(), randomPosition.x - pet.x());
+            let newX = pet.x() + distance * Math.cos(angle);
+            let newY = pet.y() + distance * Math.sin(angle);
+
+            pet.x(newX);
+            pet.y(newY);
+
+            if (calculateDisplacement(randomPosition,pet) < 50) {
+                animMove.stop();
+                setTimeout(()=>{rollAnim()},500)
+                do {
+                    randomPosition = getRandomPositionWithinStage();
+                } while (calculateDisplacement(randomPosition,pet) < 1000)
+            }
+        }, layer);
+
+        let animArray = [animJello,animRotate,animJump];
+        function rollAnim() {
+            acceleration = -0.15;
+            velocity = 0.15;
+            rollArray(animArray,0).start();
+        }
+
+        animMove.start();
+        layer.add(pet);
+    }
+}
+
 //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
 // REFRESH SCORES & ENERGY
 function refresh() {
@@ -6905,7 +7214,8 @@ function refresh() {
     energyDisplay.innerText = saveValues["energy"];
     primogemDisplay.innerText = saveValues["primogem"];
     
-    if (arguments[0] != undefined) { // BUYING A HERO / UPDATING MULTIPLIERS
+     // BUYING A HERO / UPDATING MULTIPLIERS
+    if (arguments[0] != undefined) {
         if (arguments[0].includes("but-")){
             let heroTextFirst = "";
             let formatCost = arguments[1];
@@ -6957,8 +7267,8 @@ function refresh() {
 }
 
 // POP UPS FOR EXPEDITIONS UNLOCKS
-// NUMBER OF UPGRADES NEEDED TO UNLOCK EXPEDITIONS vvvv
-let heroUnlockLevels = [1e6,1e9,1e12];
+// NUMBER OF UPGRADES NEEDED TO UNLOCK EXPEDITIONS
+let heroUnlockLevels = [1e6,1e11,1e14];
 let expeditionCounter = 0;
 function checkExpeditionUnlock(heroesPurchasedNumber) {
     if (heroUnlockLevels.length == 0) {

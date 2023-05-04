@@ -4,8 +4,6 @@ const workerFunctions = {
         if (morale > 80) {currentATK *= 1.10};
         postMessage({ function: 'calculateDamage', result: currentATK });
     },
-    
-   
 };
 
 onmessage = function(event) {

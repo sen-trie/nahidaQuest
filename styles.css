@@ -2919,8 +2919,7 @@ input:checked + .slider:before {
     color: #423126;
     background-color: #ECE4DA;
     border: 0.2em solid #c8b697;
-    height: auto;
-    flex-grow: 1;
+    height: 60%;
     width: 100%;
     overflow-y: auto;
     text-align: center;
@@ -3474,7 +3473,7 @@ input:checked + .slider:before {
     text-align: center;
     gap: 4%;
     aspect-ratio: 1.88;
-    padding: 2% 0 1% 0;
+    padding: 0 0 1% 0;
     box-sizing: border-box;
 }
 
@@ -3484,6 +3483,31 @@ input:checked + .slider:before {
     box-sizing: border-box;
     color: #442d10;
     font-size: 1.2em;
+    overflow-y: auto;
+    padding: 1%;
+}
+
+#inventory-offer {
+    z-index: 2;
+    width: 50%;
+    height: auto;
+    aspect-ratio: 3;
+    display: flex;
+    gap:1%;
+}
+
+#inventory-offer > p {
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    bottom: 110%;
+    color: white;
+    font-size: 1.5em;
+    text-shadow: var(--text-shadow-075);
+}
+
+#inventory-offer > div {
+    width: 33.3%;
 }
 
 .adventure-rewards {
@@ -4442,7 +4466,6 @@ input:checked + .slider:before {
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    filter: drop-shadow(0.2em 0.2em 0.2em #9ac57c);
     scrollbar-color: #d3e4d1 #60895a;
 }
 
@@ -4579,6 +4602,18 @@ input:checked + .slider:before {
     justify-content: space-evenly;
 }
 
+.transcend-dark::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 1;
+    pointer-events: none;
+  }
+
 .nut-transcend > div {
     width: 90%;
     height: 50%;
@@ -4628,7 +4663,7 @@ input:checked + .slider:before {
     border: 0.2em solid #5B7B49;
     text-shadow: var(--text-shadow-075);
     padding: 2%;
-    filter: drop-shadow(0 0 0.2em #5e7e5b) drop-shadow(0 0 0.1em #556f52);
+    z-index: 2;
 }
 
 .nut-transcend > :last-child {
@@ -4639,7 +4674,7 @@ input:checked + .slider:before {
     top: 1%;
     right:1%;
     background: transparent url("./assets/icon/help.webp") center/contain no-repeat;
-
+    z-index: 2;
 }
 
 .nut-transcend > button:hover {
@@ -4650,4 +4685,23 @@ input:checked + .slider:before {
     width: 20%;
     object-fit: contain;
     filter: drop-shadow(0 0 0.2em #31522e) drop-shadow(0 0 0.2em #314f2f);
+}
+
+/*//////////// PET SHOP CSS /////////////*/
+.pet-access {
+    bottom: 17%;
+    background: url(./assets/icon/petShop.webp);
+    background-size: contain;
+}
+
+.pet-access:hover {
+    filter: drop-shadow(0 0 0.8em #6fadf9);
+}
+
+.pet-table {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 500;
+    background-color: #6fadf9;
 }
