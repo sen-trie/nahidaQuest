@@ -69,7 +69,7 @@ const imgKey = {
     16:{Left:"88",  Top:"45",   Level:4,    Wave:[4,5],             Heads:[18,19]           ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Claymore:[4,"4-Star \n Claymore"],    DendroGeoAnemo:   [5,"5-Star \n Dendro / Geo / Anemo \n Gem"],    Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
     17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,4,5,6,7,8],   Heads:[15,16,17,18,20]  ,Loot:{Artifact:[5,"5-Star \n Artifacts"],  Weapon:[5,"5-Star \n Weapon"],        Talent:           [4,"4-Star \n Talent"],                         Gemstone: [5,"5-Star \n Gem"],                   Level: [4,"4-Star \n Level \n Books"],   Food: [5,"5-Star \n Food \n Item"]}},
     18:{Left:"53",  Top:"38",   Level:12,   Wave:["1_B","2_B","17_A"]},
-    19:{Left:"80",  Top:"18",   Level:12,   Wave:["3_A","4_A","6_A"]},
+    19:{Left:"80",  Top:"18",   Level:12,   Wave:["6_A","3_A","4_A"]},
     20:{Left:"78",  Top:"26",   Level:12,   Wave:["7_A","18_A","21_A"]},
     21:{Left:"77",  Top:"53",   Level:12,   Wave:["5_A","6_A","22_A"]},
     22:{Left:"43",  Top:"72",   Level:12,   Wave:["8_A","9_A","10_A","12_A"]},
@@ -80,7 +80,9 @@ const imgKey = {
 
 const sceneInfo = {
     "0_Meeting":{Type:"Meeting"},
-    "0_Trade":{Type:"Trade"},
+    "0_Trade_Wait":{Type:"Trade"},
+    "0_LuckCheck_Success":{Type:"LuckCheck"},
+    "0_LuckCheck_Failure":{Type:"LuckCheck"},
     "1_B":{Type:"LuckCheck"                 ,Lore:"You encountered the [s]Dreadful Withering[/s] as you were exploring. <br><br>Its spread appears to have been localized to this area."},
     "1_B_Fail":{Type:"LuckCheckFail"        ,Lore:"Oh no! The decay was too overwhelming and you were forced to run away."},
     "1_B_Success":{Type:"LuckCheckSuccess"  ,Lore:"With your efforts, you were successful in clearing the decay!"},
@@ -106,11 +108,11 @@ const sceneInfo = {
     "15_B_Success":{Type:"LuckCheckSuccess" ,Lore:"With your reflexes, you were able to evade the [s]Jadeplume Terrorshroom's[/s] barrage as you swiped the item right underneath it."},
     "16_A":{Type:"Meeting"                  ,Lore:"You encountered an unsual [s]Ruin Defender[/s] with a unique color scheme at Pardis Dhyai. <br><br>Somehow, it seems to understand what you are saying."},
     "17_A":{Type:"Exploration"              ,Lore:"You came across a strange [s]Aranara[/s] that was medidating underneath a waterfall. As a wise forest spirit, it imparts counsel to those who seek it. <br><br>After listening to its advice, you feel [s]invigorated[/s]."},
-    "18_A":{Type:"Exploration"              ,Lore:""},
+    "18_A":{Type:"Exploration"              ,Lore:"[s]Bongo-Head[/s] appears to really want to join you in your adventure. Citing potential dangers, you refuse it from joining. <br><br>After promising some gifts, the fungi eventually gives in."},
     "19_A":{Type:"Meeting"                  ,Lore:"As you were navigating Sumeru, you were suddenly ambushed by a sudden beam of energy! <br><br>Luckily, you managed to dodge it in time."},
-    "20_A":{Type:"Meeting"                  ,Lore:""},
+    "20_A":{Type:"Meeting"                  ,Lore:"Some wild fungi suddenly appeared out of the grass. <br><br>Seeing that you were not hostile, they offered a few of the fruits they gathered."},
     "21_A":{Type:"Meeting"                  ,Lore:"A suspicious man was spotted on the streets of Sumeru City with a killer's intent on his face. Fortunately, it turned out to be just the [s]Wanderer[/s]. <br><br>You gave him some advice on how to avoid such situations, which he begrudgingly accepted."},
-    "22_A":{Type:"Trade"                    ,Lore:"Dori, the elusive merchant, approaches you with what she calls a [s]'fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal'[/s]. <br><br>Will you accept?"},
+    "22_A":{Type:"Trade"                    ,Lore:"[s]Dori[/s], the elusive merchant, approaches you with what she calls a [s]'fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal'[/s]. <br><br>Will you accept?"},
 }
 
 const upgradeInfo = {

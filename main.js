@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "0.4-4-310";
+const VERSIONNUMBER = "0.4-5-050";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -4205,10 +4205,11 @@ function expedInfo(butId) {
 //------------------------------------------------ ADVENTURE & FIGHTS ----------------------------------------------------------//
 function createExpMap() {
     let advImageDiv = document.createElement("div");
-    let advImage = document.createElement("div");
     advImageDiv.classList.add("adventure-map");
     advImageDiv.id = "adventure-map";
     advImageDiv.style.zIndex = -1;
+    let advImage = document.createElement("div");
+    advImage.id = "sumeru-map";
 
     let expedXP = document.createElement("div");
     expedXP.classList.add("flex-column","exped-xpbar");
@@ -4218,6 +4219,7 @@ function createExpMap() {
     expedXPBar.currentXP = advDict.advXP;
     expedXPBar.style.width = `${Math.round((advDict.advXP / expedXPBar.maxXP)*100)}%`;
     expedXPBar.classList.add("xpbar-bar","cover-all");
+
     let expedXPInfo = document.createElement("p");
     expedXPInfo.id = "exped-xp";
     expedXPInfo.innerText = `Rank ${advDict.adventureRank} (${advDict.advXP}/${expedXPBar.maxXP} XP)`;
@@ -4252,6 +4254,7 @@ function createExpMap() {
     notifSelect.bountyArray = [];
     notifSelect.rankArray = [];
     notifSelect.charArray = [];
+    notifSelect.questArray = [];
     notifSelect.classList.add("flex-column","notif-select");
     
     let charMenu = document.createElement("div");
@@ -4323,48 +4326,7 @@ function createExpMap() {
 
     for (let key in imgKey) {
         if (key > 17) {break}
-        let button = document.createElement("button");
-        button.classList.add("adv-image-btn");
-        button.style.left = imgKey[key].Left + "%";
-        button.style.top = imgKey[key].Top + "%";
-        button.level = imgKey[key].Level;
-        button.wave = imgKey[key].Wave;
-
-        let level = imgKey[key].Level;
-        let wave = imgKey[key].Wave;
-        button.style.backgroundImage = `url(./assets/expedbg/adv-${level}.webp)`;
-        button.locked = false;
-
-        if (expeditionDict[button.level] == 1 && level != 12) {
-            button.style.zIndex = -1;
-            button.locked = true;
-        } else {
-            button.addEventListener("click",()=>{
-                let advButton = document.getElementById("adventure-button");
-                if (!activeLeader) {
-                    adventureType = 0;
-                    advButton.key = 0;
-                    expedInfo("exped-11");
-                    if (advButton.classList.contains("expedition-selected")) {
-                        advButton.classList.remove("expedition-selected");
-                    }
-                } else if (adventureType == `${level}-[${wave}]`) {
-                    adventureType = 0;
-                    advButton.key = 0;
-                    clearExped();
-                    expedInfo("exped-7");
-                    if (advButton.classList.contains("expedition-selected")) {
-                        advButton.classList.remove("expedition-selected");
-                    }
-                } else {
-                    clearExped();
-                    adventureType = `${level}-[${wave}]`;
-                    advButton.key = key;
-                    expedInfo(`exped-${level}-${key}`);
-                }  
-            })
-        }
-        advImage.appendChild(button);
+        spawnKey(advImage,imgKey,key);
     }
     
     mapZoom.oninput = function() {
@@ -4379,7 +4341,23 @@ function createExpMap() {
     })
 }
 
-function gainXP(xpAmount) {
+function gainXP(xpAmount,multiplier) {
+    if (xpAmount == "variable") {
+        if (advDict.adventureRank > 15) {
+            xpAmount = 55;
+        } else if (advDict.adventureRank > 10) {
+            xpAmount = 35;
+        } else if (advDict.adventureRank > 5) {
+            xpAmount = 20;
+        } else {
+            xpAmount = 10;
+        }
+    }
+
+    if (multiplier > 1) {
+        xpAmount *= multiplier;
+    }
+
     xpAmount = (xpAmount * randomInteger(98,103) / 100);
     let xpBar = document.getElementById('exped-xp-bar');
     xpBar.maxXP = advDict.adventureRank * 100;
@@ -4453,6 +4431,8 @@ function notifPop(type,icon,count) {
     if (type == "add") {
         let notifDiv = document.createElement("div");
         notifDiv.classList.add("flex-column");
+        notifDiv.id = `${icon}-notif`;
+
         let notifContainer = document.createElement("div");
         notifContainer.classList.add("flex-row","notif-div");
         let notifImg = new Image();
@@ -4461,57 +4441,38 @@ function notifPop(type,icon,count) {
         if (icon === "bounty") {
             notifImg.src = "./assets/icon/bountyComplete.webp";
             notifText.innerText = "Bounty Rewards";
-            notifDiv.id = "bounty-notif";
             notifSelect.bountyArray.push(count);
         } else if (icon === "rank") {
             notifImg.src = "./assets/icon/advRank.webp";
             notifText.innerText = "Adv. Rank \n Rewards";
-            notifDiv.id = "rank-notif";
             notifSelect.rankArray.push(count);
         } else if (icon === "char") {
             notifImg.src = "./assets/icon/newChar.webp";
             notifText.innerText = "New Leader \n Unlocked";
-            notifDiv.id = "char-notif";
             notifSelect.charArray.push(count);
-        }
+        } else if (icon === "quest") {
+            notifImg.src = "./assets/expedbg/adv-12.webp";
+            notifText.innerText = "World Quest \n Available";
+            notifSelect.questArray.push(count);
+        } 
 
         if (document.getElementById(notifDiv.id)) {return};
         notifContainer.append(notifText,notifImg)
         notifDiv.append(notifContainer);
         notifSelect.append(notifDiv);
     } else if (type === "clear") {
-        let array;
-        let eleId;
-        if (icon === "bounty") {
-            array = "bountyArray";
-            eleId = "bounty-notif";
-        } else if (icon === "rank") {
-            array = "rankArray";
-            eleId = "rank-notif";
-        } else if (icon === "char") {
-            array = "charArray";
-            eleId = "char-notif";
-        }
-
+        let array = `${icon}Array`;
+        let eleId = `${icon}-notif`;
         let index = notifSelect[array].indexOf(count);
+
         notifSelect[array].splice(index, 1);
         if (notifSelect[array].length <= 0) {
             let ele = document.getElementById(eleId);
             if(ele) {ele.remove()};
         }
     } else if (type == "clearAll") {
-        let array;
-        let eleId;
-        if (icon === "bounty") {
-            array = "bountyArray";
-            eleId = "bounty-notif";
-        } else if (icon === "rank") {
-            array = "rankArray";
-            eleId = "rank-notif";
-        } else if (icon === "char") {
-            array = "charArray";
-            eleId = "char-notif";
-        }
+        let array = `${icon}Array`;
+        let eleId = `${icon}-notif`;
 
         notifSelect[array] = [];
         let ele = document.getElementById(eleId);
@@ -4639,6 +4600,67 @@ function drawAdventure(advType,wave) {
     }
 }
 
+function spawnKey(advImage,imgKey,key,worldQuest) {
+    let button = document.createElement("button");
+    button.classList.add("adv-image-btn");
+    button.style.left = imgKey[key].Left + "%";
+    button.style.top = imgKey[key].Top + "%";
+    button.level = imgKey[key].Level;
+    button.wave = imgKey[key].Wave;
+
+    if (worldQuest) {button.id = "world-quest-button"};
+
+    let level = imgKey[key].Level;
+    let wave = imgKey[key].Wave;
+    button.style.backgroundImage = `url(./assets/expedbg/adv-${level}.webp)`;
+    button.locked = false;
+
+    if (expeditionDict[button.level] == 1 && level != 12) {
+        button.style.zIndex = -1;
+        button.locked = true;
+    } else {
+        button.addEventListener("click",()=>{
+            let advButton = document.getElementById("adventure-button");
+            if (!activeLeader) {
+                adventureType = 0;
+                advButton.key = 0;
+                expedInfo("exped-11");
+                if (advButton.classList.contains("expedition-selected")) {
+                    advButton.classList.remove("expedition-selected");
+                }
+            } else if (adventureType == `${level}-[${wave}]`) {
+                adventureType = 0;
+                advButton.key = 0;
+                clearExped();
+                expedInfo("exped-7");
+                if (advButton.classList.contains("expedition-selected")) {
+                    advButton.classList.remove("expedition-selected");
+                }
+            } else {
+                clearExped();
+                adventureType = `${level}-[${wave}]`;
+                advButton.key = key;
+                expedInfo(`exped-${level}-${key}`);
+            }  
+        })
+    }
+    advImage.appendChild(button);
+    return advImage;
+}
+
+
+function spawnWorldQuest() {
+    if (document.getElementById("world-quest-button")) {
+        document.getElementById("world-quest-button").remove();
+        notifPop("clearAll","quest");
+    }
+
+    let rollQuest = randomInteger(18,26);
+    let mapImage = document.getElementById('sumeru-map');
+    spawnKey(mapImage,imgKey,rollQuest,true);
+    notifPop("add","quest",1);
+}
+
 function drawWorldQuest(advType) {
     let adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
@@ -4687,19 +4709,31 @@ function drawWorldQuest(advType) {
 }
 
 function continueQuest(advType) {
-    console.log(advType)
     let infoDict = sceneInfo[advType];
-
     if (infoDict.Type === "LuckCheck") {
+        if (advType === "0_LuckCheck_Failure") {
+            saveValues.enemyAmount -= 100;
+            saveValues.enemyAmount = Math.max(0,saveValues.enemyAmount);
+            quitQuest();
+            return;
+        } else if (advType === "0_LuckCheck_Success") {
+            gainXP("variable",2);
+            quitQuest();
+            return;
+        }
+
         let adventureVideo = document.getElementById("adventure-video");
         let adventureHeading = document.getElementById("adventure-header");
+        let adventureTextBox = document.getElementById("adventure-text");
 
-        let rollChance = randomInteger(1,101);
+        let rollChance = randomInteger(1,101) + luckRate;
         let rollOutcome;
-        if (rollChance < 70) {
+        if (rollChance > 50) {
             rollOutcome = "Success";
+            adventureTextBox.questNumber = "0_LuckCheck_Success";
         } else {
             rollOutcome = "Fail";
+            adventureTextBox.questNumber = "0_LuckCheck_Failure";
         }
 
         adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${advType}_${rollOutcome}.webp`;
@@ -4708,16 +4742,17 @@ function continueQuest(advType) {
             "[s]":`<span style='color:#A97803'>`,
             "[/s]":`</span>`,
         },text);
-
-        let adventureTextBox = document.getElementById("adventure-text");
-        adventureTextBox.questNumber = "0_Meeting";
     } else if (infoDict.Type === "Meeting") {
+        updateMorale("add",randomInteger(6,10));
         quitQuest();
+        gainXP("variable");
     } else if (infoDict.Type === "Exploration") {
         quitQuest();
+        gainXP("variable");
         if (advType === "17_A" || advType === "3_A") {
-            saveValues.energy += 250;
-            currencyPopUp("energy",250);
+            let energyRoll = Math.round(randomInteger(150,250) / 5) * 5;
+            saveValues.energy += energyRoll;
+            currencyPopUp("energy",energyRoll);
         }
     } else if (infoDict.Type === "Treasure") {
         quitQuest();
@@ -4736,23 +4771,118 @@ function continueQuest(advType) {
             sortList("table2");
         }
     } else if (infoDict.Type === "Trade") {
+        if (advType === "0_Trade_Wait") {
+            let tradeOffer = document.getElementById('inventory-offer');
+            if (tradeOffer.offer == null) {
+                return;
+            } else if (tradeOffer.offer == true) {
+                shopElement.load();
+                shopElement.play();
+
+                saveValues.primogem -= document.getElementById("offer-amount").value;
+                newPop(1);
+                currencyPopUp("items",0)
+                sortList("table2");
+            }
+
+            for (let key in lootArray) {
+                if (tradeOffer.offer) {inventoryAdd(lootArray[key])};
+                delete lootArray[key];
+            }
+
+            let adventureVideo = document.getElementById("adventure-video");
+            if (adventureVideo.classList.contains("transcend-dark")) {
+                adventureVideo.classList.remove("transcend-dark");
+            }
+            
+            document.getElementById('currency-amount').remove();
+            document.getElementById('inventory-offer').remove();
+            quitQuest();
+            return;
+        }
+
+        let adventureHeading = document.getElementById("adventure-header");
         let adventureVideo = document.getElementById("adventure-video")
         adventureVideo.classList.add("transcend-dark");
 
         let inventoryOffer = document.createElement("div");
         inventoryOffer.id = "inventory-offer";
+        inventoryOffer.offer = null;
         let offerCurrency = document.createElement("p");
-        offerCurrency.innerText = `Cost: \n 403 Primogems`;
-        
-        for (let i = 0; i < 3; i++) {
-            let offerItem = document.createElement("div");
-            offerItem = inventoryFrame(offerItem,Inventory[5003],itemFrameColors);
-            inventoryOffer.appendChild(offerItem)
-        }
+        offerCurrency.value = 0;
+        offerCurrency.id = "offer-amount";
 
-        inventoryOffer.appendChild(offerCurrency)
-        adventureVideo.appendChild(inventoryOffer);
-        // quitQuest();
+        let acceptButton = new Image();
+        acceptButton.src = "./assets/icon/thumbsUp.webp";
+        acceptButton.classList.add("dim-filter");
+        let rejectButton = new Image();
+        rejectButton.classList.add("dim-filter");
+        rejectButton.src = "./assets/icon/thumbsDown.webp";
+
+        acceptButton.addEventListener("click",()=>{
+            if (saveValues.primogem > offerCurrency.value) {
+                inventoryOffer.offer = true;
+                adventureHeading.innerHTML = "You are accepting the trade. <br><br>Click 'Next' to confirm.";
+                if (acceptButton.classList.contains("dim-filter")) {
+                    acceptButton.classList.remove("dim-filter");
+                }
+                if (!rejectButton.classList.contains("dim-filter")) {
+                    rejectButton.classList.add("dim-filter");
+                }
+            } else {
+                adventureHeading.innerHTML = "You do not have enough primogems for the trade.";
+                weaselDecoy.load();
+                weaselDecoy.play();
+            }
+        });
+
+        rejectButton.addEventListener("click",()=>{
+            inventoryOffer.offer = false;
+            adventureHeading.innerHTML = "You are rejecting the trade. <br><br>Click 'Next' to confirm.";
+            if (!acceptButton.classList.contains("dim-filter")) {
+                acceptButton.classList.add("dim-filter");
+            }
+            if (rejectButton.classList.contains("dim-filter")) {
+                rejectButton.classList.remove("dim-filter");
+            }
+        });
+
+        let currencyAmount = document.createElement("div");
+        currencyAmount.innerText = saveValues.primogem;
+        currencyAmount.classList.add("flex-row")
+        currencyAmount.id = "currency-amount";
+        let primogem = new Image();
+        primogem.src = "./assets/icon/primogemIcon.webp";
+        currencyAmount.appendChild(primogem);
+        
+        const itemCost = [0,0,0,70,140,300,600];
+        const itemRoll = ["weapon","gem","artifact"]
+        for (let i = 0; i < 3; i++) {
+            let itemNumber;
+            if (advType === "6_A") {
+                itemNumber = inventoryDraw("gem", 3,5, "shop");
+            } else if (advType === "22_A") {
+                let maxStar = 5;
+                let item = rollArray(itemRoll,0)
+                if (item === "weapon" || item === 'gem') {
+                    maxStar = 6;
+                }
+                itemNumber = inventoryDraw(item,5,maxStar, "shop");
+            }
+
+            let offerItem = document.createElement("div");
+            offerItem = inventoryFrame(offerItem,Inventory[itemNumber],itemFrameColors);
+
+            offerCurrency.value += Math.round(itemCost[Inventory[itemNumber].Star] * costDiscount / 5 * 0.65) * 5;
+            inventoryOffer.appendChild(offerItem);
+            lootArray[i] = itemNumber;
+        }
+        offerCurrency.innerText = `Cost: \n ${offerCurrency.value} Primogems`;
+
+        inventoryOffer.append(offerCurrency,acceptButton,rejectButton);
+        adventureVideo.append(inventoryOffer,currencyAmount);
+        let adventureTextBox = document.getElementById("adventure-text");
+        adventureTextBox.questNumber = "0_Trade_Wait";
     }
 
     function quitQuest() {
@@ -4761,6 +4891,11 @@ function continueQuest(advType) {
         let adventureHeading = document.getElementById("adventure-header");
         adventureHeading.innerHTML = "";
         adventureHeading.style.animation = "";
+
+        if (document.getElementById("world-quest-button")) {
+            document.getElementById("world-quest-button").remove();
+            notifPop("clear","quest",1);
+        }
     }
 }
 
@@ -5830,6 +5965,12 @@ function winAdventure() {
 }
 
 function quitAdventure() {
+    let worldQuestRoll = randomInteger(1,101) - luckRate;
+    console.log(worldQuestRoll)
+    if (worldQuestRoll < 30) {
+        spawnWorldQuest();
+    }
+    
     let adventureArea = document.getElementById("adventure-area");
     adventureArea.style.zIndex = -1;
     adventureScene = false;

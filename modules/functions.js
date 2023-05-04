@@ -1,8 +1,10 @@
 // ABBREVIATES NUMBERS TO SHORTER FORM
 function abbrNum(number,digits,short) {
     let decPlaces = Math.pow(10, 3);
-    let abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion", " Undecillion", " Duodecillion", " Tredecillion", " Quattuordecillion"];
-    let abbrevShort = [""," M"," B"," T"," Q"," Qt"," Sx"," Sp", " O", " N", " D", " Ud", " Dd", " Td", " Qd"];
+    let abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion",
+                  " Undecillion", " Duodecillion", " Tredecillion", " Quattuordecillion", " Quindecillion", " Sexdecillion"," Septendecillion", " Octodecillion",
+                  " Novemdecillion", " Vigintillion", " Unvigintillion"];
+    let abbrevShort = [""," M"," B"," t"," q"," Q"," s"," S", " o", " n", " d", " U", " D", " T", " Qt", " Qd", " Sd", " St", " O", " N", " v", " c"];
 
     if (digits === 2) {
         decPlaces = Math.pow(10, 2);
@@ -77,12 +79,12 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
     for (let i = 1; i < NONWISHHEROMAX + 1; i++) {
         if (upgradeDict[i] === undefined) {continue}
         if (upgradeDict[i].Locked === true) {continue}
-        let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero-1)*1.28)));
+        let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero-1)*1.3)));
         let baseLevel = Math.round(0.75 * baseCost);
         upgradeDict[i]["BaseCost"] = Number(baseCost.toPrecision(3)).toExponential(3);
         upgradeDict[i]["Level"] = baseLevel.toExponential(3);
         
-        let baseATK = Math.round(initATKCost * (multiplierATKCost **((currentHero-1)*3.2)));
+        let baseATK = Math.round(initATKCost * (multiplierATKCost **((currentHero-1)*3.4)));
         upgradeDict[i]["Factor"] = Number(baseATK.toPrecision(3)).toExponential(3);
         upgradeDict[i]["BaseFactor"] = upgradeDict[i]["Factor"];
         upgradeDict[i]["Contribution"] = 0;

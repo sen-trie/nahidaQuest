@@ -77,7 +77,7 @@ let permUpgrades = {
     1:{Name:"Blessing of Vitality",        Effect:5,  Max:50,   Cap:false,   Description:"Increases Energy gained by clicking Big Nahida."},
     2:{Name:"Blessing of Technique",       Effect:3,  Max:50,    Cap:true,   Description:"Increase clicking DMG during Combat Expeditions."},
     3:{Name:"Blessing of Wanderlust",      Effect:2,   Max:50,   Cap:true,   Description:"Increases base power of Wish characters."},
-    4:{Name:"Blessing of Concession",      Effect:2,   Max:25,   Cap:true,   Description:"Decreases price of Dori's Shop items."},
+    4:{Name:"Blessing of Concession",      Effect:2,   Max:25,   Cap:true,   Description:"Decreases price of Dori's Shop items and random trades."},
     5:{Name:"Blessing of Might",           Effect:1,   Max:50,   Cap:true,   Description:"Increases critical hit amount and chance.",   zeroDescription:"Enables critical hits for clicking Big Nahida."},
     6:{Name:"Blessing of Tranquillity",    Effect:1,   Max:50,   Cap:false,   Description:"Increases offline Nut accumulation rate.",    zeroDescription:"Enables accumulation of Nuts while offline."},
     7:{Name:"Blessing of Fortuity",        Effect:0.5, Max:50,   Cap:true,   Description:"Increases chances of lucky outcomes.",          zeroDescription:"Enables additional lucky outcomes for certain events."},
