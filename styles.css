@@ -257,9 +257,9 @@ img {
     }
 } 
 
-@media (max-aspect-ratio: 4/9){
+@media (max-aspect-ratio: 6/9){
     body {
-        font-size: 3vw;
+        font-size: 3.2vw;
         width: 100%;
         height: 100%;
         margin: 0;
@@ -1658,11 +1658,13 @@ input[type="range"]:focus::-moz-range-thumb{
 .settings-bottom-left {
     display: flex;
     gap: 5%;
-    width: 50%;
+    width: 55%;
     height: 100%;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    padding: 1%;
+    box-sizing: border-box;
 }
 
 .settings-bottom-left > :last-child {
@@ -1674,7 +1676,7 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .settings-bottom-right {
-    width: 48%;
+    width: 45%;
     height: 100%;
     display: flex;
     flex-direction: row;
@@ -1760,6 +1762,7 @@ input[type="range"]:focus::-moz-range-thumb{
     justify-content: space-around;
     column-gap: 1%;
     color: #20301c;
+    text-align: center;
 }
   
 .switch input {
@@ -4317,6 +4320,7 @@ input:checked + .slider:before {
 }
 
 .shop-button {
+    position: relative;
     border: 0.2em groove #867357;
     width: 17%;
     height: 40%;
@@ -4325,6 +4329,7 @@ input:checked + .slider:before {
 .shop-button-container > img {
     width: 100%;
     object-fit: contain;
+    max-height: 100%;
 }
 
 .shop-button-text {

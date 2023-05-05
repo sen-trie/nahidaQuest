@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "0.4-5-050";
+const VERSIONNUMBER = "0.4-5-060";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -3522,10 +3522,7 @@ function createAdventure() {
          
             }
         }
-
-        // if (event.key === "l") {createPetShop()}
-
-        
+        // if (event.key === "l") {createPetShop()}        
     })
 
     adventureFight.append(fightTextbox,adventureFightDodge,adventureFightSkill,adventureFightBurst);
@@ -7164,7 +7161,8 @@ function updateCoreCounter() {
     nutCounter.innerHTML = nutCounter.innerHTML.replace(/[^<]+</g, `${currentCount}<`);
 }
 
-//------------------------------------------------------------------------ PET  ----------------------------------------------------------------//
+//-------------------------------------------- PET  ------------------------------------------------------//
+const propDict = {};
 function createPetShop() {
     let petTable = document.createElement("div");
     petTable.classList.add("table-without-tooltip","pet-table");
@@ -7184,6 +7182,7 @@ function createPetShop() {
     })
     leftDiv.appendChild(petButton);
 
+    Konva.showWarnings = false;
     let stage = new Konva.Stage({
         container: 'pet-table',
         width: petTable.offsetWidth,
@@ -7191,11 +7190,36 @@ function createPetShop() {
       });
     
     let layer = new Konva.Layer();
+    addProp(layer,stage,"stool",{"width":stage.width()/2,"height":stage.height()/2})
+    addProp(layer,stage,"trampoline",{"width":stage.width()/3,"height":stage.height()/1.5})
     addPet(layer,stage,"icon/petShop");
     addPet(layer,stage,"icon/petShop");
     addPet(layer,stage,"icon/petShop");
     addPet(layer,stage,"icon/petShop");
     stage.add(layer);
+}
+
+function addProp(layer,stage,type,coords) {
+    let imageObj = new Image();
+    imageObj.src = `/assets/icon/${type}.webp`;
+    imageObj.onload = ()=> {
+        const chairImage = new Konva.Image({
+            image: imageObj,
+            x: coords["width"],
+            y: coords["height"],
+            width: stage.height() * 0.30 * imageObj.width / imageObj.height,
+            height: stage.height() * 0.30 ,
+          });
+
+        layer.add(chairImage);
+        chairImage.zIndex(0)
+        propDict[type] = {
+            "obj":chairImage,
+            "occupied":false,
+            "pet":null,
+            "type":type,
+        }
+    }
 }
 
 function addPet(layer,stage,source) {
@@ -7206,10 +7230,10 @@ function addPet(layer,stage,source) {
             image: imageObj,
             x: stage.width() / 40 * randomInteger(1,31),
             y: stage.height() / 40 * randomInteger(1,31),
-            width: stage.height() * 0.20,
-            height: stage.height() * 0.20 * imageObj.width / imageObj.height,
-            offsetX: stage.height() * 0.10,
-            offsetY: stage.height() * 0.10 * imageObj.width / imageObj.height,
+            width: stage.height() * 0.20 * imageObj.width / imageObj.height,
+            height: stage.height() * 0.20,
+            offsetX: stage.height() * 0.10 * imageObj.width / imageObj.height,
+            offsetY: stage.height() * 0.10 ,
             draggable: true,
             dragBoundFunc: function(pos) {
                 let newX = Math.max(this.width()/2, Math.min(stage.width() - this.width()/2, pos.x));
@@ -7221,6 +7245,9 @@ function addPet(layer,stage,source) {
             }
         });
         
+        layer.add(pet);
+        pet.zIndex(1);
+
         const getRandomPositionWithinStage = () => {
             const x = Math.random() * (stage.width() - pet.width());
             const y = Math.random() * (stage.height() - pet.height());
@@ -7228,7 +7255,7 @@ function addPet(layer,stage,source) {
         };
 
         let randomPosition = getRandomPositionWithinStage();
-        let speed = randomInteger(25,35);
+        let speed = randomInteger(20,40);
         const calculateDisplacement = function(randomPosition,pet) {
             return ((randomPosition.y - pet.y())**2 + (randomPosition.x - pet.x())**2);
         }
@@ -7238,26 +7265,69 @@ function addPet(layer,stage,source) {
                 randomPosition = getRandomPositionWithinStage();
             } while (calculateDisplacement(randomPosition,pet) < 100)
             setTimeout(()=>{
-                speed = randomInteger(25,35);
+                speed = randomInteger(20,40);
                 animMove.start();
             },time);
         }
 
         pet.on('dragstart', function() {
             animMove.stop();
+            if (animIdle.isRunning()) {animIdle.stop()};
+            for (let key in propDict) {
+                if (propDict[key]["pet"] == pet) {
+                    propDict[key]["pet"] = null;
+                    propDict[key]["occupied"] = false;
+                }
+            }
         });
 
         pet.on('dragend', function() {
-            rollAnim()
+            for (let i = 0; i < animArray.length; i++) {
+                if (animArray[i].isRunning()) {return};
+            } 
+
+            let propCheck = isPetOnProp();
+            if (propCheck) {
+                propCheck["occupied"] = true;
+                propCheck["pet"] = pet;
+
+                pet.position({
+                  x: propCheck["obj"].x() + propCheck["obj"].width() / 2,
+                  y: propCheck["obj"].y()
+                });
+
+                centerX = pet.x();
+                animIdle.start();
+            } else {
+                if (animIdle.isRunning()) {animIdle.stop()};
+                rollAnim();
+            }
         });
 
         pet.on('dblclick', function() {
             animMove.stop();
+            if (animIdle.isRunning()) {animIdle.stop()};
             for (let i = 0; i < animArray.length; i++) {
                 if (animArray[i].isRunning()) {return};
-            } 
+            }
+
+            for (let key in propDict) {
+                if (propDict[key]["pet"] == pet) {
+                    propDict[key]["pet"] = null;
+                    propDict[key]["occupied"] = false;
+                }
+            }
+            
             rollAnim();
         });
+
+        let centerX;
+        const animIdle = new Konva.Animation((frame)=>{
+            var amplitude = 10;
+            var period = 4000;
+            let newX = amplitude * Math.sin((frame.time * 2 * Math.PI) / period) + centerX;
+            pet.x(newX)
+        })
         
         const animJello = new Konva.Animation((frame)=>{
             let scale = 1 + (Math.sin(frame.time * 0.005) * 0.03);
@@ -7308,9 +7378,9 @@ function addPet(layer,stage,source) {
                 if (animArray[i].isRunning()) {animMove.stop()}
             } 
             
-            // WHEN SWITCHING TABS, PETS MOVEMENT CONTINUES OUT OF BOUNDARIES AND THEN RETURNS AFTER SOME TIME
-            // IM NOT SURE WHAT CAUSES THIS PROBLEM SO WORKAROUND IS TO JUST RESPAWN POSITION
-            let distance = speed * frame.timeDiff / 1000;
+            // WHEN SWITCHING BROWSER TABS, PET MOVEMENT CONTINUES FAR OUT OF BOUNDARIES, AND RETURNS AFTER SOME TIME
+            // IM NOT SURE WHAT CAUSES THIS GLITCH SO WORKAROUND IS TO FORCE RESPAWN
+            let distance = speed * frame.timeDiff / 1000 * randomInteger(90,110) / 100;
             if (pet.x() > stage.width() || pet.x() < 0 || pet.y() > stage.height() || pet.y() < 0) {
                 pet.x(stage.width() / 40 * randomInteger(1,31));
                 pet.y(stage.height() / 40 * randomInteger(1,31));
@@ -7339,8 +7409,25 @@ function addPet(layer,stage,source) {
             rollArray(animArray,0).start();
         }
 
+        function isPetOnProp() {
+            for (let key in propDict) {
+                if (propDict[key]["occupied"]) {continue}
+                let propBounds = propDict[key]["obj"].getClientRect();
+                let petTransform = pet.getAbsoluteTransform();
+                let petPosition = petTransform.point({ x: 0, y: 0 });
+                petPosition.x += pet.width() / 2;
+                petPosition.y += pet.height() / 2;
+
+                if (petPosition.x > propBounds.x && petPosition.x < (propBounds.x + propBounds.width) && 
+                    petPosition.y > propBounds.y && petPosition.y < (propBounds.y + propBounds.height)) {
+                    return propDict[key];
+                } else {
+                    continue;
+                }
+            }
+        }
+
         animMove.start();
-        layer.add(pet);
     }
 }
 

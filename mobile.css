@@ -339,8 +339,8 @@ body {
 
 .wish-button {
     top: unset;
-    width: 50%;
-    bottom: -25%;
+    width: 80%;
+    bottom: -22.5%;
 }
 
 #wish-tutorial {
@@ -443,15 +443,15 @@ body {
 }
 
 #table7 > img {
-    height: 70%;
-}
-
-#table7 > div {
-    left: 5%;
+    height: 30%;
 }
 
 #table7 > :last-child {
-    height: 20%;
+    height: 25%;
+    width: 75%;
+    position: relative;
+    right: 0%;
+    transform: translateX(10%);
 }
 
 .store-buy {
@@ -459,13 +459,12 @@ body {
 }
 
 .store-div {
-    width: 70%;
-    height: 45%;
+    width: unset;
+    max-width: 90%;
+    height: 50%;
+    aspect-ratio: 2.44;
     scrollbar-width: 0.1vw;
     scrollbar-color: #9b744f #cda682;
-    overflow-x: scroll;
-    flex-wrap: nowrap;
-    justify-content:unset;
     padding-left: 1%;
     padding-right: 1%;
     box-sizing: border-box;
@@ -487,7 +486,8 @@ body {
 }
 
 .shop-button {
-    height: 80%;
+    max-height: 45%;
+    aspect-ratio: 1;
     width: 15%;
     flex: 0 0 auto;
 }
@@ -624,6 +624,10 @@ body {
     width: auto;
 }
 
+.char-morale > p {
+    bottom: 135%;
+}
+
 .exped-xpbar,.drag-icon {
     bottom: 3%;
 }
@@ -633,19 +637,21 @@ body {
 }
 
 .exped-xpbar {
-    width: 40%;
+    width: 80%;
 }
 
 .notif-select {
     height: 13%;
+    top: 13%;
+    right: 0;
 }
 
 .adventure-map > input {
-    width: 40%;
-    height: 4.5%;
-    bottom: 4%;
-    left: 45%;
-    aspect-ratio: 20;
+    left: 20%;
+    top: 4%;
+    width: 75%;
+    max-height: 5%;
+    aspect-ratio: 15;
     transform: none;
 }
 
@@ -696,7 +702,60 @@ body {
     font-size: 1.2em;
 }
 
+.rank-button {
+    height: unset;
+    width: 100%;
+    flex-basis: 15%;
+}
+
 .rank-button > p {
     font-size: 1.6em;
     filter: drop-shadow(0 0 0.2em #3556B0);
+}
+
+.rank-menu {
+    flex-wrap: wrap;
+}
+
+.rank-menu > :first-child {
+    flex-direction: column;
+    height: 100%;
+    width: 25%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.rank-lore {
+    width: 73%;
+    height: 85%;
+    font-size: 1.2em;
+}
+
+.rank-lore > div {
+    height: 30%;
+}
+
+.rank-menu > :last-child {
+    height: 14%;
+}
+
+.select-indicator {
+    top: 15%;
+    width: 30%;
+}
+
+#adventure-encounter {
+    width: 95%;
+}
+
+/* PHONE SPECIFIC CSS */
+@media (max-aspect-ratio: 9.5 / 9) {
+    .settings-menu {
+        max-height: 50%;
+        aspect-ratio: 1.18;
+    }
+
+    .notif-select {
+        height:10%;
+    }
 }
