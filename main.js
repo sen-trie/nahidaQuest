@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "V.1-00-001";
+const VERSIONNUMBER = "V.1-00-002";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -4322,7 +4322,7 @@ function createExpMap() {
     }
 
     for (let key in imgKey) {
-        if (key > 17) {break}
+        // if (key > 17) {break}
         spawnKey(advImage,imgKey,key);
     }
     
@@ -4588,6 +4588,7 @@ function drawAdventure(advType,wave) {
 
     function textFadeIn() {
         adventureHeading.style.top = "10%";
+        adventureHeading.style.overflowY = "hidden";
         adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
         adventureHeading.style.animation = "fadeOut 1s ease-out reverse";
 
@@ -4680,6 +4681,7 @@ function drawWorldQuest(advType) {
     adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${advType}.webp`;
     let adventureHeading = document.getElementById("adventure-header");
     adventureHeading.style.flexGrow = "1";
+    adventureHeading.style.overflowY = "auto";
 
     let preloadedImage = new Image();
     preloadedImage.src = `./assets/expedbg/choice/${advType}.webp`;
@@ -5828,7 +5830,7 @@ function winAdventure() {
     let advButton = document.getElementById("adventure-button");
     let keyNumber = advButton.key;
     let adventureHeading = document.getElementById("adventure-header");
-    adventureHeading.style.top = "0";
+    adventureHeading.style.top = "1%";
     adventureHeading.innerText = "You won! You received some loot:";
 
     let levelLoot = adventureLoot[`Level-${imgKey[keyNumber].Level}`];

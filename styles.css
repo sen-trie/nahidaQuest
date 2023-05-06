@@ -3485,7 +3485,7 @@ input:checked + .slider:before {
     height: 100%;
     z-index: 502;
     text-align: center;
-    gap: 4%;
+    gap: 2%;
     aspect-ratio: 1.88;
     padding: 0 0 1% 0;
     box-sizing: border-box;
