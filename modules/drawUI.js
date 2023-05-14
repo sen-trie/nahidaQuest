@@ -308,4 +308,84 @@ function drawMailTable(table4) {
     return table4;
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadMinimumArray,preloadImage }
+const patchDict = {
+    "Update: v.1-01":`
+    Note: If your save has any NaN values present, please type 'transcend' into the command console under 'Settings' and transcend from the appropriate menu. Any current NaN values may result in 0 NpS. <br><br>
+    Please note that you WILL lose all of your current progress after transcending.
+
+    <br><br><line>Bugs Fixed 🐞:</line><br><br>
+        <indent>
+        1. NaN Bug for Wish Characters <br>
+        Newly spawned Wished Characters will have their appropriate NpS and can have items freely applied.
+
+        <br><br> 2. Nahida NaN Bug <br>
+        Nahida's NpS should no longer turn into NaN after applying items/upgrades.
+        </indent>
+    
+    <br><br><line>New Additions 💡: </line><br><br>
+        </indent>
+        1. Map Icon QoL <br>
+        Expeditions icons zoom inversely to the map's zoom level.
+
+        <br><br> 2. Desktop keybinds <br>
+        Desktop keybinds (Q,W,E) can be used during expedition combat to reduce hand strain from flicking the mouse.
+        </indent>
+
+    <br><br><line>Systems Rework 🌰: </line><br><br>
+        </indent>
+        1. XP Books rework <br>
+        XP Books have shown to be too strong for their own good and can easily trivialize levelling up. 
+        XP Books can now only be obtained as a bonus item from Expeditions or Events. 
+        Furthermore, they now only provide a 50% cashback instead of a full discount.
+
+        <br><br> 2. Progression adjustments <br>
+        NpS and character costs have been increased at the upper level. Upgrade power has also been reduced to slow down progression. <br>Note: These changes may only appear in new runs (after transcending or new saves).
+        </indent>
+
+    <br><br>Please report any bugs and tell me what you feel about this update! Many thanks. [img]
+    `,
+
+    "Update: v.1-00":`
+    First Release 🎆<br>
+    Thank you to all players!`,
+}
+
+function patchNotes(parent,textReplacer) {
+    let title = new Image();
+    title.src = "./assets/settings/patchNotes.webp";
+
+
+    let patchContainer = document.createElement("div");
+    patchContainer.classList.add("flex-column");
+
+    let nahidaImg = new Image();
+    nahidaImg.src = "./assets/expedbg/exped-Nahida.webp";
+
+    for (let key in patchDict) {
+        let patchButton = document.createElement("div");
+        patchButton.innerText = key;
+
+        let patchInfo = document.createElement("p");
+        let text = textReplacer({
+            '[img]':nahidaImg.outerHTML,
+        },patchDict[key]);
+        patchInfo.innerHTML = text;
+        patchInfo.style.display = "none";
+
+        patchButton.addEventListener("click",()=>{
+            if (patchInfo.style.display === 'none') {
+                patchInfo.style.display = 'block';
+              } else {
+                patchInfo.style.display = 'none';
+              }
+        })
+
+        patchContainer.append(patchButton,patchInfo)
+    }
+
+
+    return parent.append(title,patchContainer);
+
+}
+
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadMinimumArray,preloadImage,patchNotes }

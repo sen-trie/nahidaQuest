@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "V.1-00-004";
+const VERSIONNUMBER = "V.1-01-000";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -465,6 +465,17 @@ function loadSaveData() {
                 upgradeDict[key]["BaseFactor"] = upgradeDict[key]["Factor"];
             }
         }
+        // FOR SAVE DATA BELOW 1.00.005 (WORKAROUND TO PREVENT ITEM NAN BUG FOR WISH HEROES)
+        if (parseInt(saveValues.versNumber) < 100005) {
+            for (let key in upgradeDict) {
+                if (key > 799 || key == 0) {
+                    if (upgradeDict[key]["Factor"]) {
+                        upgradeDict[key]["BaseFactor"] = upgradeDict[key]["Factor"];
+                    }
+                } 
+            }
+        }
+
         setTimeout(loadRow,1000);
     }
     // LOAD INVENTORY DATA
@@ -482,7 +493,7 @@ function loadSaveData() {
     } else {
         let expeditionDictTemp = localStorage.getItem("expeditionDictSave");
         expeditionDictTemp = JSON.parse(expeditionDictTemp);
-        // FOR SAVE DATA BELOW 0.3.000
+        // FOR SAVE DATA BELOW 0.3.000 TO REFRESH EXPEDITIONS
         if (typeof(expeditionDictTemp[1]) != "string") {
             expeditionDict = expeditionDictDefault;
         } else {
@@ -497,7 +508,7 @@ function loadSaveData() {
         let advDictTemp = localStorage.getItem("advDictSave");
         advDict = JSON.parse(advDictTemp);
         updateObjectKeys(advDict,advDictDefault);
-        // FOR SAVE DATA BELOW 0.4.4281
+        // FOR SAVE DATA BELOW 0.4.4281 TO REFRESH REWARDS
         if (parseInt(saveValues.versNumber) < 44290) {
             for (let key in advDict.rankDict) {
                 advDict.rankDict[key].Locked = true;
@@ -520,7 +531,7 @@ function loadSaveData() {
     if (localStorage.getItem("storeInventory") == null) {
         storeInventory = storeInventoryDefault;
     } else {
-        // FOR SAVE DATA BELOW 0.3.411
+        // FOR SAVE DATA BELOW 0.3.411 TO FIX STORE BUG
         if (parseInt(saveValues.versNumber) < 34112) {
             storeInventory = storeInventoryDefault;
         } else {
@@ -1771,10 +1782,19 @@ function tutorial(idleAmount) {
         playButton.classList.add("play-button");
         playButton.addEventListener("click",()=>{
             overlay.style.zIndex = -1;
+            // CHECK IF ITS PLAYER'S FIRST LOAD FOR THE DAY
+            const lastVisit = document.cookie.replace(/(?:(?:^|.*;\s*)lastVisit\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+            const today = new Date().toDateString();
+            if (lastVisit === '' || lastVisit !== today) {
+                settingsBox("toggle","patch")
+                document.cookie = 'lastVisit=' + today + '; expires=' + new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toUTCString() + '; path=/';
+            }
+
             clearInterval(timerLoad);
             timer = setInterval(timerEvents,timeRatio);
             currentBGM = playAudio();
             settingsVolume();
+
             setTimeout(()=>{
                 if (document.getElementById('idle-nuts-div')) {document.getElementById('idle-nuts-div').remove()}
                 saveValues.realScore += idleAmount;
@@ -1933,6 +1953,7 @@ function tabChange(x) {
     TABS[x].style.display = "flex";
     filterDiv.style.display = "none";
     table6.style.display = "none";
+
     let filterMenuOne = document.getElementById("filter-menu-one");
     if (filterMenuOne.style.display !== "none") {filterMenuOne.style.display = "none"};
     let filterMenuTwo = document.getElementById("filter-menu-two");
@@ -1960,7 +1981,7 @@ function tabChange(x) {
         updateFilter(filteredHeroes);
         if (document.getElementById("tool-tip-button")) {
             let tooltipButtonText = document.getElementById("tool-tip-button");
-            tooltipButtonText.innerText = "Purchase";
+            tooltipButtonText.innerText = currentMultiplier === 1 ? 'Purchase' : `Purchase ${currentMultiplier}`;
         }
         if (document.getElementById('upgrade-menu-button')) {
             document.getElementById('upgrade-menu-button').style.display = "block";
@@ -2047,7 +2068,7 @@ function settings() {
     settingButton.appendChild(settingButtonImg);
 
     // RELATED TO SETTINGS MENU
-    var settingsMenu = document.createElement("div");
+    let settingsMenu = document.createElement("div");
     settingsMenu.id = "settings-menu";
     settingsMenu.classList.add("flex-column","settings-menu");
 
@@ -2145,8 +2166,21 @@ function settings() {
 
     let errorButton = document.createElement("div");
     errorButton.innerText = "Error Log";
-    errorButton.addEventListener("click",()=>{settingsBox("toggle","error")})
-    settingsBottomLeft.append(label,errorButton);
+    errorButton.addEventListener("click",()=>{settingsBox("toggle","error")});
+
+    let extraButton = document.createElement("div");
+    extraButton.innerText = "Command Console";
+    extraButton.addEventListener("click",()=>{settingsBox("toggle","command")});
+
+    let reportButton = document.createElement("div");
+    reportButton.innerText = "Report a Bug!";
+    reportButton.addEventListener("click",()=>{window.open('https://nahidaquest.com/feedback',"_blank")})
+
+    let creditsButton = document.createElement("div");
+    creditsButton.innerText = "Credits";
+    creditsButton.addEventListener("click",()=>{window.open('https://nahidaquest.com/credits',"_blank")})
+
+    settingsBottomLeft.append(label,errorButton,reportButton,extraButton);
 
     let exportSaveSetting = document.createElement("div");
     exportSaveSetting.innerText = "Export Save";
@@ -2156,7 +2190,7 @@ function settings() {
     let importSaveSetting = document.createElement("div");
     importSaveSetting.innerText = "Import Save";
     importSaveSetting.classList.add("flex-row");
-    importSaveSetting.addEventListener("click",()=>{settingsBox("toggle","import");})
+    importSaveSetting.addEventListener("click",()=>{settingsBox("toggle","import")})
 
     let cancelButton = document.createElement("button");
     cancelButton.classList.add("cancel-button");
@@ -2166,9 +2200,13 @@ function settings() {
         deleteConfirmMenu("close","loaded");
     })
 
+    let patchNotesButton = document.createElement("button");
+    patchNotesButton.classList.add("patch-button");
+    patchNotesButton.addEventListener("click",()=>{settingsBox("toggle","patch")})
+
     settingsBottomRight.append(importSaveSetting,exportSaveSetting,infoSetting,saveSetting,clearSetting);
     settingsBottom.append(settingsBottomLeft,settingsBottomRight);
-    settingsMenu.append(settingsText, volumeScrollerContainer, settingsBottom,cancelButton);
+    settingsMenu.append(settingsText,volumeScrollerContainer,settingsBottom,cancelButton,patchNotesButton);
     mainBody.appendChild(settingsMenu);
 
     settingButton.addEventListener("click", () => {
@@ -2212,7 +2250,7 @@ function settingsVolume() {
     });
 }
 
-const settingsID = ["export","import","error"];
+const settingsID = ["export","import","error","command","patch"];
 function settingsBox(type,eleId) {
     if (type === "create") {
         // EXPORT SAVE
@@ -2268,8 +2306,7 @@ function settingsBox(type,eleId) {
                 } else {
                     let clearPromise = new Promise(function(myResolve, myReject) {
                         localStorage.clear();
-            
-                        if(localStorage.length === 0) {
+                        if (localStorage.length === 0) {
                             myResolve(); 
                         } else {
                             myReject();
@@ -2299,7 +2336,7 @@ function settingsBox(type,eleId) {
         errorBoxDiv.style.zIndex = -1;
 
         let errorBox = document.createElement("textarea");
-        errorBox.value = "Any errors or bugs will appear below this line! \nPlease report such errors to the developer through the feedback form at the starting page :) \n------------------------------------------------------------------------------------------\n"
+        errorBox.value = "Any errors or bugs will appear below this line! \nPlease report such errors to the developer through 'Report a Bug'. Thank you! :) \n------------------------------------------------------------------------------------------\n"
         errorBox.readOnly = true;
 
         window.onerror = function(message, url, line, col, error) {
@@ -2313,6 +2350,49 @@ function settingsBox(type,eleId) {
         
         errorBoxDiv.append(errorBox,cancelErrorButton);
         mainBody.appendChild(errorBoxDiv);
+
+        // COMMAND BOX
+        let commandDiv = document.createElement("div");
+        commandDiv.classList.add("text-box");
+        commandDiv.id = "command-box";
+        commandDiv.style.zIndex = -1;
+
+        let commandBox = document.createElement("textarea");
+        commandBox.value = "Type your command here!";
+        let cancelCmdButton = document.createElement("button");
+        cancelCmdButton.addEventListener("click",()=>{
+            commandDiv.style.zIndex = -1;
+        })
+
+        let commandButton = document.createElement("button");
+        commandButton.innerText = "Execute Command";
+        commandButton.addEventListener("click",()=>{
+            let commandText = commandBox.value.toLowerCase();
+            if (commandText === "transcend") {
+                nutPopUp();
+                toggleSettings(true);
+            } else {
+                alert("Invalid command.");
+            }
+        })
+        commandDiv.append(commandBox,cancelCmdButton,commandButton);
+        mainBody.appendChild(commandDiv);
+
+        // PATCH NOTES
+        let patchDiv = document.createElement("div");
+        patchDiv.classList.add("text-box","patch-notes-div","flex-column");
+        patchDiv.id = "patch-box";
+        patchDiv.style.zIndex = -1;
+
+        drawUI.patchNotes(patchDiv,textReplacer);
+
+        let patchCmdButton = document.createElement("button");
+        patchCmdButton.addEventListener("click",()=>{
+            patchDiv.style.zIndex = -1;
+        })
+
+        patchDiv.append(patchCmdButton);
+        mainBody.appendChild(patchDiv);
     } else if (type === "toggle") {
         let textBox = document.getElementById(`${eleId}-box`);
         if (textBox.style.zIndex == -1) {
@@ -2693,7 +2773,7 @@ function upgrade(clicked_id) {
     if (realScoreCurrent >= costCurrent) {
         if (requiredFree) {
             if (saveValues["freeLevels"] >= requiredFree) {
-                realScoreCurrent += costCurrent;
+                realScoreCurrent += (costCurrent * 0.5);
                 saveValues["freeLevels"] -= requiredFree;
             }
         }
@@ -2750,7 +2830,9 @@ function costMultiplier(multi) {
 function updatePurchaseText() {
     if (document.getElementById("tool-tip-button")) {
         let tooltipButtonText = document.getElementById("tool-tip-button");
-        if (milestoneOn) {
+        if (table2.style.display === "flex") {
+            return;
+        } else if (milestoneOn) {
             tooltipButtonText.innerText = `Buy`;
         } else if (currentMultiplier == 1) {
             tooltipButtonText.innerText = `Purchase`;
@@ -2820,17 +2902,17 @@ function milestoneBuy(heroTooltip) {
 
     let itemID = 5002;
     let itemArray = [];
-    let buff = 1;
+    let buff = 0.5;
     let itemStar = -1;
     if (level >= 350) {
         itemStar = 0;
-        buff = 6;
+        buff = 4;
     } else if (level >= 200) {
         itemStar = 1;
-        buff = 3.5;
+        buff = 2;
     } else if (level >= 75) {
         itemStar = 2;
-        buff = 2;
+        buff = 1;
     }
 
     if (itemStar != -1) {
@@ -3366,12 +3448,9 @@ function drawLoot(type) {
         case 1:
             inventoryDraw("artifact", 1, 2);
             inventoryDraw("weapon", 1, 2);
-            inventoryDraw("xp", 2, 2);
             inventoryDraw("food", 1, 2);
             break;
         case 2:
-            inventoryDraw("xp", 2, 2);
-            inventoryDraw("xp", 2, 3);
             inventoryDraw("food", 2, 3);
             inventoryDraw("artifact", 1, 3);
             inventoryDraw("weapon", 1, 3);
@@ -3381,8 +3460,6 @@ function drawLoot(type) {
             }
             break;
         case 3:
-            inventoryDraw("xp", 3, 3);
-            inventoryDraw("xp", 2, 3);
             inventoryDraw("artifact", 2, 4);
             inventoryDraw("weapon", 2, 4);
             inventoryDraw("talent", 2, 4);
@@ -3393,8 +3470,7 @@ function drawLoot(type) {
             }
             break;
         case 4:
-            inventoryDraw("xp", 3, 4);
-            inventoryDraw("xp", 2, 3);
+            inventoryDraw("xp", 2, 2);
             inventoryDraw("artifact", 3, 4);
             inventoryDraw("weapon", 3, 4);
             inventoryDraw("artifact", 2, 3);
@@ -3407,8 +3483,7 @@ function drawLoot(type) {
             
             break;
         case 5:
-            inventoryDraw("xp", 4, 4);
-            inventoryDraw("xp", 4, 4);
+            inventoryDraw("xp", 2, 3);
             inventoryDraw("weapon", 4, 5);
             inventoryDraw("talent", 4, 4);
             inventoryDraw("artifact", 4, 5);  
@@ -3527,6 +3602,18 @@ function createAdventure() {
 
     adventureFight.append(fightTextbox,adventureFightDodge,adventureFightSkill,adventureFightBurst);
     adventureFight.style.display = "none";
+    const adventureFightChild = adventureFight.childNodes;
+    const keyCodes = [0,"Q","W","E"];
+    for (let i = 0; i < adventureFightChild.length; i++) {
+        if (adventureFightChild[i].tagName === "DIV") {
+            if (!navigator.userAgentData.mobile) {
+                let keyImg = document.createElement("p");
+                keyImg.innerText = keyCodes[i];
+                adventureFightChild[i].appendChild(keyImg);
+            }
+        }
+    }
+
     adventureChoiceOne.addEventListener("click",()=>{
         if (adventureChoiceOne.pressAllowed) {
             if (adventureChoiceOne.advType != 12) {
@@ -4329,9 +4416,16 @@ function createExpMap() {
     mapZoom.oninput = function() {
         zoomValue = 0.3 + (2/100) * this.value;
         settingsValues.defaultZoom = this.value;
-        mapInstance.zoom(zoomValue)
+        mapInstance.zoom(zoomValue);
+
+        const mapPins = advImage.childNodes;
+        for (let i = 0; i < mapPins.length; i++) {
+            const mapPin = mapPins[i];
+            mapPin.style.transform = `scale(${1 / zoomValue})`;
+        }
     }
 
+    mapZoom.dispatchEvent(new Event("input"));
     dragIcon.addEventListener("click",()=>{
         mapInstance.reset();
         mapInstance.zoom(zoomValue)
@@ -4568,7 +4662,7 @@ function drawAdventure(advType,wave) {
     adventureRewards.style.flexGrow = "1";
     let adventureHeading = document.getElementById("adventure-header");
     adventureHeading.style.flexGrow = "0";
-
+ 
     let adventureArea = document.getElementById("adventure-area");
     let adventureTextBox = document.getElementById("adventure-text");
     let adventureVideo = document.getElementById("adventure-video");
@@ -4606,7 +4700,10 @@ function spawnKey(advImage,imgKey,key,worldQuest) {
     button.level = imgKey[key].Level;
     button.wave = imgKey[key].Wave;
 
-    if (worldQuest) {button.id = "world-quest-button"};
+    if (worldQuest) {
+        button.id = "world-quest-button"
+        button.style.transform = `scale(${1 / ( 0.3 + (2/100) * settingsValues.defaultZoom)})`;
+    };
 
     let level = imgKey[key].Level;
     let wave = imgKey[key].Wave;
@@ -5045,7 +5142,7 @@ function triggerFight() {
         if (i == 1) {
             amountInterval *= 4;
             normalAtkCooldown.maxAmount = 2;
-            if (!advDict.rankDict[13].Locked) {
+            if (!advDict.rankDict[16].Locked) {
                 amountInterval *= 1.1;
             }
 
@@ -5965,7 +6062,6 @@ function winAdventure() {
 
 function quitAdventure() {
     let worldQuestRoll = randomInteger(1,101) - luckRate;
-    console.log(worldQuestRoll)
     if (worldQuestRoll < 30) {
         spawnWorldQuest();
     }
@@ -6135,7 +6231,8 @@ function wish() {
                 let upgradeDictTemp = upgradeDict[randomWishHero];
                 upgradeDictTemp.Purchased = -1;
                 upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/500 * wishPower + 1);
-                upgradeDictTemp["BaseCost"] = Math.round(saveValues["dps"] * (55) + 1);
+                upgradeDictTemp["BaseCost"] = Math.round(saveValues["dps"] * (65) + 1);
+                upgradeDictTemp["BaseFactor"] = upgradeDictTemp["Factor"];
                 upgradeDictTemp["Contribution"] = 0;
                 
                 wishMultiplier++;
@@ -6169,6 +6266,7 @@ function wishAnimation(randomWishHero) {
         wishImage.addEventListener("click",()=>{
             wishBackdropDark.remove();
             stopWishAnimation = false;
+            stopSpawnEvents = false;
         })
 
         wishBackdropDark.appendChild(wishImage);
@@ -6382,7 +6480,7 @@ function changeTooltip(dict, type, number) {
     if (type == "hero") {
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
         let tooltipTextLocal = "Level: " + upgradeDict[number]["Purchased"] + 
-                                "\n Free Levels: " + saveValues["freeLevels"] + 
+                                "\n Discounted Lvls: " + saveValues["freeLevels"] + 
                                 "\n" + abbrNum(upgradeDict[number]["Contribution"],2) + ` ${dict.Name === "Nahida" ? 'Nuts per Click' : 'Nps'}`;
         
         tooltipElementImg.src = "./assets/tooltips/elements/" +dict.Ele+ ".webp";
@@ -6398,18 +6496,18 @@ function changeTooltip(dict, type, number) {
     } else if (type == "milestone") {
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
 
-        let upgradeLevel = 100;
+        let upgradeLevel = 50;
         let extraText = "";
         if (number >= 350) {
-            upgradeLevel = 600;
+            upgradeLevel = 400;
             extraText = `& a 5-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 5-Star Gem`}
         } else if (number >= 200) {
-            upgradeLevel = 350;
+            upgradeLevel = 200;
             extraText = `& a 4-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 4-Star Gem`}
         } else if (number >= 75) {
-            upgradeLevel = 200;
+            upgradeLevel = 100;
             extraText = `& a 3-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 3-Star Gem`}
         }
@@ -7151,7 +7249,7 @@ function nutPopUp() {
 
         setTimeout(()=>{
             addNutStore();
-            customTutorial("goldenNut",4)
+            customTutorial("goldenNut",4);
         },3000);
     }
 }
@@ -7489,7 +7587,13 @@ function refresh() {
                 formatCost *= (COSTRATIO**currentPurchased);
             }
 
-            let heroText = upgradeInfo[arguments[1]].Name + ": " + abbrNum(formatCost,2) + ", +" + abbrNum(formatATK,2) + " NpS";
+            let heroText;
+            if (arguments[1] == 0) {
+                heroText = upgradeInfo[arguments[1]].Name + ": " + abbrNum(formatCost,2) + ", +" + abbrNum(formatATK,2) + " Nuts per click";
+            } else {
+                heroText = upgradeInfo[arguments[1]].Name + ": " + abbrNum(formatCost,2) + ", +" + abbrNum(formatATK,2) + " NpS";
+            }
+
             let id="but-" + hero.Row + "";
             document.getElementById(id).innerText = heroText;
         }

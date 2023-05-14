@@ -228,7 +228,7 @@ let enemyInfo = {
 }
 
 let upgradeDictDefault = {
-    0:  {Row:-1,        Purchased: -1,   "Contribution": 0, "Level": 1, "BaseCost":20, Factor:1  },
+    0:  {Row:-1,        Purchased: -1,   "Contribution": 0, "Level": 1, "BaseCost":20, Factor:1  , BaseFactor:1},
     1:  {Row:-1,        Purchased: -1,    },
     2:  {Row:-1,        Purchased: -1,    },
     3:  {Row:-1,        Purchased: -1,    },

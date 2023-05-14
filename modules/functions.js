@@ -3,8 +3,11 @@ function abbrNum(number,digits,short) {
     let decPlaces = Math.pow(10, 3);
     let abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion",
                   " Undecillion", " Duodecillion", " Tredecillion", " Quattuordecillion", " Quindecillion", " Sexdecillion"," Septendecillion", " Octodecillion",
-                  " Novemdecillion", " Vigintillion", " Unvigintillion"];
-    let abbrevShort = [""," M"," B"," t"," q"," Q"," s"," S", " o", " n", " d", " U", " D", " T", " Qt", " Qd", " Sd", " St", " O", " N", " v", " c"];
+                  " Novemdecillion", " Vigintillion", " Unvigintillion", " Duovigintillion", " Trevigintillion", " Quattuorvigintillion", " Quinvigintillion",
+                  " Sexvigintillion", " Septenvigintillion"," Octovigintillion", " Nonvigintillion", " Trigintillion", " Untrigintillion", " Duotrigintillion"
+    ];
+    let abbrevShort = [""," M"," B"," T"," Qd"," Qt"," Sx"," Sp", " O", " N", " D", " Ud", " Dd", " Td", " Qa", " Qi", " Sxd", " Spd", " Od", " Nd", 
+                    " V", " Uv", " Dv", " Tv", " Qtv", " Sv", " Spv", " Ov", " Nv", " Tn", " Ut", " Dt"];
 
     if (digits === 2) {
         decPlaces = Math.pow(10, 2);
@@ -79,12 +82,12 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
     for (let i = 1; i < NONWISHHEROMAX + 1; i++) {
         if (upgradeDict[i] === undefined) {continue}
         if (upgradeDict[i].Locked === true) {continue}
-        let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero-1)*1.3)));
+        let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero-1)*1.5)));
         let baseLevel = Math.round(0.75 * baseCost);
         upgradeDict[i]["BaseCost"] = Number(baseCost.toPrecision(3)).toExponential(3);
         upgradeDict[i]["Level"] = baseLevel.toExponential(3);
         
-        let baseATK = Math.round(initATKCost * (multiplierATKCost **((currentHero-1)*3.4)));
+        let baseATK = Math.round(initATKCost * (multiplierATKCost **((currentHero-1)*3.3)));
         upgradeDict[i]["Factor"] = Number(baseATK.toPrecision(3)).toExponential(3);
         upgradeDict[i]["BaseFactor"] = upgradeDict[i]["Factor"];
         upgradeDict[i]["Contribution"] = 0;

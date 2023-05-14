@@ -177,6 +177,20 @@ body {
     width: 100%;
 }
 
+.patch-notes-div {
+    width: 85%;
+    left: 5%;
+}
+
+.patch-notes-div > button:first-of-type {
+    max-width: 10%;
+    height: 8%;
+}
+
+.patch-notes-div > img {
+    height: 5%;
+}
+
 .switch {
     font-size: 0.8em;
 }
