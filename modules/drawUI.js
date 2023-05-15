@@ -329,8 +329,10 @@ const patchDict = {
 
         <br><br> 2. Desktop keybinds <br>
         Desktop keybinds (Q,W,E) can be used during expedition combat to reduce hand strain from flicking the mouse.
-        </indent>
 
+        <br><br> 3. Reset map position <br>
+        If your expedition map goes off-screen for whatever reason, clicking the 'reset icon' on the bottom right will recenter the map position.
+        </indent>
     <br><br><line>Systems Rework 🌰: </line><br><br>
         </indent>
         1. XP Books rework <br>

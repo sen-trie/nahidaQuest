@@ -802,7 +802,7 @@ table, button, label {
 
 @keyframes slidedown {
     0% { transform: translateY(0);}
-    100% { transform: translateY(50%); }
+    100% { transform: translateY(100%); }
 }
  
 
@@ -3075,6 +3075,7 @@ input:checked + .slider:before {
     height: auto;
     aspect-ratio: 20;
     transform: rotate(270deg);
+    -moz-transform: scaleY(300%) translateY(20%);
     writing-mode: vertical-lr;
 }
 
@@ -3105,27 +3106,29 @@ input:checked + .slider:before {
     outline-offset: none;
 }
 
-.adventure-map > input::-moz-range-track {
-    background-color: #99b390;
-    border-radius: 0.5em;
+.adventure-map > input[type="range"]::-moz-range-track {
+    background-color: #81a56ddd;
+    border: 0.15em solid #465B3D;
     height: 100%;
+    width: 5%;
+
+    cursor: grab;
 }
   
-.adventure-map > input::-moz-range-thumb {
+.adventure-map > input[type="range"]::-moz-range-thumb {
     background-color: transparent;
     width: auto;
-    height: 200%;
+    height: 20%;
     aspect-ratio: 1;
 
     margin: 0;
-    background: url(./assets/icon/warning.webp) no-repeat center/cover;
+    background: url(./assets/icon/zoom.webp) no-repeat center/cover;
     cursor: grab;
     position: relative;
-    top: 50%;
-    transform: translateY(-50%) rotate(90deg);
+    -moz-transform: scaleY(33%);
 }
 
-.adventure-map > input:focus:focus::-moz-range-thumb{
+.adventure-map > input[type="range"]:focus::-moz-range-thumb{
     outline: none;
     outline-offset: none;
 }
@@ -3310,7 +3313,7 @@ input:checked + .slider:before {
     background-position: center;
     background-size: contain;
     background-repeat: no-repeat;
-    filter: grayscale(0.7) sepia(0.5);
+    filter: grayscale(0.1) sepia(0.1);
 }
 
 .adventure-area {

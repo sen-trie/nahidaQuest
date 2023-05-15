@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "V.1-01-000";
+const VERSIONNUMBER = "V.1-01-001";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -198,7 +198,7 @@ let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
-const EVENTCOOLDOWN = 70;
+const EVENTCOOLDOWN = 80;
 const BOUNTYCOOLDOWN = 60;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
@@ -3606,11 +3606,15 @@ function createAdventure() {
     const keyCodes = [0,"Q","W","E"];
     for (let i = 0; i < adventureFightChild.length; i++) {
         if (adventureFightChild[i].tagName === "DIV") {
-            if (!navigator.userAgentData.mobile) {
-                let keyImg = document.createElement("p");
-                keyImg.innerText = keyCodes[i];
-                adventureFightChild[i].appendChild(keyImg);
-            }
+            if (navigator.userAgentData) {
+                if (!navigator.userAgentData.mobile) {
+                    let keyImg = document.createElement("p");
+                    keyImg.innerText = keyCodes[i];
+                    adventureFightChild[i].appendChild(keyImg);
+                }
+            } else {
+                console.error("Error: Navigator UserAgent is undefined.")
+            } 
         }
     }
 
@@ -4382,7 +4386,7 @@ function createExpMap() {
 
     let dragIcon = new Image();
     dragIcon.classList.add("drag-icon");
-    dragIcon.src = "./assets/expedbg/drag.webp";
+    dragIcon.src = "./assets/expedbg/reset.webp";
 
     let mapZoom = document.createElement("input");
     mapZoom.id = "zoom-scroller";
