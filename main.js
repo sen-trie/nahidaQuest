@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "V.1-01-002";
+const VERSIONNUMBER = "V.1-01-003";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -2646,7 +2646,9 @@ function loadRow() {
         if (formatATK == null) {
             upgradeDict[loadedHeroID]['Factor'] = formatCost / 1300;
             upgradeDict[loadedHeroID]['Contribution'] = upgradeDict[loadedHeroID]['Factor'] * upgradeDictTemp["Purchased"];
+            upgradeDict[loadedHeroID]['BaseFactor'] = upgradeDictTemp["Factor"];
             formatATK = upgradeDictTemp["Factor"];
+
         }
 
         if (upgradeDictTemp["Purchased"] > 0) {
@@ -7789,8 +7791,7 @@ function newPop(type) {
 }
 
 // FOR TESTING PURPOSES ONLY
-let beta = false;
-
+const beta = false;
 if (beta) {
     let warning = document.createElement('p');
     warning.innerText = 'BETA';
@@ -7803,8 +7804,53 @@ if (beta) {
         setTimeout(()=>{
             let startButton = document.getElementById("play-button");
             startButton.click();
-        },1500)
+            setTimeout(()=>{startingFunction();},500)
+        },2000);
     },800);
 
+    function startingFunction() {
+        // PRESS A KEY
+        const event = new KeyboardEvent('keydown', {
+            key: '5',
+        });
+          
+        document.dispatchEvent(event);
 
+        // BETA FUNCTIONS
+        let table5Image = document.getElementById('table5-Image');
+        let tabDiv = document.createElement('div');
+        tabDiv.classList.add('flex-row');
+        tabDiv.active;
+
+        let achievementTab = document.createElement('img');
+        achievementTab.src = './assets/achievement/achieve-tab1-clicked.webp';
+        let challengeTab = document.createElement('img');
+        challengeTab.src = './assets/achievement/achieve-tab2.webp';
+
+        achievementTab.addEventListener('click',()=>{
+            changeAchTab(achievementTab);
+        })
+
+        challengeTab.addEventListener('click',()=>{
+            changeAchTab(challengeTab);
+        })
+
+        function changeAchTab(ele) {
+            if (tabDiv.active !== ele) {
+                achievementTab.src = './assets/achievement/achieve-tab1.webp';
+                challengeTab.src = './assets/achievement/achieve-tab2.webp';
+                tabDiv.active = ele;
+
+                if (ele === achievementTab) {
+                    achievementTab.src = './assets/achievement/achieve-tab1-clicked.webp';
+                } else {
+                    challengeTab.src = './assets/achievement/achieve-tab2-clicked.webp';
+                }
+            }
+        }
+
+        tabDiv.active = achievementTab;
+        tabDiv.append(achievementTab,challengeTab)
+        table5Image.append(tabDiv);
+    }
 }

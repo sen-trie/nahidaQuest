@@ -164,6 +164,7 @@ function drawMainBody() {
     table5Container.classList.add("table-without-tooltip");
     let table5Image = document.createElement("div");
     table5Image.classList.add("table5-Image");
+    table5Image.id = 'table5-Image';
 
     let table5 = document.createElement("div");
     table5.classList.add("flex-container-ACHIEVEMENT");

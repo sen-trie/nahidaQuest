@@ -4173,7 +4173,7 @@ input:checked + .slider:before {
     position: absolute;
     width: 95%;
     height: 90%;
-    top: 7.5%;
+    top: 10%;
     background:url(./assets/bg/left.webp), url(./assets/bg/middle.webp), url(./assets/bg/right.webp);
     background-repeat: no-repeat;
     background-position: left, center, right;
@@ -4183,10 +4183,33 @@ input:checked + .slider:before {
     justify-content: center;
 }
 
+.table5-Image > div {
+    width: auto;
+    position: absolute;
+    bottom: 98%;
+    left: 8%;
+    gap:1%;
+    height: 10%;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.table5-Image > div > img {
+    width: fit-content;
+    height: 100%;
+    position: relative;
+    transition: 0.3s ease;
+}
+
+.table5-Image > div > img:hover {
+    transform: translateY(-12%);
+}
+
 .flex-container-ACHIEVEMENT {
     position: absolute;
     width: 90%;
     height: 80%;
+    top: 12%;
     
     overflow-y: auto;
     display: flex;
