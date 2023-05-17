@@ -5,8 +5,8 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "V.1-01-001";
-const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact  are trademarks, \n services marks, or registered trademarks of HoYoverse.";
+const VERSIONNUMBER = "V.1-01-002";
+const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
@@ -679,7 +679,6 @@ function resetAnimationListener(elem) {
         elem.removeEventListener('animationend',resetAnimation);
     }
 }
-
 
 // UPDATES VALUES WITH PERSISTENT VALUES
 function specialValuesUpgrade(loading, valueUpdate) {
@@ -1778,11 +1777,12 @@ function tutorial(idleAmount) {
         }
 
         let playButton = document.createElement("img");
-        playButton.src = "./assets/tutorial/play-button.webp"
+        playButton.src = "./assets/tutorial/play-button.webp";
+        playButton.id = 'play-button';
         playButton.classList.add("play-button");
         playButton.addEventListener("click",()=>{
             overlay.style.zIndex = -1;
-            // CHECK IF ITS PLAYER'S FIRST LOAD FOR THE DAY
+            // CHECK IF ITS PLAYER'S FIRST LOAD FOR THE DAY (ONLY WORKS ON DEPLOYMENT)
             const lastVisit = document.cookie.replace(/(?:(?:^|.*;\s*)lastVisit\s*\=\s*([^;]*).*$)|^.*$/, '$1');
             const today = new Date().toDateString();
             if (lastVisit === '' || lastVisit !== today) {
@@ -1856,15 +1856,21 @@ function saveData(skip) {
         mainBody.append(saveCurrently);
     }
 
-    localStorage.setItem("settingsValues", JSON.stringify(settingsValues));
-    localStorage.setItem("saveValuesSave", JSON.stringify(saveValues));
-    localStorage.setItem("upgradeDictSave", JSON.stringify(upgradeDict));
-    localStorage.setItem("expeditionDictSave", JSON.stringify(expeditionDict));
-    localStorage.setItem("InventorySave", JSON.stringify(Array.from(InventoryMap)));
-    localStorage.setItem("achievementListSave", JSON.stringify(Array.from(achievementMap)));
-    localStorage.setItem("persistentValues", JSON.stringify(persistentValues));
-    localStorage.setItem("advDictSave", JSON.stringify(advDict));
-    localStorage.setItem("storeInventory", JSON.stringify(storeInventory));
+    const localStorageDict = {
+        "settingsValues":settingsValues,
+        "saveValuesSave":saveValues,
+        "upgradeDictSave":upgradeDict,
+        "expeditionDictSave":expeditionDict,
+        "InventorySave":Array.from(InventoryMap),
+        "achievementListSave":Array.from(achievementMap),
+        "persistentValues":persistentValues,
+        "advDictSave":advDict,
+        "storeInventory":storeInventory,
+    }
+
+    for (let key in localStorageDict) {
+        localStorage.setItem(key,JSON.stringify(localStorageDict[key]));
+    }
 }
 
 //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
@@ -2401,8 +2407,8 @@ function settingsBox(type,eleId) {
                 setTimeout(()=>{
                     textBox.children[0].value = JSON.stringify(localStorage);
                 },300)
-                
             }
+
             settingsBox("close");
             textBox.style.zIndex = 10000;
         } else {
@@ -2437,18 +2443,18 @@ function createMultiplierButton() {
 
     let multiplierButton1 = document.createElement("button");
     multiplierButton1 = multiplierButtonAdjust(multiplierButton1,1);
-    multiplierButton1.addEventListener("click",() => {costMultiplier(10),currentDimMultiplier = dimMultiplierButton(1, currentDimMultiplier)})
+    multiplierButton1.addEventListener("click",() => {costMultiplier(10),currentDimMultiplier = dimMultiplierButton(1, currentDimMultiplier)});
 
     let multiplierButton2 = document.createElement("button");
     multiplierButton2 = multiplierButtonAdjust(multiplierButton2,2);
-    multiplierButton2.addEventListener("click",() => {costMultiplier(25),currentDimMultiplier = dimMultiplierButton(2, currentDimMultiplier)})
+    multiplierButton2.addEventListener("click",() => {costMultiplier(25),currentDimMultiplier = dimMultiplierButton(2, currentDimMultiplier)});
     
     let multiplierButton3 = document.createElement("button");
     multiplierButton3 = multiplierButtonAdjust(multiplierButton3,3);
-    multiplierButton3.addEventListener("click",() => {costMultiplier(100),currentDimMultiplier = dimMultiplierButton(3, currentDimMultiplier)})
+    multiplierButton3.addEventListener("click",() => {costMultiplier(100),currentDimMultiplier = dimMultiplierButton(3, currentDimMultiplier)});
 
     multiplierButtonContainer.append(multiplierButton3, multiplierButton2, multiplierButton1);
-    midDiv.appendChild(multiplierButtonContainer)
+    midDiv.appendChild(multiplierButtonContainer);
 }
 
 function updateMilestoneNumber() {
@@ -2470,6 +2476,7 @@ function createFilter() {
     filterMenuOne.id = "filter-menu-one";
     let filterMenuTwo = document.createElement("div");
     filterMenuTwo.id = "filter-menu-two";
+
     let upgradeMenu = document.createElement("button");
     upgradeMenu.id = "upgrade-menu-button";
     upgradeMenu.innerText = `Upgrades:`;
@@ -2507,11 +2514,9 @@ function createFilter() {
     const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','Sword','Claymore','Catalyst','Polearm','Bow','Sumeru','Mondstadt','Liyue','Inazuma'];
     const invOptions = ['Artifact','Food','Level','Gemstone','Talent','Sword','Claymore','Catalyst','Polearm','Bow'];
     for (let i=0,len=heroOptions.length; i < len; i++) {
-        let filterPicture;
-        filterPicture = document.createElement("button");
+        let filterPicture = document.createElement("button");
         filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +heroOptions[i]+ ".webp)";
         filterPicture.classList.add("background-image-cover")
-
         filterPicture.addEventListener("click",()=> {
             if (filterPicture.classList.contains("dim-filter")) {
                 filterPicture.classList.remove("dim-filter");
@@ -2636,6 +2641,13 @@ function loadRow() {
         let upgradeDictTemp = upgradeDict[loadedHeroID];
         let formatCost = upgradeDictTemp["BaseCost"];
         let formatATK = upgradeDictTemp["Factor"];
+
+        // FOR NAN BUG;
+        if (formatATK == null) {
+            upgradeDict[loadedHeroID]['Factor'] = formatCost / 1300;
+            upgradeDict[loadedHeroID]['Contribution'] = upgradeDict[loadedHeroID]['Factor'] * upgradeDictTemp["Purchased"];
+            formatATK = upgradeDictTemp["Factor"];
+        }
 
         if (upgradeDictTemp["Purchased"] > 0) {
             formatCost *= (COSTRATIO**upgradeDictTemp["Purchased"])
@@ -3140,7 +3152,7 @@ function inventoryload() {
             if (Inventory[i] == undefined) {continue}
             let x = InventoryMap.get(i);
             if (x > 0) {
-                inventoryAdd(i, "load")
+                inventoryAdd(i, "load");
             }
         } else {
             continue;
@@ -3473,8 +3485,7 @@ function drawLoot(type) {
             inventoryDraw("xp", 2, 2);
             inventoryDraw("artifact", 3, 4);
             inventoryDraw("weapon", 3, 4);
-            inventoryDraw("artifact", 2, 3);
-            inventoryDraw("artifact", 2, 3);
+            inventoryDraw("artifact", 3, 3);
             inventoryDraw("gem", 3, 5);
 
             if (randomDraw == 1) {
@@ -7775,4 +7786,25 @@ function newPop(type) {
         mainBody.append(newPopUp);
     }    
 }
+}
+
+// FOR TESTING PURPOSES ONLY
+let beta = false;
+
+if (beta) {
+    let warning = document.createElement('p');
+    warning.innerText = 'BETA';
+    warning.classList.add('beta-warning');
+    mainBody.append(warning);
+
+    setTimeout(()=>{
+        let startButton = document.getElementById("start-button");
+        startButton.click();
+        setTimeout(()=>{
+            let startButton = document.getElementById("play-button");
+            startButton.click();
+        },1500)
+    },800);
+
+
 }

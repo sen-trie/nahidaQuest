@@ -3271,7 +3271,7 @@ input:checked + .slider:before {
     height: 6%;
     width: auto;
     object-fit: contain;
-    filter: drop-shadow(0 0 0.2em #2a653d);
+    filter: drop-shadow(0 0 0.1em #ffffff);
     transition: 0.1s ease;
 }
 
@@ -3301,7 +3301,6 @@ input:checked + .slider:before {
 	position: relative;
 	user-select: none;
     border: 0.2em solid #3B425E;
-    
 }
 
 .adventure-image::before {
@@ -4173,7 +4172,8 @@ input:checked + .slider:before {
 .table5-Image {
     position: absolute;
     width: 95%;
-    height: 95%;
+    height: 90%;
+    top: 7.5%;
     background:url(./assets/bg/left.webp), url(./assets/bg/middle.webp), url(./assets/bg/right.webp);
     background-repeat: no-repeat;
     background-position: left, center, right;
@@ -4185,9 +4185,8 @@ input:checked + .slider:before {
 
 .flex-container-ACHIEVEMENT {
     position: absolute;
-    top: 5%;
     width: 90%;
-    height: 85%;
+    height: 80%;
     
     overflow-y: auto;
     display: flex;
@@ -4864,4 +4863,14 @@ input:checked + .slider:before {
     top: 0;
     z-index: 500;
     background-color: #6fadf9;
+}
+
+.beta-warning {
+    position: absolute;
+    left: 49%;
+    z-index: 99999999999999;
+    background-color: yellow;
+    color: purple;
+    padding: 1%;
+    pointer-events: none;
 }

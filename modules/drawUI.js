@@ -309,7 +309,7 @@ function drawMailTable(table4) {
 }
 
 const patchDict = {
-    "Update: v.1-01":`
+    "Update: v.1-01 (15/5/23)":`
     Note: If your save has any NaN values present, please type 'transcend' into the command console under 'Settings' and transcend from the appropriate menu. Any current NaN values may result in 0 NpS. <br><br>
     Please note that you WILL lose all of your current progress after transcending.
 
@@ -347,7 +347,7 @@ const patchDict = {
     <br><br>Please report any bugs and tell me what you feel about this update! Many thanks. [img]
     `,
 
-    "Update: v.1-00":`
+    "Update: v.1-00 (6/5/23)":`
     First Release 🎆<br>
     Thank you to all players!`,
 }

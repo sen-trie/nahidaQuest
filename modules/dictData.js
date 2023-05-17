@@ -934,7 +934,7 @@ const adventureLoot = {
     },
     "Level-4":{
         Artifact:   ["artifact", 3, 4, "adventure", "Any"],
-        Artifact:   ["artifact", 3, 3, "adventure", "Any"],
+        Artifact2:   ["artifact", 3, 3, "adventure", "Any"],
         Food:       ["food", 3, 5, "adventure", "Any"],
     },
     "Level-5":{

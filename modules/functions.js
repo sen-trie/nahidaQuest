@@ -36,7 +36,7 @@ function abbrNum(number,digits,short) {
         number = Math.round(number);
         return number;
     }
-};
+}
 
 // GET HIGHEST KEY IN AN OBJECT
 function getHighestKey(obj) {
