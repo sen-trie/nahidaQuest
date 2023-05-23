@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "V.1-01-003";
+const VERSIONNUMBER = "V.1-01-004";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -202,6 +202,15 @@ const EVENTCOOLDOWN = 80;
 const BOUNTYCOOLDOWN = 60;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
+
+let MOBILE = false;
+if (navigator.userAgentData) {
+    if (navigator.userAgentData.mobile) {
+        MOBILE = true;
+    }
+} else {
+    console.error("Error: Navigator UserAgent is undefined.")
+} 
 
 // ADVENTURE VARIABLES
 let quickType;
@@ -2276,6 +2285,8 @@ function settingsBox(type,eleId) {
         copyExportButton.innerText = "Download Save";
         copyExportButton.addEventListener("click",()=>{
             let text = JSON.stringify(localStorage);
+            text = JSON.stringify(JSON.parse(text), null, 2)
+
             let blob = new Blob([text], {type: "text/plain"});
             let link = document.createElement("a");
             link.download = `NQ Save ${DBNUBMER}.txt`;
@@ -2405,7 +2416,7 @@ function settingsBox(type,eleId) {
             if (eleId === "export") {
                 saveData(true);
                 setTimeout(()=>{
-                    textBox.children[0].value = JSON.stringify(localStorage);
+                    textBox.children[0].value = `Please use a JSON reader like JSONHERO if you like to manipulate the save values. Beware! Directly changing 'realScore','rowCount' or adding non-integer values may result in the save file being corrupted!\n---------------------------------\n\n${JSON.stringify(localStorage)}`;
                 },300)
             }
 
@@ -3610,6 +3621,15 @@ function createAdventure() {
          
             }
         }
+        if (beta) {
+            if (event.key === "a") {
+                adventure('10-');
+            } else if (event.key === "s") {
+                saveValues['dps'] += 1e15
+            } else if (event.key === "d") {
+                saveValues['dps'] -= 1e5
+            }
+        }
         // if (event.key === "l") {createPetShop()}        
     })
 
@@ -3619,15 +3639,11 @@ function createAdventure() {
     const keyCodes = [0,"Q","W","E"];
     for (let i = 0; i < adventureFightChild.length; i++) {
         if (adventureFightChild[i].tagName === "DIV") {
-            if (navigator.userAgentData) {
-                if (!navigator.userAgentData.mobile) {
-                    let keyImg = document.createElement("p");
-                    keyImg.innerText = keyCodes[i];
-                    adventureFightChild[i].appendChild(keyImg);
-                }
-            } else {
-                console.error("Error: Navigator UserAgent is undefined.")
-            } 
+            if (!MOBILE) {
+                let keyImg = document.createElement("p");
+                keyImg.innerText = keyCodes[i];
+                adventureFightChild[i].appendChild(keyImg);
+            }
         }
     }
 
@@ -4401,20 +4417,31 @@ function createExpMap() {
     dragIcon.classList.add("drag-icon");
     dragIcon.src = "./assets/expedbg/reset.webp";
 
-    let mapZoom = document.createElement("input");
-    mapZoom.id = "zoom-scroller";
-    mapZoom.setAttribute("type", "range");
-    mapZoom.min = 0;
-    mapZoom.max = 100;
+    let mapZoom = document.createElement("div");
+    mapZoom.classList.add('flex-column')
+    mapZoom.id = "zoom-scroller"
+
+    let mapZoomIn = document.createElement("button");
+    mapZoomIn.innerText = '+';
+    mapZoomIn.classList.add('flex-column');
+    let mapZoomOut = document.createElement("button");
+    mapZoomOut.innerText = '-';
+    mapZoomOut.classList.add('flex-column');
+    mapZoom.append(mapZoomIn,mapZoomOut);
+
     if (isNaN(settingsValues.defaultZoom)) {settingsValues.defaultZoom = 25}
     mapZoom.value = settingsValues.defaultZoom;
 
     advImageDiv.append(advImage,dragIcon,charSelect,notifSelect,expedMesgDiv,charMenu,expedXP,mapZoom);
     leftDiv.appendChild(advImageDiv);
 
-    let mapInstance = Panzoom(advImage)
+    let mapInstance = Panzoom(advImage, {
+        canvas: true,
+        zoomSpeed: 1,
+    })
+
     let zoomValue = 0.3 + (2/100) * settingsValues.defaultZoom;
-    mapInstance.zoom(zoomValue)
+    mapInstance.zoom(zoomValue);
 
     let img = new Image();
     img.src = "./assets/expedbg/adventureMap.webp";
@@ -4429,23 +4456,39 @@ function createExpMap() {
         if (key > 17) {break}
         spawnKey(advImage,imgKey,key);
     }
-    
-    mapZoom.oninput = function() {
-        zoomValue = 0.3 + (2/100) * this.value;
-        settingsValues.defaultZoom = this.value;
+
+    const changeZoom = () => {
+        zoomValue = 0.2 + (2/100) * settingsValues.defaultZoom;
         mapInstance.zoom(zoomValue);
 
         const mapPins = advImage.childNodes;
         for (let i = 0; i < mapPins.length; i++) {
             const mapPin = mapPins[i];
-            mapPin.style.transform = `scale(${1 / zoomValue})`;
+            mapPin.style.transform = `scale(${1 / zoomValue * (MOBILE ? 1.7 : 1)})`;
         }
     }
 
-    mapZoom.dispatchEvent(new Event("input"));
+    mapZoomIn.addEventListener('click',()=>{
+        settingsValues.defaultZoom += 10;
+        if (settingsValues.defaultZoom >= 100) {
+            settingsValues.defaultZoom = 100
+        }
+        changeZoom();
+    })
+
+    mapZoomOut.addEventListener('click',()=>{
+        settingsValues.defaultZoom -= 10;
+        if (settingsValues.defaultZoom <= 0) {
+            settingsValues.defaultZoom = 1
+        }
+        changeZoom();
+    })
+
+    changeZoom();
+
     dragIcon.addEventListener("click",()=>{
         mapInstance.reset();
-        mapInstance.zoom(zoomValue)
+        mapInstance.zoom(zoomValue);
     })
 }
 
@@ -6247,7 +6290,7 @@ function wish() {
             } else {
                 let upgradeDictTemp = upgradeDict[randomWishHero];
                 upgradeDictTemp.Purchased = -1;
-                upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/500 * wishPower + 1);
+                upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * 0.01 * (STARTINGWISHFACTOR + wishMultiplier)/500 * wishPower + 1) ;
                 upgradeDictTemp["BaseCost"] = Math.round(saveValues["dps"] * (65) + 1);
                 upgradeDictTemp["BaseFactor"] = upgradeDictTemp["Factor"];
                 upgradeDictTemp["Contribution"] = 0;
@@ -7805,16 +7848,16 @@ if (beta) {
             let startButton = document.getElementById("play-button");
             startButton.click();
             setTimeout(()=>{startingFunction();},500)
-        },2000);
+        },2500);
     },800);
 
     function startingFunction() {
         // PRESS A KEY
-        const event = new KeyboardEvent('keydown', {
-            key: '5',
-        });
+        // const event = new KeyboardEvent('keydown', {
+        //     key: '5',
+        // });
           
-        document.dispatchEvent(event);
+        // document.dispatchEvent(event);
 
         // BETA FUNCTIONS
         let table5Image = document.getElementById('table5-Image');

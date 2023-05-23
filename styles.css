@@ -3060,25 +3060,40 @@ input:checked + .slider:before {
     background-position: center;
     background-size: cover;
     z-index: 11;
-    pointer-events: none;
 }
 
 .adventure-map > * {
     pointer-events: auto;
 }
 
-.adventure-map > input {
+#zoom-scroller {
     position: absolute;
-    left: 50%;
-    bottom: 40%;
-    width: 90%;
-    height: auto;
-    aspect-ratio: 20;
-    transform: rotate(270deg);
-    -moz-transform: scaleY(300%) translateY(20%);
-    writing-mode: vertical-lr;
+    right: 1%;
+    bottom: 9%;
+    width: auto;
+    height: 12%;
+    aspect-ratio: 1/2;
+    z-index: 30;
+    background-color: #B0DF7D;
+    border: 0.15em solid #3D7250;
+    box-sizing: border-box;
+    border-radius: 0.3em;
 }
 
+#zoom-scroller > button:first-of-type{
+    border-bottom: 0.1em solid #3D7250;
+}
+
+#zoom-scroller > button {
+    width: 100%;
+    height: 45%;
+    background-color: transparent;
+    color: #2b583c;
+    margin-top: 2%;
+    font: inherit;
+    font-size: 2vw;
+}
+/* 
 .adventure-map > input::-webkit-slider-runnable-track {
     background-color: #81a56ddd;
     border-radius: 1em;
@@ -3111,7 +3126,6 @@ input:checked + .slider:before {
     border: 0.15em solid #465B3D;
     height: 100%;
     width: 5%;
-
     cursor: grab;
 }
   
@@ -3131,7 +3145,7 @@ input:checked + .slider:before {
 .adventure-map > input[type="range"]:focus::-moz-range-thumb{
     outline: none;
     outline-offset: none;
-}
+} */
 
 .char-select {
     position: absolute;

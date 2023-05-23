@@ -660,13 +660,15 @@ body {
     right: 0;
 }
 
-.adventure-map > input {
-    left: 20%;
-    top: 4%;
-    width: 75%;
-    max-height: 5%;
-    aspect-ratio: 15;
-    transform: none;
+#zoom-scroller {
+    right: 1%;
+    bottom: 15%;
+    width: auto;
+    height: 20%;
+}
+
+#zoom-scroller > button {
+    font-size: 4vw;
 }
 
 .exped-loot {
