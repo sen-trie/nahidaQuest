@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "V.1-01-004";
+const VERSIONNUMBER = "V.1-01-005";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -3625,9 +3625,11 @@ function createAdventure() {
             if (event.key === "a") {
                 adventure('10-');
             } else if (event.key === "s") {
-                saveValues['dps'] += 1e15
+                notifPop("clearAll","rank",2);
+                notifPop("clearAll","quest",1);
             } else if (event.key === "d") {
-                saveValues['dps'] -= 1e5
+                notifPop("add","rank",2);
+                notifPop("add","quest",1);
             }
         }
         // if (event.key === "l") {createPetShop()}        
@@ -4464,7 +4466,7 @@ function createExpMap() {
         const mapPins = advImage.childNodes;
         for (let i = 0; i < mapPins.length; i++) {
             const mapPin = mapPins[i];
-            mapPin.style.transform = `scale(${1 / zoomValue * (MOBILE ? 1.7 : 1)})`;
+            mapPin.style.transform = `scale(${1 / zoomValue * (MOBILE ? 1.5 : 1)})`;
         }
     }
 
@@ -4593,10 +4595,20 @@ function notifPop(type,icon,count) {
             notifImg.src = "./assets/icon/bountyComplete.webp";
             notifText.innerText = "Bounty Rewards";
             notifSelect.bountyArray.push(count);
+
+            notifDiv.addEventListener('click',()=>{
+                let guildTable = document.getElementById("guild-table");
+                guildTable.toggle();
+            })
         } else if (icon === "rank") {
             notifImg.src = "./assets/icon/advRank.webp";
             notifText.innerText = "Adv. Rank \n Rewards";
             notifSelect.rankArray.push(count);
+
+            notifDiv.addEventListener('click',()=>{
+                let guildTable = document.getElementById("guild-table");
+                guildTable.toggle();
+            })
         } else if (icon === "char") {
             notifImg.src = "./assets/icon/newChar.webp";
             notifText.innerText = "New Leader \n Unlocked";
@@ -4762,7 +4774,7 @@ function spawnKey(advImage,imgKey,key,worldQuest) {
 
     if (worldQuest) {
         button.id = "world-quest-button"
-        button.style.transform = `scale(${1 / ( 0.3 + (2/100) * settingsValues.defaultZoom)})`;
+        button.style.transform = `scale(${1 / (0.2 + (2/100) * settingsValues.defaultZoom) * (MOBILE ? 1.5 : 1)})`;
     };
 
     let level = imgKey[key].Level;
@@ -7129,7 +7141,7 @@ function addNutStore() {
     bodyText.append(bodyTextLeft,bodyTextRight);
 
     let bodyTextBottom = document.createElement("p");
-    bodyTextBottom.innerText = "Gain more by upgrading heroes, getting achievements, \n primogems & nuts (golden or otherwise).";
+    bodyTextBottom.innerText = "Gain more by upgrading heroes, getting \nachievements & nuts (golden or otherwise).";
 
     let transendHelp = document.createElement("button");
     let transcendHelpbox = document.createElement("p");
@@ -7170,7 +7182,7 @@ function addNutStore() {
 function calculateGoldenCore(type) {
     let calculateNuts = 0;
     if (saveValues.realScore > 1e6) {calculateNuts = Math.log(saveValues.realScore)}
-    let goldenNutValue = Math.round(((saveValues.heroesPurchased/25))*2 + calculateNuts + saveValues.primogem/10 + saveValues.goldenNut + saveValues.achievementCount * 3);
+    let goldenNutValue = Math.round(((saveValues.heroesPurchased/25))*2 + calculateNuts + saveValues.goldenNut + saveValues.achievementCount * 3);
     if (goldenNutValue < 100) {goldenNutValue = 0}
 
     if (type === "formula") {
