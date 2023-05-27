@@ -5146,6 +5146,7 @@ function triggerFight() {
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
     adventureVideo.quicktime = 0;
+    adventureVideo.guardtime = 0;
     adventureVideo.defenseMob = null;
 
     let adventureVideoChildren = adventureVideo.children;
@@ -5363,6 +5364,7 @@ function triggerFight() {
                             guardStance(mobDiv,"exit");
                         } else {
                             canvas.style.filter = `brightness(1)`;
+                            guardStance(mobDiv,"refresh");
                         }
                         window.requestAnimationFrame(increaseBrightness);
                         return;
@@ -5371,7 +5373,9 @@ function triggerFight() {
                     if (!quicktimeAttack) {
                         canvas.brightness += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
                         adventureVideo.quicktime += (brightnessIncrement * speedUpFactor);
+                        adventureVideo.guardtime += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
                         quicktimeCheck();
+                        if (enemyAmount > 1) guardStance(mobDiv,"check");
                     }
 
                     if (canvas.attackState) {
@@ -5391,10 +5395,6 @@ function triggerFight() {
                             loseHP(mobHealth.atk,"normal",mobHealth.class);
                         }
                         canvas.attackState = false;
-                    }
-
-                    if (canvas.brightness > 0.5) {
-                        if (mobAtkIndicator.skirmish && enemyAmount != 1) guardStance(mobDiv);
                     }
 
                     if (canvas.brightness > 0.8) {
@@ -5419,26 +5419,38 @@ function triggerFight() {
             }
         }
 
+        function guardCheck() {
+            return !(adventureVideo.defenseMob != mobDiv && adventureVideo.defenseMob != null)
+        }
+
+        // MOB CHANGES INTO DEFENSE STANCE FOR SKIRMISH
         function guardStance(mobDiv,type) {
             if (type === "exit") {
                 adventureVideo.defenseMob = null;
+                adventureVideo.guardtime = 0;
                 mobAtkIndicator.defence = false;
                 canvas.style.animation = ``;
                 void canvas.offsetWidth;
                 mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`
-            } else if (!(adventureVideo.defenseMob)) {
-                let guardRoll = randomInteger(1,101);
-                if (guardRoll > 1) {
-                    mobAtkIndicator.defence = true;
-                    canvas.style.animation = `tada ${randomInteger(12,18)/10}s linear`;
-                    mobAtkIndicator.src = `./assets/icon/shield.webp`;
-                    adventureVideo.defenseMob = mobDiv;
+            } else if (type === "check") {
+                if (!(adventureVideo.defenseMob)) {
+                    if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * 1.5)) {
+                        let guardRoll = randomInteger(1,101);
+                        if (guardRoll > 1) {
+                            mobAtkIndicator.defence = true;
+                            canvas.style.animation = `tada ${randomInteger(12,18)/10}s linear`;
+                            mobAtkIndicator.src = `./assets/icon/shield.webp`;
+                            adventureVideo.defenseMob = mobDiv;
+                            adventureVideo.guardtime = 0;
+                        }
+                    }
+                }
+            } else if (type === "refresh") {
+                if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * 1)) {
+                    guardStance(mobDiv,"exit");
+                    return;
                 }
             }
-        }
-        
-        function guardCheck() {
-            return !(adventureVideo.defenseMob != mobDiv && adventureVideo.defenseMob != null)
         }
 
         mobDiv.children[0].addEventListener("click",()=>{
@@ -5544,7 +5556,11 @@ function triggerFight() {
                 mobHealth.dead = true;
                 enemyAmount--;
                 if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
-                if (adventureVideo.defenseMob == mobDiv) {adventureVideo.defenseMob = null;}
+                console.log(adventureVideo.defenseMob,mobDiv)
+                if (adventureVideo.defenseMob == mobDiv) {
+                    adventureVideo.defenseMob = null;
+                    adventureVideo.guardtime = 0;
+                }
 
                 mobDiv.children[0].style.animation = "";
                 mobDiv.style.filter = "grayscale(100%) brightness(20%)";
@@ -5568,6 +5584,7 @@ function triggerFight() {
         mobDiv.append(mobHealth,canvas);
     }
 
+    // SPAWNS QUICKTIME EVENT AFTER TIME
     function quicktimeCheck() {
         if (adventureVideo.quicktime >= (2.5 * maxEnemyAmount)) {
             if (Array.isArray(quickType)) {
@@ -6010,7 +6027,11 @@ function attackAll(adventureFightBurst) {
         if (mobHealth.health <= 0) {
             mobHealth.dead = true;
             if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
-            if (adventureVideo.defenseMob == mobDiv) {adventureVideo.defenseMob = null;}
+            if (adventureVideo.defenseMob == mobDiv) {
+                adventureVideo.defenseMob = null;
+                adventureVideo.guardtime = 0;
+            }
+
             enemyAmount--;
 
             mobDiv.children[0].style.animation = "";
