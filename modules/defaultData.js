@@ -100,6 +100,7 @@ let expeditionDictDefault = {
     9:"1",
     10:"0",
     12:"0",
+    13:"0",
 }
 
 let storeInventoryDefault = {
@@ -145,6 +146,9 @@ let enemyInfo = {
             3:[0.49,0.35,0.47,0.53],
             4:[0.53,0.53,0.53],
             5:[0.36,0.40,0.45,0.53,0.57],
+        },
+        13:{
+            1:[0.51,0.56],
         }
     },
 
@@ -225,6 +229,9 @@ let enemyInfo = {
     523:{Class:"Boss",      Variation:1,   Type:"Automaton",   HP:2000,   ATK:2.5,   AtkCooldown:42.5},
     531:{Class:"Leader",    Variation:3,   Type:"Eremite",     HP:750,   ATK:1.5,   AtkCooldown:40},
     532:{Class:"Boss",      Variation:3,   Type:"Eremite",     HP:1200,   ATK:1.5,     AtkCooldown:32.5},
+    // LVL 13
+    "13-Wave-1":{Wave:[1301,1301,1301],         BG:[1,1]},
+    1301:{Class:"Mob",       Variation:2,   Type:"WAbyss",      HP:300,   ATK:0.5,     AtkCooldown:40},
 }
 
 let upgradeDictDefault = {

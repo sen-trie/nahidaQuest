@@ -310,6 +310,36 @@ function drawMailTable(table4) {
 }
 
 const patchDict = {
+    "Update: v.1-2 (27/5/23)":`
+    <line>Bugs Fixed 🐞: </line><br><br>
+        </indent>
+        1. Expedition Combat<br>
+        When there's text on the monster like 'Dodge' or 'Counter', it can block player input like clicking damage.
+        </indent>
+
+    <br><br><line>New Additions 💡: </line><br><br>
+        </indent>
+        1. Expedition Notification QOL <br>
+        'Adventure Rank Rewards' and 'Bounty Claims' pop-ups direct to the Adventurer's Guild when clicked on for ease of access.
+        </indent>
+
+    <br><br><line>Systems Rework 🌰: </line><br><br>
+        </indent>
+        1. Expedition UI rework <br>
+        The Expedition map can now be moved without clicking the image of the map itself. The zoom slider has been replaced with +/- buttons which should be provide easier navigation for all devices.
+
+        <br><br> 2. Progression adjustments <br>
+        NpS and character costs have been further increased at the upper level. These changes may only be obvious near Inazuman characters. 
+        <br> Note: These changes may only appear in new runs (after transcending or new saves).
+        </indent>
+
+        <br><br> 3. Transcend adjustments <br>
+        Primogems no longer count towards Golden Cores after transcends. Players should be using primogems in the shop instead of hoarding them, in turn increasing the value of progressing to further levels.
+        </indent>
+
+    <br><br>Please report any bugs and stay tuned for more updates! Many thanks. [img]
+    `,
+
     "Update: v.1-1 (15/5/23)":`
     Note: If your save has any NaN values present, please type 'transcend' into the command console under 'Settings' and transcend from the appropriate menu. Any current NaN values may result in 0 NpS. <br><br>
     Please note that you WILL lose all of your current progress after transcending.

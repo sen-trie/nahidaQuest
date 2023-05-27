@@ -76,6 +76,7 @@ const imgKey = {
     23:{Left:"30",  Top:"37",   Level:12,   Wave:["11_B","13_A","14_A"]},
     24:{Left:"55",  Top:"24",   Level:12,   Wave:["15_B","20_A"]},
     25:{Left:"66",  Top:"41",   Level:12,   Wave:["16_A","19_A"]},
+    26:{Left:"76",  Top:"51",   Level:13,   Wave:[1],  Heads:[18,19]           ,Loot:{}},
 }
 
 const sceneInfo = {
@@ -656,6 +657,7 @@ const expeditionDictInfo = {
     10:{Text:"Visit the Adventurers' Guild"          ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
     11:{Text:"No Party Leader selected"               ,Lore:"Please select one at the top left of the map before going on Expeditions."            },
     12:{Text:"Random World Quest"                    ,Lore:"These quests are random encounters that the you can run into while roaming around the world of Teyvat."            },
+    13:{Text:"Skirmish Quest"                              ,Lore:"The combat abilities of these monsters have been enhanced as the result of the Ley Line Overflow. Take extra precaution before engaging in combat."},
 }
 
 const advInfo = {
@@ -946,7 +948,7 @@ const adventureLoot = {
         Food:       ["food", 4, 5, "adventure", "Any"],
         Talent:     ["talent", 4,4, "adventure", "Any"],
     },
-
+    "Level-13":{},
     2:{
         Weapon: ["weapon", 1, 2, "adventure", "Catalyst"],
         Talent: ["talent", 2, 2,"adventure",  "Sumeru"],
@@ -1041,6 +1043,7 @@ const adventureLoot = {
         Bonus:  ["xp", 4, 4, "Bonus", "Any"],
         Bonus2: ["weapon", 6, 6, "Bonus2", "Any"],
     },
+    26:{}
 }
 
 const eventText = {
@@ -1053,4 +1056,74 @@ const eventText = {
     6: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
 }
 
-export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo}
+const challengeInfo = [
+    {
+        '1': {'title': '', 'desc': 'Ascend for over 250 Cores'},
+        '2': {'title': '', 'desc': 'Possess 1000 primogems in one run'},
+        '3': {'title': '', 'desc': 'Reach 2,500 energy in one run'},
+        '4': {'title': '', 'desc': 'Catch 13 Weasel Thieves'},
+        '5': {'title': '', 'desc': 'Possess 50 discounted levels'},
+        '6': {'title': '', 'desc': 'Survive a battle with 1 HP remaining'},
+        '7': {'title': '', 'desc': ''},
+        '8': {'title': '', 'desc': ''},
+        '9': {'title': '', 'desc': ''},
+        '10': {'title': '', 'desc': ''},
+        '11': {'title': '', 'desc': ''},
+        '12': {'title': '', 'desc': ''}
+    }, {
+        '1': {'title': '', 'desc': 'Ascend for over 500 Cores'},
+        '2': {'title': '', 'desc': "Clear out Dori's regular shop"},
+        '3': {'title': '', 'desc': 'Wish for 10 characters in one run'},
+        '4': {'title': '', 'desc': 'Reach level 20 Adventure Rank'},
+        '5': {'title': '', 'desc': 'Clear out all Bounties'},
+        '6': {'title': '', 'desc': 'Level up the Wanderer 200 times'},
+        '7': {'title': '', 'desc': ''},
+        '8': {'title': '', 'desc': ''},
+        '9': {'title': '', 'desc': ''},
+        '10': {'title': '', 'desc': ''},
+        '11': {'title': '', 'desc': ''},
+        '12': {'title': '', 'desc': ''}
+    },{
+        '1': {'title': '', 'desc': 'Ascend for over 1,000 Cores'},
+        '2': {'title': '', 'desc': "Call for Ei's help"},
+        '3': {'title': '', 'desc': 'Reach 1 trillion NpS with Traveller'},
+        '4': {'title': '', 'desc': 'Defeat the Abyss without losing any HP'},
+        '5': {'title': '', 'desc': 'Reach 7,500 energy in one run'},
+        '6': {'title': '', 'desc': "Use 'A Thousand Floating Dreams'"},
+        '7': {'title': '', 'desc': ''},
+        '8': {'title': '', 'desc': ''},
+        '9': {'title': '', 'desc': ''},
+        '10': {'title': '', 'desc': ''},
+        '11': {'title': '', 'desc': ''},
+        '12': {'title': '', 'desc': ''}
+    }, {
+        '1': {'title': '', 'desc': 'Ascend for over 2,000 Cores'},
+        '2': {'title': '', 'desc': 'Level up Venti 300 times'},
+        '3': {'title': '', 'desc': 'Click unboosted for over a million Nuts'},
+        '4': {'title': '', 'desc': 'Possess 200 discounted levels'},
+        '5': {'title': '', 'desc': 'Possess 5000 primogems in one run'},
+        '6': {'title': '', 'desc': ''},
+        '7': {'title': '', 'desc': ''},
+        '8': {'title': '', 'desc': ''},
+        '9': {'title': '', 'desc': ''},
+        '10': {'title': '', 'desc': ''},
+        '11': {'title': '', 'desc': ''},
+        '12': {'title': '', 'desc': ''}
+    }, {
+        '1': {'title': '', 'desc': 'Ascend for over 5,000 Cores'},
+        '2': {'title': '', 'desc': 'Level up Zhongli 300 times'},
+        '3': {'title': '', 'desc': 'Level up Nahida 1000 times'},
+        '4': {'title': '', 'desc': 'Reach 10,000 energy in one run'},
+        '5': {'title': '', 'desc': ''},
+        '6': {'title': '', 'desc': ''},
+        '7': {'title': '', 'desc': ''},
+        '8': {'title': '', 'desc': ''},
+        '9': {'title': '', 'desc': ''},
+        '10': {'title': '', 'desc': ''},
+        '11': {'title': '', 'desc': ''},
+        '12': {'title': '', 'desc': ''},
+    }
+]
+
+
+export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo}

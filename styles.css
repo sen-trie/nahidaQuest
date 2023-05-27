@@ -3093,59 +3093,6 @@ input:checked + .slider:before {
     font: inherit;
     font-size: 2vw;
 }
-/* 
-.adventure-map > input::-webkit-slider-runnable-track {
-    background-color: #81a56ddd;
-    border-radius: 1em;
-    border: 0.3em solid #465B3D;
-    box-sizing: unset;
-    height: 100%;
-}
-
-.adventure-map > input::-webkit-slider-thumb {
-    background-color: transparent;
-    width: auto;
-    height: 200%;
-    aspect-ratio: 1;
-
-    margin: 0;
-    background: url(./assets/icon/zoom.webp) no-repeat center/cover;
-    cursor: grab;
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%) rotate(90deg);
-  }
-
-.adventure-map > input:focus::-webkit-slider-thumb {
-    outline: none;
-    outline-offset: none;
-}
-
-.adventure-map > input[type="range"]::-moz-range-track {
-    background-color: #81a56ddd;
-    border: 0.15em solid #465B3D;
-    height: 100%;
-    width: 5%;
-    cursor: grab;
-}
-  
-.adventure-map > input[type="range"]::-moz-range-thumb {
-    background-color: transparent;
-    width: auto;
-    height: 20%;
-    aspect-ratio: 1;
-
-    margin: 0;
-    background: url(./assets/icon/zoom.webp) no-repeat center/cover;
-    cursor: grab;
-    position: relative;
-    -moz-transform: scaleY(33%);
-}
-
-.adventure-map > input[type="range"]:focus::-moz-range-thumb{
-    outline: none;
-    outline-offset: none;
-} */
 
 .char-select {
     position: absolute;
@@ -3478,6 +3425,28 @@ input:checked + .slider:before {
     filter: none;
     position: absolute;
     bottom: 10%;
+}
+
+@keyframes tada {
+    0%, 100% {
+        -webkit-transform: scaleX(1);    
+        transform: scaleX(1);
+    }
+    
+    10%, 20% {    
+        -webkit-transform: scale3d(.9,.9,.9) rotate(-3deg);;
+        transform: scale3d(.9,.9,.9) rotate(-3deg);
+    }
+    
+    30%, 50%, 70%, 90% {
+        -webkit-transform: scale3d(1.2,1.2,1.2) rotate(3deg);
+        transform: scale3d(1.2,1.2,1.2) rotate(3deg);
+    }
+    
+    40%, 60%, 80% {  
+        -webkit-transform: scale3d(1.2,1.2,1.2) rotate(-3deg);
+        transform: scale3d(1.2,1.2,1.2) rotate(-3deg);
+    }
 }
 
 @keyframes atk-delay {
@@ -4588,6 +4557,7 @@ input:checked + .slider:before {
     background:url(./assets/icon/nutShop.webp);
     background-size: contain;
     transition: 0.2s ease;
+    /* animation: tada 1s linear; */
 }
 
 .nut-store-access:hover {

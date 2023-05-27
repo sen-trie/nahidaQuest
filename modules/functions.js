@@ -168,6 +168,42 @@ function universalStyleCheck(ele,styleCheck,paramOn,paramOff) {
     }
 
     return ele;
-} 
+}
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray, textReplacer,universalStyleCheck};
+// CHECKS FOR ALL CHALLENGES
+function challengeCheck(type,tier,prop,prop2) {
+    if (type === 'populate') {
+        const challengeInfo = prop;
+        let challengeCheck = challengeInfo.map(tier => {
+            let tierCheck = {};
+            for (let key in tier) {
+                tierCheck[key] = false;
+            }
+            return tierCheck;
+        })
+        return challengeCheck;
+    } else if (type === 'check') {
+        let challengeCheck = prop;
+        const challengeInfo = prop2;
+        if (challengeInfo.length > challengeCheck.length) {
+            for (let i = challengeCheck.length; i < challengeInfo.length; i++) {
+                let tierCheck = {};
+                for (let key in challengeInfo[i]) {
+                    tierCheck[key] = false;
+                }
+                challengeCheck[i] = tierCheck;
+            }
+        }
+        for (let j = 0; j < challengeCheck.length; j++) {
+            let tierCheck = challengeInfo[j];
+            for (let key in tierCheck) {
+                if (challengeCheck[j][key] === undefined) {
+                    challengeCheck[j][key] = false;
+                }
+            }
+        }
+        return challengeCheck;
+    }
+}
+
+export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck };
