@@ -657,7 +657,7 @@ const expeditionDictInfo = {
     10:{Text:"Visit the Adventurers' Guild"          ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
     11:{Text:"No Party Leader selected"               ,Lore:"Please select one at the top left of the map before going on Expeditions."            },
     12:{Text:"Random World Quest"                    ,Lore:"These quests are random encounters that the you can run into while roaming around the world of Teyvat."            },
-    13:{Text:"Skirmish Quest"                              ,Lore:"The combat abilities of these monsters have been enhanced as the result of the Ley Line Overflow. Take extra precaution before engaging in combat."},
+    13:{Text:"Skirmish Quest"                        ,Lore:"The combat abilities of these monsters have been enhanced as the result of the Ley Line Overflow. Your Burst also appears to recharge faster due to the presence of latent energy."},
 }
 
 const advInfo = {

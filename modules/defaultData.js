@@ -231,7 +231,7 @@ let enemyInfo = {
     532:{Class:"Boss",      Variation:3,   Type:"Eremite",     HP:1200,   ATK:1.5,     AtkCooldown:32.5},
     // LVL 13
     "13-Wave-1":{Wave:[1301,1301,1301],         BG:[1,1]},
-    1301:{Class:"Mob",       Variation:2,   Type:"WAbyss",      HP:300,   ATK:0.5,     AtkCooldown:40},
+    1301:{Class:"Mob",       Variation:2,   Type:"WAbyss",      HP:1700,   ATK:1.5,     AtkCooldown:40},
 }
 
 let upgradeDictDefault = {

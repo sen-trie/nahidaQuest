@@ -749,6 +749,16 @@ table, button, label {
 	100% {transform: translate(0);}
 }
 
+@keyframes rubberband {
+    0% {transform: scaleX(1);}
+    30% {transform: scale3d(1.10, 0.85, 1);}
+    40% {transform: scale3d(0.90, 1.10, 1);}
+    50% {transform: scale3d(1.05, 0.90, 1);}
+    65% {transform: scale3d(0.95, 1.05, 1);}
+    75% {transform: scale3d(1.05, 0.95, 1);}
+    100% {transform: scaleX(1);}
+}
+
 @keyframes vibrate-hard {
 	0% {transform: translate(0);}
     20% {transform: translate(7%, -7%);}

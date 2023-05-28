@@ -2258,14 +2258,14 @@ function toggleSettings(closeOnly) {
 function settingsVolume() {
     let volumeScroller = document.getElementById('volume-scroller-bgm');
     let bgmAudio = document.getElementById('bgm');
-    volumeScroller.addEventListener("change", function() {
+    volumeScroller.addEventListener("input", function() {
         bgmElement.volume = this.value / 100;
         fightBgmElement.volume = this.value / 100;
         settingsValues.bgmVolume = this.value / 100;
     });
 
     let sfxScroller = document.getElementById('volume-scroller-sfx');
-    sfxScroller.addEventListener("change", function() {
+    sfxScroller.addEventListener("input", function() {
         for (let i=0,len=sfxArray.length; i < len; i++) {
             sfxArray[i].volume = this.value / 100;
             settingsValues.sfxVolume = this.value / 100;
@@ -3440,7 +3440,7 @@ function adventure(advType) {
             saveValues["energy"] -= ADVENTURECOSTS[type !== 13 ? type : 0];
             updateMorale("add",(randomInteger(7,10) * -1));
 
-            if (activeLeader == "Paimon") {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.1)}
+            if (activeLeader == "Paimon" && type !== 13) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.1)}
             if (!persistentValues.tutorialBasic) {
                 customTutorial("advTut",6,()=>{drawAdventure(type,wave)});
                 persistentValues.tutorialBasic = true;
@@ -5154,15 +5154,16 @@ function triggerFight() {
     let currentSong;
     if (adventureScaraText) {
         currentSong = 4;
+    } else if (advLevel == 13) {
+        currentSong = randomInteger(5,7);
     } else {
         currentSong = randomInteger(1,4);
-        // LEFTOVER BGM FROM SCARA BOSS
+    }
+
+    // LEFTOVER BGM FROM SCARA BOSS
         // let mobDiv = adventureVideoChildren[2];
         // if (mobDiv.enemyID.HP == 2666) {
         //     currentSong = 4;
-        // } else {
-        // }
-    }
     
     bgmElement.pause();
     fightBgmElement.src = `./assets/sfx/battleTheme-${currentSong}.mp3`;
@@ -5385,6 +5386,8 @@ function triggerFight() {
                         if (mobAtkIndicator.doubleAtk == true) {
                             mobAtkIndicator.doubleAtk = false;
                             mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                            canvas.style.animation = ``;
+                            void canvas.offsetWidth;
                         } else if (mobAtkIndicator.doubleAtk == "parry") {
                             mobAtkIndicator.doubleAtk = true;
                         } else if (!(guardCheck())) {
@@ -5404,7 +5407,7 @@ function triggerFight() {
                         if (evadeRoll <= evadeMax) {
                             createBattleText("dodge",animationTime * 150 * 2,mobDiv);
                         } else {
-                            loseHP(mobHealth.atk,"normal",mobHealth.class);
+                            if (!beta) loseHP(mobHealth.atk,"normal",mobHealth.class);
                         }
                         canvas.attackState = false;
 
@@ -5447,7 +5450,8 @@ function triggerFight() {
                 if (doubleRoll > -1) {
                     mobAtkIndicator.doubleAtk = "parry";
                     mobAtkIndicator.src = `./assets/icon/doubleAtk.webp`;
-                    adventureVideo.doubleAtkCooldown = 3;
+                    canvas.style.animation = `tada ${randomInteger(12,18)/10}s linear`;
+                    adventureVideo.doubleAtkCooldown = 5;
                 }
             }
         }
@@ -5464,7 +5468,7 @@ function triggerFight() {
                 mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
             } else if (type === "check") {
                 if (!(adventureVideo.defenseMob)) {
-                    if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * (beta ? 0.5 : 1.5))) {
+                    if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * 0.75)) {
                         let guardRoll = randomInteger(1,101);
                         if (guardRoll > 1) {
                             mobAtkIndicator.defence = true;
@@ -5511,16 +5515,14 @@ function triggerFight() {
                         createBattleText("guard", animationTime * 150 * 2, mobDiv);
                     }
 
-                    console.log(mobAtkIndicator.doubleAtk)
-
-                    if (mobAtkIndicator.doubleAtk == "parry") {
-                        mobAtkIndicator.doubleAtk = true;
-                    } else if (mobAtkIndicator.doubleAtk == true) {
+                    if (mobAtkIndicator.doubleAtk == true) {
                         mobAtkIndicator.doubleAtk = false;
                         mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                        canvas.style.animation = ``;
+                        void canvas.offsetWidth;
+                    } else if (mobAtkIndicator.doubleAtk == "parry") {
+                        mobAtkIndicator.doubleAtk = true;
                     }
-
-                    console.log(mobAtkIndicator.doubleAtk)
                     
                     // } LEFTOVER FROM SUPERBOSS
                     // } else {
@@ -5553,6 +5555,7 @@ function triggerFight() {
                     if (!advDict.rankDict[10].Locked) {
                         let cooldown = document.getElementById('adventure-cooldown-3');
                         cooldown.amount += 25;
+                        if ((advLevel == 13)) {cooldown.amount += 5}
                     }
                 } else {
                     mobDiv.children[0].classList.add("damaged");
@@ -5627,7 +5630,7 @@ function triggerFight() {
 
     // SPAWNS QUICKTIME EVENT AFTER TIME
     function quicktimeCheck() {
-        if (adventureVideo.quicktime >= (2.5 * maxEnemyAmount * (beta ? 100 : 1))) {
+        if (adventureVideo.quicktime >= (2.5 * maxEnemyAmount)) {
             if (Array.isArray(quickType)) {
                 let quicktimeArray = quickType[0];
                 let atkValue = quickType[1];

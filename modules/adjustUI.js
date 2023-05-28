@@ -16,7 +16,6 @@ function inventoryAddButton(buttonInv, Item) {
     buttonInvItem.classList.add("button-inv-item");
 
     buttonInv.append(buttonInvFrame,buttonInvItem,buttonInvStarDiv);
-
     return buttonInv;
 }
 
