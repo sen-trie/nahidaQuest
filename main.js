@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "V.1-02-000";
+const VERSIONNUMBER = "V.1-02-001";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -5147,6 +5147,7 @@ function triggerFight() {
     adventureVideo = comboHandler("create",adventureVideo);
     adventureVideo.quicktime = 0;
     adventureVideo.guardtime = 0;
+    adventureVideo.doubleAtkCooldown = 1;
     adventureVideo.defenseMob = null;
 
     let adventureVideoChildren = adventureVideo.children;
@@ -5309,10 +5310,12 @@ function triggerFight() {
         
         let animationTime = singleEnemyInfo.AtkCooldown * randomInteger(90,110) / 1000;
         mobDiv.attackTime = animationTime;
+
         let mobAtkIndicator = document.createElement("img");
         mobAtkIndicator.skirmish = (advLevel == 13) ? true : false;
         mobAtkIndicator.defence = false;
         mobAtkIndicator.firstLoad = true;
+        mobAtkIndicator.doubleAtk = false;
 
         let canvas = document.createElement("canvas");
         canvas.classList.add("atk-indicator");
@@ -5371,7 +5374,7 @@ function triggerFight() {
                     }
 
                     if (!quicktimeAttack) {
-                        canvas.brightness += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
+                        canvas.brightness += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100 * (mobAtkIndicator.doubleAtk == true ? 3 : 1));
                         adventureVideo.quicktime += (brightnessIncrement * speedUpFactor);
                         adventureVideo.guardtime += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
                         quicktimeCheck();
@@ -5379,6 +5382,15 @@ function triggerFight() {
                     }
 
                     if (canvas.attackState) {
+                        if (mobAtkIndicator.doubleAtk == true) {
+                            mobAtkIndicator.doubleAtk = false;
+                            mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                        } else if (mobAtkIndicator.doubleAtk == "parry") {
+                            mobAtkIndicator.doubleAtk = true;
+                        } else if (!(guardCheck())) {
+                            doubleAttack();
+                        }
+
                         let evadeRoll = randomInteger(1,101);
                         let evadeMax = -1;
                         if (!advDict.rankDict[19].Locked) {
@@ -5395,6 +5407,8 @@ function triggerFight() {
                             loseHP(mobHealth.atk,"normal",mobHealth.class);
                         }
                         canvas.attackState = false;
+
+                        
                     }
 
                     if (canvas.brightness > 0.8) {
@@ -5423,18 +5437,34 @@ function triggerFight() {
             return !(adventureVideo.defenseMob != mobDiv && adventureVideo.defenseMob != null)
         }
 
-        // MOB CHANGES INTO DEFENSE STANCE FOR SKIRMISH
+        // MOB NEXT ATTACK IS DOUBLE ATTACK
+        function doubleAttack() {
+            if (!mobAtkIndicator.skirmish) {return}
+            if (adventureVideo.doubleAtkCooldown > 1) {
+                adventureVideo.doubleAtkCooldown -= 1;
+            } else {
+                let doubleRoll = randomInteger(1,101);
+                if (doubleRoll > -1) {
+                    mobAtkIndicator.doubleAtk = "parry";
+                    mobAtkIndicator.src = `./assets/icon/doubleAtk.webp`;
+                    adventureVideo.doubleAtkCooldown = 3;
+                }
+            }
+        }
+
+        // MOB CHANGES INTO DEFENSE STANCE
         function guardStance(mobDiv,type) {
+            if (!mobAtkIndicator.skirmish) {return}
             if (type === "exit") {
                 adventureVideo.defenseMob = null;
                 adventureVideo.guardtime = 0;
                 mobAtkIndicator.defence = false;
                 canvas.style.animation = ``;
                 void canvas.offsetWidth;
-                mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`
+                mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
             } else if (type === "check") {
                 if (!(adventureVideo.defenseMob)) {
-                    if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * 1.5)) {
+                    if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * (beta ? 0.5 : 1.5))) {
                         let guardRoll = randomInteger(1,101);
                         if (guardRoll > 1) {
                             mobAtkIndicator.defence = true;
@@ -5475,11 +5505,22 @@ function triggerFight() {
                     canvas.style.transform = ``;
                     canvas.style.filter = `brightness(0)`;
                     if (guardCheck()) {
-                        createBattleText("counter",animationTime * 150 * 2,mobDiv);
-                        loseHP(mobHealth.atk / 2,"inverse");
+                        createBattleText("counter", animationTime * 150 * 2, mobDiv);
+                        loseHP(mobHealth.atk / 2, "inverse");
                     } else {
-                        createBattleText("guard",animationTime * 150 * 2,mobDiv);
+                        createBattleText("guard", animationTime * 150 * 2, mobDiv);
                     }
+
+                    console.log(mobAtkIndicator.doubleAtk)
+
+                    if (mobAtkIndicator.doubleAtk == "parry") {
+                        mobAtkIndicator.doubleAtk = true;
+                    } else if (mobAtkIndicator.doubleAtk == true) {
+                        mobAtkIndicator.doubleAtk = false;
+                        mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                    }
+
+                    console.log(mobAtkIndicator.doubleAtk)
                     
                     // } LEFTOVER FROM SUPERBOSS
                     // } else {
@@ -5492,7 +5533,7 @@ function triggerFight() {
                     if (mobDiv.children[0].children[0]) {
                         if (guardCheck()) {
                             mobHealth.health -= (currentATK * attackMultiplier);
-                            loseHP(mobHealth.atk / 2,"inverse");
+                            loseHP(mobHealth.atk / 2, "inverse");
                         } else {
                             mobHealth.health -= (currentATK * attackMultiplier * 0.25);
                         }
@@ -5530,6 +5571,7 @@ function triggerFight() {
                 } else {
                     mobHealth.health -= (currentATK * 0.25);
                     createBattleText("guard",animationTime * 150 * 2,mobDiv);
+                    doubleAttack();
                 }
 
                 let cooldown = document.getElementById('adventure-cooldown-1');
@@ -5556,7 +5598,6 @@ function triggerFight() {
                 mobHealth.dead = true;
                 enemyAmount--;
                 if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
-                console.log(adventureVideo.defenseMob,mobDiv)
                 if (adventureVideo.defenseMob == mobDiv) {
                     adventureVideo.defenseMob = null;
                     adventureVideo.guardtime = 0;
@@ -5586,7 +5627,7 @@ function triggerFight() {
 
     // SPAWNS QUICKTIME EVENT AFTER TIME
     function quicktimeCheck() {
-        if (adventureVideo.quicktime >= (2.5 * maxEnemyAmount)) {
+        if (adventureVideo.quicktime >= (2.5 * maxEnemyAmount * (beta ? 100 : 1))) {
             if (Array.isArray(quickType)) {
                 let quicktimeArray = quickType[0];
                 let atkValue = quickType[1];
