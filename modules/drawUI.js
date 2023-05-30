@@ -6,7 +6,7 @@ const uniqueFileArray = {
     "tooltips/elements/":["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"],
     "event/":["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"],
     "icon/":["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","event-easy","event-hard"],
-    "expedbg/":["break","counter","crit","dodge"]
+    "expedbg/":["break","counter","crit","dodge","Red","Blue","Green","quicktime","guard"]
 }
 
 const numberedFileArray = {
@@ -20,6 +20,8 @@ const numberedFileArray = {
     "event/bad-":4,
     "tutorial/tut-":5,
     "event/weasel-":9,
+    "expedbg/battle":3,
+    "expedbg/battle-scara":3,
     "expedbg/header/":17,
 }
 
@@ -170,7 +172,10 @@ function drawMainBody() {
     table5.classList.add("flex-container-ACHIEVEMENT");
     table5.id = "table5";
     table5Container.id = "table5-container";
-    table5Container.append(table5Image,table5);
+    let challengeDiv = document.createElement("div");
+    challengeDiv.id = "challenge-div";
+    challengeDiv.style.display = "none";
+    table5Container.append(table5Image,table5,challengeDiv);
     
     // TABLE 6
     let table6 = document.createElement("div");

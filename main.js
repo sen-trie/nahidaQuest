@@ -713,7 +713,7 @@ function specialValuesUpgrade(loading, valueUpdate) {
         additionalPrimo = (1 + persistentValues.upgrade9.Purchased/10).toFixed(3);
         additionalStrength = (1 + persistentValues.upgrade10.Purchased/10).toFixed(3);
         additionalDefense = (1 + persistentValues.upgrade11.Purchased/10).toFixed(3);
-        additionalXP = (1 + persistentValues.upgrade12.Purchased/100).toFixed(3);
+        additionalXP = (1 + persistentValues.upgrade12.Purchased/50).toFixed(3);
     } else if (loading == false) {
         switch (valueUpdate) {
             case 1:
@@ -752,7 +752,7 @@ function specialValuesUpgrade(loading, valueUpdate) {
                 additionalDefense = (1 + persistentValues.upgrade11.Purchased/10).toFixed(3);
                 break;
             case 12:
-                additionalXP = (1 + persistentValues.upgrade12.Purchased/100).toFixed(3);
+                additionalXP = (1 + persistentValues.upgrade12.Purchased/50).toFixed(3);
                 break;
             default:
                 console.error('Upgrade error: Invalid value to update');
@@ -2503,9 +2503,9 @@ function createFilter() {
     
     filterButton.addEventListener("click",()=>{
         if (table1.style.display == "flex") {
-            filterMenuOne = universalStyleCheck(filterMenuOne,"display","flex","none");
+            filterMenuOne = universalStyleCheck(filterMenuOne,"display","grid","none");
         } else if (table2.style.display == "flex") {
-            filterMenuTwo = universalStyleCheck(filterMenuTwo,"display","flex","none");
+            filterMenuTwo = universalStyleCheck(filterMenuTwo,"display","grid","none");
         }
     })
 
@@ -4720,9 +4720,17 @@ function drawAdventure(advType,wave) {
     let waveType = enemyInfo[`${advType}-Wave-${wave}`];
     enemyAmount = waveType.Wave.length;
     maxEnemyAmount = waveType.Wave.length;
+
+    let adventureVideo = document.getElementById("adventure-video");
     let imageGif = document.getElementById("adventure-gif");
     let adventureFightImg = document.getElementById("adventure-fight").children;
-    if (adventureScaraText) {imageGif.src = `./assets/expedbg/exped${adventureScaraText}.webp`};
+    if (adventureScaraText) {
+        imageGif.src = `./assets/expedbg/exped${adventureScaraText}.webp`;
+        adventureVideo.style.border = `0.2em ridge #C0C5ED`;
+    } else {
+        adventureVideo.style.border = `0.2em ridge #AEDF7D`;
+    };
+
     for (let i = 0; i < adventureFightImg.length; i++) {
         if (adventureFightImg[i].classList.contains(`fight-button${!adventureScaraText}`)) {adventureFightImg[i].classList.remove(`fight-button${!adventureScaraText}`)};
         adventureFightImg[i].classList.add(`fight-button${adventureScaraText}`);
@@ -4742,7 +4750,7 @@ function drawAdventure(advType,wave) {
  
     let adventureArea = document.getElementById("adventure-area");
     let adventureTextBox = document.getElementById("adventure-text");
-    let adventureVideo = document.getElementById("adventure-video");
+    
     adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp)`;
     adventureVideo = spawnMob(adventureVideo,waveType.Wave);
 
@@ -5379,7 +5387,7 @@ function triggerFight() {
                         adventureVideo.quicktime += (brightnessIncrement * speedUpFactor);
                         adventureVideo.guardtime += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
                         quicktimeCheck();
-                        if (enemyAmount > 1) guardStance(mobDiv,"check");
+                        if (enemyAmount > 1 && canvas.brightness < 0.8) guardStance(mobDiv,"check");
                     }
 
                     if (canvas.attackState) {
@@ -5410,18 +5418,6 @@ function triggerFight() {
                             if (!beta) loseHP(mobHealth.atk,"normal",mobHealth.class);
                         }
                         canvas.attackState = false;
-
-                        
-                    }
-
-                    if (canvas.brightness > 0.8) {
-                        if (canvas.style.transform == ``) {
-                            canvas.style.transform = `scale(1.2)`;
-                            canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
-                            canvas.classList.add("attack-ready");
-                        }
-                    } else {
-                        canvas.style.filter = `brightness(${canvas.brightness})`;
                     }
 
                     if (canvas.brightness > maxBrightness) {
@@ -5430,6 +5426,14 @@ function triggerFight() {
                         canvas.brightness = 0;
                         canvas.style.transform = ``;
                         canvas.style.filter = `brightness(0)`;
+                    } else if (canvas.brightness > 0.8) {
+                        if (canvas.style.transform == ``) {
+                            canvas.style.transform = `scale(1.2)`;
+                            canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
+                            canvas.classList.add("attack-ready");
+                        }
+                    } else {
+                        canvas.style.filter = `brightness(${canvas.brightness})`;
                     }
                 }
                 window.requestAnimationFrame(increaseBrightness);
@@ -5463,6 +5467,7 @@ function triggerFight() {
                 adventureVideo.defenseMob = null;
                 adventureVideo.guardtime = 0;
                 mobAtkIndicator.defence = false;
+                canvas.brightness = 0.25;
                 canvas.style.animation = ``;
                 void canvas.offsetWidth;
                 mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
@@ -5480,7 +5485,7 @@ function triggerFight() {
                     }
                 }
             } else if (type === "refresh") {
-                if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * 1)) {
+                if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * 0.75)) {
                     guardStance(mobDiv,"exit");
                     return;
                 }
@@ -6311,6 +6316,7 @@ function quitAdventure() {
     imageGif.src = "./assets/expedbg/exped-Nahida.webp";
 
     let adventureVideo = document.getElementById("adventure-video");
+    adventureVideo.style.border = '0.2em ridge #AEDF7D';
     let enemyElements = adventureVideo.getElementsByClassName("enemy");
     while (enemyElements.length > 0) {
         enemyElements[0].remove();
@@ -6535,6 +6541,49 @@ function achievementListload() {
             }
         }
     }
+
+    let table5Image = document.getElementById('table5-Image');
+    let tabDiv = document.createElement('div');
+    tabDiv.classList.add('flex-row');
+    tabDiv.active;
+
+    let achievementTab = document.createElement('img');
+    achievementTab.src = './assets/achievement/achieve-tab1-clicked.webp';
+    let challengeTab = document.createElement('img');
+    challengeTab.src = './assets/achievement/achieve-tab2.webp';
+
+    achievementTab.addEventListener('click',()=>{
+        changeAchTab(achievementTab);
+    })
+
+    challengeTab.addEventListener('click',()=>{
+        changeAchTab(challengeTab);
+    })
+
+    let challengeDiv = document.getElementById('challenge-div');
+    challengeDiv.innerText = "??? \n\n Development in progress. \n Stay tuned!"
+    table5.style.display = "flex";
+    function changeAchTab(ele) {
+        if (tabDiv.active !== ele) {
+            achievementTab.src = './assets/achievement/achieve-tab1.webp';
+            challengeTab.src = './assets/achievement/achieve-tab2.webp';
+            tabDiv.active = ele;
+
+            if (ele === achievementTab) {
+                achievementTab.src = './assets/achievement/achieve-tab1-clicked.webp';
+                table5.style.display = "flex";
+                challengeDiv.style.display = "none";
+            } else {
+                challengeTab.src = './assets/achievement/achieve-tab2-clicked.webp';
+                table5.style.display = "none";
+                challengeDiv.style.display = "flex";
+            }
+        }
+    }
+
+    tabDiv.active = achievementTab;
+    tabDiv.append(achievementTab,challengeTab)
+    table5Image.append(tabDiv);
 }
 
 
@@ -7212,8 +7261,30 @@ function addNutStore() {
     let nutTranscend = document.createElement("div");
     nutTranscend.id = "nut-shop-transcend";
     nutTranscend.style.display = "none";
-    let nutAscend = document.createElement("button");
-    nutAscend.innerText = "Transcend";
+    let nutAscend = document.createElement("div");
+    nutAscend.id = "nut-shop-ascend";
+    nutAscend.innerText = "??? \n\n Development in progress. \n Stay tuned!";
+    
+    let nutButtonContainer = document.createElement("div");
+    nutButtonContainer.classList.add('flex-row','nut-button-container');
+    const buttonText = ["Blessings","Transcend","???"];
+    const nutArray = [nutShopDiv,nutTranscend,nutAscend];
+    for (let i = 0; i < 3; i++) {
+        let nutButton = document.createElement("button");
+        nutButton.innerText = buttonText[i];
+        nutButton.addEventListener("click",()=>{
+            for (let j = 0; j < 3; j++) {
+                if (nutArray[j].style.display !== "none") {
+                    nutArray[j].style.display = "none";
+                }
+            }
+            nutArray[i].style.display = "flex";
+        })
+
+        nutButtonContainer.appendChild(nutButton);
+    }
+
+    
 
     let nutStoreButton = document.createElement("button");
     nutStoreButton.classList = "nut-store-access";
@@ -7228,7 +7299,7 @@ function addNutStore() {
     leftDiv.appendChild(nutStoreButton);
 
     let len = (getHighestKey(permUpgrades) + 1);
-    for (let i=1; i < len; i++) {
+    for (let i = 1; i < len; i++) {
         let nutShopItem = document.createElement("div");
         nutShopItem.classList.add("nut-shop-button","flex-row");
         nutShopItem.id = "nut-shop-" + i;
@@ -7277,18 +7348,7 @@ function addNutStore() {
     }
 
     nutShopDiv.style.display = "flex";
-    nutAscend.addEventListener("click",()=>{
-        if (nutShopDiv.style.display === "flex") {
-            nutTranscend.style.display = "flex";
-            nutShopDiv.style.display = "none";
-            nutAscend.innerText = "Upgrade";
-        } else {
-            nutTranscend.style.display = "none";
-            nutShopDiv.style.display = "flex";
-            nutAscend.innerText = "Transcend";
-        }
-    })
-
+    nutAscend.style.display = "none";
     nutTranscend.classList.add("nut-transcend","flex-column");
     let titleText = document.createElement("p");
     titleText.innerText = "Do you wish to turn \n back time and transcend?";
@@ -7311,8 +7371,7 @@ function addNutStore() {
     transcendHelpbox.style.display = "none";
     transcendHelpbox.innerText = `What is the Golden Core amount affected by? \n 
                                 Character Levels (High Priority)
-                                Achievements (High Priority)
-                                Primogems (High Priority)\n
+                                Achievements (High Priority)\n
                                 Golden Nuts (Low Priority)
                                 Regular Nuts (Low Priority)`;
     transendHelp.addEventListener("click",()=>{
@@ -7337,7 +7396,7 @@ function addNutStore() {
     })
     nutTranscend.append(titleText,bodyText,bodyTextBottom,trascendButton,transcendHelpbox,transendHelp);
 
-    nutStoreTable.append(shopHeader,nutTranscend,nutShopDiv,nutAscend,nutStoreCurrency);
+    nutStoreTable.append(shopHeader,nutTranscend,nutShopDiv,nutAscend,nutButtonContainer,nutStoreCurrency);
     mainTable.appendChild(nutStoreTable);
     calculateGoldenCore();
 }
@@ -8028,50 +8087,16 @@ if (beta) {
 
     function startingFunction() {
         // PRESS A KEY
-        const event = new KeyboardEvent('keydown', {
-            key: '3',
-        });
+        // const event = new KeyboardEvent('keydown', {
+        //     key: '3',
+        // });
           
-        document.dispatchEvent(event);
-        document.getElementById('char-selected').click();
-        document.getElementById('char-select-0').click();
-        document.getElementById('char-selected').click();
+        // document.dispatchEvent(event);
+        // document.getElementById('char-selected').click();
+        // document.getElementById('char-select-0').click();
+        // document.getElementById('char-selected').click();
 
         // BETA FUNCTIONS
-        let table5Image = document.getElementById('table5-Image');
-        let tabDiv = document.createElement('div');
-        tabDiv.classList.add('flex-row');
-        tabDiv.active;
-
-        let achievementTab = document.createElement('img');
-        achievementTab.src = './assets/achievement/achieve-tab1-clicked.webp';
-        let challengeTab = document.createElement('img');
-        challengeTab.src = './assets/achievement/achieve-tab2.webp';
-
-        achievementTab.addEventListener('click',()=>{
-            changeAchTab(achievementTab);
-        })
-
-        challengeTab.addEventListener('click',()=>{
-            changeAchTab(challengeTab);
-        })
-
-        function changeAchTab(ele) {
-            if (tabDiv.active !== ele) {
-                achievementTab.src = './assets/achievement/achieve-tab1.webp';
-                challengeTab.src = './assets/achievement/achieve-tab2.webp';
-                tabDiv.active = ele;
-
-                if (ele === achievementTab) {
-                    achievementTab.src = './assets/achievement/achieve-tab1-clicked.webp';
-                } else {
-                    challengeTab.src = './assets/achievement/achieve-tab2-clicked.webp';
-                }
-            }
-        }
-
-        tabDiv.active = achievementTab;
-        tabDiv.append(achievementTab,challengeTab)
-        table5Image.append(tabDiv);
+        
     }
 }

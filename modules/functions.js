@@ -85,16 +85,18 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
         if (upgradeDict[i].Locked === true) {continue}
 
         let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero-1)*1.3)));
+        let baseATK = Math.round(initATKCost * (multiplierATKCost **((currentHero-1)*3.3)));
         let baseLevel = Math.round(0.75 * baseCost);
         upgradeDict[i]["BaseCost"] = baseCost;
         upgradeDict[i]["Level"] = baseLevel.toExponential(3);
+        upgradeDict[i]["Factor"] = baseATK;
 
         if (currentKey > 1) {
             upgradeDict[i]["BaseCost"] = Math.round(baseCost + upgradeDict[currentKey]["BaseCost"] * 6);
+            upgradeDict[i]["Level"] = Math.round(upgradeDict[i]["BaseCost"] * 0.75);
+            upgradeDict[i]["Factor"] = Math.round(baseATK + upgradeDict[currentKey]["Factor"] * 4.5);
         }
         
-        let baseATK = Math.round(initATKCost * (multiplierATKCost **((currentHero-1)*3.3)));
-        upgradeDict[i]["Factor"] = Number(baseATK.toPrecision(3)).toExponential(3);
         upgradeDict[i]["BaseFactor"] = upgradeDict[i]["Factor"];
         upgradeDict[i]["Contribution"] = 0;
         currentHero++;

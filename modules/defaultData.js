@@ -78,14 +78,14 @@ let permUpgrades = {
     2:{Name:"Blessing of Technique",       Effect:3,  Max:50,    Cap:true,   Description:"Increase clicking DMG during Combat Expeditions."},
     3:{Name:"Blessing of Wanderlust",      Effect:2,   Max:50,   Cap:true,   Description:"Increases base power of Wish characters."},
     4:{Name:"Blessing of Concession",      Effect:2,   Max:25,   Cap:true,   Description:"Decreases price of Dori's Shop items and random trades."},
-    5:{Name:"Blessing of Might",           Effect:1,   Max:50,   Cap:true,   Description:"Increases critical hit amount and chance.",   zeroDescription:"Enables critical hits for clicking Big Nahida."},
+    5:{Name:"Blessing of Might",           Effect:1,   Max:50,   Cap:true,   Description:"Increases critical rate amount for clicking Big Nahida.",   zeroDescription:"Enables critical hits for clicking Big Nahida."},
     6:{Name:"Blessing of Tranquillity",    Effect:1,   Max:50,   Cap:false,   Description:"Increases offline Nut accumulation rate.",    zeroDescription:"Enables accumulation of Nuts while offline."},
     7:{Name:"Blessing of Fortuity",        Effect:0.5, Max:50,   Cap:true,   Description:"Increases chances of lucky outcomes.",          zeroDescription:"Enables additional lucky outcomes for certain events."},
     8:{Name:"Blessing of Enlightenment",   Effect:2,   Max:25,   Cap:true,   Description:"Decreases cooldown between Event spawns."},
     9:{Name:"Blessing of Riches",          Effect:10,  Max:25,   Cap:true,   Description:"Increases Primogems gained from Events/Achievements."},
     10:{Name:"Blessing of Strength",       Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
     11:{Name:"Blessing of Fortification",  Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
-    12:{Name:"Blessing of Determination",  Effect:1,  Max:50,   Cap:false,   Description:"Increase XP gain from Expeditions attempts."},
+    12:{Name:"Blessing of Determination",  Effect:2,  Max:50,   Cap:false,   Description:"Increase XP gain from Expeditions attempts."},
 }
 
 let expeditionDictDefault = {
@@ -231,7 +231,7 @@ let enemyInfo = {
     532:{Class:"Boss",      Variation:3,   Type:"Eremite",     HP:1200,   ATK:1.5,     AtkCooldown:32.5},
     // LVL 13
     "13-Wave-1":{Wave:[1301,1301,1301],         BG:[1,1]},
-    1301:{Class:"Mob",       Variation:2,   Type:"WAbyss",      HP:1700,   ATK:1.5,     AtkCooldown:40},
+    1301:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1700,   ATK:1.5,     AtkCooldown:40},
 }
 
 let upgradeDictDefault = {

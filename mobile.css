@@ -229,7 +229,7 @@ body {
     height: 25%;
 }
 
-.nut-store-table > div {
+#nut-shop-div, #nut-shop-transcend {
     height: 65%;
     width: 80%;
     top: 20%;
@@ -240,9 +240,9 @@ body {
     width: 87%;
 }
 
-.nut-store-table > :last-child {
-    height: 10%;
-    top: 10%;
+#nut-store-currency {
+    height: fit-content;
+    bottom: 80%;
     left: 12%;
 }
 
@@ -270,12 +270,6 @@ body {
 
 .nut-transcend > div {
     height: 80%;
-}
-
-.nut-transcend > button {
-    height: unset;
-    min-width: 50%;
-    aspect-ratio: 4.6;
 }
 
 /*/////////////////////////////////// MOBILE CSS FOR TABLES ///////////////////////////////////////*/
@@ -441,11 +435,10 @@ body {
     width: 58%;
     height: 15%;
 }
-
-.filter-row div:nth-child(3) > button {
-    height:37%;
-    aspect-ratio: 1;
-}
+/* 
+.filter-row div:nth-child(3), .filter-row div:nth-child(2) {
+    grid-template-columns: repeat(auto-fill, minmax(3em, 1fr));
+} */
 
 .wish-img {
     width: 90%;
