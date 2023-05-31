@@ -1922,7 +1922,6 @@ input:checked + .slider:before {
     position: relative;
 }
 
-
 .dim-filter {
     transition: 0.3s ease;
     filter: brightness(25%);
@@ -4622,8 +4621,108 @@ input:checked + .slider:before {
 
 #nut-shop-ascend {
     text-align: center;
-    justify-content: center;
+    justify-content: space-between;
     color: #22391f;
+}
+
+#nut-shop-ascend > p {
+    font-size: 1.4em;
+    color: white;
+    text-align: center;
+    text-shadow: var(--text-shadow-075);
+    margin-bottom: 1%;
+}
+
+#nut-shop-ascend > div:first-of-type {
+    width: 100%;
+    height: auto;
+    justify-content: space-evenly;
+    margin-bottom: 1%;
+    max-height: 30%;
+}
+
+#nut-shop-ascend > div:last-of-type {
+    width: 95%;
+    flex-grow: 1;
+    overflow-y: hidden;
+}
+
+.nut-char-container {
+    width: 55%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    align-content: start;
+    gap: 2%;
+    overflow-y: auto;
+    padding: 1%;
+    box-sizing: border-box;
+    
+}
+
+.nut-char-container > img {
+    object-fit: contain;
+    width: 100%;
+    border: 0.2em solid #88705B;
+    border-radius: 0.3em;
+    box-sizing: border-box;
+    transition: 0.3s ease;
+}
+
+.nut-element {
+    object-fit: contain;
+    width: 10%;
+    max-height: 100%;
+}
+
+.nut-element:hover {
+    filter: unset;
+}
+
+.ascend-info {
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+    height: 100%;
+    border: 0.2em solid #88705B;
+    border-radius: 0.3em;
+    background-color: #E9D5C1;
+    color: #48392b;
+    box-sizing: border-box;
+}
+
+img[src=""] {
+    display: none;
+ }
+
+ .ascend-info > p {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 2%;
+    box-sizing: border-box;
+ }
+
+.ascend-info > div {
+    color: #f0e5da;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: auto;
+    background: url(./assets/tutorial/exped-button.webp) center / contain no-repeat;
+    margin-bottom: 2%;
+    transition: 0.2s ease;
+}
+
+.ascend-info > div:hover {
+    filter: drop-shadow(0 0 0.2em #685024);
+}
+
+.ascend-info > div > img {
+    height: 1.6em;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    filter: drop-shadow(0 0 0.1em black);
 }
 
 .nut-store-table > div::-webkit-scrollbar-thumb {
@@ -4634,22 +4733,6 @@ input:checked + .slider:before {
 .nut-store-table > div::-webkit-scrollbar-thumb:hover {
   background-color: #466842;
 }
-/* 
-.nut-store-table > button {
-    position: absolute;
-    bottom: 2%;
-    height: 9%;
-    width: 50%;
-    background-color: transparent;
-    background-image: url(./assets/tutorial/tut-button.webp);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-    font: inherit;
-    font-size: 1.3em;
-    color: white;
-    text-shadow: var(--text-shadow-075);
-} */
 
 .nut-store-table::before {
     content: "";

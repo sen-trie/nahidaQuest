@@ -5,7 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,m
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 import * as drawUI from "./modules/drawUI.js"
 
-const VERSIONNUMBER = "V.1-02-001";
+const VERSIONNUMBER = "V.1-02-002";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact are trademarks, \n services marks, or registered trademarks of HoYoverse.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -703,7 +703,7 @@ function specialValuesUpgrade(loading, valueUpdate) {
         upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade1.Purchased) / 10);
         lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
         specialClick = (1 + (persistentValues.upgrade2.Purchased)/10).toFixed(3);
-        wishPower = (1 + (persistentValues.upgrade3.Purchased)/50).toFixed(3);
+        wishPower = (1 - (persistentValues.upgrade3.Purchased)/200).toFixed(3);
         costDiscount = (1 - (persistentValues.upgrade4.Purchased)/50).toFixed(3);
         clickCritRate = persistentValues.upgrade5.Purchased;
         clickCritDmg = Math.round((Math.log(persistentValues.upgrade5.Purchased + 1) * 18));
@@ -724,7 +724,7 @@ function specialValuesUpgrade(loading, valueUpdate) {
                 specialClick = (1 + (persistentValues.upgrade2.Purchased)/10).toFixed(3);
                 break;
             case 3:
-                wishPower = (1 + (persistentValues.upgrade3.Purchased)/50).toFixed(3);
+                wishPower = (1 - (persistentValues.upgrade3.Purchased)/200).toFixed(3);
                 break;
             case 4:
                 costDiscount = (1 - (persistentValues.upgrade4.Purchased)/50).toFixed(3);
@@ -1926,23 +1926,22 @@ function tabChange(x) {
     let i = 7;
     let tabButton;
     while (i--) {
-        if (document.getElementById("tab-" + (i)) != null) {
+        if (document.getElementById("tab-" + (i))) {
             tabButton = document.getElementById("tab-" + (i));
+            if (!tabButton.firstChild.classList.contains("darken")) {
+                tabButton.firstChild.classList.add("darken");
+            }
+            if (i === x - 1) {
+                if (tabButton.firstChild.classList.contains("darken")) {
+                    tabButton.firstChild.classList.remove("darken");
+                }
+            }
         } else {
             continue;
         }
-        
-        if (!tabButton.firstChild.classList.contains("darken")) {
-            tabButton.firstChild.classList.add("darken");
-        }
-        if (i == x - 1) {
-            if (tabButton.firstChild.classList.contains("darken")) {
-                tabButton.firstChild.classList.remove("darken");
-            }
-        }
     }
     
-    for (let i=0, len=TABS.length; i < len; i++){
+    for (let i = 0, len = TABS.length; i < len; i++){
         if (TABS[i].style.display !== "none") {
             TABS[i].style.display = "none";
         }
@@ -6418,7 +6417,7 @@ function updateWishDisplay() {
         if (saveValues["wishCounterSaved"] >= wishCounter) {
             wishNpsDisplay.innerText = "All Wish Heroes obtained!";
         } else {
-            wishNpsDisplay.innerText = `Next character's NpS: ${abbrNum(Math.round(saveValues["dps"] * (STARTINGWISHFACTOR + wishMultiplier)/500 * wishPower + 1))}`;
+            wishNpsDisplay.innerText = `Next character's NpS: ${abbrNum(Math.round(saveValues["dps"] * 0.01 * (STARTINGWISHFACTOR + wishMultiplier)/2500 + 1))}`;
         }
         let wishCurrency = document.getElementById("wish-counter-display");
         wishCurrency.innerHTML = wishCurrency.innerHTML.replace(/[^<]+</g, `${saveValues.mailCore}<`);
@@ -6471,8 +6470,8 @@ function wish() {
             } else {
                 let upgradeDictTemp = upgradeDict[randomWishHero];
                 upgradeDictTemp.Purchased = -1;
-                upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * 0.01 * (STARTINGWISHFACTOR + wishMultiplier)/500 * wishPower + 1) ;
-                upgradeDictTemp["BaseCost"] = Math.round(saveValues["dps"] * (65) + 1);
+                upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * 0.01 * (STARTINGWISHFACTOR + wishMultiplier)/2500 + 1);
+                upgradeDictTemp["BaseCost"] = Math.round(saveValues["dps"] * (65) * wishPower + 1);
                 upgradeDictTemp["BaseFactor"] = upgradeDictTemp["Factor"];
                 upgradeDictTemp["Contribution"] = 0;
                 
@@ -7399,6 +7398,103 @@ function addNutStore() {
     nutStoreTable.append(shopHeader,nutTranscend,nutShopDiv,nutAscend,nutButtonContainer,nutStoreCurrency);
     mainTable.appendChild(nutStoreTable);
     calculateGoldenCore();
+
+    if (beta) {
+        let ascend = document.getElementById('nut-shop-ascend');
+        ascend.innerText = '';
+        let ascendText = document.createElement('p');
+        ascendText.innerText = "Mark characters for Ascension";
+
+        let elementContainer = document.createElement('div');
+        elementContainer.classList.add('flex-row');
+        elementContainer.activeElement;
+        elementContainer.activeChar = null;
+        const boxBeta = ["Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
+        for (let i = 0; i < boxBeta.length; i++) {
+            let text = document.createElement('img');
+            text.classList.add("nut-element",'dim-filter');
+            text.ele = boxBeta[i];
+            text.src = `./assets/tooltips/elements/nut-${boxBeta[i]}.webp`;
+            elementContainer.appendChild(text);
+
+            text.addEventListener('click',()=>{
+                if (elementContainer.activeElement) {
+                    if (!elementContainer.activeElement.classList.contains('dim-filter')) elementContainer.activeElement.classList.add('dim-filter');
+                }
+
+                if (text.classList.contains('dim-filter')) text.classList.remove('dim-filter');
+                elementContainer.activeElement = text;
+                showChar(boxBeta[i]);
+            })
+        }
+
+        let characterContainer = document.createElement('div');
+        characterContainer.classList.add('flex-row');
+        let characterImgContainer = document.createElement('div');
+        characterImgContainer.classList.add('nut-char-container');
+        let ascendInfo = document.createElement('div');
+        ascendInfo.classList.add('ascend-info');
+        let ascendTooltips = document.createElement('p');
+
+        let ascendCurency = document.createElement('div');
+        ascendCurency.classList.add('flex-row');
+        let ascendNumber = document.createElement('p');
+        let ascendEle = new Image();
+        ascendEle.src = '';
+        ascendEle.classList.add('icon','primogem');
+
+        ascendCurency.append(ascendNumber,ascendEle);
+        ascendInfo.append(ascendTooltips,ascendCurency)
+        characterContainer.append(characterImgContainer,ascendInfo);
+        ascend.append(ascendText,elementContainer,characterContainer);
+
+        function showChar(ele) {
+            ascendTooltips.innerText = '';
+            ascendNumber.innerText = `${persistentValues.ascendEle[ele]}`;
+            ascendEle.src = `./assets/tooltips/inventory/solid${ele}.webp`;
+
+            characterImgContainer.style.opacity = 0;
+            elementContainer.activeChar = null;
+            while (characterImgContainer.firstChild) {
+                characterImgContainer.removeChild(characterImgContainer.firstChild);
+            }
+
+            const charArray = [];
+            for (let key in upgradeDict) {
+                if (upgradeDict[key].Purchased > 0) {
+                    if (upgradeInfo[key].Ele === ele || upgradeInfo[key].Ele === "Any") {
+                        charArray.push(upgradeInfo[key].Name);
+                        let charImg = new Image();
+                        charImg.classList.add('dim-filter');
+                        charImg.src = `./assets/tooltips/hero/${upgradeInfo[key].Name}.webp`;
+                        charImg.addEventListener('click',()=>{
+                            let level = persistentValues.ascendDict[upgradeInfo[key].Name];
+                            ascendNumber.innerText = `${persistentValues.ascendEle[ele]} / ${(2**level)}`;
+                            charImg.classList.remove('dim-filter');
+                            ascendTooltipsInfo(upgradeInfo[key].Name, level);
+
+                            if (elementContainer.activeChar) {
+                                if (elementContainer.activeChar != charImg) elementContainer.activeChar.classList.add('dim-filter');
+                            }
+
+                            elementContainer.activeChar = charImg;
+                        })
+
+                        characterImgContainer.append(charImg);
+                    }
+                }
+            }
+            setTimeout(()=>{characterImgContainer.style.opacity = 1;},100)
+        }
+
+        function ascendTooltipsInfo(name, level) {
+            ascendTooltips.innerText = `${name}
+                                    Ascension ${level}
+                                    \n ${100 + level * 10}% >> ${100 + (level + 1) * 10}%
+                                    Base ${name === "Nahida" ? "Nuts per Click" : "NpS"}
+                                    `;
+        }
+    }
 }
 
 function calculateGoldenCore(type) {
@@ -7430,7 +7526,7 @@ function createTranscendMenu() {
         transcendMenu.style.zIndex = -1;
     })
 
-    mainBody.appendChild(transcendMenu)
+    mainBody.appendChild(transcendMenu);
 }
 
 let transcendDelay = null;

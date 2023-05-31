@@ -229,15 +229,14 @@ body {
     height: 25%;
 }
 
-#nut-shop-div, #nut-shop-transcend {
+#nut-shop-div, #nut-shop-transcend, #nut-shop-ascend {
     height: 65%;
-    width: 80%;
+    width: 95%;
     top: 20%;
 }
 
 .nut-shop-button {
-    height: 60%;
-    width: 87%;
+    height: 50%;
 }
 
 #nut-store-currency {
