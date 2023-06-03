@@ -1989,10 +1989,17 @@ function tabChange(x) {
         if (nutStoreTemp.style.display === "flex") {nutStoreTemp.style.display = "none"}
     }
 
-    if (document.getElementById("pet-table")) {
-        let petTemp = document.getElementById("pet-table");
-        if (petTemp.style.display === "flex") {petTemp.style.display = "none"}
+    if (document.getElementById('tree-table')) {
+        let treeTable = document.getElementById("tree-table");
+        if (treeTable.style.display === "flex") {treeTable.style.display = "none";}
+        let treeSide = document.getElementById("tree-side");
+        if (treeSide.style.display === "flex") {treeSide.style.display = "none";}
     }
+
+    // if (document.getElementById("pet-table")) {
+    //     let petTemp = document.getElementById("pet-table");
+    //     if (petTemp.style.display === "flex") {petTemp.style.display = "none"}
+    // }
 
     if (x == 0) {
         if (filterDiv.style.display !== "flex") {filterDiv.style.display = "flex"};
@@ -3630,7 +3637,7 @@ function createAdventure() {
         }
         if (beta) {
             if (event.key === "a") {
-                adventure('10-');
+                createTreeMenu();
             } else if (event.key === "s") {
                 notifPop("clearAll","rank",2);
                 notifPop("clearAll","quest",1);
@@ -3639,7 +3646,6 @@ function createAdventure() {
                 notifPop("add","quest",1);
             }
         }
-        // if (event.key === "l") {createPetShop()}        
     })
 
     adventureFight.append(fightTextbox,adventureFightDodge,adventureFightSkill,adventureFightBurst);
@@ -5833,6 +5839,7 @@ function loseHP(ATK,type,mobClass) {
     if (!fightSceneOn) {return}
     let healthBar = document.getElementById('health-bar');
     let hpInterval = (100/healthBar.maxHealth);
+    let adventureHealth = document.getElementById('adventure-health');
 
     if (type == "inverse") {
         healthBar.currentWidth += (hpInterval * ATK);
@@ -5843,6 +5850,12 @@ function loseHP(ATK,type,mobClass) {
         if (mobClass != "Superboss") {
             comboHandler("reset");
         }
+
+        adventureHealth.style.animation = 'shake 1s infinite linear';
+        setTimeout(()=>{
+            void adventureHealth.offsetWidth;
+            adventureHealth.style.animation = '';
+        },1000);
     }
 
     healthBar.style.width = `${healthBar.currentWidth}%`;
@@ -7290,9 +7303,9 @@ function addNutStore() {
     nutStoreButton.addEventListener("click",()=>{
         calculateGoldenCore();
         universalStyleCheck(nutStoreTable,"display","flex","none");
-        if (document.getElementById("pet-table")) {
-            let petTemp = document.getElementById("pet-table");
-            if (petTemp.style.display === "flex") {petTemp.style.display = "none"}
+        if (document.getElementById('tree-table')) {
+            universalStyleCheck(document.getElementById("tree-table"),"display","flex","none",true);
+            universalStyleCheck(document.getElementById("tree-side"),"display","flex","none",true);
         }
     })
     leftDiv.appendChild(nutStoreButton);
@@ -7488,11 +7501,19 @@ function addNutStore() {
         }
 
         function ascendTooltipsInfo(name, level) {
-            ascendTooltips.innerText = `${name}
-                                    Ascension ${level}
-                                    \n ${100 + level * 10}% >> ${100 + (level + 1) * 10}%
-                                    Base ${name === "Nahida" ? "Nuts per Click" : "NpS"}
-                                    `;
+            let text = `${name}
+                        <br> Ascension ${level}
+                        <br><br> ${100 + level * 10}% >> [green]${100 + (level + 1) * 10}</span>%
+                        <br>Base ${name === "Nahida" ? "Nuts per Click" : "NpS"}
+                        <br><br> ${100 + level * 2}% >> [red]${100 + (level + 1) * 2}</span>%
+                        <br>Base Cost
+                        `;
+
+            text = textReplacer({
+                '[green]':`<span style='color:#417428'>`,
+                '[red]':`<span style='color:#9E372D'>`,
+            },text)
+            ascendTooltips.innerHTML = text;
         }
     }
 }
@@ -7651,275 +7672,379 @@ function updateCoreCounter() {
     nutCounter.innerHTML = nutCounter.innerHTML.replace(/[^<]+</g, `${currentCount}<`);
 }
 
-//-------------------------------------------- PET  ------------------------------------------------------//
-const propDict = {};
-function createPetShop() {
-    let petTable = document.createElement("div");
-    petTable.classList.add("table-without-tooltip","pet-table");
-    petTable.id = 'pet-table';
+//-------------------------------------------- TREES ------------------------------------------------------//
+function createTreeMenu() {
+    const mainTable = rightDiv.childNodes[1];
+    const treeTable = document.createElement('div');
+    treeTable.classList.add('flex-column','table-without-tooltip');
+    treeTable.id = 'tree-table';
+    treeTable.style.display = "flex";
+    const treeSide = document.createElement('div');
+    treeSide.classList.add('adventure-map');
+    treeSide.id = 'tree-side';
+    treeSide.style.display = "flex";
 
-    let mainTable = rightDiv.childNodes[1];
-    mainTable.appendChild(petTable);
+    const sandImg = new Image();
+    sandImg.src = './assets/tree/sand.webp';
+    sandImg.classList.add('tree-sand');
 
-    let petButton = document.createElement("button");
-    petButton.classList.add("nut-store-access","pet-access");
-    petButton.addEventListener("click",()=>{
-        universalStyleCheck(petTable,"display","flex","none");
-        if (document.getElementById("nut-store-table")) {
-            let nutStoreTemp = document.getElementById("nut-store-table");
-            if (nutStoreTemp.style.display === "flex") {nutStoreTemp.style.display = "none"}
-        }
-    })
-    leftDiv.appendChild(petButton);
+    const treeImg = new Image();
+    treeImg.src = './assets/tree/tree-2.webp';
+    treeImg.classList.add('tree-two');
+    const treeImg2 = new Image();
+    treeImg2.src = './assets/tree/tree-3.webp';
+    treeImg2.classList.add('tree-three');
+    const treeImg3 = new Image();
+    treeImg3.src = './assets/tree/tree-4.webp';
+    treeImg3.classList.add('tree-four');
 
-    Konva.showWarnings = false;
-    let stage = new Konva.Stage({
-        container: 'pet-table',
-        width: petTable.offsetWidth,
-        height: petTable.offsetHeight
-      });
+    const treeHealthContainer = document.createElement('div');
+    treeHealthContainer.classList.add('tree-health');
+    const treeNut = new Image();
+    treeNut.src = './assets/icon/nut.webp';
+    const treeHealthText = document.createElement('p');
+    treeHealthText.innerText = '100%';
+    treeHealthContainer.append(treeNut,treeHealthText);
+
+    function createCloud(range) {
+        let cloudImg = new Image();
+        cloudImg.classList.add('cloud');
+        cloudImg.style.top = (randomInteger(range * 100, (range + 1) * 100)/10) + '%';
+        cloudImg.style.animation = `slide ${randomInteger(2000,9000)/100}s linear`;
+        cloudImg.style.width = `${randomInteger(150,350)/10}%`;
+        cloudImg.src = `assets/tree/cloud${randomInteger(1,5)}.webp`;
+
+        cloudImg.addEventListener('animationend',() => {
+            cloudImg.style.animation = 'unset';
+            void cloudImg.offsetWidth;
+            cloudImg.style.top = (randomInteger(range * 100, (range + 1) * 100)/10) + '%';
+            cloudImg.style.animation = `slide ${randomInteger(2000,9000)/100}s linear`;
+            cloudImg.style.width = `${randomInteger(150,350)/10}%`;
+        })
+        treeSide.appendChild(cloudImg);
+    }
+
+    createCloud(0)
+    createCloud(0.5)
+    createCloud(1)
+    createCloud(1.5)
+    createCloud(2.5)
+    createCloud(4)
+
+    // let chains = document.createElement('div');
+    // chains.classList.add('chain-lock','cover-all');
+
+    treeSide.append(sandImg,treeImg,treeImg2,treeImg3,treeHealthContainer);
+
+    const palmText = document.createElement('p');
+    palmText.innerText = 'Palm Energy: 100';
+
+    const optionsContainer = document.createElement('div');
+    optionsContainer.classList.add('flex-row','options-container');
+    const optionsTextArray = ['Bless','Fertilize','Destroy'];
+    for (let i = 0; i < 3; i++) {
+        let treeButton = document.createElement('div');
+        let optionImg = new Image();
+        optionImg.src = `./assets/tree/option-${i}.webp`;
+        let optionText = document.createElement('p');
+        optionText.innerText = optionsTextArray[i];
+
+        treeButton.append(optionImg,optionText);
+        optionsContainer.appendChild(treeButton)
+    }
+
+    const affinityContainer = document.createElement('div');
+    affinityContainer.classList.add('flex-row','affinity-container');
+    affinityContainer.innerText = 'Element\n Affinity';
+
+    let container = document.createElement('div');
+    container.classList.add('flex-row');
+    let element = rollArray(boxElement,1);
+    container.style.background = `url(./assets/tooltips/elements/nut-${element.toLowerCase()}.webp) no-repeat center center/contain`;
+    affinityContainer.appendChild(container);
     
-    let layer = new Konva.Layer();
-    addProp(layer,stage,"stool",{"width":stage.width()/2,"height":stage.height()/2})
-    addProp(layer,stage,"trampoline",{"width":stage.width()/3,"height":stage.height()/1.5})
-    addPet(layer,stage,"icon/petShop");
-    addPet(layer,stage,"icon/petShop");
-    addPet(layer,stage,"icon/petShop");
-    addPet(layer,stage,"icon/petShop");
-    stage.add(layer);
+    treeTable.append(palmText,optionsContainer,affinityContainer);
+    leftDiv.appendChild(treeSide);
+    mainTable.appendChild(treeTable);
+
+    let nutStoreButton = document.createElement("button");
+    nutStoreButton.classList.add("nut-store-access","pet-access");
+    nutStoreButton.addEventListener("click",()=>{
+        universalStyleCheck(treeTable,"display","none","flex",true);
+        universalStyleCheck(treeSide,"display","none","flex",true);
+    })
+    leftDiv.appendChild(nutStoreButton);
 }
 
-function addProp(layer,stage,type,coords) {
-    let imageObj = new Image();
-    imageObj.src = `/assets/icon/${type}.webp`;
-    imageObj.onload = ()=> {
-        const chairImage = new Konva.Image({
-            image: imageObj,
-            x: coords["width"],
-            y: coords["height"],
-            width: stage.height() * 0.30 * imageObj.width / imageObj.height,
-            height: stage.height() * 0.30 ,
-          });
+//-------------------------------------------- PET ------------------------------------------------------//
+// const propDict = {};
+// function createPetShop() {
+//     let petTable = document.createElement("div");
+//     petTable.classList.add("table-without-tooltip","pet-table");
+//     petTable.id = 'pet-table';
 
-        layer.add(chairImage);
-        chairImage.zIndex(0)
-        propDict[type] = {
-            "obj":chairImage,
-            "occupied":false,
-            "pet":null,
-            "type":type,
-        }
-    }
-}
+//     let mainTable = rightDiv.childNodes[1];
+//     mainTable.appendChild(petTable);
 
-function addPet(layer,stage,source) {
-    let imageObj = new Image();
-    imageObj.src = `/assets/${source}.webp`;
-    imageObj.onload = () => {
-        let pet = new Konva.Image({
-            image: imageObj,
-            x: stage.width() / 40 * randomInteger(1,31),
-            y: stage.height() / 40 * randomInteger(1,31),
-            width: stage.height() * 0.20 * imageObj.width / imageObj.height,
-            height: stage.height() * 0.20,
-            offsetX: stage.height() * 0.10 * imageObj.width / imageObj.height,
-            offsetY: stage.height() * 0.10 ,
-            draggable: true,
-            dragBoundFunc: function(pos) {
-                let newX = Math.max(this.width()/2, Math.min(stage.width() - this.width()/2, pos.x));
-                let newY = Math.max(this.height()/2, Math.min(stage.height() - this.height()/2, pos.y));
-                return {
-                    x: newX,
-                    y: newY
-                };
-            }
-        });
+//     let petButton = document.createElement("button");
+//     petButton.classList.add("nut-store-access","pet-access");
+//     petButton.addEventListener("click",()=>{
+//         universalStyleCheck(petTable,"display","flex","none");
+//         if (document.getElementById("nut-store-table")) {
+//             let nutStoreTemp = document.getElementById("nut-store-table");
+//             if (nutStoreTemp.style.display === "flex") {nutStoreTemp.style.display = "none"}
+//         }
+//     })
+//     leftDiv.appendChild(petButton);
+
+//     Konva.showWarnings = false;
+//     let stage = new Konva.Stage({
+//         container: 'pet-table',
+//         width: petTable.offsetWidth,
+//         height: petTable.offsetHeight
+//       });
+    
+//     let layer = new Konva.Layer();
+//     addProp(layer,stage,"stool",{"width":stage.width()/2,"height":stage.height()/2})
+//     addProp(layer,stage,"trampoline",{"width":stage.width()/3,"height":stage.height()/1.5})
+//     addPet(layer,stage,"icon/petShop");
+//     addPet(layer,stage,"icon/petShop");
+//     addPet(layer,stage,"icon/petShop");
+//     addPet(layer,stage,"icon/petShop");
+//     stage.add(layer);
+// }
+
+// function addProp(layer,stage,type,coords) {
+//     let imageObj = new Image();
+//     imageObj.src = `/assets/icon/${type}.webp`;
+//     imageObj.onload = ()=> {
+//         const chairImage = new Konva.Image({
+//             image: imageObj,
+//             x: coords["width"],
+//             y: coords["height"],
+//             width: stage.height() * 0.30 * imageObj.width / imageObj.height,
+//             height: stage.height() * 0.30 ,
+//           });
+
+//         layer.add(chairImage);
+//         chairImage.zIndex(0)
+//         propDict[type] = {
+//             "obj":chairImage,
+//             "occupied":false,
+//             "pet":null,
+//             "type":type,
+//         }
+//     }
+// }
+
+// function addPet(layer,stage,source) {
+//     let imageObj = new Image();
+//     imageObj.src = `/assets/${source}.webp`;
+//     imageObj.onload = () => {
+//         let pet = new Konva.Image({
+//             image: imageObj,
+//             x: stage.width() / 40 * randomInteger(1,31),
+//             y: stage.height() / 40 * randomInteger(1,31),
+//             width: stage.height() * 0.20 * imageObj.width / imageObj.height,
+//             height: stage.height() * 0.20,
+//             offsetX: stage.height() * 0.10 * imageObj.width / imageObj.height,
+//             offsetY: stage.height() * 0.10 ,
+//             draggable: true,
+//             dragBoundFunc: function(pos) {
+//                 let newX = Math.max(this.width()/2, Math.min(stage.width() - this.width()/2, pos.x));
+//                 let newY = Math.max(this.height()/2, Math.min(stage.height() - this.height()/2, pos.y));
+//                 return {
+//                     x: newX,
+//                     y: newY
+//                 };
+//             }
+//         });
         
-        layer.add(pet);
-        pet.zIndex(1);
+//         layer.add(pet);
+//         pet.zIndex(1);
 
-        const getRandomPositionWithinStage = () => {
-            const x = Math.random() * (stage.width() - pet.width());
-            const y = Math.random() * (stage.height() - pet.height());
-            return { x, y };
-        };
+//         const getRandomPositionWithinStage = () => {
+//             const x = Math.random() * (stage.width() - pet.width());
+//             const y = Math.random() * (stage.height() - pet.height());
+//             return { x, y };
+//         };
 
-        let randomPosition = getRandomPositionWithinStage();
-        let speed = randomInteger(20,40);
-        const calculateDisplacement = function(randomPosition,pet) {
-            return ((randomPosition.y - pet.y())**2 + (randomPosition.x - pet.x())**2);
-        }
+//         let randomPosition = getRandomPositionWithinStage();
+//         let speed = randomInteger(20,40);
+//         const calculateDisplacement = function(randomPosition,pet) {
+//             return ((randomPosition.y - pet.y())**2 + (randomPosition.x - pet.x())**2);
+//         }
 
-        const resetAnimation = function(time) {
-            do {
-                randomPosition = getRandomPositionWithinStage();
-            } while (calculateDisplacement(randomPosition,pet) < 100)
-            setTimeout(()=>{
-                speed = randomInteger(20,40);
-                animMove.start();
-            },time);
-        }
+//         const resetAnimation = function(time) {
+//             do {
+//                 randomPosition = getRandomPositionWithinStage();
+//             } while (calculateDisplacement(randomPosition,pet) < 100)
+//             setTimeout(()=>{
+//                 speed = randomInteger(20,40);
+//                 animMove.start();
+//             },time);
+//         }
 
-        pet.on('dragstart', function() {
-            animMove.stop();
-            if (animIdle.isRunning()) {animIdle.stop()};
-            for (let key in propDict) {
-                if (propDict[key]["pet"] == pet) {
-                    propDict[key]["pet"] = null;
-                    propDict[key]["occupied"] = false;
-                }
-            }
-        });
+//         pet.on('dragstart', function() {
+//             animMove.stop();
+//             if (animIdle.isRunning()) {animIdle.stop()};
+//             for (let key in propDict) {
+//                 if (propDict[key]["pet"] == pet) {
+//                     propDict[key]["pet"] = null;
+//                     propDict[key]["occupied"] = false;
+//                 }
+//             }
+//         });
 
-        pet.on('dragend', function() {
-            for (let i = 0; i < animArray.length; i++) {
-                if (animArray[i].isRunning()) {return};
-            } 
+//         pet.on('dragend', function() {
+//             for (let i = 0; i < animArray.length; i++) {
+//                 if (animArray[i].isRunning()) {return};
+//             } 
 
-            let propCheck = isPetOnProp();
-            if (propCheck) {
-                propCheck["occupied"] = true;
-                propCheck["pet"] = pet;
+//             let propCheck = isPetOnProp();
+//             if (propCheck) {
+//                 propCheck["occupied"] = true;
+//                 propCheck["pet"] = pet;
 
-                pet.position({
-                  x: propCheck["obj"].x() + propCheck["obj"].width() / 2,
-                  y: propCheck["obj"].y()
-                });
+//                 pet.position({
+//                   x: propCheck["obj"].x() + propCheck["obj"].width() / 2,
+//                   y: propCheck["obj"].y()
+//                 });
 
-                centerX = pet.x();
-                animIdle.start();
-            } else {
-                if (animIdle.isRunning()) {animIdle.stop()};
-                rollAnim();
-            }
-        });
+//                 centerX = pet.x();
+//                 animIdle.start();
+//             } else {
+//                 if (animIdle.isRunning()) {animIdle.stop()};
+//                 rollAnim();
+//             }
+//         });
 
-        pet.on('dblclick', function() {
-            animMove.stop();
-            if (animIdle.isRunning()) {animIdle.stop()};
-            for (let i = 0; i < animArray.length; i++) {
-                if (animArray[i].isRunning()) {return};
-            }
+//         pet.on('dblclick', function() {
+//             animMove.stop();
+//             if (animIdle.isRunning()) {animIdle.stop()};
+//             for (let i = 0; i < animArray.length; i++) {
+//                 if (animArray[i].isRunning()) {return};
+//             }
 
-            for (let key in propDict) {
-                if (propDict[key]["pet"] == pet) {
-                    propDict[key]["pet"] = null;
-                    propDict[key]["occupied"] = false;
-                }
-            }
+//             for (let key in propDict) {
+//                 if (propDict[key]["pet"] == pet) {
+//                     propDict[key]["pet"] = null;
+//                     propDict[key]["occupied"] = false;
+//                 }
+//             }
             
-            rollAnim();
-        });
+//             rollAnim();
+//         });
 
-        let centerX;
-        const animIdle = new Konva.Animation((frame)=>{
-            var amplitude = 10;
-            var period = 4000;
-            let newX = amplitude * Math.sin((frame.time * 2 * Math.PI) / period) + centerX;
-            pet.x(newX)
-        })
+//         let centerX;
+//         const animIdle = new Konva.Animation((frame)=>{
+//             var amplitude = 10;
+//             var period = 4000;
+//             let newX = amplitude * Math.sin((frame.time * 2 * Math.PI) / period) + centerX;
+//             pet.x(newX)
+//         })
         
-        const animJello = new Konva.Animation((frame)=>{
-            let scale = 1 + (Math.sin(frame.time * 0.005) * 0.03);
-            pet.scale({
-                 x: scale, 
-                 y: scale,
-            });
+//         const animJello = new Konva.Animation((frame)=>{
+//             let scale = 1 + (Math.sin(frame.time * 0.005) * 0.03);
+//             pet.scale({
+//                  x: scale, 
+//                  y: scale,
+//             });
 
-            if (frame.time > 2500) {
-                resetAnimation(100);
-                frame.time = 0;
-                animJello.stop();
-            }
-        })
+//             if (frame.time > 2500) {
+//                 resetAnimation(100);
+//                 frame.time = 0;
+//                 animJello.stop();
+//             }
+//         })
 
-        let acceleration;
-        let velocity;
-        let Ydistance;
-        const animJump = new Konva.Animation((frame)=>{
-            Ydistance = velocity * frame.timeDiff;
-            velocity = velocity + acceleration * frame.timeDiff / 1000;
+//         let acceleration;
+//         let velocity;
+//         let Ydistance;
+//         const animJump = new Konva.Animation((frame)=>{
+//             Ydistance = velocity * frame.timeDiff;
+//             velocity = velocity + acceleration * frame.timeDiff / 1000;
 
-            let newY = pet.y() - Ydistance;
-            pet.y(newY);
+//             let newY = pet.y() - Ydistance;
+//             pet.y(newY);
 
-            if (frame.time > 2000) {
-                resetAnimation(200);
-                frame.time = 0;
-                animJump.stop();
-            }
-        });
+//             if (frame.time > 2000) {
+//                 resetAnimation(200);
+//                 frame.time = 0;
+//                 animJump.stop();
+//             }
+//         });
        
-        const animRotate = new Konva.Animation((frame)=>{
-            let angleDiff = 288;
-            let angle = (frame.time * angleDiff) / 1000;
-            pet.rotation(angle);
+//         const animRotate = new Konva.Animation((frame)=>{
+//             let angleDiff = 288;
+//             let angle = (frame.time * angleDiff) / 1000;
+//             pet.rotation(angle);
 
-            if (frame.time > 2500) {
-                pet.rotation(0);
-                resetAnimation(200);
-                frame.time = 0;
-                animRotate.stop();
-            }
-        })
+//             if (frame.time > 2500) {
+//                 pet.rotation(0);
+//                 resetAnimation(200);
+//                 frame.time = 0;
+//                 animRotate.stop();
+//             }
+//         })
 
-        const animMove = new Konva.Animation((frame) => {
-            for (let i = 0; i < animArray.length; i++) {
-                if (animArray[i].isRunning()) {animMove.stop()}
-            } 
+//         const animMove = new Konva.Animation((frame) => {
+//             for (let i = 0; i < animArray.length; i++) {
+//                 if (animArray[i].isRunning()) {animMove.stop()}
+//             } 
             
-            // WHEN SWITCHING BROWSER TABS, PET MOVEMENT CONTINUES FAR OUT OF BOUNDARIES, AND RETURNS AFTER SOME TIME
-            // IM NOT SURE WHAT CAUSES THIS GLITCH SO WORKAROUND IS TO FORCE RESPAWN
-            let distance = speed * frame.timeDiff / 1000 * randomInteger(90,110) / 100;
-            if (pet.x() > stage.width() || pet.x() < 0 || pet.y() > stage.height() || pet.y() < 0) {
-                pet.x(stage.width() / 40 * randomInteger(1,31));
-                pet.y(stage.height() / 40 * randomInteger(1,31));
-            }
+//             // WHEN SWITCHING BROWSER TABS, PET MOVEMENT CONTINUES FAR OUT OF BOUNDARIES, AND RETURNS AFTER SOME TIME
+//             // IM NOT SURE WHAT CAUSES THIS GLITCH SO WORKAROUND IS TO FORCE RESPAWN
+//             let distance = speed * frame.timeDiff / 1000 * randomInteger(90,110) / 100;
+//             if (pet.x() > stage.width() || pet.x() < 0 || pet.y() > stage.height() || pet.y() < 0) {
+//                 pet.x(stage.width() / 40 * randomInteger(1,31));
+//                 pet.y(stage.height() / 40 * randomInteger(1,31));
+//             }
 
-            let angle = Math.atan2(randomPosition.y - pet.y(), randomPosition.x - pet.x());
-            let newX = pet.x() + distance * Math.cos(angle);
-            let newY = pet.y() + distance * Math.sin(angle);
+//             let angle = Math.atan2(randomPosition.y - pet.y(), randomPosition.x - pet.x());
+//             let newX = pet.x() + distance * Math.cos(angle);
+//             let newY = pet.y() + distance * Math.sin(angle);
 
-            pet.x(newX);
-            pet.y(newY);
+//             pet.x(newX);
+//             pet.y(newY);
 
-            if (calculateDisplacement(randomPosition,pet) < 50) {
-                animMove.stop();
-                setTimeout(()=>{rollAnim()},500)
-                do {
-                    randomPosition = getRandomPositionWithinStage();
-                } while (calculateDisplacement(randomPosition,pet) < 1000)
-            }
-        }, layer);
+//             if (calculateDisplacement(randomPosition,pet) < 50) {
+//                 animMove.stop();
+//                 setTimeout(()=>{rollAnim()},500)
+//                 do {
+//                     randomPosition = getRandomPositionWithinStage();
+//                 } while (calculateDisplacement(randomPosition,pet) < 1000)
+//             }
+//         }, layer);
 
-        let animArray = [animJello,animRotate,animJump];
-        function rollAnim() {
-            acceleration = -0.15;
-            velocity = 0.15;
-            rollArray(animArray,0).start();
-        }
+//         let animArray = [animJello,animRotate,animJump];
+//         function rollAnim() {
+//             acceleration = -0.15;
+//             velocity = 0.15;
+//             rollArray(animArray,0).start();
+//         }
 
-        function isPetOnProp() {
-            for (let key in propDict) {
-                if (propDict[key]["occupied"]) {continue}
-                let propBounds = propDict[key]["obj"].getClientRect();
-                let petTransform = pet.getAbsoluteTransform();
-                let petPosition = petTransform.point({ x: 0, y: 0 });
-                petPosition.x += pet.width() / 2;
-                petPosition.y += pet.height() / 2;
+//         function isPetOnProp() {
+//             for (let key in propDict) {
+//                 if (propDict[key]["occupied"]) {continue}
+//                 let propBounds = propDict[key]["obj"].getClientRect();
+//                 let petTransform = pet.getAbsoluteTransform();
+//                 let petPosition = petTransform.point({ x: 0, y: 0 });
+//                 petPosition.x += pet.width() / 2;
+//                 petPosition.y += pet.height() / 2;
 
-                if (petPosition.x > propBounds.x && petPosition.x < (propBounds.x + propBounds.width) && 
-                    petPosition.y > propBounds.y && petPosition.y < (propBounds.y + propBounds.height)) {
-                    return propDict[key];
-                } else {
-                    continue;
-                }
-            }
-        }
+//                 if (petPosition.x > propBounds.x && petPosition.x < (propBounds.x + propBounds.width) && 
+//                     petPosition.y > propBounds.y && petPosition.y < (propBounds.y + propBounds.height)) {
+//                     return propDict[key];
+//                 } else {
+//                     continue;
+//                 }
+//             }
+//         }
 
-        animMove.start();
-    }
-}
+//         animMove.start();
+//     }
+// }
 
 //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
 // REFRESH SCORES & ENERGY
@@ -8183,11 +8308,11 @@ if (beta) {
 
     function startingFunction() {
         // PRESS A KEY
-        // const event = new KeyboardEvent('keydown', {
-        //     key: '3',
-        // });
+        const event = new KeyboardEvent('keydown', {
+            key: 'a',
+        });
           
-        // document.dispatchEvent(event);
+        document.dispatchEvent(event);
         // document.getElementById('char-selected').click();
         // document.getElementById('char-select-0').click();
         // document.getElementById('char-selected').click();

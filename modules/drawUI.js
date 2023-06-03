@@ -331,7 +331,7 @@ const patchDict = {
     <br><br><line>Systems Rework 🌰: </line><br><br>
         </indent>
         1. Expedition UI rework <br>
-        The Expedition map can now be moved without clicking the image of the map itself. The zoom slider has been replaced with +/- buttons which should be provide easier navigation for all devices.
+        The Expedition map can now be moved without clicking the image of the map itself. The zoom slider has been replaced with +/- buttons which should provide easier navigation for all devices.
 
         <br><br> 2. Progression adjustments <br>
         NpS and character costs have been further increased at the upper level. These changes may only be obvious near Inazuman characters. 

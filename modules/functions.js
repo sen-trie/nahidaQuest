@@ -2,9 +2,9 @@
 function abbrNum(number,digits,short) {
     let decPlaces = Math.pow(10, 3);
     let abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion",
-                  " Undecillion", " Duodecillion", " Tredecillion", " Quattuordecillion", " Quindecillion", " Sexdecillion"," Septendecillion", " Octodecillion",
-                  " Novemdecillion", " Vigintillion", " Unvigintillion", " Duovigintillion", " Trevigintillion", " Quattuorvigintillion", " Quinvigintillion",
-                  " Sexvigintillion", " Septenvigintillion"," Octovigintillion", " Nonvigintillion", " Trigintillion", " Untrigintillion", " Duotrigintillion"
+                  " Undecill", " Duodecill", " Tredecill", " Quattuordecill", " Quindecill", " Sexdecill"," Septendecill", " Octodecill",
+                  " Novemdecill", " Vigintill", " Unvigintill", " Duovigintill", " Trevigintill", " Quattuorvigintill", " Quinvigintill",
+                  " Sexvigintill", " Septenvigintill"," Octovigintill", " Nonvigintill", " Trigintill", " Untrigintill", " Duotrigintill"
     ];
     let abbrevShort = [""," M"," B"," T"," Qd"," Qt"," Sx"," Sp", " O", " N", " D", " Ud", " Dd", " Td", " Qa", " Qi", " Sxd", " Spd", " Od", " Nd", 
                     " V", " Uv", " Dv", " Tv", " Qtv", " Sv", " Spv", " Ov", " Nv", " Tn", " Ut", " Dt"];
@@ -162,11 +162,17 @@ function textReplacer(dictReplace,originalText) {
 }
 
 // TOGGLES CSS STYLE
-function universalStyleCheck(ele,styleCheck,paramOn,paramOff) {
-    if (ele.style[styleCheck] === paramOn) {
-        ele.style[styleCheck] = paramOff;
+function universalStyleCheck(ele,styleCheck,paramOn,paramOff,forced) {
+    if (forced) {
+        if (ele.style[styleCheck] !== paramOff) {
+            ele.style[styleCheck] = paramOff;
+        }
     } else {
-        ele.style[styleCheck] = paramOn;
+        if (ele.style[styleCheck] === paramOn) {
+            ele.style[styleCheck] = paramOff;
+        } else {
+            ele.style[styleCheck] = paramOn;
+        }
     }
 
     return ele;

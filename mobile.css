@@ -148,6 +148,8 @@ body {
 .score-container {
     top: 0;
     height: 16%;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 #demo-container {

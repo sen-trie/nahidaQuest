@@ -384,8 +384,10 @@ table, button, label {
     justify-content: space-around;
     top: 10%;
     width: 100%;
-    height: 9.25%;
+    height: fit-content;
     background-color: rgba(0, 0, 0, 0.727);
+    padding-top: 1%;
+    padding-bottom: 1%;
     z-index: 11;
     font-size: inherit;
 }
@@ -3358,6 +3360,25 @@ input:checked + .slider:before {
     transition: 0.2s ease-out;
 }
 
+@keyframes shake {
+    0%,
+    100% {
+        transform: translate(-55%,0)
+    }
+    10%,
+    30%,
+    50%,
+    70% {
+        transform: translate(-55%,3%)
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translate(-55%,-3%)
+    }
+}
+
 .adventure-video > div {
     width: 25%;
     height: 85%;
@@ -4550,7 +4571,7 @@ input:checked + .slider:before {
     filter: drop-shadow(0 0 0.8em #f7c624);
 }
 
-.nut-store-table {
+.nut-store-table, #tree-table {
     position: absolute;
     left: 0;
     top: 0;
@@ -4856,7 +4877,7 @@ img[src=""] {
     justify-content: space-evenly;
 }
 
-.transcend-dark::before {
+.transcend-dark::before, .chain-lock::before {
     content: "";
     position: absolute;
     top: 0;
@@ -4959,14 +4980,178 @@ img[src=""] {
     filter: drop-shadow(0 0 0.8em #6fadf9);
 }
 
-.pet-table {
+/* .pet-table {
     position: absolute;
     left: 0;
     top: 0;
     z-index: 500;
     background-color: #6fadf9;
+} */
+
+/*//////////// TREE CSS /////////////*/
+#tree-table {
+    height: 100%;
+    padding: 2%;
+    box-sizing: border-box;
+    justify-content: space-between;
 }
 
+#tree-table::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    z-index: -1;
+    filter: opacity(0.9);
+    background: url(./assets/bg/tree-bg.jpg) no-repeat center center/cover;
+}
+
+#tree-table > p {
+    color: white;
+    font-size: 1.5em;
+    text-shadow: var(--text-shadow-075);
+}
+
+.options-container {
+    width: 100%;
+    max-height: 30%;
+    gap:2%;
+}
+
+.options-container > div {
+    justify-content: space-evenly;
+    max-width: 30%;
+    height: auto;
+    background-color: #CEE573;
+    border: 0.2em solid #3B6F51;
+    border-radius: 1em;
+    text-align: center;
+    padding: 1%;
+    color: #163f26;
+}
+
+.options-container > div > img {
+    width: 100%;
+    filter: drop-shadow(0 0 0.1em black);
+    object-fit: contain;
+
+}
+
+#tree-side {
+    background: linear-gradient(to bottom, #ACA9FC, #D2EEFC);
+}
+
+.tree-sand {
+    position: absolute;
+    bottom: 0;
+    min-width: 100%;
+    height: 30%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.1em black);
+}
+
+.tree-two, .tree-three, .tree-four {
+    position: absolute;
+    bottom: 15%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.1em black);
+    max-height: 70%;
+}
+
+.tree-health {
+    position: absolute;
+    right: 2%;
+    bottom: 1%;
+    height: 15%;
+    aspect-ratio: 1;
+}
+
+.tree-health > img {
+    max-height: 100%;
+    object-fit: cover;
+    filter: drop-shadow(0 0 0.1em black);
+}
+
+.tree-health > p {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.756);
+    color: white;
+    border-radius: 0.2em;
+    padding: 2%;
+}
+
+.tree-two {
+    width: 50%;
+    display: none;
+}
+
+.tree-three {
+    width: 70%;
+    display: none;
+    
+}
+
+.tree-four {
+    width: 95%;
+    display: block;
+}
+
+.cloud {
+    z-index: -1;
+    right: 100%;
+    position: absolute;
+    width: 20%;
+    height: auto;
+    touch-action: none;
+    /* right: 100%; */
+}
+
+@keyframes slide {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(600%);
+    }
+}
+
+.affinity-container {
+    width: auto;
+    height: 10%;
+    background-color: yellow;
+    padding: 1%;
+    gap:2%;
+}
+
+.affinity-container > div:first-of-type {
+    margin-left: 5%;
+}
+
+.affinity-container > div {
+    height: 100%;
+    width: auto;
+    aspect-ratio: 1;
+    align-items: flex-end;
+}
+
+.affinity-container > div > p {
+    transform: translateY(90%);
+}
+
+.chain-lock::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: url(./assets/bg/chains.webp) no-repeat center center/cover;
+}
+
+/*//////////// OTHER CSS /////////////*/
 .beta-warning {
     position: absolute;
     left: 49%;
