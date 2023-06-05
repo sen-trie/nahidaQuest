@@ -198,7 +198,7 @@ let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
-const EVENTCOOLDOWN = 80;
+const EVENTCOOLDOWN = 90;
 const BOUNTYCOOLDOWN = 60;
 const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
@@ -372,13 +372,14 @@ let fightEnemyDownElement = new Audio("./assets/sfx/battle-enemyDown.mp3");
 let fightEncounter = new Audio("./assets/sfx/battle-encounter.mp3");
 let parrySuccess = new Audio("./assets/sfx/battle-parry-success.mp3");
 let parryFailure = new Audio("./assets/sfx/battle-parry-fail.mp3");
+let simonElement = new Audio();
 let sfxArray = [
     tabElement,demoElement,upgradeElement,mailElement,
     achievementElement,eventElement,reactionStartElement,
     reactionCorrectElement,weaselBurrow,weaselDecoy,
     adventureElement,shopElement,
     fightEncounter,fightEnemyDownElement,fightLoseElement,fightWinElement,
-    parrySuccess,parryFailure
+    parrySuccess,parryFailure,simonElement
 ];
 
 let timerLoad = setInterval(timerEventsLoading,50);
@@ -777,6 +778,7 @@ function idleCheck(idleAmount) {
 let eventTimes = 1;
 let eventChance = 0;
 function randomEventTimer(timerSeconds) {
+    if (beta) {eventCooldownDecrease = 0.05}
     let eventTimeMin = EVENTCOOLDOWN * eventTimes * eventCooldownDecrease;
     if (eventChance !== 0) {
         let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/((EVENTCOOLDOWN * eventCooldownDecrease)/2))
@@ -802,6 +804,8 @@ function startRandomEvent() {
     } else {
         aranaraNumber = randomInteger(1,4);
     }
+
+    if (beta) {aranaraNumber = 8}
      
     eventPicture.classList.add("random-event");
     eventPicture.addEventListener("click", () => {
@@ -817,11 +821,14 @@ function startRandomEvent() {
 
     let eventPictureImg = document.createElement("img");
     eventPictureImg.classList.add("event-pic-img");
-    if (aranaraNumber < 4) {
-        eventPictureImg.src = "./assets/icon/event-easy.webp";
-    } else {
+    if (aranaraNumber > 6) {
+        eventPictureImg.src = "./assets/icon/event-three.webp";
+        eventPictureImg.classList.add("vibrate-more");
+    } else if (aranaraNumber > 3) {
         eventPictureImg.src = "./assets/icon/event-hard.webp";
         eventPictureImg.classList.add("vibrate-more");
+    } else {
+        eventPictureImg.src = "./assets/icon/event-easy.webp";
     }
     eventPicture.appendChild(eventPictureImg);
     mainBody.appendChild(eventPicture);
@@ -855,10 +862,16 @@ function clickedEvent(aranaraNumber) {
     eventDropdownImage.classList.add("event-dropdown-image");
     
     eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
-    eventDropdown.addEventListener("animationend", () => {
+    if (beta) {
         eventDropdown.remove();
         chooseEvent(aranaraNumber,specialEvent);
-    });
+    } else {
+        eventDropdown.addEventListener("animationend", () => {
+            eventDropdown.remove();
+            chooseEvent(aranaraNumber,specialEvent);
+        });
+    }
+    
     mainBody.appendChild(eventDropdown);
 }
 
@@ -883,6 +896,12 @@ function chooseEvent(type,specialMode) {
             break;
         case 6:
             rainEvent();
+            break;
+        case 7:
+            simonEvent(randomInteger(1,3) === 2 ? true : false);
+            break;
+        case 8:
+            battleshipEvent();
             break;
         default:
             console.error("Event error: Invalid event");
@@ -1486,7 +1505,7 @@ function rainEvent() {
     eventDescription.classList.add("event-description");
     eventDescription.style.position = "absolute";
     eventDescription.style.top = "1%";
-    eventBackdrop.append(eventDescription)
+    eventBackdrop.append(eventDescription);
 
     rainText.classList.add("event-rain-text");
     let dpsMultiplier = (saveValues.dps + 1)* 10;
@@ -1565,6 +1584,151 @@ function rainEvent() {
                 }
         }),8000})
     }, 28000);
+    mainBody.append(eventBackdrop);
+}
+
+// EVENT 7 (SIMON SAYS)
+function simonEvent(hexMode) {
+    stopSpawnEvents = true;
+    let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
+
+    let eventDescription = document.createElement("p");
+    eventDescription.innerText = "Follow the sequence! [1]";
+    eventDescription.classList.add("event-description");
+    eventDescription.style.position = "absolute";
+    eventDescription.style.top = "1%";
+    eventBackdrop.append(eventDescription);
+
+    let saysContainer = document.createElement('div');
+    saysContainer.sequenceArray = [];
+    saysContainer.activeArray = [];
+    saysContainer.ready = false;
+    let requiredAmount;
+
+    if (hexMode) {
+        requiredAmount = 7;
+        saysContainer.classList.add('hex-container');
+        const hexArray = {
+            1:[-46,-74.5], 2:[53.5,-74.5], 3:[103,0], 4:[53,74.5], 5:[-47,74], 6:[-96,0]
+        }
+        for (let i = 1; i < 7; i++) {
+            let saysImg = document.createElement('img');
+            saysImg.src = `./assets/event/hex-${i}.webp`;
+            saysImg.id = `says-${i}`;
+            saysImg.classList.add('say-img');
+            saysImg.style.filter = 'brightness(0.1)';
+            saysImg.style.transform = `translate(${hexArray[i][0]}%, ${hexArray[i][1]}%)`;
+            saysImg.addEventListener('click',()=>{
+                saysClick(i);
+            })
+            saysContainer.appendChild(saysImg);
+        }
+    } else {
+        requiredAmount = 8;
+        saysContainer.classList.add('say-container');
+        for (let i = 1; i < 5; i++) {
+            let saysImg = document.createElement('img');
+            saysImg.src = `./assets/event/says-${i}.webp`;
+            saysImg.id = `says-${i}`;
+            saysImg.classList.add('say-img');
+            saysImg.style.filter = 'brightness(0.1)';
+            saysImg.style.transform = `translate(${(((i === 1) || (i === 4)) ? -1 : 1) * 50}%, ${(i < 3 ? -1 : 1) * 50}%)`;
+            saysImg.addEventListener('click',()=>{
+                saysClick(i);
+            })
+            saysContainer.appendChild(saysImg);
+        }
+    }
+
+    setTimeout(()=>{
+        addSequence();
+    },2000);
+
+    function showSequence(array) {
+        let colorPick = array[0];
+        let activeElement = document.getElementById(`says-${colorPick}`);
+        activeElement.style.filter = 'brightness(1)';
+
+        simonElement.src = `./assets/sfx/simon-${colorPick}.mp3`;
+        simonElement.load();
+        simonElement.play();
+
+        setTimeout(()=>{
+            activeElement.style.filter = 'brightness(0.1)';
+            array.shift();
+            if (array.length === 0) {
+                saysContainer.ready = true;
+            } else {
+                setTimeout(() => {showSequence(array);},550);   
+            }
+        },750);
+    }
+
+    function addSequence() {
+        let colorPick = randomInteger(1,5);
+        if (hexMode) {colorPick = randomInteger(1,7)}
+
+        saysContainer.sequenceArray.push(colorPick);
+        // JAVASCRIPT PASSES REFERENCES SO THIS IS NEEDED TO PREVENT MODIFICATIONS TO THE ORIGINAL
+        showSequence(Array.from(saysContainer.sequenceArray));
+    }
+
+    function saysClick(number) {
+        if (!saysContainer.ready) {return}
+        saysContainer.ready = false;
+        saysContainer.activeArray.push(number);
+
+        let activeElement = document.getElementById(`says-${number}`);
+        activeElement.style.filter = 'brightness(1)';
+
+        simonElement.src = `./assets/sfx/simon-${number}.mp3`;
+        simonElement.load();
+        simonElement.play();
+
+        for (let i = 0; i < saysContainer.activeArray.length; i++) {
+            if (saysContainer.activeArray[i] !== saysContainer.sequenceArray[i]) {
+                let eventText = `You missed the sequence!`;
+                eventOutcome(eventText,eventBackdrop,"simon");
+                return;
+            }
+        }
+        
+        setTimeout(()=>{
+            activeElement.style.filter = 'brightness(0.1)';
+            if (saysContainer.activeArray.length >= requiredAmount) {
+                let eventText = `You win!`;
+                eventOutcome(eventText,eventBackdrop,"simon");
+                return;
+            } else if (saysContainer.sequenceArray.length === saysContainer.activeArray.length) {
+                setTimeout(()=>{
+                    saysContainer.activeArray = [];
+                    eventDescription.innerText = `Follow the sequence! [${saysContainer.sequenceArray.length+1}]`;
+                    addSequence();
+                },500)
+            } else {
+                saysContainer.ready = true;
+            }
+        },350);
+    }
+
+    eventBackdrop.append(saysContainer);
+    mainBody.append(eventBackdrop);
+}
+
+// EVENT 8 (BATTLESHIP)
+function battleshipEvent() {
+    stopSpawnEvents = true;
+    let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
+
+    let eventDescription = document.createElement("p");
+    eventDescription.innerText = "Hide your keys!";
+    eventDescription.classList.add("event-description");
+    eventDescription.style.position = "absolute";
+    eventDescription.style.top = "1%";
+    eventBackdrop.append(eventDescription);
+
     mainBody.append(eventBackdrop);
 }
 
@@ -8308,11 +8472,11 @@ if (beta) {
 
     function startingFunction() {
         // PRESS A KEY
-        const event = new KeyboardEvent('keydown', {
-            key: 'a',
-        });
+        // const event = new KeyboardEvent('keydown', {
+        //     key: 'a',
+        // });
           
-        document.dispatchEvent(event);
+        // document.dispatchEvent(event);
         // document.getElementById('char-selected').click();
         // document.getElementById('char-select-0').click();
         // document.getElementById('char-selected').click();

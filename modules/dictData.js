@@ -1054,6 +1054,8 @@ const eventText = {
     4: "A whopperflower infestation has occured in the area - please help to identify them!",
     5: "Weasel thieves has been hoarding the Ajilenakh Nuts for themselves, we need to catch them!",
     6: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
+    7: "Let's play a game! Follow Arachatora's rhythm to win a prize!",
+    8: "We dug up a strange lens that can reveal underground items. Let's see who's better at using it!",
 }
 
 const challengeInfo = [

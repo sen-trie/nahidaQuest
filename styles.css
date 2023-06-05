@@ -1353,6 +1353,28 @@ table, button, label {
     }
 }
 
+.say-container, .hex-container {
+    position: absolute;
+    width: auto;
+    height: 30%;
+    aspect-ratio: 0.920;
+}
+
+.say-container {
+    background: url(./assets/event/says-0.webp) no-repeat center center/cover;
+}
+
+.hex-container {
+    background: url(./assets/event/hex-0.webp) no-repeat center center/contain;
+}
+
+.say-img {
+    position: absolute;
+    height: 100%;
+    object-fit: contain;
+    transition: 0.2s ease;
+}
+
 /*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
 .temp-buff {
     position: relative;
