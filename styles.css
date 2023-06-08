@@ -1375,6 +1375,112 @@ table, button, label {
     transition: 0.2s ease;
 }
 
+.battleship-div {
+    position: relative;
+    top: 5%;
+    width: auto;
+    max-width: 90%;
+    height: 85%;
+    aspect-ratio: 2.3;
+    background-color: yellow;
+    z-index: 1;
+}
+
+.battleship-left, .battleship-right {
+    width: 50%;
+    height: 100%;
+    background-color: pink;
+    padding: 1%;
+    box-sizing: border-box;
+}
+
+.key-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    height: 15%;
+    width: 100%;
+    box-sizing: border-box;
+    column-gap: 2%;
+}
+
+.key-container > * {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+}
+
+.key-container > button {
+    background: url(./assets/expedbg/refresh.webp) no-repeat center center/contain;
+    transition: 0.2s ease;
+}
+
+.key-container > button:last-of-type:hover {
+    transform: scale(1.1);
+}
+
+.key-container > button:last-of-type {
+    background: url(./assets/tutorial/buttonBox.webp) no-repeat center center/contain;
+    font: inherit;
+    width: 100%;
+    height: 100%;
+    font-size: 0.9em;
+    color: #28360d;
+}
+
+.key-container > p, .battleship-right > p {
+    width: 100%;
+    transform: translateY(15%);
+    text-align: center;
+    font-size: 2em;
+    color: white;
+    text-shadow: var(--text-shadow-075);
+}
+
+.key-container > p {
+    position: absolute;
+}
+
+.battleship-right > p {
+    height: 15%;
+    
+}
+
+.battleship-container {
+    position: relative;
+    max-width: 100%;
+    flex-grow: 1;
+    aspect-ratio: 1;
+    background-color: green;
+    display: grid;
+    grid-template: repeat(auto-fit, minmax(20%, 1fr)) / repeat(auto-fit, minmax(20%, 1fr));
+}
+
+.battleship-container > div {
+    border: 1px solid black;
+    position: relative;
+}
+
+.battleship-container > div > img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 10;
+}
+
+.block-input::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    pointer-events: all;
+    z-index: 20;
+}
+
 /*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
 .temp-buff {
     position: relative;

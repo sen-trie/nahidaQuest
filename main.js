@@ -1668,7 +1668,6 @@ function simonEvent(hexMode) {
     function addSequence() {
         let colorPick = randomInteger(1,5);
         if (hexMode) {colorPick = randomInteger(1,7)}
-
         saysContainer.sequenceArray.push(colorPick);
         // JAVASCRIPT PASSES REFERENCES SO THIS IS NEEDED TO PREVENT MODIFICATIONS TO THE ORIGINAL
         showSequence(Array.from(saysContainer.sequenceArray));
@@ -1726,9 +1725,344 @@ function battleshipEvent() {
     eventDescription.innerText = "Hide your keys!";
     eventDescription.classList.add("event-description");
     eventDescription.style.position = "absolute";
-    eventDescription.style.top = "1%";
+    eventDescription.style.top = "2%";
     eventBackdrop.append(eventDescription);
 
+    const battleshipContainer = document.createElement('div');
+    battleshipContainer.classList.add('battleship-div','flex-row');
+    const battleshipLeft = document.createElement('div');
+    battleshipLeft.classList.add('battleship-left','flex-column');
+    const battleshipRight = document.createElement('div');
+    battleshipRight.classList.add('battleship-right','flex-column');
+
+    let keyContainer = document.createElement('div');
+    keyContainer.classList.add('key-container');
+    keyContainer.disp;
+    keyContainer.activeKey;
+    keyContainer.horizontal = true;
+
+    let rotateButton = document.createElement('button');
+    rotateButton.addEventListener('click',() => {
+        keyContainer.horizontal = !(keyContainer.horizontal);
+        rotateButton.style.transform = keyContainer.horizontal ? 'unset' : 'rotate(90deg)';
+    })
+    let confirmButton = document.createElement('button');
+    confirmButton.addEventListener('click',() => {startBattleship(rotateButton, confirmButton, keyContainer)})
+    confirmButton.innerText = 'Confirm Placement';
+    confirmButton.style.gridColumn = 'span 3';
+    confirmButton.style.display = 'none';
+    keyContainer.append(rotateButton, confirmButton);
+
+    for (let i = 0; i < 3; i++) {
+        let key = new Image();
+        key.src = `./assets/event/key-${i+1}.webp`;
+        key.disp = i + 1;
+        key.horizontal;
+        key.pos = [];
+
+        // key.id = `event-key-${i}`;
+        key.classList.add('dim-filter');
+        key.style.gridColumn = `span ${key.disp}`;
+        key.addEventListener('click',() => {selectKey(key)})
+        keyContainer.appendChild(key);
+    }
+
+    const friendlyDiv = document.createElement('div');
+    friendlyDiv.id = 'friendly-div'
+    friendlyDiv.classList.add('battleship-container');
+    friendlyDiv.grid = {};
+    for (let i = 0; i < 5; i++) {
+        friendlyDiv.grid[i+1] = [false,false,false,false,false];
+        for (let j = 0; j < 5; j++) {
+            let container = document.createElement('div');
+            container.pos = i * 5 + j;
+            container.addEventListener('click',(event) => {
+                event.stopPropagation();
+                addKey(container, i, j);
+            })
+            friendlyDiv.append(container);
+        }
+    }
+
+    function selectKey(key) {
+        if (keyContainer.activeKey) {
+            if (keyContainer.activeKey != key) {
+                keyContainer.activeKey.classList.add('dim-filter');
+            }
+        }
+
+        if (key.pos.length !== 0) {
+            returnKey(key);
+        } else {
+            if (key.classList.contains('dim-filter')) key.classList.remove('dim-filter');
+            keyContainer.activeKey = key;
+            keyContainer.disp = key.disp;
+        }
+    }
+
+    function returnKey(key) {
+        let length = key.disp;
+        if (key.horizontal) {
+            while (length > 0) {
+                friendlyDiv.grid[key.pos[0] + 1][key.pos[1] + length - 1] = false;
+                length--;
+            }
+        } else {
+            while (length > 0) {
+                friendlyDiv.grid[key.pos[0] + length][key.pos[1]] = false;
+                length--;
+            }
+        }
+
+        key.pos = [];
+        key.style.width = '90%';
+        key.style.transform = 'unset';
+        key.style.gridColumn = `span ${key.disp}`;
+        if (!key.classList.contains('dim-filter')) key.classList.add('dim-filter');
+        setTimeout(() => {
+            keyContainer.append(key);
+            checkKeyContainer();
+        },0);
+    }
+
+    function keyCollision(type, objectInfo) {
+        let row = objectInfo.row;
+        let column = objectInfo.column;
+        let horizontal = objectInfo.horizontal;
+        let key = objectInfo.key;
+        let length = keyContainer.disp;
+
+        if (type === 'friendly') {
+            if (horizontal) {
+                if (column + length > 5) {
+                    let offset = column + length - 5;
+                    addKey(getSiblingAbove(objectInfo.cell, offset, 1), row, column - offset);
+                    return;
+                }
+    
+                // THIS TO CHECK IF THE CELLS HAS KEYS FIRST
+                // COMBINING THEM WILL NOT UNDO ANY CELLS ALREADY SET TO TRUE
+                // IF A CELL IS DETERMINED TO HAVE A KEY HALFWAY
+                while (length > 0) {
+                    if (friendlyDiv.grid[row + 1][column + length - 1]) {return};
+                    length--;
+                }
+                length = keyContainer.disp;
+                 
+                while (length > 0) {
+                    friendlyDiv.grid[row + 1][column + length - 1] = true;
+                    length--;
+                }
+                key.horizontal = true;
+            } else {
+                if (row + length > 5) {
+                    let offset = row + length - 5;
+                    addKey(getSiblingAbove(objectInfo.cell, offset, 5), row - offset, column);
+                    return;
+                }
+    
+                while (length > 0) {
+                    if (friendlyDiv.grid[row + length][column]) {return};
+                    length--;
+                }
+                length = keyContainer.disp;
+                
+                while (length > 0) {
+                    friendlyDiv.grid[row + length][column] = true;
+                    length--;
+                }
+                key.horizontal = false;
+                key.style.transform = 'rotate(90deg) translate(0, -100%)';
+                key.style.transformOrigin = '0 0';
+            }
+        } else if (type === 'enemy') {
+
+        }
+    }
+
+    function addKey(cell, row, column) {
+        if (keyContainer.activeKey) {
+            let length = keyContainer.disp;
+            let key = keyContainer.activeKey;
+            key.style.transform = 'unset';
+
+            keyCollision('friendly',{
+                row: row,
+                column: column,
+                horizontal: keyContainer.horizontal,
+                key: key,
+                cell: cell,
+            })
+
+
+            // if (keyContainer.horizontal) {
+            //     if (column + length > 5) {
+            //         let offset = column + length - 5;
+            //         addKey(getSiblingAbove(cell, offset, 1), row, column - offset);
+            //         return;
+            //     }
+    
+            //     // THIS TO CHECK IF THE CELLS HAS KEYS FIRST
+            //     // COMBINING THEM WILL NOT UNDO ANY CELLS ALREADY SET TO TRUE
+            //     // IF A CELL IS DETERMINED TO HAVE A KEY HALFWAY
+            //     while (length > 0) {
+            //         if (friendlyDiv.grid[row + 1][column + length - 1]) {return};
+            //         length--;
+            //     }
+            //     length = keyContainer.disp;
+                 
+            //     while (length > 0) {
+            //         friendlyDiv.grid[row + 1][column + length - 1] = true;
+            //         length--;
+            //     }
+            //     key.horizontal = true;
+            // } else {
+            //     if (row + length > 5) {
+            //         let offset = row + length - 5;
+            //         addKey(getSiblingAbove(cell, offset, 5), row - offset, column );
+            //         return;
+            //     }
+    
+            //     while (length > 0) {
+            //         if (friendlyDiv.grid[row + length][column]) {return};
+            //         length--;
+            //     }
+            //     length = keyContainer.disp;
+                
+            //     while (length > 0) {
+            //         friendlyDiv.grid[row + length][column] = true;
+            //         length--;
+            //     }
+            //     key.horizontal = false;
+            //     key.style.transform = 'rotate(90deg) translate(0, -100%)';
+            //     key.style.transformOrigin = '0 0';
+            // }
+
+            key.pos = [row, column];
+            keyContainer.activeKey = null;
+            key.style.width = `${keyContainer.disp}00%`;
+            keyContainer.disp = null;
+            if (key.classList.contains('dim-filter')) key.classList.remove('dim-filter');
+            cell.appendChild(key);
+            checkKeyContainer();
+        }
+    }
+
+    function getSiblingAbove(element, offset, multiples) {
+        let sibling = element.previousElementSibling;
+        offset *= multiples
+        offset--;
+
+        while (offset > 0) {
+            sibling = sibling.previousElementSibling;
+            offset--;
+        }
+        
+        return sibling;
+    }
+
+    function checkKeyContainer() {
+        if (keyContainer.children.length === 2) {
+            confirmButton.style.display = 'block';
+        } else {
+            confirmButton.style.display = 'none';
+        }
+    }
+
+    const enemyDiv = document.createElement('div');
+    enemyDiv.classList.add('battleship-container');
+    const textSide = document.createElement('p');
+    textSide.innerText = 'Other Side';
+    
+    enemyDiv.grid = {};
+    for (let i = 0; i < 5; i++) {
+        enemyDiv.grid[i+1] = [false,false,false,false,false];
+        for (let j = 0; j < 5; j++) {
+            let container = document.createElement('div');
+            container.pos = i * 5 + j;
+            container.addEventListener('click',(event) => {
+                event.stopPropagation();
+                console.log(enemyDiv.grid);
+            })
+            enemyDiv.append(container);
+        }
+    }
+
+    for (let i = 1; i < 4; i++) {
+        populateEnemy(enemyDiv.grid, i);
+    }
+
+    console.log(enemyDiv.grid)
+    
+
+    function populateEnemy(grid, length) {
+        let column = randomInteger(1,6);
+        let row = randomInteger(1,6);
+        let horizontal = randomInteger(1,3) === 1 ? true : false;
+
+        let tempLength = length;
+        if (horizontal) {
+            if (column + length > 5) {
+                populateEnemy(grid, length);
+                return;
+            }
+
+            
+
+            while (tempLength > 0) {
+                if (grid[row][column + tempLength - 1]) {
+                    console.log([row][column + tempLength - 1])
+                    populateEnemy(grid, length);
+                    return;
+                }
+                tempLength--;
+            }
+             
+            while (length > 0) {
+                grid[row][column + length - 1] = true;
+                length--;
+            }
+        } else {
+            if (row + length > 5) {
+                populateEnemy(grid, length);
+                return;
+            }
+
+            while (tempLength > 0) {
+                if (grid[row + tempLength - 1][column]) {
+                    populateEnemy(grid, length);
+                    return;
+                }
+                tempLength--;
+            }
+            
+            while (length > 0) {
+                grid[row + length - 1][column] = true;
+                length--;
+            }
+            // key.style.transform = 'rotate(90deg) translate(0, -100%)';
+            // key.style.transformOrigin = '0 0';
+        }
+    }
+
+
+
+    console.log(enemyDiv.grid)
+
+    function startBattleship(rotateButton, confirmButton, keyContainer) {
+        friendlyDiv.classList.add('block-input');
+        rotateButton.remove();
+        confirmButton.remove();
+
+        const textSide = document.createElement('p');
+        textSide.innerText = 'Your Side';
+        keyContainer.appendChild(textSide);
+    }
+
+    battleshipLeft.append(keyContainer,friendlyDiv);
+    battleshipRight.append(textSide,enemyDiv);
+    battleshipContainer.append(battleshipLeft,battleshipRight);
+    eventBackdrop.append(battleshipContainer);
     mainBody.append(eventBackdrop);
 }
 
@@ -4925,7 +5259,7 @@ function drawAdventure(advType,wave) {
 
     let preloadedImage = new Image();
     preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp`;
-    preloadedImage.onload = ()=> {
+    preloadedImage.onload = () => {
         adventureArea.style.zIndex = 500;
         adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
         adventureTextBox.addEventListener("animationend",textFadeIn,true);
