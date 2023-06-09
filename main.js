@@ -1730,6 +1730,7 @@ function battleshipEvent() {
 
     const battleshipContainer = document.createElement('div');
     battleshipContainer.classList.add('battleship-div','flex-row');
+    battleshipContainer.gameStarted = false;
     const battleshipLeft = document.createElement('div');
     battleshipLeft.classList.add('battleship-left','flex-column');
     const battleshipRight = document.createElement('div');
@@ -1746,6 +1747,7 @@ function battleshipEvent() {
         keyContainer.horizontal = !(keyContainer.horizontal);
         rotateButton.style.transform = keyContainer.horizontal ? 'unset' : 'rotate(90deg)';
     })
+
     let confirmButton = document.createElement('button');
     confirmButton.addEventListener('click',() => {startBattleship(rotateButton, confirmButton, keyContainer)})
     confirmButton.innerText = 'Confirm Placement';
@@ -1778,7 +1780,7 @@ function battleshipEvent() {
             container.pos = i * 5 + j;
             container.addEventListener('click',(event) => {
                 event.stopPropagation();
-                addKey(container, i, j);
+                addKey(container, i, j);  
             })
             friendlyDiv.append(container);
         }
@@ -1832,57 +1834,69 @@ function battleshipEvent() {
         let key = objectInfo.key;
         let length = keyContainer.disp;
 
-        if (type === 'friendly') {
-            if (horizontal) {
-                if (column + length > 5) {
-                    let offset = column + length - 5;
-                    addKey(getSiblingAbove(objectInfo.cell, offset, 1), row, column - offset);
-                    return;
-                }
-    
-                // THIS TO CHECK IF THE CELLS HAS KEYS FIRST
-                // COMBINING THEM WILL NOT UNDO ANY CELLS ALREADY SET TO TRUE
-                // IF A CELL IS DETERMINED TO HAVE A KEY HALFWAY
-                while (length > 0) {
-                    if (friendlyDiv.grid[row + 1][column + length - 1]) {return};
-                    length--;
-                }
-                length = keyContainer.disp;
-                 
-                while (length > 0) {
-                    friendlyDiv.grid[row + 1][column + length - 1] = true;
-                    length--;
-                }
-                key.horizontal = true;
-            } else {
-                if (row + length > 5) {
-                    let offset = row + length - 5;
-                    addKey(getSiblingAbove(objectInfo.cell, offset, 5), row - offset, column);
-                    return;
-                }
-    
-                while (length > 0) {
-                    if (friendlyDiv.grid[row + length][column]) {return};
-                    length--;
-                }
-                length = keyContainer.disp;
-                
-                while (length > 0) {
-                    friendlyDiv.grid[row + length][column] = true;
-                    length--;
-                }
-                key.horizontal = false;
-                key.style.transform = 'rotate(90deg) translate(0, -100%)';
-                key.style.transformOrigin = '0 0';
+        if (horizontal) {
+            if (column + length > 5) {
+                let offset = column + length - 5;
+                let newCell = getSiblingAbove(objectInfo.cell, offset, 1);
+                keyCollision('friendly',{
+                    ...objectInfo, cell: newCell, column: (column - offset)
+                    }
+                )
+                return;
             }
-        } else if (type === 'enemy') {
 
+            // THIS TO CHECK IF THE CELLS HAS KEYS FIRST
+            // COMBINING THEM WILL NOT UNDO ANY CELLS ALREADY SET TO TRUE
+            // IF A CELL IS DETERMINED TO HAVE A KEY HALFWAY
+            while (length > 0) {
+                if (friendlyDiv.grid[row + 1][column + length - 1]) {return};
+                length--;
+            }
+            length = keyContainer.disp;
+            
+            while (length > 0) {
+                friendlyDiv.grid[row + 1][column + length - 1] = true;
+                length--;
+            }
+            key.horizontal = true;
+        } else {
+            if (row + length > 5) {
+                let offset = row + length - 5;
+                let newCell = getSiblingAbove(objectInfo.cell, offset, 5);
+                keyCollision('friendly',{
+                    ...objectInfo, cell: newCell, row: (row - offset)
+                    }
+                )
+                return;
+            }
+
+            while (length > 0) {
+                if (friendlyDiv.grid[row + length][column]) {return};
+                length--;
+            }
+            length = keyContainer.disp;
+            
+            while (length > 0) {
+                friendlyDiv.grid[row + length][column] = true;
+                length--;
+            }
+            key.horizontal = false;
+            key.style.transform = 'rotate(90deg) translate(0, -100%)';
+            key.style.transformOrigin = '0 0';
         }
+
+        key.pos = [row, column];
+        key.style.width = `${keyContainer.disp}00%`;
+        keyContainer.disp = null;
+        keyContainer.activeKey = null;
+
+        if (key.classList.contains('dim-filter')) key.classList.remove('dim-filter');
+        objectInfo.cell.appendChild(key);
+        checkKeyContainer();
     }
 
     function addKey(cell, row, column) {
         if (keyContainer.activeKey) {
-            let length = keyContainer.disp;
             let key = keyContainer.activeKey;
             key.style.transform = 'unset';
 
@@ -1893,71 +1907,19 @@ function battleshipEvent() {
                 key: key,
                 cell: cell,
             })
-
-
-            // if (keyContainer.horizontal) {
-            //     if (column + length > 5) {
-            //         let offset = column + length - 5;
-            //         addKey(getSiblingAbove(cell, offset, 1), row, column - offset);
-            //         return;
-            //     }
-    
-            //     // THIS TO CHECK IF THE CELLS HAS KEYS FIRST
-            //     // COMBINING THEM WILL NOT UNDO ANY CELLS ALREADY SET TO TRUE
-            //     // IF A CELL IS DETERMINED TO HAVE A KEY HALFWAY
-            //     while (length > 0) {
-            //         if (friendlyDiv.grid[row + 1][column + length - 1]) {return};
-            //         length--;
-            //     }
-            //     length = keyContainer.disp;
-                 
-            //     while (length > 0) {
-            //         friendlyDiv.grid[row + 1][column + length - 1] = true;
-            //         length--;
-            //     }
-            //     key.horizontal = true;
-            // } else {
-            //     if (row + length > 5) {
-            //         let offset = row + length - 5;
-            //         addKey(getSiblingAbove(cell, offset, 5), row - offset, column );
-            //         return;
-            //     }
-    
-            //     while (length > 0) {
-            //         if (friendlyDiv.grid[row + length][column]) {return};
-            //         length--;
-            //     }
-            //     length = keyContainer.disp;
-                
-            //     while (length > 0) {
-            //         friendlyDiv.grid[row + length][column] = true;
-            //         length--;
-            //     }
-            //     key.horizontal = false;
-            //     key.style.transform = 'rotate(90deg) translate(0, -100%)';
-            //     key.style.transformOrigin = '0 0';
-            // }
-
-            key.pos = [row, column];
-            keyContainer.activeKey = null;
-            key.style.width = `${keyContainer.disp}00%`;
-            keyContainer.disp = null;
-            if (key.classList.contains('dim-filter')) key.classList.remove('dim-filter');
-            cell.appendChild(key);
-            checkKeyContainer();
         }
     }
 
     function getSiblingAbove(element, offset, multiples) {
         let sibling = element.previousElementSibling;
-        offset *= multiples
+        offset *= multiples;
         offset--;
 
         while (offset > 0) {
             sibling = sibling.previousElementSibling;
             offset--;
         }
-        
+
         return sibling;
     }
 
@@ -1976,27 +1938,41 @@ function battleshipEvent() {
     
     enemyDiv.grid = {};
     for (let i = 0; i < 5; i++) {
-        enemyDiv.grid[i+1] = [false,false,false,false,false];
+        enemyDiv.grid[i + 1] = [false,false,false,false,false];
         for (let j = 0; j < 5; j++) {
             let container = document.createElement('div');
             container.pos = i * 5 + j;
             container.addEventListener('click',(event) => {
                 event.stopPropagation();
-                console.log(enemyDiv.grid);
+                if (battleshipContainer.gameStarted) {markTile('enemy', i, j)}
             })
             enemyDiv.append(container);
         }
     }
 
-    for (let i = 1; i < 4; i++) {
-        populateEnemy(enemyDiv.grid, i);
+    const friendChildren = friendlyDiv.children;
+    friendlyDiv.score = 3 + 2 + 1;
+    const enemyChildren = enemyDiv.children;
+    enemyDiv.score = 3 + 2 + 1;
+    
+    const enemyKeys = [];
+    for (let i = 0; i < 3; i++) {
+        let key = new Image();
+        key.src = `./assets/event/key-${i+1}.webp`;
+        key.disp = i + 1;
+
+
+        enemyKeys.push({
+            key: key,  
+            pos: []
+        })
+        populateEnemy(enemyDiv.grid, i + 1);
     }
 
-    console.log(enemyDiv.grid)
-    
+    // MAKE IT ASYNC LATER
 
     function populateEnemy(grid, length) {
-        let column = randomInteger(1,6);
+        let column = randomInteger(0,5);
         let row = randomInteger(1,6);
         let horizontal = randomInteger(1,3) === 1 ? true : false;
 
@@ -2007,20 +1983,19 @@ function battleshipEvent() {
                 return;
             }
 
-            
-
             while (tempLength > 0) {
                 if (grid[row][column + tempLength - 1]) {
-                    console.log([row][column + tempLength - 1])
                     populateEnemy(grid, length);
                     return;
                 }
                 tempLength--;
             }
+
+            tempLength = length;
              
-            while (length > 0) {
-                grid[row][column + length - 1] = true;
-                length--;
+            while (tempLength > 0) {
+                grid[row][column + tempLength - 1] = true;
+                tempLength--;
             }
         } else {
             if (row + length > 5) {
@@ -2035,19 +2010,36 @@ function battleshipEvent() {
                 }
                 tempLength--;
             }
+
+            tempLength = length;
             
+            while (tempLength > 0) {
+                grid[row + tempLength - 1][column] = true;
+                tempLength--;
+            }
+        }
+
+        console.log(enemyKeys)
+
+        enemyKeys[length - 1].pos = [row, column, horizontal];
+        let key = enemyKeys[length - 1].key;
+        key.style.width = `${length}00%`;
+        
+        enemyChildren[(row - 1) * 5 + column].appendChild(key);
+        if (!horizontal) {
+            key.style.transform = 'rotate(90deg) translate(0, -100%)';
+            key.style.transformOrigin = '0 0';
             while (length > 0) {
-                grid[row + length - 1][column] = true;
+                enemyChildren[(row + length - 2) * 5 + column].key = key;
                 length--;
             }
-            // key.style.transform = 'rotate(90deg) translate(0, -100%)';
-            // key.style.transformOrigin = '0 0';
+        } else {
+            while (length > 0) {
+                enemyChildren[(row - 1) * 5 + column + (length - 1)].key = key;
+                length--;
+            }
         }
     }
-
-
-
-    console.log(enemyDiv.grid)
 
     function startBattleship(rotateButton, confirmButton, keyContainer) {
         friendlyDiv.classList.add('block-input');
@@ -2057,6 +2049,68 @@ function battleshipEvent() {
         const textSide = document.createElement('p');
         textSide.innerText = 'Your Side';
         keyContainer.appendChild(textSide);
+
+        battleshipContainer.gameStarted = true;
+    }
+
+    function markTile(type, row, column) {
+        if (type === 'enemy') {
+            let cross = document.createElement('p')
+            if (enemyDiv.grid[row + 1][column] === true) {
+                cross.innerText = 'X';
+                enemyDiv.score--;
+                checkScore('enemy')
+            } else if (enemyDiv.grid[row + 1][column] === false) {
+                cross.innerText = 'O';
+            } else {
+                console.log(enemyDiv.grid)
+                return;
+            }
+
+            markTile('friendly');
+            enemyChildren[row * 5 + column].appendChild(cross);
+            enemyDiv.grid[row + 1][column] = 0;
+            showEnemyKey(enemyChildren[row * 5 + column])
+        } else if (type === 'friendly') {
+            let row = randomInteger(0,5);
+            let column = randomInteger(0,5);
+
+            let cross = document.createElement('p')
+            if (friendlyDiv.grid[row + 1][column] === true) {
+                cross.innerText = 'X';
+                friendlyDiv.score--;
+                checkScore('friendly')
+            } else if (friendlyDiv.grid[row + 1][column] === false) {
+                cross.innerText = 'O';
+            } else {
+                markTile('friendly');
+            }
+
+            friendChildren[row * 5 + column].appendChild(cross);
+            friendlyDiv.grid[row + 1][column] = 0;
+        }
+    }
+
+    function showEnemyKey(cell) {
+        console.log(cell.key)
+        if (cell.key) {
+            cell.key.disp--;
+            if (cell.key.disp === 0) {
+                cell.key.style.display = 'block';
+            }
+        }
+    }
+
+    function checkScore(type) {
+        if (type === 'friendly') {
+            if (friendlyDiv.score === 0) {
+                eventOutcome('You lost!', eventBackdrop);
+            }
+        } else {
+            if (enemyDiv.score === 0) {
+                eventOutcome('You won!', eventBackdrop);
+            }
+        }
     }
 
     battleshipLeft.append(keyContainer,friendlyDiv);
