@@ -629,15 +629,14 @@
     width: auto;
     max-width: 90%;
     height: 85%;
+    /* background: url(./assets/expedbg/scene/1-B-1.webp) no-repeat center center/cover; */
     aspect-ratio: 2.3;
-    background-color: yellow;
     z-index: 1;
 }
 
 .battleship-left, .battleship-right {
     width: 50%;
     height: 100%;
-    background-color: pink;
     padding: 1%;
     box-sizing: border-box;
 }
@@ -659,7 +658,7 @@
 }
 
 .key-container > button {
-    background: url(./assets/expedbg/refresh.webp) no-repeat center center/contain;
+    background: url(./assets/event/rotate.webp) no-repeat center center/contain;
     transition: 0.2s ease;
 }
 
@@ -668,19 +667,20 @@
 }
 
 .key-container > button:last-of-type {
-    background: url(./assets/tutorial/buttonBox.webp) no-repeat center center/contain;
-    font: inherit;
     width: 100%;
     height: 100%;
+    font: inherit;
     font-size: 0.9em;
-    color: #28360d;
+    color: #f0e5da;
+    background: url(./assets/tutorial/exped-button.webp) no-repeat center center/contain;
+    
 }
 
 .key-container > p, .battleship-right > p {
     width: 100%;
-    transform: translateY(15%);
+    transform: translateY(30%);
     text-align: center;
-    font-size: 2em;
+    font-size: 1.8em;
     color: white;
     text-shadow: var(--text-shadow-075);
 }
@@ -699,13 +699,14 @@
     max-width: 100%;
     flex-grow: 1;
     aspect-ratio: 1;
-    background-color: green;
+    background: url(./assets/event/weasel-back.webp) no-repeat center center/cover;
     display: grid;
     grid-template: repeat(auto-fit, minmax(20%, 1fr)) / repeat(auto-fit, minmax(20%, 1fr));
+    border: 0.05em solid #ccc567;
 }
 
 .battleship-container > div {
-    border: 1px solid black;
+    border: 0.05em solid #ccc567;
     position: relative;
 }
 
@@ -717,9 +718,17 @@
     z-index: 10;
 }
 
-.battleship-right > .battleship-container > div > img {
+.battleship-cross {
+    padding: 15%;
+    box-sizing: border-box;
+    z-index: 5;
+}
+
+.enemy-key {
     pointer-events: none;
-    display: none;
+    opacity: 0;
+    transition: 0.6s ease;
+    padding: 0;
 }
 
 .block-input::after {
@@ -729,9 +738,34 @@
     left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: all;
+    z-index: 20;
+}
+
+.battleship-cover::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     pointer-events: all;
     z-index: 20;
+}
+
+.battleship-cover::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 55%;
+    height: 55%;
+    transform: translate(-50%, -50%);
+    background: url(./assets/tutorial/aranara-8.webp) no-repeat center center/cover;
+    pointer-events: all;
+    z-index: 20;
+    filter: drop-shadow(0 0 0.2em white);
 }
 
 /*/////////////////////////////// ADVENTURE CSS ///////////////////////////////*/

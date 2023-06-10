@@ -10,10 +10,10 @@
     <meta name="msapplication-navbutton-color" content="#CFE275">
     <meta name="apple-mobile-web-app-status-bar-style" content="#CFE275">
     <meta property="og:image" content="https://nahidaquest.com/assets/logo.webp" />
-    <link rel="stylesheet" type="text/css" href="styles.css?v=4975ae7b909720fd3a31ac2e863cba4d">
-    <link rel="stylesheet" type="text/css" href="mobile.css?v=4975ae7b909720fd3a31ac2e863cba4d" media="screen and (max-aspect-ratio: 11.5/9)">
-    <link rel="stylesheet" type="text/css" href="mobile.css?v=4975ae7b909720fd3a31ac2e863cba4d" media="(device-width: 768px) and (device-height: 1024px) and (orientation:portrait)" >
-    <link rel="stylesheet" type="text/css" href="components.css?v=4975ae7b909720fd3a31ac2e863cba4d" media="print" onload="this.media='all'">
+    <link rel="stylesheet" type="text/css" href="styles.css?v=4975ae7b909720fd3a312163cba4d">
+    <link rel="stylesheet" type="text/css" href="mobile.css?v=4975ae7b909720fd3a312163cba4d" media="screen and (max-aspect-ratio: 11.5/9)">
+    <link rel="stylesheet" type="text/css" href="mobile.css?v=4975ae7b909720fd3a312163cba4d" media="(device-width: 768px) and (device-height: 1024px) and (orientation:portrait)" >
+    <link rel="stylesheet" type="text/css" href="components.css?v=4975ae7b909720fd3a312163cba4d" media="print" onload="this.media='all'">
     <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon-iphone-60x60.png">
     <link rel="apple-touch-icon" sizes="60x60" href="./assets/apple-touch-icon-ipad-76x76.png">
@@ -24,18 +24,18 @@
     <meta http-equiv='pragma' content='no-cache'>
 </head>
 <body>
-    <div id="start-screen" class="cover-all flex-column" importance="high" rel="preload">
-        <img alt="Start Screen Background" src="./assets/start.webp" importance="high" rel="preload">
-        <img id="start-image" alt="Nahida Quest Title" src="./assets/settings/nahidaQuest.webp" importance="high" rel="preload">
-        <button id="start-button" class="dim-filter" importance="high" rel="preload">Continue</button>
-        <button id="start-delete" importance="high" rel="preload">New Game</button>
+    <div id="start-screen" class="cover-all flex-column" importance="high">
+        <img alt="Start Screen Background" src="./assets/start.webp" importance="high">
+        <img id="start-image" alt="Nahida Quest Title" src="./assets/settings/nahidaQuest.webp" importance="high">
+        <button id="start-button" class="dim-filter" importance="high">Continue</button>
+        <button id="start-delete" importance="high">New Game</button>
         <p id="vers-number-start"></p>
         <a class="link" href="https://nahidaquest.com/feedback">Feedback</a>
         <a class="link second-link" href="https://nahidaquest.com/credits">Credits</a>
     </div>
     <div id="game" class="prevent-select">
         <div id="loading" class="cover-all flex-row overlay">
-            <img src="./assets/loading.webp" alt="Nahida Quest Loading Screen" class="overlay-tutorial" importance="high" rel="preload">
+            <img src="./assets/loading.webp" alt="Nahida Quest Loading Screen" class="overlay-tutorial" importance="high">
             <p id="loading-number" loadingValue="0">0%</p>
         </div>
     </div>
@@ -45,9 +45,9 @@
         <img alt="Unsupported image" src="./assets/error.webp">
         <p>Your device's screen is too narrow for nahidaQuest.</p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js" async></script>
     <!-- <script src="https://unpkg.com/konva@9.0.1/konva.min.js"></script> -->
-    <script type="module" src="main.js?v=4975ae7b909720fd3a31ac2e863cba4d"></script>
+    <script type="module" src="main.js?v=4975ae7b909720fd3a312163cba4d"></script>
     <noscript style="height: 100%; width: 100%; z-index: 9999999999; position: absolute;">
         <div style="text-align: center; padding: 20px; background-color: #ffcccc; height: 100%; width: 100%;">
           <p>This website requires JavaScript to be enabled. Please enable JavaScript in your browser settings.</p>

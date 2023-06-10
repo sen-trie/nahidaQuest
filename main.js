@@ -3,7 +3,7 @@ import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,In
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
-import * as drawUI from "./modules/drawUI.js"
+// import * as drawUI from "./modules/drawUI.js"
 
 const VERSIONNUMBER = "V.1-02-002";
 const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact are trademarks, \n services marks, or registered trademarks of HoYoverse.";
@@ -103,7 +103,6 @@ function clearLocalStorage(forceReload) {
         currentlyClearing = true;
         let clearPromise = new Promise(function(myResolve, myReject) {
             localStorage.clear();
-
             if(localStorage.length === 0) {
                 myResolve(); 
             } else {
@@ -155,10 +154,12 @@ function deleteConfirmButton(confirmed) {
     return;
 }
 
-setTimeout(()=>{
+let drawUI;
+(async () => {
+    drawUI = await import('./modules/drawUI.js');
     mainBody = drawUI.buildGame(mainBody);
     mainBody.style.display = "block";
-},300)
+})();
 
 let copyrightText = document.getElementById("copyright-number"); 
 copyrightText.innerText = COPYRIGHT;
@@ -1725,12 +1726,13 @@ function battleshipEvent() {
     eventDescription.innerText = "Hide your keys!";
     eventDescription.classList.add("event-description");
     eventDescription.style.position = "absolute";
-    eventDescription.style.top = "2%";
+    eventDescription.style.top = "5%";
     eventBackdrop.append(eventDescription);
 
     const battleshipContainer = document.createElement('div');
     battleshipContainer.classList.add('battleship-div','flex-row');
     battleshipContainer.gameStarted = false;
+    battleshipContainer.transition = false;
     const battleshipLeft = document.createElement('div');
     battleshipLeft.classList.add('battleship-left','flex-column');
     const battleshipRight = document.createElement('div');
@@ -1743,13 +1745,18 @@ function battleshipEvent() {
     keyContainer.horizontal = true;
 
     let rotateButton = document.createElement('button');
+    rotateButton.style.transform = 'rotate(0)';
     rotateButton.addEventListener('click',() => {
         keyContainer.horizontal = !(keyContainer.horizontal);
-        rotateButton.style.transform = keyContainer.horizontal ? 'unset' : 'rotate(90deg)';
+        rotateButton.style.transform = keyContainer.horizontal ? 'rotate(0)' : 'rotate(-180deg)';
     })
 
     let confirmButton = document.createElement('button');
-    confirmButton.addEventListener('click',() => {startBattleship(rotateButton, confirmButton, keyContainer)})
+    confirmButton.addEventListener('click',() => {
+        if (enemyKeys.length !== 3) {return}
+        eventDescription.innerText = "Find the Aranara's keys!"
+        startBattleship(rotateButton, confirmButton, keyContainer);
+    })
     confirmButton.innerText = 'Confirm Placement';
     confirmButton.style.gridColumn = 'span 3';
     confirmButton.style.display = 'none';
@@ -1886,6 +1893,7 @@ function battleshipEvent() {
         }
 
         key.pos = [row, column];
+        key.style.padding = '0';
         key.style.width = `${keyContainer.disp}00%`;
         keyContainer.disp = null;
         keyContainer.activeKey = null;
@@ -1932,9 +1940,10 @@ function battleshipEvent() {
     }
 
     const enemyDiv = document.createElement('div');
-    enemyDiv.classList.add('battleship-container');
+    enemyDiv.classList.add('battleship-container','battleship-cover');
     const textSide = document.createElement('p');
-    textSide.innerText = 'Other Side';
+    textSide.innerText = 'Aranara Side';
+    textSide.id = 'enemy-battleship-text';
     
     enemyDiv.grid = {};
     for (let i = 0; i < 5; i++) {
@@ -1959,8 +1968,8 @@ function battleshipEvent() {
     for (let i = 0; i < 3; i++) {
         let key = new Image();
         key.src = `./assets/event/key-${i+1}.webp`;
+        key.classList.add('enemy-key');
         key.disp = i + 1;
-
 
         enemyKeys.push({
             key: key,  
@@ -1969,9 +1978,7 @@ function battleshipEvent() {
         populateEnemy(enemyDiv.grid, i + 1);
     }
 
-    // MAKE IT ASYNC LATER
-
-    function populateEnemy(grid, length) {
+    async function populateEnemy(grid, length) {
         let column = randomInteger(0,5);
         let row = randomInteger(1,6);
         let horizontal = randomInteger(1,3) === 1 ? true : false;
@@ -2012,14 +2019,11 @@ function battleshipEvent() {
             }
 
             tempLength = length;
-            
             while (tempLength > 0) {
                 grid[row + tempLength - 1][column] = true;
                 tempLength--;
             }
         }
-
-        console.log(enemyKeys)
 
         enemyKeys[length - 1].pos = [row, column, horizontal];
         let key = enemyKeys[length - 1].key;
@@ -2043,60 +2047,97 @@ function battleshipEvent() {
 
     function startBattleship(rotateButton, confirmButton, keyContainer) {
         friendlyDiv.classList.add('block-input');
+        enemyDiv.classList.remove('battleship-cover');
         rotateButton.remove();
         confirmButton.remove();
 
         const textSide = document.createElement('p');
         textSide.innerText = 'Your Side';
+        textSide.id = 'friendly-battleship-text';
         keyContainer.appendChild(textSide);
 
         battleshipContainer.gameStarted = true;
+        transitionTurn('enemy');
+    }
+
+    function transitionTurn(type) {
+        battleshipContainer.transition = true;
+        const enemySide = document.getElementById('enemy-battleship-text');
+        const friendSide = document.getElementById('friendly-battleship-text');
+
+        if (type === 'enemy') {
+            enemySide.classList.add('dim-filter');
+            if (friendSide.classList.contains('dim-filter')) {friendSide.classList.remove('dim-filter');}
+            setTimeout(() => {
+                battleshipContainer.transition = false;
+                markTile('friendly');
+            }, 1000)
+        } else {
+            friendSide.classList.add('dim-filter');
+            if (enemySide.classList.contains('dim-filter')) {enemySide.classList.remove('dim-filter');}
+            setTimeout(() => {battleshipContainer.transition = false}, 400);
+        }
     }
 
     function markTile(type, row, column) {
+        if (!battleshipContainer.gameStarted || battleshipContainer.transition) {return}
+        let source;
         if (type === 'enemy') {
-            let cross = document.createElement('p')
             if (enemyDiv.grid[row + 1][column] === true) {
-                cross.innerText = 'X';
+                source = './assets/event/cross.webp';
+                shopElement.load();
+                shopElement.play();
                 enemyDiv.score--;
-                checkScore('enemy')
+                checkScore('enemy');
             } else if (enemyDiv.grid[row + 1][column] === false) {
-                cross.innerText = 'O';
+                source = './assets/event/circle.webp';
+                mailElement.load();
+                mailElement.play();
             } else {
-                console.log(enemyDiv.grid)
                 return;
             }
+            
+            let cross = new Image();
+            cross.classList.add('battleship-cross');
+            cross.src = source;
 
-            markTile('friendly');
             enemyChildren[row * 5 + column].appendChild(cross);
             enemyDiv.grid[row + 1][column] = 0;
-            showEnemyKey(enemyChildren[row * 5 + column])
+            showEnemyKey(enemyChildren[row * 5 + column]);
+            transitionTurn(type);
         } else if (type === 'friendly') {
             let row = randomInteger(0,5);
             let column = randomInteger(0,5);
-
-            let cross = document.createElement('p')
             if (friendlyDiv.grid[row + 1][column] === true) {
-                cross.innerText = 'X';
+                source = './assets/event/cross.webp';
+                shopElement.load();
+                shopElement.play();
                 friendlyDiv.score--;
                 checkScore('friendly')
             } else if (friendlyDiv.grid[row + 1][column] === false) {
-                cross.innerText = 'O';
+                source = './assets/event/circle.webp';
+                mailElement.load();
+                mailElement.play();
             } else {
                 markTile('friendly');
+                return;
             }
+            
+            let cross = new Image();
+            cross.classList.add('battleship-cross');
+            cross.src = source;
 
             friendChildren[row * 5 + column].appendChild(cross);
             friendlyDiv.grid[row + 1][column] = 0;
+            transitionTurn(type);
         }
     }
 
     function showEnemyKey(cell) {
-        console.log(cell.key)
         if (cell.key) {
             cell.key.disp--;
             if (cell.key.disp === 0) {
-                cell.key.style.display = 'block';
+                cell.key.style.opacity = '1';
             }
         }
     }
@@ -2104,11 +2145,13 @@ function battleshipEvent() {
     function checkScore(type) {
         if (type === 'friendly') {
             if (friendlyDiv.score === 0) {
-                eventOutcome('You lost!', eventBackdrop);
+                eventOutcome("You lost! You didn't win any treasure...", eventBackdrop);
+                battleshipContainer.gameStarted = false;
             }
         } else {
             if (enemyDiv.score === 0) {
-                eventOutcome('You won!', eventBackdrop);
+                eventOutcome("You won! You earned some treasure!", eventBackdrop);
+                battleshipContainer.gameStarted = false;
             }
         }
     }
