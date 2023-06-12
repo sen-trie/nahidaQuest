@@ -389,13 +389,11 @@ const patchDict = {
 }
 
 function patchNotes(parent,textReplacer) {
-    let title = new Image();
-    title.src = "./assets/settings/patchNotes.webp";
-
-
     let patchContainer = document.createElement("div");
     patchContainer.classList.add("flex-column");
 
+    let title = new Image();
+    title.src = "./assets/settings/patchNotes.webp";
     let nahidaImg = new Image();
     nahidaImg.src = "./assets/expedbg/exped-Nahida.webp";
 
@@ -421,9 +419,7 @@ function patchNotes(parent,textReplacer) {
         patchContainer.append(patchButton,patchInfo)
     }
 
-
     return parent.append(title,patchContainer);
-
 }
 
 export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadMinimumArray,preloadImage,patchNotes }

@@ -149,4 +149,38 @@ function inventoryFrame(ele,itemInfo,itemFrameColors) {
     return ele;
 }
 
-export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame };
+// CHOICE BOX
+function choiceBox(mainBody,dialog,stopSpawnEvents,yesFunc,noFunc) {
+    if (stopSpawnEvents) stopSpawnEvents = false;
+
+    const choiceEle = document.createElement('div');
+    choiceEle.classList.add('choice-ele','flex-column');
+    const choiceDiv = document.createElement('div');
+    choiceDiv.classList.add('flex-column');
+    const text = document.createElement('p');
+    text.innerHTML = dialog;
+
+    const choiceContainer = document.createElement('div');
+    choiceContainer.classList.add('flex-row');
+    const yesButton = document.createElement('button');
+    yesButton.innerText = 'Confirm';
+    yesButton.addEventListener('click',() => {
+        choiceEle.remove();
+        if (stopSpawnEvents) stopSpawnEvents = true;
+        if (yesFunc) yesFunc();
+    })
+    const noButton = document.createElement('button');
+    noButton.innerText = 'Cancel';
+    noButton.addEventListener('click',() => {
+        choiceEle.remove();
+        if (stopSpawnEvents) stopSpawnEvents = true;
+        if (noFunc) noFunc();
+    })
+
+    choiceContainer.append(yesButton,noButton);
+    choiceDiv.append(text,choiceContainer);
+    choiceEle.appendChild(choiceDiv)
+    mainBody.append(choiceEle);
+}
+
+export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox };

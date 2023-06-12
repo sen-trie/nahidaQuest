@@ -1,7 +1,7 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo } from "./modules/dictData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
 
@@ -210,8 +210,8 @@ if (navigator.userAgentData) {
         MOBILE = true;
     }
 } else {
-    console.error("Error: Navigator UserAgent is undefined.")
-} 
+    MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 
 // ADVENTURE VARIABLES
 let quickType;
@@ -352,7 +352,7 @@ createTooltip();
 settings();
 var settingsValues;
 var currentBGM;
-var bgmElement;
+var bgmElement = new Audio();
 let fightBgmElement = new Audio();
 
 let tabElement = new Audio("./assets/sfx/tab-change.mp3");
@@ -536,7 +536,6 @@ function loadSaveData() {
     } else {
         let achievementListTemp = localStorage.getItem("achievementListSave");
         achievementMap = new Map(JSON.parse(achievementListTemp));
-        achievementListload();
     }
     // LOAD STORE DATA
     if (localStorage.getItem("storeInventory") == null) {
@@ -563,9 +562,11 @@ function loadSaveData() {
         } else {
             persistentValues = JSON.parse(persistentDictTemp);
             updateObjectKeys(persistentValues,persistentValuesDefault);
+            updateObjectKeys(persistentValues.ascendDict,persistentValuesDefault.ascendDict);
         }
     }
 
+    achievementListload();
     specialValuesUpgrade(true);
     if (saveValues.goldenTutorial === true) {
         addNutStore();
@@ -779,7 +780,7 @@ function idleCheck(idleAmount) {
 let eventTimes = 1;
 let eventChance = 0;
 function randomEventTimer(timerSeconds) {
-    if (beta) {eventCooldownDecrease = 0.05}
+    // if (beta) {eventCooldownDecrease = 0.05}
     let eventTimeMin = EVENTCOOLDOWN * eventTimes * eventCooldownDecrease;
     if (eventChance !== 0) {
         let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/((EVENTCOOLDOWN * eventCooldownDecrease)/2))
@@ -806,7 +807,7 @@ function startRandomEvent() {
         aranaraNumber = randomInteger(1,4);
     }
 
-    if (beta) {aranaraNumber = 8}
+    if (beta) {aranaraNumber = 5}
      
     eventPicture.classList.add("random-event");
     eventPicture.addEventListener("click", () => {
@@ -850,6 +851,8 @@ function clickedEvent(aranaraNumber) {
             aranaraNumber = 1.5;
         }
     }
+
+    if (beta) specialEvent = true;
 
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
@@ -1566,7 +1569,10 @@ function rainEvent() {
         eventBackdrop.append(img);
     }
 
-    let rainTimer = setInterval(() => {spawnRain()}, 300);
+    let rainTimer = setInterval(() => {
+        spawnRain();
+    }, randomInteger(250,350));
+
     setTimeout(()=>{
         clearInterval(rainTimer);
         setTimeout(()=>{
@@ -2316,7 +2322,7 @@ function removeLoading(loadingNumber) {
 var currentSong = randomInteger(1,6);
 var nextSong = "";
 function playAudio() {
-    bgmElement = new Audio("./assets/sfx/bgm"+currentSong+".mp3");
+    bgmElement.src = "./assets/sfx/bgm"+currentSong+".mp3";
     bgmElement.id = "bgm";
     bgmElement.volume = settingsValues.bgmVolume;
     bgmElement.play();
@@ -5069,7 +5075,7 @@ function createExpMap() {
         const mapPins = advImage.childNodes;
         for (let i = 0; i < mapPins.length; i++) {
             const mapPin = mapPins[i];
-            mapPin.style.transform = `scale(${1 / zoomValue * (MOBILE ? 1.5 : 1)})`;
+            mapPin.style.transform = `scale(${1 / zoomValue * (MOBILE ? 2 : 1)})`;
         }
     }
 
@@ -5386,8 +5392,8 @@ function spawnKey(advImage,imgKey,key,worldQuest) {
     button.wave = imgKey[key].Wave;
 
     if (worldQuest) {
-        button.id = "world-quest-button"
-        button.style.transform = `scale(${1 / (0.2 + (2/100) * settingsValues.defaultZoom) * (MOBILE ? 1.5 : 1)})`;
+        button.id = "world-quest-button";
+        button.style.transform = `scale(${1 / (0.2 + (2/100) * settingsValues.defaultZoom) * (MOBILE ? 2 : 1)})`;
     };
 
     let level = imgKey[key].Level;
@@ -6145,6 +6151,8 @@ function triggerFight() {
                             mobHealth.health -= (currentATK * attackMultiplier * 0.25);
                         }
                         mobDiv.children[0].children[0].remove();
+                        let cooldown = document.getElementById('adventure-cooldown-1');
+                        cooldown.amount += 15;
                     }
 
                     parrySuccess.load();
@@ -7167,9 +7175,63 @@ function achievementListload() {
         changeAchTab(challengeTab);
     })
 
-    let challengeDiv = document.getElementById('challenge-div');
-    challengeDiv.innerText = "??? \n\n Development in progress. \n Stay tuned!"
     table5.style.display = "flex";
+
+    let challengeDiv = document.getElementById('challenge-div');
+    challengeDiv.classList.add("flex-column");
+    challengeDiv.innerText = "Development in progress. Stay tuned!";
+    if (!beta) challengeDiv.style.color = 'black'
+    if (beta) {
+        table5.style.display = "none";
+        challengeTab.click();
+        challengeDiv.innerText = '';
+
+        let title = new Image();
+        title.src = "./assets/settings/patchNotes.webp";
+        const romanNum = ["I: Initiate's Journey",'II: Skillful Endeavors','III: Challenging Pursuits',"IV: Elites' Quest",'V: The Ultimate Challenge'];
+        let challengeDict = persistentValues.challengeCheck;
+
+        for (let i = 0; i < challengeInfo.length; i++) {
+            let tierButton = document.createElement("div");
+            tierButton.classList.add('tier-button');
+            tierButton.innerText = 'Tier ' + romanNum[i];
+
+            let tierContainer = document.createElement("div");
+            tierContainer.classList.add('tier-container');
+            tierContainer.style.display = "none";
+            
+            let tierInfo = challengeInfo[i];
+            for (let key in tierInfo) {
+                let challengeContainer = document.createElement("div");
+                challengeContainer.classList.add('flex-row')
+
+                let challengeInfo = document.createElement("div");
+                let challengeTitle = document.createElement("p");
+                challengeTitle.innerText = challengeDict[i][key] === false ? '???' : `${tierInfo[key]['title']}`;
+                let challengeDesc = document.createElement("p");
+                challengeDesc.innerText = `${tierInfo[key]['desc']}`;
+                let challengeButton = document.createElement("button");
+                challengeButton.innerText = 'Locked';
+
+                challengeInfo.append(challengeTitle,challengeDesc)
+                challengeContainer.append(challengeButton,challengeInfo);
+                tierContainer.append(challengeContainer)
+            }
+
+            tierButton.addEventListener("click",()=>{
+                if (tierContainer.style.display === 'none') {
+                    tierContainer.style.display = 'block';
+                } else {
+                    tierContainer.style.display = 'none';
+                }
+            })
+
+            challengeDiv.append(tierButton,tierContainer)
+        }
+    }
+
+    
+    
     function changeAchTab(ele) {
         if (tabDiv.active !== ele) {
             achievementTab.src = './assets/achievement/achieve-tab1.webp';
@@ -7963,7 +8025,7 @@ function addNutStore() {
     let bodyText = document.createElement("div");
     bodyText.classList.add("flex-row")
     let bodyTextLeft = document.createElement("p");
-    bodyTextLeft.innerText = `You lose: \n\n All Nuts, \n All Items, \n Energy, \n Primogems, \n Achievements`;
+    bodyTextLeft.innerText = `You lose: \n\n All Nuts, \n All Items, \n Energy, \n Primogems`;
     bodyTextLeft.classList.add("flex-column");
     let bodyTextRight = document.createElement("p");
     bodyTextRight.id = "transcend-display";
@@ -8283,22 +8345,22 @@ function createTreeMenu() {
     sandImg.src = './assets/tree/sand.webp';
     sandImg.classList.add('tree-sand');
 
+    const treeContainer = document.createElement('div');
+    treeContainer.classList.add('tree-container');
     const treeImg = new Image();
-    treeImg.src = './assets/tree/tree-2.webp';
-    treeImg.classList.add('tree-two');
-    const treeImg2 = new Image();
-    treeImg2.src = './assets/tree/tree-3.webp';
-    treeImg2.classList.add('tree-three');
-    const treeImg3 = new Image();
-    treeImg3.src = './assets/tree/tree-4.webp';
-    treeImg3.classList.add('tree-four');
+    let treeLevel = saveValues.treeObj.level;
+    treeLevel = 2;
+    treeImg.src = `./assets/tree/tree-${treeLevel}.webp`;
+    treeImg.classList.add('tree-image');
+    treeContainer.classList.add(`tree-${treeLevel}`);
 
     const treeHealthContainer = document.createElement('div');
     treeHealthContainer.classList.add('tree-health');
     const treeNut = new Image();
     treeNut.src = './assets/icon/nut.webp';
     const treeHealthText = document.createElement('p');
-    treeHealthText.innerText = '100%';
+    treeHealthText.health = saveValues.treeObj.health;
+    treeHealthText.innerText = treeHealthText.health + '%';
     treeHealthContainer.append(treeNut,treeHealthText);
 
     function createCloud(range) {
@@ -8319,20 +8381,20 @@ function createTreeMenu() {
         treeSide.appendChild(cloudImg);
     }
 
-    createCloud(0)
-    createCloud(0.5)
-    createCloud(1)
-    createCloud(1.5)
-    createCloud(2.5)
-    createCloud(4)
+    createCloud(0);
+    createCloud(0.5);
+    createCloud(1);
+    createCloud(1.5);
+    createCloud(2.5);
+    createCloud(4);
 
     // let chains = document.createElement('div');
     // chains.classList.add('chain-lock','cover-all');
-
-    treeSide.append(sandImg,treeImg,treeImg2,treeImg3,treeHealthContainer);
+    treeContainer.appendChild(treeImg);
+    treeSide.append(sandImg,treeContainer,treeHealthContainer);
 
     const palmText = document.createElement('p');
-    palmText.innerText = 'Palm Energy: 100';
+    palmText.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
 
     const optionsContainer = document.createElement('div');
     optionsContainer.classList.add('flex-row','options-container');
@@ -8344,8 +8406,24 @@ function createTreeMenu() {
         let optionText = document.createElement('p');
         optionText.innerText = optionsTextArray[i];
 
+        switch (i) {
+            case 0:
+                treeButton.addEventListener('click',() => {})
+                break;
+            case 1:
+                treeButton.addEventListener('click',() => {})
+                break;
+            case 2:
+                treeButton.addEventListener('click',() => {
+                    choiceBox(mainBody,'Are you sure you want to destroy the tree? This cannot be undone.',stopSpawnEvents)
+                })
+                break;
+            default:
+                break;
+        }
+
         treeButton.append(optionImg,optionText);
-        optionsContainer.appendChild(treeButton)
+        optionsContainer.appendChild(treeButton);
     }
 
     const affinityContainer = document.createElement('div');
@@ -8646,9 +8724,9 @@ function createTreeMenu() {
 function refresh() {
     let formatScore = abbrNum(saveValues["realScore"]);
     score.innerText = `${formatScore} Nut${saveValues["realScore"] !== 1 ? 's' : ''}`;
-    
     let formatDps = abbrNum(saveValues["dps"] * foodBuff);
     dpsDisplay.innerText = formatDps + " per second" ;
+
     energyDisplay.innerText = saveValues["energy"];
     primogemDisplay.innerText = saveValues["primogem"];
     
@@ -8903,11 +8981,11 @@ if (beta) {
 
     function startingFunction() {
         // PRESS A KEY
-        // const event = new KeyboardEvent('keydown', {
-        //     key: 'a',
-        // });
+        const event = new KeyboardEvent('keydown', {
+            key: 'a',
+        });
           
-        // document.dispatchEvent(event);
+        document.dispatchEvent(event);
         // document.getElementById('char-selected').click();
         // document.getElementById('char-select-0').click();
         // document.getElementById('char-selected').click();

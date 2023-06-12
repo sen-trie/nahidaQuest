@@ -16,6 +16,13 @@ let saveValuesDefault = {
     goldenTutorial: false,
     currentTime: 0,
     achievementCount: 0,
+    treeObj: {
+        level: 1,
+        element: null,
+        growth: 0,
+        energy: 100,
+        health: 100,
+    }
 }
 
 let persistentValuesDefault = {
@@ -107,6 +114,10 @@ let persistentValuesDefault = {
         "Tartaglia":0,
         "Jean":0,
         "Dehya":0,
+        "Mika":0,
+        "Kaveh":0,
+        "Baizhu":0,
+        "Kirara":0,
     }
 }
 

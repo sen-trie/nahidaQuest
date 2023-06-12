@@ -147,9 +147,12 @@ body {
 
 .score-container {
     top: 0;
-    height: 16%;
-    padding-top: 0;
-    padding-bottom: 0;
+    white-space: nowrap;
+    display: block;
+}
+
+#score {
+    margin-right: 1em;
 }
 
 #demo-container {
@@ -162,8 +165,9 @@ body {
     font-size: 0.9em;
     max-width: 20%;
     left: 0;
-    top: 16%;
+    top: 8%;
     height: fit-content;
+    opacity: 0;
 }
 
 .settings-menu {
@@ -213,7 +217,7 @@ body {
     width: auto;
     max-width: 95%;
     aspect-ratio: 7;
-    z-index: 10;
+    z-index: 11;
 }
 
 .confirm-box {
@@ -232,9 +236,9 @@ body {
 }
 
 #nut-shop-div, #nut-shop-transcend, #nut-shop-ascend {
-    height: 65%;
+    height: 75%;
     width: 95%;
-    top: 20%;
+    top: 10%;
 }
 
 .nut-shop-button {
@@ -243,12 +247,12 @@ body {
 
 #nut-store-currency {
     height: fit-content;
-    bottom: 80%;
+    bottom: 90%;
     left: 12%;
 }
 
 .nut-store-table > img {
-    height: 19%;
+    opacity: 0;
 }
 
 .nut-store-table > button {
@@ -350,6 +354,7 @@ body {
     top: unset;
     width: 80%;
     bottom: -22.5%;
+    max-height: 30%;
 }
 
 #wish-tutorial {
@@ -641,7 +646,7 @@ body {
 }
 
 .drag-icon  {
-    height: 10%;
+    height: 13%;
 }
 
 .exped-xpbar {
@@ -655,10 +660,10 @@ body {
 }
 
 #zoom-scroller {
-    right: 1%;
-    bottom: 15%;
+    right: 1.5%;
+    bottom: 20%;
     width: auto;
-    height: 20%;
+    height: 25%;
 }
 
 #zoom-scroller > button {

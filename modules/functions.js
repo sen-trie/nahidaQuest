@@ -178,6 +178,33 @@ function universalStyleCheck(ele,styleCheck,paramOn,paramOff,forced) {
     return ele;
 }
 
+let challengeThreshold = {
+    'core':{
+        1000:[0,1],
+        2500:[1,1],
+        5000:[2,1],
+        10000:[3,1],
+        25000:[4,1],
+    },
+    'primogem':{
+        1000:[0,2],
+        5000:[3,5]
+    },
+    'energy':{
+        2500:[0,3],
+        7500:[2,5],
+        15000:[3,6],
+    },
+    'discount':{
+        50:[0,4],
+        200:[3,4],
+    },
+    'nahidaCrit':{
+        3:[0,5],
+        7:[3,8]
+    }
+}
+
 // CHECKS FOR ALL CHALLENGES
 function challengeCheck(type,tier,prop,prop2) {
     if (type === 'populate') {
@@ -191,6 +218,7 @@ function challengeCheck(type,tier,prop,prop2) {
         })
         return challengeCheck;
     } else if (type === 'check') {
+        // CHECKS IF THERE ARE NEW KEYS
         let challengeCheck = prop;
         const challengeInfo = prop2;
         if (challengeInfo.length > challengeCheck.length) {
