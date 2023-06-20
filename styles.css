@@ -2243,7 +2243,7 @@ table, button, label {
     height: 100%;
     padding: 2%;
     box-sizing: border-box;
-    justify-content: space-between;
+    row-gap: 2% !important;
 }
 
 #tree-table::before {
@@ -2267,29 +2267,83 @@ table, button, label {
     width: 100%;
     max-height: 70%;
     gap:2%;
+    justify-content: space-evenly;
 }
 
 .options-container > div {
-    justify-content: space-evenly;
-    max-width: 30%;
+    width: 20%;
     height: auto;
+    aspect-ratio: 1;
     background-color: #CEE573;
     border: 0.2em solid #3B6F51;
     border-radius: 1em;
     text-align: center;
     padding: 1%;
     color: #163f26;
+    transition: 0.3s ease;
+}
+
+.options-container > div:hover {
+    transform: scale(1.05);
 }
 
 .options-container > div > img {
-    width: 100%;
+    height: 80%;
     filter: drop-shadow(0 0 0.1em black);
     object-fit: contain;
+}
 
+.options-container > div > p {
+    height: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-size: 1.2em;
 }
 
 #tree-side {
     background: linear-gradient(to bottom, #ACA9FC, #D2EEFC);
+}
+
+.tree-progress {
+    position: absolute;
+    top: 2%;
+    width: 90%;
+    height: auto;
+    max-height: 5%;
+    aspect-ratio: 17;
+    display: grid;
+    grid-template-columns: repeat(10,1fr);
+    border-radius: 0.5em;
+    border: 0.11em solid #182c0a;
+    background-color: #316547;
+    overflow: hidden;
+}
+
+.tree-progress > div {
+    position: absolute;
+    left: 0;
+    height: 100%;
+    background-color: #a4cf88;
+    z-index: 1;
+}
+
+.tree-progress > b:last-of-type {
+    border-right: 0;
+}
+
+.tree-progress > b {
+    z-index: 2;
+    border-right: 0.11em solid #182c0a;
+}
+
+.tree-progress-value {
+    position: absolute;
+    right: 6%;
+    top: 7%;
+    color: white;
+    font-size: 1.3em;
+    text-shadow: var(--text-shadow-050);
 }
 
 .tree-sand {
@@ -2332,6 +2386,7 @@ table, button, label {
     color: white;
     border-radius: 0.2em;
     padding: 2%;
+    text-align: center;
 }
 
 .tree-container {
@@ -2375,7 +2430,7 @@ table, button, label {
 
 .tree-1 {
     width: 5%;
-    filter: drop-shadow(0.15em 0.15em 0.2em black);
+    filter: drop-shadow(0.1em 0.1em 0.1em black);
 }
 
 .tree-2 {
@@ -2422,6 +2477,47 @@ table, button, label {
 
 .affinity-container > div > p {
     transform: translateY(90%);
+}
+
+.tree-enemy {
+    position: absolute;
+    background-color: #3E4758;
+    transform: translate(-50%,-60%);
+    padding: 1%;
+    padding-bottom: 0;
+    width: 80%;
+    color: white;
+    text-shadow: 0.1em 0.1em 0.25em #000000;
+    font-size: inherit;
+    background-color: #3E4659;
+    border: 0.2em solid #8B857C;
+}
+
+.tree-enemy > img {
+    width: 70%;
+    margin: 2%;
+    object-fit: contain;
+    border: 0.2em solid #D5C8B8;
+    box-shadow: 0 0 0.5em black;
+}
+
+.tree-enemy > p:first-of-type {
+    font-size: 1.4em;
+}
+
+.tree-enemy > p:last-of-type {
+    width: 90%;
+    text-align: left;
+}
+
+.tree-enemy > button {
+    margin: 2%;
+    font: inherit;
+    font-size: 1.1em;
+    padding: 1%;
+    background-color: #557a36;
+    border-radius: 0.5em;
+    color: white;
 }
 
 .chain-lock::after {

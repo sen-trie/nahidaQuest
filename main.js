@@ -221,6 +221,7 @@ let maxEnemyAmount = 0;
 let enemyAmount = 0;
 let quicktimeAttack = false;
 let skillCooldownReset;
+let adventureTreeDefense = false;
 
 // SPECIAL UPGRADE VARIABLES
 let wishPower = 0;
@@ -286,6 +287,8 @@ const moraleLore = [
     "Nahida feels [s]Sad[/s]... [mor]<br><br> XP gains are reduced by 15%, recover party morale <br> by resting or completing expeditions successfully.",
 ]
 
+const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
+const specialText = ["Ah! It's Bongo-Head!","'Thank you for releasing Arapacati!'","Woah, a treasure-seeking Seelie!","Woah, a shikigami was trapped inside!"];
 const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");
@@ -416,6 +419,7 @@ function timerEvents() {
     shopCheck();
     shopTimerFunction();
     checkTimerBounty();
+    if (beta) growTree('add');
 }
 
 // TEMPORARY TIMER
@@ -431,7 +435,7 @@ function timerSave(timerSeconds) {
     let saveTimeMin = 180 * savedTimes;
     if (timerSeconds > saveTimeMin) {
         saveData();        
-        console.log("Saved!");
+        if (!beta) console.log("Saved!");
         savedTimes++;
     }
 }
@@ -566,19 +570,20 @@ function loadSaveData() {
         }
     }
 
-    achievementListload();
-    specialValuesUpgrade(true);
-    if (saveValues.goldenTutorial === true) {
-        addNutStore();
-    }
-
     if (beta) {
         if (persistentValues.challengeCheck === undefined) {
             persistentValues.challengeCheck = challengeCheck('populate',0,challengeInfo);
         } else {
             persistentValues.challengeCheck = challengeCheck('check',0,persistentValues.challengeCheck,challengeInfo);
         }
+        createTreeMenu();
     }
+
+    achievementListload();
+    specialValuesUpgrade(true);
+    if (saveValues.goldenTutorial === true) {
+        addNutStore();
+    }    
 }
 
 // BIG BUTTON FUNCTIONS
@@ -807,7 +812,7 @@ function startRandomEvent() {
         aranaraNumber = randomInteger(1,4);
     }
 
-    if (beta) {aranaraNumber = 5}
+    // if (beta) {aranaraNumber = 5}
      
     eventPicture.classList.add("random-event");
     eventPicture.addEventListener("click", () => {
@@ -852,7 +857,7 @@ function clickedEvent(aranaraNumber) {
         }
     }
 
-    if (beta) specialEvent = true;
+    // if (beta) specialEvent = true;
 
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
@@ -866,15 +871,15 @@ function clickedEvent(aranaraNumber) {
     eventDropdownImage.classList.add("event-dropdown-image");
     
     eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
-    if (beta) {
-        eventDropdown.remove();
-        chooseEvent(aranaraNumber,specialEvent);
-    } else {
+    // if (beta) {
+    //     eventDropdown.remove();
+    //     chooseEvent(aranaraNumber,specialEvent);
+    // } else {
         eventDropdown.addEventListener("animationend", () => {
             eventDropdown.remove();
             chooseEvent(aranaraNumber,specialEvent);
         });
-    }
+    // }
     
     mainBody.appendChild(eventDropdown);
 }
@@ -1085,8 +1090,6 @@ function boxFunction(specialBox) {
     mainBody.append(eventBackdrop,boxOuterDiv);
 }
 
-const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
-const specialText = ["Ah! It's Bongo-Head!","'Thank you for releasing Arapacati!'","Woah, a treasure-seeking Seelie!","Woah, a shikigami was trapped inside!"];
 function boxOpen(eventBackdrop,specialBox) {
     let boxOuter = document.getElementById("box-outer-div")
     let boxOuterNew = boxOuter.cloneNode(true);
@@ -2416,6 +2419,26 @@ function tutorial(idleAmount) {
             setTimeout(()=>{
                 if (document.getElementById('idle-nuts-div')) {document.getElementById('idle-nuts-div').remove()}
                 saveValues.realScore += idleAmount;
+
+                // FOR GOLDEN CORE CHALLENGE
+                if (persistentValues.transitionCore != undefined || persistentValues.transitionCore != null) {
+                    // if (persistentValues.transitionCore > 25000) {
+
+                    // } else if (persistentValues.transitionCore > 10000) {
+
+                    // } else if (persistentValues.transitionCore > 5000) {
+                        
+                    // } else if (persistentValues.transitionCore > 2500) {
+                        
+                    // } else if (persistentValues.transitionCore > 1000) {
+                        
+                    // }
+
+
+
+
+                    delete persistentValues.transitionCore;
+                }
             },250)
         });
 
@@ -4238,7 +4261,7 @@ function createAdventure() {
         }
         if (beta) {
             if (event.key === "a") {
-                createTreeMenu();
+                
             } else if (event.key === "s") {
                 notifPop("clearAll","rank",2);
                 notifPop("clearAll","quest",1);
@@ -4864,7 +4887,7 @@ function expedInfo(butId) {
             enemyInfo.appendChild(img);
         }
 
-        let lootHTML = `<span style='font-size:1.2em'>Recommended Level: ${recommendedLevel[level != 13 ? level : 6]}</span>  <br> Max Potential Rewards: <br> [container]`;
+        let lootHTML = `<span style='font-size:1.2em'>Recommended Rank: ${recommendedLevel[level != 13 ? level : 6]}</span>  <br> Max Potential Rewards: <br> [container]`;
         let lootTable = imgKey[id].Loot;
         let invDiv = document.createElement("div");
         invDiv.classList.add("inv-div","flex-row");
@@ -6920,6 +6943,11 @@ function quitAdventure() {
     if (worldQuestRoll < 30) {
         spawnWorldQuest();
     }
+
+    if (adventureTreeDefense) {
+        adventureTreeDefense = false;
+        enemyBlock(true);
+    }
     
     let adventureArea = document.getElementById("adventure-area");
     adventureArea.style.zIndex = -1;
@@ -7188,7 +7216,7 @@ function achievementListload() {
 
         let title = new Image();
         title.src = "./assets/settings/patchNotes.webp";
-        const romanNum = ["I: Initiate's Journey",'II: Skillful Endeavors','III: Challenging Pursuits',"IV: Elites' Quest",'V: The Ultimate Challenge'];
+        const romanNum = ["I: Initiate's Journey",'II: Skillful Endeavors','III: Challenging Pursuits',"IV: Elites' Quest",'V: Ultimate Challenge'];
         let challengeDict = persistentValues.challengeCheck;
 
         for (let i = 0; i < challengeInfo.length; i++) {
@@ -7229,8 +7257,6 @@ function achievementListload() {
             challengeDiv.append(tierButton,tierContainer)
         }
     }
-
-    
     
     function changeAchTab(ele) {
         if (tabDiv.active !== ele) {
@@ -8212,7 +8238,6 @@ function toggleTranscendMenu(forceClose) {
     toggleSettings(true);
     deleteConfirmMenu("close","loaded");
     let transcendMenu = document.getElementById("transcend-menu");
-
     if (transcendMenu.style.zIndex == -1) {
         transcendMenu.style.zIndex = 200;
 
@@ -8248,15 +8273,18 @@ function transcendFunction() {
                 function(value) {
                     let overlay = document.getElementById("loading");
                     overlay.style.zIndex = 100000;
-                    overlay.children[0].style.backgroundImage = "url(./assets/bg/wood.webp";
+                    overlay.children[0].style.backgroundImage = "url(./assets/bg/wood.webp)";
 
                     let oldGif = overlay.children[0].children[0];
                     let newGif = oldGif.cloneNode(true);
                     oldGif.parentNode.replaceChild(newGif, oldGif);
                     newGif.src = "./assets/transcend.webp";
-                    newGif.classList.add("overlay-tutorial")
+                    newGif.classList.add("overlay-tutorial");
+                    newGif.classList.remove('play-button');
 
-                    persistentValues.goldenCore += calculateGoldenCore("formula");
+                    const addCore = calculateGoldenCore("formula");
+                    persistentValues.goldenCore += addCore;
+                    persistentValues.transitionCore = addCore;
                     localStorage.setItem("settingsValues", JSON.stringify(settingsValues));
                     localStorage.setItem("persistentValues", JSON.stringify(persistentValues));
                     localStorage.setItem("advDictSave", JSON.stringify(advDict));
@@ -8347,12 +8375,20 @@ function createTreeMenu() {
 
     const treeContainer = document.createElement('div');
     treeContainer.classList.add('tree-container');
+    treeContainer.id = 'tree-container';
     const treeImg = new Image();
     let treeLevel = saveValues.treeObj.level;
-    treeLevel = 2;
-    treeImg.src = `./assets/tree/tree-${treeLevel}.webp`;
+    treeImg.id = 'tree-img';
     treeImg.classList.add('tree-image');
-    treeContainer.classList.add(`tree-${treeLevel}`);
+
+    if (treeLevel !== 0) {
+        treeImg.src = `./assets/tree/tree-${treeLevel}.webp`;
+        treeContainer.classList.add(`tree-${treeLevel}`);
+        saveValues.treeObj.growthRate = 100;
+    } else {
+        treeImg.src = `./assets/tooltips/Empty.webp`;
+        saveValues.treeObj.growthRate = 0;
+    }
 
     const treeHealthContainer = document.createElement('div');
     treeHealthContainer.classList.add('tree-health');
@@ -8360,8 +8396,31 @@ function createTreeMenu() {
     treeNut.src = './assets/icon/nut.webp';
     const treeHealthText = document.createElement('p');
     treeHealthText.health = saveValues.treeObj.health;
-    treeHealthText.innerText = treeHealthText.health + '%';
+    treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
     treeHealthContainer.append(treeNut,treeHealthText);
+
+    const treeProgressBar = document.createElement('div');
+    treeProgressBar.classList.add('tree-progress');
+    const treeProgress = document.createElement('div');
+    treeProgress.id = 'tree-progress';
+    treeProgress.progress = saveValues.treeObj.growth;
+    treeProgress.style.width = treeProgress.progress + '%';
+
+    const treeProgressValue = document.createElement('p');
+    treeProgressValue.classList.add('tree-progress-value');
+    treeProgressValue.id = 'tree-progress-value';
+    treeProgressValue.rate;
+
+    
+
+
+    
+
+    for (let i = 0; i < 10; i++) {
+        let bar = document.createElement('b');
+        treeProgressBar.appendChild(bar);
+    }
+    treeProgressBar.append(treeProgress);
 
     function createCloud(range) {
         let cloudImg = new Image();
@@ -8381,50 +8440,23 @@ function createTreeMenu() {
         treeSide.appendChild(cloudImg);
     }
 
-    createCloud(0);
-    createCloud(0.5);
-    createCloud(1);
-    createCloud(1.5);
-    createCloud(2.5);
-    createCloud(4);
+    const cloudArray = [0,0.5,1,1.5,2.5,4];
+    cloudArray.forEach((num) => {
+        createCloud(num);
+    })
 
     // let chains = document.createElement('div');
     // chains.classList.add('chain-lock','cover-all');
     treeContainer.appendChild(treeImg);
-    treeSide.append(sandImg,treeContainer,treeHealthContainer);
+    treeSide.append(treeProgressBar,sandImg,treeContainer,treeHealthContainer,treeProgressValue);
+
+   
 
     const palmText = document.createElement('p');
     palmText.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
-
     const optionsContainer = document.createElement('div');
-    optionsContainer.classList.add('flex-row','options-container');
-    const optionsTextArray = ['Bless','Fertilize','Destroy'];
-    for (let i = 0; i < 3; i++) {
-        let treeButton = document.createElement('div');
-        let optionImg = new Image();
-        optionImg.src = `./assets/tree/option-${i}.webp`;
-        let optionText = document.createElement('p');
-        optionText.innerText = optionsTextArray[i];
-
-        switch (i) {
-            case 0:
-                treeButton.addEventListener('click',() => {})
-                break;
-            case 1:
-                treeButton.addEventListener('click',() => {})
-                break;
-            case 2:
-                treeButton.addEventListener('click',() => {
-                    choiceBox(mainBody,'Are you sure you want to destroy the tree? This cannot be undone.',stopSpawnEvents)
-                })
-                break;
-            default:
-                break;
-        }
-
-        treeButton.append(optionImg,optionText);
-        optionsContainer.appendChild(treeButton);
-    }
+    optionsContainer.id = 'options-container';
+    treeOptions(treeLevel === 0 ? false : true, optionsContainer)
 
     const affinityContainer = document.createElement('div');
     affinityContainer.classList.add('flex-row','affinity-container');
@@ -8447,6 +8479,166 @@ function createTreeMenu() {
         universalStyleCheck(treeSide,"display","none","flex",true);
     })
     leftDiv.appendChild(nutStoreButton);
+
+    updateTreeValues(treeLevel === 0 ? true : false);
+    if (saveValues.treeObj.defense === 'block') {
+        enemyBlock();
+    }
+}
+
+function treeOptions(planted, optionsContainer) {
+    while (optionsContainer.firstChild) {
+        optionsContainer.firstChild.remove();
+    }
+
+    if (planted) {
+        optionsContainer.classList.add('flex-row','options-container');
+        const optionsTextArray = ['Bless','Fertilize','Destroy'];
+        for (let i = 0; i < 3; i++) {
+            let treeButton = document.createElement('div');
+            let optionImg = new Image();
+            optionImg.src = `./assets/tree/option-${i}.webp`;
+            let optionText = document.createElement('p');
+            optionText.innerText = optionsTextArray[i];
+    
+            switch (i) {
+                case 0:
+                    treeButton.addEventListener('click',() => {})
+                    break;
+                case 1:
+                    treeButton.addEventListener('click',() => {})
+                    break;
+                case 2:
+                    treeButton.addEventListener('click',() => {
+                        choiceBox(mainBody,'Are you sure you want to destroy the tree? This cannot be undone.', stopSpawnEvents, destroyTree)
+                    })
+                    break;
+                default:
+                    break;
+            }
+    
+            treeButton.append(optionImg,optionText);
+            optionsContainer.appendChild(treeButton);
+        }
+    } else {
+        optionsContainer.classList.add('flex-row','options-container');
+        let treeButton = document.createElement('div');
+        let optionImg = new Image();
+        optionImg.src = `./assets/tree/plant.webp`;
+        let optionText = document.createElement('p');
+        optionText.innerText = 'Plant';
+
+        treeButton.addEventListener('click',() => {growTree('level')})
+        treeButton.append(optionImg,optionText);
+        optionsContainer.appendChild(treeButton);
+    }
+} 
+
+function destroyTree() {
+    const treeProgress = document.getElementById('tree-progress');
+    const treeImg = document.getElementById('tree-img');
+    const treeContainer = document.getElementById('tree-container');
+    const optionsContainer = document.getElementById('options-container');
+    
+    treeOptions(false, optionsContainer);
+    updateTreeValues(true);
+
+    setTimeout(()=>{
+        treeProgress.style.width = 0;
+        treeContainer.classList.remove(`tree-${saveValues.treeObj.level}`);
+        saveValues.treeObj.level = 0;
+        saveValues.treeObj.defense = false;
+        treeImg.src = `./assets/tooltips/Empty.webp`;
+    },600);
+}
+
+function updateTreeValues(turnZero) {
+    const treeProgress = document.getElementById('tree-progress');
+    const treeProgressValue = document.getElementById('tree-progress-value');
+
+    if (turnZero) {
+        treeProgress.progress = 0;
+        treeProgress.style.width = 0;
+        treeProgressValue.rate = 0;
+        treeProgressValue.innerText = 'Growth: 0x';
+    } else {
+        saveValues.treeObj.growthRate = 500;
+        treeProgressValue.rate = saveValues.treeObj.growthRate / 100;
+        treeProgressValue.innerText = 'Growth: ' + saveValues.treeObj.growthRate + 'x';
+    }
+}
+
+function enemyBlock(remove) {
+    if (remove) {
+        document.getElementById('tree-block').remove();
+        saveValues.treeObj.defense = false;
+    } else {
+        const treeTable = document.getElementById('tree-table');
+        let eventBackdrop = document.createElement('div');
+        eventBackdrop.classList.add('event-dark');
+        eventBackdrop.id = 'tree-block';
+        let enemyContainer = document.createElement('div');
+        enemyContainer.classList.add('tree-enemy','flex-column')
+    
+        let treeEnemyHeader = document.createElement('p');
+        treeEnemyHeader.innerText = 'Tree Defense';
+        let treeEnemyImg = new Image();
+        treeEnemyImg.src = './assets/tree/treeDefense.webp';
+    
+        let treeEnemyText = document.createElement('p');
+        treeEnemyText.innerText = 'Recommended Rank: 16 \n\n Stop the monsters from destroying your leyline tree. \n Any damage inflicted on you is inflicted on the tree as well!';
+        let treeEnemyButton = document.createElement('button');
+        treeEnemyButton.innerText = 'Defend!';
+        treeEnemyButton.addEventListener('click',() => {
+            let advButton = document.getElementById("adventure-button");
+            advButton.key = 2;
+            adventure('1-[2]');
+            adventureTreeDefense = true;
+        })
+    
+        enemyContainer.append(treeEnemyHeader,treeEnemyImg,treeEnemyText,treeEnemyButton);
+        eventBackdrop.append(enemyContainer);
+        treeTable.append(eventBackdrop);
+    } 
+}
+
+function growTree(type, amount) {
+    const treeProgress = document.getElementById('tree-progress');
+    const treeProgressValue = document.getElementById('tree-progress-value');
+    if (type === 'add') {
+        if (saveValues.treeObj.defense !== 'block') {
+            treeProgress.progress += treeProgressValue.rate;
+            saveValues.treeObj.growth = treeProgress.progress;
+            treeProgress.style.width = treeProgress.progress + '%';
+            if (treeProgress.progress > 100 && saveValues.treeObj.level !== 4) {
+                treeProgress.progress = 0;
+                growTree('level');
+                
+            }
+        }
+    } else if (type === 'rate') {
+        treeProgressValue.rate += (amount / 100);
+    } else if (type === 'level') {
+        const treeImg = document.getElementById('tree-img');
+        const treeContainer = document.getElementById('tree-container');
+        if (saveValues.treeObj.level === 0) {
+            treeOptions(true, document.getElementById('options-container'));
+            updateTreeValues(false);
+            saveValues.treeObj.defense = randomIntegerWrapper(90,101);
+        };
+
+        treeContainer.classList.remove(`tree-${saveValues.treeObj.level}`);
+        saveValues.treeObj.level++;
+        treeImg.src = `./assets/tree/tree-${saveValues.treeObj.level}.webp`;
+        treeContainer.classList.add(`tree-${saveValues.treeObj.level}`);
+
+        if (saveValues.treeObj.level === 3) {
+            if (saveValues.treeObj.defense) {
+                saveValues.treeObj.defense = 'block';
+                enemyBlock();
+            }
+        }
+    }
 }
 
 //-------------------------------------------- PET ------------------------------------------------------//

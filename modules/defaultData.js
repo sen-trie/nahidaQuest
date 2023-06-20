@@ -20,6 +20,8 @@ let saveValuesDefault = {
         level: 1,
         element: null,
         growth: 0,
+        growthRate: 1,
+        defense: false,
         energy: 100,
         health: 100,
     }
@@ -316,6 +318,7 @@ let enemyInfo = {
     532:{Class:"Boss",      Variation:3,   Type:"Eremite",     HP:1200,   ATK:1.5,     AtkCooldown:32.5},
     // LVL 13
     "13-Wave-1":{Wave:[1301,1301,1301],         BG:[1,1]},
+    "13-Wave-2":{Wave:[1301,1301,1301],         BG:[4,6]},
     1301:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1700,   ATK:1.5,     AtkCooldown:40},
 }
 
