@@ -2532,11 +2532,10 @@ table, button, label {
 /*//////////// OTHER CSS + ANIMATION CSS /////////////*/
 .beta-warning {
     position: absolute;
-    left: 49%;
+    left: 40%;
     z-index: 99999999;
     background-color: yellow;
     color: purple;
-    padding: 1%;
     pointer-events: none;
 }
 

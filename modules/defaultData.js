@@ -235,7 +235,10 @@ let enemyInfo = {
             5:[0.36,0.40,0.45,0.53,0.57],
         },
         13:{
-            1:[0.51,0.56],
+            1:[0.54,0.56],
+            2:[0.52,0.54,0.56],
+            3:[0.50,0.53,0.57],
+            4:[0.55,0.47,0.60],
         }
     },
 
@@ -318,8 +321,9 @@ let enemyInfo = {
     532:{Class:"Boss",      Variation:3,   Type:"Eremite",     HP:1200,   ATK:1.5,     AtkCooldown:32.5},
     // LVL 13
     "13-Wave-1":{Wave:[1301,1301,1301],         BG:[1,1]},
-    "13-Wave-2":{Wave:[1301,1301,1301],         BG:[4,6]},
-    1301:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1700,   ATK:1.5,     AtkCooldown:40},
+    "13-Wave-2":{Wave:[1302,1302,1302],         BG:[4,6]},
+    1301:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1700,   ATK:2,     AtkCooldown:40},
+    1302:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1200,   ATK:1.5,     AtkCooldown:35},
 }
 
 let upgradeDictDefault = {

@@ -5810,7 +5810,9 @@ function triggerFight() {
     fightBgmElement.addEventListener('canplaythrough', () => {fightBgmElement.play();})
 
     let healthDiv = document.getElementById("adventure-health");
+    healthDiv.healthLost = 0;
     healthDiv.style.opacity = 1;
+
     let healthBar = document.getElementById("health-bar");
     healthBar.maxHealth = 5 + Math.floor(advDict.adventureRank / 4);
     if (activeLeader == "Nahida") {healthBar.maxHealth = Math.ceil(1.2 * healthBar.maxHealth)}
@@ -6044,7 +6046,7 @@ function triggerFight() {
                         if (evadeRoll <= evadeMax) {
                             createBattleText("dodge",animationTime * 150 * 2,mobDiv);
                         } else {
-                            if (!beta) loseHP(mobHealth.atk,"normal",mobHealth.class);
+                            loseHP(mobHealth.atk,"normal",mobHealth.class);
                         }
                         canvas.attackState = false;
                     }
@@ -6448,7 +6450,7 @@ function quicktimeEvent(waveQuicktime,advLevel) {
 
                 atkNumber = atkNumber * (maxBeat - correctBeat);
                 if (atkNumber > 0) {
-                    if (!beta) loseHP(atkNumber,"normal","Quicktime");
+                    loseHP(atkNumber,"normal","Quicktime");
                 }
             },2000)
         } else if (currentBeat < maxBeat) {
@@ -6463,6 +6465,8 @@ function quicktimeEvent(waveQuicktime,advLevel) {
 
 function loseHP(ATK,type,mobClass) {
     if (!fightSceneOn) {return}
+    // if (beta) {return}
+
     let healthBar = document.getElementById('health-bar');
     let hpInterval = (100/healthBar.maxHealth);
     let adventureHealth = document.getElementById('adventure-health');
@@ -6471,6 +6475,7 @@ function loseHP(ATK,type,mobClass) {
         healthBar.currentWidth += (hpInterval * ATK);
         if (healthBar.currentWidth > 100) {healthBar.currentWidth = 100}
     } else {
+        adventureHealth.healthLost += ATK;
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
         if (mobClass != "Superboss") {
@@ -6943,11 +6948,6 @@ function quitAdventure() {
     if (worldQuestRoll < 30) {
         spawnWorldQuest();
     }
-
-    if (adventureTreeDefense) {
-        adventureTreeDefense = false;
-        enemyBlock(true);
-    }
     
     let adventureArea = document.getElementById("adventure-area");
     adventureArea.style.zIndex = -1;
@@ -6976,6 +6976,12 @@ function quitAdventure() {
     adventureHealthbarDiv.style.width = "100%";
     adventureScaraText = "";
     if (document.getElementById('refresh-icon')) {document.getElementById('refresh-icon').remove()};
+
+    if (adventureTreeDefense) {
+        let healthBar = document.getElementById('health-bar');
+        adventureTreeDefense = false;
+        enemyBlock(true, adventureHealth.healthLost,healthBar.maxHealth);
+    }
 }
 
 //------------------------------------------------------------------------TABLE 4 (WISH)------------------------------------------------------------------------//
@@ -8395,6 +8401,7 @@ function createTreeMenu() {
     const treeNut = new Image();
     treeNut.src = './assets/icon/nut.webp';
     const treeHealthText = document.createElement('p');
+    treeHealthText.id = 'tree-health-text';
     treeHealthText.health = saveValues.treeObj.health;
     treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
     treeHealthContainer.append(treeNut,treeHealthText);
@@ -8410,11 +8417,6 @@ function createTreeMenu() {
     treeProgressValue.classList.add('tree-progress-value');
     treeProgressValue.id = 'tree-progress-value';
     treeProgressValue.rate;
-
-    
-
-
-    
 
     for (let i = 0; i < 10; i++) {
         let bar = document.createElement('b');
@@ -8544,6 +8546,8 @@ function destroyTree() {
     updateTreeValues(true);
 
     setTimeout(()=>{
+        mailElement.load();
+        mailElement.play();
         treeProgress.style.width = 0;
         treeContainer.classList.remove(`tree-${saveValues.treeObj.level}`);
         saveValues.treeObj.level = 0;
@@ -8568,8 +8572,31 @@ function updateTreeValues(turnZero) {
     }
 }
 
-function enemyBlock(remove) {
-    if (remove) {
+function enemyBlock(remove, damage, maxHP) {
+    if (remove === true) {
+        let enemyContainer = document.getElementById('tree-block').firstChild;
+        let enemyContainerChildren = enemyContainer.children;
+        let lostHP = Math.min(50,(50 * (damage / maxHP)));
+
+        enemyContainerChildren[2].innerHTML = `You took ${damage} cumulative damage <br> The tree lost ${lostHP}% of its HP.`;
+        enemyContainerChildren[2].style.textAlign = 'center';
+        enemyContainerChildren[2].style.margin = '2% 0';
+        enemyContainerChildren[2].style.width = '100%';
+        enemyContainer.style.width = 'fit-content';
+
+        enemyContainerChildren[3].innerText = 'Okay';
+        let enemyButtonNew = enemyContainerChildren[3].cloneNode(true);
+        enemyContainer.replaceChild(enemyButtonNew, enemyContainerChildren[3]);
+        enemyButtonNew.addEventListener('click', () => {
+            enemyBlock('confirm');
+            let treeHealthText = document.getElementById('tree-health-text');
+            saveValues.treeObj.health -= lostHP;
+            treeHealthText.health = saveValues.treeObj.health;
+            treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
+        })
+
+        enemyContainerChildren[1].remove();
+    } else if (remove === 'confirm') {
         document.getElementById('tree-block').remove();
         saveValues.treeObj.defense = false;
     } else {
@@ -8586,13 +8613,15 @@ function enemyBlock(remove) {
         treeEnemyImg.src = './assets/tree/treeDefense.webp';
     
         let treeEnemyText = document.createElement('p');
-        treeEnemyText.innerText = 'Recommended Rank: 16 \n\n Stop the monsters from destroying your leyline tree. \n Any damage inflicted on you is inflicted on the tree as well!';
+        treeEnemyText.innerHTML = `Recommended Rank: 16 <br><br> 
+                                  Stop the monsters from destroying your leyline tree! <br>
+                                  <span style='color:#dd5548'>Any damage inflicted upon you is inflicted on the tree as well! </span>`;
         let treeEnemyButton = document.createElement('button');
         treeEnemyButton.innerText = 'Defend!';
         treeEnemyButton.addEventListener('click',() => {
             let advButton = document.getElementById("adventure-button");
-            advButton.key = 2;
-            adventure('1-[2]');
+            advButton.key = 26;
+            adventure('13-[2]');
             adventureTreeDefense = true;
         })
     
@@ -8625,6 +8654,8 @@ function growTree(type, amount) {
             treeOptions(true, document.getElementById('options-container'));
             updateTreeValues(false);
             saveValues.treeObj.defense = randomIntegerWrapper(90,101);
+            weaselBurrow.load();
+            weaselBurrow.play();
         };
 
         treeContainer.classList.remove(`tree-${saveValues.treeObj.level}`);
@@ -9157,7 +9188,7 @@ function newPop(type) {
 const beta = false;
 if (beta) {
     let warning = document.createElement('p');
-    warning.innerText = 'BETA';
+    warning.innerText = 'BETA (you should not see this)';
     warning.classList.add('beta-warning');
     mainBody.append(warning);
 
