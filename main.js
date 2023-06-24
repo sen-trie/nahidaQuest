@@ -912,6 +912,9 @@ function chooseEvent(type,specialMode) {
         case 8:
             battleshipEvent();
             break;
+        case 9:
+            pinballEvent();
+            break;
         default:
             console.error("Event error: Invalid event");
             break;
@@ -2169,6 +2172,148 @@ function battleshipEvent() {
     battleshipRight.append(textSide,enemyDiv);
     battleshipContainer.append(battleshipLeft,battleshipRight);
     eventBackdrop.append(battleshipContainer);
+    mainBody.append(eventBackdrop);
+}
+
+// EVENT 9 (PINBALL)
+function pinballEvent() {
+    stopSpawnEvents = true;
+    let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
+
+    let eventDescription = document.createElement("p");
+    eventDescription.innerText = "Hit the pins!";
+    eventDescription.classList.add("event-description");
+    eventDescription.style.position = "absolute";
+    eventDescription.style.top = "2%";
+    eventBackdrop.append(eventDescription);
+
+    var Engine = Matter.Engine,
+    Render = Matter.Render,
+    Runner = Matter.Runner,
+    Bodies = Matter.Bodies,
+    Composite = Matter.Composite;
+
+    // create an engine
+    var engine = Engine.create();
+    engine.world.gravity.y = 0.25;
+
+    // create a renderer
+    var render = Render.create({
+        element: eventBackdrop ,
+        engine: engine
+    });
+
+    // create two boxes and a ground
+    var circleA = Bodies.circle(790, 150, 20, { restitution: 1 } );
+    circleA.gravityScale = 0.1;
+    circleA.frictionAir = 0.0005;
+    var boxA = Bodies.circle(100, 250, 20, { isStatic: true });
+    var boxB = Bodies.circle(700, 250, 20, { isStatic: true });
+    // var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
+
+    const boxWidth = 800;
+    const boxHeight = 600;
+    const borderWidth = 20;
+
+    const rectangleWidth = 20;
+    const rectangleHeight = 200;
+    const rectangleX = 800;
+    const rectangleY = 50;
+
+    // Create the angled rectangle body
+    const angledRectangle = Bodies.rectangle(rectangleX, rectangleY, rectangleWidth, rectangleHeight, { isStatic: true});
+    Matter.Body.rotate(angledRectangle, 3/2 * Math.PI / 2)
+
+    const angledBottomLeft = Bodies.rectangle(boxWidth / 2 - 100, boxHeight, boxWidth, borderWidth, { isStatic: true, restitution: 1 })
+    Matter.Body.rotate(angledBottomLeft, 1/6 * Math.PI / 2)
+    const angledBottomRight = Bodies.rectangle(boxWidth / 2, boxHeight, boxWidth - 100, borderWidth, { isStatic: true, restitution: 1 })
+    Matter.Body.rotate(angledBottomRight, -1/6 * Math.PI / 2)
+
+
+
+    // Create boundary walls
+    const walls = [
+        Bodies.rectangle(boxWidth / 2, 0, boxWidth, borderWidth, { isStatic: true, restitution: 1 }), // Top wall
+        Bodies.rectangle(boxWidth / 2, boxHeight, boxWidth, borderWidth, { isStatic: true, restitution: 1 }), // Bottom wall
+        Bodies.rectangle(0, boxHeight / 2, borderWidth, boxHeight, { isStatic: true, restitution: 1 }), // Left wall
+        Bodies.rectangle(boxWidth, boxHeight / 2, borderWidth, boxHeight, { isStatic: true, restitution: 1 }), // Right wall
+        Bodies.rectangle(boxWidth - 62, boxHeight / 2 + 125, borderWidth, boxHeight, { isStatic: true })
+    ];
+
+    const launcherWidth = 100;
+    const launcherHeight = 20;
+    const launcher = Matter.Bodies.rectangle(750, 580, launcherWidth, launcherHeight, { isStatic: true });
+
+    const flipper = Matter.Bodies.rectangle(350, 280, launcherWidth, launcherHeight, { restitution: 0.1, density: 0.01 });
+    const hinge = Matter.Bodies.circle(350, 280, 50, { isStatic: true });
+
+    
+
+    var hingeConstraint = Matter.Constraint.create({
+        bodyA: flipper,
+        pointA: { x: launcherWidth / 2 - 10, y: 0 },
+        bodyB: hinge,
+        pointB: { x: 0, y: 0 },
+        length: 0,
+        stiffness: 1,
+      });
+
+    // const constraint = Matter.Constraint.create({
+    //     pointA: { x: 300, y: 280 },
+    //     bodyB: flipper
+    // })
+    Composite.add(engine.world, [flipper, hingeConstraint]);
+
+    function createPaddles() {
+        // these bodies keep paddle swings contained, but allow the ball to pass through
+        let leftUpStopper = Matter.Bodies.circle(300, 360, 40, { isStatic: true })
+        let leftDownStopper = Matter.Bodies.circle(300, 200, 40, { isStatic: true })
+        let rightUpStopper = Matter.Bodies.circle(160, 591, 40, { isStatic: true })
+        let rightDownStopper = Matter.Bodies.circle(160, 591, 40, { isStatic: true })
+        Composite.add(engine.world, [leftUpStopper, leftDownStopper, rightUpStopper, rightDownStopper]);
+    }
+
+    createPaddles()
+
+
+    // Define a key press event handler
+    let launcherActivated = true;
+    let flipperActive = false;
+    document.addEventListener("keydown", function(event) {
+        if (event.code === "Space") {
+            if (launcherActivated) {
+                Matter.Body.applyForce(circleA, circleA.position, { x: 0, y: -0.085 });
+                launcherActivated = false;
+                flipperActive = true;
+            }
+        }
+    });
+
+    let buttonDown = false;
+
+    eventBackdrop.addEventListener("mousedown", () => {
+        buttonDown = true;
+    })
+
+    eventBackdrop.addEventListener("mouseup", () => {
+        buttonDown = false;
+    })
+
+    // add all of the bodies to the world
+    Composite.add(engine.world, [circleA,boxA, boxB, ...walls,launcher,angledRectangle,angledBottomLeft,angledBottomRight,]);
+
+    // run the renderer
+    Render.run(render);
+
+    Matter.Events.on(engine, 'beforeUpdate', () => {
+        if (buttonDown)  Matter.Body.setAngularVelocity(flipper, Math.PI / 40);
+    });
+
+    // create runner
+    var runner = Runner.create();
+    // run the engine
+    Runner.run(runner, engine);
     mainBody.append(eventBackdrop);
 }
 
@@ -8388,8 +8533,8 @@ function createTreeMenu() {
     treeImg.classList.add('tree-image');
 
     if (treeLevel !== 0) {
-        treeImg.src = `./assets/tree/tree-${treeLevel}.webp`;
-        treeContainer.classList.add(`tree-${treeLevel}`);
+        treeImg.src = `./assets/tree/tree-${treeLevel === 5 ? 4 : treeLevel}.webp`;
+        treeContainer.classList.add(`tree-${treeLevel === 5 ? 4 : treeLevel}`);
         saveValues.treeObj.growthRate = 100;
     } else {
         treeImg.src = `./assets/tooltips/Empty.webp`;
@@ -8485,15 +8630,28 @@ function createTreeMenu() {
     updateTreeValues(treeLevel === 0 ? true : false);
     if (saveValues.treeObj.defense === 'block') {
         enemyBlock();
+    } else if (treeLevel === 5) {
+        treeOptions(true, document.getElementById('options-container'), true);
     }
 }
 
-function treeOptions(planted, optionsContainer) {
+function treeOptions(planted, optionsContainer, lastPhase) {
     while (optionsContainer.firstChild) {
         optionsContainer.firstChild.remove();
     }
 
-    if (planted) {
+    if (lastPhase) {
+        optionsContainer.classList.add('flex-row','options-container');
+        let treeButton = document.createElement('div');
+        let optionImg = new Image();
+        optionImg.src = `./assets/tree/harvest.webp`;
+        let optionText = document.createElement('p');
+        optionText.innerText = 'Harvest';
+
+        treeButton.addEventListener('click',() => {destroyTree()})
+        treeButton.append(optionImg,optionText);
+        optionsContainer.appendChild(treeButton);
+    } else if (planted) {
         optionsContainer.classList.add('flex-row','options-container');
         const optionsTextArray = ['Bless','Fertilize','Destroy'];
         for (let i = 0; i < 3; i++) {
@@ -8548,8 +8706,14 @@ function destroyTree() {
     setTimeout(()=>{
         mailElement.load();
         mailElement.play();
+
+        let treeHealthText = document.getElementById('tree-health-text');
+        saveValues.treeObj.health = 0;
+        treeHealthText.health = saveValues.treeObj.health;
+        treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
+
         treeProgress.style.width = 0;
-        treeContainer.classList.remove(`tree-${saveValues.treeObj.level}`);
+        treeContainer.classList.remove(`tree-${saveValues.treeObj.level === 5 ? 4 : saveValues.treeObj.level}`);
         saveValues.treeObj.level = 0;
         saveValues.treeObj.defense = false;
         treeImg.src = `./assets/tooltips/Empty.webp`;
@@ -8578,6 +8742,7 @@ function enemyBlock(remove, damage, maxHP) {
         let enemyContainerChildren = enemyContainer.children;
         let lostHP = Math.min(50,(50 * (damage / maxHP)));
 
+        // TODO: add a funny picture or smth depending on amount of lost HP
         enemyContainerChildren[2].innerHTML = `You took ${damage} cumulative damage <br> The tree lost ${lostHP}% of its HP.`;
         enemyContainerChildren[2].style.textAlign = 'center';
         enemyContainerChildren[2].style.margin = '2% 0';
@@ -8635,14 +8800,19 @@ function growTree(type, amount) {
     const treeProgress = document.getElementById('tree-progress');
     const treeProgressValue = document.getElementById('tree-progress-value');
     if (type === 'add') {
+        if (saveValues.treeObj.level === 5) {return}
         if (saveValues.treeObj.defense !== 'block') {
             treeProgress.progress += treeProgressValue.rate;
             saveValues.treeObj.growth = treeProgress.progress;
             treeProgress.style.width = treeProgress.progress + '%';
-            if (treeProgress.progress > 100 && saveValues.treeObj.level !== 4) {
-                treeProgress.progress = 0;
-                growTree('level');
-                
+            if (treeProgress.progress > 100) {
+                if (saveValues.treeObj.level === 4) {
+                    saveValues.treeObj.level = 5;
+                    treeOptions(true, document.getElementById('options-container'), true);
+                } else {
+                    treeProgress.progress = 0;
+                    growTree('level');
+                }
             }
         }
     } else if (type === 'rate') {
@@ -8652,8 +8822,14 @@ function growTree(type, amount) {
         const treeContainer = document.getElementById('tree-container');
         if (saveValues.treeObj.level === 0) {
             treeOptions(true, document.getElementById('options-container'));
+            
+            let treeHealthText = document.getElementById('tree-health-text');
+            saveValues.treeObj.health = 100;
+            treeHealthText.health = saveValues.treeObj.health;
+            treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
+
             updateTreeValues(false);
-            saveValues.treeObj.defense = randomIntegerWrapper(90,101);
+            saveValues.treeObj.defense = randomIntegerWrapper(0);
             weaselBurrow.load();
             weaselBurrow.play();
         };
@@ -9182,6 +9358,8 @@ function newPop(type) {
         mainBody.append(newPopUp);
     }    
 }
+
+if (beta) setTimeout(()=>{pinballEvent();},500)
 }
 
 // FOR TESTING PURPOSES ONLY

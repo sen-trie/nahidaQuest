@@ -80,6 +80,10 @@
     column-gap: 3%;
 }
 
+.event-dark > canvas {
+    z-index: 10001;
+}
+
 .event-dark::before {
     content: "";
     background-color: #000000;
