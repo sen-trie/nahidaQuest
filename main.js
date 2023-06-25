@@ -785,7 +785,7 @@ function idleCheck(idleAmount) {
 let eventTimes = 1;
 let eventChance = 0;
 function randomEventTimer(timerSeconds) {
-    // if (beta) {eventCooldownDecrease = 0.05}
+    if (beta) {eventCooldownDecrease = 0.05}
     let eventTimeMin = EVENTCOOLDOWN * eventTimes * eventCooldownDecrease;
     if (eventChance !== 0) {
         let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/((EVENTCOOLDOWN * eventCooldownDecrease)/2))
@@ -812,7 +812,7 @@ function startRandomEvent() {
         aranaraNumber = randomInteger(1,4);
     }
 
-    // if (beta) {aranaraNumber = 5}
+    if (beta) {aranaraNumber = randomInteger(7,10)}
      
     eventPicture.classList.add("random-event");
     eventPicture.addEventListener("click", () => {
@@ -2186,7 +2186,29 @@ function pinballEvent() {
     eventDescription.classList.add("event-description");
     eventDescription.style.position = "absolute";
     eventDescription.style.top = "2%";
-    eventBackdrop.append(eventDescription);
+
+    let pinballContainer = document.createElement("div");
+    pinballContainer.classList.add('pinball-container');
+
+    let cancelBox = document.createElement("button");
+    cancelBox.classList.add("cancel-event");
+    cancelBox.innerText = "Give Up...";
+    cancelBox.addEventListener("click",()=>{
+        if (eventBackdrop != null) {
+            eventBackdrop.remove();
+            stopSpawnEvents = false;
+        }
+    })
+
+    let launchButton = document.createElement("button");
+    launchButton.classList.add("launch-button");
+
+    let resetButton = document.createElement("button");
+    resetButton.classList.add("launch-button");
+
+    pinballContainer.append(launchButton, resetButton)
+    eventBackdrop.append(eventDescription, pinballContainer, cancelBox);
+    mainBody.append(eventBackdrop);
 
     var Engine = Matter.Engine,
     Render = Matter.Render,
@@ -2196,85 +2218,157 @@ function pinballEvent() {
 
     // create an engine
     var engine = Engine.create();
-    engine.world.gravity.y = 0.25;
+    engine.world.gravity.y = 0.35;
+
+    let pinWidth = pinballContainer.clientWidth / 100;
+    let pinHeight = pinballContainer.clientHeight / 100;
 
     // create a renderer
     var render = Render.create({
-        element: eventBackdrop ,
-        engine: engine
+        element: pinballContainer,
+        engine: engine,
+        options: {
+            width: 100 * pinWidth,
+            height: 100 * pinHeight,
+            wireframes: false,
+            background: 'transparent'
+        }
+        
     });
 
     // create two boxes and a ground
-    var circleA = Bodies.circle(790, 150, 20, { restitution: 1 } );
-    circleA.gravityScale = 0.1;
-    circleA.frictionAir = 0.0005;
-    var boxA = Bodies.circle(100, 250, 20, { isStatic: true });
-    var boxB = Bodies.circle(700, 250, 20, { isStatic: true });
+    const ballCollisionCategory = 0x0001;    // Unique collision category for the ball
+    const flipperCollisionCategory = 0x0002; // Unique collision category for the flipper
+    const stopperCollisionCategory = 0x0004; // Unique collision category for the stopper
+    const wallCollisionCategory = 0x0008;
+
+    const flipperTexture = new Image();
+    flipperTexture.src = './assets/expedbg/leader-0.webp';
+
+    let circleA;
+    
+
+    flipperTexture.onload = function (){
+        console.log(flipperTexture.width, 3 * pinWidth)
+
+
+        circleA = Bodies.circle(99 * pinWidth, 70 * pinHeight, 3 * pinWidth, { 
+            restitution: 0.8, 
+            render: {
+                sprite: {
+                    texture: './assets/expedbg/leader-0.webp',
+                    xScale: (6 * pinWidth / flipperTexture.width),
+                    yScale: (6 * pinWidth / flipperTexture.height), 
+                }
+            },
+            collisionFilter: {
+                category: ballCollisionCategory,
+                mask: wallCollisionCategory | flipperCollisionCategory
+            } 
+        });
+        circleA.frictionAir = 0.0010;
+    
+
+
+    
+
     // var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
 
-    const boxWidth = 800;
-    const boxHeight = 600;
+    const boxWidth = 100 * pinWidth;
+    const boxHeight = 100 * pinHeight;
     const borderWidth = 20;
 
     const rectangleWidth = 20;
-    const rectangleHeight = 200;
-    const rectangleX = 800;
-    const rectangleY = 50;
+    const rectangleHeight = 75 * pinHeight;
+    const dividerLine = 90 * pinWidth
+    const rectangleX = 100 * pinWidth;
+    const rectangleY = 10 * pinHeight;
 
     // Create the angled rectangle body
-    const angledRectangle = Bodies.rectangle(rectangleX, rectangleY, rectangleWidth, rectangleHeight, { isStatic: true});
+    const angledRectangle = Bodies.rectangle(rectangleX, rectangleY, rectangleWidth, rectangleHeight, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory}  });
     Matter.Body.rotate(angledRectangle, 3/2 * Math.PI / 2)
+    const angledBottomLeft = Bodies.rectangle(14 * pinWidth, 83 * pinHeight, 33 * pinWidth, borderWidth, { isStatic: true, chamfer: { radius: 10 }, restitution: 1, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory}  })
+    Matter.Body.rotate(angledBottomLeft, 0.35 * Math.PI / 2)
+    const angledBottomRight = Bodies.rectangle(dividerLine - 14 * pinWidth, 83 * pinHeight, 33 * pinWidth, borderWidth, { isStatic: true, chamfer: { radius: 10 }, restitution: 1, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory}  })
+    Matter.Body.rotate(angledBottomRight, -0.35 * Math.PI / 2)
 
-    const angledBottomLeft = Bodies.rectangle(boxWidth / 2 - 100, boxHeight, boxWidth, borderWidth, { isStatic: true, restitution: 1 })
-    Matter.Body.rotate(angledBottomLeft, 1/6 * Math.PI / 2)
-    const angledBottomRight = Bodies.rectangle(boxWidth / 2, boxHeight, boxWidth - 100, borderWidth, { isStatic: true, restitution: 1 })
-    Matter.Body.rotate(angledBottomRight, -1/6 * Math.PI / 2)
-
+    const angleWalls = [angledRectangle, angledBottomLeft, angledBottomRight];
 
 
     // Create boundary walls
     const walls = [
-        Bodies.rectangle(boxWidth / 2, 0, boxWidth, borderWidth, { isStatic: true, restitution: 1 }), // Top wall
-        Bodies.rectangle(boxWidth / 2, boxHeight, boxWidth, borderWidth, { isStatic: true, restitution: 1 }), // Bottom wall
-        Bodies.rectangle(0, boxHeight / 2, borderWidth, boxHeight, { isStatic: true, restitution: 1 }), // Left wall
-        Bodies.rectangle(boxWidth, boxHeight / 2, borderWidth, boxHeight, { isStatic: true, restitution: 1 }), // Right wall
-        Bodies.rectangle(boxWidth - 62, boxHeight / 2 + 125, borderWidth, boxHeight, { isStatic: true })
+        Bodies.rectangle(boxWidth / 2, 0, boxWidth, borderWidth, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Top wall
+        Bodies.rectangle(dividerLine + 5 * pinWidth, 75 * pinHeight, 10 * pinWidth, borderWidth, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Bottom wall
+        // Bodies.rectangle(boxWidth / 2, boxHeight - 30, boxWidth, borderWidth, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Bottom wall
+        Bodies.rectangle(0, boxHeight / 2, borderWidth, boxHeight, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Left wall
+        Bodies.rectangle(boxWidth, boxHeight / 2, borderWidth, boxHeight, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
+        Bodies.rectangle(dividerLine, boxHeight / 2 + 125, borderWidth, boxHeight, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
+        Bodies.circle(50 * pinWidth, 35 * pinHeight, 20, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
+        Bodies.circle(35 * pinWidth, 25 * pinHeight, 20, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
+        Bodies.circle(60 * pinWidth, 20 * pinHeight, 20, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
+        Bodies.circle(15 * pinWidth, 10 * pinHeight, 20, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
+
+        Bodies.rectangle(25 * pinWidth, 75 * pinHeight, 12.5 * pinWidth, borderWidth, { angle:0.6, chamfer: { radius: 10 }, isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
+        Bodies.rectangle(20 * pinWidth, 68 * pinHeight, borderWidth, 17.5 * pinWidth, { isStatic: true, chamfer: { radius: 10 }, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
+        Bodies.rectangle(25 * pinWidth, 70 * pinHeight, 25 * pinWidth, borderWidth, { angle:1.1, chamfer: { radius: 10 }, isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
+        
+
+        // Bodies.fromVertices(35 * pinWidth, 80 * pinHeight, [
+        //     { x: 0, y: 0 },
+        //     { x: 0, y: 10 * pinHeight },
+        //     { x: 10 * pinWidth, y: 15 * pinHeight },
+        // ], { isStatic: true, chamfer: { radius: 10 }, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory } }),
     ];
 
-    const launcherWidth = 100;
-    const launcherHeight = 20;
-    const launcher = Matter.Bodies.rectangle(750, 580, launcherWidth, launcherHeight, { isStatic: true });
+    createPaddles();
 
-    const flipper = Matter.Bodies.rectangle(350, 280, launcherWidth, launcherHeight, { restitution: 0.1, density: 0.01 });
-    const hinge = Matter.Bodies.circle(350, 280, 50, { isStatic: true });
 
-    
-
+    const launcherWidth = 15 * pinWidth;
+    const launcherHeight = 2.5 * pinHeight;
+    // const launcher = Matter.Bodies.rectangle(750, 580, launcherWidth, launcherHeight, { isStatic: true });
+    const flipper = Matter.Bodies.rectangle(dividerLine / 2, 680, launcherWidth, launcherHeight, { restitution: 0.1, density: 1, collisionFilter: {
+        category: flipperCollisionCategory,
+        mask: wallCollisionCategory | ballCollisionCategory | stopperCollisionCategory
+    }});
+    const hinge = Matter.Bodies.circle(dividerLine / 2 - 17 * pinWidth, 90 * pinHeight, 50, { isStatic: true });
     var hingeConstraint = Matter.Constraint.create({
         bodyA: flipper,
-        pointA: { x: launcherWidth / 2 - 10, y: 0 },
+        pointA: { x: -1 * launcherWidth / 2 + 10, y: 0 },
         bodyB: hinge,
         pointB: { x: 0, y: 0 },
         length: 0,
         stiffness: 1,
       });
 
-    // const constraint = Matter.Constraint.create({
-    //     pointA: { x: 300, y: 280 },
-    //     bodyB: flipper
-    // })
-    Composite.add(engine.world, [flipper, hingeConstraint]);
+    const rightFlipper = Matter.Bodies.rectangle(dividerLine / 2, 680, launcherWidth, launcherHeight, { restitution: 0.1, density: 1, collisionFilter: {
+        category: flipperCollisionCategory,
+        mask: wallCollisionCategory | ballCollisionCategory | stopperCollisionCategory
+    }});
+    const rightHinge = Matter.Bodies.circle(dividerLine / 2 + 17 * pinWidth, 90 * pinHeight, 50, { isStatic: true });
+    var hingeRightConstraint = Matter.Constraint.create({
+        bodyA: rightFlipper,
+        pointA: { x: launcherWidth / 2 - 10, y: 0 },
+        bodyB: rightHinge,
+        pointB: { x: 0, y: 0 },
+        length: 0,
+        stiffness: 1,
+      });
+
+      
+    Composite.add(engine.world, [flipper, hingeConstraint, rightFlipper, hingeRightConstraint]);
 
     function createPaddles() {
-        // these bodies keep paddle swings contained, but allow the ball to pass through
-        let leftUpStopper = Matter.Bodies.circle(300, 360, 40, { isStatic: true })
-        let leftDownStopper = Matter.Bodies.circle(300, 200, 40, { isStatic: true })
-        let rightUpStopper = Matter.Bodies.circle(160, 591, 40, { isStatic: true })
-        let rightDownStopper = Matter.Bodies.circle(160, 591, 40, { isStatic: true })
-        Composite.add(engine.world, [leftUpStopper, leftDownStopper, rightUpStopper, rightDownStopper]);
+        // these bodies keep paddle swings contained, but allow the ball to pass through render: {visible: false }
+        const stopperArray = [
+            Bodies.circle(dividerLine / 2 - 13 * pinWidth, 80 * pinHeight, 40, { isStatic: true, collisionFilter: { category: stopperCollisionCategory, mask: flipperCollisionCategory}, render: {visible: false }}),
+            Bodies.circle(dividerLine / 2 - 12 * pinWidth, 100 * pinHeight, 40, { isStatic: true, collisionFilter: { category: stopperCollisionCategory, mask: flipperCollisionCategory}, render: {visible: false }}),
+            Bodies.circle(dividerLine / 2 + 13 * pinWidth, 80 * pinHeight, 40, { isStatic: true, collisionFilter: { category: stopperCollisionCategory, mask: flipperCollisionCategory}, render: {visible: false }}),
+            Bodies.circle(dividerLine / 2 + 12 * pinWidth, 100 * pinHeight, 40, { isStatic: true, collisionFilter: { category: stopperCollisionCategory, mask: flipperCollisionCategory}, render: {visible: false }})
+        ]
+
+        Composite.add(engine.world, [...stopperArray]);
     }
 
-    createPaddles()
 
 
     // Define a key press event handler
@@ -2283,12 +2377,29 @@ function pinballEvent() {
     document.addEventListener("keydown", function(event) {
         if (event.code === "Space") {
             if (launcherActivated) {
-                Matter.Body.applyForce(circleA, circleA.position, { x: 0, y: -0.085 });
+                Matter.Body.applyForce(circleA, circleA.position, { x: 0, y: -0.075 });
                 launcherActivated = false;
                 flipperActive = true;
             }
         }
     });
+
+    launchButton.innerText = 'LAUNCH'
+    launchButton.addEventListener('click', () => {
+        if (launcherActivated) {
+            Matter.Body.applyForce(circleA, circleA.position, { x: 0, y: -0.075 });
+            launcherActivated = false;
+            flipperActive = true;
+        }
+    });
+
+    resetButton.innerText = 'RESET'
+    resetButton.addEventListener('click', () => {
+        Matter.Body.setPosition(circleA, { x: 99 * pinWidth, y: 70 * pinHeight});
+        Matter.Body.setVelocity(circleA, { x: 0, y: 0 });
+        launcherActivated = true;
+    });
+    
 
     let buttonDown = false;
 
@@ -2296,25 +2407,52 @@ function pinballEvent() {
         buttonDown = true;
     })
 
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'k') {
+            Matter.Body.setPosition(circleA, { x: 99 * pinWidth, y: 70 * pinHeight});
+            Matter.Body.setVelocity(circleA, { x: 0, y: 0 });
+            launcherActivated = true;
+        }
+    })
+
     eventBackdrop.addEventListener("mouseup", () => {
         buttonDown = false;
     })
 
     // add all of the bodies to the world
-    Composite.add(engine.world, [circleA,boxA, boxB, ...walls,launcher,angledRectangle,angledBottomLeft,angledBottomRight,]);
+    Composite.add(engine.world, [circleA, ...walls, ...angleWalls,]);
 
     // run the renderer
     Render.run(render);
 
     Matter.Events.on(engine, 'beforeUpdate', () => {
-        if (buttonDown)  Matter.Body.setAngularVelocity(flipper, Math.PI / 40);
+        if (buttonDown)  {
+            Matter.Body.setAngularVelocity(flipper, -Math.PI / 35);
+            Matter.Body.setAngularVelocity(rightFlipper, Math.PI / 35);
+        }
     });
+
+    Matter.Events.on(engine, 'afterUpdate', () => {
+        if (circleA.position.y > render.options.height + 10) {
+            Matter.Body.setPosition(circleA, { x: 99 * pinWidth, y: 70 * pinHeight});
+            Matter.Body.setVelocity(circleA, { x: 0, y: 0 });
+            launcherActivated = true;
+        }
+
+    });
+
+    setTimeout(() => {
+        Matter.Body.setAngle(flipper,0);
+        Matter.Body.setAngle(rightFlipper,0);
+    },0)
+
 
     // create runner
     var runner = Runner.create();
     // run the engine
     Runner.run(runner, engine);
-    mainBody.append(eventBackdrop);
+
+}
 }
 
 // EVENT OUTCOME (BLACK BAR THAT APPEARS IN THE MIDDLE OF SCREEN)
@@ -2552,7 +2690,7 @@ function tutorial(idleAmount) {
             const lastVisit = document.cookie.replace(/(?:(?:^|.*;\s*)lastVisit\s*\=\s*([^;]*).*$)|^.*$/, '$1');
             const today = new Date().toDateString();
             if (lastVisit === '' || lastVisit !== today) {
-                settingsBox("toggle","patch")
+                settingsBox("toggle","patch");
                 document.cookie = 'lastVisit=' + today + '; expires=' + new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toUTCString() + '; path=/';
             }
 
@@ -3171,6 +3309,12 @@ function settingsBox(type,eleId) {
             if (commandText === "transcend") {
                 nutPopUp();
                 toggleSettings(true);
+            } else if (commandText === "beta tools activate") {
+                localStorage.setItem('beta', true);
+                window.refresh();
+            } else if (commandText === "beta tools off") {
+                localStorage.setItem('beta', false);
+                window.refresh();
             } else {
                 alert("Invalid command.");
             }
@@ -9363,10 +9507,14 @@ if (beta) setTimeout(()=>{pinballEvent();},500)
 }
 
 // FOR TESTING PURPOSES ONLY
-const beta = false;
+let beta = false;
+if (localStorage.getItem('beta') == 'true') {
+    beta = true;
+}
+
 if (beta) {
     let warning = document.createElement('p');
-    warning.innerText = 'BETA (you should not see this)';
+    warning.innerText = 'BETA';
     warning.classList.add('beta-warning');
     mainBody.append(warning);
 

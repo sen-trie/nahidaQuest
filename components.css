@@ -772,6 +772,44 @@
     filter: drop-shadow(0 0 0.2em white);
 }
 
+.pinball-container {
+    position: absolute;
+    z-index: 1001;
+    top: 4em;
+    height: 85%;
+    width: auto;
+    max-width: 90%;
+    aspect-ratio: 0.7;
+    background: url(./assets/expedbg/choice/11_B_Fail.webp) no-repeat center center/cover;
+}
+
+.launch-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: yellow;
+    width: 15%;
+    height: 10%;
+}
+
+.launch-button:last-of-type {
+    position: absolute;
+    bottom: 10%;
+    right: 0;
+    background-color: green;
+    width: 15%;
+    height: 10%;
+}
+
+.pinball-container::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
 /*/////////////////////////////// ADVENTURE CSS ///////////////////////////////*/
 .adventure-map {
     position: absolute;

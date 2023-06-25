@@ -1056,6 +1056,7 @@ const eventText = {
     6: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
     7: "Let's play a game! Follow Arachatora's rhythm to win a prize!",
     8: "Arakarman dug up a strange lens that can reveal underground items. Let's see who's better at using it!",
+    9: "I've come up with a new contraption! Behold Haravatat's newest creation!",
 }
 
 const challengeInfo = [
