@@ -2336,11 +2336,14 @@ function playAudio() {
         } else {
             currentSong++;
         }
-        nextSong = "./assets/sfx/bgm"+currentSong+".mp3";
+        nextSong = "./assets/sfx/bgm" + currentSong + ".mp3";
         bgmElement.src = nextSong;
         bgmElement.load();
+    });
+
+    bgmElement.addEventListener('canplaythrough', () => {
         bgmElement.play();
-    }, false); 
+    });
 
     for (let i=0,len=sfxArray.length; i < len; i++) {
         sfxArray[i].volume = settingsValues.sfxVolume;
@@ -3565,14 +3568,24 @@ const elemItemID = {
     "Geo":7,
 }
 
+const constNation = {
+    Liyue: 1,
+    Mondstadt: 2,
+    Sumeru: 3,
+    Inazuma: 4,
+}
+
 function milestoneBuy(heroTooltip) {
     if (document.getElementById(`milestone-${heroTooltip}`).classList.contains("milestone-selected")) {document.getElementById(`milestone-${heroTooltip}`).classList.remove("milestone-selected")}
-    let heroID = heroTooltip.split("-")[0];
-    let level = heroTooltip.split("-")[1];
-    let cost = (4 * upgradeDict[heroID]["BaseCost"] * (COSTRATIO ** (level - 1)));
+    const heroID = heroTooltip.split("-")[0];
+    const level = heroTooltip.split("-")[1];
+    const cost = (4 * upgradeDict[heroID]["BaseCost"] * (COSTRATIO ** (level - 1)));
 
-    let itemID = 5002;
+    const currentSelection = document.getElementById('upgrade-selection').currentValue;
+    let elementItemID = 5002;
+    let nationItemID = 6000;
     let itemArray = [];
+
     let buff = 0.5;
     let itemStar = -1;
     if (level >= 350) {
@@ -3586,61 +3599,89 @@ function milestoneBuy(heroTooltip) {
         buff = 1;
     }
 
-    if (itemStar != -1) {
-        if (upgradeInfo[heroID].Ele == "Any") {
+    if (itemStar !== -1) {
+        // TRAVELER ONLY
+        if (upgradeInfo[heroID].Ele === "Any") {
+            if (currentSelection === 'prefer-book') {
+                weaselDecoy.load();
+                weaselDecoy.play();
+                return;
+            }
             for (let i = 1; i < 8; i++) {
-                if (InventoryMap.get(itemID + i + 7 * itemStar) > 0) {
-                    itemArray.push(itemID + i + 7 * itemStar)
+                if (InventoryMap.get(elementItemID + i + 7 * itemStar) > 0) {
+                    itemArray.push(elementItemID + i + 7 * itemStar);
                 }
             }
         } else {
-            for (let key in elemItemID) {
-                if (key == upgradeInfo[heroID].Ele) {
-                    itemID += (elemItemID[key] + 7 * itemStar);
-                    break;
+            let heroElement = upgradeInfo[heroID].Ele;
+            let heroNation = upgradeInfo[heroID].Nation;
+
+            let tempElement = InventoryMap.get(elementItemID + elemItemID[heroElement] + 7 * itemStar);
+            if (currentSelection !== 'prefer-book' && tempElement && tempElement > 0) {
+                itemArray.push(elementItemID + elemItemID[heroElement] + 7 * itemStar);
+            }
+
+            if (beta) {
+                let tempNation = InventoryMap.get(nationItemID + constNation[heroNation] + 4 * (4 - itemStar));
+                if (currentSelection !== 'prefer-gem' && tempNation && tempNation > 0) {
+                    itemArray.push(nationItemID + constNation[heroNation] + 4 * (4 - itemStar));
                 }
-            }    
+            }
         }
     }
     
     if (saveValues.realScore >= cost) {
-        if (itemArray.length > 0) {
-            let tempID = rollArray(itemArray,0)
+        // TRAVELER ONLY
+        if (upgradeInfo[heroID].Ele === "Any" && itemArray.length > 0) {
+            let tempID = rollArray(itemArray, 0);
             if (!InventoryMap.has(tempID)) {
                 weaselDecoy.load();
                 weaselDecoy.play();
                 return;
             }
+
             let inventoryCount = InventoryMap.get(tempID);
-            if (inventoryCount <= 0) {
+            if (!inventoryCount || inventoryCount <= 0) {
                 weaselDecoy.load();
                 weaselDecoy.play();
             }
 
             inventoryCount--;
-            InventoryMap.set(tempID,inventoryCount)
+            InventoryMap.set(tempID, inventoryCount)
 
             let buttonID = document.getElementById(tempID);
             if (inventoryCount <= 0) {buttonID.remove()}
-        } else if (itemID != 5002) {
-            if (!InventoryMap.has(itemID)) {
-                weaselDecoy.load();
-                weaselDecoy.play();
-                return;
-            }
-            let inventoryCount = InventoryMap.get(itemID);
-            if (inventoryCount <= 0) {
-                weaselDecoy.load();
-                weaselDecoy.play();
-                return;
-            }
-
+        } else if (itemArray.length > 0) {
+            let inventoryCount = InventoryMap.get(itemArray[0]);
             inventoryCount--;
-            InventoryMap.set(itemID,inventoryCount);
+            InventoryMap.set(itemArray[0], inventoryCount);
 
-            let buttonID = document.getElementById(itemID);
+            let buttonID = document.getElementById(itemArray[0]);
             if (inventoryCount <= 0) {buttonID.remove()}
+        } else if (itemStar !== -1) {
+            weaselDecoy.load();
+            weaselDecoy.play();
+            return;
         }
+        // } else if (itemID != 5002) {
+        //     if (!InventoryMap.has(itemID)) {
+        //         weaselDecoy.load();
+        //         weaselDecoy.play();
+        //         return;
+        //     }
+        //     let inventoryCount = InventoryMap.get(itemID);
+        //     if (!inventoryCount || inventoryCount <= 0) {
+        //         weaselDecoy.load();
+        //         weaselDecoy.play();
+        //         return;
+        //     }
+
+        //     inventoryCount--;
+        //     InventoryMap.set(itemID, inventoryCount);
+
+        //     let buttonID = document.getElementById(itemID);
+        //     if (inventoryCount <= 0) {buttonID.remove()}
+        // }
 
         let upgradeDictTemp = upgradeDict[heroID];
         let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * buff);
@@ -3651,13 +3692,18 @@ function milestoneBuy(heroTooltip) {
         upgradeDict[heroID]["Factor"] = Math.ceil(upgradeDictTemp["Factor"] * (buff+1));
         upgradeDict[heroID].milestone[level] = true;
 
+        if (document.getElementById(`milestone-${heroTooltip}`).nextSibling) {
+            document.getElementById(`milestone-${heroTooltip}`).nextSibling.click()
+        } else {
+            clearTooltip();
+        }
+        
         document.getElementById(`milestone-${heroTooltip}`).remove();
         refresh("hero", heroID);
         updatedHero(heroID);
 
         saveValues.realScore -= cost;
         milestoneCount--;
-        clearTooltip();
         updateMilestoneNumber();
         upgradeElement.load();
         upgradeElement.play();
@@ -7437,35 +7483,42 @@ function createTooltip() {
     upgradeSelection.classList.add('flex-column');
     upgradeSelection.id = 'upgrade-selection';
     upgradeSelection.style.display = 'none';
-    const preferDict = [
-        ['prefer-gem', 'Gems Only'], 
-        ['prefer-book', 'Materials Only'], 
-        ['prefer-none', 'Gems > Materials']
-    ]
+    upgradeSelection.currentValue = 'prefer-none';
 
-    for (let i = 0; i < 3; i++) {
+    const preferDict = [
+        { id: 'prefer-gem', label: 'Gems Only' },
+        { id: 'prefer-book', label: 'Materials Only' },
+        { id: 'prefer-none', label: 'Gems > Materials' }
+    ];
+
+    preferDict.forEach(preferItem => {
         const prefer = document.createElement('input');
-        prefer.type = 'Radio';
-        prefer.id = preferDict[i][0];
+        prefer.type = 'radio';
+        prefer.id = preferItem.id;
         prefer.name = 'upgrade-preference';
-    
+
         const preferLabel = document.createElement('label');
         preferLabel.classList.add('prefer-container');
-        preferLabel.setAttribute('for', preferDict[i][0]);
+        preferLabel.setAttribute('for', preferItem.id);
 
         const preferText = document.createElement('p');
-        preferText.innerText = preferDict[i][1];
-
+        preferText.innerText = preferItem.label;
         const checkSpan = document.createElement('span');
         checkSpan.classList.add('checked-prefer');
 
-        if (i === 2) {
+        if (preferItem.id === 'prefer-none') {
             prefer.checked = true;
         }
 
-        preferLabel.append(prefer, preferText, checkSpan);
-        if (beta) upgradeSelection.append(preferLabel);
-    }
+        prefer.addEventListener('change', function() {
+            if (prefer.checked) {
+                upgradeSelection.currentValue = preferItem.id;
+            }
+        });
+
+        preferLabel.prepend(prefer, preferText, checkSpan);
+        if (beta) upgradeSelection.appendChild(preferLabel);
+    });
 
     const tooltipButton = document.createElement("button");
     tooltipButton.id = "tool-tip-button";
@@ -8271,9 +8324,6 @@ function calculateGoldenCore(type) {
             }
         }
 
-        if (corePerHero > 0) {
-            console.log(corePerHero, upgradeDict[key].milestone)
-        }
         goldenNutValue += Math.round(corePerHero);
     }
 
