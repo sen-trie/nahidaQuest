@@ -24,6 +24,10 @@ let saveValuesDefault = {
         defense: false,
         energy: 100,
         health: 100,
+        offerAmount: 0,
+        offer: [],
+        // PYRO, HYDRO, DENDRO, ELECTRO, ANEMO, CRYO, GEO
+        elementAffinity: [1,1,1,1,1,1,1]
     }
 }
 
@@ -43,6 +47,7 @@ let persistentValuesDefault = {
     upgrade10:{Purchased: 0},
     upgrade11:{Purchased: 0},
     upgrade12:{Purchased: 0},
+    treeSeeds:[0,0,0,0,0,0],
     ascendEle:{
         "Pyro":0,
         "Hydro":0,

@@ -2365,6 +2365,7 @@ input:checked + .slider:before {
     background-size: cover;
     background-repeat: no-repeat;
     scrollbar-color: #d3e4d1 #60895a;
+    transform: translateZ(0);
 }
 
 #nut-shop-ascend {

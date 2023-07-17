@@ -6,7 +6,7 @@ import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min
 // import * as drawUI from "./modules/drawUI.js"
 
 const VERSIONNUMBER = "V.1-02-002";
-const COPYRIGHT = "DISCLAIMER © HoYoverse. All rights reserved. \n HoYoverse and Genshin Impact are trademarks, \n services marks, or registered trademarks of HoYoverse.";
+const COPYRIGHT = "DISCLAIMER © HoYoverse.  \n All rights reserved. This site is not affiliated \n with Hoyoverse, nor Genshin Impact.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
@@ -565,18 +565,19 @@ function loadSaveData() {
             persistentValues = persistentValuesDefault;
         } else {
             persistentValues = JSON.parse(persistentDictTemp);
-            updateObjectKeys(persistentValues,persistentValuesDefault);
-            updateObjectKeys(persistentValues.ascendDict,persistentValuesDefault.ascendDict);
+            updateObjectKeys(persistentValues, persistentValuesDefault);
+            updateObjectKeys(persistentValues.ascendDict, persistentValuesDefault.ascendDict);
         }
     }
 
     if (beta) {
         if (persistentValues.challengeCheck === undefined) {
-            persistentValues.challengeCheck = challengeCheck('populate',0,challengeInfo);
+            persistentValues.challengeCheck = challengeCheck('populate', 0, challengeInfo);
         } else {
-            persistentValues.challengeCheck = challengeCheck('check',0,persistentValues.challengeCheck,challengeInfo);
+            persistentValues.challengeCheck = challengeCheck('check', 0, persistentValues.challengeCheck, challengeInfo);
         }
-        createTreeMenu();
+
+        updateObjectKeys(saveValues.treeObj, saveValuesDefault.treeObj);
     }
 
     achievementListload();
@@ -653,7 +654,7 @@ function spawnFallingNut() {
     let animation = `fall ${number}s cubic-bezier(1,.05,.55,1.04) forwards`;
     let img = document.createElement("img");
     img.src = "./assets/icon/nut.webp";
-    img.style.left = `${randomInteger(0,100)}%`
+    img.style.left = `${randomInteger(0,100)}%`;
     img.style.animation = animation;
     img.addEventListener('animationend', () => {img.remove();});
     img.classList.add("falling-image");
@@ -785,7 +786,7 @@ function idleCheck(idleAmount) {
 let eventTimes = 1;
 let eventChance = 0;
 function randomEventTimer(timerSeconds) {
-    if (beta) {eventCooldownDecrease = 0.05}
+    // if (beta) {eventCooldownDecrease = 0.05}
     let eventTimeMin = EVENTCOOLDOWN * eventTimes * eventCooldownDecrease;
     if (eventChance !== 0) {
         let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/((EVENTCOOLDOWN * eventCooldownDecrease)/2))
@@ -812,7 +813,7 @@ function startRandomEvent() {
         aranaraNumber = randomInteger(1,4);
     }
 
-    if (beta) {aranaraNumber = randomInteger(7,10)}
+    if (beta) {aranaraNumber = randomInteger(7,9)}
      
     eventPicture.classList.add("random-event");
     eventPicture.addEventListener("click", () => {
@@ -842,7 +843,7 @@ function startRandomEvent() {
 }
 
 function clickedEvent(aranaraNumber) {
-    let specialEvent = randomIntegerWrapper(luckRate*2,200);
+    let specialEvent = randomIntegerWrapper(luckRate*2, 200);
     eventElement.load();
     eventElement.play();
 
@@ -877,7 +878,7 @@ function clickedEvent(aranaraNumber) {
     // } else {
         eventDropdown.addEventListener("animationend", () => {
             eventDropdown.remove();
-            chooseEvent(aranaraNumber,specialEvent);
+            chooseEvent(aranaraNumber, specialEvent);
         });
     // }
     
@@ -911,9 +912,6 @@ function chooseEvent(type,specialMode) {
             break;
         case 8:
             battleshipEvent();
-            break;
-        case 9:
-            pinballEvent();
             break;
         default:
             console.error("Event error: Invalid event");
@@ -2175,394 +2173,6 @@ function battleshipEvent() {
     mainBody.append(eventBackdrop);
 }
 
-// EVENT 9 (PINBALL)
-function pinballEvent() {
-    stopSpawnEvents = true;
-    let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
-
-    let eventDescription = document.createElement("p");
-    eventDescription.innerText = "Hit the pins!";
-    eventDescription.classList.add("event-description");
-    eventDescription.style.position = "absolute";
-    eventDescription.style.top = "2%";
-
-    let pinballContainer = document.createElement("div");
-    pinballContainer.classList.add('pinball-container');
-
-    let cancelBox = document.createElement("button");
-    cancelBox.classList.add("cancel-event");
-    cancelBox.innerText = "Give Up...";
-    cancelBox.addEventListener("click",()=>{
-        if (eventBackdrop != null) {
-            eventBackdrop.remove();
-            stopSpawnEvents = false;
-        }
-    })
-
-    let launchButton = document.createElement("button");
-    launchButton.classList.add("launch-button");
-
-    let resetButton = document.createElement("button");
-    resetButton.classList.add("launch-button");
-
-    pinballContainer.append(launchButton, resetButton)
-    eventBackdrop.append(eventDescription, pinballContainer, cancelBox);
-    mainBody.append(eventBackdrop);
-
-    var Engine = Matter.Engine,
-    Render = Matter.Render,
-    Runner = Matter.Runner,
-    Bodies = Matter.Bodies,
-    Common = Matter.Common,
-    Composite = Matter.Composite;
-
-    var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/poly-decomp@0.3.0/build/decomp.min.js';
-    script.onload = loadDecomp;
-    document.head.appendChild(script);
-
-
-    function loadDecomp() {
-        Common.setDecomp(decomp);
- 
-    
-    
-
-    // create an engine
-    var engine = Engine.create();
-    engine.world.gravity.y = 0.20;
-
-    let pinWidth = pinballContainer.clientWidth / 100;
-    let pinHeight = pinballContainer.clientHeight / 100;
-
-    // create a renderer
-    var render = Render.create({
-        element: pinballContainer,
-        engine: engine,
-        options: {
-            width: 100 * pinWidth,
-            height: 100 * pinHeight,
-            wireframes: false,
-            background: 'transparent'
-        }
-        
-    });
-
-    // create two boxes and a ground
-    const ballCollisionCategory = 0x0001;    // Unique collision category for the ball
-    const flipperCollisionCategory = 0x0002; // Unique collision category for the flipper
-    const stopperCollisionCategory = 0x0004; // Unique collision category for the stopper
-    const wallCollisionCategory = 0x0008;
-    const cuttingCollisionCategory = 0x0016;
-
-    const flipperTexture = new Image();
-    flipperTexture.src = './assets/expedbg/leader-0.webp';
-
-    let circleA;
-  
-    flipperTexture.onload = function (){
-        circleA = Bodies.circle(95 * pinWidth, 70 * pinHeight, 3 * pinWidth, { 
-            restitution: 0.8, 
-            isStatic: false,
-            render: {
-                sprite: {
-                    texture: './assets/expedbg/leader-0.webp',
-                    xScale: (6 * pinWidth / flipperTexture.width),
-                    yScale: (6 * pinWidth / flipperTexture.height), 
-                }
-            },
-            collisionFilter: {
-                category: ballCollisionCategory,
-                mask: wallCollisionCategory | flipperCollisionCategory
-            } 
-        });
-        circleA.frictionAir = 0.0005;
-    
-
-
-    
-
-    // var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
-
-    const boxWidth = 100 * pinWidth;
-    const boxHeight = 100 * pinHeight;
-    const borderWidth = 15;
-
-    const rectangleWidth = 20;
-    const rectangleHeight = 75 * pinHeight;
-    const dividerLine = 90 * pinWidth
-    const rectangleX = 100 * pinWidth;
-    const rectangleY = 10 * pinHeight;
-
-    // Create the angled rectangle body
-    const angledRectangle = Bodies.rectangle(rectangleX, rectangleY, rectangleWidth, rectangleHeight, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory}  });
-    Matter.Body.rotate(angledRectangle, 3/2 * Math.PI / 2)
-    const angledBottomLeft = Bodies.rectangle(14 * pinWidth, 83 * pinHeight, 33 * pinWidth, borderWidth, { isStatic: true, chamfer: { radius: 10 }, restitution: 1, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory}  })
-    Matter.Body.rotate(angledBottomLeft, 0.35 * Math.PI / 2)
-    const angledBottomRight = Bodies.rectangle(dividerLine - 14 * pinWidth, 83 * pinHeight, 33 * pinWidth, borderWidth, { isStatic: true, chamfer: { radius: 10 }, restitution: 1, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory}  })
-    Matter.Body.rotate(angledBottomRight, -0.35 * Math.PI / 2)
-    const conditionalRight = Bodies.rectangle(dividerLine + 6.5 * pinWidth, 56.5 * pinHeight, 20 * pinWidth, borderWidth, { isStatic: true, chamfer: { radius: 10 }, restitution: 1, collisionFilter: { mask: ballCollisionCategory }  })
-    Matter.Body.rotate(conditionalRight, -0.35 * Math.PI / 2)
-    const angleWalls = [angledRectangle, angledBottomLeft, angledBottomRight,conditionalRight];
-
-
-    // Create boundary walls
-    const walls = [
-        // Bodies.rectangle(boxWidth / 2, 0, boxWidth, borderWidth, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Top wall
-        Bodies.rectangle(dividerLine + 5 * pinWidth, 75 * pinHeight, 10 * pinWidth, borderWidth, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Bottom wall
-        // Bodies.rectangle(boxWidth / 2, boxHeight - 30, boxWidth, borderWidth, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Bottom wall
-        Bodies.rectangle(0, boxHeight / 2, borderWidth, boxHeight, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Left wall
-        Bodies.rectangle(boxWidth, boxHeight / 2, borderWidth, boxHeight, { isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
-        Bodies.rectangle(dividerLine, boxHeight / 2 + 265, borderWidth, boxHeight / 2, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-        Bodies.rectangle(dividerLine, 40 * pinHeight, borderWidth, 20 * pinHeight, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-        
-        Bodies.circle(50 * pinWidth, 35 * pinHeight, 15, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-        Bodies.circle(35 * pinWidth, 25 * pinHeight, 15, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-        Bodies.circle(45 * pinWidth, 20 * pinHeight, 15, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-        Bodies.circle(15 * pinWidth, 10 * pinHeight, 15, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-
-        Bodies.circle(20 * pinWidth, 45 * pinHeight, 2 * pinWidth, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-        Bodies.circle(2 * pinWidth, 48 * pinHeight, 2 * pinWidth, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-        Bodies.circle(12 * pinWidth, 57 * pinHeight, 2 * pinWidth, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-        Bodies.rectangle(22 * pinWidth, 50 * pinHeight, borderWidth, 30 * pinHeight, { isStatic: true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }),
-        
-        Bodies.rectangle(64 * pinWidth, 10 * pinHeight, 17 * pinWidth, 10, { angle:0.2, chamfer: { radius: 10 }, isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
-
-        Bodies.rectangle(25 * pinWidth, 78 * pinHeight, 12.5 * pinWidth, borderWidth, { angle:0.6, chamfer: { radius: 10 }, isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
-        Bodies.rectangle(20 * pinWidth, 71 * pinHeight, borderWidth, 17.5 * pinWidth, { isStatic: true, chamfer: { radius: 10 }, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
-        Bodies.rectangle(25 * pinWidth, 73 * pinHeight, 25 * pinWidth, borderWidth, { angle:1.1, chamfer: { radius: 10 }, isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
-        
-        Bodies.rectangle(65 * pinWidth, 78 * pinHeight, 12.5 * pinWidth, borderWidth, { angle:2.54, chamfer: { radius: 10 }, isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
-        Bodies.rectangle(70 * pinWidth, 71 * pinHeight, borderWidth, 17.5 * pinWidth, { isStatic: true, chamfer: { radius: 10 }, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
-        Bodies.rectangle(65 * pinWidth, 73 * pinHeight, 25 * pinWidth, borderWidth, { angle:2, chamfer: { radius: 10 }, isStatic: true, restitution: 0.7, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} }), // Right wall
-        
-
-        // Bodies.fromVertices(35 * pinWidth, 80 * pinHeight, [
-        //     { x: 0, y: 0 },
-        //     { x: 0, y: 10 * pinHeight },
-        //     { x: 10 * pinWidth, y: 15 * pinHeight },
-        // ], { isStatic: true, chamfer: { radius: 10 }, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory } }),
-    ];
-
-    createPaddles();
-
-    const path = '0 0 0 250 19 250 20 231.9 25.7 196.1 36.9 161.7 53.3 129.5 74.6 100.2 100.2 74.6 129.5 53.3 161.7 36.9 196.1 25.7 231.9 20 268.1 20 303.9 25.7 338.3 36.9 370.5 53.3 399.8 74.6 425.4 100.2 446.7 129.5 463.1 161.7 474.3 196.1 480 231.9 480 250 500 250 500 0 0 0';
-    const numbersArray = path.split(' ');
-    const multipliedArray = numbersArray.map(number => parseFloat(number) * 1.12); // Replace '2' with your desired multiplier
-    const multipliedString = multipliedArray.join(' ');
-    let vertices = Matter.Vertices.fromPath(multipliedString);
-    let concaveBodies = Matter.Bodies.fromVertices(boxWidth /2, 11 * pinHeight, vertices, {isStatic:true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} })
-
-
-
-
-    const path2 = `370.5 55 370.5 60 399.8 74.6 425.4 100.2 446.7 129.5 463.1 161.7 474.3 196.1 480 231.9 480 250 490 250 490 231.9 484.3 196.1 473.1 161.7 458.7 130.5 435.4 98.2 409.8 70.6 380.5 54 370.3 49`;
-    let vertices2 = Matter.Vertices.fromPath(path2);
-    let concaveBodies2 = Matter.Bodies.fromVertices(dividerLine - 9 * pinWidth, 21 * pinHeight, vertices2, {isStatic:true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} })
-    let concaveBodies3 = Matter.Bodies.fromVertices(dividerLine - 20 * pinWidth, 21 * pinHeight, vertices2, {isStatic:true, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory} })
-
-    const rampRight = Bodies.rectangle(dividerLine - 4 * pinWidth, 42 * pinHeight, 17 * pinWidth, borderWidth, { isStatic: true, chamfer: { radius: 10 }, restitution: 1, collisionFilter: { category: wallCollisionCategory, mask: ballCollisionCategory}  })
-    Matter.Body.rotate(rampRight, -0.60 * Math.PI / 2)
-
-
-
-    Composite.add(engine.world, [concaveBodies, concaveBodies2,concaveBodies3, rampRight]);
-
-    const launcherWidth = 15 * pinWidth;
-    const launcherHeight = 2.5 * pinHeight;
-    // const launcher = Matter.Bodies.rectangle(750, 580, launcherWidth, launcherHeight, { isStatic: true });
-    const flipper = Matter.Bodies.rectangle(dividerLine / 2, 680, launcherWidth, launcherHeight, { restitution: 0, density: 0.015, collisionFilter: {
-        category: flipperCollisionCategory,
-        mask: wallCollisionCategory | ballCollisionCategory | stopperCollisionCategory
-    }});
-    const hinge = Matter.Bodies.circle(dividerLine / 2 - 17 * pinWidth, 90 * pinHeight, 50, { isStatic: true });
-    var hingeConstraint = Matter.Constraint.create({
-        bodyA: flipper,
-        pointA: { x: -1 * launcherWidth / 2 + 10, y: 0 },
-        bodyB: hinge,
-        pointB: { x: 0, y: 0 },
-        length: 0,
-        stiffness: 1,
-      });
-
-    const rightFlipper = Matter.Bodies.rectangle(dividerLine / 2, 680, launcherWidth, launcherHeight, { restitution: 0, density: 0.015, collisionFilter: {
-        category: flipperCollisionCategory,
-        mask: wallCollisionCategory | ballCollisionCategory | stopperCollisionCategory
-    }});
-    const rightHinge = Matter.Bodies.circle(dividerLine / 2 + 17 * pinWidth, 90 * pinHeight, 50, { isStatic: true });
-    var hingeRightConstraint = Matter.Constraint.create({
-        bodyA: rightFlipper,
-        pointA: { x: launcherWidth / 2 - 10, y: 0 },
-        bodyB: rightHinge,
-        pointB: { x: 0, y: 0 },
-        length: 0,
-        stiffness: 1,
-      });
-
-      
-    Composite.add(engine.world, [flipper, hingeConstraint, rightFlipper, hingeRightConstraint]);
-
-    function createPaddles() {
-        // these bodies keep paddle swings contained, but allow the ball to pass through render: {visible: false }
-        const stopperArray = [
-            Bodies.circle(dividerLine / 2 - 11 * pinWidth, 80 * pinHeight, 40, { isStatic: true, collisionFilter: { category: stopperCollisionCategory, mask: flipperCollisionCategory}, render: {visible: false }}),
-            Bodies.circle(dividerLine / 2 - 12 * pinWidth, 100 * pinHeight, 40, { isStatic: true, collisionFilter: { category: stopperCollisionCategory, mask: flipperCollisionCategory}, render: {visible: false }}),
-            Bodies.circle(dividerLine / 2 + 11 * pinWidth, 80 * pinHeight, 40, { isStatic: true, collisionFilter: { category: stopperCollisionCategory, mask: flipperCollisionCategory}, render: {visible: false }}),
-            Bodies.circle(dividerLine / 2 + 12 * pinWidth, 100 * pinHeight, 40, { isStatic: true, collisionFilter: { category: stopperCollisionCategory, mask: flipperCollisionCategory}, render: {visible: false }}),
-            
-        ]
-        Composite.add(engine.world, [...stopperArray]);
-    }
-
-
-    let bodyLock = Bodies.circle(dividerLine / 2 - 6 * pinWidth, 88 * pinHeight, 10, { isStatic: true, collisionFilter: { category:'', mask:''}, render: {visible: false }})
-    let bodyLockRight = Bodies.circle(dividerLine / 2 + 6 * pinWidth, 88 * pinHeight, 10, { isStatic: true, collisionFilter: { category:'', mask:''}, render: {visible: false }})
-    Composite.add(engine.world, [bodyLock,bodyLockRight])
-
-    const areaCheck = Matter.Bodies.rectangle(dividerLine - 7 * pinWidth, 30 * pinHeight, 8 * pinWidth, 5 * pinHeight, { isStatic: true, collisionFilter: { category: stopperCollisionCategory, mask: flipperCollisionCategory} });
-       
-    Composite.add(engine.world, [areaCheck])
-
-    // Define a key press event handler
-    let launcherActivated = true;
-    let flipperActive = false;
-    document.addEventListener("keydown", function(event) {
-        if (event.code === "Space") {
-            launchBall()
-        }
-    });
-
-    function launchBall() {
-        if (launcherActivated) {
-            Matter.Body.applyForce(circleA, circleA.position, { x: 0, y: -0.045 });
-            launcherActivated = false;
-            flipperActive = true;
-            setTimeout(() => {
-                conditionalRight.collisionFilter.category = wallCollisionCategory
-            },300)
-        }
-    }
-
-    function resetBall() {
-        Matter.Body.setPosition(circleA, { x: 99 * pinWidth, y: 70 * pinHeight});
-        Matter.Body.setVelocity(circleA, { x: 0, y: 0 });
-        launcherActivated = true;
-        conditionalRight.collisionFilter.category = ''
-    }
-
-    launchButton.innerText = 'LAUNCH'
-    launchButton.addEventListener('click', () => {
-        if (launcherActivated) {
-            launchBall()
-        }
-    });
-
-    resetButton.innerText = 'RESET'
-    resetButton.addEventListener('click', () => {
-        resetBall()
-    });
-    
-
-    let buttonDown = false;
-    let leftLock = false;
-    let rightLock = false;
-
-    eventBackdrop.addEventListener("mousedown", () => {
-        buttonDown = true;
-    })
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'k') {
-            resetBall()
-        }
-    })
-
-    eventBackdrop.addEventListener("mouseup", () => {
-        buttonDown = false;
-        if (bodyLock.collisionFilter.category != '') {
-            bodyLock.collisionFilter.category = ''
-            bodyLock.collisionFilter.mask = ''
-            leftLock = false;
-            Matter.Body.setAngularVelocity(flipper, Math.PI / 25)
-        }
-
-        if (bodyLockRight.collisionFilter.category != '') {
-            bodyLockRight.collisionFilter.category = ''
-            bodyLockRight.collisionFilter.mask = ''
-            rightLock = false;
-            Matter.Body.setAngularVelocity(rightFlipper, -1 * Math.PI / 25)
-        }
-    })
-
-    // add all of the bodies to the world
-    Composite.add(engine.world, [circleA, ...walls, ...angleWalls,]);
-
-    // run the renderer
-    Render.run(render);
-
-    Matter.Events.on(engine, 'beforeUpdate', () => {
-        if (buttonDown)  {
-            if (!leftLock) Matter.Body.setAngularVelocity(flipper, -1 * Math.PI / 30);
-            if (!rightLock) Matter.Body.setAngularVelocity(rightFlipper, Math.PI / 30);
-        }
-    });
-
-    let overlapDelay = true;
-
-
-    Matter.Events.on(engine, 'afterUpdate', () => {
-        if (circleA.position.y > render.options.height + 10) {
-            resetBall()
-        }
-
-        let overlapping = Matter.Bounds.overlaps(circleA.bounds, areaCheck.bounds);
-        if (overlapping && overlapDelay) {
-            overlapDelay = false;
-            Matter.Body.setPosition(circleA, { x: 75 * pinWidth, y: 17.5 * pinHeight });
-            Matter.Body.setStatic(circleA, true);
-
-            setTimeout(() => {
-                Matter.Body.setStatic(circleA, false);
-                Matter.Body.setVelocity(circleA, { x: 8, y: 10 });
-                setTimeout(() => {
-                    overlapDelay = true;
-                },500)
-            },1000)
-        }
-
-        if (Math.round(flipper.angle * 1000) === -615) {
-            if (bodyLock.collisionFilter.category !== stopperCollisionCategory) {
-                bodyLock.collisionFilter.category = stopperCollisionCategory
-                bodyLock.collisionFilter.mask = flipperCollisionCategory
-                leftLock = true;
-            }
-        }
-
-
-        if (Math.round(rightFlipper.angle * 1000) === 615) {
-            if (bodyLockRight.collisionFilter.category !== stopperCollisionCategory) {
-                bodyLockRight.collisionFilter.category = stopperCollisionCategory
-                bodyLockRight.collisionFilter.mask = flipperCollisionCategory
-                rightLock = true;
-            }
-        }
-    });
-
-    setTimeout(() => {
-        Matter.Body.setAngle(flipper,0);
-        Matter.Body.setAngle(rightFlipper,0);
-    },0)
-
-
-    // create runner
-    var runner = Runner.create();
-    // run the engine
-    Runner.run(runner, engine);
-}
-}
-}
-
 // EVENT OUTCOME (BLACK BAR THAT APPEARS IN THE MIDDLE OF SCREEN)
 function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
     stopSpawnEvents = false;
@@ -2824,10 +2434,6 @@ function tutorial(idleAmount) {
                     // } else if (persistentValues.transitionCore > 1000) {
                         
                     // }
-
-
-
-
                     delete persistentValues.transitionCore;
                 }
             },250)
@@ -2997,6 +2603,7 @@ function tabChange(x) {
     if (filterMenuTwo.style.display !== "none") {filterMenuTwo.style.display = "none"};
     if (document.getElementById('upgrade-menu-button')) {
         document.getElementById('upgrade-menu-button').style.display = "none";
+        universalStyleCheck(document.getElementById('upgrade-selection'), 'display', 'flex', 'none', true);
     }
 
     if (document.getElementById("nut-store-table")) {
@@ -3454,12 +3061,10 @@ function settingsBox(type,eleId) {
                     textBox.children[0].value = `Please use a JSON reader like JSONHERO if you like to manipulate the save values. Beware! Directly changing 'realScore','rowCount' or adding non-integer values may result in the save file being corrupted!\n---------------------------------\n\n${JSON.stringify(localStorage)}`;
                 },300)
             }
-
             settingsBox("close");
             textBox.style.zIndex = 10000;
         } else {
             textBox.style.zIndex = -1;
-            
         }
     } else if (type === "close") {
         for (let i = 0; i < settingsID.length; i++) {
@@ -3538,6 +3143,7 @@ function createFilter() {
 
     upgradeMenu.addEventListener("click",()=>{
         upgradeMenu.style.filter == "brightness(1)" ? upgradeMenu.style.filter = "brightness(0.4)" : upgradeMenu.style.filter = "brightness(1)";
+        universalStyleCheck(document.getElementById('upgrade-selection'), 'display', 'flex', 'none');
         
         milestoneToggle("toggle");
         if (heroTooltip !== -1) {
@@ -3559,11 +3165,16 @@ function createFilter() {
 
     const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','Sword','Claymore','Catalyst','Polearm','Bow','Sumeru','Mondstadt','Liyue','Inazuma'];
     const invOptions = ['Artifact','Food','Level','Gemstone','Talent','Sword','Claymore','Catalyst','Polearm','Bow'];
-    for (let i=0,len=heroOptions.length; i < len; i++) {
+    for (let i = 0, len = heroOptions.length; i < len; i++) {
         let filterPicture = document.createElement("button");
         filterPicture.style.backgroundImage = "url(./assets/tooltips/elements/" +heroOptions[i]+ ".webp)";
         filterPicture.classList.add("background-image-cover")
         filterPicture.addEventListener("click",()=> {
+            // IF IMPORTANT, ALLOW UPGRADES TO FILTER HERE
+            if (document.getElementById('upgrade-selection') && document.getElementById('upgrade-selection').style.display === "flex") {
+                return;
+            }
+
             if (filterPicture.classList.contains("dim-filter")) {
                 filterPicture.classList.remove("dim-filter");
                 filterHeroes(heroOptions[i]);
@@ -3596,7 +3207,7 @@ function createFilter() {
         filterMenuTwo.appendChild(filterPicture);
     }
     
-    filterDiv.append(filterButton,filterMenuOne,filterMenuTwo,filterCurrently,upgradeMenu);
+    filterDiv.append(filterButton, filterMenuOne, filterMenuTwo, filterCurrently, upgradeMenu);
 }
 
 
@@ -6086,7 +5697,7 @@ function continueQuest(advType) {
         }
         offerCurrency.innerText = `Cost: \n ${offerCurrency.value} Primogems`;
 
-        inventoryOffer.append(offerCurrency,acceptButton,rejectButton);
+        inventoryOffer.append(offerCurrency, acceptButton, rejectButton);
         adventureVideo.append(inventoryOffer,currencyAmount);
         let adventureTextBox = document.getElementById("adventure-text");
         adventureTextBox.questNumber = "0_Trade_Wait";
@@ -7796,32 +7407,67 @@ function createTooltip() {
     tooltipName = document.createElement("div");
     tooltipName.classList += " tool-tip-name";
     
-    let toolInfo = document.createElement("div");
+    const toolInfo = document.createElement("div");
     toolInfo.classList.add("flex-column","toolInfo");
     toolImgContainer = document.createElement("div");
     toolImgContainer.classList.add("toolImgContainer","background-image-cover");
     toolImgContainer.style.display = "none";
+
     toolImg = document.createElement("img");
     toolImg.src = "./assets/tooltips/Empty.webp";
     toolImg.classList.add("toolImg");
+
     toolImgOverlay = document.createElement("img");
     toolImgOverlay.src = "./assets/tooltips/Empty.webp";
     toolImgOverlay.classList.add("toolImgOverlay");
     toolImgContainer.append(toolImg,toolImgOverlay);
     
     tooltipText = document.createElement("div");
-    tooltipText.classList += " tool-tip-text";
+    tooltipText.classList.add("tool-tip-text");
     tooltipLore = document.createElement("div");
-    tooltipLore.classList += " tool-tip-lore";
+    tooltipLore.classList.add("tool-tip-lore");
 
-    let tooltipExtraImg = document.createElement("div");
-    tooltipExtraImg.classList.add("flex-row");
-    tooltipExtraImg.classList += " tool-tip-extraimg";
+    const tooltipExtraImg = document.createElement("div");
+    tooltipExtraImg.classList.add("flex-row","tool-tip-extraimg");
     tooltipWeaponImg = document.createElement("img");
     tooltipElementImg = document.createElement("img");
     tooltipExtraImg.append(tooltipWeaponImg,tooltipElementImg);
 
-    let tooltipButton = document.createElement("button");
+    const upgradeSelection = document.createElement("form");
+    upgradeSelection.classList.add('flex-column');
+    upgradeSelection.id = 'upgrade-selection';
+    upgradeSelection.style.display = 'none';
+    const preferDict = [
+        ['prefer-gem', 'Gems Only'], 
+        ['prefer-book', 'Materials Only'], 
+        ['prefer-none', 'Gems > Materials']
+    ]
+
+    for (let i = 0; i < 3; i++) {
+        const prefer = document.createElement('input');
+        prefer.type = 'Radio';
+        prefer.id = preferDict[i][0];
+        prefer.name = 'upgrade-preference';
+    
+        const preferLabel = document.createElement('label');
+        preferLabel.classList.add('prefer-container');
+        preferLabel.setAttribute('for', preferDict[i][0]);
+
+        const preferText = document.createElement('p');
+        preferText.innerText = preferDict[i][1];
+
+        const checkSpan = document.createElement('span');
+        checkSpan.classList.add('checked-prefer');
+
+        if (i === 2) {
+            prefer.checked = true;
+        }
+
+        preferLabel.append(prefer, preferText, checkSpan);
+        if (beta) upgradeSelection.append(preferLabel);
+    }
+
+    const tooltipButton = document.createElement("button");
     tooltipButton.id = "tool-tip-button";
     tooltipButton.classList.add("background-image-cover");
     tooltipButton.innerText = "Purchase";
@@ -7831,7 +7477,7 @@ function createTooltip() {
     table6Background.src = "./assets/tooltips/background.webp"
     table6Background.classList.add("table6-background");
     toolInfo.append(toolImgContainer,tooltipText,tooltipExtraImg);
-    table6.append(tooltipName,toolInfo,tooltipLore,table6Background,tooltipButton);
+    table6.append(tooltipName, toolInfo, tooltipLore, upgradeSelection, table6Background, tooltipButton);
 }
 
 var tooltipInterval = null;
@@ -7882,16 +7528,18 @@ function changeTooltip(dict, type, number) {
         let extraText = "";
         if (number >= 350) {
             upgradeLevel = 400;
-            extraText = `& a 5-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 5-Star Gem`}
+            if (dict.Ele !== "Any" && beta) { extraText += ` / 4-Star <span style='color:#A97803'>${dict.Nation}</span> Materials`}
         } else if (number >= 200) {
             upgradeLevel = 200;
             extraText = `& a 4-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 4-Star Gem`}
+            if (dict.Ele !== "Any" && beta) { extraText += ` / 3-Star <span style='color:#A97803'>${dict.Nation}</span> Materials`}
         } else if (number >= 75) {
             upgradeLevel = 100;
             extraText = `& a 3-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
             if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 3-Star Gem`}
+            if (dict.Ele !== "Any" && beta) { extraText += ` / 2-Star <span style='color:#A97803'>${dict.Nation}</span> Materials`}
         }
 
         let nahidaText = "";
@@ -8161,23 +7809,29 @@ function refreshShop(minutesPassed) {
 
     let shopContainer = document.getElementById("shop-container");
     shopContainer.innerHTML = "";
-    let i=10;
+    let i = 10;
     while (i--) {
         let inventoryNumber;
         if (i >= 7 && i <= 9) {
-            inventoryNumber = inventoryDraw("talent", 2,4, "shop");
+            inventoryNumber = inventoryDraw("talent", 2, 4, "shop");
         } else if (i === 6) {
             inventoryNumber = randomInteger(4011,4014);
         } else if (i === 5) {
             if (saveValues["wishUnlocked"] === true) {
                 inventoryNumber = 4010;
             } else {
-                inventoryNumber = inventoryDraw("gem", 3,6, "shop");
+                inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
             }
-        } else if (i >= 2 && i <= 4) {
-            inventoryNumber = inventoryDraw("gem", 3,6, "shop");
+        } else if (i >= 3 && i <= 4) {
+            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
+        } else if (i === 2) {
+            if (saveValues.treeObj && saveValues.treeObj.offer) {
+                inventoryNumber = rollArray(saveValues.treeObj.offer, 1);
+            } else {
+                inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
+            }
         } else {
-            inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
+            inventoryNumber = inventoryDraw("weapon", 5, 6, "shop");
         }
         createShopItems(shopContainer, i, inventoryNumber);
     }
@@ -8389,12 +8043,9 @@ function addNutStore() {
     nutStoreButton.addEventListener("click",()=>{
         calculateGoldenCore();
         universalStyleCheck(nutStoreTable,"display","flex","none");
-        if (document.getElementById('tree-table')) {
-            universalStyleCheck(document.getElementById("tree-table"),"display","flex","none",true);
-            universalStyleCheck(document.getElementById("tree-side"),"display","flex","none",true);
-        }
     })
-    leftDiv.appendChild(nutStoreButton);
+
+    leftDiv.append(nutStoreButton);
 
     let len = (getHighestKey(permUpgrades) + 1);
     for (let i = 1; i < len; i++) {
@@ -8469,6 +8120,7 @@ function addNutStore() {
     transcendHelpbox.style.display = "none";
     transcendHelpbox.innerText = `What is the Golden Core amount affected by? \n 
                                 Character Levels (High Priority)
+                                Character Upgrades (High Priority)
                                 Achievements (High Priority)\n
                                 Golden Nuts (Low Priority)
                                 Regular Nuts (Low Priority)`;
@@ -8589,6 +8241,7 @@ function addNutStore() {
         function ascendTooltipsInfo(name, level) {
             let text = `${name}
                         <br> Ascension ${level}
+                        <br>[yellow]Core Factor: ${1 + level * 0.01}</span>
                         <br><br> ${100 + level * 10}% >> [green]${100 + (level + 1) * 10}</span>%
                         <br>Base ${name === "Nahida" ? "Nuts per Click" : "NpS"}
                         <br><br> ${100 + level * 2}% >> [red]${100 + (level + 1) * 2}</span>%
@@ -8596,6 +8249,7 @@ function addNutStore() {
                         `;
 
             text = textReplacer({
+                '[yellow]':`<span style='color:#b39300'>`,
                 '[green]':`<span style='color:#417428'>`,
                 '[red]':`<span style='color:#9E372D'>`,
             },text)
@@ -8608,8 +8262,22 @@ function calculateGoldenCore(type) {
     let calculateNuts = 0;
     if (saveValues.realScore > 1e6) {calculateNuts = Math.log(saveValues.realScore)}
     let goldenNutValue = Math.round(((saveValues.heroesPurchased/25))*2 + calculateNuts + saveValues.goldenNut + saveValues.achievementCount * 3);
-    if (goldenNutValue < 100) {goldenNutValue = 0}
 
+    for (let key in upgradeDict) {
+        let corePerHero = 0;
+        for (let Nestedkey in upgradeDict[key].milestone) {
+            if (upgradeDict[key].milestone[Nestedkey]) {
+                corePerHero += 1 * Math.max(corePerHero / 2, 1);
+            }
+        }
+
+        if (corePerHero > 0) {
+            console.log(corePerHero, upgradeDict[key].milestone)
+        }
+        goldenNutValue += Math.round(corePerHero);
+    }
+
+    if (goldenNutValue < 100) {goldenNutValue = 0}
     if (type === "formula") {
         return goldenNutValue;
     } else {
@@ -8787,7 +8455,6 @@ function createTreeMenu() {
     if (treeLevel !== 0) {
         treeImg.src = `./assets/tree/tree-${treeLevel === 5 ? 4 : treeLevel}.webp`;
         treeContainer.classList.add(`tree-${treeLevel === 5 ? 4 : treeLevel}`);
-        saveValues.treeObj.growthRate = 100;
     } else {
         treeImg.src = `./assets/tooltips/Empty.webp`;
         saveValues.treeObj.growthRate = 0;
@@ -8849,30 +8516,32 @@ function createTreeMenu() {
     treeContainer.appendChild(treeImg);
     treeSide.append(treeProgressBar,sandImg,treeContainer,treeHealthContainer,treeProgressValue);
 
-   
-
     const palmText = document.createElement('p');
+    palmText.id = 'palm-text';
     palmText.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
     const optionsContainer = document.createElement('div');
     optionsContainer.id = 'options-container';
     treeOptions(treeLevel === 0 ? false : true, optionsContainer)
 
-    const affinityContainer = document.createElement('div');
-    affinityContainer.classList.add('flex-row','affinity-container');
-    affinityContainer.innerText = 'Element\n Affinity';
+    // const affinityContainer = document.createElement('div');
+    // affinityContainer.classList.add('flex-row','affinity-container');
+    // affinityContainer.innerText = 'Element\n Affinity';
 
     let container = document.createElement('div');
     container.classList.add('flex-row');
     let element = rollArray(boxElement,1);
     container.style.background = `url(./assets/tooltips/elements/nut-${element.toLowerCase()}.webp) no-repeat center center/contain`;
-    affinityContainer.appendChild(container);
+    // affinityContainer.appendChild(container);
     
-    treeTable.append(palmText,optionsContainer,affinityContainer);
+    treeTable.append(palmText, optionsContainer);
+    offerBox(treeTable, optionsContainer);
+    
+
     leftDiv.appendChild(treeSide);
     mainTable.appendChild(treeTable);
 
     let nutStoreButton = document.createElement("button");
-    nutStoreButton.classList.add("nut-store-access","pet-access");
+    nutStoreButton.classList.add("tree-access","nut-store-access");
     nutStoreButton.addEventListener("click",()=>{
         universalStyleCheck(treeTable,"display","none","flex",true);
         universalStyleCheck(treeSide,"display","none","flex",true);
@@ -8885,6 +8554,100 @@ function createTreeMenu() {
     } else if (treeLevel === 5) {
         treeOptions(true, document.getElementById('options-container'), true);
     }
+
+    populateTreeItems();
+}
+
+function rollTreeItems() {  
+    saveValues.treeObj.offer = [randomInteger(1,3), inventoryDraw("food", 4, 5, "shop"), inventoryDraw("weapon", 5, 6, "shop")];
+
+    const treeItem = document.getElementById('tree-offer-items');
+    while (treeItem.firstChild) {
+        treeItem.firstChild.remove();
+    }
+
+    populateTreeItems();
+}
+
+function populateTreeItems() {
+    const treeItem = document.getElementById('tree-offer-items');
+
+    const coreContainer = document.createElement('div');
+    const coreContainerImg = new Image();
+    coreContainerImg.src = "./assets/icon/core.webp"
+    const coreContainerText = document.createElement('p');
+    coreContainerText.innerText = saveValues.treeObj.offer[0];
+
+    const plusImage = new Image();
+    plusImage.src = './assets/icon/plus.webp';
+
+    coreContainer.append(coreContainerImg, coreContainerText);
+    treeItem.append(coreContainer, plusImage);
+
+    for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
+        let itemContainer = document.createElement('div');
+        let treeImage = new Image();
+        treeImage.src = `./assets/tooltips/inventory/${Inventory[saveValues.treeObj.offer[i]].File}.webp`;
+        let itemStars = new Image();
+        itemStars.src = `./assets/frames/star-${Inventory[saveValues.treeObj.offer[i]].Star}.webp`;
+
+        itemContainer.append(treeImage, itemStars);
+        treeItem.append(itemContainer);
+    }
+}
+
+function offerBox(treeTable, optionsContainer) {
+    const treeOffer = document.createElement('div');
+    treeOffer.id = 'tree-offer-container';
+    treeOffer.classList.add('flex-column');
+    treeOffer.style.display = 'none';
+
+    const treeOfferText = document.createElement('p');
+    treeOfferText.innerText = 'The Tree wishes for these items...';
+    const treeItem = document.createElement('div');
+    treeItem.id = 'tree-offer-items';
+    treeItem.classList.add('flex-row');
+
+    const treeMissingText = document.createElement('p');
+    treeMissingText.id = 'tree-missing-text';
+
+    const buttonContainer = document.createElement('container');
+    buttonContainer.classList.add('flex-row')
+
+    const backButton = document.createElement('button');
+    backButton.innerText = 'Back';
+    backButton.addEventListener('click', () => {
+        universalStyleCheck(optionsContainer,"display","flex","none");
+        universalStyleCheck(treeOffer,"display","none","flex");
+    });
+
+    const offerButton = document.createElement('button');
+    offerButton.innerText = 'Offer';
+    offerButton.addEventListener('click', () => {
+        offerItemFunction();
+    });
+
+    buttonContainer.append(backButton, offerButton);
+    treeOffer.append(treeOfferText, treeItem, treeMissingText, buttonContainer);
+    treeTable.append(treeOffer);
+}
+
+function offerItemFunction() {
+    let treeMissingText = document.getElementById('tree-missing-text');
+
+    if (saveValues.treeObj.offer[0] > persistentValues.goldenCore) {
+        treeMissingText.innerText = `You lack Golden Cores (${persistentValues.goldenCore}/${saveValues.treeObj.offer[0]}).`;
+        return;
+    } else {
+        for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
+            if (!InventoryMap.get(saveValues.treeObj.offer[i]) || InventoryMap.get(saveValues.treeObj.offer[i]) === 0) {
+                treeMissingText.innerText = `Missing item ${i}: '${Inventory[saveValues.treeObj.offer[i]].Name}'`;
+                return;
+            }
+        }
+    }
+
+    saveValues.treeObj.offerAmount++;
 }
 
 function treeOptions(planted, optionsContainer, lastPhase) {
@@ -8905,7 +8668,8 @@ function treeOptions(planted, optionsContainer, lastPhase) {
         optionsContainer.appendChild(treeButton);
     } else if (planted) {
         optionsContainer.classList.add('flex-row','options-container');
-        const optionsTextArray = ['Bless','Fertilize','Destroy'];
+        optionsContainer.style.display = 'flex';
+        const optionsTextArray = ['Offer','Fertilize','Destroy'];
         for (let i = 0; i < 3; i++) {
             let treeButton = document.createElement('div');
             let optionImg = new Image();
@@ -8915,7 +8679,10 @@ function treeOptions(planted, optionsContainer, lastPhase) {
     
             switch (i) {
                 case 0:
-                    treeButton.addEventListener('click',() => {})
+                    treeButton.addEventListener('click',() => {
+                        universalStyleCheck(optionsContainer,"display","flex","none");
+                        universalStyleCheck(document.getElementById('tree-offer-container'),"display","none","flex");
+                    })
                     break;
                 case 1:
                     treeButton.addEventListener('click',() => {})
@@ -8940,27 +8707,31 @@ function treeOptions(planted, optionsContainer, lastPhase) {
         let optionText = document.createElement('p');
         optionText.innerText = 'Plant';
 
-        treeButton.addEventListener('click',() => {growTree('level')})
+        treeButton.addEventListener('click',() => {pickTree()})
         treeButton.append(optionImg,optionText);
         optionsContainer.appendChild(treeButton);
     }
-} 
+}
 
 function destroyTree() {
     const treeProgress = document.getElementById('tree-progress');
     const treeImg = document.getElementById('tree-img');
     const treeContainer = document.getElementById('tree-container');
     const optionsContainer = document.getElementById('options-container');
+    const treeMissingText = document.getElementById('tree-missing-text');
     
+    treeMissingText.innerText = ''
     treeOptions(false, optionsContainer);
     updateTreeValues(true);
+    treeImg.src = `./assets/tooltips/Empty.webp`;
 
     setTimeout(()=>{
         mailElement.load();
         mailElement.play();
-
+        
         let treeHealthText = document.getElementById('tree-health-text');
         saveValues.treeObj.health = 0;
+        saveValues.treeObj.offerAmount = 0;
         treeHealthText.health = saveValues.treeObj.health;
         treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
 
@@ -8968,23 +8739,24 @@ function destroyTree() {
         treeContainer.classList.remove(`tree-${saveValues.treeObj.level === 5 ? 4 : saveValues.treeObj.level}`);
         saveValues.treeObj.level = 0;
         saveValues.treeObj.defense = false;
-        treeImg.src = `./assets/tooltips/Empty.webp`;
-    },600);
+    },100);
 }
 
 function updateTreeValues(turnZero) {
     const treeProgress = document.getElementById('tree-progress');
     const treeProgressValue = document.getElementById('tree-progress-value');
+    const palmEnergy = document.getElementById('palm-text');
 
     if (turnZero) {
         treeProgress.progress = 0;
         treeProgress.style.width = 0;
         treeProgressValue.rate = 0;
         treeProgressValue.innerText = 'Growth: 0x';
+        palmEnergy.innerText = 'Palm Energy: 0';
     } else {
-        saveValues.treeObj.growthRate = 500;
         treeProgressValue.rate = saveValues.treeObj.growthRate / 100;
         treeProgressValue.innerText = 'Growth: ' + saveValues.treeObj.growthRate + 'x';
+        palmEnergy.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
     }
 }
 
@@ -8995,7 +8767,8 @@ function enemyBlock(remove, damage, maxHP) {
         let lostHP = Math.min(50,(50 * (damage / maxHP)));
 
         // TODO: add a funny picture or smth depending on amount of lost HP
-        enemyContainerChildren[2].innerHTML = `You took ${damage} cumulative damage <br> The tree lost ${lostHP}% of its HP.`;
+        let endText = `You took ${damage} cumulative damage <br> The tree lost ` + (lostHP == 0 ? '0' : `<span style='color:#dd5548'>${lostHP}%</span>`) + ' of its HP.'
+        enemyContainerChildren[2].innerHTML = endText;
         enemyContainerChildren[2].style.textAlign = 'center';
         enemyContainerChildren[2].style.margin = '2% 0';
         enemyContainerChildren[2].style.width = '100%';
@@ -9015,12 +8788,16 @@ function enemyBlock(remove, damage, maxHP) {
         enemyContainerChildren[1].remove();
     } else if (remove === 'confirm') {
         document.getElementById('tree-block').remove();
+        universalStyleCheck(document.getElementById('tree-offer-container'),"display","flex","none", true);
         saveValues.treeObj.defense = false;
     } else {
+        universalStyleCheck(document.getElementById('tree-offer-container'),"display","flex","none", true);
         const treeTable = document.getElementById('tree-table');
+
         let eventBackdrop = document.createElement('div');
-        eventBackdrop.classList.add('event-dark');
+        eventBackdrop.classList.add('event-dark', 'cover-all');
         eventBackdrop.id = 'tree-block';
+
         let enemyContainer = document.createElement('div');
         enemyContainer.classList.add('tree-enemy','flex-column')
     
@@ -9048,6 +8825,85 @@ function enemyBlock(remove, damage, maxHP) {
     } 
 }
 
+function pickTree() {
+    const palmEnergy = document.getElementById('palm-text');
+    palmEnergy.innerText = 'How much are you planting?';
+
+    while (document.getElementById('options-container').firstChild) {document.getElementById('options-container').firstChild.remove()}
+
+    const seedContainer = document.createElement('div');
+    seedContainer.classList.add('flex-row');
+    seedContainer.id = 'seed-container';
+    document.getElementById('tree-table').appendChild(seedContainer);
+
+    updateSeedContainer(false);
+
+
+
+
+    // growTree('level');
+}
+
+function updateSeedContainer(updateValueOnly) {
+    if (document.getElementById('seed-container')) {
+        const seedContainer = document.getElementById('seed-container');
+        if (updateValueOnly) {
+
+        } else {
+            let seedAdded = [0,0,0,0,0];
+            for (let i = 0; i < 5; i++) {
+                let seedColumnContainer = document.createElement('div');
+                seedColumnContainer.classList.add('seed-column')
+                
+                let seedImg = new Image();
+                seedImg.src = `./assets/tree/seed-${i+1}.webp`
+
+                let seedNumber = document.createElement('p');
+                seedNumber.amount = 0;
+                seedNumber.innerText = `0 / ${10}`;
+
+                let seedDecrement = document.createElement('button');
+                seedDecrement.innerText = '-';
+                seedDecrement.addEventListener('click', () => {
+                    if (seedNumber.amount > 0) {
+                        seedNumber.amount--;
+                        seedNumber.innerText = `${seedNumber.amount} / ${10}`;
+                        seedAdded[i] = seedNumber.amount;
+                    }
+                })
+                let seedIncrement = document.createElement('button');
+                seedIncrement.innerText = '+';
+                seedIncrement.addEventListener('click', () => {
+                    if (seedNumber.amount < 10) {
+                        seedNumber.amount++;
+                        seedNumber.innerText = `${seedNumber.amount} / ${10}`;
+                        seedAdded[i] = seedNumber.amount;
+                    }
+                })
+
+                seedColumnContainer.append(seedImg, seedNumber, seedDecrement, seedIncrement);
+                seedContainer.append(seedColumnContainer)
+            }
+
+            const plantButton = document.createElement('button');
+            plantButton.innerText = 'Plant!';
+            plantButton.addEventListener('click', () => {
+                let seedValue = 0;
+                for (let i = 0; i < seedAdded.length; i++) {
+                    seedValue += (seedAdded[i] * (i + 1)**2)
+                }
+
+                if (seedValue > 0) {
+                    saveValues.treeObj.growthRate = seedValue;
+                    seedContainer.remove();
+                    growTree('level');
+                }
+            })
+            seedContainer.append(plantButton)
+        }
+    }
+}
+
 function growTree(type, amount) {
     const treeProgress = document.getElementById('tree-progress');
     const treeProgressValue = document.getElementById('tree-progress-value');
@@ -9058,6 +8914,7 @@ function growTree(type, amount) {
             saveValues.treeObj.growth = treeProgress.progress;
             treeProgress.style.width = treeProgress.progress + '%';
             if (treeProgress.progress > 100) {
+                // REMOVE MAXED TREE
                 if (saveValues.treeObj.level === 4) {
                     saveValues.treeObj.level = 5;
                     treeOptions(true, document.getElementById('options-container'), true);
@@ -9072,6 +8929,7 @@ function growTree(type, amount) {
     } else if (type === 'level') {
         const treeImg = document.getElementById('tree-img');
         const treeContainer = document.getElementById('tree-container');
+        // PLANT NEW TREE
         if (saveValues.treeObj.level === 0) {
             treeOptions(true, document.getElementById('options-container'));
             
@@ -9082,6 +8940,7 @@ function growTree(type, amount) {
 
             updateTreeValues(false);
             saveValues.treeObj.defense = randomIntegerWrapper(0);
+            rollTreeItems();
             weaselBurrow.load();
             weaselBurrow.play();
         };
@@ -9091,6 +8950,7 @@ function growTree(type, amount) {
         treeImg.src = `./assets/tree/tree-${saveValues.treeObj.level}.webp`;
         treeContainer.classList.add(`tree-${saveValues.treeObj.level}`);
 
+        // TREE DEFENSE INTIATE
         if (saveValues.treeObj.level === 3) {
             if (saveValues.treeObj.defense) {
                 saveValues.treeObj.defense = 'block';
@@ -9100,283 +8960,13 @@ function growTree(type, amount) {
     }
 }
 
-//-------------------------------------------- PET ------------------------------------------------------//
-// const propDict = {};
-// function createPetShop() {
-//     let petTable = document.createElement("div");
-//     petTable.classList.add("table-without-tooltip","pet-table");
-//     petTable.id = 'pet-table';
-
-//     let mainTable = rightDiv.childNodes[1];
-//     mainTable.appendChild(petTable);
-
-//     let petButton = document.createElement("button");
-//     petButton.classList.add("nut-store-access","pet-access");
-//     petButton.addEventListener("click",()=>{
-//         universalStyleCheck(petTable,"display","flex","none");
-//         if (document.getElementById("nut-store-table")) {
-//             let nutStoreTemp = document.getElementById("nut-store-table");
-//             if (nutStoreTemp.style.display === "flex") {nutStoreTemp.style.display = "none"}
-//         }
-//     })
-//     leftDiv.appendChild(petButton);
-
-//     Konva.showWarnings = false;
-//     let stage = new Konva.Stage({
-//         container: 'pet-table',
-//         width: petTable.offsetWidth,
-//         height: petTable.offsetHeight
-//       });
-    
-//     let layer = new Konva.Layer();
-//     addProp(layer,stage,"stool",{"width":stage.width()/2,"height":stage.height()/2})
-//     addProp(layer,stage,"trampoline",{"width":stage.width()/3,"height":stage.height()/1.5})
-//     addPet(layer,stage,"icon/petShop");
-//     addPet(layer,stage,"icon/petShop");
-//     addPet(layer,stage,"icon/petShop");
-//     addPet(layer,stage,"icon/petShop");
-//     stage.add(layer);
-// }
-
-// function addProp(layer,stage,type,coords) {
-//     let imageObj = new Image();
-//     imageObj.src = `/assets/icon/${type}.webp`;
-//     imageObj.onload = ()=> {
-//         const chairImage = new Konva.Image({
-//             image: imageObj,
-//             x: coords["width"],
-//             y: coords["height"],
-//             width: stage.height() * 0.30 * imageObj.width / imageObj.height,
-//             height: stage.height() * 0.30 ,
-//           });
-
-//         layer.add(chairImage);
-//         chairImage.zIndex(0)
-//         propDict[type] = {
-//             "obj":chairImage,
-//             "occupied":false,
-//             "pet":null,
-//             "type":type,
-//         }
-//     }
-// }
-
-// function addPet(layer,stage,source) {
-//     let imageObj = new Image();
-//     imageObj.src = `/assets/${source}.webp`;
-//     imageObj.onload = () => {
-//         let pet = new Konva.Image({
-//             image: imageObj,
-//             x: stage.width() / 40 * randomInteger(1,31),
-//             y: stage.height() / 40 * randomInteger(1,31),
-//             width: stage.height() * 0.20 * imageObj.width / imageObj.height,
-//             height: stage.height() * 0.20,
-//             offsetX: stage.height() * 0.10 * imageObj.width / imageObj.height,
-//             offsetY: stage.height() * 0.10 ,
-//             draggable: true,
-//             dragBoundFunc: function(pos) {
-//                 let newX = Math.max(this.width()/2, Math.min(stage.width() - this.width()/2, pos.x));
-//                 let newY = Math.max(this.height()/2, Math.min(stage.height() - this.height()/2, pos.y));
-//                 return {
-//                     x: newX,
-//                     y: newY
-//                 };
-//             }
-//         });
-        
-//         layer.add(pet);
-//         pet.zIndex(1);
-
-//         const getRandomPositionWithinStage = () => {
-//             const x = Math.random() * (stage.width() - pet.width());
-//             const y = Math.random() * (stage.height() - pet.height());
-//             return { x, y };
-//         };
-
-//         let randomPosition = getRandomPositionWithinStage();
-//         let speed = randomInteger(20,40);
-//         const calculateDisplacement = function(randomPosition,pet) {
-//             return ((randomPosition.y - pet.y())**2 + (randomPosition.x - pet.x())**2);
-//         }
-
-//         const resetAnimation = function(time) {
-//             do {
-//                 randomPosition = getRandomPositionWithinStage();
-//             } while (calculateDisplacement(randomPosition,pet) < 100)
-//             setTimeout(()=>{
-//                 speed = randomInteger(20,40);
-//                 animMove.start();
-//             },time);
-//         }
-
-//         pet.on('dragstart', function() {
-//             animMove.stop();
-//             if (animIdle.isRunning()) {animIdle.stop()};
-//             for (let key in propDict) {
-//                 if (propDict[key]["pet"] == pet) {
-//                     propDict[key]["pet"] = null;
-//                     propDict[key]["occupied"] = false;
-//                 }
-//             }
-//         });
-
-//         pet.on('dragend', function() {
-//             for (let i = 0; i < animArray.length; i++) {
-//                 if (animArray[i].isRunning()) {return};
-//             } 
-
-//             let propCheck = isPetOnProp();
-//             if (propCheck) {
-//                 propCheck["occupied"] = true;
-//                 propCheck["pet"] = pet;
-
-//                 pet.position({
-//                   x: propCheck["obj"].x() + propCheck["obj"].width() / 2,
-//                   y: propCheck["obj"].y()
-//                 });
-
-//                 centerX = pet.x();
-//                 animIdle.start();
-//             } else {
-//                 if (animIdle.isRunning()) {animIdle.stop()};
-//                 rollAnim();
-//             }
-//         });
-
-//         pet.on('dblclick', function() {
-//             animMove.stop();
-//             if (animIdle.isRunning()) {animIdle.stop()};
-//             for (let i = 0; i < animArray.length; i++) {
-//                 if (animArray[i].isRunning()) {return};
-//             }
-
-//             for (let key in propDict) {
-//                 if (propDict[key]["pet"] == pet) {
-//                     propDict[key]["pet"] = null;
-//                     propDict[key]["occupied"] = false;
-//                 }
-//             }
-            
-//             rollAnim();
-//         });
-
-//         let centerX;
-//         const animIdle = new Konva.Animation((frame)=>{
-//             var amplitude = 10;
-//             var period = 4000;
-//             let newX = amplitude * Math.sin((frame.time * 2 * Math.PI) / period) + centerX;
-//             pet.x(newX)
-//         })
-        
-//         const animJello = new Konva.Animation((frame)=>{
-//             let scale = 1 + (Math.sin(frame.time * 0.005) * 0.03);
-//             pet.scale({
-//                  x: scale, 
-//                  y: scale,
-//             });
-
-//             if (frame.time > 2500) {
-//                 resetAnimation(100);
-//                 frame.time = 0;
-//                 animJello.stop();
-//             }
-//         })
-
-//         let acceleration;
-//         let velocity;
-//         let Ydistance;
-//         const animJump = new Konva.Animation((frame)=>{
-//             Ydistance = velocity * frame.timeDiff;
-//             velocity = velocity + acceleration * frame.timeDiff / 1000;
-
-//             let newY = pet.y() - Ydistance;
-//             pet.y(newY);
-
-//             if (frame.time > 2000) {
-//                 resetAnimation(200);
-//                 frame.time = 0;
-//                 animJump.stop();
-//             }
-//         });
-       
-//         const animRotate = new Konva.Animation((frame)=>{
-//             let angleDiff = 288;
-//             let angle = (frame.time * angleDiff) / 1000;
-//             pet.rotation(angle);
-
-//             if (frame.time > 2500) {
-//                 pet.rotation(0);
-//                 resetAnimation(200);
-//                 frame.time = 0;
-//                 animRotate.stop();
-//             }
-//         })
-
-//         const animMove = new Konva.Animation((frame) => {
-//             for (let i = 0; i < animArray.length; i++) {
-//                 if (animArray[i].isRunning()) {animMove.stop()}
-//             } 
-            
-//             // WHEN SWITCHING BROWSER TABS, PET MOVEMENT CONTINUES FAR OUT OF BOUNDARIES, AND RETURNS AFTER SOME TIME
-//             // IM NOT SURE WHAT CAUSES THIS GLITCH SO WORKAROUND IS TO FORCE RESPAWN
-//             let distance = speed * frame.timeDiff / 1000 * randomInteger(90,110) / 100;
-//             if (pet.x() > stage.width() || pet.x() < 0 || pet.y() > stage.height() || pet.y() < 0) {
-//                 pet.x(stage.width() / 40 * randomInteger(1,31));
-//                 pet.y(stage.height() / 40 * randomInteger(1,31));
-//             }
-
-//             let angle = Math.atan2(randomPosition.y - pet.y(), randomPosition.x - pet.x());
-//             let newX = pet.x() + distance * Math.cos(angle);
-//             let newY = pet.y() + distance * Math.sin(angle);
-
-//             pet.x(newX);
-//             pet.y(newY);
-
-//             if (calculateDisplacement(randomPosition,pet) < 50) {
-//                 animMove.stop();
-//                 setTimeout(()=>{rollAnim()},500)
-//                 do {
-//                     randomPosition = getRandomPositionWithinStage();
-//                 } while (calculateDisplacement(randomPosition,pet) < 1000)
-//             }
-//         }, layer);
-
-//         let animArray = [animJello,animRotate,animJump];
-//         function rollAnim() {
-//             acceleration = -0.15;
-//             velocity = 0.15;
-//             rollArray(animArray,0).start();
-//         }
-
-//         function isPetOnProp() {
-//             for (let key in propDict) {
-//                 if (propDict[key]["occupied"]) {continue}
-//                 let propBounds = propDict[key]["obj"].getClientRect();
-//                 let petTransform = pet.getAbsoluteTransform();
-//                 let petPosition = petTransform.point({ x: 0, y: 0 });
-//                 petPosition.x += pet.width() / 2;
-//                 petPosition.y += pet.height() / 2;
-
-//                 if (petPosition.x > propBounds.x && petPosition.x < (propBounds.x + propBounds.width) && 
-//                     petPosition.y > propBounds.y && petPosition.y < (propBounds.y + propBounds.height)) {
-//                     return propDict[key];
-//                 } else {
-//                     continue;
-//                 }
-//             }
-//         }
-
-//         animMove.start();
-//     }
-// }
-
 //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
 // REFRESH SCORES & ENERGY
 function refresh() {
     let formatScore = abbrNum(saveValues["realScore"]);
     score.innerText = `${formatScore} Nut${saveValues["realScore"] !== 1 ? 's' : ''}`;
     let formatDps = abbrNum(saveValues["dps"] * foodBuff);
-    dpsDisplay.innerText = formatDps + " per second" ;
+    dpsDisplay.innerText = formatDps + (MOBILE ? "/s" : " per second") ;
 
     energyDisplay.innerText = saveValues["energy"];
     primogemDisplay.innerText = saveValues["primogem"];
@@ -9611,14 +9201,16 @@ function newPop(type) {
     }    
 }
 
-if (beta) setTimeout(()=>{pinballEvent();},500)
+    if (beta) {
+        createTreeMenu();
+    }
 }
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
-if (localStorage.getItem('beta') == 'true') {
-    beta = true;
-}
+// if (localStorage.getItem('beta') == 'true') {
+//     beta = true;
+// }
 
 if (beta) {
     let warning = document.createElement('p');

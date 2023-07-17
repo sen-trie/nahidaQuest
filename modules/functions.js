@@ -56,12 +56,13 @@ function randomInteger(min, max) {
 }
 
 // WRAPS RNG TO BOOLEAN
-function randomIntegerWrapper(compare,max) {
+function randomIntegerWrapper(compare, max) {
+    // IF FIRST NUMBER LESS THAN MAX/100, RETURN TRUE
     let randInt;
     if (max > 0) {
-        randInt = randomInteger(1,max+1);
+        randInt = randomInteger(1, max+1);
     } else {
-        randInt = randomInteger(1,101);
+        randInt = randomInteger(1, 101);
     }
     
     if (randInt <= compare) {
@@ -149,8 +150,8 @@ function updateObjectKeys(savedObject,referenceObject) {
 }
 
 // ROLLS RANDOM INT IN AN ARRAY
-function rollArray(array,startingPos) {
-    return array[randomInteger(startingPos,array.length)]
+function rollArray(array, startingPos) {
+    return array[randomInteger(startingPos, array.length)]
 }
 
 // REPLACES TEXT FOR USE IN INNERHTML
@@ -162,7 +163,7 @@ function textReplacer(dictReplace,originalText) {
 }
 
 // TOGGLES CSS STYLE
-function universalStyleCheck(ele,styleCheck,paramOn,paramOff,forced) {
+function universalStyleCheck(ele, styleCheck, paramOn, paramOff, forced) {
     if (forced) {
         if (ele.style[styleCheck] !== paramOff) {
             ele.style[styleCheck] = paramOff;

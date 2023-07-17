@@ -950,6 +950,7 @@ table, button, label {
     overflow-y: auto;  
     overflow-x: hidden;
     font-size: inherit;
+    transform: translateZ(0);
 }
 
 .upgrade {
@@ -1049,6 +1050,7 @@ table, button, label {
     align-content: flex-start;
     align-items: stretch;
     gap: 2% 2%;
+    transform: translateZ(0);
 }
 
 .inventory-selected {
@@ -2040,6 +2042,7 @@ table, button, label {
     overflow-y: auto;
     justify-content: flex-start;
     gap: 2%;
+    transform: translateZ(0);
 }
 
 .tier-button {
@@ -2111,8 +2114,66 @@ table, button, label {
     color: #5c461f;
 }
 
-#table6 > div {
+#table6 > div, form {
     z-index: 5;
+}
+
+#table6 > form {
+    font-size: 0.8em;
+    width: 100%;
+}
+
+.prefer-container {
+    position: relative;
+    width: 100%;
+}
+
+.prefer-container > input:checked ~ .checked-prefer {
+    background-color: #867256;
+}
+
+.checked-prefer:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.prefer-container > input:checked ~ .checked-prefer:after {
+    display: block;
+}
+
+.prefer-container > .checked-prefer:after {
+    left: 50%;
+    top: 0.1em;
+    width: 0.2em;
+    height: 0.45em;
+    border: solid white;
+    border-width: 0 0.15em 0.15em 0;
+    -webkit-transform: rotate(45deg) translate(-10%, 20%);
+    -ms-transform: rotate(45deg) translate(-10%, 20%);
+    transform: rotate(45deg) translate(-10%, 20%);
+}
+
+.checked-prefer {
+    position: absolute;
+    top: 0;
+    left: 5%;
+    height: 1em;
+    width: 1em;
+    background-color: #51432f;
+  }
+
+.prefer-container > input {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #51432f;
+    margin: 0;
+}
+
+.prefer-container > p {
+    display: inline;
+    position: relative;
+    left: 18%;
 }
 
 .toolInfo {
@@ -2219,25 +2280,6 @@ table, button, label {
     filter: brightness(115%);
 }
 
-/*//////////// PET SHOP CSS /////////////
-.pet-access {
-    bottom: 17%;
-    background: url(./assets/icon/petShop.webp);
-    background-size: contain;
-}
-
-.pet-access:hover {
-    filter: drop-shadow(0 0 0.8em #6fadf9);
-} 
-
- .pet-table {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 500;
-    background-color: #6fadf9;
-} */
-
 /*//////////// TREE CSS /////////////*/
 #tree-table {
     height: 100%;
@@ -2299,6 +2341,54 @@ table, button, label {
     flex-direction: column;
     justify-content: flex-end;
     font-size: 1.2em;
+}
+
+#seed-container {
+    position: relative;
+    width: 100%;
+    gap: 1%;
+}
+
+.seed-column {
+    padding: 1%;
+    border-radius: 0.5em;
+    width: 20%;
+    text-align: center;
+    border: 0.2em solid #88705B;
+    border-radius: 0.3em;
+    background-color: #E9D5C1;
+    color: #48392b;
+}
+
+.seed-column > img {
+    max-width: 80%;
+    object-fit: contain;
+}
+
+.seed-column > button {
+    width: 30%;
+    font-size: 1.2em;
+    margin-top: 0.2em;
+    background-color: #B1A79A;
+    color: #48392b;
+}
+
+.seed-column > button:first-of-type {
+    margin-right: 2.5%;
+}
+
+#seed-container > button {
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent url(./assets/tutorial/buttonBox.webp) center/contain no-repeat;
+    height: auto;
+    width: 33%;
+    aspect-ratio: 4.61;
+    font: inherit;
+    color: white;
+    text-shadow: var(--text-shadow-075);
 }
 
 #tree-side {
@@ -2395,6 +2485,7 @@ table, button, label {
 }
 
 .tree-image {
+    height: 100%;
     width: 100%;
     object-fit: contain;
     z-index: 1;
@@ -2444,6 +2535,7 @@ table, button, label {
 
 .tree-4 {
     width: 95%;
+    height: 75%;
 }
 
 .cloud {
@@ -2479,10 +2571,110 @@ table, button, label {
     transform: translateY(90%);
 }
 
+#tree-offer-container {
+    padding: 1% 1%;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 0.3em;
+    color: white;
+}
+
+#tree-offer-container > p {
+    font-size: 1.2em;
+    margin: 0.2em;
+}
+
+#tree-offer-container > p:last-of-type {
+    font-size: 1em;
+}
+
+
+.tree-access {
+    bottom: 16% !important;
+    background: url(./assets/tree/tree-icon.webp) no-repeat center center/contain !important;
+}
+
+#tree-block {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#tree-offer-items {
+    width: 80%;
+    height: auto;
+    aspect-ratio: 3;
+    gap: 1%;
+}
+
+#tree-offer-items > img {
+    margin: 0.5em;
+    width: 8%;
+    aspect-ratio: 1;
+    object-fit: contain;
+}
+
+#tree-offer-items > div {
+    width: 25%;
+    height: auto;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #AAD4A5;
+    border: 0.2em solid #6e9168;
+    box-sizing: border-box;
+    border-radius: 0.2em;
+    color: #254620;
+}
+
+#tree-offer-items > div:first-of-type {
+    width: 15%;
+    height: auto;
+    aspect-ratio: 1;
+}
+
+#tree-offer-items > div:first-of-type > img:first-of-type {
+    width: auto;
+    flex-grow: 1;
+}
+
+#tree-offer-items > div > img:first-of-type {
+    width: auto;
+    max-width: 100%;
+    height: 80%;
+    object-fit: contain;
+    aspect-ratio: 1;
+    filter: drop-shadow(0.1em 0.1em 0.1em black);
+}
+
+#tree-offer-items > div > img:nth-of-type(2) {
+    height: 15%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.1em black);
+}
+
+#tree-offer-container > container {
+    width: 100%;
+    gap: 2%
+}
+
+#tree-offer-container > container > button {
+    width: 33%;
+    aspect-ratio: 4.61;
+    font: inherit;
+    font-size: 1em;
+    color: white;
+    text-shadow: var(--text-shadow-075);
+    background: transparent url(./assets/tutorial/nutPill.webp) center/contain no-repeat;
+}
+
 .tree-enemy {
     position: absolute;
     background-color: #3E4758;
-    transform: translate(-50%,-60%);
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
     padding: 1%;
     padding-bottom: 0;
     width: 80%;
@@ -2682,14 +2874,14 @@ table, button, label {
 @keyframes fadeOutOpacity {
     0% { 
         opacity: 1.0;
-        transform: translate(0);
+        transform: translateY(0);
     }
     50% { 
-        opacity: 1.0
+        opacity: 1.0;
     }
     100% {
         opacity: 0.5;   
-        transform: translate(0,-15em);
+        transform: translateY(-15em);
     }
 }
 

@@ -1061,7 +1061,7 @@ const eventText = {
 
 const challengeInfo = [
     {
-        '1': {'title': 'Rise and Shine', 'desc': 'Ascend for over 1000 Cores'},
+        '1': {'title': 'Rise and Shine', 'desc': 'Ascend for over 1,000 Cores'},
         '2': {'title': 'Breaking Impact', 'desc': 'Possess 1000 primogems in one run'},
         '3': {'title': 'Fungi On Seeds', 'desc': 'Reach 2,500 energy in one run'},
         '4': {'title': 'Rear of the Library', 'desc': 'Possess 50 discounted levels'},
