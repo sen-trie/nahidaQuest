@@ -591,7 +591,7 @@ function loadSaveData() {
 let clickAudioDelay = null;
 let currentClick = 1;
 let demoImg = document.createElement("img");
-demoImg.src = "./assets/nahida.webp";
+demoImg.src = settingsValues.preferOldPic ? "./assets/nahida.webp" : "./assets/nahidaTwo.webp";
 demoImg.classList.add("demo-img");
 demoImg.id = "demo-main-img";
 
@@ -643,7 +643,7 @@ function touchDemo() {
         }
     }
 
-    spawnFallingNut();
+    if (settingsValues.showFallingNuts) {spawnFallingNut()};
 };
 
 drawUI.demoFunction(demoContainer,demoImg);
@@ -964,7 +964,7 @@ function stopClickEvent() {
 
         let leftBG = document.getElementById("left-bg");
         setTimeout(()=>{
-            button.src = "./assets/nahida.webp";
+            button.src = settingsValues.preferOldPic ? "./assets/nahida.webp" : "./assets/nahidaTwo.webp";
             leftBG.src = "./assets/bg/bg.webp";
         },150)
     } else {
@@ -2818,35 +2818,41 @@ function settings() {
 
     label.append(input,slider);
 
-    let errorButton = document.createElement("div");
+    const advancedSettingButton = document.createElement("button");
+    advancedSettingButton.innerText = "Advanced Settings";
+    advancedSettingButton.addEventListener("click",()=>{settingsBox("toggle", "advanced")});
+
+    const errorButton = document.createElement("button");
     errorButton.innerText = "Error Log";
     errorButton.addEventListener("click",()=>{settingsBox("toggle","error")});
 
-    let extraButton = document.createElement("div");
+    const extraButton = document.createElement("button");
     extraButton.innerText = "Command Console";
     extraButton.addEventListener("click",()=>{settingsBox("toggle","command")});
 
-    let reportButton = document.createElement("div");
+    const reportButton = document.createElement("button");
     reportButton.innerText = "Report a Bug!";
     reportButton.addEventListener("click",()=>{window.open('https://nahidaquest.com/feedback',"_blank")})
 
-    let creditsButton = document.createElement("div");
+    const creditsButton = document.createElement("button");
     creditsButton.innerText = "Credits";
     creditsButton.addEventListener("click",()=>{window.open('https://nahidaquest.com/credits',"_blank")})
 
-    settingsBottomLeft.append(label,errorButton,reportButton,extraButton);
+    settingsBottomLeft.append(label);
+    if (beta) settingsBottomLeft.append(advancedSettingButton);
+    settingsBottomLeft.append(errorButton, reportButton, extraButton);
 
-    let exportSaveSetting = document.createElement("div");
+    const exportSaveSetting = document.createElement("div");
     exportSaveSetting.innerText = "Export Save";
     exportSaveSetting.classList.add("flex-row");
     exportSaveSetting.addEventListener("click",()=>{settingsBox("toggle","export")})
 
-    let importSaveSetting = document.createElement("div");
+    const importSaveSetting = document.createElement("div");
     importSaveSetting.innerText = "Import Save";
     importSaveSetting.classList.add("flex-row");
     importSaveSetting.addEventListener("click",()=>{settingsBox("toggle","import")})
 
-    let cancelButton = document.createElement("button");
+    const cancelButton = document.createElement("button");
     cancelButton.classList.add("cancel-button");
     cancelButton.addEventListener("click",()=>{
         settingsMenu.style.zIndex = -1;
@@ -2854,13 +2860,13 @@ function settings() {
         deleteConfirmMenu("close","loaded");
     })
 
-    let patchNotesButton = document.createElement("button");
+    const patchNotesButton = document.createElement("button");
     patchNotesButton.classList.add("patch-button");
     patchNotesButton.addEventListener("click",()=>{settingsBox("toggle","patch")})
 
-    settingsBottomRight.append(importSaveSetting,exportSaveSetting,infoSetting,saveSetting,clearSetting);
-    settingsBottom.append(settingsBottomLeft,settingsBottomRight);
-    settingsMenu.append(settingsText,volumeScrollerContainer,settingsBottom,cancelButton,patchNotesButton);
+    settingsBottomRight.append(importSaveSetting, exportSaveSetting, infoSetting, saveSetting, clearSetting);
+    settingsBottom.append(settingsBottomLeft, settingsBottomRight);
+    settingsMenu.append(settingsText, volumeScrollerContainer, settingsBottom, cancelButton, patchNotesButton);
     mainBody.appendChild(settingsMenu);
 
     settingButton.addEventListener("click", () => {
@@ -2904,23 +2910,23 @@ function settingsVolume() {
     });
 }
 
-const settingsID = ["export","import","error","command","patch"];
+const settingsID = ["export", "import", "error", "command", "patch", "advanced"];
 function settingsBox(type,eleId) {
     if (type === "create") {
         // EXPORT SAVE
-        let exportBoxDiv = document.createElement("div");
+        const exportBoxDiv = document.createElement("div");
         exportBoxDiv.classList.add("text-box");
         exportBoxDiv.id = "export-box";
         exportBoxDiv.style.zIndex = -1;
 
-        let exportBox = document.createElement("textarea");
+        const exportBox = document.createElement("textarea");
         exportBox.value = "Save your game to export it!"
-        let cancelExportButton = document.createElement("button");
+        const cancelExportButton = document.createElement("button");
         cancelExportButton.addEventListener("click",()=>{
             exportBoxDiv.style.zIndex = -1;
         })
 
-        let copyExportButton = document.createElement("button");
+        const copyExportButton = document.createElement("button");
         copyExportButton.innerText = "Download Save";
         copyExportButton.addEventListener("click",()=>{
             let text = JSON.stringify(localStorage);
@@ -2937,19 +2943,19 @@ function settingsBox(type,eleId) {
         mainBody.appendChild(exportBoxDiv);
 
         // IMPORT SAVE
-        let importBoxDiv = document.createElement("div");
+        const importBoxDiv = document.createElement("div");
         importBoxDiv.classList.add("text-box");
         importBoxDiv.id = "import-box";
         importBoxDiv.style.zIndex = -1;
 
-        let textBox = document.createElement("textarea");
+        const textBox = document.createElement("textarea");
         textBox.value = "Paste save data here.";
-        let cancelButton = document.createElement("button");
+        const cancelButton = document.createElement("button");
         cancelButton.addEventListener("click",()=>{
             importBoxDiv.style.zIndex = -1;
         })
 
-        let copyButton = document.createElement("button");
+        const copyButton = document.createElement("button");
         copyButton.innerText = "Import Data";
         copyButton.addEventListener("click",()=>{
             let promptSave = textBox.value;
@@ -2986,12 +2992,12 @@ function settingsBox(type,eleId) {
         mainBody.appendChild(importBoxDiv);
 
         // ERROR LOG
-        let errorBoxDiv = document.createElement("div");
+        const errorBoxDiv = document.createElement("div");
         errorBoxDiv.classList.add("text-box");
         errorBoxDiv.id = "error-box";
         errorBoxDiv.style.zIndex = -1;
 
-        let errorBox = document.createElement("textarea");
+        const errorBox = document.createElement("textarea");
         errorBox.value = "Any errors or bugs will appear below this line! \nPlease report such errors to the developer through 'Report a Bug'. Thank you! :) \n------------------------------------------------------------------------------------------\n"
         errorBox.readOnly = true;
 
@@ -2999,7 +3005,7 @@ function settingsBox(type,eleId) {
             errorBox.value += `${error}\nLine:${line}, Column:${col}\n\n`;
           };
 
-        let cancelErrorButton = document.createElement("button");
+        const cancelErrorButton = document.createElement("button");
         cancelErrorButton.addEventListener("click",()=>{
             errorBoxDiv.style.zIndex = -1;
         })
@@ -3008,19 +3014,19 @@ function settingsBox(type,eleId) {
         mainBody.appendChild(errorBoxDiv);
 
         // COMMAND BOX
-        let commandDiv = document.createElement("div");
+        const commandDiv = document.createElement("div");
         commandDiv.classList.add("text-box");
         commandDiv.id = "command-box";
         commandDiv.style.zIndex = -1;
 
-        let commandBox = document.createElement("textarea");
+        const commandBox = document.createElement("textarea");
         commandBox.value = "Type your command here!";
-        let cancelCmdButton = document.createElement("button");
+        const cancelCmdButton = document.createElement("button");
         cancelCmdButton.addEventListener("click",()=>{
             commandDiv.style.zIndex = -1;
         })
 
-        let commandButton = document.createElement("button");
+        const commandButton = document.createElement("button");
         commandButton.innerText = "Execute Command";
         commandButton.addEventListener("click",()=>{
             let commandText = commandBox.value.toLowerCase();
@@ -3041,20 +3047,85 @@ function settingsBox(type,eleId) {
         mainBody.appendChild(commandDiv);
 
         // PATCH NOTES
-        let patchDiv = document.createElement("div");
+        const patchDiv = document.createElement("div");
         patchDiv.classList.add("text-box","patch-notes-div","flex-column");
         patchDiv.id = "patch-box";
         patchDiv.style.zIndex = -1;
 
         drawUI.patchNotes(patchDiv,textReplacer);
 
-        let patchCmdButton = document.createElement("button");
+        const patchCmdButton = document.createElement("button");
         patchCmdButton.addEventListener("click",()=>{
             patchDiv.style.zIndex = -1;
         })
 
         patchDiv.append(patchCmdButton);
         mainBody.appendChild(patchDiv);
+
+        // ADVANCED SETTINGS
+        const advancedSettings = document.createElement("div");
+        advancedSettings.classList.add("advanced-settings-box", "patch-notes-div", "flex-column", "text-box");
+        advancedSettings.id = "advanced-box";
+        advancedSettings.style.zIndex = -1;
+
+        const advancedMenu = document.createElement("form");
+        advancedMenu.classList.add('advanced-menu-form')
+        const advancedMenuText = new Image();
+        advancedMenuText.src = './assets/settings/adv-settings.webp';
+        advancedMenu.append(advancedMenuText)
+
+        const advSettingsDict = [
+            {id: 'nahida-preference',  default: 'preferOldPic', text: "Prefer Old 'Big Nahida'"},
+            {id: 'falling-preference',  default: 'showFallingNuts', text: "Spawn Falling Nuts on Click"},
+            {id: 'clicking-preference',  default: 'combineFloatText', text: "Combine Click Counts"},
+        ]
+
+        advSettingsDict.forEach(advItem => {
+            const prefer = document.createElement('input');
+            prefer.checked = settingsValues[advItem.default];
+            prefer.type = 'checkbox';
+            prefer.id = advItem.id;
+    
+            const preferLabel = document.createElement('label');
+            preferLabel.classList.add('switch', 'flex-row');
+            preferLabel.setAttribute('for', advItem.id);
+    
+            const preferText = document.createElement('p');
+            preferText.innerText = advItem.text;
+            const checkSpan = document.createElement('span');
+            checkSpan.classList.add('slider');
+
+            switch (advItem.id) {
+                case 'nahida-preference':
+                    prefer.addEventListener('change', () => {
+                        settingsValues.preferOldPic = prefer.checked;
+                        let demoImg = document.getElementById('demo-main-img');
+                        if (demoImg.src != "./assets/event/scara.webp") {
+                            demoImg.src = settingsValues.preferOldPic ? "./assets/nahida.webp" : "./assets/nahidaTwo.webp";
+                        }
+                    });
+                    break;
+                case 'falling-preference':
+                case 'clicking-preference':
+                    prefer.addEventListener('change', () => {
+                        settingsValues[advItem.default] = prefer.checked;
+                    });
+                    break;
+                default:
+                    break;
+            }
+            
+            preferLabel.append(preferText, prefer, checkSpan)
+            advancedMenu.append(preferLabel);
+        });
+
+        const closeAdvancedSettings = document.createElement("button");
+        closeAdvancedSettings.addEventListener("click", ()=>{
+            advancedSettings.style.zIndex = -1;
+        })
+
+        advancedSettings.append(advancedMenu, closeAdvancedSettings);
+        mainBody.appendChild(advancedSettings);
     } else if (type === "toggle") {
         let textBox = document.getElementById(`${eleId}-box`);
         if (textBox.style.zIndex == -1) {

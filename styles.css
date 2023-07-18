@@ -2124,6 +2124,7 @@ table, button, label {
 }
 
 .prefer-container {
+    display: block;
     position: relative;
     width: 100%;
 }
@@ -2587,9 +2588,8 @@ table, button, label {
     font-size: 1em;
 }
 
-
 .tree-access {
-    bottom: 16% !important;
+    right: 24% !important;
     background: url(./assets/tree/tree-icon.webp) no-repeat center center/contain !important;
 }
 

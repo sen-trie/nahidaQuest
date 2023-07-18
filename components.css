@@ -662,7 +662,7 @@
 }
 
 .key-container > button {
-    background: url(./assets/event/rotate.webp) no-repeat center center/contain;
+    background: url(./assets/event/clock-arrow.webp) no-repeat center center/contain;
     transition: 0.2s ease;
 }
 
@@ -1693,6 +1693,31 @@
     object-fit: contain;
 }
 
+.advanced-settings-box {
+    width: 35% !important;
+}
+
+.advanced-menu-form {
+    width: 100%;
+    height: 100%;
+    padding: 1% 5%;
+    box-sizing: border-box;
+}
+
+.advanced-menu-form > img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 1%;
+}
+
+.advanced-menu-form > label {
+    margin-bottom: 1%;
+    box-sizing: border-box;
+    height: 1.5em;
+    justify-content: space-between;
+}
+
 .text-box {
     position: absolute;
     left: 15%;
@@ -1706,7 +1731,8 @@
 
 .patch-notes-div {
     background-color: #DAEACB;
-    left: 20%;
+    left: 50%;
+    transform: translateX(-50%);
     width: 60%;
     height: 85%;
     padding: 0.5%;
@@ -1981,12 +2007,14 @@ input[type="range"]:focus::-moz-range-thumb{
     text-align: center;
 }
 
-.settings-bottom-left > div {
+.settings-bottom-left > button {
     background-color: #99B589;
     border: 0.15em solid #677D56;
+    color: #20301c;
     border-radius: 1em;
     width: fit-content;
     padding: 1% 6% 1% 6%;
+    font: inherit;
 }
 
 .settings-bottom-right {
@@ -2077,9 +2105,11 @@ input[type="range"]:focus::-moz-range-thumb{
 }
 
 .slider {
+    display: block;
     position: relative;
-    width: 15%;
+    width: auto;
     height: 100%;
+    aspect-ratio: 2;
     background-color: #bfc99b;
     -webkit-transition: .4s;
     transition: .4s;
@@ -2139,7 +2169,6 @@ input:checked + .slider:before {
     transition: 0.3s ease;
     filter: brightness(25%);
 }
-
 
 /*/////////////////////// SHOP CSS (TABLE 7) ///////////////////////////////*/
 #table7 {

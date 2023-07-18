@@ -81,7 +81,7 @@ function floatText(clickType,combineText,leftDiv,clickFactor,Xlocation,Ylocation
     clickCountAppear.style.left = Xlocation + "%";
     clickCountAppear.style.top = Ylocation + "%";
     clickCountAppear.addEventListener('animationend', ()=>{clickCountAppear.remove()});
-    leftDiv.appendChild(clickCountAppear);
+    if (!document.getElementById("float-text")) leftDiv.appendChild(clickCountAppear);
     return leftDiv;
 }
 

@@ -1,4 +1,4 @@
-let saveValuesDefault = {
+const saveValuesDefault = {
     versNumber:0,
     clickCount:0,
     clickFactor:1,
@@ -31,7 +31,7 @@ let saveValuesDefault = {
     }
 }
 
-let persistentValuesDefault = {
+const persistentValuesDefault = {
     goldenCore: 0,
     tutorialRanged: false,
     tutorialBasic: false,
@@ -128,14 +128,16 @@ let persistentValuesDefault = {
     }
 }
 
-let SettingsDefault = {
+const SettingsDefault = {
     bgmVolume:0.5,
     sfxVolume:0.5,
-    combineFloatText:false,
     defaultZoom: 50,
+    combineFloatText:false,
+    preferOldPic: true,
+    showFallingNuts: true,
 }
 
-let advDictDefault = {
+const advDictDefault = {
     adventureRank: 1,
     advXP: 0,
     bounty:[],
@@ -165,7 +167,7 @@ let advDictDefault = {
     }
 }
 
-let permUpgrades = {
+const permUpgrades = {
     1:{Name:"Blessing of Vitality",        Effect:5,  Max:50,   Cap:false,   Description:"Increases Energy gained by clicking Big Nahida."},
     2:{Name:"Blessing of Technique",       Effect:3,  Max:50,    Cap:true,   Description:"Increase clicking DMG during Combat Expeditions."},
     3:{Name:"Blessing of Wanderlust",      Effect:0.5, Max:50,   Cap:true,   Description:"Decreases base price of Wish characters."},
@@ -180,7 +182,7 @@ let permUpgrades = {
     12:{Name:"Blessing of Determination",  Effect:2,  Max:50,   Cap:false,   Description:"Increase XP gain from Expeditions attempts."},
 }
 
-let expeditionDictDefault = {
+const expeditionDictDefault = {
     1:"0",
     2:"0",
     3:"1",
@@ -195,7 +197,7 @@ let expeditionDictDefault = {
     13:"0",
 }
 
-let storeInventoryDefault = {
+const storeInventoryDefault = {
     active:false,
     storedTime:0,
     1:{Purchased:false, Item:0, Cost:0},
@@ -210,7 +212,7 @@ let storeInventoryDefault = {
     10:{Purchased:false, Item:0, Cost:0},
 }
 
-let enemyInfo = {
+const enemyInfo = {
     bountyKey: {
         0:["Fungi-Mob.4","Specter-Mob.5","Hilichurl-Mob.4","Hoarder-Mob.4"],
         1:["Eremite-Mob.2","Fatui-Mob.5","Fatui-Leader.4","Hilichurl-Leader.3","Automaton-Mob.3"],
@@ -331,7 +333,7 @@ let enemyInfo = {
     1302:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1200,   ATK:1.5,     AtkCooldown:35},
 }
 
-let upgradeDictDefault = {
+const upgradeDictDefault = {
     0:  {Row:-1,        Purchased: -1,   "Contribution": 0, "Level": 1, "BaseCost":20, Factor:1  , BaseFactor:1},
     1:  {Row:-1,        Purchased: -1,    },
     2:  {Row:-1,        Purchased: -1,    },
