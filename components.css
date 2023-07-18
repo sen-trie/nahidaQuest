@@ -2338,7 +2338,7 @@ input:checked + .slider:before {
     row-gap: 1.5%;
 }
 
-#nut-store-currency {
+#nut-store-currency, #tree-store-currency {
     position: absolute;
     left: 8%;
     bottom: 83%;
@@ -2357,7 +2357,7 @@ input:checked + .slider:before {
     filter: none;
 }
 
-#nut-store-currency > img {
+#nut-store-currency > img, #tree-store-currency > img {
     margin-left: 5%;
     height: 1.5em;
     object-fit: contain;

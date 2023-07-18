@@ -179,7 +179,7 @@ function universalStyleCheck(ele, styleCheck, paramOn, paramOff, forced) {
     return ele;
 }
 
-let challengeThreshold = {
+const challengeThreshold = {
     'core':{
         1000:[0,1],
         2500:[1,1],
@@ -243,4 +243,29 @@ function challengeCheck(type,tier,prop,prop2) {
     }
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck };
+const rollDict = [
+     ['artifact', 'weapon', 'food'],
+     ['artifact', 'weapon', 'food', 'talent'],
+     ['artifact', 'weapon', 'food', 'talent', 'gem'],
+     ['artifact', 'weapon', 'food', 'talent', 'gem'],
+     ['artifact', 'weapon', 'food', 'gem'],
+]
+
+// ROLLS FOR TREE ITEMS, BOUNDARIES EVERY FIVE LEVELS
+function createTreeItems(saveValues, randomInteger, inventoryDraw, rollArray) {
+    const offer = saveValues.treeObj.offerAmount;
+    const boundary = Math.floor(saveValues.treeObj.offerAmount / 5);
+    const maxItem = Math.min(Math.max(boundary, 2), 5);
+
+    const goldCore = randomInteger(85, 116) / 100 * ((Math.min(offer, 25) + 5) * 5**(boundary / 2)) * (offer > 25 ? (1 + (offer - 25) / 10 ) : 1) ;
+    let itemArray = [Math.round(goldCore)];
+
+    for (let i = 0; i < maxItem; i++) {
+        let itemRoll = rollDict[Math.min(boundary, 4)];
+        itemArray.push(inventoryDraw(rollArray(itemRoll, 0), Math.min(Math.max(boundary - 1, 1), 5), Math.min(boundary + 1, 5), "shop"));
+    }
+
+    return itemArray;
+}
+
+export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems };

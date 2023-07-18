@@ -1587,6 +1587,7 @@ table, button, label {
     height: 85%;
     max-height: 85%;
     background-color: rgba(1, 1, 1, 0.75);
+    color: white;
 }
 
 .bounty-menu {
@@ -2364,6 +2365,7 @@ table, button, label {
 .seed-column > img {
     max-width: 80%;
     object-fit: contain;
+    filter: drop-shadow(0 0 0.2em black);
 }
 
 .seed-column > button {
@@ -2573,6 +2575,9 @@ table, button, label {
 }
 
 #tree-offer-container {
+    margin-top: 1em;
+    position: relative;
+    width: 100%;
     padding: 1% 1%;
     background: rgba(0, 0, 0, 0.8);
     border-radius: 0.3em;
@@ -2599,10 +2604,17 @@ table, button, label {
     left: 0;
 }
 
+#tree-store-currency {
+    left: 2% !important;
+    bottom: 100% !important;
+    background: rgba(0, 0, 0, 0.9) !important;
+    border: none !important;
+}
+
 #tree-offer-items {
-    width: 80%;
-    height: auto;
-    aspect-ratio: 3;
+    width: 95%;
+    height: fit-content;
+    padding: 2% 0;
     gap: 1%;
 }
 
@@ -2615,6 +2627,7 @@ table, button, label {
 
 #tree-offer-items > div {
     width: 25%;
+    max-width: 6em;
     height: auto;
     aspect-ratio: 1;
     display: flex;
@@ -2629,13 +2642,15 @@ table, button, label {
 }
 
 #tree-offer-items > div:first-of-type {
-    width: 15%;
+    width: 25%;
     height: auto;
     aspect-ratio: 1;
+    text-align: center;
 }
 
 #tree-offer-items > div:first-of-type > img:first-of-type {
     width: auto;
+    max-width: 3.5em;
     flex-grow: 1;
 }
 

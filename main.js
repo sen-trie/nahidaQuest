@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo } from "./modules/dictData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck } from "./modules/functions.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
@@ -1758,7 +1758,7 @@ function battleshipEvent() {
     rotateButton.style.transform = 'rotate(0)';
     rotateButton.addEventListener('click',() => {
         keyContainer.horizontal = !(keyContainer.horizontal);
-        rotateButton.style.transform = keyContainer.horizontal ? 'rotate(0)' : 'rotate(-180deg)';
+        rotateButton.style.transform = keyContainer.horizontal ? 'rotate(90deg)' : 'rotate(180deg)';
     })
 
     let confirmButton = document.createElement('button');
@@ -2323,13 +2323,13 @@ function removeLoading(loadingNumber) {
 }
 
 // SETUP AUDIO API
-var currentSong = randomInteger(1,6);
-var nextSong = "";
+let currentSong = randomInteger(1,6);
+let nextSong = "";
 function playAudio() {
     bgmElement.src = "./assets/sfx/bgm"+currentSong+".mp3";
     bgmElement.id = "bgm";
     bgmElement.volume = settingsValues.bgmVolume;
-    bgmElement.play();
+    bgmElement.load();
     bgmElement.addEventListener('ended', () => {
         if (currentSong === 5) {
             currentSong = 1;
@@ -3720,39 +3720,18 @@ function milestoneBuy(heroTooltip) {
             inventoryCount--;
             InventoryMap.set(tempID, inventoryCount)
 
-            let buttonID = document.getElementById(tempID);
-            if (inventoryCount <= 0) {buttonID.remove()}
+            if (inventoryCount <= 0) { (document.getElementById(tempID)).remove();}
         } else if (itemArray.length > 0) {
             let inventoryCount = InventoryMap.get(itemArray[0]);
             inventoryCount--;
             InventoryMap.set(itemArray[0], inventoryCount);
 
-            let buttonID = document.getElementById(itemArray[0]);
-            if (inventoryCount <= 0) {buttonID.remove()}
+            if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
         } else if (itemStar !== -1) {
             weaselDecoy.load();
             weaselDecoy.play();
             return;
         }
-        // } else if (itemID != 5002) {
-        //     if (!InventoryMap.has(itemID)) {
-        //         weaselDecoy.load();
-        //         weaselDecoy.play();
-        //         return;
-        //     }
-        //     let inventoryCount = InventoryMap.get(itemID);
-        //     if (!inventoryCount || inventoryCount <= 0) {
-        //         weaselDecoy.load();
-        //         weaselDecoy.play();
-        //         return;
-        //     }
-
-        //     inventoryCount--;
-        //     InventoryMap.set(itemID, inventoryCount);
-
-        //     let buttonID = document.getElementById(itemID);
-        //     if (inventoryCount <= 0) {buttonID.remove()}
-        // }
 
         let upgradeDictTemp = upgradeDict[heroID];
         let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * buff);
@@ -4622,20 +4601,20 @@ function createGuild() {
         }
     }
 
-    let bountyMenu = document.createElement("div");
+    const bountyMenu = document.createElement("div");
     bountyMenu.classList.add("flex-row","bounty-menu");
     bountyMenu.id = "bounty-menu";
     buildBounty(bountyMenu);
 
-    let rankMenu = document.createElement("div");
+    const rankMenu = document.createElement("div");
     rankMenu.classList.add("flex-column","rank-menu");
-    let rankDiv = document.createElement("div");
+    const rankDiv = document.createElement("div");
     rankDiv.classList.add("flex-row","rank-div");
     rankDiv.activeLevel;
-    let rankLore = document.createElement("div");
+    const rankLore = document.createElement("div");
     rankLore.classList.add("rank-lore");
     rankLore.innerText = `Select a level to get more information!`;
-    let rankClaim = document.createElement("button");
+    const rankClaim = document.createElement("button");
     rankClaim.classList.add("flex-row");
 
     rankMenu.append(rankDiv,rankLore,rankClaim)
@@ -4741,12 +4720,14 @@ function createGuild() {
         }
     })
 
-    let tradingMenu = document.createElement("div");
-    const guildArray = [rankMenu,bountyMenu,tradingMenu];
-    const buttonArray = ["Adventure Rank","Bounties","Trading"];
+    const commisionMenu = document.createElement("div");
+    commisionMenu.innerText = '??? \n In Development. Stay Tuned!';
+
+    const guildArray = [rankMenu, bountyMenu, commisionMenu];
+    const buttonArray = ["Adventure Rank", "Bounties", "Commision"];
     guildTable.activeButton;
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3 ; i++) {
         let menuButton = document.createElement("div");
         menuButton.innerText = buttonArray[i];
         menuButton.classList.add("flex-column","guild-button");
@@ -5003,7 +4984,7 @@ function expedInfo(butId) {
     } 
 
     if ((level < 6 && level > 0) || level == 13) {
-        if (level != 13) expedRow1.innerHTML += `<img class="icon primogem" src="./assets/icon/energyIcon.webp"></img>`;
+        expedRow1.innerHTML += `<img class="icon primogem" src="./assets/icon/energyIcon.webp"></img>`;
         let heads = imgKey[id].Heads;
         for (let j = 0; j < heads.length; j++) {
             let img = new Image();
@@ -7766,7 +7747,7 @@ function tooltipFunction() {
         InventoryMap.set(itemTooltip,inventoryCount)
 
         if (inventoryCount > 0) {
-            changeTooltip(Inventory[itemTooltip],"item",itemTooltip)
+            changeTooltip(Inventory[itemTooltip],"item",itemTooltip);
         } else if (inventoryCount <= 0) {
             let nextButton = itemButton.nextSibling;
             itemButton.remove();
@@ -7854,7 +7835,7 @@ function setShop(type) {
         }
     } else if (type === "add") {
         storeInventory.storedTime = getTime();
-        let i=10;
+        let i = 10;
         while (i--) {
             let inventoryNumber;
             if (i >= 7 && i <= 9) {
@@ -7949,11 +7930,11 @@ function refreshShop(minutesPassed) {
         } else if (i >= 3 && i <= 4) {
             inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
         } else if (i === 2) {
-            if (saveValues.treeObj && saveValues.treeObj.offer) {
-                inventoryNumber = rollArray(saveValues.treeObj.offer, 1);
-            } else {
+            // if (saveValues.treeObj && saveValues.treeObj.offer) {
+            //     inventoryNumber = rollArray(saveValues.treeObj.offer, 1);
+            // } else {
                 inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
-            }
+            // }
         } else {
             inventoryNumber = inventoryDraw("weapon", 5, 6, "shop");
         }
@@ -8119,25 +8100,28 @@ function addNutStore() {
     }
     preloadStart.fetch(preloadArray)
 
-    let mainTable = rightDiv.childNodes[1];
-    let nutStoreTable = document.createElement("div");
+    const mainTable = rightDiv.childNodes[1];
+    const nutStoreTable = document.createElement("div");
     nutStoreTable.classList.add("table-without-tooltip","nut-store-table","flex-column");
     nutStoreTable.id = "nut-store-table";
-    let nutStoreCurrency = document.createElement("div");
+
+    const nutStoreCurrency = document.createElement("div");
     nutStoreCurrency.id = "nut-store-currency";
     nutStoreCurrency.classList.add("flex-row");
     nutStoreCurrency.innerText = abbrNum(persistentValues["goldenCore"],2,true);
-    let nutStoreCurrencyImage = document.createElement("img");
+    const nutStoreCurrencyImage = document.createElement("img");
     nutStoreCurrencyImage.src = "./assets/icon/core.webp";
     nutStoreCurrency.appendChild(nutStoreCurrencyImage);
-    let shopHeader = document.createElement("img");
+
+    const shopHeader = document.createElement("img");
     shopHeader.src = "./assets/tooltips/store-header.webp";
-    let nutShopDiv = document.createElement("div");
+
+    const nutShopDiv = document.createElement("div");
     nutShopDiv.id = "nut-shop-div";
-    let nutTranscend = document.createElement("div");
+    const nutTranscend = document.createElement("div");
     nutTranscend.id = "nut-shop-transcend";
     nutTranscend.style.display = "none";
-    let nutAscend = document.createElement("div");
+    const nutAscend = document.createElement("div");
     nutAscend.id = "nut-shop-ascend";
     nutAscend.innerText = "??? \n\n Development in progress. \n Stay tuned!";
     
@@ -8680,7 +8664,7 @@ function createTreeMenu() {
 }
 
 function rollTreeItems() {  
-    saveValues.treeObj.offer = [randomInteger(1,3), inventoryDraw("food", 4, 5, "shop"), inventoryDraw("weapon", 5, 6, "shop")];
+    saveValues.treeObj.offer = createTreeItems(saveValues, randomInteger, inventoryDraw, rollArray);
 
     const treeItem = document.getElementById('tree-offer-items');
     while (treeItem.firstChild) {
@@ -8697,7 +8681,7 @@ function populateTreeItems() {
     const coreContainerImg = new Image();
     coreContainerImg.src = "./assets/icon/core.webp"
     const coreContainerText = document.createElement('p');
-    coreContainerText.innerText = saveValues.treeObj.offer[0];
+    coreContainerText.innerText = abbrNum(saveValues.treeObj.offer[0], 2, true);
 
     const plusImage = new Image();
     plusImage.src = './assets/icon/plus.webp';
@@ -8722,6 +8706,14 @@ function offerBox(treeTable, optionsContainer) {
     treeOffer.id = 'tree-offer-container';
     treeOffer.classList.add('flex-column');
     treeOffer.style.display = 'none';
+
+    const nutStoreCurrency = document.createElement("div");
+    nutStoreCurrency.id = "tree-store-currency";
+    nutStoreCurrency.classList.add("flex-row");
+    nutStoreCurrency.innerText = abbrNum(persistentValues["goldenCore"],2,true);
+    const nutStoreCurrencyImage = document.createElement("img");
+    nutStoreCurrencyImage.src = "./assets/icon/core.webp";
+    nutStoreCurrency.appendChild(nutStoreCurrencyImage);
 
     const treeOfferText = document.createElement('p');
     treeOfferText.innerText = 'The Tree wishes for these items...';
@@ -8749,12 +8741,12 @@ function offerBox(treeTable, optionsContainer) {
     });
 
     buttonContainer.append(backButton, offerButton);
-    treeOffer.append(treeOfferText, treeItem, treeMissingText, buttonContainer);
+    treeOffer.append(treeOfferText, treeItem, treeMissingText, buttonContainer, nutStoreCurrency);
     treeTable.append(treeOffer);
 }
 
 function offerItemFunction() {
-    let treeMissingText = document.getElementById('tree-missing-text');
+    const treeMissingText = document.getElementById('tree-missing-text');
 
     if (saveValues.treeObj.offer[0] > persistentValues.goldenCore) {
         treeMissingText.innerText = `You lack Golden Cores (${persistentValues.goldenCore}/${saveValues.treeObj.offer[0]}).`;
@@ -8768,7 +8760,17 @@ function offerItemFunction() {
         }
     }
 
+    saveValues.treeObj.offer[0] -= persistentValues.goldenCore;
+    for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
+        let itemNumber = saveValues.treeObj.offer[i];
+        let newAmount = InventoryMap.get(itemNumber) - 1;
+
+        InventoryMap.set(itemNumber, newAmount);
+        if (newAmount === 0) {(document.getElementById(itemNumber)).remove();}
+    }
+
     saveValues.treeObj.offerAmount++;
+    rollTreeItems();
 }
 
 function treeOptions(planted, optionsContainer, lastPhase) {
@@ -8803,6 +8805,10 @@ function treeOptions(planted, optionsContainer, lastPhase) {
                     treeButton.addEventListener('click',() => {
                         universalStyleCheck(optionsContainer,"display","flex","none");
                         universalStyleCheck(document.getElementById('tree-offer-container'),"display","none","flex");
+
+                        let nutCounter = document.getElementById("tree-store-currency");
+                        let currentCount = abbrNum(persistentValues.goldenCore,2,true);
+                        nutCounter.innerHTML = nutCounter.innerHTML.replace(/[^<]+</g, `${currentCount}<`);
                     })
                     break;
                 case 1:
