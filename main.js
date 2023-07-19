@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
-import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo } from "./modules/dictData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems } from "./modules/functions.js"
+import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText} from "./modules/dictData.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,createDom } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
@@ -287,9 +287,11 @@ const moraleLore = [
     "Nahida feels [s]Sad[/s]... [mor]<br><br> XP gains are reduced by 15%, recover party morale <br> by resting or completing expeditions successfully.",
 ]
 
+const possibleItems = ['Bow', 'Catalyst', 'Claymore', 'Polearm', 'Sword', 'Artifact', 'Food', 'DendroGeoAnemo', 'ElectroCryo', 'PyroHydro', 'Inazuma', 'Liyue', 'Mondstadt', 'Sumeru'];
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
 const specialText = ["Ah! It's Bongo-Head!","'Thank you for releasing Arapacati!'","Woah, a treasure-seeking Seelie!","Woah, a shikigami was trapped inside!"];
 const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
+
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");
 let energyDisplay = document.getElementById("energy");
@@ -1755,7 +1757,7 @@ function battleshipEvent() {
     keyContainer.horizontal = true;
 
     let rotateButton = document.createElement('button');
-    rotateButton.style.transform = 'rotate(0)';
+    rotateButton.style.transform = 'rotate(90deg)';
     rotateButton.addEventListener('click',() => {
         keyContainer.horizontal = !(keyContainer.horizontal);
         rotateButton.style.transform = keyContainer.horizontal ? 'rotate(90deg)' : 'rotate(180deg)';
@@ -3078,6 +3080,7 @@ function settingsBox(type,eleId) {
             {id: 'nahida-preference',  default: 'preferOldPic', text: "Prefer Old 'Big Nahida'"},
             {id: 'falling-preference',  default: 'showFallingNuts', text: "Spawn Falling Nuts on Click"},
             {id: 'clicking-preference',  default: 'combineFloatText', text: "Combine Click Counts"},
+            {id: 'wish-preference',  default: 'showWishAnimation', text: "Show Wish Animation"},
         ]
 
         advSettingsDict.forEach(advItem => {
@@ -3107,11 +3110,13 @@ function settingsBox(type,eleId) {
                     break;
                 case 'falling-preference':
                 case 'clicking-preference':
+                case 'wish-preference':
                     prefer.addEventListener('change', () => {
                         settingsValues[advItem.default] = prefer.checked;
                     });
                     break;
                 default:
+                    console.error(`It seems the dev forgot to implement a setting for ${advItem.id}`);
                     break;
             }
             
@@ -4174,7 +4179,7 @@ function adventure(advType) {
             saveValues["energy"] -= ADVENTURECOSTS[type !== 13 ? type : 0];
             updateMorale("add",(randomInteger(7,10) * -1));
 
-            if (activeLeader == "Paimon" && type !== 13) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.1)}
+            if (activeLeader == "Paimon" && type !== 13) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.15)}
             if (!persistentValues.tutorialBasic) {
                 customTutorial("advTut",6,()=>{drawAdventure(type,wave)});
                 persistentValues.tutorialBasic = true;
@@ -4656,13 +4661,13 @@ function createGuild() {
 
             let loreHTML = advInfo[i].Desc.replace("[hp]",`<div style='height:1.4em;gap:1%;white-space: nowrap;' class='flex-row'>
                                                           +1 HP <img style="height: 100%;margin-right:10%" src=./assets/icon/health.webp> 
-                                                          +6 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp></div>`);
+                                                          +6 ATK <img style='height: 100%;' src=./assets/icon/atkIndicator.webp></div>`
+            );
+
             rankLore.innerHTML += textReplacer({
                 "[s]":`<span style='color:#A97803'>`,
                 "[/s]":`</span>`,
             },loreHTML);
-
-            
 
             if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
             rankClaim.buttonLevel = i;
@@ -4721,17 +4726,130 @@ function createGuild() {
     })
 
     const commisionMenu = document.createElement("div");
-    commisionMenu.innerText = '??? \n In Development. Stay Tuned!';
+    if (!beta) commisionMenu.innerText = '??? \n In Development. Stay Tuned!';
+    if (beta) {
+        commisionMenu.classList.add('commision-menu', 'flex-column');
+
+        const commisionList = document.createElement('div');
+        commisionList.id = 'commision-list'
+        commisionList.classList.add('commision-list');
+
+        saveValues.baseCommisions = []
+        if (saveValues.baseCommisions.length === 0) {
+            generateCommisions();
+        }
+
+        saveValues.baseCommisions.forEach((item) => {
+            const newCommisionsCell = createDom('div', { class:['commision-cell', 'flex-row'], style:{ display: 'flex' }})
+            newCommisionsCell.addEventListener('click',() => {focusNewComm(false, item)})
+
+            const commText = createDom('div', { class:['flex-column', 'commision-text']});
+            const commTitle = document.createElement('p');
+
+            commTitle.innerText = item.title;
+            const newCommisionsTime = document.createElement('p');
+            newCommisionsTime.innerText = convertTo24HourFormat(item.duration);
+
+            const commItems = document.createElement('div');
+            commItems.classList.add('commision-items', 'flex-row');
+            
+            item.possibleItems.forEach((reward) => {
+                let itemPic = new Image();
+                itemPic.src = `./assets/expedbg/loot/${reward}.webp`;
+                commItems.appendChild(itemPic);
+            })
+
+            const commLevel = document.createElement('p');
+            commLevel.innerText = `Rank ${item.rank}`;
+            const itemStar = new Image();
+            itemStar.src = `./assets/frames/star-${item.rating}.webp`;
+
+            commText.append(commTitle, newCommisionsTime);
+            newCommisionsCell.append(commLevel, commText, commItems, itemStar);
+            commisionList.appendChild(newCommisionsCell);
+        })
+
+        const selectComission = document.createElement('div');
+        selectComission.classList.add('flex-column');
+        selectComission.style.display = 'none';
+        selectComission.id = 'select-comission';
+        const commissionSetting = document.createElement('div');
+        commissionSetting.classList.add('commision-setting', 'flex-row');
+
+        const commTitle = document.createElement('p');
+
+        const commItems = document.createElement('div');
+        commItems.classList.add('select-commision-items', 'flex-column');
+        const commRewards = document.createElement('div');
+        const commStars = document.createElement('img');
+        commItems.append(commRewards, commStars)
+
+        const commHeroes = document.createElement('div');
+        commHeroes.classList.add('comm-heroes');
+        const textArray = ['Leader', 'Support', 'Perk'];
+        textArray.forEach((text) => {
+            let barText = document.createElement('p');
+            barText.innerText = text
+            commHeroes.append(barText);
+        })
+
+        let heroContainer = document.createElement('div');
+        heroContainer.classList.add('flex-row');
+        const selectHero = new Image();
+        selectHero.src = `./assets/icon/charPlus.webp`;
+        heroContainer.appendChild(selectHero);
+
+        let suppContainer = document.createElement('div');
+        suppContainer.classList.add('flex-row');
+        const selectSupp = new Image();
+        selectSupp.src = `./assets/icon/charPlus.webp`;
+        suppContainer.appendChild(selectSupp);
+        const perkText = document.createElement('p');
+        perkText.innerText = 'None Curently';
+        
+        commHeroes.append(heroContainer, suppContainer, perkText);
+
+        commissionSetting.append(commTitle, commItems, commHeroes);
+
+
+
+
+        const commissionChar = document.createElement('div');
+        commissionChar.id = 'commission-char';
+        commissionChar.classList.add('commision-char');
+        selectComission.append(commissionSetting, commissionChar);
+
+        const currentCommisions = document.createElement('div');
+        currentCommisions.classList.add('current-commision', 'flex-row');
+
+        for (let i = 0; i < 3; i++) {
+            const currentCommisionsCell = document.createElement('div');
+            currentCommisionsCell.classList.add('current-commision-cell', 'flex-row');
+
+            const currentCommisionsLeader = document.createElement('img');
+            currentCommisionsLeader.src = './assets/tooltips/hero/Collei.webp';
+            const currentCommisionsSupport = document.createElement('img');
+            currentCommisionsSupport.src = './assets/tooltips/hero/Collei.webp';
+
+            const currentCommisionsTime = document.createElement('p');
+            currentCommisionsTime.innerText = '01:33'
+
+            currentCommisionsCell.append(currentCommisionsLeader, currentCommisionsSupport, currentCommisionsTime);
+            currentCommisions.appendChild(currentCommisionsCell);
+        }
+
+        commisionMenu.append(commisionList, selectComission, currentCommisions);
+    }
 
     const guildArray = [rankMenu, bountyMenu, commisionMenu];
-    const buttonArray = ["Adventure Rank", "Bounties", "Commision"];
+    const buttonArray = ["Adventure Rank", "Bounties", "Commisions"];
     guildTable.activeButton;
 
     for (let i = 0; i < 3 ; i++) {
         let menuButton = document.createElement("div");
         menuButton.innerText = buttonArray[i];
         menuButton.classList.add("flex-column","guild-button");
-        menuButton.addEventListener("click",()=>{
+        menuButton.addEventListener("click",() => {
             if (guildTable.activeTable) {guildArray[guildTable.activeTable - 1].style.display = "none"};
             guildArray[i].style.display = "flex";
             guildTable.activeTable = i + 1;
@@ -4742,6 +4860,7 @@ function createGuild() {
                 }
             }
 
+            if (i === 2) {focusNewComm(true, null)}
             menuButton.classList.add("guild-selected");
             guildTable.activeButton = menuButton;
         })
@@ -4880,6 +4999,107 @@ function resetBounty(bountyMenu,type) {
         }
         advDict.bounty = bountyObject;
     }
+}
+
+function focusNewComm(forceShowComm, item) {
+    console.log(item)
+    const commisionList = document.getElementById('commision-list');
+    const selectComission = document.getElementById('select-comission');
+    const commissionChar = document.getElementById('commission-char');
+
+    const selectComissionChildren = selectComission.firstChild.children;
+
+    while (selectComissionChildren[1].firstChild.firstChild) {
+        selectComissionChildren[1].firstChild.firstChild.remove();
+    }
+
+    while (commissionChar.firstChild) {
+        commissionChar.firstChild.remove();
+    }
+
+    if (forceShowComm) {
+        selectComission.style.display = 'none';
+        commisionList.style.display = 'grid';
+    } else {
+        commisionList.style.display = 'none';
+        selectComission.style.display = 'flex';
+        selectComissionChildren[0].innerHTML = `[Rank: ${item.rank}]
+                                                <hr style="height:10px; visibility:hidden;" />${item.title}
+                                                <br>${convertTo24HourFormat(item.duration)}`;
+
+        selectComissionChildren[1].lastChild.src = `./assets/frames/star-${item.rating}.webp`;
+        item.possibleItems.forEach((reward) => {
+            let itemPic = new Image();
+            itemPic.src = `./assets/expedbg/loot/${reward}.webp`;
+            selectComissionChildren[1].firstChild.appendChild(itemPic);
+        })
+
+        for (let key in upgradeInfo) {
+            if (upgradeInfo[key].Nation === "Sumeru") {
+                if (upgradeDict[key].Purchased > 0) {
+                    let name = upgradeInfo[key].Name
+                    let charButton = createDom('button', { class:['flex-row','commision-button'] })
+
+                    let charLeft = createDom('div', { class:['flex-column', 'commision-picture'] })
+                    let charImg = createDom('img', { src: `./assets/tooltips/hero/${name}.webp` })
+                    let charText = createDom('p');
+                    charText.innerHTML = `${name}
+                                          <br>Perk: ${saveValues.commisionDict[name].perk}
+                                          <br>Stamina: ${saveValues.commisionDict[name].stamina}
+                                          `
+
+                    charLeft.append(charImg)
+                    charButton.append(charLeft, charText)
+                    commissionChar.append(charButton);
+                }
+            }
+        }
+    }
+
+}
+
+function shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+
+    while (currentIndex != 0) {
+  
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+  
+    return array;
+}
+  
+function generateCommisions() {
+    const baseCommisions = [];
+    const textArray = [];
+
+    for (let i = 0; i < 10; i++) {
+        let text = '';
+        while (text in textArray || text === '') {
+            text = rollArray(commisionText, 0);
+        }
+        textArray.push(text);
+
+        let rating = Math.floor(i / 3) + 3;
+        let shuffledItems = shuffle(possibleItems);
+        let possibleCommItems = [shuffledItems[0], shuffledItems[1]];
+        let extraItem = randomInteger(0,2);
+        if (extraItem === 1) {possibleCommItems.push(shuffledItems[2])}
+
+        baseCommisions.push({
+            title: text,
+            rating: Math.min(rating, 5),
+            rank: 5 + rating * 2 + extraItem * 2 + randomInteger(0,2),
+            duration: (Math.round(randomInteger(2, 6) / 2 * 10) / 10),
+            possibleItems: possibleCommItems
+        })
+    }
+
+    saveValues.baseCommisions = baseCommisions;
 }
 
 function completeBounty(bountyID,type,ele) {
@@ -5079,7 +5299,7 @@ function createExpMap() {
     expedXPInfo.id = "exped-xp";
     expedXPInfo.innerText = `Rank ${advDict.adventureRank} (${advDict.advXP}/${expedXPBar.maxXP} XP)`;
     if (advDict.adventureRank >= 20) {
-        expedXPInfo.innerText = "Level 20 (MAX)";
+        expedXPInfo.innerText = "Rank 20 (MAX)";
         expedXPBar.maxXP = 1e20;
         expedXPBar.style.width = "100%";
     }
@@ -7238,7 +7458,7 @@ function wish() {
 
                 let mailImageTemp = document.getElementById("mailImageID");
                 mailImageTemp.style.opacity = 0;
-                wishAnimation(randomWishHero);
+                if (settingsValues.showWishAnimation) wishAnimation(randomWishHero);
                 break;
             }
         }
@@ -9330,6 +9550,7 @@ function newPop(type) {
 
     if (beta) {
         createTreeMenu();
+        activeLeader = "Paimon"
     }
 }
 
@@ -9358,7 +9579,7 @@ if (beta) {
     function startingFunction() {
         // PRESS A KEY
         const event = new KeyboardEvent('keydown', {
-            key: 'a',
+            key: '3',
         });
           
         document.dispatchEvent(event);

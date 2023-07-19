@@ -44,7 +44,7 @@ const screenLoreDict = {
 
 const charLoreObj = {
     0:{Name:"Nahida",     Desc:"20%+ HP in Combat"},
-    1:{Name:"Paimon",     Desc:"10%+ Energy Refund"},
+    1:{Name:"Paimon",     Desc:"15%+ Energy Refund"},
     2:{Name:"Venti",      Desc:"10%+ Counter Recharge Rate"},
     3:{Name:"Zhongli",    Desc:"50%+ Burst DMG"},
     4:{Name:"Ei",         Desc:"35%+ Counter DMG"},
@@ -557,7 +557,7 @@ const upgradeInfo = {
         Lore: "My favourite food? Candied Ajilenakh Nuts, no contest. Easy to take on the road, and of course delicious.",
         Type: "Claymore",
         Ele: "Pyro",
-        Nation: "Sumeru"
+        Nation: "Sumeru",
     },
 }
 
@@ -1118,5 +1118,12 @@ const challengeInfo = [
     }
 ]
 
+const commisionText = [
+    'Yasna Monument', 'Gandha Hill', 'Yazadaha Pool','Sobek Oasis','Samudra Coast',
+    'Dar al-Shifa', 'Valley of Dahri', 'Sands of Al-Azif', 'Mawtiyima Forest','Dunes of Steel','Chinbat Ravine','Ruins of Dahri','Apam Woods',
+    'Debris of Panjvahe', 'Abdju Pit','Qusayr Al-Inkhida','Devantaka Mountain','Wadi Al-Majuj','Khemenu Temple','Hills of Barsom','Vourukasha Oasis',
+    'Chatrakam Cave','Wounded Shin Valley','Sands of Three Canals','Khaj-Nisut','Passsage of Ghouls', 'Temir Mountains',
+    'Mt. Damavand','Mausoleum of Deshret', 'Tunigi Hollow', 'Old Vanarana'
+]
 
-export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo}
+export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo, commisionText}

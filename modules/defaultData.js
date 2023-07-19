@@ -1,3 +1,138 @@
+
+const commisionDict = {
+    'Alhaitham':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Toughness',
+    },
+    'Candace':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Toughness',
+    },
+    'Collei':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Lightweight',
+    },
+    'Cyno':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Scavenger',
+    },
+    'Dehya':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Toughness',
+    },
+    'Dori':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Proficient',
+    },
+    'Faruzan':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Scavenger',
+    },
+    'Kaveh':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Energized',
+    },
+    'Layla':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Proficient',
+    },
+    'Nahida':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Scavenger',
+    },
+    'Nilou':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Energized',
+    },
+    'Tighnari':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Lightweight',
+    },
+    'Wanderer':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        affection: 0, 
+        stamina: 100,
+        perk: 'Lightweight',
+    },
+}
+
+const treeObj = {
+    level: 1,
+    element: null,
+    growth: 0,
+    growthRate: 1,
+    defense: false,
+    energy: 100,
+    health: 100,
+    offerAmount: 0,
+    offer: [],
+    // PYRO, HYDRO, DENDRO, ELECTRO, ANEMO, CRYO, GEO
+    elementAffinity: [1,1,1,1,1,1,1]
+}
+
 const saveValuesDefault = {
     versNumber:0,
     clickCount:0,
@@ -16,19 +151,10 @@ const saveValuesDefault = {
     goldenTutorial: false,
     currentTime: 0,
     achievementCount: 0,
-    treeObj: {
-        level: 1,
-        element: null,
-        growth: 0,
-        growthRate: 1,
-        defense: false,
-        energy: 100,
-        health: 100,
-        offerAmount: 0,
-        offer: [],
-        // PYRO, HYDRO, DENDRO, ELECTRO, ANEMO, CRYO, GEO
-        elementAffinity: [1,1,1,1,1,1,1]
-    }
+    treeObj: treeObj,
+    baseCommisions: [],
+    extraCommisions: [],
+    commisionDict: commisionDict,
 }
 
 const persistentValuesDefault = {
@@ -135,6 +261,7 @@ const SettingsDefault = {
     combineFloatText:false,
     preferOldPic: true,
     showFallingNuts: true,
+    showWishAnimation: true,
 }
 
 const advDictDefault = {

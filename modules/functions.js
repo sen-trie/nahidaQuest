@@ -268,4 +268,38 @@ function createTreeItems(saveValues, randomInteger, inventoryDraw, rollArray) {
     return itemArray;
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems };
+function convertTo24HourFormat(hours) {
+    const isFloat = hours % 1 !== 0;
+    let roundedHours = Math.floor(hours);
+    let minutes = 0;
+  
+    if (isFloat) {
+      minutes = Math.round((hours % 1) * 60);
+    }
+  
+    const formattedHours = String(roundedHours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
+  
+    return `${formattedHours}:${formattedMinutes}`;
+}
+
+function createDom(elementType, attributes) {
+    const element = document.createElement(elementType);
+  
+    if (attributes) {
+        for (const attr in attributes) {
+            if ((attr === 'class' || attr === 'classList') && Array.isArray(attributes[attr])) {
+                element.classList.add(...attributes[attr]);
+            } else if (attr === 'style' && typeof attributes[attr] === 'object') {
+                Object.assign(element.style, attributes[attr]);
+            } else {
+                element.setAttribute(attr, attributes[attr]);
+            }
+        }
+    }
+  
+    return element;
+  }
+  
+
+export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,createDom };
