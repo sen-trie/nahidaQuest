@@ -287,11 +287,17 @@ function createDom(elementType, attributes) {
     const element = document.createElement(elementType);
   
     if (attributes) {
+        
         for (const attr in attributes) {
+            
             if ((attr === 'class' || attr === 'classList') && Array.isArray(attributes[attr])) {
                 element.classList.add(...attributes[attr]);
             } else if (attr === 'style' && typeof attributes[attr] === 'object') {
                 Object.assign(element.style, attributes[attr]);
+            } else if (attr === 'innerText' && typeof attributes[attr] === 'string') {
+                element.innerText = attributes[attr];
+            } else if (attr === 'innerHTML' && typeof attributes[attr] === 'string') {
+                element.innerHTML = attributes[attr];
             } else {
                 element.setAttribute(attr, attributes[attr]);
             }
@@ -299,7 +305,7 @@ function createDom(elementType, attributes) {
     }
   
     return element;
-  }
+}
   
 
 export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,createDom };

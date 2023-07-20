@@ -1126,4 +1126,103 @@ const commisionText = [
     'Mt. Damavand','Mausoleum of Deshret', 'Tunigi Hollow', 'Old Vanarana'
 ]
 
-export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo, commisionText}
+const commisionInfo = {
+    'Toughness':'[Toughness]\nLess likely to be attacked',
+    'Lightweight':'[Lightweight]\nCommision time is reduced by 15%',
+    'Scavenger':'[Scavenger]\nHas a chance for additional rewards',
+    'Proficient':'[Proficient]\nCan prioritize certain items',
+    'Energized':'[Energized]\nStamina costs are reduced by 20%',
+    'Alhaitham':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Toughness',
+    },
+    'Candace':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Toughness',
+    },
+    'Collei':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Lightweight',
+    },
+    'Cyno':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Scavenger',
+    },
+    'Dehya':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Toughness',
+    },
+    'Dori':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Proficient',
+    },
+    'Faruzan':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Scavenger',
+    },
+    'Kaveh':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Energized',
+    },
+    'Layla':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Proficient',
+    },
+    'Nahida':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[], 
+        perk: 'Scavenger',
+    },
+    'Nilou':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Energized',
+    },
+    'Tighnari':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Lightweight',
+    },
+    'Wanderer':{
+        foodLikes:[],
+        foodDisikes:[],
+        charLikes:[],
+        charDislikes:[],
+        perk: 'Lightweight',
+    },
+}
+
+export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo, commisionText, commisionInfo}

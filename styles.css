@@ -29,6 +29,10 @@ img {
     -ms-user-select: none;
  }
 
+button {
+    font: inherit;
+}
+
 #cache {
     position: absolute;
     height: 100%;
@@ -1054,7 +1058,7 @@ table, button, label {
 }
 
 .inventory-selected {
-    border: 0.35em inset #867357;
+    border: 0.5rem inset #867357;
     border-radius: 1em;
     transition: 0.2s ease;
     transform: scale(1.20);
@@ -1139,7 +1143,6 @@ table, button, label {
 }
 
 .filter-row > button {
-    font: inherit;
     height: 70%;
     width: 20%;
     background-color: #C7C2B3;
@@ -1583,7 +1586,8 @@ table, button, label {
 .guild-menu {
     position: relative;
     top: -1%;
-    width: 90%;
+    width: 98%;
+    left: -1%;
     height: 85%;
     max-height: 85%;
     background-color: rgba(1, 1, 1, 0.75);
@@ -1651,7 +1655,6 @@ table, button, label {
     top: 50%;
     left: 50%;
     padding: 2% 10% 2% 10%;
-    font: inherit;
     color: #f3e4cb;
     border: 0.2em solid #954434;
     border-radius: 1.5em;
@@ -1762,11 +1765,6 @@ table, button, label {
     border: 0.2em solid #5B8550;
 }
 
-.commision-menu {
-    width: 98%;
-    left: -1%;
-}
-
 .commision-menu img {
     max-height: 100%;
     object-fit: contain;
@@ -1835,14 +1833,38 @@ table, button, label {
 
 .current-commision {
     width: 100%;
-    background-color: yellow;
     height: 3em;
+    justify-content: space-between;
+    color: #c1c1c1;
+    background-color: #2D3743;
+    border: 0.2em solid #757D83;
 }
 
-.current-commision > div {
+.current-commision-cell {
     height: 100%;
     width: 33%;
-    border: 0.1em solid black;
+    border-right: 0.2em solid #757D83;
+    gap: 2%;
+}
+
+.current-commision-cell:last-of-type {
+    border-right: none;
+}
+
+.commision-footer {
+    height: 2.5em;
+    width: fit-content;
+    padding: 0 2%;
+    margin: 0 8%;
+    color: white;
+    background-color: #757D83;
+}
+
+.current-commision > p {
+    margin: unset;
+    padding: unset;
+    text-align: center;
+    background-color: unset;
 }
 
 #select-comission {
@@ -1850,12 +1872,12 @@ table, button, label {
     width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    color: #423126;
 }
 
 .commision-setting {
     width: 100%;
-    height: 6em;
-    color: #423126;
+    height: 8em;
     background-color: #ECE4DA;
     border: 0.2em solid #c8b697;
 }
@@ -1863,10 +1885,12 @@ table, button, label {
 .commision-setting > p {
     text-align: center;
     width: 7em;
+    min-width: 7em;
     padding: 0 1%;
 }
 
 .select-commision-items {
+    min-width: fit-content;
     padding: 0 2%;
     background-color: #b9a47f;
     height: 100%;
@@ -1886,7 +1910,7 @@ table, button, label {
     display: grid;
     overflow-y: auto;
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 4em;
+    grid-auto-rows: 6em;
     gap: 2% 1%;
     padding: 1%;
     box-sizing: border-box;
@@ -1895,6 +1919,9 @@ table, button, label {
 .commision-button {
     height: 100%;
     width: 100%;
+    box-sizing: border-box;
+    border: 0.2em solid #c8b697;
+    color: #423126;
 }
 
 .commision-char > img {
@@ -1904,7 +1931,7 @@ table, button, label {
 .comm-heroes {
     flex-grow: 1;
     display: grid;
-    grid-template-rows: fit-content 1fr;
+    grid-template-rows: 2em 1fr;
     grid-template-columns: 1fr 1fr 2fr;
     height: 100%;
     box-sizing: border-box;
@@ -1913,9 +1940,14 @@ table, button, label {
 }
 
 .comm-heroes > p {
-    padding-top: 0.5em;
+    padding-top: 0.2em;
     box-sizing: border-box;
     text-align: center;
+}
+
+.comm-heroes > p:last-child {
+    font-size: 0.8em;
+    padding: 0 2%;
 }
 
 .comm-heroes > div {
@@ -1930,11 +1962,18 @@ table, button, label {
 }
 
 .commision-picture {
+    width: 25%;
     height: 100%;
+    display: grid;
+    grid-template-rows: 1fr 1.5em;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #b9a47f;
 }
 
-.commision-picture > img {
-    max-height: 100%;
+.commision-picture > div:first-child {
+    filter: drop-shadow(0 0 0.2em black);
+    grid-row: 1; 
+    grid-column: 1 / span 3;
 }
 
 .commision-button > p {
@@ -2256,7 +2295,6 @@ table, button, label {
 .tier-container > div > button {
     width: 20%;
     padding: 1%;
-    font: inherit;
     background-color: #314151;
     border: 0.15em solid #162120;
     color: rgb(236, 236, 236);
@@ -2568,7 +2606,6 @@ table, button, label {
     height: auto;
     width: 33%;
     aspect-ratio: 4.61;
-    font: inherit;
     color: white;
     text-shadow: var(--text-shadow-075);
 }
@@ -2856,7 +2893,6 @@ table, button, label {
 #tree-offer-container > container > button {
     width: 33%;
     aspect-ratio: 4.61;
-    font: inherit;
     font-size: 1em;
     color: white;
     text-shadow: var(--text-shadow-075);
@@ -2898,7 +2934,6 @@ table, button, label {
 
 .tree-enemy > button {
     margin: 2%;
-    font: inherit;
     font-size: 1.1em;
     padding: 1%;
     background-color: #557a36;
@@ -2959,7 +2994,6 @@ table, button, label {
 }
 
 .choice-ele > div > div > button {
-    font: inherit;
     font-size: 1.1em;
     padding: 5%;
     background-color: #557a36;
@@ -3212,11 +3246,9 @@ table, button, label {
 @keyframes flipIn {
     0% {
         transform: scaleX(0);
-        opacity: 1;
     }
     100% {
         transform: scaleX(1);
-        opacity: 1;
     }
 }
 

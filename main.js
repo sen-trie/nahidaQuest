@@ -1,5 +1,5 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
-import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText} from "./modules/dictData.js"
+import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,createDom } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
@@ -279,6 +279,7 @@ let activeLeader;
 
 let bountyObject = {};
 let lootArray = {};
+let selectHeroType = null;
 const upgradeThreshold = [0,0,64,113,160];
 const moraleLore = [
     "Nahida is feeling [s]Really Happy[/s]! [mor]<br><br> XP gains are increased by 10% and party <br> deals 10% additional DMG in combat.",
@@ -4726,6 +4727,7 @@ function createGuild() {
     })
 
     const commisionMenu = document.createElement("div");
+    commisionMenu.id = 'commision-menu';
     if (!beta) commisionMenu.innerText = '??? \n In Development. Stay Tuned!';
     if (beta) {
         commisionMenu.classList.add('commision-menu', 'flex-column');
@@ -4734,40 +4736,9 @@ function createGuild() {
         commisionList.id = 'commision-list'
         commisionList.classList.add('commision-list');
 
-        saveValues.baseCommisions = []
         if (saveValues.baseCommisions.length === 0) {
             generateCommisions();
         }
-
-        saveValues.baseCommisions.forEach((item) => {
-            const newCommisionsCell = createDom('div', { class:['commision-cell', 'flex-row'], style:{ display: 'flex' }})
-            newCommisionsCell.addEventListener('click',() => {focusNewComm(false, item)})
-
-            const commText = createDom('div', { class:['flex-column', 'commision-text']});
-            const commTitle = document.createElement('p');
-
-            commTitle.innerText = item.title;
-            const newCommisionsTime = document.createElement('p');
-            newCommisionsTime.innerText = convertTo24HourFormat(item.duration);
-
-            const commItems = document.createElement('div');
-            commItems.classList.add('commision-items', 'flex-row');
-            
-            item.possibleItems.forEach((reward) => {
-                let itemPic = new Image();
-                itemPic.src = `./assets/expedbg/loot/${reward}.webp`;
-                commItems.appendChild(itemPic);
-            })
-
-            const commLevel = document.createElement('p');
-            commLevel.innerText = `Rank ${item.rank}`;
-            const itemStar = new Image();
-            itemStar.src = `./assets/frames/star-${item.rating}.webp`;
-
-            commText.append(commTitle, newCommisionsTime);
-            newCommisionsCell.append(commLevel, commText, commItems, itemStar);
-            commisionList.appendChild(newCommisionsCell);
-        })
 
         const selectComission = document.createElement('div');
         selectComission.classList.add('flex-column');
@@ -4786,33 +4757,45 @@ function createGuild() {
 
         const commHeroes = document.createElement('div');
         commHeroes.classList.add('comm-heroes');
-        const textArray = ['Leader', 'Support', 'Perk'];
+        const textArray = ['Leader', 'Support', 'Boon'];
         textArray.forEach((text) => {
             let barText = document.createElement('p');
             barText.innerText = text
             commHeroes.append(barText);
         })
 
-        let heroContainer = document.createElement('div');
-        heroContainer.classList.add('flex-row');
-        const selectHero = new Image();
-        selectHero.src = `./assets/icon/charPlus.webp`;
-        heroContainer.appendChild(selectHero);
+        const heroContainer = createDom('div', {
+            hero: null,
+            id: 'select-hero-leader',
+            style:{ background: 'url(./assets/icon/charPlus.webp) no-repeat center center/contain' }
+        });
 
-        let suppContainer = document.createElement('div');
-        suppContainer.classList.add('flex-row');
-        const selectSupp = new Image();
-        selectSupp.src = `./assets/icon/charPlus.webp`;
-        suppContainer.appendChild(selectSupp);
+        const suppContainer = createDom('div', {
+            hero: null,
+            id: 'select-hero-support',
+            style:{ background: 'url(./assets/icon/charPlus.webp) no-repeat center center/contain' }
+        });
+
+        heroContainer.addEventListener('click',() => {
+            selectHeroType = 'leader';
+            heroContainer.style.animation = 'tallyCount 0.5s ease-in-out infinite both';
+            suppContainer.style.animation = 'unset';
+            suppContainer.offsetWidth;
+        });
+
+        suppContainer.addEventListener('click',() => {
+            selectHeroType = 'support';
+            suppContainer.style.animation = 'tallyCount 0.5s ease-in-out infinite both';
+            heroContainer.style.animation = 'unset';
+            heroContainer.offsetWidth;
+        });
+        
         const perkText = document.createElement('p');
+        perkText.id = 'comm-perk-test';
         perkText.innerText = 'None Curently';
         
         commHeroes.append(heroContainer, suppContainer, perkText);
-
         commissionSetting.append(commTitle, commItems, commHeroes);
-
-
-
 
         const commissionChar = document.createElement('div');
         commissionChar.id = 'commission-char';
@@ -4823,8 +4806,11 @@ function createGuild() {
         currentCommisions.classList.add('current-commision', 'flex-row');
 
         for (let i = 0; i < 3; i++) {
-            const currentCommisionsCell = document.createElement('div');
-            currentCommisionsCell.classList.add('current-commision-cell', 'flex-row');
+            const currentCommisionsCell = createDom('div', {
+                id: `commision-cell-${i}`,
+                class: ['current-commision-cell', 'flex-row'],
+                style: { display: 'flex' },
+            });
 
             const currentCommisionsLeader = document.createElement('img');
             currentCommisionsLeader.src = './assets/tooltips/hero/Collei.webp';
@@ -4832,12 +4818,23 @@ function createGuild() {
             currentCommisionsSupport.src = './assets/tooltips/hero/Collei.webp';
 
             const currentCommisionsTime = document.createElement('p');
-            currentCommisionsTime.innerText = '01:33'
+            currentCommisionsTime.innerText = '01:33';
 
+            currentCommisionsCell.leader = currentCommisionsLeader;
+            currentCommisionsCell.support = currentCommisionsSupport;
+            currentCommisionsCell.time = currentCommisionsTime;
+            
             currentCommisionsCell.append(currentCommisionsLeader, currentCommisionsSupport, currentCommisionsTime);
             currentCommisions.appendChild(currentCommisionsCell);
         }
 
+        const currentCommisionsBack = createDom('button', { class:['commision-footer', 'flex-column'], innerText: 'Back', style: { display:'none' }})
+        currentCommisionsBack.addEventListener('click', () => {focusNewComm(true, null)});
+        const enterCommision = createDom('button', { class:['commision-footer', 'flex-column'], innerText: 'Confirm!', style: { display:'none' }})
+        enterCommision.addEventListener('click', () => {enterNewComm()});
+        const commFeedback = createDom('p', {class:['commision-footer', 'flex-column'], style: { display:'none' }, id:'comm-feedback', chosenComm: null})
+
+        currentCommisions.append(currentCommisionsBack, commFeedback, enterCommision);
         commisionMenu.append(commisionList, selectComission, currentCommisions);
     }
 
@@ -4873,6 +4870,8 @@ function createGuild() {
         guildTable.appendChild(guildArray[i]);
     }
     table3.appendChild(guildTable);
+
+    if (beta) {showCommisions()};
     return guildTable;
 }
 
@@ -5001,26 +5000,99 @@ function resetBounty(bountyMenu,type) {
     }
 }
 
+function showCommisions() {
+    const commisionList = document.getElementById('commision-list');
+    while (commisionList.firstChild) {
+        commisionList.firstChild.remove();
+    }
+
+    saveValues.baseCommisions.forEach((item) => {
+        if (item.progress == false) {
+            const newCommisionsCell = createDom('div', { class:['commision-cell', 'flex-row'], style:{ display: 'flex' }})
+            newCommisionsCell.addEventListener('click',() => {focusNewComm(false, item)})
+
+            const commText = createDom('div', { class:['flex-column', 'commision-text']});
+            const commTitle = document.createElement('p');
+
+            commTitle.innerText = item.title;
+            const newCommisionsTime = document.createElement('p');
+            newCommisionsTime.innerText = convertTo24HourFormat(item.duration);
+
+            const commItems = document.createElement('div');
+            commItems.classList.add('commision-items', 'flex-row');
+            
+            item.possibleItems.forEach((reward) => {
+                let itemPic = new Image();
+                itemPic.src = `./assets/expedbg/loot/${reward}.webp`;
+                commItems.appendChild(itemPic);
+            })
+
+            const commLevel = document.createElement('p');
+            commLevel.innerText = `Rank ${item.rank}`;
+            const itemStar = new Image();
+            itemStar.src = `./assets/frames/star-${item.rating}.webp`;
+
+            commText.append(commTitle, newCommisionsTime);
+            newCommisionsCell.append(commLevel, commText, commItems, itemStar);
+            commisionList.appendChild(newCommisionsCell);
+        }
+    });
+
+    for (let i = 0; i < 3; i++) {
+        let commCell = document.getElementById(`commision-cell-${i}`);
+        if (saveValues.currentCommisions[i] != undefined) {
+            let commId = saveValues.currentCommisions[i];
+            if (commId.split('-')[0] === 'base') {
+                let commInfo = saveValues.baseCommisions[commId.split('-')[1]];
+
+                commCell.leader.style.display = 'flex';
+                commCell.leader.src = `./assets/tooltips/emoji/${commInfo.char[0]}.webp`;
+                commCell.support.style.display = 'flex';
+                commCell.support.src = `./assets/tooltips/emoji/${commInfo.char[1]}.webp`;
+            }
+        } else {
+            commCell.leader.style.display = 'none'
+            commCell.support.style.display = 'none'
+            commCell.time.innerText = 'Available';
+        }
+    }
+}
+
 function focusNewComm(forceShowComm, item) {
-    console.log(item)
     const commisionList = document.getElementById('commision-list');
     const selectComission = document.getElementById('select-comission');
     const commissionChar = document.getElementById('commission-char');
-
+    while (commissionChar.firstChild) {
+        commissionChar.firstChild.remove();
+    }
+    
     const selectComissionChildren = selectComission.firstChild.children;
-
     while (selectComissionChildren[1].firstChild.firstChild) {
         selectComissionChildren[1].firstChild.firstChild.remove();
     }
 
-    while (commissionChar.firstChild) {
-        commissionChar.firstChild.remove();
-    }
+    const commisionMenu = document.getElementById('commision-menu');
+    let currentCommArray = commisionMenu.querySelectorAll('.current-commision-cell');
+    let footerCommArray = commisionMenu.querySelectorAll('.commision-footer');
+    const footFeedback = document.getElementById('comm-feedback');
+    footFeedback.innerText = '';
 
     if (forceShowComm) {
+        footFeedback.chosenComm = null;
         selectComission.style.display = 'none';
+        showCommisions();
         commisionList.style.display = 'grid';
+
+        currentCommArray.forEach((commItem) => {
+            commItem.style.display = 'flex';
+        })
+        footerCommArray.forEach((commItem) => {
+            commItem.style.display = 'none';
+        })
     } else {
+        if (saveValues.currentCommisions[2] != undefined) {return};
+
+        footFeedback.chosenComm = item;
         commisionList.style.display = 'none';
         selectComission.style.display = 'flex';
         selectComissionChildren[0].innerHTML = `[Rank: ${item.rank}]
@@ -5037,26 +5109,109 @@ function focusNewComm(forceShowComm, item) {
         for (let key in upgradeInfo) {
             if (upgradeInfo[key].Nation === "Sumeru") {
                 if (upgradeDict[key].Purchased > 0) {
-                    let name = upgradeInfo[key].Name
-                    let charButton = createDom('button', { class:['flex-row','commision-button'] })
+                    const name = upgradeInfo[key].Name;
+                    if (saveValues.commisionDict[name].currentComm !== '') {continue}
 
-                    let charLeft = createDom('div', { class:['flex-column', 'commision-picture'] })
-                    let charImg = createDom('img', { src: `./assets/tooltips/hero/${name}.webp` })
+                    const charButton = createDom('button', { class:['flex-row','commision-button'] });
+                    charButton.addEventListener('click', () => {selectCommHero(name)})
+
+                    let charLeft = createDom('div', { class:['commision-picture'] });
+                    let charImg = createDom('div', { style: { background: `url(./assets/tooltips/emoji/${name}.webp) no-repeat center center/cover`} });
+
+                    let affinity = saveValues.commisionDict[name].affection;
+                    let charStar = createDom('img', { src: `./assets/icon/heart-${affinity >= 35 ? 'full' : 'empty'}.webp` });
+                    let charStar2 = createDom('img', { src: `./assets/icon/heart-${affinity >= 65 ? 'full' : 'empty'}.webp` });
+                    let charStar3 = createDom('img', { src: `./assets/icon/heart-${affinity >= 95 ? 'full' : 'empty'}.webp` });
+
                     let charText = createDom('p');
                     charText.innerHTML = `${name}
-                                          <br>Perk: ${saveValues.commisionDict[name].perk}
+                                          <br><br>Boon: ${commisionInfo[name].perk}
                                           <br>Stamina: ${saveValues.commisionDict[name].stamina}
                                           `
 
-                    charLeft.append(charImg)
-                    charButton.append(charLeft, charText)
+                    charLeft.append(charImg, charStar, charStar2, charStar3);
+                    charButton.append(charLeft, charText);
                     commissionChar.append(charButton);
                 }
             }
         }
+
+        currentCommArray.forEach((commItem) => {
+            commItem.style.display = 'none';
+        });
+        footerCommArray.forEach((commItem) => {
+            commItem.style.display = 'flex';
+        });
+    }
+}
+
+function selectCommHero(name) {
+    if (selectHeroType !== null) {
+        const heroLeader = document.getElementById(`select-hero-leader`);
+        const heroSupp = document.getElementById(`select-hero-support`);
+        const perkText = document.getElementById('comm-perk-test');
+
+        const comparison = selectHeroType === 'leader' ? heroSupp : heroLeader;
+        const antiComparison = selectHeroType === 'leader' ? heroLeader : heroSupp;
+
+        if (comparison.hero === name) {
+            comparison.style.background = `url(./assets/icon/charPlus.webp) no-repeat center center/contain`;
+            comparison.hero = null;
+        }
+
+        antiComparison.style.background = `url(./assets/tooltips/emoji/${name}.webp) no-repeat center center/contain`;
+        antiComparison.style.animation = 'unset';
+        antiComparison.hero = name;
+        antiComparison.offsetWidth;
+
+        if (heroLeader.hero) {
+            let currentPerk = commisionInfo[heroLeader.hero].perk;
+            perkText.innerText = commisionInfo[currentPerk];
+        } else {
+            perkText.innerText = 'None Curently';
+        }
+        selectHeroType = null;
+    }
+}
+
+function enterNewComm() {
+    const heroLeader = document.getElementById(`select-hero-leader`);
+    const heroSupp = document.getElementById(`select-hero-support`);
+    const footFeedback = document.getElementById('comm-feedback');
+
+    if (!heroLeader.hero) {
+        footFeedback.innerText = 'Please select a leader';
+        return;
+    } else if (!heroSupp.hero) {
+        footFeedback.innerText = 'Please select a support';
+        return;
+    } else if (!footFeedback.chosenComm) {
+        return;
     }
 
+    const commId = footFeedback.chosenComm.id;
+    const type = commId.split('-')[0];
+    const id = commId.split('-')[1];
+
+    saveValues.baseCommisions[id].progress = 'ongoing';
+    saveValues.baseCommisions[id].char = [heroLeader.hero, heroSupp.hero];
+    saveValues.commisionDict[heroLeader.hero].currentComm = commId;
+    saveValues.commisionDict[heroSupp.hero].currentComm = commId;
+    saveValues.currentCommisions.push(commId);
+
+    heroLeader.style.background = `url(./assets/icon/charPlus.webp) no-repeat center center/contain`;
+    heroLeader.style.animation = 'unset';
+    heroLeader.hero = null;
+    heroLeader.offsetWidth;
+
+    heroSupp.style.background = `url(./assets/icon/charPlus.webp) no-repeat center center/contain`;
+    heroSupp.style.animation = 'unset';
+    heroSupp.hero = null;
+    heroSupp.offsetWidth;
+
+    focusNewComm(true, null);
 }
+
 
 function shuffle(array) {
     let currentIndex = array.length,  randomIndex;
@@ -5075,11 +5230,11 @@ function shuffle(array) {
   
 function generateCommisions() {
     const baseCommisions = [];
-    const textArray = [];
+    let textArray = [];
 
     for (let i = 0; i < 10; i++) {
         let text = '';
-        while (text in textArray || text === '') {
+        while (textArray.includes(text) || text === '') {
             text = rollArray(commisionText, 0);
         }
         textArray.push(text);
@@ -5095,7 +5250,10 @@ function generateCommisions() {
             rating: Math.min(rating, 5),
             rank: 5 + rating * 2 + extraItem * 2 + randomInteger(0,2),
             duration: (Math.round(randomInteger(2, 6) / 2 * 10) / 10),
-            possibleItems: possibleCommItems
+            possibleItems: possibleCommItems,
+            char: [],
+            id: `base-${i}`,
+            progress: false,
         })
     }
 
@@ -7458,7 +7616,11 @@ function wish() {
 
                 let mailImageTemp = document.getElementById("mailImageID");
                 mailImageTemp.style.opacity = 0;
-                if (settingsValues.showWishAnimation) wishAnimation(randomWishHero);
+                if (settingsValues.showWishAnimation) {
+                    wishAnimation(randomWishHero);
+                } else {
+                    stopWishAnimation = false;
+                }
                 break;
             }
         }

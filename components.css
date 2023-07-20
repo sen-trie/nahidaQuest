@@ -673,7 +673,6 @@
 .key-container > button:last-of-type {
     width: 100%;
     height: 100%;
-    font: inherit;
     font-size: 0.9em;
     color: #f0e5da;
     background: url(./assets/tutorial/exped-button.webp) no-repeat center center/contain;
@@ -857,7 +856,6 @@
     background-color: transparent;
     color: #2b583c;
     margin-top: 2%;
-    font: inherit;
     font-size: 2vw;
 }
 
@@ -1407,7 +1405,6 @@
     padding-bottom: 2%;
     height: fit-content;
     color: white;
-    font: inherit;
     text-shadow: 0 0 0.2em black, 0 0 0.3em black, 0 0 0.4em black;
     box-sizing: border-box;
     background-color: #24303F;
@@ -1823,7 +1820,6 @@
 }
 
 .text-box > button:nth-of-type(2) {
-    font: inherit;
     position: absolute;
     top: 102%;
     left: 0;
@@ -1881,7 +1877,6 @@
 .confirm-button-div > button {
     width: 49%;
     height: 100%;
-    font: inherit;
     color: #2b401e;
     aspect-ratio: 4.6;
     background-color: transparent;
@@ -2014,7 +2009,6 @@ input[type="range"]:focus::-moz-range-thumb{
     border-radius: 1em;
     width: fit-content;
     padding: 1% 6% 1% 6%;
-    font: inherit;
 }
 
 .settings-bottom-right {
@@ -2683,7 +2677,6 @@ img[src=""] {
     width: auto;
     max-width: 33%;
     aspect-ratio: 4.61;
-    font: inherit;
     font-size: 1em;
     color: white;
     text-shadow: var(--text-shadow-075);
