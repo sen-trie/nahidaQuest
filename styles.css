@@ -1877,12 +1877,14 @@ table, button, label {
 
 .commision-setting {
     width: 100%;
-    height: 8em;
+    height: 6em;
+    max-height: 6em;
     background-color: #ECE4DA;
     border: 0.2em solid #c8b697;
 }
 
 .commision-setting > p {
+    font-size: 0.8em;
     text-align: center;
     width: 7em;
     min-width: 7em;

@@ -453,12 +453,12 @@ function getTime() {
 
 // LOAD SAVE DATA
 function loadSaveData() {
-    // LOAD SETTIGNS
+    // LOAD SETTINGS
     if (localStorage.getItem("settingsValues") == null) {
         settingsValues = SettingsDefault;
     } else {
         let settingsTemp = localStorage.getItem("settingsValues");
-        settingsValues = JSON.parse(settingsTemp)
+        settingsValues = JSON.parse(settingsTemp);
         updateObjectKeys(settingsValues,SettingsDefault);
     }
     // LOAD VALUES DATA
@@ -467,6 +467,13 @@ function loadSaveData() {
     } else {
         let saveValuesTemp = localStorage.getItem("saveValuesSave");
         saveValues = JSON.parse(saveValuesTemp);
+        
+        if (beta) {
+            delete saveValues.baseCommisions;
+            delete saveValues.commisionDict;
+            delete saveValues.currentCommisions;
+        }
+
         updateObjectKeys(saveValues,saveValuesDefault);
     }
     // LOAD HEROES DATA
@@ -5011,6 +5018,10 @@ function showCommisions() {
             const newCommisionsCell = createDom('div', { class:['commision-cell', 'flex-row'], style:{ display: 'flex' }})
             newCommisionsCell.addEventListener('click',() => {focusNewComm(false, item)})
 
+            if (saveValues.currentCommisions[2] != undefined) {
+                newCommisionsCell.classList.add('dim-filter');
+            };
+
             const commText = createDom('div', { class:['flex-column', 'commision-text']});
             const commTitle = document.createElement('p');
 
@@ -5049,6 +5060,9 @@ function showCommisions() {
                 commCell.leader.src = `./assets/tooltips/emoji/${commInfo.char[0]}.webp`;
                 commCell.support.style.display = 'flex';
                 commCell.support.src = `./assets/tooltips/emoji/${commInfo.char[1]}.webp`;
+
+                let timeLeft = (commInfo.endTime - getTime()) / 3600
+                commCell.time.innerText = timeLeft <= 0 ? 'DONE' : convertTo24HourFormat(timeLeft)
             }
         } else {
             commCell.leader.style.display = 'none'
@@ -5194,6 +5208,7 @@ function enterNewComm() {
     const id = commId.split('-')[1];
 
     saveValues.baseCommisions[id].progress = 'ongoing';
+    saveValues.baseCommisions[id].endTime = getTime() + saveValues.baseCommisions[id].duration * 3600 * (commisionInfo[heroLeader.hero].perk === 'Lightweight' ? 0.85 : 1)
     saveValues.baseCommisions[id].char = [heroLeader.hero, heroSupp.hero];
     saveValues.commisionDict[heroLeader.hero].currentComm = commId;
     saveValues.commisionDict[heroSupp.hero].currentComm = commId;
@@ -5254,6 +5269,7 @@ function generateCommisions() {
             char: [],
             id: `base-${i}`,
             progress: false,
+            endTime: null,
         })
     }
 

@@ -274,7 +274,7 @@ function convertTo24HourFormat(hours) {
     let minutes = 0;
   
     if (isFloat) {
-      minutes = Math.round((hours % 1) * 60);
+      minutes = Math.floor((hours % 1) * 60);
     }
   
     const formattedHours = String(roundedHours).padStart(2, '0');
