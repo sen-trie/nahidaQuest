@@ -183,13 +183,13 @@ body {
     width: 100%;
 }
 
-.patch-notes-div {
-    width: 85%;
+.advanced-settings-box {
+    width: 80% !important;
+    font-size: 1.4em !important;
 }
 
-.patch-notes-div > button:first-of-type {
-    max-width: 10%;
-    height: 8%;
+.patch-notes-div {
+    width: 85%;
 }
 
 .patch-notes-div > img {
@@ -654,8 +654,8 @@ body {
 
 .notif-select {
     height: 13%;
-    top: 13%;
     right: 0;
+    aspect-ratio: 4;
 }
 
 #zoom-scroller {
@@ -762,6 +762,12 @@ body {
     width: 95%;
 }
 
+.notif-ele > div {
+    width: 60%;
+    max-width: 60%;
+ }
+
+
 /* PHONE SPECIFIC CSS */
 @media (max-aspect-ratio: 9.5 / 9) {
     .settings-menu {
@@ -771,5 +777,14 @@ body {
 
     .notif-select {
         height:10%;
+    }
+
+    .notif-ele > div {
+       width: 60%;
+       max-width: 60%;
+    }
+
+    .notif-item {
+        grid-template-columns: repeat(4, 25%);
     }
 }

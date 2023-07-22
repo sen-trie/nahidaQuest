@@ -468,11 +468,10 @@ function loadSaveData() {
         let saveValuesTemp = localStorage.getItem("saveValuesSave");
         saveValues = JSON.parse(saveValuesTemp);
         
-        if (beta) {
-            delete saveValues.baseCommisions;
-            delete saveValues.commisionDict;
-            delete saveValues.currentCommisions;
-        }
+        // if (beta) {
+        //     delete saveValues.baseCommisions;
+        //     delete saveValues.currentCommisions;
+        // }
 
         updateObjectKeys(saveValues,saveValuesDefault);
     }
@@ -2421,7 +2420,7 @@ function tutorial(idleAmount) {
             const lastVisit = document.cookie.replace(/(?:(?:^|.*;\s*)lastVisit\s*\=\s*([^;]*).*$)|^.*$/, '$1');
             const today = new Date().toDateString();
             if (lastVisit === '' || lastVisit !== today) {
-                settingsBox("toggle","patch");
+                settingsBox("toggle", "patch");
                 document.cookie = 'lastVisit=' + today + '; expires=' + new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toUTCString() + '; path=/';
             }
 
@@ -3683,69 +3682,86 @@ function milestoneBuy(heroTooltip) {
         buff = 1;
     }
 
-    if (itemStar !== -1) {
+    if (itemStar === -1) {
+        if (saveValues.realScore >= cost) {
+            milestoneSuccess();
+        } else {
+            weaselDecoy.load();
+            weaselDecoy.play();
+            return;
+        }
+    } else {
         // TRAVELER ONLY
         if (upgradeInfo[heroID].Ele === "Any") {
-            if (currentSelection === 'prefer-book') {
+            if (currentSelection === 'prefer-book' || saveValues.realScore < cost) {
                 weaselDecoy.load();
                 weaselDecoy.play();
                 return;
-            }
-            for (let i = 1; i < 8; i++) {
-                if (InventoryMap.get(elementItemID + i + 7 * itemStar) > 0) {
-                    itemArray.push(elementItemID + i + 7 * itemStar);
+            } else {
+                for (let i = 1; i < 8; i++) {
+                    if (InventoryMap.has(elementItemID + i + 7 * itemStar) && InventoryMap.get(elementItemID + i + 7 * itemStar) > 0) {
+                        itemArray.push(elementItemID + i + 7 * itemStar);
+                    }
                 }
+
+                if (itemArray.length === 0) {
+                    weaselDecoy.load();
+                    weaselDecoy.play();
+                    return;
+                }
+
+                let tempID = rollArray(itemArray, 0);
+                let inventoryCount = InventoryMap.get(tempID);
+                inventoryCount--;
+                InventoryMap.set(tempID, inventoryCount)
+
+                if (inventoryCount <= 0) { (document.getElementById(tempID)).remove()}
+                milestoneSuccess();
             }
         } else {
             let heroElement = upgradeInfo[heroID].Ele;
             let heroNation = upgradeInfo[heroID].Nation;
 
             let tempElement = InventoryMap.get(elementItemID + elemItemID[heroElement] + 7 * itemStar);
-            if (currentSelection !== 'prefer-book' && tempElement && tempElement > 0) {
+            if (tempElement && tempElement > 0) {
                 itemArray.push(elementItemID + elemItemID[heroElement] + 7 * itemStar);
             }
 
-            if (beta) {
-                let tempNation = InventoryMap.get(nationItemID + constNation[heroNation] + 4 * (4 - itemStar));
-                if (currentSelection !== 'prefer-gem' && tempNation && tempNation > 0) {
-                    itemArray.push(nationItemID + constNation[heroNation] + 4 * (4 - itemStar));
-                }
-            }
-        }
-    }
-    
-    if (saveValues.realScore >= cost) {
-        // TRAVELER ONLY
-        if (upgradeInfo[heroID].Ele === "Any" && itemArray.length > 0) {
-            let tempID = rollArray(itemArray, 0);
-            if (!InventoryMap.has(tempID)) {
+            if (itemArray.length === 0 && currentSelection === 'prefer-gem') {
                 weaselDecoy.load();
                 weaselDecoy.play();
                 return;
+            } else if (itemArray.length >= 0 && currentSelection !== 'prefer-book') {
+                let inventoryCount = InventoryMap.get(itemArray[0]);
+                inventoryCount--;
+                InventoryMap.set(itemArray[0], inventoryCount);
+
+                if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
+                milestoneSuccess();
             }
 
-            let inventoryCount = InventoryMap.get(tempID);
-            if (!inventoryCount || inventoryCount <= 0) {
+            itemArray = [];
+            let tempBook = InventoryMap.get(nationItemID + constNation[heroNation] + 4 * (4 - itemStar));
+            if (tempBook && tempBook > 0) {
+                itemArray.push(nationItemID + constNation[heroNation] + 4 * (4 - itemStar));
+            }
+
+            if (itemArray.length === 0) {
                 weaselDecoy.load();
                 weaselDecoy.play();
+                return;
+            } else if (itemArray.length >= 0) {
+                let inventoryCount = InventoryMap.get(itemArray[0]);
+                inventoryCount--;
+                InventoryMap.set(itemArray[0], inventoryCount);
+
+                if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
+                milestoneSuccess();
             }
-
-            inventoryCount--;
-            InventoryMap.set(tempID, inventoryCount)
-
-            if (inventoryCount <= 0) { (document.getElementById(tempID)).remove();}
-        } else if (itemArray.length > 0) {
-            let inventoryCount = InventoryMap.get(itemArray[0]);
-            inventoryCount--;
-            InventoryMap.set(itemArray[0], inventoryCount);
-
-            if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
-        } else if (itemStar !== -1) {
-            weaselDecoy.load();
-            weaselDecoy.play();
-            return;
         }
+    }
 
+    function milestoneSuccess() {
         let upgradeDictTemp = upgradeDict[heroID];
         let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * buff);
         if (heroID != 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
@@ -3755,8 +3771,10 @@ function milestoneBuy(heroTooltip) {
         upgradeDict[heroID]["Factor"] = Math.ceil(upgradeDictTemp["Factor"] * (buff+1));
         upgradeDict[heroID].milestone[level] = true;
 
-        if (document.getElementById(`milestone-${heroTooltip}`).nextSibling) {
-            document.getElementById(`milestone-${heroTooltip}`).nextSibling.click()
+        console.log(heroTooltip)
+
+        if (document.getElementById(`milestone-${heroTooltip}`).previousSibling) {
+            document.getElementById(`milestone-${heroTooltip}`).previousSibling.click();
         } else {
             clearTooltip();
         }
@@ -3770,9 +3788,6 @@ function milestoneBuy(heroTooltip) {
         updateMilestoneNumber();
         upgradeElement.load();
         upgradeElement.play();
-    } else {
-        weaselDecoy.load();
-        weaselDecoy.play();
     }
 }
 
@@ -4264,11 +4279,11 @@ function drawLoot(type) {
         case 5:
             inventoryDraw("xp", 2, 3);
             inventoryDraw("weapon", 4, 5);
+            inventoryDraw("weapon", 4, 4);
+            inventoryDraw("talent", 4, 4);
             inventoryDraw("talent", 4, 4);
             inventoryDraw("artifact", 4, 5);  
             inventoryDraw("gem", 4, 5);
-            inventoryDraw("weapon", 4, 4);
-            inventoryDraw("talent", 4, 4);
 
             if (randomDraw == 1) {
                 inventoryDraw("food", 4, 5);
@@ -4426,6 +4441,7 @@ function createAdventure() {
 
 // DRAWS FOR RANDOM INVENTORY LOOT
 function inventoryDraw(itemType, min, max, type, itemClass){
+    itemType = itemType.toLowerCase();
     let attempts = 0;
     let upperInventoryType = {
         "weapon": WEAPONMAX, 
@@ -4447,11 +4463,11 @@ function inventoryDraw(itemType, min, max, type, itemClass){
     while (true){
         attempts++;
         if (attempts >= 2000) {
-            console.error(`Error drawing item with properties [${itemType},${itemClass},${type}]. Please inform the developer using the feedback form :)`);
+            console.error(`Error drawing item with properties [${itemType},${type}${itemClass ? `,${itemClass}` : ','}]. Please inform the developer using the feedback form :)`);
             return;
         }
 
-        drawnItem = randomInteger(lowerInventoryType[itemType], upperInventoryType[itemType])
+        drawnItem = randomInteger(lowerInventoryType[itemType], upperInventoryType[itemType]);
         if (Inventory[drawnItem] == undefined) {continue}
         if (Inventory[drawnItem].Star >= min && Inventory[drawnItem].Star < (max + 1)) {
             if (type === "shop") {
@@ -4481,7 +4497,13 @@ function inventoryDraw(itemType, min, max, type, itemClass){
                             lootArray[type] = drawnItem;
                         }
                     }
-                }
+                } else if (type === "itemLoot") {
+                    let checkedProperty = "Type";
+                    if (Inventory[drawnItem][checkedProperty] != itemClass) {
+                        continue;
+                    }
+                    return drawnItem;
+                } 
             } else {
                 inventoryAdd(drawnItem);
             }
@@ -4820,12 +4842,79 @@ function createGuild() {
             });
 
             const currentCommisionsLeader = document.createElement('img');
-            currentCommisionsLeader.src = './assets/tooltips/hero/Collei.webp';
             const currentCommisionsSupport = document.createElement('img');
-            currentCommisionsSupport.src = './assets/tooltips/hero/Collei.webp';
+            const currentCommisionsTime = createDom('button', { class:['current-commision-button'] });
 
-            const currentCommisionsTime = document.createElement('p');
-            currentCommisionsTime.innerText = '01:33';
+            currentCommisionsTime.ready = false;
+            currentCommisionsTime.addEventListener('click', () => {
+                if (currentCommisionsTime.ready != false) {
+                    currentCommisionsLeader.style.display = 'none'
+                    currentCommisionsSupport.style.display = 'none'
+                    currentCommisionsTime.innerText = 'Available';
+                    if (currentCommisionsTime.classList.contains('rank-button-available')) currentCommisionsTime.classList.remove('rank-button-available');
+
+                    const commId = currentCommisionsTime.ready.split('/');
+                    let commInfo;
+                    if (commId[1].includes('base')) {
+                        saveValues.currentCommisions.splice(saveValues.currentCommisions.indexOf(commId[1]), 1)
+                        commInfo = saveValues.baseCommisions[commId[1].split('-')[1]]
+                    }
+
+                    for (let key in persistentValues.commisionDict) {
+                        if (persistentValues.commisionDict[key].currentComm === commId[1]) {
+                            persistentValues.commisionDict[key].currentComm = '';
+                        }
+                    }
+
+                    const lootContainer = createDom('div', { class:['notif-item'] });
+                    let lootArray = [];
+                    commInfo.possibleItems.forEach((item) => {
+                        let itemType;
+                        let minLevel = commInfo.rating - 2;
+                        let maxLevel = commInfo.rating;
+                        let specialType = null;
+
+                        if (Object.keys(constNation).includes(item)) {
+                            itemType = 'talent';
+                            minLevel = Math.min(minLevel, 2);
+                            maxLevel = Math.max(minLevel, 4);
+                        } else if (item === "PyroHydro" || item === "DendroGeoAnemo" || item === "ElectroCryo") {
+                            itemType = 'gem';
+                            minLevel = Math.min(minLevel, 3);
+                        } else if (['bow', 'catalyst', 'claymore', 'polearm', 'sword'].includes(item.toLowerCase())) {
+                            itemType = 'weapon';
+                            specialType = item.charAt(0).toUpperCase() + item.slice(1);
+                        } else {
+                            itemType = item;
+                        }
+
+                        const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                        const itemId2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                        lootArray.push(itemId1, itemId2);
+
+                        if (randomInteger(1,3) === 1) {
+                            const itemId3 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                            lootArray.push(itemId3);
+                            lootContainer.append(inventoryFrame(document.createElement("div"),Inventory[itemId3],itemFrameColors));
+                        }
+
+                        let rankInventoryRewards1 = inventoryFrame(document.createElement("div"),Inventory[itemId1],itemFrameColors);
+                        let rankInventoryRewards2 = inventoryFrame(document.createElement("div"),Inventory[itemId2],itemFrameColors);
+
+                        lootContainer.append(rankInventoryRewards1, rankInventoryRewards2);
+                    });
+
+                    const addLoot = (lootArray) => {
+                        lootArray.forEach((item) => {
+                            inventoryAdd(item);
+                        })
+                        newPop(1);
+                        saveValues.baseCommisions[commId[1].split('-')[1]].progress = true;
+                    }
+
+                    choiceBox(mainBody, 'Loot obtained:', stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
+                }
+            })
 
             currentCommisionsCell.leader = currentCommisionsLeader;
             currentCommisionsCell.support = currentCommisionsSupport;
@@ -5018,7 +5107,7 @@ function showCommisions() {
             const newCommisionsCell = createDom('div', { class:['commision-cell', 'flex-row'], style:{ display: 'flex' }})
             newCommisionsCell.addEventListener('click',() => {focusNewComm(false, item)})
 
-            if (saveValues.currentCommisions[2] != undefined) {
+            if (saveValues.currentCommisions[0] != undefined && saveValues.currentCommisions[1] != undefined && saveValues.currentCommisions[2] != undefined) {
                 newCommisionsCell.classList.add('dim-filter');
             };
 
@@ -5061,13 +5150,24 @@ function showCommisions() {
                 commCell.support.style.display = 'flex';
                 commCell.support.src = `./assets/tooltips/emoji/${commInfo.char[1]}.webp`;
 
-                let timeLeft = (commInfo.endTime - getTime()) / 3600
-                commCell.time.innerText = timeLeft <= 0 ? 'DONE' : convertTo24HourFormat(timeLeft)
+                let timeLeft = (commInfo.endTime - getTime()) / 3600;
+                timeLeft = 0;
+                let ready = timeLeft <= 0;
+                commCell.time.ready = `commision-cell-${i}/${commId}`;
+                commCell.time.innerText = ready ? 'Done!' : convertTo24HourFormat(timeLeft);
+
+                if (ready) {
+                    if (!commCell.time.classList.contains('rank-button-available')) commCell.time.classList.add('rank-button-available');
+                } else {
+                    if (commCell.time.classList.contains('rank-button-available')) commCell.time.classList.remove('rank-button-available');
+                }
             }
         } else {
             commCell.leader.style.display = 'none'
             commCell.support.style.display = 'none'
             commCell.time.innerText = 'Available';
+            commCell.time.ready = false;
+            if (commCell.time.classList.contains('rank-button-available')) commCell.time.classList.remove('rank-button-available');
         }
     }
 }
@@ -5104,7 +5204,7 @@ function focusNewComm(forceShowComm, item) {
             commItem.style.display = 'none';
         })
     } else {
-        if (saveValues.currentCommisions[2] != undefined) {return};
+        if (saveValues.currentCommisions[0] != undefined && saveValues.currentCommisions[1] != undefined && saveValues.currentCommisions[2] != undefined) {return};
 
         footFeedback.chosenComm = item;
         commisionList.style.display = 'none';
@@ -5120,33 +5220,32 @@ function focusNewComm(forceShowComm, item) {
             selectComissionChildren[1].firstChild.appendChild(itemPic);
         })
 
+        const commisionKeys = Object.keys(persistentValues.commisionDict)
         for (let key in upgradeInfo) {
-            if (upgradeInfo[key].Nation === "Sumeru") {
-                if (upgradeDict[key].Purchased > 0) {
-                    const name = upgradeInfo[key].Name;
-                    if (saveValues.commisionDict[name].currentComm !== '') {continue}
+            const name = upgradeInfo[key].Name;
+            if (commisionKeys.includes(name)) {
+                if (persistentValues.commisionDict[name].currentComm !== '') {continue}
 
-                    const charButton = createDom('button', { class:['flex-row','commision-button'] });
-                    charButton.addEventListener('click', () => {selectCommHero(name)})
+                const charButton = createDom('button', { class:['flex-row','commision-button'] });
+                charButton.addEventListener('click', () => {selectCommHero(name)})
 
-                    let charLeft = createDom('div', { class:['commision-picture'] });
-                    let charImg = createDom('div', { style: { background: `url(./assets/tooltips/emoji/${name}.webp) no-repeat center center/cover`} });
+                let charLeft = createDom('div', { class:['commision-picture'] });
+                let charImg = createDom('div', { style: { background: `url(./assets/tooltips/emoji/${name}.webp) no-repeat center center/cover`} });
 
-                    let affinity = saveValues.commisionDict[name].affection;
-                    let charStar = createDom('img', { src: `./assets/icon/heart-${affinity >= 35 ? 'full' : 'empty'}.webp` });
-                    let charStar2 = createDom('img', { src: `./assets/icon/heart-${affinity >= 65 ? 'full' : 'empty'}.webp` });
-                    let charStar3 = createDom('img', { src: `./assets/icon/heart-${affinity >= 95 ? 'full' : 'empty'}.webp` });
+                let affinity = persistentValues.commisionDict[name].affection;
+                let charStar = createDom('img', { src: `./assets/icon/heart-${affinity >= 35 ? 'full' : 'empty'}.webp` });
+                let charStar2 = createDom('img', { src: `./assets/icon/heart-${affinity >= 65 ? 'full' : 'empty'}.webp` });
+                let charStar3 = createDom('img', { src: `./assets/icon/heart-${affinity >= 95 ? 'full' : 'empty'}.webp` });
 
-                    let charText = createDom('p');
-                    charText.innerHTML = `${name}
-                                          <br><br>Boon: ${commisionInfo[name].perk}
-                                          <br>Stamina: ${saveValues.commisionDict[name].stamina}
-                                          `
+                let charText = createDom('p');
+                charText.innerHTML = `${name}
+                                        <br><br>Boon: ${commisionInfo[name].perk}
+                                        <br>Stamina: ${persistentValues.commisionDict[name].stamina}
+                                        `
 
-                    charLeft.append(charImg, charStar, charStar2, charStar3);
-                    charButton.append(charLeft, charText);
-                    commissionChar.append(charButton);
-                }
+                charLeft.append(charImg, charStar, charStar2, charStar3);
+                charButton.append(charLeft, charText);
+                commissionChar.append(charButton);
             }
         }
 
@@ -5210,8 +5309,9 @@ function enterNewComm() {
     saveValues.baseCommisions[id].progress = 'ongoing';
     saveValues.baseCommisions[id].endTime = getTime() + saveValues.baseCommisions[id].duration * 3600 * (commisionInfo[heroLeader.hero].perk === 'Lightweight' ? 0.85 : 1)
     saveValues.baseCommisions[id].char = [heroLeader.hero, heroSupp.hero];
-    saveValues.commisionDict[heroLeader.hero].currentComm = commId;
-    saveValues.commisionDict[heroSupp.hero].currentComm = commId;
+
+    persistentValues.commisionDict[heroLeader.hero].currentComm = commId;
+    persistentValues.commisionDict[heroSupp.hero].currentComm = commId;
     saveValues.currentCommisions.push(commId);
 
     heroLeader.style.background = `url(./assets/icon/charPlus.webp) no-repeat center center/contain`;
@@ -5425,7 +5525,7 @@ function expedInfo(butId) {
             let star = new Image();
             star.src = `./assets/frames/star-${lootTable[key][0]}.webp`;
 
-            lootDiv.append(star,img);
+            lootDiv.append(star, img);
             invDiv.appendChild(lootDiv);
         }
 
@@ -5598,7 +5698,7 @@ function createExpMap() {
         const mapPins = advImage.childNodes;
         for (let i = 0; i < mapPins.length; i++) {
             const mapPin = mapPins[i];
-            mapPin.style.transform = `scale(${1 / zoomValue * (MOBILE ? 2 : 1)})`;
+            mapPin.style.transform = `scale(${Math.min(1 / zoomValue * (MOBILE ? 2 : 1), 4)})`;
         }
     }
 
@@ -7937,8 +8037,8 @@ function createTooltip() {
 
     const preferDict = [
         { id: 'prefer-gem', label: 'Gems Only' },
-        { id: 'prefer-book', label: 'Materials Only' },
-        { id: 'prefer-none', label: 'Gems > Materials' }
+        { id: 'prefer-book', label: 'Mats + Nuts Only' },
+        { id: 'prefer-none', label: 'Gems > Mats + Nuts' }
     ];
 
     preferDict.forEach(preferItem => {
@@ -7967,7 +8067,7 @@ function createTooltip() {
         });
 
         preferLabel.prepend(prefer, preferText, checkSpan);
-        if (beta) upgradeSelection.appendChild(preferLabel);
+        upgradeSelection.appendChild(preferLabel);
     });
 
     const tooltipButton = document.createElement("button");
@@ -8028,21 +8128,26 @@ function changeTooltip(dict, type, number) {
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
 
         let upgradeLevel = 50;
-        let extraText = "";
+        let level = 0;
         if (number >= 350) {
             upgradeLevel = 400;
-            if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 5-Star Gem`}
-            if (dict.Ele !== "Any" && beta) { extraText += ` / 4-Star <span style='color:#A97803'>${dict.Nation}</span> Materials`}
+            level = 5;
         } else if (number >= 200) {
             upgradeLevel = 200;
-            extraText = `& a 4-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
-            if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 4-Star Gem`}
-            if (dict.Ele !== "Any" && beta) { extraText += ` / 3-Star <span style='color:#A97803'>${dict.Nation}</span> Materials`}
+            level = 4;
         } else if (number >= 75) {
             upgradeLevel = 100;
-            extraText = `& a 3-Star <span style='color:#A97803'> ${dict.Ele} </span> Gem`;
-            if (dict.Ele == "Any") {extraText = `& <span style='color:#A97803'> ${dict.Ele} </span> 3-Star Gem`}
-            if (dict.Ele !== "Any" && beta) { extraText += ` / 2-Star <span style='color:#A97803'>${dict.Nation}</span> Materials`}
+            level = 3;
+        }
+
+        let extraText = "";
+        if (level > 0) {
+            if (dict.Ele !== "Any") {
+                extraText = `& ${level - 1}-Star <span style='color:#A97803'>${dict.Nation}</span> Materials
+                            OR <span style='color:#A97803'> ${dict.Ele === "Any" ? "Any" : dict.Ele} </span> ${level}-Star Gem`;
+            } else {
+                extraText = `& <span style='color:#A97803'> ${dict.Ele === "Any" ? "Any" : dict.Ele} </span> ${level}-Star Gem`;
+            }
         }
 
         let nahidaText = "";
@@ -9089,12 +9194,7 @@ function populateTreeItems() {
 
     for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
         let itemContainer = document.createElement('div');
-        let treeImage = new Image();
-        treeImage.src = `./assets/tooltips/inventory/${Inventory[saveValues.treeObj.offer[i]].File}.webp`;
-        let itemStars = new Image();
-        itemStars.src = `./assets/frames/star-${Inventory[saveValues.treeObj.offer[i]].Star}.webp`;
-
-        itemContainer.append(treeImage, itemStars);
+        itemContainer = inventoryFrame(itemContainer, Inventory[saveValues.treeObj.offer[i]], itemFrameColors);
         treeItem.append(itemContainer);
     }
 }
@@ -9114,7 +9214,10 @@ function offerBox(treeTable, optionsContainer) {
     nutStoreCurrency.appendChild(nutStoreCurrencyImage);
 
     const treeOfferText = document.createElement('p');
-    treeOfferText.innerText = 'The Tree wishes for these items...';
+    treeOfferText.innerHTML = `The Tree wishes for these items...
+                               <br><br><span style='font-size: 0.6em'>Note: Anytime you receive new loot, you have a higher chance to <br>get these items, which can increased through
+                                your <span style='color:#b39300'>luck rate</span>!</span>
+                                `;
     const treeItem = document.createElement('div');
     treeItem.id = 'tree-offer-items';
     treeItem.classList.add('flex-row');
@@ -9145,19 +9248,19 @@ function offerBox(treeTable, optionsContainer) {
 
 function offerItemFunction() {
     const treeMissingText = document.getElementById('tree-missing-text');
+    treeMissingText.innerText = ''
 
     if (saveValues.treeObj.offer[0] > persistentValues.goldenCore) {
-        treeMissingText.innerText = `You lack Golden Cores (${persistentValues.goldenCore}/${saveValues.treeObj.offer[0]}).`;
-        return;
-    } else {
-        for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
-            if (!InventoryMap.get(saveValues.treeObj.offer[i]) || InventoryMap.get(saveValues.treeObj.offer[i]) === 0) {
-                treeMissingText.innerText = `Missing item ${i}: '${Inventory[saveValues.treeObj.offer[i]].Name}'`;
-                return;
-            }
+        treeMissingText.innerText += `You lack Golden Cores (${persistentValues.goldenCore}/${saveValues.treeObj.offer[0]})\n`;
+    }
+    
+    for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
+        if (!InventoryMap.get(saveValues.treeObj.offer[i]) || InventoryMap.get(saveValues.treeObj.offer[i]) === 0) {
+            treeMissingText.innerText += `Missing item ${i}: '${Inventory[saveValues.treeObj.offer[i]].Name}'\n`;
         }
     }
 
+    if (treeMissingText.innerText !== '') {return}
     saveValues.treeObj.offer[0] -= persistentValues.goldenCore;
     for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
         let itemNumber = saveValues.treeObj.offer[i];
@@ -9214,7 +9317,7 @@ function treeOptions(planted, optionsContainer, lastPhase) {
                     break;
                 case 2:
                     treeButton.addEventListener('click',() => {
-                        choiceBox(mainBody,'Are you sure you want to destroy the tree? This cannot be undone.', stopSpawnEvents, destroyTree)
+                        choiceBox(mainBody,'Are you sure you want to destroy the tree? This cannot be undone.', stopSpawnEvents, destroyTree, ['choice-ele']);
                     })
                     break;
                 default:

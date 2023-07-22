@@ -134,7 +134,7 @@ function volumeScrollerAdjust(volumeScroller) {
 }
 
 // CREATES A FRAME OF AN INVENTORY ITEM
-function inventoryFrame(ele,itemInfo,itemFrameColors) {
+function inventoryFrame(ele, itemInfo, itemFrameColors) {
     ele.classList.add("flex-column","item-frame");
     ele.style.backgroundImage = `url(./assets/frames/background-${itemInfo.Star}.webp)`;
     ele.style.border = `0.15em solid ${itemFrameColors[itemInfo.Star-1]}`;
@@ -150,11 +150,15 @@ function inventoryFrame(ele,itemInfo,itemFrameColors) {
 }
 
 // CHOICE BOX
-function choiceBox(mainBody,dialog,stopSpawnEvents,yesFunc,noFunc) {
+function choiceBox(mainBody, dialog, stopSpawnEvents, yesFunc, noFunc, extraEle, classes) {
     if (stopSpawnEvents) stopSpawnEvents = false;
 
     const choiceEle = document.createElement('div');
-    choiceEle.classList.add('choice-ele','flex-column');
+    classes.forEach((item) => {
+        choiceEle.classList.add(item);
+    })
+
+    choiceEle.classList.add('flex-column');
     const choiceDiv = document.createElement('div');
     choiceDiv.classList.add('flex-column');
     const text = document.createElement('p');
@@ -162,24 +166,34 @@ function choiceBox(mainBody,dialog,stopSpawnEvents,yesFunc,noFunc) {
 
     const choiceContainer = document.createElement('div');
     choiceContainer.classList.add('flex-row');
+
     const yesButton = document.createElement('button');
     yesButton.innerText = 'Confirm';
     yesButton.addEventListener('click',() => {
         choiceEle.remove();
         if (stopSpawnEvents) stopSpawnEvents = true;
         if (yesFunc) yesFunc();
-    })
+    });
+
     const noButton = document.createElement('button');
     noButton.innerText = 'Cancel';
     noButton.addEventListener('click',() => {
         choiceEle.remove();
         if (stopSpawnEvents) stopSpawnEvents = true;
         if (noFunc) noFunc();
-    })
+    });
 
-    choiceContainer.append(yesButton,noButton);
-    choiceDiv.append(text,choiceContainer);
-    choiceEle.appendChild(choiceDiv)
+    choiceContainer.append(yesButton);
+    if (noFunc !== null) {choiceContainer.append(noButton)}
+
+    choiceDiv.append(text);
+    if (extraEle) {
+        choiceDiv.append(extraEle, choiceContainer);
+    } else {
+        choiceDiv.append(choiceContainer);
+    }
+    
+    choiceEle.append(choiceDiv)
     mainBody.append(choiceEle);
 }
 

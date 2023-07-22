@@ -199,14 +199,14 @@ const upgradeInfo = {
         Lore: "Outrider Amber reporting for duty! Just say the word if you ever need my help!",
         Type: "Bow",
         Ele: "Pyro",
-        Nation: "Sumeru"
+        Nation: "Mondstadt"
     },
     51: {
         Name: "Noelle",
         Lore: "A maid, to me, is the most liberating job there is. I'm a chef, a gardener, a warrior, a guide... I can be anything you need me to be!",
         Type: "Claymore",
         Ele: "Geo",
-        Nation: "Sumeru"
+        Nation: "Mondstadt"
     },
     52: {
         Name: "Barbara",
@@ -248,7 +248,7 @@ const upgradeInfo = {
         Lore: "No one's joined me on an adventure in ages. C'mon, let's go find some treasure!",
         Type: "Sword",
         Ele: "Pyro",
-        Nation: "Sumeru"
+        Nation: "Mondstadt"
     },
     58: {
         Name: "Sucrose",

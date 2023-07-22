@@ -1760,9 +1760,9 @@ table, button, label {
 }
 
 .rank-button-available {
-    color: #2f4e27;
-    background-color: #A6D19A;
-    border: 0.2em solid #5B8550;
+    color: #2f4e27 !important;
+    background-color: #A6D19A !important;
+    border: 0.2em solid #5B8550 !important;
 }
 
 .commision-menu img {
@@ -1845,6 +1845,13 @@ table, button, label {
     width: 33%;
     border-right: 0.2em solid #757D83;
     gap: 2%;
+}
+
+.current-commision-button {
+    color: #c1c1c1;
+    background-color: transparent;
+    border-radius: 0.25em;
+    padding: 1%;
 }
 
 .current-commision-cell:last-of-type {
@@ -2804,11 +2811,14 @@ table, button, label {
 
 #tree-offer-container > p {
     font-size: 1.2em;
-    margin: 0.2em;
+    margin: 0.4em;
+    text-align: center;
+    line-height: 0.8em;
 }
 
 #tree-offer-container > p:last-of-type {
     font-size: 1em;
+    line-height: unset;
 }
 
 .tree-access {
@@ -2843,7 +2853,7 @@ table, button, label {
     object-fit: contain;
 }
 
-#tree-offer-items > div {
+#tree-offer-items > div, .notif-item > div {
     width: 25%;
     max-width: 6em;
     height: auto;
@@ -2857,13 +2867,6 @@ table, button, label {
     box-sizing: border-box;
     border-radius: 0.2em;
     color: #254620;
-}
-
-#tree-offer-items > div:first-of-type {
-    width: 25%;
-    height: auto;
-    aspect-ratio: 1;
-    text-align: center;
 }
 
 #tree-offer-items > div:first-of-type > img:first-of-type {
@@ -2881,7 +2884,7 @@ table, button, label {
     filter: drop-shadow(0.1em 0.1em 0.1em black);
 }
 
-#tree-offer-items > div > img:nth-of-type(2) {
+#tree-offer-items > div > img:nth-of-type(2), .notif-item > div > img:nth-of-type(2) {
     height: 15%;
     object-fit: contain;
     filter: drop-shadow(0 0 0.1em black);
@@ -2962,7 +2965,7 @@ table, button, label {
     pointer-events: none;
 }
 
-.choice-ele {
+.choice-ele, .notif-ele {
     position: absolute;
     z-index: 10000;
     width: 100%;
@@ -2970,11 +2973,11 @@ table, button, label {
     color:white;
 }
 
-.choice-ele > * {
+.choice-ele > *, .notif-ele > * {
     z-index: 10;
 }
 
-.choice-ele > div {
+.choice-ele > div, .notif-ele > div {
     position: relative;
     top: -5%;
     background-color: #DEE3BA;
@@ -2983,9 +2986,32 @@ table, button, label {
     padding: 2% 4% 1% 4%;
     max-width: 40%;
     filter: drop-shadow(0.2em 0.2em 0.2em black);
+    animation: scaleIn 1s ease-in-out forwards;
+    animation-delay: -0.7s;
 }
 
-.choice-ele > div > p {
+.notif-ele > div {
+    padding: 1%;
+    width: 70%;
+}
+
+.notif-item {
+    width: 95%;
+    height: fit-content;
+    margin-top: 0em;
+    padding: 2% 0;
+    display: grid;
+    grid-template-columns: repeat(5, 20%);
+    grid-auto-rows: auto;
+}
+
+.notif-item > div {
+    width: 95%;
+    margin-bottom: 2%;
+    max-width: unset;
+}
+
+.choice-ele > div > p, .notif-ele > div > p {
     font-size: 1.4em;
     text-shadow: var(--text-shadow-075);
 }
@@ -2995,7 +3021,7 @@ table, button, label {
     gap: 5%;
 }
 
-.choice-ele > div > div > button {
+.choice-ele > div > div > button, .notif-ele > div > div > button {
     font-size: 1.1em;
     padding: 5%;
     background-color: #557a36;
@@ -3003,16 +3029,16 @@ table, button, label {
     color: white;
 }
 
-.choice-ele > div > div > button:last-of-type {
+.choice-ele > div > div > button:nth-of-type(2) {
     background-color: #a2443b;
 }
 
-.choice-ele:before {
+.choice-ele:before, .notif-ele:before {
     content: '';
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.70);
+    background-color: rgba(0,0,0,0.80);
     pointer-events: all;
 }
 
@@ -3246,12 +3272,13 @@ table, button, label {
 }
 
 @keyframes flipIn {
-    0% {
-        transform: scaleX(0);
-    }
-    100% {
-        transform: scaleX(1);
-    }
+    0% {transform: scaleX(0)}
+    100% {transform: scaleX(1)}
+}
+
+@keyframes scaleIn {
+    0% {transform: scale(0)}
+    100% {transform: scale(1)}
 }
 
 @keyframes puffOut {

@@ -1691,7 +1691,11 @@
 }
 
 .advanced-settings-box {
-    width: 35% !important;
+    width: 40% !important;
+    height: fit-content !important;
+    top: 30% !important;
+    transform: translate(-50% -50%) !important;
+    font-size: 1em !important;
 }
 
 .advanced-menu-form {
@@ -1796,7 +1800,7 @@
 }
 
 .patch-notes-div > button:first-of-type {
-    height:8%;
+    height: 3rem;
 }
 
 .patch-notes-div > div > div {
