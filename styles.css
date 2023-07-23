@@ -680,6 +680,43 @@ table, button, label {
     height: 100%;
 }
 
+.healthbar-container {
+    position: relative;
+    aspect-ratio: 17;
+}
+
+.healthbar-grid {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    display: grid;
+    overflow: hidden;
+}
+
+.healthbar-grid > b {
+    z-index: 2;
+}
+
+.healthbar-container > img {
+    z-index: 5;
+    position: absolute;
+    bottom: 50%;
+    height: 200%;
+    width: auto;
+    object-fit: contain;
+    transform: translate(-50%, 50%);
+
+}
+
+.healthbar-grid > div {
+    position: absolute;
+    left: 0;
+    height: 100%;
+    z-index: 1;
+    border-radius: 0.2em;
+}
+
 /*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
 .temp-buff {
     position: relative;
@@ -2623,36 +2660,15 @@ table, button, label {
     background: linear-gradient(to bottom, #ACA9FC, #D2EEFC);
 }
 
-.tree-progress {
+.tree-progress, .leyline-progress {
     position: absolute;
     top: 2%;
     width: 90%;
     height: auto;
     max-height: 5%;
-    aspect-ratio: 17;
-    display: grid;
-    grid-template-columns: repeat(10,1fr);
-    border-radius: 0.5em;
-    border: 0.11em solid #182c0a;
+    border-radius: 0.25em;
+    border: 0.12em solid #182c0a;
     background-color: #316547;
-    overflow: hidden;
-}
-
-.tree-progress > div {
-    position: absolute;
-    left: 0;
-    height: 100%;
-    background-color: #a4cf88;
-    z-index: 1;
-}
-
-.tree-progress > b:last-of-type {
-    border-right: 0;
-}
-
-.tree-progress > b {
-    z-index: 2;
-    border-right: 0.11em solid #182c0a;
 }
 
 .tree-progress-value {
@@ -2799,7 +2815,7 @@ table, button, label {
     transform: translateY(90%);
 }
 
-#tree-offer-container {
+#tree-offer-container, #leyline-container {
     margin-top: 1em;
     position: relative;
     width: 100%;
@@ -2890,12 +2906,12 @@ table, button, label {
     filter: drop-shadow(0 0 0.1em black);
 }
 
-#tree-offer-container > container {
+#tree-offer-container > container, #leyline-container > div:last-of-type {
     width: 100%;
     gap: 2%
 }
 
-#tree-offer-container > container > button {
+#tree-offer-container > container > button, #leyline-container > div:last-of-type > button {
     width: 33%;
     aspect-ratio: 4.61;
     font-size: 1em;
@@ -2953,6 +2969,32 @@ table, button, label {
     height: 100%;
     z-index: 1;
     background: url(./assets/bg/chains.webp) no-repeat center center/cover;
+}
+
+#leyline-container {
+    margin-top: 0.5em;
+    height: fit-content;
+    justify-content: flex-start;
+    text-align: center;
+}
+
+#leyline-container > p:first-of-type {
+    font-size: 1.4em;
+    color: #e39f2b;
+}
+
+#leyline-container > div:last-of-type {
+     margin-top: 1em;
+}
+
+.leyline-progress {
+    position: relative;
+    top: unset;
+    max-height: 2.5rem;
+    margin: 2% 0;
+    border-radius: 0.4em;
+    border: 0.2em solid #c8b697;
+    background-color: transparent;
 }
 
 /*//////////// OTHER CSS + ANIMATION CSS /////////////*/

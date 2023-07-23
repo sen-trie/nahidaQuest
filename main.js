@@ -1,7 +1,7 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,createDom } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox } from "./modules/adjustUI.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat } from "./modules/functions.js"
+import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
 
@@ -3771,23 +3771,28 @@ function milestoneBuy(heroTooltip) {
         upgradeDict[heroID]["Factor"] = Math.ceil(upgradeDictTemp["Factor"] * (buff+1));
         upgradeDict[heroID].milestone[level] = true;
 
-        console.log(heroTooltip)
-
-        if (document.getElementById(`milestone-${heroTooltip}`).previousSibling) {
-            document.getElementById(`milestone-${heroTooltip}`).previousSibling.click();
+        let currentEle = document.getElementById(`milestone-${heroTooltip}`);
+        if (currentEle.nextSibling  !== null) {
+            let nextEle = currentEle.nextSibling;
+            nextEle.classList.contains('milestone-upgrade') ? nextEle.click() : clearTooltip();
         } else {
             clearTooltip();
         }
         
-        document.getElementById(`milestone-${heroTooltip}`).remove();
-        refresh("hero", heroID);
-        updatedHero(heroID);
+        setTimeout(()=> {
+            currentEle.remove();
+            refresh("hero", heroID);
+            updatedHero(heroID);
 
-        saveValues.realScore -= cost;
-        milestoneCount--;
-        updateMilestoneNumber();
-        upgradeElement.load();
-        upgradeElement.play();
+            saveValues.realScore -= cost;
+            milestoneCount--;
+            updateMilestoneNumber();  
+        }, 0);
+
+        try {
+            upgradeElement.load();
+            upgradeElement.play();
+        } catch {}
     }
 }
 
@@ -9078,23 +9083,19 @@ function createTreeMenu() {
     treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
     treeHealthContainer.append(treeNut,treeHealthText);
 
-    const treeProgressBar = document.createElement('div');
-    treeProgressBar.classList.add('tree-progress');
-    const treeProgress = document.createElement('div');
-    treeProgress.id = 'tree-progress';
-    treeProgress.progress = saveValues.treeObj.growth;
-    treeProgress.style.width = treeProgress.progress + '%';
+    const treeProgressBar = createProgressBar(
+        { class: ['tree-progress', 'healthbar-container'] },
+        { id: 'tree-progress',
+          progress: parseFloat(saveValues.treeObj.growth),
+          style: { width: (saveValues.treeObj.growth + '%'), backgroundColor: '#a4cf88' }},
+        { style: { borderRight: '0.11em solid #182c0a' }},
+        10
+    );
 
     const treeProgressValue = document.createElement('p');
     treeProgressValue.classList.add('tree-progress-value');
     treeProgressValue.id = 'tree-progress-value';
     treeProgressValue.rate;
-
-    for (let i = 0; i < 10; i++) {
-        let bar = document.createElement('b');
-        treeProgressBar.appendChild(bar);
-    }
-    treeProgressBar.append(treeProgress);
 
     function createCloud(range) {
         let cloudImg = new Image();
@@ -9143,7 +9144,7 @@ function createTreeMenu() {
     
     treeTable.append(palmText, optionsContainer);
     offerBox(treeTable, optionsContainer);
-    
+    leylineCreate(treeTable, optionsContainer);
 
     leftDiv.appendChild(treeSide);
     mainTable.appendChild(treeTable);
@@ -9293,7 +9294,7 @@ function treeOptions(planted, optionsContainer, lastPhase) {
     } else if (planted) {
         optionsContainer.classList.add('flex-row','options-container');
         optionsContainer.style.display = 'flex';
-        const optionsTextArray = ['Offer','Fertilize','Destroy'];
+        const optionsTextArray = ['Offer','Absorb','Destroy'];
         for (let i = 0; i < 3; i++) {
             let treeButton = document.createElement('div');
             let optionImg = new Image();
@@ -9313,18 +9314,21 @@ function treeOptions(planted, optionsContainer, lastPhase) {
                     })
                     break;
                 case 1:
-                    treeButton.addEventListener('click',() => {})
+                    treeButton.addEventListener('click',() => {
+                        universalStyleCheck(optionsContainer,"display","flex","none");
+                        universalStyleCheck(document.getElementById('leyline-container'),"display","none","flex");
+                    })
                     break;
                 case 2:
                     treeButton.addEventListener('click',() => {
-                        choiceBox(mainBody,'Are you sure you want to destroy the tree? This cannot be undone.', stopSpawnEvents, destroyTree, ['choice-ele']);
+                        choiceBox(mainBody,'Are you sure you want to destroy the tree? This cannot be undone.', stopSpawnEvents, destroyTree, undefined, null, ['choice-ele']);
                     })
                     break;
                 default:
                     break;
             }
     
-            treeButton.append(optionImg,optionText);
+            treeButton.append(optionImg, optionText);
             optionsContainer.appendChild(treeButton);
         }
     } else {
@@ -9408,7 +9412,7 @@ function enemyBlock(remove, damage, maxHP) {
         enemyButtonNew.addEventListener('click', () => {
             enemyBlock('confirm');
             let treeHealthText = document.getElementById('tree-health-text');
-            saveValues.treeObj.health -= lostHP;
+            saveValues.treeObj.health = Math.max(saveValues.treeObj.health - lostHP, 1); ;
             treeHealthText.health = saveValues.treeObj.health;
             treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
         })
@@ -9465,10 +9469,6 @@ function pickTree() {
     document.getElementById('tree-table').appendChild(seedContainer);
 
     updateSeedContainer(false);
-
-
-
-
     // growTree('level');
 }
 
@@ -9578,7 +9578,7 @@ function growTree(type, amount) {
         treeImg.src = `./assets/tree/tree-${saveValues.treeObj.level}.webp`;
         treeContainer.classList.add(`tree-${saveValues.treeObj.level}`);
 
-        // TREE DEFENSE INTIATE
+        // INTIATE TREE DEFENSE 
         if (saveValues.treeObj.level === 3) {
             if (saveValues.treeObj.defense) {
                 saveValues.treeObj.defense = 'block';
@@ -9586,6 +9586,64 @@ function growTree(type, amount) {
             }
         }
     }
+}
+
+function leylineCreate(treeTable, optionsContainer) {
+    const leylineDisplay = createDom('div', {class:['flex-column'], id:'leyline-container', style:{ display:'none' }});
+
+    const leylineTitle = createDom('p', { innerHTML: 'Leyline Outbreak Energy Level' });
+    const leylineBar = createProgressBar(
+        { class: ['leyline-progress', 'healthbar-container'] },
+        { id: 'leyline-progress',
+          progress: parseFloat(persistentValues.leylinePower),
+          style: { width: (100 + '%'), background: 'linear-gradient(90deg, rgba(204,12,12,1) 0%, rgba(235,225,15,1) 100%)' }},
+        { style: { borderRight: '0.2em solid #C17D6D' }},
+        4,
+        { src: './assets/tree/skull.webp'}
+    );
+     
+    let text = `<br>Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
+                <br> cost of your tree's HP (More effective at higher phases)`
+    const leylineText = createDom('p', { innerHTML: text });
+    const leylineEnergy = createDom('p', { innerText: `Current Energy Levels: ${Math.ceil(persistentValues.leylinePower)}%`, progress: persistentValues.leylinePower });
+
+    const absorbButton = document.createElement('button');
+    absorbButton.innerText = 'Absorb';
+    absorbButton.addEventListener('click', () => {
+        if (saveValues.treeObj.health == 1) {
+            leylineText.innerText = 'The tree is too weak to absorb excess energy!'
+            weaselDecoy.load();
+            weaselDecoy.play();
+            return;
+        }
+
+        let leylineProgress = document.getElementById('leyline-progress');
+        persistentValues.leylinePower -= 5;
+        leylineProgress.progress = parseFloat(persistentValues.leylinePower);
+        leylineProgress.style.width = leylineProgress.progress + '%';
+
+        let treeHealthText = document.getElementById('tree-health-text');
+        saveValues.treeObj.health = Math.max(saveValues.treeObj.health - 10, 1);
+        treeHealthText.health = saveValues.treeObj.health;
+        treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
+
+        leylineEnergy.progress = persistentValues.leylinePower;
+        leylineEnergy.innerText = `Current Energy Levels: ${Math.ceil(leylineEnergy.progress)}%`
+    });
+
+    const backButton = document.createElement('button');
+    backButton.innerText = 'Back';
+    backButton.addEventListener('click', () => {
+        universalStyleCheck(optionsContainer,"display","flex","none");
+        universalStyleCheck(leylineDisplay,"display","none","flex");
+    });
+
+    const buttonContainer = createDom('div', { class:['flex-row'] })
+    buttonContainer.append(backButton, absorbButton)
+
+    
+    leylineDisplay.append(leylineTitle, leylineBar, leylineEnergy, leylineText, buttonContainer);
+    treeTable.append(leylineDisplay);
 }
 
 //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
@@ -9863,7 +9921,7 @@ if (beta) {
             key: '3',
         });
           
-        document.dispatchEvent(event);
+        // document.dispatchEvent(event);
         // document.getElementById('char-selected').click();
         // document.getElementById('char-select-0').click();
         // document.getElementById('char-selected').click();

@@ -415,10 +415,8 @@ function patchNotes(parent,textReplacer) {
                 patchInfo.style.display = 'none';
               }
         })
-
         patchContainer.append(patchButton,patchInfo)
     }
-
     return parent.append(title,patchContainer);
 }
 

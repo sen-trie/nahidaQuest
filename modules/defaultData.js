@@ -122,6 +122,7 @@ const persistentValuesDefault = {
     upgrade11:{Purchased: 0},
     upgrade12:{Purchased: 0},
     treeSeeds:[0,0,0,0,0,0],
+    leylinePower: 100,
     ascendEle:{ "Pyro":0, "Hydro":0, "Dendro":0, "Electro":0, "Anemo":0, "Cryo":0, "Geo":0 },
     ascendDict:{
         "Nahida":0,

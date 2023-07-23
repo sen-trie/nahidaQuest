@@ -197,4 +197,50 @@ function choiceBox(mainBody, dialog, stopSpawnEvents, yesFunc, noFunc, extraEle,
     mainBody.append(choiceEle);
 }
 
-export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox };
+function createDom(elementType, attributes) {
+    const element = document.createElement(elementType);
+    if (attributes) {
+        for (const attr in attributes) {
+            if ((attr === 'class' || attr === 'classList') && Array.isArray(attributes[attr])) {
+                element.classList.add(...attributes[attr]);
+            } else if (attr === 'style' && typeof attributes[attr] === 'object') {
+                Object.assign(element.style, attributes[attr]);
+            } else if ((attr === 'innerText' || attr === 'innerHTML' || attr === 'progress') && typeof attributes[attr] !== 'object') {
+                element[attr] = attributes[attr];
+            } else {
+                element.setAttribute(attr, attributes[attr]);
+            }
+        }
+    }
+    return element;
+}
+
+// CREATES PROGRESS BAR
+function createProgressBar(parentProps, childProps, dividerProps, dividerNumber, imgProps) {
+    const parentEle = createDom('div', parentProps);
+    const barEle = createDom('div', { class:[ 'healthbar-grid'] })
+    const childEle = createDom('div', childProps);
+
+    barEle.style.gridTemplateColumns = `repeat(${dividerNumber}, 1fr)`;
+    for (let i = 0; i < dividerNumber; i++) {
+        const bar = createDom('b', dividerProps);
+        if (i === (dividerNumber - 1)) {
+            bar.style.borderRight = 0;
+        }
+        barEle.appendChild(bar);
+
+        if (imgProps) {
+            const dividerImg = createDom('img', imgProps);
+            dividerImg.style.left = `${(100 / dividerNumber) * (i + 1)}%`
+            if (i !== (dividerNumber - 1)) {
+                parentEle.appendChild(dividerImg);
+            }
+        }
+    }
+
+    barEle.appendChild(childEle)
+    parentEle.appendChild(barEle);
+    return parentEle;
+}
+
+export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom };
