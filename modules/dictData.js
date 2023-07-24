@@ -1091,7 +1091,7 @@ const challengeInfo = [
         '6': {'title': 'Surging Forth', 'desc': 'Empower the Wanderer'},
         '7': {'title': 'Sumeru Sales Specialist', 'desc': 'Defeat the field of Whopperflowers in under a minute'},
         '8': {'title': 'Golden Ticket', 'desc': 'Catch 16 Weasel Thieves'},
-        '9': {'title': 'Sylvan Samaritan', 'desc': "Offer 15 times to a tree in a single cycle"},
+        '9': {'title': 'Sylvan Samaritan', 'desc': "Offer 25 times in a single cycle"},
         '10':{'title': 'Pretty Patty', 'desc': "Use 1 of each type of Magic Seed when planting a tree"},
     }, {
         '1': {'title': 'Threads of All Fate', 'desc': 'Ascend for over 20,000 Cores'},
@@ -1103,7 +1103,7 @@ const challengeInfo = [
         '7': {'title': 'Perilous Clash', 'desc': 'Conquer the Abyss in under a minute'},
         '8': {'title': 'Greater Vision', 'desc': 'Get a Crit on Big Nahida seven times in a row'},
         '9': {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 35 trees'},
-        '10': {'title': 'Rooted Philanthropist', 'desc': 'Offer 25 times to a tree in a single cycle'},
+        '10': {'title': 'Rooted Philanthropist', 'desc': 'Offer 35 times in a single cycle'},
     }, {
         '1': {'title': 'Live and Let Live', 'desc': 'Ascend for over 50,000 Cores'},
         '2': {'title': "The Journey's Final Day", 'desc': 'Level up Zhongli 300 times'},
@@ -1114,7 +1114,7 @@ const challengeInfo = [
         '7': {'title': 'One Sided Victory', 'desc': "Finish Arakarman's game with at most a single key tile of yours being revealed"},
         '8': {'title': 'THE GNOSIS IS REAL', 'desc': 'Catch 12 Golden Weasel Thieves'},
         '9': {'title': '#teamtrees', 'desc': 'Harvest 100 trees'},
-        '10': {'title': 'Aranara Thanks You', 'desc': 'Offer 35 times to a tree in a single cycle'},
+        '10': {'title': 'Aranara Thanks You', 'desc': 'Offer 50 times in a single cycle'},
     }
 ]
 

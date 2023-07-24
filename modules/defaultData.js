@@ -68,7 +68,7 @@ const commisionDict = {
 }
 
 const treeObj = {
-    level: 1,
+    level: 0,
     element: null,
     growth: 0,
     growthRate: 1,

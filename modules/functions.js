@@ -257,7 +257,7 @@ function createTreeItems(saveValues, randomInteger, inventoryDraw, rollArray) {
     const boundary = Math.floor(saveValues.treeObj.offerAmount / 5);
     const maxItem = Math.min(Math.max(boundary, 2), 5);
 
-    const goldCore = randomInteger(85, 116) / 100 * ((Math.min(offer, 25) + 5) * 5**(boundary / 2)) * (offer > 25 ? (1 + (offer - 25) / 10 ) : 1) ;
+    const goldCore = randomInteger(85, 116) / 100 * (offer + 5) * 5**(boundary / 2) ;
     let itemArray = [Math.round(goldCore)];
 
     for (let i = 0; i < maxItem; i++) {

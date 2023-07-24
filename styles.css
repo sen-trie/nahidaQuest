@@ -3037,6 +3037,16 @@ table, button, label {
     width: 70%;
 }
 
+#notif-list {
+    font-size: 1.2em;
+    margin: 1em;
+    width: 100%;
+    color: #233d10;
+    text-shadow: unset;
+    text-align: left;
+    padding-left: 1em;
+}
+
 .notif-item {
     width: 95%;
     height: fit-content;
@@ -3053,9 +3063,23 @@ table, button, label {
     max-width: unset;
 }
 
+.notif-item-number > div {
+    flex-grow: 1;
+    aspect-ratio: 1;
+    width: unset;
+}
+
+.notif-item-number {
+    background-color: unset !important;
+    border: unset !important;
+    color: white !important;
+    text-shadow: var(--text-shadow-075);
+}
+
 .choice-ele > div > p, .notif-ele > div > p {
     font-size: 1.4em;
     text-shadow: var(--text-shadow-075);
+    text-align: center;
 }
 
 .choice-ele > div > div {
@@ -3069,6 +3093,7 @@ table, button, label {
     background-color: #557a36;
     border-radius: 0.5em;
     color: white;
+    width: fit-content;
 }
 
 .choice-ele > div > div > button:nth-of-type(2) {

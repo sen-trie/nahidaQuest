@@ -2011,8 +2011,9 @@ input[type="range"]:focus::-moz-range-thumb{
     border: 0.15em solid #677D56;
     color: #20301c;
     border-radius: 1em;
-    width: fit-content;
-    padding: 1% 6% 1% 6%;
+    width: 85%;
+    margin: 0 10%;
+    padding: 1% 0;
 }
 
 .settings-bottom-right {
@@ -2694,12 +2695,13 @@ img[src=""] {
 
 .nut-transcend > :nth-last-child(2) {
     position: absolute;
-    font-size: 1.2em;
+    font-size: 1.1em;
     background-color: #99B589;
     border: 0.2em solid #5B7B49;
     text-shadow: var(--text-shadow-075);
     padding: 2%;
     z-index: 2;
+    line-height: 1.4em;
 }
 
 .nut-transcend > :last-child {

@@ -149,7 +149,7 @@ function inventoryFrame(ele, itemInfo, itemFrameColors) {
     return ele;
 }
 
-// CHOICE BOX
+// CHOICE BOX (FOR ITEMS, PARENT CONTAINER MUST HAVE 'NOTIF-ITEM' CLASS)
 function choiceBox(mainBody, dialog, stopSpawnEvents, yesFunc, noFunc, extraEle, classes) {
     if (stopSpawnEvents) stopSpawnEvents = false;
 
@@ -169,6 +169,7 @@ function choiceBox(mainBody, dialog, stopSpawnEvents, yesFunc, noFunc, extraEle,
 
     const yesButton = document.createElement('button');
     yesButton.innerText = 'Confirm';
+    if (noFunc === null)  yesButton.innerText = 'Okay';
     yesButton.addEventListener('click',() => {
         choiceEle.remove();
         if (stopSpawnEvents) stopSpawnEvents = true;

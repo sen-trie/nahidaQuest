@@ -2958,7 +2958,7 @@ function settingsBox(type,eleId) {
         importBoxDiv.style.zIndex = -1;
 
         const textBox = document.createElement("textarea");
-        textBox.value = "Paste save data here.";
+        textBox.placeholder = "Paste save data here.";
         const cancelButton = document.createElement("button");
         cancelButton.addEventListener("click",()=>{
             importBoxDiv.style.zIndex = -1;
@@ -3684,7 +3684,7 @@ function milestoneBuy(heroTooltip) {
 
     if (itemStar === -1) {
         if (saveValues.realScore >= cost) {
-            milestoneSuccess();
+            milestoneSuccess(true);
         } else {
             weaselDecoy.load();
             weaselDecoy.play();
@@ -3716,7 +3716,7 @@ function milestoneBuy(heroTooltip) {
                 InventoryMap.set(tempID, inventoryCount)
 
                 if (inventoryCount <= 0) { (document.getElementById(tempID)).remove()}
-                milestoneSuccess();
+                milestoneSuccess(true);
             }
         } else {
             let heroElement = upgradeInfo[heroID].Ele;
@@ -3737,7 +3737,8 @@ function milestoneBuy(heroTooltip) {
                 InventoryMap.set(itemArray[0], inventoryCount);
 
                 if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
-                milestoneSuccess();
+                milestoneSuccess(false);
+                return;
             }
 
             itemArray = [];
@@ -3746,22 +3747,22 @@ function milestoneBuy(heroTooltip) {
                 itemArray.push(nationItemID + constNation[heroNation] + 4 * (4 - itemStar));
             }
 
-            if (itemArray.length === 0) {
+            if (itemArray.length === 0 || saveValues.realScore < cost) {
                 weaselDecoy.load();
                 weaselDecoy.play();
                 return;
-            } else if (itemArray.length >= 0) {
+            } else if (itemArray.length >= 0 && saveValues.realScore >= cost) {
                 let inventoryCount = InventoryMap.get(itemArray[0]);
                 inventoryCount--;
                 InventoryMap.set(itemArray[0], inventoryCount);
 
                 if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
-                milestoneSuccess();
+                milestoneSuccess(true);
             }
         }
     }
 
-    function milestoneSuccess() {
+    function milestoneSuccess(useGem) {
         let upgradeDictTemp = upgradeDict[heroID];
         let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * buff);
         if (heroID != 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
@@ -3772,7 +3773,7 @@ function milestoneBuy(heroTooltip) {
         upgradeDict[heroID].milestone[level] = true;
 
         let currentEle = document.getElementById(`milestone-${heroTooltip}`);
-        if (currentEle.nextSibling  !== null) {
+        if (currentEle.nextSibling !== null) {
             let nextEle = currentEle.nextSibling;
             nextEle.classList.contains('milestone-upgrade') ? nextEle.click() : clearTooltip();
         } else {
@@ -3784,7 +3785,7 @@ function milestoneBuy(heroTooltip) {
             refresh("hero", heroID);
             updatedHero(heroID);
 
-            saveValues.realScore -= cost;
+            if (useGem) {saveValues.realScore -= cost};
             milestoneCount--;
             updateMilestoneNumber();  
         }, 0);
@@ -4852,7 +4853,7 @@ function createGuild() {
 
             currentCommisionsTime.ready = false;
             currentCommisionsTime.addEventListener('click', () => {
-                if (currentCommisionsTime.ready != false) {
+                if (currentCommisionsTime.ready != true) {
                     currentCommisionsLeader.style.display = 'none'
                     currentCommisionsSupport.style.display = 'none'
                     currentCommisionsTime.innerText = 'Available';
@@ -5156,7 +5157,6 @@ function showCommisions() {
                 commCell.support.src = `./assets/tooltips/emoji/${commInfo.char[1]}.webp`;
 
                 let timeLeft = (commInfo.endTime - getTime()) / 3600;
-                timeLeft = 0;
                 let ready = timeLeft <= 0;
                 commCell.time.ready = `commision-cell-${i}/${commId}`;
                 commCell.time.innerText = ready ? 'Done!' : convertTo24HourFormat(timeLeft);
@@ -5295,6 +5295,7 @@ function selectCommHero(name) {
 function enterNewComm() {
     const heroLeader = document.getElementById(`select-hero-leader`);
     const heroSupp = document.getElementById(`select-hero-support`);
+    const perkText = document.getElementById('comm-perk-test');
     const footFeedback = document.getElementById('comm-feedback');
 
     if (!heroLeader.hero) {
@@ -5328,6 +5329,8 @@ function enterNewComm() {
     heroSupp.style.animation = 'unset';
     heroSupp.hero = null;
     heroSupp.offsetWidth;
+
+    perkText.innerText = 'None Curently';
 
     focusNewComm(true, null);
 }
@@ -8715,31 +8718,33 @@ function addNutStore() {
     nutShopDiv.style.display = "flex";
     nutAscend.style.display = "none";
     nutTranscend.classList.add("nut-transcend","flex-column");
-    let titleText = document.createElement("p");
+    const titleText = document.createElement("p");
     titleText.innerText = "Do you wish to turn \n back time and transcend?";
 
-    let bodyText = document.createElement("div");
+    const bodyText = document.createElement("div");
     bodyText.classList.add("flex-row")
-    let bodyTextLeft = document.createElement("p");
+    const bodyTextLeft = document.createElement("p");
     bodyTextLeft.innerText = `You lose: \n\n All Nuts, \n All Items, \n Energy, \n Primogems`;
     bodyTextLeft.classList.add("flex-column");
-    let bodyTextRight = document.createElement("p");
+    const bodyTextRight = document.createElement("p");
     bodyTextRight.id = "transcend-display";
     bodyTextRight.classList.add("flex-column");
     bodyText.append(bodyTextLeft,bodyTextRight);
 
-    let bodyTextBottom = document.createElement("p");
+    const bodyTextBottom = document.createElement("p");
     bodyTextBottom.innerText = "Gain more by upgrading heroes, getting \nachievements & nuts (golden or otherwise).";
 
-    let transendHelp = document.createElement("button");
-    let transcendHelpbox = document.createElement("p");
+    const transendHelp = document.createElement("button");
+    const transcendHelpbox = document.createElement("p");
     transcendHelpbox.style.display = "none";
     transcendHelpbox.innerText = `What is the Golden Core amount affected by? \n 
+                                Core Factor (V. High Priority)
+                                Character Upgrades (V. High Priority)\n------------------------------
                                 Character Levels (High Priority)
-                                Character Upgrades (High Priority)
-                                Achievements (High Priority)\n
+                                Achievements (High Priority)\n------------------------------
                                 Golden Nuts (Low Priority)
                                 Regular Nuts (Low Priority)`;
+
     transendHelp.addEventListener("click",()=>{
         if (transcendHelpbox.style.display == "none") {
             transcendHelpbox.style.display = "block";
@@ -8754,13 +8759,34 @@ function addNutStore() {
         }
     });
 
-    let trascendButton = document.createElement("button");
+    const transcendStats = createDom('button', { innerText:'Stats' })
+    transcendStats.addEventListener('click', () => {
+        const mostContributeDict = calculateGoldenCore('highestAmount');
+        let listText;
+        if (mostContributeDict !== 'Nothing') {
+            let sortedEntries = Object.entries(mostContributeDict).sort((a, b) => b[1] - a[1]);
+            sortedEntries = sortedEntries.slice(0, 5);
+           
+            let listInnerText = '';
+            for (let i = 0; i < sortedEntries.length; i++) {
+                listInnerText += `${(i + 1)}. ${sortedEntries[i][0]}: ${abbrNum(sortedEntries[i][1],2,true)}\n`;
+            }
+            listText = createDom('p', { id:'notif-list', innerText: listInnerText });
+        } else {
+            listText = createDom('p', { id:'notif-list', innerText: 'Nothing...' });
+        }
+
+        choiceBox(nutStoreTable, 'Top Contribution to \nCore Amounts:', stopSpawnEvents, ()=>{}, null, listText, ['notif-ele']);
+    })
+
+
+    const trascendButton = document.createElement("button");
     trascendButton.innerText = "Yes";
     trascendButton.addEventListener("click",()=>{
         calculateGoldenCore();
         toggleTranscendMenu();
     })
-    nutTranscend.append(titleText,bodyText,bodyTextBottom,trascendButton,transcendHelpbox,transendHelp);
+    nutTranscend.append(titleText,bodyText,bodyTextBottom,transcendStats,trascendButton,transcendHelpbox,transendHelp);
 
     nutStoreTable.append(shopHeader,nutTranscend,nutShopDiv,nutAscend,nutButtonContainer,nutStoreCurrency);
     mainTable.appendChild(nutStoreTable);
@@ -8805,6 +8831,8 @@ function addNutStore() {
 
         let ascendCurency = document.createElement('div');
         ascendCurency.classList.add('flex-row');
+        ascendCurency.ele = null;
+        ascendCurency.addEventListener('click', (() => {ascendChar(elementContainer.activeChar)}))
         let ascendNumber = document.createElement('p');
         let ascendEle = new Image();
         ascendEle.src = '';
@@ -8828,36 +8856,35 @@ function addNutStore() {
 
             const charArray = [];
             for (let key in upgradeDict) {
-                if (upgradeDict[key].Purchased > 0) {
-                    if (upgradeInfo[key].Ele === ele || upgradeInfo[key].Ele === "Any") {
-                        charArray.push(upgradeInfo[key].Name);
-                        let charImg = new Image();
-                        charImg.classList.add('dim-filter');
-                        charImg.src = `./assets/tooltips/hero/${upgradeInfo[key].Name}.webp`;
-                        charImg.addEventListener('click',()=>{
-                            let level = persistentValues.ascendDict[upgradeInfo[key].Name];
-                            ascendNumber.innerText = `${persistentValues.ascendEle[ele]} / ${(2**level)}`;
-                            charImg.classList.remove('dim-filter');
-                            ascendTooltipsInfo(upgradeInfo[key].Name, level);
+                if (upgradeDict[key].Purchased > 0 && (upgradeInfo[key].Ele === ele || upgradeInfo[key].Ele === "Any")) {
+                    charArray.push(upgradeInfo[key].Name);
+                    let charImg = new Image();
+                    charImg.classList.add('dim-filter');
+                    charImg.src = `./assets/tooltips/hero/${upgradeInfo[key].Name}.webp`;
+                    charImg.addEventListener('click',()=>{
+                        let level = persistentValues.ascendDict[upgradeInfo[key].Name];
+                        ascendNumber.innerText = `${persistentValues.ascendEle[ele]} / ${(2**level)}`;
+                        charImg.classList.remove('dim-filter');
+                        ascendTooltipsInfo(upgradeInfo[key].Name, level, ele);
 
-                            if (elementContainer.activeChar) {
-                                if (elementContainer.activeChar != charImg) elementContainer.activeChar.classList.add('dim-filter');
-                            }
+                        if (elementContainer.activeChar) {
+                            if (elementContainer.activeChar != charImg) elementContainer.activeChar.classList.add('dim-filter');
+                        }
 
-                            elementContainer.activeChar = charImg;
-                        })
+                        elementContainer.activeChar = charImg;
+                    })
 
-                        characterImgContainer.append(charImg);
-                    }
+                    characterImgContainer.append(charImg);
                 }
             }
             setTimeout(()=>{characterImgContainer.style.opacity = 1;},100)
         }
 
-        function ascendTooltipsInfo(name, level) {
+        function ascendTooltipsInfo(name, level, ele) {
+            ascendCurency.ele = ele;
             let text = `${name}
                         <br> Ascension ${level}
-                        <br>[yellow]Core Factor: ${1 + level * 0.01}</span>
+                        <br>[yellow]Core Factor: ${1 + level * 0.5}</span>
                         <br><br> ${100 + level * 10}% >> [green]${100 + (level + 1) * 10}</span>%
                         <br>Base ${name === "Nahida" ? "Nuts per Click" : "NpS"}
                         <br><br> ${100 + level * 2}% >> [red]${100 + (level + 1) * 2}</span>%
@@ -8871,28 +8898,80 @@ function addNutStore() {
             },text)
             ascendTooltips.innerHTML = text;
         }
+
+        const ascendChar = (name) => {
+            // NAME IS THE IMAGE ELEMENT
+            if (name === null) {return}
+            const heroName = name.src.split('/').slice(-1)[0].replace('.webp','').replace('%20',' ');
+            const ele = ascendCurency.ele;
+
+            if (persistentValues.ascendDict[heroName] == undefined) {
+                persistentValues.ascendDict[heroName] = 0;
+            }
+
+            const level = persistentValues.ascendDict[heroName];
+            const minCost = 2**level;
+
+            if (minCost <= persistentValues.ascendEle[ele]) {
+                persistentValues.ascendEle[ele] -= minCost;
+                persistentValues.ascendDict[heroName] += 1;
+                name.click();
+            } else {
+                weaselDecoy.load();
+                weaselDecoy.play();
+                return;
+            }
+        }
     }
 }
 
 function calculateGoldenCore(type) {
     let calculateNuts = 0;
-    if (saveValues.realScore > 1e6) {calculateNuts = Math.log(saveValues.realScore)}
-    let goldenNutValue = Math.round(((saveValues.heroesPurchased/25))*2 + calculateNuts + saveValues.goldenNut + saveValues.achievementCount * 3);
+    if (saveValues.realScore > 1e6) {calculateNuts = Math.log(saveValues.realScore) / Math.log(1.7)}
+    const contributionDict = {
+        'Regular Nuts': Math.round(calculateNuts),
+        'Golden Nuts':  Math.round(saveValues.goldenNut * 2),
+        'Achievements':  Math.round(saveValues.achievementCount * 3),
+    }
 
-    for (let key in upgradeDict) {
+    let goldenNutValue = contributionDict['Regular Nuts'] + contributionDict['Golden Nuts'] + contributionDict['Achievements'];
+    let heroCount = 1;
+
+    const sortByNestedValues = (obj) => {
+        const filteredEntries = Object.entries(obj).filter(([, value]) => value.Row >= 0 && value.Purchased >= 1);
+        const sortedEntries = filteredEntries.sort(([, a], [, b]) => a.Row - b.Row);
+        return Object.fromEntries(sortedEntries);
+    }
+
+    const filteredDict = sortByNestedValues(upgradeDict)
+    for (let key in filteredDict) {
         let corePerHero = 0;
+        corePerHero += (Math.floor(upgradeDict[key].Purchased / 25) + 1);
+        let name = upgradeInfo[parseInt(key)].Name;
+
+        if (upgradeDict[key].Purchased <= 0) {continue}
+        heroCount++;
+
+        let upgradeCore = 1;
         for (let Nestedkey in upgradeDict[key].milestone) {
             if (upgradeDict[key].milestone[Nestedkey]) {
-                corePerHero += 1 * Math.max(corePerHero / 2, 1);
+                upgradeCore += 1 * Math.max(upgradeCore / 2, 1);
             }
         }
 
+        corePerHero *= upgradeCore;
+        corePerHero *= (1 + persistentValues.ascendDict[name] * 0.5);
+        corePerHero *= (1 + Math.floor(heroCount / 4.5)**1.6);
+
         goldenNutValue += Math.round(corePerHero);
+        contributionDict[name] = Math.round(corePerHero);
     }
 
     if (goldenNutValue < 100) {goldenNutValue = 0}
     if (type === "formula") {
         return goldenNutValue;
+    } else if (type === "highestAmount") {
+        return (calculateNuts === 0 ? 'Nothing' : contributionDict);
     } else {
         let transcendValue = document.getElementById("transcend-display");
         transcendValue.innerHTML = `You gain:<br><br> ${abbrNum(goldenNutValue)} 
@@ -9272,6 +9351,9 @@ function offerItemFunction() {
     }
 
     saveValues.treeObj.offerAmount++;
+    saveValues.treeObj.energy = Math.round(saveValues.treeObj.energy * randomInteger(115, 125) / 100);
+    const palmText = document.getElementById('palm-text');
+    palmText.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
     rollTreeItems();
 }
 
@@ -9371,6 +9453,33 @@ function destroyTree() {
         treeContainer.classList.remove(`tree-${saveValues.treeObj.level === 5 ? 4 : saveValues.treeObj.level}`);
         saveValues.treeObj.level = 0;
         saveValues.treeObj.defense = false;
+
+        const lootContainer = createDom('div', { class:['notif-item']});
+        let lootArray = Array.from({ length: 7 }, () => randomInteger(1, 100));
+
+        for (let i = 0; i < lootArray.length; i++) {
+            if (lootArray[i] !== 0) {
+                const rankInventoryReward = createDom('div', { class:['notif-item-number', 'flex-column']});
+                let rankInventoryRewardsImg = document.createElement('div');
+                rankInventoryRewardsImg = inventoryFrame(rankInventoryRewardsImg, { Star: 5, File: `solid${boxElement[i + 1]}` }, itemFrameColors);
+                let rankInventoryRewardsText = createDom('p', { innerText: lootArray[i] });
+                rankInventoryReward.append(rankInventoryRewardsImg, rankInventoryRewardsText);
+
+                lootContainer.append(rankInventoryReward);
+            }
+            
+        }
+
+        const addLoot = (lootArray) => {
+            for (let i = 0; i < lootArray.length; i++) {
+                if (lootArray[i] !== 0) {
+                    persistentValues.ascendEle[boxElement[i + 1]] += lootArray[i];
+                }
+            }
+            console.log(persistentValues.ascendEle)
+        }
+
+        choiceBox(mainBody, 'Materials harvested:', stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
     },100);
 }
 
