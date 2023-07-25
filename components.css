@@ -1138,11 +1138,15 @@
     transition: 0.2s ease-out;
 }
 
-.adventure-video > div {
+.adventure-video > .enemy {
     width: 25%;
     height: 85%;
     position: relative;
     bottom: -8%;
+}
+
+.adventure-video > .wide-enemy {
+    width: 75%;
 }
 
 .enemyImg {
@@ -1179,10 +1183,9 @@
 .select-indicator {
     position: absolute;
     object-fit: contain;
-    width: 20%;
-    height: auto;
-    top: 5%;
-    left: 40%;
+    width: 100%;
+    height: 1.5em;
+    top: 2%;
     animation: glow 0.8s linear infinite forwards;
     filter: drop-shadow(0 0 0.3em #ffffff);
 }
@@ -1269,11 +1272,12 @@
 }
 
 #inventory-offer {
-    z-index: 2;
+    display: flex;
+    position: relative;
     width: 50%;
     height: auto;
     aspect-ratio: 3;
-    display: flex;
+    z-index: 2;
     gap:1%;
 }
 

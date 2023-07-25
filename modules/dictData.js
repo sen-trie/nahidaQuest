@@ -76,7 +76,8 @@ const imgKey = {
     23:{Left:"30",  Top:"37",   Level:12,   Wave:["11_B","13_A","14_A"]},
     24:{Left:"55",  Top:"24",   Level:12,   Wave:["15_B","20_A"]},
     25:{Left:"66",  Top:"41",   Level:12,   Wave:["16_A","19_A"]},
-    26:{Left:"76",  Top:"51",   Level:13,   Wave:[1],  Heads:[18,19]           ,Loot:{}},
+    26:{Left:"78",  Top:"48",   Level:13,   Wave:[1],  Heads:[18,19]           ,Loot:{}},
+    27:{Left:"72",  Top:"28",   Level:14,   Wave:[1],  Heads:[25]           ,Loot:{}},
 }
 
 const sceneInfo = {
@@ -652,12 +653,13 @@ const expeditionDictInfo = {
     5:{Text:"Abyss Diving | 1000 "                   ,Lore:"All trails seem to end here. With nowhere else to go, the Abyss is the sole place left where the fruit is likely to be. Search through the floors with the help of an unlikely ally."},
     6:{Text:"Locked"                                 ,Lore:"Perhaps this path will open after you get stronger..."            },
     7:{Text:"Select an Expedition"                   ,Lore:"Go on Expeditions to get items to upgrade your characters! <br><br><br><br> [currentStats]"},
-    8:{Text:"Going on Expeditions"                ,Lore:"Expeditions use Energy which can be obtained by clicking Big Nahida. Beware! You may encounter unexpected obstacles in your journey."},
-    9:{Text:"Not enough Energy..."                     ,Lore:"Obtain more by clicking Big Nahida!"            },
+    8:{Text:"Going on Expeditions"                   ,Lore:"Expeditions use Energy which can be obtained by clicking Big Nahida. Beware! You may encounter unexpected obstacles in your journey."},
+    9:{Text:"Not enough Energy..."                   ,Lore:"Obtain more by clicking Big Nahida!"            },
     10:{Text:"Visit the Adventurers' Guild"          ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
-    11:{Text:"No Party Leader selected"               ,Lore:"Please select one at the top left of the map before going on Expeditions."            },
+    11:{Text:"No Party Leader selected"              ,Lore:"Please select one at the top left of the map before going on Expeditions."            },
     12:{Text:"Random World Quest"                    ,Lore:"These quests are random encounters that the you can run into while roaming around the world of Teyvat."            },
-    13:{Text:"Skirmish Quest | 1000"                        ,Lore:"The combat abilities of these monsters have been enhanced as the result of the Ley Line Overflow. Your Burst also appears to recharge faster due to the presence of latent energy."},
+    13:{Text:"Skirmish Quest | 1000"                 ,Lore:"The combat abilities of these monsters have been enhanced as the result of the Ley Line Overflow. Your Burst also appears to recharge faster due to the presence of latent energy."},
+    14:{Text:"Leyline Boss | 2500"                   ,Lore:"The following monsters have absorbed a tremendous amount of energy from the Ley Line Overflow. Be extremely cautious of any extra abilities they may possess."}
 }
 
 const advInfo = {
@@ -949,6 +951,7 @@ const adventureLoot = {
         Talent:     ["talent", 4,4, "adventure", "Any"],
     },
     "Level-13":{},
+    "Level-14":{},
     2:{
         Weapon: ["weapon", 1, 2, "adventure", "Catalyst"],
         Talent: ["talent", 2, 2,"adventure",  "Sumeru"],

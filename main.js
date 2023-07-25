@@ -215,10 +215,10 @@ if (navigator.userAgentData) {
 
 // ADVENTURE VARIABLES
 let quickType;
+let adventureVariables = {};
+let battleVariables = {};
 let adventureScene = false;
 let adventureScaraText = "";
-let maxEnemyAmount = 0;
-let enemyAmount = 0;
 let quicktimeAttack = false;
 let skillCooldownReset;
 let adventureTreeDefense = false;
@@ -422,7 +422,10 @@ function timerEvents() {
     shopCheck();
     shopTimerFunction();
     checkTimerBounty();
-    if (beta) growTree('add');
+    if (beta) {
+        growTree('add');
+        checkCommisions();
+    };
 }
 
 // TEMPORARY TIMER
@@ -1305,6 +1308,7 @@ function minesweeperEvent() {
                     let randomPrimo = randomInteger(200,400);
                     adventure("10-");
                     newPop(1);
+                    sortList("table2");
                     eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop);
                     setTimeout(()=>{currencyPopUp("items",0,"primogem", randomPrimo)},4000)
                 }
@@ -4202,18 +4206,19 @@ function adventure(advType) {
     let type = parseInt(advType.split("-")[0]);
     if (type !== 10 && expeditionDict[type] != '1') {
         let wave = rollArray(JSON.parse(advType.split("-")[1]),0);
-        if (saveValues["energy"] >= ADVENTURECOSTS[type !== 13 ? type : 0]) {
+        if (saveValues["energy"] >= ADVENTURECOSTS[type <= 5 && type > 1 ? type : 0]) {
             adventureElement.load();
             adventureElement.play();
-            saveValues["energy"] -= ADVENTURECOSTS[type !== 13 ? type : 0];
+            saveValues["energy"] -= ADVENTURECOSTS[type <= 5 && type > 1  ? type : 0];
             updateMorale("add",(randomInteger(7,10) * -1));
 
-            if (activeLeader == "Paimon" && type !== 13) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.15)}
+            if (activeLeader == "Paimon" && type <= 5 && type > 1) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.15)}
+
             if (!persistentValues.tutorialBasic) {
-                customTutorial("advTut",6,()=>{drawAdventure(type,wave)});
+                customTutorial("advTut", 6, ()=>{drawAdventure(type,wave)});
                 persistentValues.tutorialBasic = true;
             } else if (type >= 3 && type < 6 && persistentValues.tutorialRanged != true) {
-                customTutorial("rangTut",2,()=>{drawAdventure(type,wave)});
+                customTutorial("rangTut", 2, ()=>{drawAdventure(type,wave)});
                 persistentValues.tutorialRanged = true;
             } else {
                 drawAdventure(type,wave);
@@ -4395,17 +4400,6 @@ function createAdventure() {
             } else if (event.key === "c" || event.key === "e") {
                 adventureFightBurst.click();
          
-            }
-        }
-        if (beta) {
-            if (event.key === "a") {
-                
-            } else if (event.key === "s") {
-                notifPop("clearAll","rank",2);
-                notifPop("clearAll","quest",1);
-            } else if (event.key === "d") {
-                notifPop("add","rank",2);
-                notifPop("add","quest",1);
             }
         }
     })
@@ -4642,6 +4636,12 @@ function createGuild() {
         }
     }
 
+    guildTable.open = function() {
+        if (this.style.display == "none") {
+            this.style.display = "flex";
+        }
+    }
+
     const bountyMenu = document.createElement("div");
     bountyMenu.classList.add("flex-row","bounty-menu");
     bountyMenu.id = "bounty-menu";
@@ -4853,13 +4853,14 @@ function createGuild() {
 
             currentCommisionsTime.ready = false;
             currentCommisionsTime.addEventListener('click', () => {
-                if (currentCommisionsTime.ready != true) {
-                    currentCommisionsLeader.style.display = 'none'
-                    currentCommisionsSupport.style.display = 'none'
+                if (currentCommisionsTime.ready === true) {
+                    currentCommisionsTime.ready = false;
+                    currentCommisionsLeader.style.display = 'none';
+                    currentCommisionsSupport.style.display = 'none';
                     currentCommisionsTime.innerText = 'Available';
                     if (currentCommisionsTime.classList.contains('rank-button-available')) currentCommisionsTime.classList.remove('rank-button-available');
 
-                    const commId = currentCommisionsTime.ready.split('/');
+                    const commId = currentCommisionsTime.commId.split('/');
                     let commInfo;
                     if (commId[1].includes('base')) {
                         saveValues.currentCommisions.splice(saveValues.currentCommisions.indexOf(commId[1]), 1)
@@ -4915,7 +4916,9 @@ function createGuild() {
                             inventoryAdd(item);
                         })
                         newPop(1);
+                        sortList("table2");
                         saveValues.baseCommisions[commId[1].split('-')[1]].progress = true;
+                        notifPop("clear","comm",commId[1]);
                     }
 
                     choiceBox(mainBody, 'Loot obtained:', stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
@@ -4942,10 +4945,12 @@ function createGuild() {
 
     const guildArray = [rankMenu, bountyMenu, commisionMenu];
     const buttonArray = ["Adventure Rank", "Bounties", "Commisions"];
+    const notifPopArray = ['rank', 'bounty', 'comm'];
     guildTable.activeButton;
 
     for (let i = 0; i < 3 ; i++) {
         let menuButton = document.createElement("div");
+        menuButton.id = `guild-button-${notifPopArray[i]}`
         menuButton.innerText = buttonArray[i];
         menuButton.classList.add("flex-column","guild-button");
         menuButton.addEventListener("click",() => {
@@ -5102,6 +5107,52 @@ function resetBounty(bountyMenu,type) {
     }
 }
 
+function completeBounty(bountyID,type,ele) {
+    let button;
+    if (type == "load") {
+        button = ele;
+    } else {
+        if (bountyObject[bountyID].Completed == "claimed") {return}
+        if (bountyObject[bountyID].Completed != true) {
+            button = document.getElementById(`bounty-${bountyID}`);
+            bountyObject[bountyID].Completed = true;
+       }
+    }
+
+    if (button == undefined) {return}
+    let img = button.children[1];
+    img.style.filter = "grayscale(0.9) brightness(0.1)";
+    button.style.backgroundColor =  "rgb(152 132 91)";
+    notifPop("add","bounty",bountyID);
+    
+    let claim = document.createElement("button");
+    claim.innerText = "Claim Reward";
+    claim.primoReward = bountyObject[bountyID].primoReward;
+    claim.xpReward = bountyObject[bountyID].xpReward;
+
+    if (!advDict.rankDict[11].Locked) {
+        claim.xpReward *= 1.15;
+        claim.primoReward *= 1.15;
+    } else if (!advDict.rankDict[3].Locked) {
+        claim.xpReward *= 1.05;
+        claim.primoReward *= 1.05;
+    }
+
+    claim.addEventListener("click",()=>{
+        notifPop("clear","bounty",bountyID);
+        currencyPopUp("primogem",Math.round(claim.primoReward));
+        gainXP(Math.round(claim.xpReward));
+        bountyObject[bountyID].Completed = "claimed";
+        claim.remove();
+
+        let markImg = new Image();
+        markImg.src = "./assets/expedbg/bountyDone.webp"
+        button.appendChild(markImg)
+    })
+
+    button.appendChild(claim);
+}
+
 function showCommisions() {
     const commisionList = document.getElementById('commision-list');
     while (commisionList.firstChild) {
@@ -5156,9 +5207,10 @@ function showCommisions() {
                 commCell.support.style.display = 'flex';
                 commCell.support.src = `./assets/tooltips/emoji/${commInfo.char[1]}.webp`;
 
-                let timeLeft = (commInfo.endTime - getTime()) / 3600;
+                let timeLeft = (commInfo.endTime - getTime()) / 1000 / 3600;
                 let ready = timeLeft <= 0;
-                commCell.time.ready = `commision-cell-${i}/${commId}`;
+                commCell.time.ready = ready;
+                commCell.time.commId = `commision-cell-${i}/${commId}`;
                 commCell.time.innerText = ready ? 'Done!' : convertTo24HourFormat(timeLeft);
 
                 if (ready) {
@@ -5172,6 +5224,7 @@ function showCommisions() {
             commCell.support.style.display = 'none'
             commCell.time.innerText = 'Available';
             commCell.time.ready = false;
+            commCell.time.commId = null;
             if (commCell.time.classList.contains('rank-button-available')) commCell.time.classList.remove('rank-button-available');
         }
     }
@@ -5313,7 +5366,7 @@ function enterNewComm() {
     const id = commId.split('-')[1];
 
     saveValues.baseCommisions[id].progress = 'ongoing';
-    saveValues.baseCommisions[id].endTime = getTime() + saveValues.baseCommisions[id].duration * 3600 * (commisionInfo[heroLeader.hero].perk === 'Lightweight' ? 0.85 : 1)
+    saveValues.baseCommisions[id].endTime = getTime() + saveValues.baseCommisions[id].duration * 3600 * 1000 * (commisionInfo[heroLeader.hero].perk === 'Lightweight' ? 0.85 : 1)
     saveValues.baseCommisions[id].char = [heroLeader.hero, heroSupp.hero];
 
     persistentValues.commisionDict[heroLeader.hero].currentComm = commId;
@@ -5384,50 +5437,18 @@ function generateCommisions() {
     saveValues.baseCommisions = baseCommisions;
 }
 
-function completeBounty(bountyID,type,ele) {
-    let button;
-    if (type == "load") {
-        button = ele;
-    } else {
-        if (bountyObject[bountyID].Completed == "claimed") {return}
-        if (bountyObject[bountyID].Completed != true) {
-            button = document.getElementById(`bounty-${bountyID}`);
-            bountyObject[bountyID].Completed = true;
-       }
+function checkCommisions() {
+    if (saveValues.currentCommisions && saveValues.currentCommisions.length > 0) {
+        saveValues.currentCommisions.forEach((item) => {
+            if (item.split('-')[0] === 'base') {
+                const baseId = item.split('-')[1];
+                const timeLeft = saveValues.baseCommisions[baseId].endTime - getTime() / 1000 / 3600;
+                if (timeLeft <= 0) {
+                    notifPop("add","comm", item);
+                }
+            }
+        })
     }
-
-    if (button == undefined) {return}
-    let img = button.children[1];
-    img.style.filter = "grayscale(0.9) brightness(0.1)";
-    button.style.backgroundColor =  "rgb(152 132 91)";
-    notifPop("add","bounty",bountyID);
-    
-    let claim = document.createElement("button");
-    claim.innerText = "Claim Reward";
-    claim.primoReward = bountyObject[bountyID].primoReward;
-    claim.xpReward = bountyObject[bountyID].xpReward;
-
-    if (!advDict.rankDict[11].Locked) {
-        claim.xpReward *= 1.15;
-        claim.primoReward *= 1.15;
-    } else if (!advDict.rankDict[3].Locked) {
-        claim.xpReward *= 1.05;
-        claim.primoReward *= 1.05;
-    }
-
-    claim.addEventListener("click",()=>{
-        notifPop("clear","bounty",bountyID);
-        currencyPopUp("primogem",Math.round(claim.primoReward));
-        gainXP(Math.round(claim.xpReward));
-        bountyObject[bountyID].Completed = "claimed";
-        claim.remove();
-
-        let markImg = new Image();
-        markImg.src = "./assets/expedbg/bountyDone.webp"
-        button.appendChild(markImg)
-    })
-
-    button.appendChild(claim);
 }
 
 function clearExped() {
@@ -5485,7 +5506,7 @@ function expedInfo(butId) {
         lootInfo.innerText = "";
     } 
 
-    if ((level < 6 && level > 0) || level == 13) {
+    if ((level < 6 && level > 0) || level >= 13) {
         expedRow1.innerHTML += `<img class="icon primogem" src="./assets/icon/energyIcon.webp"></img>`;
         let heads = imgKey[id].Heads;
         for (let j = 0; j < heads.length; j++) {
@@ -5495,7 +5516,7 @@ function expedInfo(butId) {
             enemyInfo.appendChild(img);
         }
 
-        let lootHTML = `<span style='font-size:1.2em'>Recommended Rank: ${recommendedLevel[level != 13 ? level : 6]}</span>  <br> Max Potential Rewards: <br> [container]`;
+        let lootHTML = `<span style='font-size:1.2em'>Recommended Rank: ${recommendedLevel[level <= 5 && level > 1 ? level : 6]}</span>  <br> Max Potential Rewards: <br> [container]`;
         let lootTable = imgKey[id].Loot;
         let invDiv = document.createElement("div");
         invDiv.classList.add("inv-div","flex-row");
@@ -5612,6 +5633,7 @@ function createExpMap() {
     notifSelect.rankArray = [];
     notifSelect.charArray = [];
     notifSelect.questArray = [];
+    notifSelect.commArray = [];
     notifSelect.classList.add("flex-column","notif-select");
     
     let charMenu = document.createElement("div");
@@ -5824,6 +5846,7 @@ function expedPop(type,text) {
 function notifPop(type,icon,count) {
     let notifSelect = document.getElementById('notif-selected');
     if (type == "add") {
+        const guildButton = ['comm', 'bounty', 'rank'];
         let notifDiv = document.createElement("div");
         notifDiv.classList.add("flex-column");
         notifDiv.id = `${icon}-notif`;
@@ -5837,20 +5860,10 @@ function notifPop(type,icon,count) {
             notifImg.src = "./assets/icon/bountyComplete.webp";
             notifText.innerText = "Bounty Rewards";
             notifSelect.bountyArray.push(count);
-
-            notifDiv.addEventListener('click',()=>{
-                let guildTable = document.getElementById("guild-table");
-                guildTable.toggle();
-            })
         } else if (icon === "rank") {
             notifImg.src = "./assets/icon/advRank.webp";
             notifText.innerText = "Adv. Rank \n Rewards";
             notifSelect.rankArray.push(count);
-
-            notifDiv.addEventListener('click',()=>{
-                let guildTable = document.getElementById("guild-table");
-                guildTable.toggle();
-            })
         } else if (icon === "char") {
             notifImg.src = "./assets/icon/newChar.webp";
             notifText.innerText = "New Leader \n Unlocked";
@@ -5859,8 +5872,20 @@ function notifPop(type,icon,count) {
             notifImg.src = "./assets/expedbg/adv-12.webp";
             notifText.innerText = "World Quest \n Available";
             notifSelect.questArray.push(count);
+        } else if (icon === "comm") {
+            notifImg.src = "./assets/icon/comm.webp";
+            notifText.innerText = "Commision \n Complete";
+            notifSelect.questArray.push(count);
         } 
 
+        if (guildButton.includes(icon)) {
+            notifDiv.addEventListener('click',()=>{
+                let guildTable = document.getElementById("guild-table");
+                guildTable.open();
+                document.getElementById(`guild-button-${icon}`).click();
+            })
+        }
+        
         if (document.getElementById(notifDiv.id)) {return};
         notifContainer.append(notifText,notifImg)
         notifDiv.append(notifContainer);
@@ -5933,65 +5958,72 @@ function unlockExpedition(i,expeditionDict) {
 // ADVENTURE PROCESS
 const adventurePreload = new Preload();
 const adventureWorker = new Worker('./modules/workers.js');
-function drawAdventure(advType,wave) {
-    adventureScaraText = "";
+function drawAdventure(advType, wave) {
+    adventureScaraText = advType === 5 || advType === 14 ? "-scara" : "";
     lootArray = {};
 
     if (adventureScene) {return}
     adventureScene = true;
-    if (advType === 5) {
-        adventureScaraText = "-scara";
-    };
 
     let removeEle = document.querySelectorAll('.adventure-atk-cooldown, .adventure-atk-cooldown-scara');
     removeEle.forEach((element) => {
         element.remove();
     });
 
-    if ((advType >= 3 && advType < 6) || advType == 13) {
+    if ((advType >= 3 && advType < 6) || advType >= 13) {
         quickType = [enemyInfo.quicktimeDict[advType],advType];
     } else {
         quickType = advType;
     }
     
-    let waveType = enemyInfo[`${advType}-Wave-${wave}`];
-    enemyAmount = waveType.Wave.length;
-    maxEnemyAmount = waveType.Wave.length;
+    const waveType = enemyInfo[`${advType}-Wave-${wave}`];
+    const quicktimeEnabled = ((advType >= 3 && advType < 6) || advType >= 13);
+
+    adventureVariables = {
+        quicktimeEnabled: quicktimeEnabled,  // BOOL
+        quickType: quicktimeEnabled ? enemyInfo.quicktimeDict[advType] : null, // ARRAY
+        advType: advType, // INTEGER
+        specialty: advType === 14 ? 'Workshop' :null,
+        waveType: waveType, // TWO ARRAYS
+        currentEnemyAmount: waveType.Wave.length,
+        maxEnemyAmount: waveType.Wave.length,
+        lootArray: {},
+        fightSceneOn: false,
+        pheonixMode: false,
+    }
 
     let adventureVideo = document.getElementById("adventure-video");
-    let imageGif = document.getElementById("adventure-gif");
-    let adventureFightImg = document.getElementById("adventure-fight").children;
-    if (adventureScaraText) {
-        imageGif.src = `./assets/expedbg/exped${adventureScaraText}.webp`;
-        adventureVideo.style.border = `0.2em ridge #C0C5ED`;
-    } else {
-        adventureVideo.style.border = `0.2em ridge #AEDF7D`;
-    };
+    const adventureFightImg = document.getElementById("adventure-fight").children;
+
+    // SCARA MODE
+    const imageGif = document.getElementById("adventure-gif");
+    imageGif.src = `./assets/expedbg/exped${adventureScaraText ? '-scara' : '-Nahida'}.webp`;
+    adventureVideo.style.border = `0.2em ridge ${adventureScaraText === '-scara' ? '#C0C5ED' : '#AEDF7D'}`;
 
     for (let i = 0; i < adventureFightImg.length; i++) {
         if (adventureFightImg[i].classList.contains(`fight-button${!adventureScaraText}`)) {adventureFightImg[i].classList.remove(`fight-button${!adventureScaraText}`)};
         adventureFightImg[i].classList.add(`fight-button${adventureScaraText}`);
     }
     
-    let adventureChoiceOne = document.getElementById("adv-button-one");
+    const adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
     adventureChoiceOne.pressAllowed = false;
     adventureChoiceOne.innerText = "Fight!";
     adventureChoiceOne.advType = advType;
 
-    let adventureRewards = document.getElementById("adventure-rewards");
+    const adventureRewards = document.getElementById("adventure-rewards");
     adventureRewards.style.opacity = "0";
     adventureRewards.style.flexGrow = "1";
-    let adventureHeading = document.getElementById("adventure-header");
+    const adventureHeading = document.getElementById("adventure-header");
     adventureHeading.style.flexGrow = "0";
  
-    let adventureArea = document.getElementById("adventure-area");
-    let adventureTextBox = document.getElementById("adventure-text");
+    const adventureArea = document.getElementById("adventure-area");
+    const adventureTextBox = document.getElementById("adventure-text");
     
     adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp)`;
-    adventureVideo = spawnMob(adventureVideo,waveType.Wave);
+    adventureVideo = spawnMob(adventureVideo, waveType.Wave);
 
-    let preloadedImage = new Image();
+    const preloadedImage = new Image();
     preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp`;
     preloadedImage.onload = () => {
         adventureArea.style.zIndex = 500;
@@ -6005,7 +6037,15 @@ function drawAdventure(advType,wave) {
     function textFadeIn() {
         adventureHeading.style.top = "10%";
         adventureHeading.style.overflowY = "hidden";
-        adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
+
+        // TODO: DIFFERENT TEXT BASED ON ADV TYPE
+        if (adventureVariables.maxEnemyAmount > 1) {
+            adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
+        } else {
+            adventureHeading.innerText = "You encounter a hostile mob.";
+            adventureVariables.specialty === 'Workshop' ? adventureHeading.innerText = "You stand before the Prodigal, Everlasting Lord of Arcane Wisdom." : null;
+        }
+        
         adventureHeading.style.animation = "fadeOut 1s ease-out reverse";
 
         adventureTextBox.style.animation = "";
@@ -6191,9 +6231,14 @@ function continueQuest(advType) {
     } else if (infoDict.Type === "Trade") {
         if (advType === "0_Trade_Wait") {
             let tradeOffer = document.getElementById('inventory-offer');
-            if (tradeOffer.offer == null) {
-                return;
-            } else if (tradeOffer.offer == true) {
+            if (tradeOffer.offer === null) {return}
+
+            for (let key in lootArray) {
+                if (tradeOffer.offer) {inventoryAdd(lootArray[key])};
+                delete lootArray[key];
+            }
+
+            if (tradeOffer.offer === true) {
                 shopElement.load();
                 shopElement.play();
 
@@ -6201,11 +6246,6 @@ function continueQuest(advType) {
                 newPop(1);
                 currencyPopUp("items",0)
                 sortList("table2");
-            }
-
-            for (let key in lootArray) {
-                if (tradeOffer.offer) {inventoryAdd(lootArray[key])};
-                delete lootArray[key];
             }
 
             let adventureVideo = document.getElementById("adventure-video");
@@ -6298,7 +6338,7 @@ function continueQuest(advType) {
         offerCurrency.innerText = `Cost: \n ${offerCurrency.value} Primogems`;
 
         inventoryOffer.append(offerCurrency, acceptButton, rejectButton);
-        adventureVideo.append(inventoryOffer,currencyAmount);
+        adventureVideo.append(inventoryOffer, currencyAmount);
         let adventureTextBox = document.getElementById("adventure-text");
         adventureTextBox.questNumber = "0_Trade_Wait";
     }
@@ -6317,15 +6357,15 @@ function continueQuest(advType) {
     }
 }
 
-function comboHandler(type,ele) {
-    if (type == "create") {
+function comboHandler(type, ele) {
+    if (type === "create") {
         let comboNumber = document.createElement("p");
         comboNumber.id = "combo-number";
         comboNumber.combo = 0;
         comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
         ele.appendChild(comboNumber);
         return ele;
-    } else if (type == "add") {
+    } else if (type === "add") {
         let comboNumber = document.getElementById("combo-number");
         comboNumber.combo++;
         comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
@@ -6333,7 +6373,7 @@ function comboHandler(type,ele) {
         comboNumber.style.animation = "";
         void comboNumber.offsetWidth;
         comboNumber.style.animation = "tallyCount 1s ease";
-    } else if (type == "reset") {
+    } else if (type === "reset") {
         let comboNumber = document.getElementById("combo-number");
         comboNumber.combo = 0;
         comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
@@ -6341,14 +6381,14 @@ function comboHandler(type,ele) {
         comboNumber.style.animation = "";
         void comboNumber.offsetWidth;
         comboNumber.style.animation = "tallyCount 1s ease";
-    } else if (type == "check") {
+    } else if (type === "check") {
         let comboNumber = document.getElementById("combo-number");
         let multiplierThreshold = Math.floor(comboNumber.combo / 3) * 0.25;
         return (ele + multiplierThreshold);
     }
 }
 
-function spawnMob(adventureVideo,waveInfo) {
+function spawnMob(adventureVideo, waveInfo) {
     for (let i = 0; i < waveInfo.length; i++) {
         let singleEnemyInfo = enemyInfo[waveInfo[i]];
         let mobDiv = document.createElement("div");
@@ -6361,50 +6401,53 @@ function spawnMob(adventureVideo,waveInfo) {
 
         mobDiv.enemyID = singleEnemyInfo;
         mobDiv.classList.add("enemy");
+        adventureVariables.specialty === 'Workshop' ? mobDiv.classList.add("wide-enemy") : null;
+
         mobDiv.append(mobImg);
         adventureVideo.append(mobDiv);
     }
     return adventureVideo;
 }
 
-let fightSceneOn = false;
-let pheonixMode = false;
 function triggerFight() {
     if (!adventureScene) {return}
-    fightSceneOn = true;
-    skillCooldownReset = false;
-    pheonixMode = !advDict.rankDict[20].Locked ? true : false;
+    adventureVariables.fightSceneOn = true;
+    adventureVariables.pheonixMode = advDict.rankDict[20].Locked ? false : true;
 
-    let advLevel = Array.isArray(quickType) ? quickType[1] : quickType;
-    let currentATK;
+    skillCooldownReset = false;
+
     adventureWorker.postMessage({
         function: 'calculateDamage',
-        args:[advDict.adventureRank,advDict.morale]
+        args:[advDict.adventureRank, advDict.morale]
     })
 
     adventureWorker.onmessage = function(event) {
         if (event.data.function === 'calculateDamage') {
-            currentATK = event.data.result;
+            battleVariables.currentATK = event.data.result;
         }
     }
 
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
-    adventureVideo.quicktime = 0;
-    adventureVideo.guardtime = 0;
-    adventureVideo.doubleAtkCooldown = 1;
-    adventureVideo.defenseMob = null;
-
-    let adventureVideoChildren = adventureVideo.children;
+    battleVariables = {
+        quicktime: 0,
+        guardtime: 0,
+        doubleAtkCooldown: 1,
+        defenseMob: null,
+        healthLost: 0,
+        maxHealth: Math.ceil(5 + Math.floor(advDict.adventureRank / 4) * (activeLeader == "Nahida" ? 1.2 : 1))
+    }
+    
     let currentSong;
     if (adventureScaraText) {
         currentSong = 4;
-    } else if (advLevel == 13) {
+    } else if (adventureVariables.advType >= 13) {
         currentSong = randomInteger(5,7);
     } else {
         currentSong = randomInteger(1,4);
     }
 
+    let adventureVideoChildren = adventureVideo.children;
     // LEFTOVER BGM FROM SCARA BOSS
         // let mobDiv = adventureVideoChildren[2];
         // if (mobDiv.enemyID.HP == 2666) {
@@ -6418,12 +6461,9 @@ function triggerFight() {
     fightBgmElement.addEventListener('canplaythrough', () => {fightBgmElement.play();})
 
     let healthDiv = document.getElementById("adventure-health");
-    healthDiv.healthLost = 0;
     healthDiv.style.opacity = 1;
 
     let healthBar = document.getElementById("health-bar");
-    healthBar.maxHealth = 5 + Math.floor(advDict.adventureRank / 4);
-    if (activeLeader == "Nahida") {healthBar.maxHealth = Math.ceil(1.2 * healthBar.maxHealth)}
     healthBar.currentWidth = 100;
     healthBar.classList.add("adventure-health");
     healthBar.style.width = "100%";
@@ -6436,7 +6476,7 @@ function triggerFight() {
         if (healthBar.classList.contains("adventure-scara-barHealth")) {healthBar.classList.remove("adventure-scara-barHealth")}
     };
 
-    for (let i = 0; i < healthBar.maxHealth; i++) {
+    for (let i = 0; i < battleVariables.maxHealth; i++) {
         let health = document.createElement("div");
         health.classList.add("heart-bit","flex-column");
         if (adventureScaraText) {health.style.borderRight = "0.1em solid #333553"};
@@ -6447,14 +6487,14 @@ function triggerFight() {
         healthDiv.append(health);
     }
 
-    let adventureFightImg = document.getElementById("adventure-fight").children;
+    const adventureFightImg = document.getElementById("adventure-fight").children;
     for (let i = 1; i < 4; i++) {
         let advImage = adventureFightImg[i].children[0];
         advImage.src = `./assets/expedbg/battle${adventureScaraText}${i}.webp`;
         advImage.id = `adventure-image-${i}`;
         if (advImage.classList.contains('dim-filter')) {advImage.classList.remove('dim-filter')}
 
-        let adventureAtkCooldown = document.createElement("div");
+        const adventureAtkCooldown = document.createElement("div");
         adventureAtkCooldown.classList.add(`adventure-atk-cooldown${adventureScaraText}`,"flex-row");
 
         let normalAtkCooldown = document.createElement("div");
@@ -6504,8 +6544,8 @@ function triggerFight() {
             adventureAtkCooldown.appendChild(barBit)
         }
 
-        let frames_per_second = 60;
-        let interval = Math.floor(1000 / frames_per_second);
+        const frames_per_second = 60;
+        const interval = Math.floor(1000 / frames_per_second);
         let startTime = performance.now();
         let previousTime = startTime;
 
@@ -6514,7 +6554,7 @@ function triggerFight() {
 
         window.requestAnimationFrame(increaseCooldownBar);
         function increaseCooldownBar(timestamp) {
-            if (!fightSceneOn) {return}
+            if (!adventureVariables.fightSceneOn) {return}
             currentTime = timestamp;
             deltaTime = currentTime - previousTime;
           
@@ -6540,11 +6580,11 @@ function triggerFight() {
         adventureFightImg[i].appendChild(adventureAtkCooldown);
     }
     
+    // NOTE WHAT IS ADVENUTER VIDEO CHILDREN: CHANGE TO QUERY SELECTOR FOR ENEMY
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         let mobDiv = adventureVideoChildren[i];
-        if (mobDiv.tagName != 'DIV') {continue}
-        if (mobDiv.id == 'adventure-health') {continue}
-        mobDiv.children[0].style.animation = `vibrate ${randomInteger(600,1200)/100}s linear infinite both`;
+        if (mobDiv.tagName != 'DIV' || !mobDiv.classList.contains('enemy')) {continue};
+        mobDiv.children[0].style.animation = `vibrate ${adventureVariables.specialty === 'Workshop' ? randomInteger(2000,2400) / 100 : randomInteger(600,1200) / 100}s linear infinite both`;
 
         let singleEnemyInfo = mobDiv.enemyID;
         let mobHealth = document.createElement("div");
@@ -6560,7 +6600,7 @@ function triggerFight() {
         mobDiv.attackTime = animationTime;
 
         let mobAtkIndicator = document.createElement("img");
-        mobAtkIndicator.skirmish = (advLevel == 13) ? true : false;
+        mobAtkIndicator.skirmish = (adventureVariables.advType == 13) ? true : false;
         mobAtkIndicator.defence = false;
         mobAtkIndicator.firstLoad = true;
         mobAtkIndicator.doubleAtk = false;
@@ -6568,11 +6608,8 @@ function triggerFight() {
         let canvas = document.createElement("canvas");
         canvas.classList.add("atk-indicator");
         mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
-        if (mobHealth.class == "Superboss") {
-            mobAtkIndicator.src = `./assets/icon/atkIndicator-boss.webp`;
-        }
 
-        canvas.brightness = 0 - 0.1 * (i * randomInteger(1,adventureVideoChildren.length) - 2);
+        canvas.brightness = 0 - 0.1 * (i * randomInteger(1, adventureVideoChildren.length) - 2);
         mobAtkIndicator.onload = () => {
             canvas.width = mobAtkIndicator.naturalWidth;
             canvas.height = mobAtkIndicator.naturalHeight;
@@ -6592,8 +6629,8 @@ function triggerFight() {
                 mobAtkIndicator.firstLoad = false;
             }
 
-            let frames_per_second = 60;
-            let interval = Math.floor(1000 / frames_per_second);
+            const frames_per_second = 60;
+            const interval = Math.floor(1000 / frames_per_second);
             let startTime = performance.now();
             let previousTime = startTime;
 
@@ -6601,17 +6638,18 @@ function triggerFight() {
             let deltaTime = 0;
 
             function increaseBrightness(timestamp) {
-                if (!fightSceneOn) {return}
+                if (!adventureVariables.fightSceneOn) {return}
                 if (mobHealth.dead) {return}
+
                 currentTime = timestamp;
                 deltaTime = currentTime - previousTime;
               
                 // ATTACKS ARE FASTER WHEN MORE ENEMIES ARE DOWN
                 if (deltaTime > interval) {
                     previousTime = currentTime - (deltaTime % interval);
-                    let speedUpFactor = 1 + (maxEnemyAmount - enemyAmount) * 0.75;
+                    const speedUpFactor = 1 + (adventureVariables.maxEnemyAmount - adventureVariables.currentEnemyAmount) * 0.75;
                     if (mobAtkIndicator.defence) {
-                        if (enemyAmount == 1) {
+                        if (adventureVariables.currentEnemyAmount === 1) {
                             guardStance(mobDiv,"exit");
                         } else {
                             canvas.style.filter = `brightness(1)`;
@@ -6622,11 +6660,11 @@ function triggerFight() {
                     }
 
                     if (!quicktimeAttack) {
-                        canvas.brightness += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100 * (mobAtkIndicator.doubleAtk == true ? 3 : 1));
-                        adventureVideo.quicktime += (brightnessIncrement * speedUpFactor);
-                        adventureVideo.guardtime += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
+                        canvas.brightness += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100 * (mobAtkIndicator.doubleAtk == true ? 2.5 : 1));
+                        battleVariables.quicktime += (brightnessIncrement * speedUpFactor);
+                        battleVariables.guardtime += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
                         quicktimeCheck();
-                        if (enemyAmount > 1 && canvas.brightness < 0.8) guardStance(mobDiv,"check");
+                        if (adventureVariables.currentEnemyAmount > 1 && canvas.brightness < 0.8) guardStance(mobDiv,"check");
                     }
 
                     if (canvas.attackState) {
@@ -6660,8 +6698,8 @@ function triggerFight() {
                     }
 
                     if (canvas.brightness > maxBrightness) {
-                        canvas.attackState = true;
                         if (canvas.classList.contains("attack-ready")) {canvas.classList.remove("attack-ready")}
+                        canvas.attackState = true;
                         canvas.brightness = 0;
                         canvas.style.transform = ``;
                         canvas.style.filter = `brightness(0)`;
@@ -6679,22 +6717,24 @@ function triggerFight() {
             }
         }
 
+        // CHECK IF THERE IS CURRENTLY A GUARD AND THAT THE GUARD IS NOT THE MOB ITSELF
         function guardCheck() {
-            return !(adventureVideo.defenseMob != mobDiv && adventureVideo.defenseMob != null)
+            return !(battleVariables.defenseMob != mobDiv && battleVariables.defenseMob != null)
         }
 
         // MOB NEXT ATTACK IS DOUBLE ATTACK
         function doubleAttack() {
             if (!mobAtkIndicator.skirmish) {return}
-            if (adventureVideo.doubleAtkCooldown > 1) {
-                adventureVideo.doubleAtkCooldown -= 1;
+            if (battleVariables.doubleAtkCooldown > 1) {
+                battleVariables.doubleAtkCooldown -= 1;
             } else {
                 let doubleRoll = randomInteger(1,101);
                 if (doubleRoll > -1) {
+                    battleVariables.doubleAtkCooldown = 5;
+
                     mobAtkIndicator.doubleAtk = "parry";
                     mobAtkIndicator.src = `./assets/icon/doubleAtk.webp`;
                     canvas.style.animation = `tada ${randomInteger(12,18)/10}s linear`;
-                    adventureVideo.doubleAtkCooldown = 5;
                 }
             }
         }
@@ -6703,42 +6743,45 @@ function triggerFight() {
         function guardStance(mobDiv,type) {
             if (!mobAtkIndicator.skirmish) {return}
             if (type === "exit") {
-                adventureVideo.defenseMob = null;
-                adventureVideo.guardtime = 0;
+                battleVariables.defenseMob = null;
+                battleVariables.guardtime = 0;
                 mobAtkIndicator.defence = false;
+
                 canvas.brightness = 0.25;
                 canvas.style.animation = ``;
                 void canvas.offsetWidth;
                 mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
             } else if (type === "check") {
-                if (!(adventureVideo.defenseMob)) {
-                    if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * 0.75)) {
+                if (!(battleVariables.defenseMob)) {
+                    if (battleVariables.guardtime >= (2.5 * adventureVariables.maxEnemyAmount * 0.75)) {
                         let guardRoll = randomInteger(1,101);
                         if (guardRoll > 1) {
+                            battleVariables.defenseMob = mobDiv;
+                            battleVariables.guardtime = 0;
+
                             mobAtkIndicator.defence = true;
-                            canvas.style.animation = `tada ${randomInteger(12,18)/10}s linear`;
                             mobAtkIndicator.src = `./assets/icon/shield.webp`;
-                            adventureVideo.defenseMob = mobDiv;
-                            adventureVideo.guardtime = 0;
+                            canvas.style.animation = `tada ${randomInteger(12,18)/10}s linear`;
                         }
                     }
                 }
             } else if (type === "refresh") {
-                if (adventureVideo.guardtime >= (2.5 * maxEnemyAmount * 0.75)) {
-                    guardStance(mobDiv,"exit");
+                if (battleVariables.guardtime >= (2.5 * adventureVariables.maxEnemyAmount * 0.75)) {
+                    guardStance(mobDiv, "exit");
                     return;
                 }
             }
         }
 
         mobDiv.children[0].addEventListener("click",()=>{
-            if (!fightSceneOn) {return}
-            if (mobHealth.dead) {return}
-            if (quicktimeAttack) {return}
+            if (!adventureVariables.fightSceneOn || mobHealth.dead || quicktimeAttack) {return}
             let attackMultiplier = 1;
+            const guardCheckBool = guardCheck();
 
+            // CHECK IF PARRY IS BEING USED
             if (document.getElementById('select-indicator')) {
-                // CHECK IF PARRY IS BEING USED
+                if (activeLeader == "Ei") {attackMultiplier = 1.35}
+                // IF TIMING WAS CORRECT
                 if (canvas.classList.contains("attack-ready")) {
                     // if (mobHealth.class != "Superboss") {
                     canvas.attackState = false;
@@ -6747,79 +6790,72 @@ function triggerFight() {
                     
                     setTimeout(()=>{
                         mobDiv.children[0].classList.remove("staggered");
-                    },animationTime * 150);
+                    }, Math.max(animationTime * 150, 500));
 
-                    canvas.brightness = 0;
+                    canvas.brightness = 0 - (randomInteger(0,10) / 10);
                     canvas.style.transform = ``;
                     canvas.style.filter = `brightness(0)`;
-                    if (guardCheck()) {
-                        createBattleText("counter", animationTime * 150 * 2, mobDiv);
-                        loseHP(mobHealth.atk / 2, "inverse");
-                    } else {
-                        createBattleText("guard", animationTime * 150 * 2, mobDiv);
-                    }
 
-                    if (mobAtkIndicator.doubleAtk == true) {
+                    if (mobAtkIndicator.doubleAtk === true) {
                         mobAtkIndicator.doubleAtk = false;
                         mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+
                         canvas.style.animation = ``;
                         void canvas.offsetWidth;
                     } else if (mobAtkIndicator.doubleAtk == "parry") {
                         mobAtkIndicator.doubleAtk = true;
                     }
                     
-                    // } LEFTOVER FROM SUPERBOSS
-                    // } else {
-                    //     mobDiv.children[0].classList.add("damaged");
-                    //     setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},animationTime * 150);
-                    // }
-
-                    if (activeLeader == "Ei") {attackMultiplier = 1.35}
                     // CHECKS IF SKILL MARKED
-                    if (mobDiv.children[0].children[0]) {
-                        if (guardCheck()) {
-                            mobHealth.health -= (currentATK * attackMultiplier);
+                    if (mobDiv.children[0].querySelector('.skill-mark')) {
+                        if (guardCheckBool) {
+                            mobHealth.health -= (battleVariables.currentATK * attackMultiplier);
                             loseHP(mobHealth.atk / 2, "inverse");
                         } else {
-                            mobHealth.health -= (currentATK * attackMultiplier * 0.25);
+                            mobHealth.health -= (battleVariables.currentATK * attackMultiplier * 0.25);
                         }
-                        mobDiv.children[0].children[0].remove();
-                        let cooldown = document.getElementById('adventure-cooldown-1');
+
+                        mobDiv.children[0].querySelector('.skill-mark').remove()
+
+                        const cooldown = document.getElementById('adventure-cooldown-1');
                         cooldown.amount += 15;
                     }
 
+                    if (guardCheckBool) {
+                        mobHealth.health -= (battleVariables.currentATK * attackMultiplier);
+                        loseHP(mobHealth.atk / 2, "inverse");
+                        createBattleText("counter", animationTime * 150 * 2, mobDiv);
+                    } else {
+                        mobHealth.health -= (battleVariables.currentATK * attackMultiplier * 0.25);
+                        createBattleText("guard", animationTime * 150 * 2, mobDiv);
+                    }
+
+                    if (!advDict.rankDict[10].Locked) {
+                        const cooldown = document.getElementById('adventure-cooldown-3');
+                        cooldown.amount += 25 + (adventureVariables.advType === 13 ? 5 : 0);
+                    }
+                    
                     parrySuccess.load();
                     parrySuccess.play();
                     comboHandler("add");
-
-                    if (guardCheck()) {
-                        mobHealth.health -= (currentATK * attackMultiplier);
-                    } else {
-                        mobHealth.health -= (currentATK * attackMultiplier * 0.25);
-                    }
-                    if (activeLeader == "Ei") {attackMultiplier = 1}
-                    if (!advDict.rankDict[10].Locked) {
-                        let cooldown = document.getElementById('adventure-cooldown-3');
-                        cooldown.amount += 25;
-                        if ((advLevel == 13)) {cooldown.amount += 5}
-                    }
                 } else {
                     mobDiv.children[0].classList.add("damaged");
-                    setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},animationTime * 150);
+                    setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")}, Math.max(animationTime * 150, 500));
+
                     parryFailure.load();
                     parryFailure.play();
                     comboHandler("reset");
                     if (!advDict.rankDict[10].Locked) {
-                        let cooldown = document.getElementById('adventure-cooldown-3');
+                        const cooldown = document.getElementById('adventure-cooldown-3');
                         cooldown.amount += 10;
                     }
                 }
 
-                if (guardCheck()) {
-                    mobHealth.health -= currentATK;
+                if (guardCheckBool) {
+                    mobHealth.health -= battleVariables.currentATK;
                 } else {
-                    mobHealth.health -= (currentATK * 0.25);
-                    createBattleText("guard",animationTime * 150 * 2,mobDiv);
+                    mobHealth.health -= (battleVariables.currentATK * 0.25);
+                    createBattleText("guard", animationTime * 150 * 2, mobDiv);
                     doubleAttack();
                 }
 
@@ -6828,28 +6864,28 @@ function triggerFight() {
                 dodgeOn("close");
             } else {
                 // NO PARRY IS BEING USED
-                attackMultiplier = comboHandler("check",attackMultiplier);
+                attackMultiplier = comboHandler("check", attackMultiplier);
                 // NAHIDA UPGRADE CHECKER
                 let nahidaMultiplier = 0;
                 for (let key in upgradeDict[0]["milestone"]) {
                     if (upgradeDict[0]["milestone"][key]) {nahidaMultiplier += 3}
                 }
 
-                if (guardCheck()) {
-                    mobHealth.health -= (((currentATK + nahidaMultiplier) * attackMultiplier * specialClick)/ 5);
+                if (guardCheckBool) {
+                    mobHealth.health -= (((battleVariables.currentATK + nahidaMultiplier) * attackMultiplier * specialClick)/ 5);
                 } else {
-                    mobHealth.health -= (((currentATK + nahidaMultiplier) * attackMultiplier * specialClick)/ 5 * 0.25);
+                    mobHealth.health -= (((battleVariables.currentATK + nahidaMultiplier) * attackMultiplier * specialClick)/ 5 * 0.25);
                 }
                 attackMultiplier = 1;
             }
 
             if (mobHealth.health <= 0) {
                 mobHealth.dead = true;
-                enemyAmount--;
-                if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
-                if (adventureVideo.defenseMob == mobDiv) {
-                    adventureVideo.defenseMob = null;
-                    adventureVideo.guardtime = 0;
+                adventureVariables.currentEnemyAmount--;
+                if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)}, randomInteger(1,100))}
+                if (battleVariables.defenseMob == mobDiv) {
+                    battleVariables.defenseMob = null;
+                    battleVariables.guardtime = 0;
                 }
 
                 mobDiv.children[0].style.animation = "";
@@ -6858,70 +6894,62 @@ function triggerFight() {
                 fightEnemyDownElement.play();
                 mobHealth.remove();
 
-                if (!advDict.rankDict[8].Locked) {
-                    loseHP(1,"inverse");
-                }
+                if (!advDict.rankDict[8].Locked) {loseHP(1,"inverse");}
                 let mobChildArray = mobDiv.children;
                 while (mobChildArray.length > 1) {
                     mobChildArray[mobChildArray.length - 1].remove();
                 }
-                if (enemyAmount === 0) {
-                    winAdventure();
-                }
+
+                if (adventureVariables.currentEnemyAmount === 0) {winAdventure();}
             }
             mobHealth.style.width = `${Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100}%`
         })
-        mobDiv.append(mobHealth,canvas);
+        mobDiv.append(mobHealth, canvas);
     }
 
     // SPAWNS QUICKTIME EVENT AFTER TIME
     function quicktimeCheck() {
-        if (adventureVideo.quicktime >= (2.5 * maxEnemyAmount)) {
-            if (Array.isArray(quickType)) {
-                let quicktimeArray = quickType[0];
-                let atkValue = quickType[1];
+        if (adventureVariables.quicktimeEnabled && battleVariables.quicktime >= (2.5 * adventureVariables.maxEnemyAmount) && !document.getElementById('warning-quicktime')) {
+            const quicktimeArray = adventureVariables.quickType;
+            battleVariables.quicktime = 0;
 
-                adventureVideo.quicktime = 0;
-                if (document.getElementById('warning-quicktime')) {return}
+            let warningImg = new Image();
+            warningImg.id = "warning-quicktime";
+            warningImg.src = "./assets/icon/warning.webp";
+            warningImg.classList.add("quicktime-warning");
+            adventureVideo.appendChild(warningImg);
 
-                let warningImg = new Image();
-                warningImg.id = "warning-quicktime";
-                warningImg.src = "./assets/icon/warning.webp";
-                warningImg.classList.add("quicktime-warning");
-                adventureVideo.appendChild(warningImg);
-
-                adventurePreload.fetch(["./assets/expedbg/Blue.webp","./assets/expedbg/Red.webp","./assets/expedbg/Green.webp"])
-                warningImg.onload = ()=>{
-                    warningImg.addEventListener("animationend",()=>{
-                        quicktimeEvent(quicktimeArray[randomInteger(1,Object.keys(quicktimeArray).length+1)],atkValue);
-                        warningImg.remove();
-                    })
-                }
+            adventurePreload.fetch(["./assets/expedbg/Blue.webp","./assets/expedbg/Red.webp","./assets/expedbg/Green.webp"]);
+            warningImg.onload = ()=>{
+                warningImg.addEventListener("animationend",()=>{
+                    quicktimeEvent(quicktimeArray[randomInteger(1, Object.keys(quicktimeArray).length + 1)], battleVariables.currentATK);
+                    warningImg.remove();
+                })
             }
         }
     }
 }
 
-function createBattleText(text,timer,container) {
+function createBattleText(text, timer, container) {
     let textBox = document.createElement("img");
     textBox.classList.add("flex-column","battle-text")
     textBox.src = `./assets/expedbg/${text}.webp`;
-    setTimeout(()=>{textBox.remove()},timer);
+    setTimeout(()=>{textBox.remove()}, timer);
     container.append(textBox);
     return container;
 }
 
 function quicktimeEvent(waveQuicktime,advLevel) {
-    if (!fightSceneOn) {return}
+    if (!adventureVariables.fightSceneOn) {return}
     quicktimeAttack = true;
 
-    let adventureVideo = document.getElementById('adventure-video');
-    let videoOverlay = document.createElement("div");
+    const adventureVideo = document.getElementById('adventure-video');
+    const videoOverlay = document.createElement("div");
     videoOverlay.id = "quicktime-overlay";
     videoOverlay.classList.add("flex-column");
 
-    let adventureText = document.getElementById('adventure-text');
-    let textOverlay = document.createElement("div");
+    const adventureText = document.getElementById('adventure-text');
+    const textOverlay = document.createElement("div");
     textOverlay.classList.add("text-overlay","cover-all","flex-row");
 
     let textBox = document.createElement('p');
@@ -6933,7 +6961,7 @@ function quicktimeEvent(waveQuicktime,advLevel) {
     let correctBeat = 0;
     let removeBeat = false;
     
-    let quicktimeBar = document.createElement("div");
+    const quicktimeBar = document.createElement("div");
     quicktimeBar.id = "quicktime-bar";
     quicktimeBar.state = null;
     quicktimeBar.classList.add("flex-row","quicktime-bar");
@@ -6951,7 +6979,7 @@ function quicktimeEvent(waveQuicktime,advLevel) {
             } else if (quicktimeBar.state == "ready"){
                 currentBeat++;
                 quicktimeBar.state = null;
-                createBattleText("miss",2000,videoOverlay);
+                createBattleText("miss", 2000, videoOverlay);
                 removeBeat = true;
             }
         })
@@ -6974,7 +7002,7 @@ function quicktimeEvent(waveQuicktime,advLevel) {
 
         // ALLOWS BEAT TO GO IN REVERSE DIRECTION
         let inverseDirection = false;
-        if (advLevel == 13) {
+        if (advLevel >= 13) {
             if (randomInteger(1,101) > 50) {
                 inverseDirection = true;
                 beatImage.style.left = "-10%";
@@ -6987,15 +7015,15 @@ function quicktimeEvent(waveQuicktime,advLevel) {
         }
     
         beatImage.onload = () => {
-            let frames_per_second = 60;
-            let interval = Math.floor(1000 / frames_per_second);
+            const frames_per_second = 60;
+            const interval = Math.floor(1000 / frames_per_second);
             let previousTime = performance.now();
     
             let currentTime = 0;
             let deltaTime = 0;
             window.requestAnimationFrame(increaseGlow);
             function increaseGlow(timestamp) {
-                if (!fightSceneOn) {return}
+                if (!adventureVariables.fightSceneOn) {return}
                 if (removeBeat) {
                     removeBeat = false;
                     beatImage.style.animation = "puffOut 0.25s linear";
@@ -7033,7 +7061,7 @@ function quicktimeEvent(waveQuicktime,advLevel) {
     }
 
     function outcomeCheck(advLevel) {
-        if (currentBeat == maxBeat) {
+        if (currentBeat === maxBeat) {
             textBox.innerHTML = `You successfully countered <span style='color:#A97803'>${correctBeat}</span> out of <span style='color:#A97803'>${maxBeat}</span> ranged attacks!`;
             setTimeout(()=>{
                 videoOverlay.remove();
@@ -7054,11 +7082,14 @@ function quicktimeEvent(waveQuicktime,advLevel) {
                     case 3:
                         atkNumber = 1;
                         break;
+                    default:
+                        atkNumber = 1;
+                        break;
                 }
 
                 atkNumber = atkNumber * (maxBeat - correctBeat);
                 if (atkNumber > 0) {
-                    loseHP(atkNumber,"normal","Quicktime");
+                    loseHP(atkNumber, "normal", "Quicktime");
                 }
             },2000)
         } else if (currentBeat < maxBeat) {
@@ -7072,23 +7103,24 @@ function quicktimeEvent(waveQuicktime,advLevel) {
 }
 
 function loseHP(ATK,type,mobClass) {
-    if (!fightSceneOn) {return}
-    // if (beta) {return}
+    if (!adventureVariables.fightSceneOn) {return}
+    if (beta) {return}
 
-    let healthBar = document.getElementById('health-bar');
-    let hpInterval = (100/healthBar.maxHealth);
+    const healthBar = document.getElementById('health-bar');
+    let hpInterval = (100 / battleVariables.maxHealth);
     let adventureHealth = document.getElementById('adventure-health');
 
-    if (type == "inverse") {
+    if (type === "inverse") {
         healthBar.currentWidth += (hpInterval * ATK);
         if (healthBar.currentWidth > 100) {healthBar.currentWidth = 100}
     } else {
-        adventureHealth.healthLost += ATK;
+        battleVariables.healthLost += ATK;
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
-        if (mobClass != "Superboss") {
-            comboHandler("reset");
-        }
+
+        // if (mobClass != "Superboss") {
+        comboHandler("reset");
+        
 
         adventureHealth.style.animation = 'shake 1s infinite linear';
         setTimeout(()=>{
@@ -7099,11 +7131,12 @@ function loseHP(ATK,type,mobClass) {
 
     healthBar.style.width = `${healthBar.currentWidth}%`;
     if (healthBar.currentWidth <= 0) {
-        if (pheonixMode == true) {
-            pheonixMode = false;
+        if (adventureVariables.pheonixMode) {
+            adventureVariables.pheonixMode = false;
+
             healthBar.currentWidth += (hpInterval * 3);
-            createBattleText("endure",2000,document.getElementById('adventure-video'));
             healthBar.style.width = `${healthBar.currentWidth}%`;
+            createBattleText("endure",2000,document.getElementById('adventure-video'));
         } else {
             loseAdventure();
         }
@@ -7111,64 +7144,48 @@ function loseHP(ATK,type,mobClass) {
 }
 
 let dodgeAppearance = false;
-function dodgeOn(type,parentEle) {
-    if (!fightSceneOn) {return}
-    if (quicktimeAttack) {return}
+function dodgeOn(type) {
+    if (!adventureVariables.fightSceneOn || quicktimeAttack) {return}
     if (type === "toggle") {
         let cooldown = document.getElementById('adventure-cooldown-1')
         if (cooldown.amount < 100) {return}
         if (dodgeAppearance) {
-            let adventureVideo = document.getElementById("adventure-video");
-            let adventureVideoChildren = adventureVideo.children;
-            for (let i = 0; i < adventureVideoChildren.length; i++) {
-                let mobDiv = adventureVideoChildren[i];
-                if (mobDiv.tagName != 'DIV') {continue};
-                if (mobDiv.id == 'adventure-health') {continue};
-                for (let j = 0; j < mobDiv.children.length; j++) {
-                    if (mobDiv.children[j].id == "select-indicator") {
-                        mobDiv.children[j].remove();
-                    }
-                }
-            }
+            const adventureVideo = document.getElementById("adventure-video");
+            let selectIndicator = adventureVideo.querySelectorAll('.select-indicator');
+            selectIndicator.forEach((ele) => {
+                ele.remove();
+            })
 
-            let button = document.getElementById("battle-toggle");
+            const button = document.getElementById("battle-toggle");
             if (button.classList.contains("battle-selected")) {button.classList.remove("battle-selected")}
             if (button.classList.contains("battle-selected-scara")) {button.classList.remove("battle-selected-scara")}
             dodgeAppearance = false;
         } else {
-            let adventureVideo = document.getElementById("adventure-video");
-            let adventureVideoChildren = adventureVideo.children;
+            const adventureVideo = document.getElementById("adventure-video");
+            const adventureVideoChildren = Array.from(adventureVideo.children).filter((child) => child.tagName === "DIV");
             for (let i = 0; i < adventureVideoChildren.length; i++) {
-                let mobDiv = adventureVideoChildren[i];
-                if (mobDiv.tagName != 'DIV') {continue};
-                if (mobDiv.id == 'adventure-health') {continue};
-                if (mobDiv.children[1] == undefined) {continue};
+                const mobDiv = adventureVideoChildren[i];
+                if (!mobDiv.classList.contains('enemy') || mobDiv.children[1] == undefined) {continue};
 
-                let mobAtkIndicator = document.createElement("img");
+                const mobAtkIndicator = document.createElement("img");
                 mobAtkIndicator.classList.add("select-indicator");
                 mobAtkIndicator.id = "select-indicator";
                 mobAtkIndicator.src = `./assets/icon/selectIndicator${adventureScaraText}.webp`
                 mobDiv.appendChild(mobAtkIndicator);
             }
 
-            let button = document.getElementById("battle-toggle");
+            const button = document.getElementById("battle-toggle");
             button.classList.add(`battle-selected${adventureScaraText}`);
             dodgeAppearance = true;
         }
     } else if (type === "close") {
-        let adventureVideo = document.getElementById("adventure-video");
-        let adventureVideoChildren = adventureVideo.children;
-        for (let i = 0; i < adventureVideoChildren.length; i++) {
-            let mobDivChild = adventureVideoChildren[i].children;
-            for (let j = 0; j < mobDivChild.length; j++) {
-                if (mobDivChild[j].id == "select-indicator") {
-                    mobDivChild[j].remove();
-                    continue;
-                }
-            }
-        }
+        const adventureVideo = document.getElementById("adventure-video");
+        let selectIndicator = adventureVideo.querySelectorAll('.select-indicator');
+        selectIndicator.forEach((ele) => {
+            ele.remove();
+        })
 
-        let button = document.getElementById("battle-toggle");
+        const button = document.getElementById("battle-toggle");
         if (button.classList.contains("battle-selected")) {button.classList.remove("battle-selected")}
         if (button.classList.contains("battle-selected-scara")) {button.classList.remove("battle-selected-scara")}
         dodgeAppearance = false;
@@ -7176,13 +7193,10 @@ function dodgeOn(type,parentEle) {
 }
 
 function skillUse() {
-    if (!fightSceneOn) {return}
-    if (advDict.rankDict[5].Locked) {return}
-    if (quicktimeAttack) {return}
+    if (!adventureVariables.fightSceneOn || advDict.rankDict[5].Locked || quicktimeAttack) {return}
     
-    let adventureVideo = document.getElementById("adventure-video");
-    let adventureVideoChildren = adventureVideo.children;
-    let cooldown = document.getElementById('adventure-cooldown-2');
+    const adventureVideoChildren = Array.from(document.getElementById("adventure-video").children).filter((child) => child.tagName === "DIV");
+    const cooldown = document.getElementById('adventure-cooldown-2');
     if (cooldown.amount < 100) {return}
 
     let resetChance = randomInteger(1,101);
@@ -7195,7 +7209,7 @@ function skillUse() {
         resetRoll = 20;
     }
 
-    if (resetChance <= resetRoll && skillCooldownReset == false) {
+    if (resetChance <= resetRoll && skillCooldownReset === false) {
         let resetButton = document.getElementById('battle-skill');
         let img = new Image();
         img.classList.add("cover-all");
@@ -7214,22 +7228,22 @@ function skillUse() {
     }
 
     for (let i = 0; i < adventureVideoChildren.length; i++) {
-        let mobDiv = adventureVideoChildren[i];
-        if (mobDiv.tagName != 'DIV') {continue};
-        if (mobDiv.id == 'adventure-health') {continue};
-        if (!mobDiv.children[1]) {continue};
+        const mobDiv = adventureVideoChildren[i];
+        if (!mobDiv.classList.contains('enemy') || mobDiv.children[1] == undefined) {continue};
+
+        if (mobDiv.querySelector('.skill-mark')) {
+            mobDiv.querySelector('.skill-mark').remove();
+        };
 
         let skillMark = new Image();
         skillMark.src = `./assets/icon/mark${adventureScaraText}.webp`;
 
-        if (mobDiv.children[0].children[0]) {
-            mobDiv.children[0].children[0].remove();
-        };
-
         let canvas = document.createElement("canvas");
-        mobDiv.children[0].appendChild(canvas);
         canvas.classList.add("skill-mark");
         canvas.brightness = 1;
+
+        mobDiv.children[0].appendChild(canvas);
+
         skillMark.onload = ()=> {
             canvas.width = skillMark.naturalWidth;
             canvas.height = skillMark.naturalHeight;
@@ -7239,8 +7253,8 @@ function skillUse() {
             let brightnessIncrement = 0.001;
             canvas.style.filter = "drop-shadow(0 0 0.2em #ADDE7D)";
 
-            let frames_per_second = 60;
-            let interval = Math.floor(1000 / frames_per_second);
+            const frames_per_second = 60;
+            const interval = Math.floor(1000 / frames_per_second);
             let previousTime = performance.now();
 
             let currentTime = 0;
@@ -7248,7 +7262,7 @@ function skillUse() {
 
             window.requestAnimationFrame(increaseGlow);
             function increaseGlow(timestamp) {
-                if (!fightSceneOn) {return}
+                if (!adventureVariables.fightSceneOn) {return}
                 currentTime = timestamp;
                 deltaTime = currentTime - previousTime;
                 
@@ -7265,35 +7279,29 @@ function skillUse() {
     }
 }
 
-function attackAll(adventureFightBurst) {
-    if (!fightSceneOn) {return}
-    if (advDict.rankDict[10].Locked) {return}
-    if (quicktimeAttack) {return}
+function attackAll() {
+    if (!adventureVariables.fightSceneOn || advDict.rankDict[10].Locked || quicktimeAttack) {return}
+
+    const cooldown = document.getElementById('adventure-cooldown-3');
+    if (cooldown.amount < 100) {return}
+    cooldown.amount -= 100;
 
     let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
     if (activeLeader == "Zhongli") {currentATK *= 1.50};
     if (advDict.morale > 80) {currentATK *= 1.10};
-    let attackMultiplier = 1;
-    attackMultiplier = comboHandler("check",attackMultiplier);
+
+    let attackMultiplier = comboHandler("check", 1);
     currentATK *= attackMultiplier;
 
-    let adventureVideo = document.getElementById("adventure-video");
-    let adventureVideoChildren = adventureVideo.children;
-
     let cooldownTime;
-    let cooldown = document.getElementById('adventure-cooldown-3');
-    if (cooldown.amount < 100) {return}
-    cooldown.amount -= 100;
-    
     parryFailure.load();
     parryFailure.play();
-    for (let i = 0; i < adventureVideoChildren.length; i++) {
-        let mobDiv = adventureVideoChildren[i];
-        if (mobDiv.tagName != 'DIV') {continue};
-        if (mobDiv.id == 'adventure-health') {continue};
-        if (!mobDiv.children[1]) {continue};
 
-        let mobHealth = mobDiv.children[1];
+    const adventureVideoChildren = Array.from(document.getElementById("adventure-video").children).filter((child) => child.tagName === "DIV");
+    for (let i = 0; i < adventureVideoChildren.length; i++) {
+        const mobDiv = adventureVideoChildren[i];
+        if (!mobDiv.classList.contains('enemy') || mobDiv.children[1] == undefined) {continue};
+
         let critRoll = randomInteger(1,101);
         let critThreshold = -1;
         if (!advDict.rankDict[18].Locked) {
@@ -7302,37 +7310,38 @@ function attackAll(adventureFightBurst) {
             critThreshold = 10;
         }
 
-        if (adventureVideo.defenseMob != null) {
+        if (battleVariables.defenseMob != null) {
             currentATK *= 0.5;
-            createBattleText("guard",2000,mobDiv);
             critThreshold = -1;
+            createBattleText("guard",2000,mobDiv);
         }
 
+        const mobHealth = mobDiv.children[1];
         if (critRoll <= critThreshold) {
-            createBattleText("crit",2000,mobDiv);
+            createBattleText("crit", 2000, mobDiv);
             mobHealth.health -= (currentATK * 4 * 1.5);
         } else {
             mobHealth.health -= (currentATK * 4);
         }
 
-        if (!cooldownTime) {cooldownTime = mobDiv.attackTime * 150}
+        if (!cooldownTime) {cooldownTime = Math.max(mobDiv.attackTime * 150, 500)}
         if (mobHealth.class != "Superboss") {
             mobDiv.children[0].classList.add("staggered");
-            setTimeout(()=>{mobDiv.children[0].classList.remove("staggered")},cooldownTime);
+            setTimeout(()=>{mobDiv.children[0].classList.remove("staggered")}, cooldownTime);
         } else {
             mobDiv.children[0].classList.add("damaged");
-            setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")},cooldownTime);
+            setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")}, cooldownTime);
         }
         
         if (mobHealth.health <= 0) {
             mobHealth.dead = true;
             if (bountyObject.hasOwnProperty(mobDiv.enemyType)) {setTimeout(()=>{completeBounty(mobDiv.enemyType)},randomInteger(1,100))}
-            if (adventureVideo.defenseMob == mobDiv) {
-                adventureVideo.defenseMob = null;
-                adventureVideo.guardtime = 0;
+            if (battleVariables.defenseMob == mobDiv) {
+                battleVariables.defenseMob = null;
+                battleVariables.guardtime = 0;
             }
 
-            enemyAmount--;
+            adventureVariables.currentEnemyAmount--;
 
             mobDiv.children[0].style.animation = "";
             mobDiv.style.filter = "grayscale(100%) brightness(20%)";
@@ -7342,16 +7351,14 @@ function attackAll(adventureFightBurst) {
             while (mobChildArray.length > 1) {
                 mobChildArray[mobChildArray.length - 1].remove();
             }
-            if (enemyAmount === 0) {
-                winAdventure();
-            }
 
+            if (adventureVariables.currentEnemyAmount === 0) { winAdventure();}
             continue;
         }
 
         mobHealth.style.width = `${Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100}%`;
         if (mobHealth.class != "Superboss") {
-            let canvas = mobDiv.children[2];
+            let canvas = mobDiv.querySelector('.atk-indicator');
             canvas.brightness = 0 - 0.05 * (i * randomInteger(1,adventureVideoChildren.length) - 2);
             canvas.style.transform = ``;
             canvas.style.filter = `brightness(0)`;
@@ -7360,32 +7367,33 @@ function attackAll(adventureFightBurst) {
 }
 
 function loseAdventure() {
-    if (!fightSceneOn) {return}
-    fightSceneOn = false;
+    if (!adventureVariables.fightSceneOn) {return}
+    adventureVariables.fightSceneOn = false;
 
     document.getElementById("combo-number").remove();
-    let adventureHeading = document.getElementById("adventure-header");
+    const adventureHeading = document.getElementById("adventure-header");
     adventureHeading.style.top = "10%";
     adventureHeading.innerText = "You passed out...";
-    let adventureChoiceOne = document.getElementById("adv-button-one");
+
+    const adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
     adventureChoiceOne.innerText = "Leave";
-    adventureChoiceOne.addEventListener("click",quitButton);
+    adventureChoiceOne.addEventListener("click", quitButton);
 
     let advButton = document.getElementById("adventure-button");
     let keyNumber = advButton.key;
     function quitButton() {
-        let xp = 5*(2**(imgKey[keyNumber].Level != 13 ? imgKey[keyNumber].Level : 5)) * additionalXP;
+        let level = imgKey[keyNumber].Level;
+        let xp = 5*(2**(level >= 1 && level <= 5 ? level : 5)) * additionalXP;
         gainXP(Math.round(xp));
 
         quitAdventure();
-        adventureChoiceOne.removeEventListener("click",quitButton);
+        adventureChoiceOne.removeEventListener("click", quitButton);
     }
 
-    let adventureVideo = document.getElementById("adventure-video");
+    const adventureVideo = document.getElementById("adventure-video");
     let targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator');
-    let len = targetElements.length;
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < targetElements.length; i++) {
         targetElements[i].remove();
     }
 
@@ -7406,17 +7414,16 @@ function loseAdventure() {
         fightLoseElement.load();
         fightLoseElement.play();
         fightLoseElement.addEventListener('ended',()=>{
-            setTimeout(()=>{if (!fightSceneOn) {bgmElement.play()}},300)
+            setTimeout(()=>{if (!adventureVariables.fightSceneOn) {bgmElement.play()}},300)
         })
     },300)
 }
 
 function winAdventure() {
-    if (!fightSceneOn) {return}
-    fightSceneOn = false;
+    if (!adventureVariables.fightSceneOn) {return}
+    adventureVariables.fightSceneOn = false;
 
-    let advButton = document.getElementById("adventure-button");
-    let keyNumber = advButton.key;
+    const keyNumber = document.getElementById("adventure-button").key;
     let adventureHeading = document.getElementById("adventure-header");
     adventureHeading.style.top = "1%";
     adventureHeading.innerText = "You won! You received some loot:";
@@ -7442,7 +7449,7 @@ function winAdventure() {
     }
 
     if (itemFirstRoll < itemFirstThreshold) {
-        if (levelLoot.hasOwnProperty("Bonus")) {
+        if (levelLoot && levelLoot.hasOwnProperty("Bonus")) {
             delete levelLoot["Bonus"];
         }   
     }
@@ -7462,14 +7469,13 @@ function winAdventure() {
         lootCounter++;
     }
 
-    let adventureRewards = document.getElementById("adventure-rewards");
-    adventureRewards.style.opacity = "1";
+    const adventureRewards = document.getElementById("adventure-rewards");
     for (let key in lootArray) {
         let itemInfo = Inventory[lootArray[key]];
         inventoryAdd(lootArray[key]);
 
         let lootDiv = document.createElement("div");
-        lootDiv = inventoryFrame(lootDiv,itemInfo,itemFrameColors)
+        lootDiv = inventoryFrame(lootDiv, itemInfo, itemFrameColors);
 
         if (key === "Bonus" || key === "Bonus2") {
             let bonus = new Image();
@@ -7480,18 +7486,27 @@ function winAdventure() {
         delete lootArray[key];
     }
 
-    let adventureChoiceOne = document.getElementById("adv-button-one");
+    if (adventureRewards.children.length === 0) {
+        adventureRewards.style.opacity = "0";
+        adventureRewards.style.flexGrow = "0";
+    } else {
+        adventureRewards.style.opacity = "1";
+        adventureRewards.style.flexGrow = "1";
+    }
+
+
+    const adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
     adventureChoiceOne.innerText = "Leave";
-    adventureChoiceOne.addEventListener("click",quitButton);
+    adventureChoiceOne.addEventListener("click", quitButton);
 
-    let adventureVideo = document.getElementById('adventure-video');
-    let nutReward = document.createElement('p');
+    const adventureVideo = document.getElementById('adventure-video');
+    const nutReward = document.createElement('p');
     nutReward.classList.add("adventure-currency");
     nutReward.value = saveValues["dps"] * 60 * 3 * (1.5**(imgKey[keyNumber].Level)) * randomInteger(90,100) / 100;
 
     if (imgKey[keyNumber].Level === 5) {
-        nutReward.gValue = randomInteger(3,10)*3+advDict.adventureRank;
+        nutReward.gValue = randomInteger(3,10)*3 + advDict.adventureRank;
         nutReward.innerHTML = `Gained:<br> ${abbrNum(nutReward.value)} [s]Nuts[/s]<br> ${nutReward.gValue} [s]Golden Nuts[/s]`;
 
         nutReward.style.color = '#333553';
@@ -7516,29 +7531,27 @@ function winAdventure() {
         charScan();
         updateMorale("recover",randomInteger(2,6));
 
-        let xp = 15*(2**(imgKey[keyNumber].Level != 13 ? imgKey[keyNumber].Level : 5)) * additionalXP;
-        gainXP(Math.round(xp));
+        let level = imgKey[keyNumber].Level;
+        gainXP(Math.round(15*(2**(level >= 1 && level <= 5 ? level : 5)) * additionalXP));
 
         document.getElementById("combo-number").remove();
         adventureChoiceOne.removeEventListener("click",quitButton);
-
-        if (nutReward.gValue === 0) {
-            currencyPopUp("items");
-        } else {
-            currencyPopUp("items",0,"nuts",(nutReward.gValue));
-        }
         
-        newPop(1);
-        sortList("table2");
+        if (adventureRewards.children.length >= 0) {
+            newPop(1);
+            sortList("table2");
+            nutReward.gValue === 0 ? currencyPopUp("items") : currencyPopUp("items",0,"nuts",(nutReward.gValue));
+        }
+
         let rewardChildren = adventureRewards.children;
         while (rewardChildren.length > 0) {
             rewardChildren[0].remove();
         }
     }
 
-    let adventureFight = document.getElementById("adventure-fight");
+    const adventureFight = document.getElementById("adventure-fight");
     adventureFight.style.display = "none";
-    let adventureEncounter = document.getElementById("adventure-encounter");
+    const adventureEncounter = document.getElementById("adventure-encounter");
     adventureEncounter.style.display = "flex";
 
     setTimeout(()=>{
@@ -7546,7 +7559,7 @@ function winAdventure() {
         fightWinElement.load();
         fightWinElement.play();
         fightWinElement.addEventListener('ended',()=>{
-            setTimeout(()=>{if (!fightSceneOn) {bgmElement.play()}},300)
+            setTimeout(()=>{if (!adventureVariables.fightSceneOn) {bgmElement.play()}},300)
         })
     },300)
 }
@@ -7557,6 +7570,8 @@ function quitAdventure() {
         spawnWorldQuest();
     }
     
+    adventureVariables = {};
+    battleVariables = {};
     let adventureArea = document.getElementById("adventure-area");
     adventureArea.style.zIndex = -1;
     adventureScene = false;
@@ -7586,9 +7601,8 @@ function quitAdventure() {
     if (document.getElementById('refresh-icon')) {document.getElementById('refresh-icon').remove()};
 
     if (adventureTreeDefense) {
-        let healthBar = document.getElementById('health-bar');
         adventureTreeDefense = false;
-        enemyBlock(true, adventureHealth.healthLost,healthBar.maxHealth);
+        enemyBlock(true, battleVariables.healthLost, battleVariables.maxHealth);
     }
 }
 
@@ -9476,7 +9490,6 @@ function destroyTree() {
                     persistentValues.ascendEle[boxElement[i + 1]] += lootArray[i];
                 }
             }
-            console.log(persistentValues.ascendEle)
         }
 
         choiceBox(mainBody, 'Materials harvested:', stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);

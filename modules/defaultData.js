@@ -264,6 +264,7 @@ const expeditionDictDefault = {
     10:"0",
     12:"0",
     13:"0",
+    14:"0",
 }
 
 const storeInventoryDefault = {
@@ -311,6 +312,12 @@ const enemyInfo = {
             5:[0.36,0.40,0.45,0.53,0.57],
         },
         13:{
+            1:[0.54,0.56],
+            2:[0.52,0.54,0.56],
+            3:[0.50,0.53,0.57],
+            4:[0.55,0.47,0.60],
+        },
+        14:{
             1:[0.54,0.56],
             2:[0.52,0.54,0.56],
             3:[0.50,0.53,0.57],
@@ -372,7 +379,7 @@ const enemyInfo = {
     402:{Class:"Boss",      Variation:1,   Type:"Fungi",       HP:1000,   ATK:2.5,    AtkCooldown:30},
     411:{Class:"Leader",    Variation:3,   Type:"Hilichurl",   HP:700,    ATK:2,    AtkCooldown:35},
     412:{Class:"Boss",      Variation:2,   Type:"Hilichurl",   HP:1000,   ATK:2.5,    AtkCooldown:35},
-    421:{Class:"Superboss", Variation:1,   Type:"Fatui",       HP:2666,   ATK:2.5,    AtkCooldown:50},
+    // 421:{Class:"Superboss", Variation:1,   Type:"Fatui",       HP:2666,   ATK:2.5,    AtkCooldown:50},
     431:{Class:"Mob",       Variation:3,   Type:"SAutomaton",   HP:700,   ATK:1.5,    AtkCooldown:30},
     432:{Class:"Boss",      Variation:2,   Type:"SAutomaton",   HP:1700,  ATK:2.5,    AtkCooldown:40},
     // LVL 5
@@ -387,7 +394,7 @@ const enemyInfo = {
     501:{Class:"Mob",       Variation:2,   Type:"WAbyss",      HP:600,   ATK:1.5,     AtkCooldown:30},
     502:{Class:"Leader",    Variation:2,   Type:"WAbyss",      HP:1100,   ATK:1.5,     AtkCooldown:40},
     503:{Class:"Boss",      Variation:1,   Type:"WAbyss",      HP:1700,   ATK:2.5,     AtkCooldown:40},
-    504:{Class:"Superboss", Variation:1,   Type:"WAbyss",      HP:3000,   ATK:2.5,     AtkCooldown:50},
+    // 504:{Class:"Superboss", Variation:1,   Type:"WAbyss",      HP:3000,   ATK:2.5,     AtkCooldown:50},
     511:{Class:"Mob",       Variation:3,   Type:"HAbyss",      HP:750,   ATK:1.5,   AtkCooldown:45},
     512:{Class:"Leader",    Variation:3,   Type:"HAbyss",      HP:1300,   ATK:2,     AtkCooldown:40},
     521:{Class:"Mob",       Variation:3,   Type:"Automaton",   HP:800,   ATK:1.5,   AtkCooldown:45},
@@ -400,6 +407,9 @@ const enemyInfo = {
     "13-Wave-2":{Wave:[1302,1302,1302],         BG:[4,6]},
     1301:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1700,   ATK:2,     AtkCooldown:40},
     1302:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1200,   ATK:1.5,     AtkCooldown:35},
+    // LVL 14
+    "14-Wave-1":{Wave:[1401],         BG:[1,1]},
+    1401:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:3000,   ATK:2,     AtkCooldown:35},
 }
 
 const upgradeDictDefault = {
