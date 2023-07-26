@@ -123,6 +123,8 @@ const persistentValuesDefault = {
     upgrade12:{Purchased: 0},
     treeSeeds:[0,0,0,0,0,0],
     leylinePower: 100,
+    harvestCount: 0,
+    
     ascendEle:{ "Pyro":0, "Hydro":0, "Dendro":0, "Electro":0, "Anemo":0, "Cryo":0, "Geo":0 },
     ascendDict:{
         "Nahida":0,
@@ -408,8 +410,10 @@ const enemyInfo = {
     1301:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1700,   ATK:2,     AtkCooldown:40},
     1302:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1200,   ATK:1.5,     AtkCooldown:35},
     // LVL 14
-    "14-Wave-1":{Wave:[1401],         BG:[1,1]},
-    1401:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:3000,   ATK:2,     AtkCooldown:35},
+    "14-Wave-3":{Wave:[1403],         BG:[3,3]},
+    "14-Wave-4":{Wave:[1404],         BG:[4,4]},
+    1403:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:3000,   ATK:2,     AtkCooldown:35},
+    1404:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:3000,   ATK:2,     AtkCooldown:35},
 }
 
 const upgradeDictDefault = {

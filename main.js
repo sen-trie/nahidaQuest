@@ -584,9 +584,9 @@ function loadSaveData() {
 
     if (beta) {
         if (persistentValues.challengeCheck === undefined) {
-            persistentValues.challengeCheck = challengeCheck('populate', 0, challengeInfo);
+            persistentValues.challengeCheck = challengeCheck('populate', challengeInfo);
         } else {
-            persistentValues.challengeCheck = challengeCheck('check', 0, persistentValues.challengeCheck, challengeInfo);
+            persistentValues.challengeCheck = challengeCheck('checkKeys', persistentValues.challengeCheck, challengeInfo);
         }
 
         updateObjectKeys(saveValues.treeObj, saveValuesDefault.treeObj);
@@ -680,6 +680,7 @@ function energyRoll() {
     if (clickDelay < 1){
         if (randInt < ENERGYCHANCE){
             saveValues["energy"] += randomInteger(lowerEnergyRate, upperEnergyRate);
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'energy', value: saveValues.energy}))
             clickDelay = 20;
         }
     }
@@ -4068,10 +4069,12 @@ function itemUse(itemUniqueId) {
     // LEVEL BOOKS
     } else if (itemID >= 4001 && itemID < XPMAX){
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'discount', value: saveValues.freeLevels}))
         refresh();
     // ENERGY POTS
     } else if (itemID >= 4011 && itemID < 4014){
         saveValues["energy"] += energyBuffPercent[Inventory[itemID].Star];
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'energy', value: saveValues.energy}))
         refresh();
     } else if (itemID === 4010) {
         saveValues["mailCore"]++;
@@ -5207,7 +5210,8 @@ function showCommisions() {
                 commCell.support.style.display = 'flex';
                 commCell.support.src = `./assets/tooltips/emoji/${commInfo.char[1]}.webp`;
 
-                let timeLeft = (commInfo.endTime - getTime()) / 1000 / 3600;
+                // console.log(commInfo.endTime, getTime(), (commInfo.endTime - getTime()) / 1000 / 3600)
+                let timeLeft = (commInfo.endTime - getTime()) / 60;
                 let ready = timeLeft <= 0;
                 commCell.time.ready = ready;
                 commCell.time.commId = `commision-cell-${i}/${commId}`;
@@ -5366,7 +5370,8 @@ function enterNewComm() {
     const id = commId.split('-')[1];
 
     saveValues.baseCommisions[id].progress = 'ongoing';
-    saveValues.baseCommisions[id].endTime = getTime() + saveValues.baseCommisions[id].duration * 3600 * 1000 * (commisionInfo[heroLeader.hero].perk === 'Lightweight' ? 0.85 : 1)
+    
+    saveValues.baseCommisions[id].endTime = getTime() + saveValues.baseCommisions[id].duration * 60 * (commisionInfo[heroLeader.hero].perk === 'Lightweight' ? 0.85 : 1)
     saveValues.baseCommisions[id].char = [heroLeader.hero, heroSupp.hero];
 
     persistentValues.commisionDict[heroLeader.hero].currentComm = commId;
@@ -5442,7 +5447,7 @@ function checkCommisions() {
         saveValues.currentCommisions.forEach((item) => {
             if (item.split('-')[0] === 'base') {
                 const baseId = item.split('-')[1];
-                const timeLeft = saveValues.baseCommisions[baseId].endTime - getTime() / 1000 / 3600;
+                const timeLeft = saveValues.baseCommisions[baseId].endTime - getTime();
                 if (timeLeft <= 0) {
                     notifPop("add","comm", item);
                 }
@@ -5978,12 +5983,25 @@ function drawAdventure(advType, wave) {
     
     const waveType = enemyInfo[`${advType}-Wave-${wave}`];
     const quicktimeEnabled = ((advType >= 3 && advType < 6) || advType >= 13);
+    let specialty = null;
+    if (advType === 14) {
+        switch (wave) {
+            case 3:
+                specialty = 'Workshop'
+                break;
+            case 4:
+                specialty = 'Finale'
+                break;
+            default:
+                break;
+        }
+    }
 
     adventureVariables = {
         quicktimeEnabled: quicktimeEnabled,  // BOOL
         quickType: quicktimeEnabled ? enemyInfo.quicktimeDict[advType] : null, // ARRAY
         advType: advType, // INTEGER
-        specialty: advType === 14 ? 'Workshop' :null,
+        specialty: specialty,
         waveType: waveType, // TWO ARRAYS
         currentEnemyAmount: waveType.Wave.length,
         maxEnemyAmount: waveType.Wave.length,
@@ -6043,7 +6061,19 @@ function drawAdventure(advType, wave) {
             adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
         } else {
             adventureHeading.innerText = "You encounter a hostile mob.";
-            adventureVariables.specialty === 'Workshop' ? adventureHeading.innerText = "You stand before the Prodigal, Everlasting Lord of Arcane Wisdom." : null;
+            switch (specialty) {
+                case 'Unusual':
+                    adventureHeading.innerText = "You stand before the Unusual Hilichurl, Menace of the Mansion."
+                    break;
+                case 'Workshop':
+                    adventureHeading.innerText = "You stand before the Prodigal, Everlasting Lord of Arcane Wisdom."
+                    break;
+                case 'Finale':
+                    adventureHeading.innerText = "You stand before the Doctor, The Second of the Fatui Harbingers."
+                    break;
+                default:
+                    break;
+            }
         }
         
         adventureHeading.style.animation = "fadeOut 1s ease-out reverse";
@@ -6171,7 +6201,7 @@ function continueQuest(advType) {
     if (infoDict.Type === "LuckCheck") {
         if (advType === "0_LuckCheck_Failure") {
             saveValues.energy -= 100;
-            saveValues.energy = Math.max(0,saveValues.energy);
+            saveValues.energy = Math.max(saveValues.energy, 0);
             quitQuest();
             return;
         } else if (advType === "0_LuckCheck_Success") {
@@ -6210,6 +6240,7 @@ function continueQuest(advType) {
         if (advType === "17_A" || advType === "3_A") {
             let energyRoll = Math.round(randomInteger(150,250) / 5) * 5;
             saveValues.energy += energyRoll;
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'energy', value: saveValues.energy}))
             currencyPopUp("energy",energyRoll);
         }
     } else if (infoDict.Type === "Treasure") {
@@ -7102,9 +7133,8 @@ function quicktimeEvent(waveQuicktime,advLevel) {
     adventureText.appendChild(textOverlay);
 }
 
-function loseHP(ATK,type,mobClass) {
+function loseHP(ATK, type, mobClass) {
     if (!adventureVariables.fightSceneOn) {return}
-    if (beta) {return}
 
     const healthBar = document.getElementById('health-bar');
     let hpInterval = (100 / battleVariables.maxHealth);
@@ -7860,25 +7890,26 @@ function achievementListload() {
             tierContainer.classList.add('tier-container');
             tierContainer.style.display = "none";
             
-            let tierInfo = challengeInfo[i];
-            for (let key in tierInfo) {
+            for (let j = 0; j < challengeInfo[i].length; j++) {
                 let challengeContainer = document.createElement("div");
                 challengeContainer.classList.add('flex-row')
 
-                let challengeInfo = document.createElement("div");
+                const challengeInfoDiv = document.createElement("div");
                 let challengeTitle = document.createElement("p");
-                challengeTitle.innerText = challengeDict[i][key] === false ? '???' : `${tierInfo[key]['title']}`;
+                challengeTitle.innerText = challengeDict[i][j] === false ? '???' : `${challengeInfo[i][j]['title']}`;
                 let challengeDesc = document.createElement("p");
-                challengeDesc.innerText = `${tierInfo[key]['desc']}`;
-                let challengeButton = document.createElement("button");
+
+                challengeDesc.innerText = `${challengeInfo[i][j].desc}`;
+                const challengeButton = document.createElement("button");
+                challengeButton.id = `challenge-button-${i}-${j}`
                 challengeButton.innerText = 'Locked';
 
-                challengeInfo.append(challengeTitle,challengeDesc)
-                challengeContainer.append(challengeButton,challengeInfo);
+                challengeInfoDiv.append(challengeTitle, challengeDesc)
+                challengeContainer.append(challengeButton, challengeInfoDiv);
                 tierContainer.append(challengeContainer)
             }
 
-            tierButton.addEventListener("click",()=>{
+            tierButton.addEventListener("click", () => {
                 if (tierContainer.style.display === 'none') {
                     tierContainer.style.display = 'block';
                 } else {
@@ -7914,7 +7945,7 @@ function achievementListload() {
 }
 
 
-function popAchievement(achievement,loading) {
+function popAchievement(achievement, loading) {
     var oldAchievement = document.getElementById("tempAchievement");
     var achievementID = 10000;
     let achievementType = "";
@@ -7958,6 +7989,7 @@ function popAchievement(achievement,loading) {
     if (loading != true) {
         saveValues["primogem"] += Math.round(20 * additionalPrimo);
         saveValues["achievementCount"]++;
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'primogem', value: saveValues.primogem}))
 
         if (timerSeconds !== 0) {
             let achievementPopUp = drawUI.createAchievement(achievementText,achievementDesc);
@@ -7978,7 +8010,7 @@ function popAchievement(achievement,loading) {
 
 function checkAchievement() {
     let saveValuesLocal = saveValues;
-    if (achievementData["achievementTypeRawScore"].length !== 0){
+    if (achievementData["achievementTypeRawScore"].length !== 0) {
         if (saveValuesLocal["realScore"] >= achievementData["achievementTypeRawScore"][0]) {
             popAchievement("score");
             achievementData["achievementTypeRawScore"].shift();
@@ -7986,7 +8018,7 @@ function checkAchievement() {
         }
     } 
 
-    if (achievementData["achievementTypeRawClick"].length !== 0){
+    if (achievementData["achievementTypeRawClick"].length !== 0) {
         if (saveValuesLocal["clickCount"] >= achievementData["achievementTypeRawClick"][0]) {
             popAchievement("click");
             achievementData["achievementTypeRawClick"].shift();
@@ -7994,7 +8026,7 @@ function checkAchievement() {
         }
     }
     
-    if (achievementData["achievementTypeRawDPS"].length !== 0){
+    if (achievementData["achievementTypeRawDPS"].length !== 0) {
         if (saveValuesLocal["dps"] >= achievementData["achievementTypeRawDPS"][0]) {
             popAchievement("dps");
             achievementData["achievementTypeRawDPS"].shift();
@@ -8016,6 +8048,12 @@ function checkAchievement() {
             achievementData["achievementTypeGolden"].shift();
             return;
         }
+    }
+}
+
+function challengeNotification(value) {
+    if (value) {
+        console.log('CHALLENGE UNLOCKED')
     }
 }
 
@@ -9365,6 +9403,7 @@ function offerItemFunction() {
     }
 
     saveValues.treeObj.offerAmount++;
+    challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'offer', value: saveValues.treeObj.offerAmount}))
     saveValues.treeObj.energy = Math.round(saveValues.treeObj.energy * randomInteger(115, 125) / 100);
     const palmText = document.getElementById('palm-text');
     palmText.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
@@ -9732,7 +9771,7 @@ function leylineCreate(treeTable, optionsContainer) {
     const absorbButton = document.createElement('button');
     absorbButton.innerText = 'Absorb';
     absorbButton.addEventListener('click', () => {
-        if (saveValues.treeObj.health == 1) {
+        if (saveValues.treeObj.health <= 15) {
             leylineText.innerText = 'The tree is too weak to absorb excess energy!'
             weaselDecoy.load();
             weaselDecoy.play();
@@ -9745,7 +9784,7 @@ function leylineCreate(treeTable, optionsContainer) {
         leylineProgress.style.width = leylineProgress.progress + '%';
 
         let treeHealthText = document.getElementById('tree-health-text');
-        saveValues.treeObj.health = Math.max(saveValues.treeObj.health - 10, 1);
+        saveValues.treeObj.health = Math.max(saveValues.treeObj.health - randomInteger(10,20), 1);
         treeHealthText.health = saveValues.treeObj.health;
         treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
 
@@ -9887,10 +9926,12 @@ function currencyPopUp(type1, amount1, type2, amount2) {
         currencyPopFirstImg.src = "./assets/icon/energyIcon.webp";
         currencyPopFirstImg.classList.add("icon");
         saveValues.energy += amount1;
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'energy', value: saveValues.energy}))
     } else if (type1 === "primogem") {
         currencyPopFirstImg.src = "./assets/icon/primogemIcon.webp";
         currencyPopFirstImg.classList.add("icon","primogem");
         saveValues.primogem += amount1;
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'primogem', value: saveValues.primogem}))
     } else if (type1 === "nuts") {
         currencyPopFirstImg.src = "./assets/icon/goldenIcon.webp";
         currencyPopFirstImg.classList.add("icon","primogem");
@@ -9920,10 +9961,12 @@ function currencyPopUp(type1, amount1, type2, amount2) {
             currencyPopSecondImg.src = "./assets/icon/energyIcon.webp";
             currencyPopSecondImg.classList.add("icon");
             saveValues.energy += amount2;
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'energy', value: saveValues.energy}))
         } else if (type2 === "primogem") {
             currencyPopSecondImg.src = "./assets/icon/primogemIcon.webp";
             currencyPopSecondImg.classList.add("icon","primogem");
             saveValues.primogem += amount2;
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'primogem', value: saveValues.primogem}))
         } else if (type2 === "nuts") {
             currencyPopSecondImg.src = "./assets/icon/goldenIcon.webp";
             currencyPopSecondImg.classList.add("icon","primogem");
@@ -10017,9 +10060,9 @@ function newPop(type) {
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
-// if (localStorage.getItem('beta') == 'true') {
-//     beta = true;
-// }
+if (localStorage.getItem('beta') == 'true') {
+    beta = true;
+}
 
 if (beta) {
     let warning = document.createElement('p');

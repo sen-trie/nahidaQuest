@@ -179,67 +179,101 @@ function universalStyleCheck(ele, styleCheck, paramOn, paramOff, forced) {
     return ele;
 }
 
+// MINUS ONE, FOLLOWS ARRAY INDEX
 const challengeThreshold = {
     'core':{
-        1000:[0,1],
-        2500:[1,1],
-        5000:[2,1],
-        10000:[3,1],
-        25000:[4,1],
+        1000:[0,0],
+        5000:[1,0],
+        15000:[2,0],
+        35000:[3,0],
+        100000:[4,0],
     },
     'primogem':{
-        1000:[0,2],
-        5000:[3,5]
+        1000:[0,1],
+        4000:[2,3]
     },
     'energy':{
-        2500:[0,3],
-        7500:[2,5],
-        15000:[3,6],
+        2500:[0,2],
+        7500:[2,2],
+        15000:[3,3],
     },
     'discount':{
-        50:[0,4],
-        200:[3,4],
+        50:[0,3],
+        200:[3,2],
     },
     'nahidaCrit':{
-        3:[0,5],
-        7:[3,8]
+        3:[0,4],
+        7:[3,4]
+    },
+    'harvest': {
+        25:[2,8],
+        40:[3,7],
+        100:[4,8]
+    },
+    'offer': {
+        20:[2,9],
+        35:[3,8],
+        50:[4,9]
     }
 }
 
 // CHECKS FOR ALL CHALLENGES
-function challengeCheck(type,tier,prop,prop2) {
+function challengeCheck(type, prop, prop2, objectInfo) {
     if (type === 'populate') {
         const challengeInfo = prop;
-        let challengeCheck = challengeInfo.map(tier => {
-            let tierCheck = {};
+        let challengeCheckDict = challengeInfo.map((tier) => {
+            let tierCheck = [];
             for (let key in tier) {
-                tierCheck[key] = false;
+                tierCheck.push(false);
             }
             return tierCheck;
         })
-        return challengeCheck;
-    } else if (type === 'check') {
+        return challengeCheckDict;
+    } else if (type === 'checkKeys') {
         // CHECKS IF THERE ARE NEW KEYS
-        let challengeCheck = prop;
+        let challengeCheckDict = prop;
         const challengeInfo = prop2;
-        if (challengeInfo.length > challengeCheck.length) {
-            for (let i = challengeCheck.length; i < challengeInfo.length; i++) {
-                let tierCheck = {};
+
+        if (challengeInfo.length > challengeCheckDict.length) {
+            for (let i = challengeCheckDict.length; i < challengeInfo.length; i++) {
+                let tierCheck = [];
                 for (let key in challengeInfo[i]) {
-                    tierCheck[key] = false;
+                    tierCheck.push(false);
                 }
-                challengeCheck[i] = tierCheck;
+                challengeCheckDict[i] = tierCheck;
             }
         }
-        for (let j = 0; j < challengeCheck.length; j++) {
-            let tierCheck = challengeInfo[j];
-            for (let key in tierCheck) {
-                if (challengeCheck[j][key] === undefined) {
-                    challengeCheck[j][key] = false;
-                }
+
+        for (let j = 0; j < challengeInfo.length; j++) {
+            for (let k = 0; k < challengeInfo[j].length; k++) {
+                if (challengeCheckDict[j][k] === undefined) {challengeCheckDict[j].push(false)}
             }
         }
-        return challengeCheck;
+        return challengeCheckDict;
+    } else if (type === 'check') {
+        let challengeCheckDict = prop;
+        let challengeComplete = false;
+
+        // OBJECT INFO CONTAINS CATEGORY, VALUE, CHALLENGE POSITIONS (PASS persistentValues.challengeCheck AS PROP)
+        if (Object.keys(challengeThreshold).includes(objectInfo.category)) {
+            const cat = objectInfo.category;
+            for (let key in challengeThreshold[cat]) {
+                let value = challengeThreshold[cat][key];
+                if (parseInt(objectInfo.value) < parseInt(key)) {
+                    break;
+                } else if (challengeCheckDict[value[0]][value[1]] === false) {
+                    challengeCheckDict[value[0]][value[1]] = 'unclaimed';
+                    challengeComplete = true;
+                }
+            }
+        } else {
+            if (challengeCheckDict[value[0]][value[1]] === false) {
+                challengeCheckDict[value[0]][value[1]] = 'unclaimed';
+                challengeComplete = true;
+            }
+        }
+
+        return challengeComplete;
     }
 }
 

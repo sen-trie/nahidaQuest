@@ -232,8 +232,8 @@ function createProgressBar(parentProps, childProps, dividerProps, dividerNumber,
 
         if (imgProps) {
             const dividerImg = createDom('img', imgProps);
-            dividerImg.style.left = `${(100 / dividerNumber) * (i + 1)}%`
-            if (i !== (dividerNumber - 1)) {
+            dividerImg.style.left = `${(100 / dividerNumber) * (i)}%`
+            if (i !== (dividerNumber)) {
                 parentEle.appendChild(dividerImg);
             }
         }
