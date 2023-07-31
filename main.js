@@ -222,6 +222,8 @@ let adventureScaraText = "";
 let quicktimeAttack = false;
 let skillCooldownReset;
 let adventureTreeDefense = false;
+let worldQuestDict = {};
+const transitionScene = ["0_Meeting", "0_Trade_Wait", "0_LuckCheck_Success", "0_LuckCheck_Failure"]
 
 // SPECIAL UPGRADE VARIABLES
 let wishPower = 0;
@@ -606,6 +608,7 @@ let demoImg = document.createElement("img");
 demoImg.src = settingsValues.preferOldPic ? "./assets/nahida.webp" : "./assets/nahidaTwo.webp";
 demoImg.classList.add("demo-img");
 demoImg.id = "demo-main-img";
+demoImg.critInARow = 0;
 
 demoContainer.addEventListener("mouseup",touchDemo);
 function touchDemo() {
@@ -623,6 +626,9 @@ function touchDemo() {
         } else {
             clickEarn = Math.ceil(saveValues["clickFactor"] * clickCritDmg);
         }
+
+        demoImg.critInARow++;
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'nahidaCrit', value: demoImg.critInARow}))
     } else {
         if (clickerEvent !== "none") {
             clickDelay -= 2;
@@ -630,9 +636,14 @@ function touchDemo() {
         } else {
             clickEarn = Math.ceil(saveValues["clickFactor"]);
         }
+
+        if (demoImg.critInARow > 0) {demoImg.critInARow = 0}
     }
 
     saveValues["realScore"] += clickEarn;
+    if (clickEarn > 1e9) {
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [3, 1]}))
+    }
     energyRoll();
 
     if (clickAudioDelay === null) {
@@ -799,7 +810,6 @@ function idleCheck(idleAmount) {
 let eventTimes = 1;
 let eventChance = 0;
 function randomEventTimer(timerSeconds) {
-    // if (beta) {eventCooldownDecrease = 0.05}
     let eventTimeMin = EVENTCOOLDOWN * eventTimes * eventCooldownDecrease;
     if (eventChance !== 0) {
         let upperLimit = 10 ** (1 + (timerSeconds - eventTimeMin)/((EVENTCOOLDOWN * eventCooldownDecrease)/2))
@@ -807,7 +817,7 @@ function randomEventTimer(timerSeconds) {
             eventChance = 0;
             eventTimes++;
             startRandomEvent();
-            updateMorale("recover",5);
+            updateMorale("recover", 5);
         }
         return;
     }
@@ -825,8 +835,6 @@ function startRandomEvent() {
     } else {
         aranaraNumber = randomInteger(1,4);
     }
-
-    if (beta) {aranaraNumber = randomInteger(7,9)}
      
     eventPicture.classList.add("random-event");
     eventPicture.addEventListener("click", () => {
@@ -871,7 +879,7 @@ function clickedEvent(aranaraNumber) {
         }
     }
 
-    // if (beta) specialEvent = true;
+    if (beta) aranaraNumber = 8;
 
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
@@ -953,6 +961,7 @@ function clickEvent(wandererMode) {
             leftBG.src = "./assets/bg/scara-bg.webp";
             button.src = "./assets/event/scara.webp";
         },150);
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2,4]}))
     } else {
         button.style.animation = "rotation 3.5s infinite linear forwards";
         if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")};
@@ -1163,7 +1172,8 @@ const ROWS = 8;
 const COLS = 8;
 function minesweeperEvent() {
     stopSpawnEvents = true;
-    var mines = randomInteger(6,8);
+    const mines = randomInteger(6,8);
+    const startTimestamp = performance.now();
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","flex-row","event-dark","minesweeper-backdrop");
     eventBackdrop.style.flexWrap = "wrap";
@@ -1290,6 +1300,7 @@ function minesweeperEvent() {
                     }
                     firstClick = false;
                 }
+
                 if (board[r][c].mine) {
                     td.innerText = "";
                     td.style.backgroundImage = "url(./assets/event/mine-wrong.webp)";
@@ -1305,13 +1316,21 @@ function minesweeperEvent() {
                     revealCell(r, c);
                     td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
                 }
+
                 if (cellsLeft <= 0) {
                     let randomPrimo = randomInteger(200,400);
                     adventure("10-");
                     newPop(1);
                     sortList("table2");
+
                     eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop);
-                    setTimeout(()=>{currencyPopUp("items",0,"primogem", randomPrimo)},4000)
+                    const endTimestamp = performance.now();
+                    setTimeout(()=> {
+                        currencyPopUp("items",0,"primogem", randomPrimo);
+                        if (endTimestamp - startTimestamp < 15 * 1000) {
+                            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2, 7]}));
+                        }
+                    },4000)
                 }
             });
             tr.appendChild(td);
@@ -1393,7 +1412,7 @@ function weaselEvent(specialWeasel) {
         if (goldWeaselCount > 0) {
             eventOutcome(eventText,eventBackdrop,"weasel",weaselCount,goldWeaselCount);
         } else {
-            eventOutcome(eventText,eventBackdrop,"weasel",weaselCount);
+            eventOutcome(eventText,eventBackdrop,"weasel",weaselCount, 0);
         }
     })
 
@@ -1415,7 +1434,7 @@ function addWeasel(weaselBack,delay,specialWeasel) {
     let specialWeaselSpawns = false;
     if (specialWeasel) {specialWeaselSpawns = randomIntegerWrapper(luckRate*6,200)}
 
-    for (let i=0, len=weaselDiv.length; i < len; i++) {
+    for (let i = 0, len = weaselDiv.length; i < len; i++) {
         let weaselImage = weaselDiv[i].querySelector('img');
         if (i === realWeasel) {
             if (specialWeaselSpawns) {
@@ -1473,7 +1492,7 @@ function addWeasel(weaselBack,delay,specialWeasel) {
             setTimeout(()=>{fakeWeaselAlert.style.animation = "fadeOutWeasel 3s linear forwards"},10)
             weaselDecoy.load();
             weaselDecoy.play();
-            clearWeasel(weaselBack,delay,specialWeasel);
+            clearWeasel(weaselBack, delay, specialWeasel);
         })
     }
 }
@@ -1491,7 +1510,7 @@ function clearWeasel(weaselBack,delay,specialWeasel) {
     }
 
     setTimeout(()=>{
-        addWeasel(weaselBack,delay,specialWeasel);
+        addWeasel(weaselBack, delay, specialWeasel);
         weaselBurrow.load();
         weaselBurrow.play();
     },delay)
@@ -1510,7 +1529,7 @@ function generateCombination(n) {
 
     combination.sort((a,b) => a - b)
     return combination;
-  }
+}
  
 // EVENT 6 (RAIN)
 function rainEvent() {
@@ -1529,8 +1548,11 @@ function rainEvent() {
     eventDescription.style.top = "1%";
     eventBackdrop.append(eventDescription);
 
+    let nutCount = 0;
+    let scarabCount = 0;
+
     rainText.classList.add("event-rain-text");
-    let dpsMultiplier = (saveValues.dps + 1)* 10;
+    let dpsMultiplier = (saveValues.dps + 1) * 10;
     let tempScore = 0;
     let tempPrimogem = 0;
     let tempGolden = 0;
@@ -1546,10 +1568,12 @@ function rainEvent() {
             img.src = "./assets/icon/goldenIcon.webp";
             animation = `rain-rotate ${(randomInteger(6,10)/2)}s linear forwards`
             img.addEventListener('click', () => {
-                img.remove();
-                tempGolden++;
                 reactionCorrectElement.load();
                 reactionCorrectElement.play();
+                img.remove();
+
+                tempGolden++;
+                nutCount++;
             });
         } else if (type >= 85) {
             img.src = "./assets/icon/primogemLarge.webp"
@@ -1565,10 +1589,13 @@ function rainEvent() {
                 weaselDecoy.load();
                 weaselDecoy.play();
                 img.remove();
+
                 tempScore -= 10;
                 tempScore = Math.max(0, tempScore);
                 tempPrimogem -= randomInteger(50,80);
-                tempPrimogem = Math.max(0, tempPrimogem)
+                tempPrimogem = Math.max(0, tempPrimogem);
+                scarabCount++;
+
                 rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + Math.round(tempPrimogem * additionalPrimo) + " Primos";
             });
         } else {
@@ -1576,6 +1603,8 @@ function rainEvent() {
             img.addEventListener('click', () => {
                 img.remove();
                 tempScore++;
+                nutCount++;
+
                 rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + tempPrimogem + " Primos";
             });
         }
@@ -1594,20 +1623,29 @@ function rainEvent() {
     setTimeout(()=>{
         clearInterval(rainTimer);
         setTimeout(()=>{
-            setTimeout(()=>{eventBackdrop.remove();},3000)
             rainText.classList.add("text-pop");
             rainText.addEventListener('animationend', () => {
-                rainText.remove();
+                eventBackdrop.remove();
+                if (nutCount >= 60) {
+                    challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [1, 9]}));
+                }
+                if (scarabCount >= 15) {
+                    challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [0, 7]}));
+                }
+
                 stopSpawnEvents = false;
                 saveValues.realScore += tempScore * dpsMultiplier;
-                if (tempPrimogem != 0) {
-                    if (tempGolden == 0) {
-                        currencyPopUp("primogem",tempPrimogem);
-                    } else {
-                        currencyPopUp("primogem",tempPrimogem,"nuts",tempGolden);
-                    }
+                if (tempPrimogem != 0 && tempGolden != 0) {
+                    currencyPopUp("primogem", tempPrimogem, "nuts", tempGolden);
+                } else if (tempPrimogem != 0) {
+                    currencyPopUp("primogem", tempPrimogem);
+                } else if (tempGolden != 0) {
+                    currencyPopUp("nuts", tempGolden);
                 }
-        }),8000})
+
+                rainText.remove();
+            });
+        },2500)
     }, 28000);
     mainBody.append(eventBackdrop);
 }
@@ -1987,6 +2025,7 @@ function battleshipEvent() {
     friendlyDiv.score = 3 + 2 + 1;
     const enemyChildren = enemyDiv.children;
     enemyDiv.score = 3 + 2 + 1;
+    let choicesTaken = 0;
     
     const enemyKeys = [];
     for (let i = 0; i < 3; i++) {
@@ -2107,6 +2146,7 @@ function battleshipEvent() {
         if (!battleshipContainer.gameStarted || battleshipContainer.transition) {return}
         let source;
         if (type === 'enemy') {
+            choicesTaken++;
             if (enemyDiv.grid[row + 1][column] === true) {
                 source = './assets/event/cross.webp';
                 shopElement.load();
@@ -2176,6 +2216,19 @@ function battleshipEvent() {
             if (enemyDiv.score === 0) {
                 eventOutcome("You won! You earned some treasure!", eventBackdrop);
                 battleshipContainer.gameStarted = false;
+
+                let finalHealth = friendlyDiv.score;
+                setTimeout(() => {
+                    if (finalHealth >= 4 && choicesTaken <= 9) {
+                        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [4, 5]}));
+                        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [4, 6]}));
+                    } else if (finalHealth >= 4) {
+                        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [4, 6]}));
+                    } else if (choicesTaken <= 9) {
+                        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [4, 5]}));
+                    }
+                }, 3750)
+                
             }
         }
     }
@@ -2224,6 +2277,17 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
         if (amount2 > 0) {
             amount2 *= 2;
             innerTextTemp = `\n Some of them were carrying Golden Nuts!`;
+        }
+
+        if (weaselCount >= 16) {
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [0, 8]}));
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2, 6]}));
+        } else if (weaselCount >= 13) {
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [0, 8]}));
+        }
+
+        if ((amount2 / 2) > 12) {
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [4, 7]}));
         }
 
         innerText += innerTextTemp;
@@ -3551,6 +3615,10 @@ function upgrade(clicked_id) {
         upgradeDictTemp.Contribution += heroIncrease;
         upgradeDictTemp.Purchased += 1 * currentMultiplierLocal;
         saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
+
+        if (clicked_id === 0 && upgradeDictTemp.Purchased >= 700) {challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [4, 1]}))}
+        if (clicked_id === 1 && upgradeDictTemp.Contribution >= 1e9) {challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2, 1]}))}
+
         checkExpeditionUnlock(saveValues["dps"]);                                        
         refresh(butIdArray, upgradeDictTemp["BaseCost"], clicked_id);
         milestoneCheck(clicked_id,upgradeDictTemp.Purchased)
@@ -3776,6 +3844,8 @@ function milestoneBuy(heroTooltip) {
         upgradeDict[heroID]["BaseFactor"] = Math.ceil(upgradeDict[heroID]["BaseFactor"]) * (buff+1);
         upgradeDict[heroID]["Factor"] = Math.ceil(upgradeDictTemp["Factor"] * (buff+1));
         upgradeDict[heroID].milestone[level] = true;
+
+        if (heroID == 1 && upgradeDict[heroID]["Contribution"] >= 1e9) {challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2, 1]}))}
 
         let currentEle = document.getElementById(`milestone-${heroTooltip}`);
         if (currentEle.nextSibling !== null) {
@@ -4034,6 +4104,8 @@ function itemUse(itemUniqueId) {
                     upgradeDict[i]["Contribution"] += additionPower;
                     upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
 
+                    if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2, 1]}))}
+
                     refresh("hero", i);
                     updatedHero(i);
                 }
@@ -4056,6 +4128,8 @@ function itemUse(itemUniqueId) {
                 if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                 upgradeDict[i]["Contribution"] += additionPower;
                 upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+
+                if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2, 1]}))}
 
                 refresh("hero", i);
             }
@@ -4103,6 +4177,8 @@ function itemUse(itemUniqueId) {
                 upgradeDict[i]["Contribution"] += additionPower;
                 upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
 
+                if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2, 1]}))}
+
                 refresh("hero", i);
             }
         }
@@ -4130,6 +4206,8 @@ function itemUse(itemUniqueId) {
                     if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
                     upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+
+                    if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2, 1]}))}
     
                     refresh("hero", i);
                     updatedHero(i);
@@ -4157,6 +4235,8 @@ function itemUse(itemUniqueId) {
                     if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                     upgradeDict[i]["Contribution"] += additionPower;
                     upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+
+                    if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [2, 1]}))}
     
                     refresh("hero", i);
                     updatedHero(i);
@@ -4421,6 +4501,7 @@ function createAdventure() {
         }
     }
 
+
     adventureChoiceOne.addEventListener("click",()=>{
         if (adventureChoiceOne.pressAllowed) {
             if (adventureChoiceOne.advType != 12) {
@@ -4430,6 +4511,7 @@ function createAdventure() {
                 adventureFight.style.display = "flex";
                 adventureChoiceOne.style.display = "none";
             } else {
+                if (!transitionScene.includes(adventureTextBox.questNumber)) {worldQuestDict.currentWorldQuest = adventureTextBox.questNumber}
                 continueQuest(adventureTextBox.questNumber);
             }
         }
@@ -5150,7 +5232,12 @@ function completeBounty(bountyID,type,ele) {
 
         let markImg = new Image();
         markImg.src = "./assets/expedbg/bountyDone.webp"
-        button.appendChild(markImg)
+        button.appendChild(markImg);
+
+        for (let key in advDict.bounty) {
+            if (advDict.bounty[key].Completed !== true) {return}
+        }
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [1, 7]}));
     })
 
     button.appendChild(claim);
@@ -5210,7 +5297,6 @@ function showCommisions() {
                 commCell.support.style.display = 'flex';
                 commCell.support.src = `./assets/tooltips/emoji/${commInfo.char[1]}.webp`;
 
-                // console.log(commInfo.endTime, getTime(), (commInfo.endTime - getTime()) / 1000 / 3600)
                 let timeLeft = (commInfo.endTime - getTime()) / 60;
                 let ready = timeLeft <= 0;
                 commCell.time.ready = ready;
@@ -5607,6 +5693,8 @@ function createExpMap() {
     expedXPInfo.id = "exped-xp";
     expedXPInfo.innerText = `Rank ${advDict.adventureRank} (${advDict.advXP}/${expedXPBar.maxXP} XP)`;
     if (advDict.adventureRank >= 20) {
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [1, 3]}));
+
         expedXPInfo.innerText = "Rank 20 (MAX)";
         expedXPBar.maxXP = 1e20;
         expedXPBar.style.width = "100%";
@@ -5823,6 +5911,8 @@ function gainXP(xpAmount,multiplier) {
     if (advDict.adventureRank >= 20) {
         advDict.adventureRank = 20;
         expedXPInfo.innerText = "Level 20 (MAX)";
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [1, 3]}));
+
         xpBar.maxXP = 1e20;
         xpBar.style.width = "100%";
         xpBar.currentXP = 0;
@@ -6144,8 +6234,8 @@ function spawnWorldQuest() {
 
     let rollQuest = randomInteger(18,26);
     let mapImage = document.getElementById('sumeru-map');
-    spawnKey(mapImage,imgKey,rollQuest,true);
-    notifPop("add","quest",1);
+    spawnKey(mapImage, imgKey, rollQuest, true);
+    notifPop("add", "quest", 1);
 }
 
 function drawWorldQuest(advType) {
@@ -6207,6 +6297,10 @@ function continueQuest(advType) {
         } else if (advType === "0_LuckCheck_Success") {
             gainXP("variable",2);
             quitQuest();
+
+            if (worldQuestDict.currentWorldQuest === "15_B") {
+                challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [0,5]}))
+            }
             return;
         }
 
@@ -6287,6 +6381,10 @@ function continueQuest(advType) {
             document.getElementById('currency-amount').remove();
             document.getElementById('inventory-offer').remove();
             quitQuest();
+
+            if (tradeOffer.offer === true) {
+                challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [0, 7]}))
+            }
             return;
         }
 
@@ -6393,6 +6491,7 @@ function comboHandler(type, ele) {
         let comboNumber = document.createElement("p");
         comboNumber.id = "combo-number";
         comboNumber.combo = 0;
+        comboNumber.maxCombo = 0;
         comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
         ele.appendChild(comboNumber);
         return ele;
@@ -6400,6 +6499,7 @@ function comboHandler(type, ele) {
         let comboNumber = document.getElementById("combo-number");
         comboNumber.combo++;
         comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
+        if (comboNumber.maxCombo < comboNumber.combo) {comboNumber.maxCombo = comboNumber.combo}
 
         comboNumber.style.animation = "";
         void comboNumber.offsetWidth;
@@ -7400,7 +7500,6 @@ function loseAdventure() {
     if (!adventureVariables.fightSceneOn) {return}
     adventureVariables.fightSceneOn = false;
 
-    document.getElementById("combo-number").remove();
     const adventureHeading = document.getElementById("adventure-header");
     adventureHeading.style.top = "10%";
     adventureHeading.innerText = "You passed out...";
@@ -7417,7 +7516,7 @@ function loseAdventure() {
         let xp = 5*(2**(level >= 1 && level <= 5 ? level : 5)) * additionalXP;
         gainXP(Math.round(xp));
 
-        quitAdventure();
+        quitAdventure(false);
         adventureChoiceOne.removeEventListener("click", quitButton);
     }
 
@@ -7524,7 +7623,6 @@ function winAdventure() {
         adventureRewards.style.flexGrow = "1";
     }
 
-
     const adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
     adventureChoiceOne.innerText = "Leave";
@@ -7538,13 +7636,15 @@ function winAdventure() {
     if (imgKey[keyNumber].Level === 5) {
         nutReward.gValue = randomInteger(3,10)*3 + advDict.adventureRank;
         nutReward.innerHTML = `Gained:<br> ${abbrNum(nutReward.value)} [s]Nuts[/s]<br> ${nutReward.gValue} [s]Golden Nuts[/s]`;
-
-        nutReward.style.color = '#333553';
-        nutReward.style.backgroundColor = '#a8acd9';
-        nutReward.style.border = '0.2em solid #494d81';
     } else {
         nutReward.innerHTML = `Gained:<br> ${abbrNum(nutReward.value)} [s]Nuts[/s]`;
         nutReward.gValue = 0;
+    }
+
+    if (adventureScaraText === '-scara') {
+        nutReward.style.color = '#333553';
+        nutReward.style.backgroundColor = '#a8acd9';
+        nutReward.style.border = '0.2em solid #494d81';
     }
 
     nutReward.innerHTML = textReplacer({
@@ -7557,15 +7657,14 @@ function winAdventure() {
         saveValues["realScore"] += nutReward.value;
         nutReward.remove();
 
-        quitAdventure();
+        quitAdventure(true);
         charScan();
         updateMorale("recover",randomInteger(2,6));
 
         let level = imgKey[keyNumber].Level;
         gainXP(Math.round(15*(2**(level >= 1 && level <= 5 ? level : 5)) * additionalXP));
 
-        document.getElementById("combo-number").remove();
-        adventureChoiceOne.removeEventListener("click",quitButton);
+        adventureChoiceOne.removeEventListener("click", quitButton);
         
         if (adventureRewards.children.length >= 0) {
             newPop(1);
@@ -7594,10 +7693,26 @@ function winAdventure() {
     },300)
 }
 
-function quitAdventure() {
+function quitAdventure(wonBattle) {
     let worldQuestRoll = randomInteger(1,101) - luckRate;
     if (worldQuestRoll < 30) {
         spawnWorldQuest();
+    }
+
+    const comboNumber = document.getElementById("combo-number");
+    comboNumber.remove();
+    challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'combo', value: comboNumber.maxCombo}));
+
+    if (wonBattle) {
+        if (adventureVariables.advType === 5 && healthLost === 0) {
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [1, 4]}));
+        } else if (adventureVariables.advType === 13) {
+            const healthBar = document.getElementById('health-bar');
+            const hpInterval = (100 / battleVariables.maxHealth);
+            if (healthBar.currentWidth <= hpInterval) {
+                challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [1, 5]}));
+            }
+        }
     }
     
     adventureVariables = {};
@@ -7779,6 +7894,8 @@ function wish() {
                 
                 wishMultiplier++;
                 saveValues["wishCounterSaved"]++;
+                if (saveValues["wishCounterSaved"] >= 10) {challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [1, 2]}));}
+
                 refresh();
                 newPop(0);
 
@@ -8527,7 +8644,12 @@ function confirmPurchase(shopCost,id) {
 
         shopElement.load();
         shopElement.play();
+
         storeInventory[parseInt(saveId)].Purchased = true;
+        for (let key in storeInventory) {
+            if (storeInventory[key].Purchased !== true) {return}
+        }
+        challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'specific', value: [1, 1]}));
     } else {
         dialog.innerText = "Hmph, come back when you're a little richer."
         return;
@@ -8540,11 +8662,11 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     let inventoryTemp = Inventory[inventoryNumber];
 
     let shopButtonImage = document.createElement("img");
-    shopButtonImage.src = "./assets/tooltips/inventory/"+ inventoryTemp.File+ ".webp";
+    shopButtonImage.src = "./assets/tooltips/inventory/" + inventoryTemp.File + ".webp";
 
     let shopButtonImageContainer = document.createElement("div");
     shopButtonImageContainer.classList.add("flex-column","shop-button-container");
-    shopButtonImageContainer.style.background = "url(./assets/frames/background-" +inventoryTemp.Star+ ".webp)";
+    shopButtonImageContainer.style.background = "url(./assets/frames/background-" + inventoryTemp.Star + ".webp)";
     shopButtonImageContainer.style.backgroundSize = "cover";
     shopButtonImageContainer.style.backgroundPosition = "center center";
     shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
@@ -8580,7 +8702,7 @@ function createShopItems(shopDiv, i, inventoryNumber) {
     shopButtonText.innerText = shopCost;
     shopButtonText.appendChild(shopButtonPrimo);
 
-    shopButton.id = ("shop-" + i + "-" + inventoryNumber + "-" + shopCost);
+    shopButton.id = ("shop-" + (i + 1) + "-" + inventoryNumber + "-" + shopCost);
     shopButton.addEventListener("click", function() {
         buyShop(shopButton.id,shopCost)
     })
@@ -9127,6 +9249,7 @@ function nutPurchase(fullId) {
         upgradeElement.play();
         persistentValues["upgrade"+id].Purchased++;
         persistentValues.goldenCore -= cost;
+
         let childArray = document.getElementById(fullId).children;
         childArray[1].innerText = `Level ${persistentValues["upgrade"+id].Purchased}`;
         childArray[3].innerText = `${permUpgrades[id]["Description"]}
@@ -9423,7 +9546,11 @@ function treeOptions(planted, optionsContainer, lastPhase) {
         let optionText = document.createElement('p');
         optionText.innerText = 'Harvest';
 
-        treeButton.addEventListener('click',() => {destroyTree()})
+        treeButton.addEventListener('click',() => {
+            persistentValues.harvestCount++;
+            challengeNotification(challengeCheck('check', persistentValues.challengeCheck, null, {category: 'harvest', value: persistentValues.harvestCount}))
+            destroyTree();
+        })
         treeButton.append(optionImg,optionText);
         optionsContainer.appendChild(treeButton);
     } else if (planted) {

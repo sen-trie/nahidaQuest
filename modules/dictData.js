@@ -1065,60 +1065,60 @@ const eventText = {
 
 const challengeInfo = [
     [
-        {'title': 'Rise and Shine', 'desc': 'Transcend for over 1,000 Cores'},
-        {'title': 'Breaking Impact', 'desc': 'Possess 1000 primogems in one run'},
-        {'title': 'Fungi On Seeds', 'desc': 'Reach 2,500 energy in one run'},
-        {'title': 'Rear of the Library', 'desc': 'Possess 50 discounted levels'},
-        {'title': 'Lucky Hits', 'desc': 'Get a Crit on Big Nahida three times in a row'},
-        {'title': 'Living on the Edge', 'desc': 'Escape from the nest of a Jadeplume Terrorshroom'},
-        {'title': 'Compulsive Shopper', 'desc': "Accept someone's fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal"},
-        {'title': 'Bug in a Bottle', 'desc': 'Catch 15 raining scarabs'},
-        {'title': 'The Commissioner', 'desc': 'Catch 13 Weasel Thieves'},
-        {'title': 'Green Bond', 'desc': 'Plant a tree for the first time'},
+        {'title': 'Rise and Shine', 'desc': 'Transcend for over 1,000 Cores'}, // CH DONE
+        {'title': 'Breaking Impact', 'desc': 'Possess 1000 primogems in one run'}, // CH DONE
+        {'title': 'Fungi On Seeds', 'desc': 'Reach 2,500 energy in one run'}, // CH DONE
+        {'title': 'Rear of the Library', 'desc': 'Possess 50 discounted levels'}, // CH DONE
+        {'title': 'Lucky Hits', 'desc': 'Get a Crit on Big Nahida three times in a row'},  // CH DONE
+        {'title': 'Living on the Edge', 'desc': 'Escape from the nest of a Jadeplume Terrorshroom'}, // CH DONE
+        {'title': 'Compulsive Shopper', 'desc': "Accept someone's fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal"}, // CH DONE
+        {'title': 'Bug in a Bottle', 'desc': 'Catch 15 raining scarabs'}, // CH DONE
+        {'title': 'The Commissioner', 'desc': 'Catch 13 Weasel Thieves'},  // CH DONE
+        {'title': 'Green Bond', 'desc': 'Harvest a fully-grown tree for the first time'}, // CH DONE
     ], [
-        {'title': 'Nothing Lasts Forever', 'desc': 'Transcend for over 5,000 Cores'},
-        {'title': 'Big Buyer', 'desc': "Clear out Dori's regular shop"},
-        {'title': 'Speed Mail', 'desc': 'Wish for 10 characters in one run'},
-        {'title': 'Onyx Rank', 'desc': 'Reach level 20 Adventure Rank'},
-        {'title': 'Barely a Scratch', 'desc': 'Defeat the Abyss without losing any HP'},
-        {'title': 'Until Til the End', 'desc': 'Survive a Skirmish battle with less than 1 HP remaining'},
-        {'title': 'Another Test Subject', 'desc': 'During a battle, reach a maximum Combo of 20'},
-        {'title': 'Sumeru Police Force', 'desc': 'Clear out all Bounties'},
+        {'title': 'Nothing Lasts Forever', 'desc': 'Transcend for over 5,000 Cores'}, // CH DONE
+        {'title': 'Big Buyer', 'desc': "Clear out Dori's regular shop"}, // CH DONE
+        {'title': 'Speed Mail', 'desc': 'Wish for 10 characters in one run'}, // CH DONE
+        {'title': 'Onyx Rank', 'desc': 'Reach level 20 Adventure Rank'}, // CH DONE
+        {'title': 'Barely a Scratch', 'desc': 'Defeat the Abyss without losing any HP'}, // CH DONE
+        {'title': 'Until Til the End', 'desc': 'Survive a Skirmish battle with at most one HP remaining'}, // CH DONE
+        {'title': 'Another Test Subject', 'desc': 'During a battle, reach a maximum combo of 20'}, // CH DONE
+        {'title': 'Sumeru Police Force', 'desc': 'Clear out all Bounties'}, // CH DONE
         {'title': 'Cheap and Tasty Chopsuey', 'desc': 'Eat 10 5-Star foods within 30 seconds'},
-        {'title': 'A Nut From Space', 'desc': 'Catch 60 raining nuts'},
+        {'title': 'A Nut From Space', 'desc': 'Catch 60 raining nuts'}, // CH DONE
     ],[
-        {'title': 'Like a Tealeaf', 'desc': 'Transcend for over 15,000 Cores'},
-        {'title': 'Let Sleeping Travellers Rest', 'desc': 'Reach 1 billion NpS with the Traveller'},
-        {'title': 'Business as Usual', 'desc': 'Reach 7,500 energy in one run'},
-        {'title': 'Gem Empire', 'desc': 'Possess 4000 primogems in one run'},
-        {'title': 'Surging Forth', 'desc': 'Empower the Wanderer'},
+        {'title': 'Like a Tealeaf', 'desc': 'Transcend for over 15,000 Cores'}, // CH DONE
+        {'title': 'Let Sleeping Travellers Rest', 'desc': 'Reach 1 billion NpS with the Traveller'}, // CH DONE
+        {'title': 'Business as Usual', 'desc': 'Reach 7,500 energy in one run'}, // CH DONE
+        {'title': 'Gem Empire', 'desc': 'Possess 4000 primogems in one run'}, // CH DONE
+        {'title': 'Surging Forth', 'desc': 'Empower the Wanderer'}, // CH DONE
         {'title': "Menace of the East", 'desc': 'Defeat the Unusual Hilichurl'},
-        {'title': 'Golden Ticket', 'desc': 'Catch 16 Weasel Thieves'},
-        {'title': 'Sumeru Sales Specialist', 'desc': 'Reveal a field of Whopperflowers in under a minute'},
-        {'title': 'Blessed Hamada', 'desc': "Harvest 25 trees"},
-        {'title': 'Sylvan Samaritan', 'desc': "Offer 20 times to a tree in a single cycle"},
+        {'title': 'Golden Ticket', 'desc': 'Catch 16 Weasel Thieves'},  // CH DONE
+        {'title': 'Sumeru Sales Specialist', 'desc': 'Reveal a field of Whopperflowers in under 15 seconds'}, // CH DONE
+        {'title': 'Blessed Hamada', 'desc': "Harvest 25 fully-grown trees"},  // CH DONE
+        {'title': 'Sylvan Samaritan', 'desc': "Offer 20 times to a tree in a single cycle"}, // CH DONE
     ], [
-        {'title': 'Threads of All Fate', 'desc': 'Transcend for over 35,000 Cores'},
-        {'title': 'Ultimate Power', 'desc': 'Click for over one billion Nuts'},
-        {'title': 'House of Haravatat', 'desc': 'Possess 200 discounted levels'},
-        {'title': 'Song of Songs', 'desc': "Reach 15,000 energy in one run"},
-        {'title': 'Greater Vision', 'desc': 'Get a Crit on Big Nahida seven times in a row'},
+        {'title': 'Threads of All Fate', 'desc': 'Transcend for over 35,000 Cores'}, // CH DONE
+        {'title': 'Ultimate Power', 'desc': 'Click for over one billion Nuts'},  // CH DONE
+        {'title': 'House of Haravatat', 'desc': 'Possess 200 discounted levels'}, // CH DONE
+        {'title': 'Song of Songs', 'desc': "Reach 15,000 energy in one run"}, // CH DONE
+        {'title': 'Greater Vision', 'desc': 'Get a Crit on Big Nahida seven times in a row'},  // CH DONE
         {'title': 'The Bestest Travel Companion', 'desc': 'Reach maximum affection with 10 characters'},
-     {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},
-        {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 40 trees'},
-        {'title': 'Rooted Philanthropist', 'desc': 'Offer 35 times to a tree in a single cycle'},
+        {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},
+        {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 40 fully-grown trees'},  // CH DONE
+        {'title': 'Rooted Philanthropist', 'desc': 'Offer 35 times to a tree in a single cycle'}, // CH DONE
         {'title': 'Pretty Patty', 'desc': "Use 1 of each type of Magic Seed when planting a tree"},
     ], [
-        {'title': 'Live and Let Live', 'desc': 'Transcend for over 100,000 Cores'},
-        {'title': 'Perspective of A God', 'desc': 'Level up Nahida 700 times'},
-        {'title': 'Team All-Stars', 'desc': 'Ascend every character 6 times'},
-        {'title': 'Apex of Akasha', 'desc': 'Stop the monster responsible for the Outbreak'},
-        {'title': 'Stance of Impregnability', 'desc': 'During a battle, reach a maximum Combo of 50'},
-        {'title': 'Flawless Perfectionist', 'desc': "Reveal all of Arakarman's keys without revealing any non-key tiles"},
-        {'title': 'One Sided Victory', 'desc': "Finish Arakarman's game with at most a single key tile of yours being revealed"},
-        {'title': 'THE GNOSIS IS REAL', 'desc': 'Catch 12 Golden Weasel Thieves'},
-        {'title': '#teamtrees', 'desc': 'Harvest 100 trees'},
-        {'title': 'Aranara Thanks You', 'desc': 'Offer 50 times to a tree in a single cycle'},
+        {'title': 'Live and Let Live', 'desc': 'Transcend for over 100,000 Cores'}, // CH DONE
+        {'title': 'Perspective of A God', 'desc': 'Level up Nahida 700 times'},  // CH DONE
+        {'title': 'Team All-Stars', 'desc': 'Ascend every character six times'},
+        {'title': 'Apex of Akasha', 'desc': 'Stop the evil responsible for the Leyline Outbreak'},
+        {'title': 'Stance of Impregnability', 'desc': 'During a battle, reach a maximum combo of 50'}, // CH DONE
+        {'title': 'Rule of Nines', 'desc': "Within nine selections, reveal all of Arakarman's keys"},  // CH DONE
+        {'title': 'Strikeout!', 'desc': "Finish Arakarman's game with less than three of your key tiles being revealed"}, // CH DONE
+        {'title': 'THE GNOSIS IS REAL', 'desc': 'Catch 12 Golden Weasel Thieves'},  // CH DONE
+        {'title': '#teamtrees', 'desc': 'Harvest 100 fully-grown trees'},  // CH DONE
+        {'title': 'Aranara Thanks You', 'desc': 'Offer 50 times to a tree in a single cycle'}, // CH DONE
     ]
 ]
 

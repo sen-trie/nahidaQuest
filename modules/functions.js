@@ -206,6 +206,7 @@ const challengeThreshold = {
         7:[3,4]
     },
     'harvest': {
+        1:[0,9],
         25:[2,8],
         40:[3,7],
         100:[4,8]
@@ -214,6 +215,10 @@ const challengeThreshold = {
         20:[2,9],
         35:[3,8],
         50:[4,9]
+    },
+    'combo': {
+        20:[1,6],
+        50:[4,4],
     }
 }
 
@@ -255,7 +260,7 @@ function challengeCheck(type, prop, prop2, objectInfo) {
         let challengeComplete = false;
 
         // OBJECT INFO CONTAINS CATEGORY, VALUE, CHALLENGE POSITIONS (PASS persistentValues.challengeCheck AS PROP)
-        if (Object.keys(challengeThreshold).includes(objectInfo.category)) {
+        if (objectInfo.category !== 'specific' || Object.keys(challengeThreshold).includes(objectInfo.category) ) {
             const cat = objectInfo.category;
             for (let key in challengeThreshold[cat]) {
                 let value = challengeThreshold[cat][key];
@@ -267,12 +272,13 @@ function challengeCheck(type, prop, prop2, objectInfo) {
                 }
             }
         } else {
-            if (challengeCheckDict[value[0]][value[1]] === false) {
-                challengeCheckDict[value[0]][value[1]] = 'unclaimed';
+            if (challengeCheckDict[objectInfo.value[0]][objectInfo.value[1]] === false) {
+                challengeCheckDict[objectInfo.value[0]][objectInfo.value[1]] = 'unclaimed';
                 challengeComplete = true;
             }
         }
 
+        if (challengeComplete) {console.log(objectInfo)}
         return challengeComplete;
     }
 }
