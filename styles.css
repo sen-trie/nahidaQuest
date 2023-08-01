@@ -2338,13 +2338,27 @@ table, button, label {
     gap: 4%;
 }
 
-.tier-container > div > button {
-    width: 20%;
+.challenge-button {
+    font-size: 0.8em;
+    width: 25%;
     padding: 1%;
     background-color: #314151;
     border: 0.15em solid #162120;
     color: rgb(236, 236, 236);
     border-radius: 0.6em;
+    transition: 0.15s ease;
+}
+
+.challenge-button-unclaimed {
+    background-color: #d8c5ac; 
+    border: 0.15em solid #68563d;
+    color: #3a2e1e;
+}
+
+.challenge-button-claimed {
+    background-color: #68563d;
+    border: 0.15em solid #d8c5ac; 
+    color: #efe2d0;
 }
 
 .tier-container > div > div {
@@ -2360,6 +2374,30 @@ table, button, label {
     border-bottom: 0.125em solid #3b4543;
     margin-bottom: 0.2em;
     color: #303a38;
+}
+
+.challenge-pop-up {
+    position: absolute;
+    bottom: 1%;
+    left: 50%;
+    z-index: 150;
+    width: auto;
+    height: 12.5%;
+    aspect-ratio: 6.92;
+    padding-left: 5%;
+    padding-right: 2%;
+    box-sizing: border-box;
+    color: #f6f1f6;
+    background: url(./assets/frames/challenge-temp.webp) no-repeat center center / cover;
+    transform: translateX(-50%);
+}
+
+.challenge-pop-up > p {
+    height: 100%;
+    width: 100%;
+    padding: 2%;
+    box-sizing: border-box;
+    text-align: center;
 }
  
 

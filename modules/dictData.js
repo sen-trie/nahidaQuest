@@ -77,8 +77,10 @@ const imgKey = {
     24:{Left:"55",  Top:"24",   Level:12,   Wave:["15_B","20_A"]},
     25:{Left:"66",  Top:"41",   Level:12,   Wave:["16_A","19_A"]},
     26:{Left:"78",  Top:"48",   Level:13,   Wave:[1],  Heads:[18,19]        ,Loot:{}},
-    27:{Left:"72",  Top:"28",   Level:14,   Wave:[3],  Heads:[25]           ,Loot:{}},
-    28:{Left:"50",  Top:"29",   Level:14,   Wave:[4],  Heads:[26]           ,Loot:{}},
+    27:{Left:"20",  Top:"57",   Level:14,   Wave:[1],  Heads:[26]           ,Loot:{}},
+    28:{Left:"38",  Top:"60",   Level:14,   Wave:[2],  Heads:[26]           ,Loot:{}},
+    29:{Left:"72",  Top:"28",   Level:14,   Wave:[3],  Heads:[25]           ,Loot:{}},
+    30:{Left:"50",  Top:"29",   Level:14,   Wave:[4],  Heads:[26]           ,Loot:{}},
 }
 
 const sceneInfo = {
@@ -1065,7 +1067,7 @@ const eventText = {
 
 const challengeInfo = [
     [
-        {'title': 'Rise and Shine', 'desc': 'Transcend for over 1,000 Cores'}, // CH DONE
+        {'title': 'Corps of Thousand', 'desc': 'Transcend for over 1,000 Cores'}, // CH DONE
         {'title': 'Breaking Impact', 'desc': 'Possess 1000 primogems in one run'}, // CH DONE
         {'title': 'Fungi On Seeds', 'desc': 'Reach 2,500 energy in one run'}, // CH DONE
         {'title': 'Rear of the Library', 'desc': 'Possess 50 discounted levels'}, // CH DONE
@@ -1076,8 +1078,8 @@ const challengeInfo = [
         {'title': 'The Commissioner', 'desc': 'Catch 13 Weasel Thieves'},  // CH DONE
         {'title': 'Green Bond', 'desc': 'Harvest a fully-grown tree for the first time'}, // CH DONE
     ], [
-        {'title': 'Nothing Lasts Forever', 'desc': 'Transcend for over 5,000 Cores'}, // CH DONE
-        {'title': 'Big Buyer', 'desc': "Clear out Dori's regular shop"}, // CH DONE
+        {'title': 'Reborn from Another', 'desc': 'Transcend for over 5,000 Cores'}, // CH DONE
+        {'title': 'Big Spender', 'desc': "Clear out Dori's regular shop"}, // CH DONE
         {'title': 'Speed Mail', 'desc': 'Wish for 10 characters in one run'}, // CH DONE
         {'title': 'Onyx Rank', 'desc': 'Reach level 20 Adventure Rank'}, // CH DONE
         {'title': 'Barely a Scratch', 'desc': 'Defeat the Abyss without losing any HP'}, // CH DONE
@@ -1087,7 +1089,7 @@ const challengeInfo = [
         {'title': 'Cheap and Tasty Chopsuey', 'desc': 'Eat 10 5-Star foods within 30 seconds'},
         {'title': 'A Nut From Space', 'desc': 'Catch 60 raining nuts'}, // CH DONE
     ],[
-        {'title': 'Like a Tealeaf', 'desc': 'Transcend for over 15,000 Cores'}, // CH DONE
+        {'title': 'The Myth of Vahumana', 'desc': 'Transcend for over 15,000 Cores'}, // CH DONE
         {'title': 'Let Sleeping Travellers Rest', 'desc': 'Reach 1 billion NpS with the Traveller'}, // CH DONE
         {'title': 'Business as Usual', 'desc': 'Reach 7,500 energy in one run'}, // CH DONE
         {'title': 'Gem Empire', 'desc': 'Possess 4000 primogems in one run'}, // CH DONE
@@ -1098,8 +1100,8 @@ const challengeInfo = [
         {'title': 'Blessed Hamada', 'desc': "Harvest 25 fully-grown trees"},  // CH DONE
         {'title': 'Sylvan Samaritan', 'desc': "Offer 20 times to a tree in a single cycle"}, // CH DONE
     ], [
-        {'title': 'Threads of All Fate', 'desc': 'Transcend for over 35,000 Cores'}, // CH DONE
-        {'title': 'Ultimate Power', 'desc': 'Click for over one billion Nuts'},  // CH DONE
+        {'title': 'Weight of A Thousand Sumpter Beasts', 'desc': 'Transcend for over 35,000 Cores'}, // CH DONE
+        {'title': 'At the Click of a Button', 'desc': 'Click for over one billion Nuts'},  // CH DONE
         {'title': 'House of Haravatat', 'desc': 'Possess 200 discounted levels'}, // CH DONE
         {'title': 'Song of Songs', 'desc': "Reach 15,000 energy in one run"}, // CH DONE
         {'title': 'Greater Vision', 'desc': 'Get a Crit on Big Nahida seven times in a row'},  // CH DONE

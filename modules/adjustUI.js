@@ -206,10 +206,10 @@ function createDom(elementType, attributes) {
                 element.classList.add(...attributes[attr]);
             } else if (attr === 'style' && typeof attributes[attr] === 'object') {
                 Object.assign(element.style, attributes[attr]);
-            } else if ((attr === 'innerText' || attr === 'innerHTML' || attr === 'progress') && typeof attributes[attr] !== 'object') {
+            } else if (typeof attributes[attr] !== 'object' || attributes[attr] === null) {
                 element[attr] = attributes[attr];
             } else {
-                element.setAttribute(attr, attributes[attr]);
+                console.warn('Invalid Attribute: ', attr);
             }
         }
     }

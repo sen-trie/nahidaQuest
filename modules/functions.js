@@ -257,7 +257,7 @@ function challengeCheck(type, prop, prop2, objectInfo) {
         return challengeCheckDict;
     } else if (type === 'check') {
         let challengeCheckDict = prop;
-        let challengeComplete = false;
+        let challengeComplete = [];
 
         // OBJECT INFO CONTAINS CATEGORY, VALUE, CHALLENGE POSITIONS (PASS persistentValues.challengeCheck AS PROP)
         if (objectInfo.category !== 'specific' || Object.keys(challengeThreshold).includes(objectInfo.category) ) {
@@ -268,18 +268,17 @@ function challengeCheck(type, prop, prop2, objectInfo) {
                     break;
                 } else if (challengeCheckDict[value[0]][value[1]] === false) {
                     challengeCheckDict[value[0]][value[1]] = 'unclaimed';
-                    challengeComplete = true;
+                    challengeComplete.push([value[0], value[1]]);
                 }
             }
         } else {
             if (challengeCheckDict[objectInfo.value[0]][objectInfo.value[1]] === false) {
                 challengeCheckDict[objectInfo.value[0]][objectInfo.value[1]] = 'unclaimed';
-                challengeComplete = true;
+                challengeComplete.push([objectInfo.value[0], objectInfo.value[1]]);
             }
         }
 
-        if (challengeComplete) {console.log(objectInfo)}
-        return challengeComplete;
+        return (challengeComplete.length === 0 ? false : challengeComplete);
     }
 }
 
