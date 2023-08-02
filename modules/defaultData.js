@@ -410,13 +410,15 @@ const enemyInfo = {
     1302:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1200,   ATK:1.5,     AtkCooldown:35},
     // LVL 14
     "14-Wave-1":{Wave:[1401],         BG:[1,1]},
-    "14-Wave-2":{Wave:[1402],         BG:[2,2]},
-    "14-Wave-3":{Wave:[1403],         BG:[3,3]},
-    "14-Wave-4":{Wave:[1404],         BG:[4,4]},
+    "14-Wave-2":{Wave:[1411],         BG:[2,2]},
+    "14-Wave-3":{Wave:[1412],         BG:[2,2]},
+    "14-Wave-4":{Wave:[1421],         BG:[3,3]},
+    "14-Wave-5":{Wave:[1431],         BG:[4,4]},
     1401:{Class:"Megaboss",       Variation:1,   Type:"FellBoss",      HP:3000,   ATK:2,     AtkCooldown:35},
-    1402:{Class:"Megaboss",       Variation:1,   Type:"Unusual",      HP:3000,   ATK:2,     AtkCooldown:35},
-    1403:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:3000,   ATK:2,     AtkCooldown:35},
-    1404:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:3000,   ATK:2,     AtkCooldown:35},
+    1411:{Class:"Megaboss",       Variation:1,   Type:"Unusual",      HP:6500,   ATK:0.5,     AtkCooldown:25},
+    1412:{Class:"Minion",          Variation:3,   Type:"Unusual",      HP:1000,   ATK:0.5,     AtkCooldown:45},
+    1421:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:3000,   ATK:2,     AtkCooldown:35},
+    1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:3000,   ATK:2,     AtkCooldown:35},
 }
 
 const upgradeDictDefault = {

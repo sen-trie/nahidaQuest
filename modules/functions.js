@@ -52,7 +52,7 @@ function getHighestKey(obj) {
 
 // RANDOM NUMBER GENERATOR (DOES NOT INCLUDE MAX)
 function randomInteger(min, max) {
-    return Math.floor(Math.random() * (max - min) ) + min;
+    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 // WRAPS RNG TO BOOLEAN

@@ -78,7 +78,7 @@ const imgKey = {
     25:{Left:"66",  Top:"41",   Level:12,   Wave:["16_A","19_A"]},
     26:{Left:"78",  Top:"48",   Level:13,   Wave:[1],  Heads:[18,19]        ,Loot:{}},
     27:{Left:"20",  Top:"57",   Level:14,   Wave:[1],  Heads:[26]           ,Loot:{}},
-    28:{Left:"38",  Top:"60",   Level:14,   Wave:[2],  Heads:[26]           ,Loot:{}},
+    28:{Left:"80",  Top:"35",   Level:14,   Wave:[2],  Heads:[26]           ,Loot:{}},
     29:{Left:"72",  Top:"28",   Level:14,   Wave:[3],  Heads:[25]           ,Loot:{}},
     30:{Left:"50",  Top:"29",   Level:14,   Wave:[4],  Heads:[26]           ,Loot:{}},
 }

@@ -3439,3 +3439,17 @@ table, button, label {
               transform: translateX(-0.3em) translateY(0.3em);
     }
 }
+
+@keyframes slit-in-horizontal {
+    0% {
+      transform: translateZ(-6em) rotateX(90deg);
+      opacity: 0;
+    }
+    54% {
+      transform: translateZ(-1em) rotateX(70deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateZ(0) rotateX(0);
+    }
+  }

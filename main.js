@@ -6124,7 +6124,7 @@ function drawAdventure(advType, wave) {
     const adventureTextBox = document.getElementById("adventure-text");
     
     adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp)`;
-    adventureVideo = spawnMob(adventureVideo, waveType.Wave);
+    spawnMob(adventureVideo, waveType.Wave, false);
 
     const preloadedImage = new Image();
     preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${randomInteger(waveType.BG[0],waveType.BG[1])}.webp`;
@@ -6153,7 +6153,7 @@ function drawAdventure(advType, wave) {
                     break;
                 case 'Unusual':
                     adventureHeading.style.animation = "fadeOut 0.4s ease-out reverse";
-                    adventureHeading.innerText = "After stepping into the domain, you...Watch out! Something fast is being launched towards you!!"
+                    adventureHeading.innerText = "After stepping into the domain, you...Watch out! Something is being launched towards you!!"
                     break;
                 case 'Workshop':
                     adventureHeading.innerText = "Before you stands the re-animated machine, the Prodigal, Everlasting Lord of Arcane Wisdom."
@@ -6523,7 +6523,13 @@ function comboHandler(type, ele) {
     }
 }
 
-function spawnMob(adventureVideo, waveInfo) {
+function spawnMob(adventureVideo, waveInfo, adjacentSibling) {
+    let decoy = null;
+    if (typeof(waveInfo[1]) === 'string' && waveInfo[1].includes('decoy')) {
+        decoy = waveInfo[1].split('-')[1];
+        waveInfo.pop();
+    }
+
     for (let i = 0; i < waveInfo.length; i++) {
         let singleEnemyInfo = enemyInfo[waveInfo[i]];
         let mobDiv = document.createElement("div");
@@ -6532,16 +6538,68 @@ function spawnMob(adventureVideo, waveInfo) {
 
         let randMob = `${singleEnemyInfo.Type}-${singleEnemyInfo.Class}-${randomInteger(1,singleEnemyInfo.Variation+1)}`;
         mobImg.style.backgroundImage = `url(./assets/expedbg/enemy/${randMob}.webp)`;
-        mobDiv.enemyType = randMob;
+        mobDiv.append(mobImg);
 
+        mobDiv.decoyNumber = null;
+        mobDiv.enemyType = randMob;
         mobDiv.enemyID = singleEnemyInfo;
         mobDiv.classList.add("enemy");
         adventureVariables.specialty === 'Workshop' ? mobDiv.classList.add("wide-enemy") : null;
 
-        mobDiv.append(mobImg);
-        adventureVideo.append(mobDiv);
+        switch (singleEnemyInfo.Class) {
+            case 'Megaboss':
+                mobDiv.classList.add("megaboss");
+                break;
+            case 'Minion':
+                mobDiv.classList.add("minion");
+                break;
+            default:
+                break;
+        }
+
+        // if (decoy !== null) {
+        //     mobDiv.classList.remove("megaboss");
+        //     mobDiv.classList.add("decoy");
+        //     mobDiv.decoyNumber = 1 + (decoy === '2' ? 2 : 0)
+        //     decoy === '2' ? adjacentSibling.after(mobDiv) : adjacentSibling.before(mobDiv);
+        //     return mobDiv;
+        // } else {
+        if (decoy === null && adventureVariables.specialty === 'Unusual') {
+            mobDiv.decoyNumber = 3;
+        }
+
+        if (adjacentSibling) {
+            const nextSibling = adjacentSibling.nextElementSibling;
+            const previousSibling = adjacentSibling.previousElementSibling;
+            
+            let positionCount = 3;
+            if (nextSibling && !nextSibling.classList.contains('enemy')) {
+                adjacentSibling.after(mobDiv);
+                positionCount += 2;
+            } else if (previousSibling && !previousSibling.classList.contains('enemy')) {
+                adjacentSibling.before(mobDiv);
+                positionCount -= 2;
+            } else if (nextSibling && !nextSibling.nextElementSibling.classList.contains('enemy')) {
+                adjacentSibling.after(mobDiv);
+                positionCount++;
+            } else if (previousSibling && !previousSibling.previousElementSibling.classList.contains('enemy')) {
+                adjacentSibling.before(mobDiv);
+                positionCount--;
+            } else {
+                randomInteger(1, 3) === 1 ? adjacentSibling.after(mobDiv) : adjacentSibling.before(mobDiv);
+            }
+
+            if (decoy !== null) {
+                mobDiv.classList.remove("megaboss");
+                mobDiv.classList.add("decoy");
+                mobDiv.decoyNumber = positionCount;
+            }
+
+            return mobDiv;
+        } else {
+            adventureVideo.append(mobDiv);
+        }
     }
-    return adventureVideo;
 }
 
 function triggerFight() {
@@ -6565,21 +6623,23 @@ function triggerFight() {
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
     battleVariables = {
-        quicktime: adventureVariables.specialty === 'Unusual' ? 100 : 0,
+        defenseMob: null,
         guardtime: 0,
         doubleAtkCooldown: 1,
-        defenseMob: null,
         healthLost: 0,
-        maxHealth: Math.ceil(5 + Math.floor(advDict.adventureRank / 4) * (activeLeader == "Nahida" ? 1.2 : 1))
+        maxHealth: Math.ceil(5 + Math.floor(advDict.adventureRank / 4) * (activeLeader == "Nahida" ? 1.2 : 1)),
+        quicktime: adventureVariables.specialty === 'Unusual' ? 100 : 0,
+        summonTime: null,
+        decoyTime: null,
+        decoyNumber: null,
+        bossHealth: adventureVariables.advType === 14 ? 100 : null,
     }
     
-    let currentSong;
+    let currentSong = randomInteger(1, 4); 
     if (adventureScaraText) {
         currentSong = 4;
     } else if (adventureVariables.advType >= 13) {
-        currentSong = randomInteger(5,7);
-    } else {
-        currentSong = randomInteger(1,4);
+        currentSong = randomInteger(5, 7);
     }
 
     let adventureVideoChildren = adventureVideo.children;
@@ -6714,21 +6774,98 @@ function triggerFight() {
         }
         adventureFightImg[i].appendChild(adventureAtkCooldown);
     }
-    
-    // NOTE WHAT IS ADVENUTER VIDEO CHILDREN: CHANGE TO QUERY SELECTOR FOR ENEMY
+
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         let mobDiv = adventureVideoChildren[i];
         if (mobDiv.tagName != 'DIV' || !mobDiv.classList.contains('enemy')) {continue};
-        mobDiv.children[0].style.animation = `vibrate ${randomInteger(600,1200) / 100}s linear infinite both`;
+
+        activateMob(mobDiv, i, adventureVideoChildren.length, quicktimeCheck, summonMob);
+    }
+
+    // SPAWNS QUICKTIME EVENT AFTER TIME
+    function quicktimeCheck() {
+        if (adventureVariables.quicktimeEnabled && battleVariables.quicktime >= (2.5 * adventureVariables.maxEnemyAmount) && !document.getElementById('warning-quicktime')) {
+            const quicktimeArray = adventureVariables.quickType;
+            battleVariables.quicktime = 0;
+
+            let warningImg = new Image();
+            warningImg.id = "warning-quicktime";
+            warningImg.src = "./assets/icon/warning.webp";
+            warningImg.classList.add("quicktime-warning");
+            adventureVideo.appendChild(warningImg);
+
+            adventurePreload.fetch(["./assets/expedbg/Blue.webp","./assets/expedbg/Red.webp","./assets/expedbg/Green.webp"]);
+            warningImg.onload = () => {
+                warningImg.addEventListener("animationend",()=>{
+                    battleVariables.quicktime = 0;
+                    quicktimeEvent(quicktimeArray[randomInteger(1, Object.keys(quicktimeArray).length + 1)], battleVariables.currentATK);
+                    warningImg.remove();
+                })
+            }
+        }
+    }
+
+    // SUMMONS NEW MOBS (CURRENTLY ONLY FOR UNUSUAL HILICHURL)
+    function summonMob(type) {
+        if (type !== 'decoy') {
+            if (battleVariables.summonTime === null || battleVariables.summonTime <= (2.5 * adventureVariables.maxEnemyAmount)) {return}
+            if (adventureVariables.currentEnemyAmount >= 5) {
+                battleVariables.summonTime = 0;
+                return;
+            }
+            battleVariables.summonTime = 0;
+        }  
+        
+        for (let i = 0; i < adventureVideoChildren.length; i++) {
+            let mobDiv = adventureVideoChildren[i];
+            if (mobDiv.classList.contains('enemy')) {
+                const bossEle = adventureVideo.querySelector('.megaboss');
+
+                if (type === 'decoy') {
+                    for (let i = 0; i < 4; i++) {
+                        activateMob(spawnMob(adventureVideo, [1411, `decoy-${i + 1}`], mobDiv), bossEle, adventureVideoChildren.length, quicktimeCheck, summonMob);
+                        adventureVariables.currentEnemyAmount++;
+                    }
+                    
+                    adventureVariables.currentEnemyAmount--;
+                } else {
+                    activateMob(spawnMob(adventureVideo, [1412], bossEle), 1, adventureVideoChildren.length, quicktimeCheck, summonMob);
+                }
+                adventureVariables.currentEnemyAmount++;
+                break;
+            }
+        }
+    }
+
+    // SUMMONS DECOYS (CURRENTLY ONLY FOR UNUSUAL HILICHURL)
+    if (adventureVariables.specialty === 'Unusual') {
+        setTimeout(() => {
+            summonMob('decoy');
+            battleVariables.decoyNumber = 3;
+        }, 5000)
+    }
+
+}
+
+// STARTS COMBAT FOR MOB
+function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCheck, summonMob) {
+    const decoy = mobDiv.classList.contains('decoy') ? true : false;
+    mobDiv.children[0].style.animation = `vibrate ${randomInteger(600,1200) / 100}s linear infinite both`;
         if (adventureVariables.specialty === 'Workshop') {
             mobDiv.children[0].style.animation = `vibrate ${randomInteger(2000,2400) / 100}s linear infinite both`;
+        } else if (adventureVariables.specialty === 'Unusual' && mobDiv.classList.contains('minion')) {
+            mobDiv.children[0].style.animation = 'slit-in-horizontal 0.6s ease-out both';
         } else if (adventureVariables.specialty === 'Unusual') {
-            mobDiv.children[0].style.animation = 'unset'
+            mobDiv.children[0].style.animation = 'unset';
         }
 
         let singleEnemyInfo = mobDiv.enemyID;
         let mobHealth = document.createElement("div");
         mobHealth.classList.add(`health-bar${adventureScaraText}`);
+
+        if (decoy) {
+            singleEnemyInfo.HP = 1e10;
+        };
         
         mobHealth.maxHP = singleEnemyInfo.HP;
         mobHealth.health = singleEnemyInfo.HP;
@@ -6745,21 +6882,24 @@ function triggerFight() {
         mobAtkIndicator.firstLoad = true;
         mobAtkIndicator.doubleAtk = false;
 
+        let decoyLoad = false;
         let canvas = document.createElement("canvas");
         canvas.classList.add("atk-indicator");
         mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
 
-        canvas.brightness = 0 - 0.1 * (i * randomInteger(1, adventureVideoChildren.length) - 2);
-        canvas.brightness = adventureVariables.specialty === 'Unusual' ? 0.75 : canvas.brightness
+        canvas.brightness = 0 - 0.1 * (position * randomInteger(1, adventureVideoChildrenLength) - 2); /// CHANGE THIS
+        canvas.brightness = adventureVariables.specialty === 'Unusual' ? 0.65 : canvas.brightness
+        
         mobAtkIndicator.onload = () => {
             canvas.width = mobAtkIndicator.naturalWidth;
             canvas.height = mobAtkIndicator.naturalHeight;
 
             let ctx = canvas.getContext("2d");
             ctx.drawImage(mobAtkIndicator, 0, 0);
-            let brightnessIncrement = Math.round(1 / animationTime * 100)/10000;
+            let brightnessIncrement = decoy ? 0 : Math.round(1 / animationTime * 100)/10000;
             let maxBrightness = 1;
 
+            if (decoyLoad) {return};
             canvas.style.filter = `brightness(0)`;
             canvas.style.transform = ``;
             canvas.attackState = false;
@@ -6788,7 +6928,7 @@ function triggerFight() {
                 // ATTACKS ARE FASTER WHEN MORE ENEMIES ARE DOWN
                 if (deltaTime > interval) {
                     previousTime = currentTime - (deltaTime % interval);
-                    const speedUpFactor = 1 + (adventureVariables.maxEnemyAmount - adventureVariables.currentEnemyAmount) * 0.75;
+                    const speedUpFactor = 1 + Math.max((adventureVariables.maxEnemyAmount - adventureVariables.currentEnemyAmount) * 0.75, 0);
                     if (mobAtkIndicator.defence) {
                         if (adventureVariables.currentEnemyAmount === 1) {
                             guardStance(mobDiv,"exit");
@@ -6802,13 +6942,24 @@ function triggerFight() {
 
                     if (!quicktimeAttack) {
                         canvas.brightness += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100 * (mobAtkIndicator.doubleAtk == true ? 2.5 : 1));
-                        battleVariables.quicktime += (brightnessIncrement * speedUpFactor);
+                        if (!mobDiv.classList.contains('minion')) battleVariables.quicktime += (brightnessIncrement * speedUpFactor);
                         battleVariables.guardtime += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
+
+                        if (mobDiv.classList.contains('megaboss')) {
+                            if (battleVariables.summonTime !== null) {
+                                battleVariables.summonTime += (brightnessIncrement * speedUpFactor * 2);
+                            } else if (adventureVariables.specialty === 'Unusual') {
+                                battleVariables.decoyTime = canvas.brightness;
+                            }
+                        }
+
                         quicktimeCheck();
+                        summonMob();
                         if (adventureVariables.currentEnemyAmount > 1 && canvas.brightness < 0.8) guardStance(mobDiv,"check");
                     }
 
-                    if (canvas.attackState) {
+                    // IF THERES DECOYS AND THAT IT IS NOT THE CHOSEN DECOY, THE CANVAS IGNORES THE ATTACK
+                    if (canvas.attackState && !(battleVariables.decoyNumber !== null && battleVariables.decoyNumber != mobDiv.decoyNumber)) {
                         if (mobAtkIndicator.doubleAtk == true) {
                             mobAtkIndicator.doubleAtk = false;
                             mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
@@ -6833,24 +6984,96 @@ function triggerFight() {
                         if (evadeRoll <= evadeMax) {
                             createBattleText("dodge",animationTime * 150 * 2,mobDiv);
                         } else {
-                            loseHP(mobHealth.atk,"normal",mobHealth.class);
+                            loseHP(mobHealth.atk, "normal");
                         }
                         canvas.attackState = false;
                     }
 
+                    if (decoy) {
+                        canvas.brightness = battleVariables.decoyTime;
+                    }
+
+                    // console.log(battleVariables.decoyTime)
                     if (canvas.brightness > maxBrightness) {
                         if (canvas.classList.contains("attack-ready")) {canvas.classList.remove("attack-ready")}
+                        if (canvas.classList.contains("decoy-ready")) {canvas.classList.remove("decoy-ready")}
                         canvas.attackState = true;
                         canvas.brightness = 0;
                         canvas.style.transform = ``;
                         canvas.style.filter = `brightness(0)`;
+
+                        if (battleVariables.decoyNumber !== null) {
+                            if (battleVariables.decoyNumber == mobDiv.decoyNumber) {
+                                setTimeout(() => {
+                                    let randomRoll = randomInteger(1, 4);
+                                    while (battleVariables.decoyNumber == randomRoll) {
+                                        randomRoll = randomInteger(1, 4);
+                                    }
+                                    battleVariables.decoyNumber = randomRoll;
+                                }, 150);
+                            }
+
+                            mobAtkIndicator.src = (`./assets/icon/atkIndicator${adventureScaraText}.webp`);
+                            decoyLoad = true;
+                        }
                     } else if (canvas.brightness > 0.8) {
-                        if (canvas.style.transform == ``) {
+                        if (battleVariables.decoyTime != null && battleVariables.decoyNumber && battleVariables.decoyTime > 0.8) {
+                            decoyLoad = true;
+
+                            if (battleVariables.decoyNumber == mobDiv.decoyNumber) {
+                                if (!mobAtkIndicator.src.includes(`/assets/icon/atkIndicator${adventureScaraText}.webp`)) {
+                                    mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                                    canvas.style.transform = ``;
+                                }
+
+                                if (!canvas.classList.contains("attack-ready")) {
+                                    canvas.classList.add("attack-ready");
+                                }
+                            } else if (battleVariables.decoyNumber != mobDiv.decoyNumber && !mobAtkIndicator.src.includes(`/assets/icon/fakeAtk.webp`)) {
+                                mobAtkIndicator.src = `./assets/icon/fakeAtk.webp`;
+                                canvas.classList.add("decoy-ready");
+                                canvas.style.transform = ``;
+                            }
+
                             canvas.style.transform = `scale(1.2)`;
                             canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
-                            canvas.classList.add("attack-ready");
+    
+                            
+                            // } else {
+                            //     if (canvas.style.transform == ``) {
+                            //         canvas.style.transform = `scale(1.2)`;
+                            //         canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
+                            //         canvas.classList.add("attack-ready");
+                            //     }
+                            // }
+                        } else if (battleVariables.decoyTime != null && battleVariables.decoyTime < 0.2) {
+                            if (canvas.classList.contains("decoy-ready")) {canvas.classList.remove("decoy-ready")};
+                            if (!mobAtkIndicator.src.includes(`/assets/icon/atkIndicator${adventureScaraText}.webp`)) {
+                                mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                            }
+                            
+                            canvas.brightness = 0;
+                            canvas.style.transform == ``;
+                            canvas.style.filter = `brightness(${canvas.brightness})`;
+                        } else {
+                            if (canvas.style.transform == ``) {
+                                canvas.style.transform = `scale(1.2)`;
+                                canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
+                                canvas.classList.add("attack-ready");
+                            }
                         }
                     } else {
+                        if (canvas.style.transform != ``) {
+                            canvas.style.transform = ``;
+                            if (canvas.classList.contains("attack-ready")) {canvas.classList.remove("attack-ready")};
+                            if (canvas.classList.contains("decoy-ready")) {canvas.classList.remove("decoy-ready")};
+                        }
+
+                        if (mobAtkIndicator.doubleAtk == false) {
+                            if (!mobAtkIndicator.src.includes(`/assets/icon/atkIndicator${adventureScaraText}.webp`)) {
+                                mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                            }
+                        }
                         canvas.style.filter = `brightness(${canvas.brightness})`;
                     }
                 }
@@ -6914,7 +7137,7 @@ function triggerFight() {
             }
         }
 
-        mobDiv.children[0].addEventListener("click",()=>{
+        mobDiv.children[0].addEventListener("click", () => {
             if (!adventureVariables.fightSceneOn || mobHealth.dead || quicktimeAttack) {return}
             let attackMultiplier = 1;
             const guardCheckBool = guardCheck();
@@ -6924,7 +7147,6 @@ function triggerFight() {
                 if (activeLeader == "Ei") {attackMultiplier = 1.35}
                 // IF TIMING WAS CORRECT
                 if (canvas.classList.contains("attack-ready")) {
-                    // if (mobHealth.class != "Superboss") {
                     canvas.attackState = false;
                     canvas.classList.remove("attack-ready");
                     mobDiv.children[0].classList.add("staggered");
@@ -6933,7 +7155,12 @@ function triggerFight() {
                         mobDiv.children[0].classList.remove("staggered");
                     }, Math.max(animationTime * 150, 500));
 
-                    canvas.brightness = 0 - (randomInteger(0,10) / 10);
+                    if (battleVariables.decoyNumber != null) {
+                        canvas.brightness = 0 - (randomInteger(0,10) / 10);
+                    } else {
+                        canvas.brightness = 0;
+                    }
+                    
                     canvas.style.transform = ``;
                     canvas.style.filter = `brightness(0)`;
 
@@ -6962,6 +7189,7 @@ function triggerFight() {
                         cooldown.amount += 15;
                     }
 
+                    // CHECKS IF THERE IS AN ACTIVE GUARD
                     if (guardCheckBool) {
                         mobHealth.health -= (battleVariables.currentATK * attackMultiplier);
                         loseHP(mobHealth.atk / 2, "inverse");
@@ -6975,10 +7203,38 @@ function triggerFight() {
                         const cooldown = document.getElementById('adventure-cooldown-3');
                         cooldown.amount += 25 + (adventureVariables.advType === 13 ? 5 : 0);
                     }
+
+                    // CHECKS IF DECOYS ARE PRESEENT
+                    if (battleVariables.decoyTime != null) {
+                        const bossEle = document.querySelector('.megaboss');
+                        const bossEleCanvas = bossEle.querySelector('.atk-indicator');
+                        bossEleCanvas.brightness = 0;
+                        battleVariables.decoyTime = 0;
+
+                        setTimeout(() => {
+                            let randomRoll = randomInteger(1, 4);
+                            while (battleVariables.decoyNumber == randomRoll) {
+                                randomRoll = randomInteger(1, 4);
+                            }
+                            battleVariables.decoyNumber = randomRoll;
+                        }, 150)
+                    }
                     
                     parrySuccess.load();
                     parrySuccess.play();
                     comboHandler("add");
+                } else if (canvas.classList.contains("decoy-ready")) {
+                    createBattleText("deflect", animationTime * 150 * 2, mobDiv);
+                    loseHP(mobHealth.atk, "normal");
+
+                    parryFailure.load();
+                    parryFailure.play();
+                    comboHandler("reset");
+
+                    if (!advDict.rankDict[10].Locked) {
+                        const cooldown = document.getElementById('adventure-cooldown-3');
+                        cooldown.amount += 15;
+                    }
                 } else {
                     mobDiv.children[0].classList.add("damaged");
                     setTimeout(()=>{mobDiv.children[0].classList.remove("damaged")}, Math.max(animationTime * 150, 500));
@@ -7035,38 +7291,46 @@ function triggerFight() {
                 fightEnemyDownElement.play();
                 mobHealth.remove();
 
-                if (!advDict.rankDict[8].Locked) {loseHP(1,"inverse");}
+                if (!advDict.rankDict[8].Locked && !mobDiv.classList.contains('minion')) {loseHP(1,"inverse");}
                 let mobChildArray = mobDiv.children;
                 while (mobChildArray.length > 1) {
                     mobChildArray[mobChildArray.length - 1].remove();
                 }
 
+                if (mobDiv.classList.contains('minion')) {mobDiv.remove()}
                 if (adventureVariables.currentEnemyAmount === 0) {winAdventure();}
             }
-            mobHealth.style.width = `${Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100}%`
+
+            let newHealth = battleVariables.bossHealth = Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100;
+            mobHealth.style.width = `${newHealth}%`
+            if (mobDiv.classList.contains('megaboss')) {bossUpdate(newHealth)};
         })
-        mobDiv.append(mobHealth, canvas);
-    }
 
-    // SPAWNS QUICKTIME EVENT AFTER TIME
-    function quicktimeCheck() {
-        if (adventureVariables.quicktimeEnabled && battleVariables.quicktime >= (2.5 * adventureVariables.maxEnemyAmount) && !document.getElementById('warning-quicktime')) {
-            const quicktimeArray = adventureVariables.quickType;
-            battleVariables.quicktime = 0;
+        if (decoy) {
+            mobDiv.append(canvas);
+        } else {
+            mobDiv.append(mobHealth, canvas);
+        }
+}
 
-            let warningImg = new Image();
-            warningImg.id = "warning-quicktime";
-            warningImg.src = "./assets/icon/warning.webp";
-            warningImg.classList.add("quicktime-warning");
-            adventureVideo.appendChild(warningImg);
+function bossUpdate(updatedHealth) {
+    battleVariables.bossHealth = updatedHealth;
 
-            adventurePreload.fetch(["./assets/expedbg/Blue.webp","./assets/expedbg/Red.webp","./assets/expedbg/Green.webp"]);
-            warningImg.onload = ()=>{
-                warningImg.addEventListener("animationend",()=>{
-                    quicktimeEvent(quicktimeArray[randomInteger(1, Object.keys(quicktimeArray).length + 1)], battleVariables.currentATK);
-                    warningImg.remove();
-                })
-            }
+    if (updatedHealth <= 60 && adventureVariables.specialty === 'Unusual') {
+        if (battleVariables.summonTime === null) {
+            battleVariables.summonTime = 0;
+            battleVariables.decoyTime = null;
+
+            const adventureVideo = document.getElementById('adventure-video');
+            const bossEle = adventureVideo.querySelector('.megaboss');
+            bossEle.children[0].style.backgroundImage = `url(./assets/expedbg/enemy/Unusual-Megaboss-2.webp)`;
+            bossEle.children[0].style.animation = 'vibrate 0.8s linear'
+
+            const decoyEle = adventureVideo.querySelectorAll('.decoy');
+            decoyEle.forEach((ele) => {
+                ele.remove();
+                adventureVariables.currentEnemyAmount--;
+            })
         }
     }
 }
@@ -7081,6 +7345,7 @@ function createBattleText(text, timer, container) {
 }
 
 function quicktimeEvent(waveQuicktime,advLevel) {
+    if (beta) {return}
     if (!adventureVariables.fightSceneOn) {return}
     quicktimeAttack = true;
 
@@ -7108,21 +7373,27 @@ function quicktimeEvent(waveQuicktime,advLevel) {
     quicktimeBar.classList.add("flex-row","quicktime-bar");
 
     let colorArray = ["Red","Green","Blue"];
+    if (adventureVariables.specialty === 'Unusual') {
+        for (let i = colorArray.length - 1; i > 0; i--) {
+            const j = randomInteger(0, i);
+            [colorArray[i], colorArray[j]] = [colorArray[j], colorArray[i]];
+        }
+    }
+
     for (let i = 0; i < 3; i++) {
         let img = new Image();
         img.src = `./assets/expedbg/${colorArray[i]}.webp`;
         img.addEventListener("click",()=>{
             if (quicktimeBar.state == colorArray[i]) {
                 correctBeat++;
-                currentBeat++;
-                quicktimeBar.state = null;
-                removeBeat = true;
             } else if (quicktimeBar.state == "ready"){
                 currentBeat++;
-                quicktimeBar.state = null;
                 createBattleText("miss", 2000, videoOverlay);
-                removeBeat = true;
             }
+            
+            quicktimeBar.state = null;
+            currentBeat++;
+            removeBeat = true;
         })
         textOverlay.appendChild(img);
     }
@@ -7230,7 +7501,7 @@ function quicktimeEvent(waveQuicktime,advLevel) {
 
                 atkNumber = atkNumber * (maxBeat - correctBeat);
                 if (atkNumber > 0) {
-                    loseHP(atkNumber, "normal", "Quicktime");
+                    loseHP(atkNumber, "normal");
                 }
             },2000)
         } else if (currentBeat < maxBeat) {
@@ -7243,7 +7514,8 @@ function quicktimeEvent(waveQuicktime,advLevel) {
     adventureText.appendChild(textOverlay);
 }
 
-function loseHP(ATK, type, mobClass) {
+function loseHP(ATK, type) {
+    if (beta) {return}
     if (!adventureVariables.fightSceneOn) {return}
 
     const healthBar = document.getElementById('health-bar');
@@ -7258,7 +7530,6 @@ function loseHP(ATK, type, mobClass) {
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
 
-        // if (mobClass != "Superboss") {
         comboHandler("reset");
         
 
@@ -7487,16 +7758,21 @@ function attackAll() {
             mobDiv.style.filter = "grayscale(100%) brightness(20%)";
             mobHealth.remove();
 
+            if (!advDict.rankDict[8].Locked && !mobDiv.classList.contains('minion')) {loseHP(1,"inverse");}
             let mobChildArray = mobDiv.children;
             while (mobChildArray.length > 1) {
                 mobChildArray[mobChildArray.length - 1].remove();
             }
 
-            if (adventureVariables.currentEnemyAmount === 0) { winAdventure();}
+            if (mobDiv.classList.contains('minion')) {mobDiv.remove()}
+            if (adventureVariables.currentEnemyAmount === 0) {winAdventure()}
             continue;
         }
 
-        mobHealth.style.width = `${Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100}%`;
+        let newHealth = Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100;
+        mobHealth.style.width = `${newHealth}%`
+        if (mobDiv.classList.contains('megaboss')) {bossUpdate(newHealth)};
+
         if (mobHealth.class != "Superboss") {
             let canvas = mobDiv.querySelector('.atk-indicator');
             canvas.brightness = 0 - 0.05 * (i * randomInteger(1,adventureVideoChildren.length) - 2);
@@ -7566,6 +7842,22 @@ function winAdventure() {
     let adventureHeading = document.getElementById("adventure-header");
     adventureHeading.style.top = "1%";
     adventureHeading.innerText = "You won! You received some loot:";
+    switch (adventureVariables.specialty) {
+        case 'FellBoss':
+            adventureHeading.innerText = "You have stopped the rampaging Wenut!"
+            break;
+        case 'Unusual':
+            adventureHeading.innerText = "You have survived the Unusual Hilichurl's onslaught!"
+            break;
+        case 'Workshop':
+            adventureHeading.innerText = "You successfully put down the Shouki no Kami!"
+            break;
+        case 'Finale':
+            adventureHeading.innerText = "You have stopped the Leyline Outbreak Experiment, once and for all."
+            break;
+        default:
+            break;
+    }
 
     let levelLoot = adventureLoot[`Level-${imgKey[keyNumber].Level}`];
     let lootCounter = 0;
