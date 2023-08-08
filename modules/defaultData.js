@@ -323,6 +323,11 @@ const enemyInfo = {
             2:[0.52,0.54,0.56],
             3:[0.50,0.53,0.57],
             4:[0.55,0.47,0.60],
+        },
+        'Unusual': {
+            1:[0.45,0.53,0.57,0.45,0.53,0.57,0.57],
+            2:[0.45,0.55,0.55,0.45,0.55,0.55],
+            3:[0.50,0.53,0.50,0.53,0.50,0.53,0.50,0.53],
         }
     },
 
@@ -415,7 +420,7 @@ const enemyInfo = {
     "14-Wave-4":{Wave:[1421],         BG:[3,3]},
     "14-Wave-5":{Wave:[1431],         BG:[4,4]},
     1401:{Class:"Megaboss",       Variation:1,   Type:"FellBoss",      HP:3000,   ATK:2,     AtkCooldown:35},
-    1411:{Class:"Megaboss",       Variation:1,   Type:"Unusual",      HP:6500,   ATK:0.5,     AtkCooldown:25},
+    1411:{Class:"Megaboss",       Variation:1,   Type:"Unusual",      HP:8500,   ATK:0.5,     AtkCooldown:30},
     1412:{Class:"Minion",          Variation:3,   Type:"Unusual",      HP:1000,   ATK:0.5,     AtkCooldown:45},
     1421:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:3000,   ATK:2,     AtkCooldown:35},
     1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:3000,   ATK:2,     AtkCooldown:35},

@@ -3399,6 +3399,19 @@ table, button, label {
     }
 }
 
+@keyframes puffOutMirror {
+    0% {
+        transform: scale(1) scaleX(-1);
+        filter: blur(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5) scaleX(-1);
+        filter: blur(0.5em);
+        opacity: 0;
+    }
+}
+
 @keyframes dropDown {
     0% {top: -100%}
     100% {top: 0%}
@@ -3452,4 +3465,13 @@ table, button, label {
     100% {
       transform: translateZ(0) rotateX(0);
     }
-  }
+}
+
+@keyframes sway {
+    0%, 100% {
+        transform: translateY(5%);
+    }
+      50% {
+        transform: translateY(-5%);
+    }
+}
