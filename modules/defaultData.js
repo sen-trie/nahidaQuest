@@ -293,6 +293,23 @@ const enemyInfo = {
         5:["Automaton-Boss.1","SAutomaton-Boss.2","Eremite-Boss.3"],
     },
 
+    osuArray: [[
+                [50, 30, 450], [45, 35, 450], [40, 40, 450], 
+                [20, 10, 400, 1000], [30, 15, 400], [40, 20, 400], 
+                [70, 50, 500, 1200], [60, 40, 500], [50, 50, 500], [40, 40, 500],
+                [60, 15, 450, 800], [50, 25, 450], [60, 35, 450], [50, 45, 450]],
+               [
+                [50, 30, 425], [40, 50, 425], [30, 30, 425],
+                [18, 30, 475, 800], [40, 60, 475], [62, 30, 475],
+                [65, 30, 475, 800], [40, 5, 475], [15, 30, 475], [40, 65, 475]
+               ],
+               [
+                [10, 10, 500], [18, 15, 500], [26, 20, 510],
+                [34, 25, 510], [42, 30, 520], [50, 35, 520],
+                [58, 40, 525], [66, 45, 525], [72, 50, 530],
+               ],
+    ],
+
     quicktimeDict: {
         3:{
             1:[0.41,0.48],
@@ -319,10 +336,11 @@ const enemyInfo = {
             4:[0.55,0.47,0.60],
         },
         14:{
-            1:[0.54,0.56],
+            1:[0.54,0.56,0.53],
             2:[0.52,0.54,0.56],
             3:[0.50,0.53,0.57],
             4:[0.55,0.47,0.60],
+            5:[0.52,0.54,0.53,0.53],
         },
         'Unusual': {
             1:[0.45,0.53,0.57,0.45,0.53,0.57,0.57],
@@ -416,12 +434,11 @@ const enemyInfo = {
     // LVL 14
     "14-Wave-1":{Wave:[1401],         BG:[1,1]},
     "14-Wave-2":{Wave:[1411],         BG:[2,2]},
-    "14-Wave-3":{Wave:[1412],         BG:[2,2]},
-    "14-Wave-4":{Wave:[1421],         BG:[3,3]},
-    "14-Wave-5":{Wave:[1431],         BG:[4,4]},
-    1401:{Class:"Megaboss",       Variation:1,   Type:"FellBoss",      HP:3000,   ATK:2,     AtkCooldown:35},
+    "14-Wave-3":{Wave:[1421],         BG:[3,3]},
+    "14-Wave-4":{Wave:[1431],         BG:[4,4]},
+    1401:{Class:"Megaboss",       Variation:1,   Type:"FellBoss",      HP:1000,   ATK:2,     AtkCooldown:32.5},
     1411:{Class:"Megaboss",       Variation:1,   Type:"Unusual",      HP:8500,   ATK:0.5,     AtkCooldown:30},
-    1412:{Class:"Minion",          Variation:3,   Type:"Unusual",      HP:1000,   ATK:0.5,     AtkCooldown:45},
+    1412:{Class:"Minion",          Variation:3,   Type:"Unusual",      HP:850,   ATK:0.5,     AtkCooldown:45},
     1421:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:3000,   ATK:2,     AtkCooldown:35},
     1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:3000,   ATK:2,     AtkCooldown:35},
 }

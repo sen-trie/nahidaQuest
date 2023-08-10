@@ -1438,6 +1438,7 @@
     width: 100%;
     aspect-ratio: unset;
     height: 30%;
+    text-align: center;
 }
 
 .fight-button, .fight-button-scara {
@@ -1569,15 +1570,64 @@
     height: 100%;
     top: 0;
     left: 0;
+    transition: 0.2s ease;
     background-color: rgba(0, 0, 0, 0.95);
     animation: slide-out-bottom 0.1s linear reverse;
 }
 
-.quicktime-bar {
-    aspect-ratio: 7.15;
+.quicktime-bar, .quicktime-block {
     width: 95%;
     position: relative;
     overflow: hidden;
+}
+
+.quicktime-bar {
+    aspect-ratio: 7.15;
+}
+
+.quicktime-block {
+    aspect-ratio: 2.43;
+    top: 5%;
+}
+
+.quicktime-osu {
+    position: absolute;
+    width: 80%;
+    height: 90%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.osu-beat, .osu-cross {
+    position: absolute;
+    height: 35%;
+    max-width: 30%;
+    object-fit: contain;
+    aspect-ratio: 1;
+}
+
+.osu-beat {
+    background: url('./assets/expedbg/Beat.webp') no-repeat center center/cover;
+    font: inherit;
+    color: white;
+    font-size: 1.3em;
+    text-shadow: var(--text-shadow-075);
+    overflow: hidden;
+}  
+
+.osu-cross {
+    transform: scale(0.6);
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.osu-grad {
+    left: 0;
+    top: 0;
+    border-radius: 50%;
+    z-index: 3;
 }
 
 .quicktime-img {
@@ -1608,6 +1658,7 @@
 }
 
 .text-overlay > p {
+    padding: 0 2%;
     width: 100%;
     height: 30%;
     font-size: 1.1em;

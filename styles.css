@@ -282,6 +282,7 @@ button {
     position: absolute;
     z-index: -1;
     height: 100%;
+    width: 100%;
     row-gap: 2%;
     opacity: 0;
 }
@@ -293,12 +294,14 @@ button {
     left:0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.949);
+    background-color: black;
 }
 
 .unsupported > img {
     z-index: 9999999;
-    width: 90%;
+    width: 30%;
+    max-height: 60%;
+    object-fit: cover;
     aspect-ratio: 1;
     box-sizing: border-box;
     border: 0.5em solid #59BD8C;
@@ -310,7 +313,7 @@ button {
     width: 85%;
     text-align: center;
     font: inherit;
-    font-size: 2.8em;
+    font-size: 2em;
     color: white;
 }
 
@@ -3365,6 +3368,25 @@ table, button, label {
     }
 }
 
+@keyframes slideOutOsu {
+    0% {
+      transform: scale(0.6) translateY(0);
+      opacity: 0.7;
+    }
+    50% {
+        transform: scale(0.5) translateY(12.5%);
+        opacity: 0.25;
+    }
+    75% {
+        transform: scale(0.45) translateY(20%);
+        opacity: 0;
+    }
+    100% {
+      transform: scale(0.45) translateY(25%);
+      opacity: 0;
+    }
+  }
+
 @keyframes glow {
     0% {transform: translateY(0)}
     50% {transform: translateY(-40%)}
@@ -3394,6 +3416,24 @@ table, button, label {
     }
     100% {
         transform: scale(1.5);
+        filter: blur(0.5em);
+        opacity: 0;
+    }
+}
+
+@keyframes puffOutSmall {
+    0% {
+        transform: scale(1);
+        filter: blur(0);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        filter: blur(0.25em);
+        opacity: 0.2;
+    }
+    100% {
+        transform: scale(1.1);
         filter: blur(0.5em);
         opacity: 0;
     }
