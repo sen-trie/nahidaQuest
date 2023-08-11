@@ -165,6 +165,11 @@
     pointer-events: auto;
 }
 
+.raining-quicktime {
+    width: 17.5%;
+    transition: filter 0.5s ease;
+}
+
 @keyframes rain {
     from {transform: translateY(0);}
     to {transform: translateY(1000%);}
@@ -1206,7 +1211,18 @@
     border: 0.1em outset #2E510C;
     box-sizing: border-box;
     border-radius: 0.2em;
-    transition: width 0.1s ease-in-out;
+    transition: 0.1s ease-in-out;
+}
+
+.health-shield {
+    position: absolute;
+    right: 101%;
+    top: 50%;
+    height: 275%;
+    width: auto;
+    object-fit: contain;
+    transform: translateY(-50%);
+    filter: drop-shadow(0 0 0.1em black);
 }
 
 .health-bar-scara {
@@ -1570,6 +1586,7 @@
     height: 100%;
     top: 0;
     left: 0;
+    z-index: 10;
     transition: 0.2s ease;
     background-color: rgba(0, 0, 0, 0.95);
     animation: slide-out-bottom 0.1s linear reverse;
