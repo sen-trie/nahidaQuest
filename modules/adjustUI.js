@@ -198,11 +198,14 @@ function choiceBox(mainBody, dialog, stopSpawnEvents, yesFunc, noFunc, extraEle,
     mainBody.append(choiceEle);
 }
 
+const cssProps = ['top', 'left', 'transform', 'right', 'background', 'display'];
 function createDom(elementType, attributes) {
     const element = document.createElement(elementType);
     if (attributes) {
         for (const attr in attributes) {
-            if ((attr === 'class' || attr === 'classList') && Array.isArray(attributes[attr])) {
+            if (cssProps.includes(attr)) {
+                console.warn(`Error putting CSS props: ${attr}`);
+            } else if ((attr === 'class' || attr === 'classList') && Array.isArray(attributes[attr])) {
                 element.classList.add(...attributes[attr]);
             } else if (attr === 'style' && typeof attributes[attr] === 'object') {
                 Object.assign(element.style, attributes[attr]);

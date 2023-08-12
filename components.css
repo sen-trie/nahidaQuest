@@ -1568,7 +1568,7 @@
     z-index: 2;
 }
 
-#adventure-gif {
+.adventure-gif {
     z-index: 503;
     position: absolute;
     top: 0;
@@ -1632,7 +1632,7 @@
     font-size: 1.3em;
     text-shadow: var(--text-shadow-075);
     overflow: hidden;
-}  
+} 
 
 .osu-cross {
     transform: scale(0.6);
@@ -1645,6 +1645,45 @@
     top: 0;
     border-radius: 50%;
     z-index: 3;
+}
+
+.cytus-line {
+    position: absolute;
+    z-index: 5;
+    height: 0.25em;
+    width: 100%;
+    background-color: #635546;
+    transform: translateY(-50%);
+}
+
+.cytus-head {
+    height: 25%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+}
+
+.cytus-head {
+    transition: 0.15s ease;
+}
+
+.cytus-beat, .cytus-warn {
+    position: absolute; 
+    object-fit: contain;
+}
+
+.cytus-beat {
+    z-index: 10;
+    width: 12.5%;
+    height: auto;
+    transform: translate(-50%, -55%);
+}
+
+.cytus-warn {
+    width: auto;
+    height: 25%;
+    z-index: 200;
+    aspect-ratio: 0.6;
+    animation: blink 0.6s linear forwards;
 }
 
 .quicktime-img {
@@ -1670,7 +1709,7 @@
     background-color: #F7F1E6;
     height: 95%;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: space-evenly;
     text-align: center;
 }
 

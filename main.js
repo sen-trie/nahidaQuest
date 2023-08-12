@@ -230,7 +230,7 @@ const WORKSHOP_THRESHOLD = 50;
 const FINALE_THRESHOLD_ONE = 65;
 const FINALE_THRESHOLD_TWO = 30;
 
-const suffixPreload = ['Blue', 'Red', 'Green'];
+const suffixPreload = ['Blue', 'Red', 'Green', 'Purple'];
 const prefixPreload = ['', 'Boomer-', 'Bullet-', 'Circle-', 'Warning-'];
 let quicktimeAssetArray = [];
 suffixPreload.forEach((color) => {
@@ -894,7 +894,7 @@ function clickedEvent(aranaraNumber) {
         }
     }
 
-    if (beta) aranaraNumber = 8;
+    // if (beta) aranaraNumber = 8;
 
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
@@ -4422,8 +4422,9 @@ function createAdventure() {
     adventureHealth.append(adventureHealthbarDiv);
     let adventureGif = new Image();
     adventureGif.id = "adventure-gif";
+    adventureGif.classList.add('adventure-gif');
     adventureGif.src = "./assets/expedbg/exped-Nahida.webp";
-    adventureVideo.append(adventureGif,adventureHealth);
+    adventureVideo.append(adventureGif, adventureHealth);
 
     let adventureEncounter = document.createElement("div");
     adventureEncounter.id = "adventure-encounter";
@@ -6058,7 +6059,7 @@ function unlockExpedition(i,expeditionDict) {
 const adventurePreload = new Preload();
 const adventureWorker = new Worker('./modules/workers.js');
 function drawAdventure(advType, wave) {
-    adventureScaraText = (advType === 5 || wave === 'Workshop') ? "-scara" : "";
+    adventureScaraText = (advType === 5 || (advType === 14 && wave === 3)) ? "-scara" : "";
     lootArray = {};
 
     if (adventureScene) {return}
@@ -6082,17 +6083,17 @@ function drawAdventure(advType, wave) {
     if (advType === 14) {
         switch (wave) {
             case 1:
-                specialty = 'FellBoss'
+                specialty = 'FellBoss';
                 break;
             case 2:
-                specialty = 'Unusual'
+                specialty = 'Unusual';
                 quickType = enemyInfo.quicktimeDict['Unusual'];
                 break;
             case 3:
-                specialty = 'Workshop'
+                specialty = 'Workshop';
                 break;
             case 4:
-                specialty = 'Finale'
+                specialty = 'Finale';
                 break;
             default:
                 break;
@@ -6650,7 +6651,7 @@ function triggerFight() {
         doubleAtkCooldown: 1,
         healthLost: 0,
         maxHealth: Math.ceil(5 + Math.floor(advDict.adventureRank / 4) * (activeLeader == "Nahida" ? 1.2 : 1)),
-        quicktime: adventureVariables.specialty === 'Unusual' ? 100 : 0,
+        quicktime: adventureVariables.specialty === 'Unusual' || adventureVariables.specialty === 'Workshop' ? 100 : 0,
         quicktimeAttack: false,
         summonTime: null,
         rainTime: null,
@@ -6819,6 +6820,8 @@ function triggerFight() {
             let variant = '';
             if (adventureVariables.specialty === 'FellBoss') {
                 variant = '-osu';
+            } else if (adventureVariables.specialty === 'Workshop') {
+                variant = '-cytus';
             }
 
             let warningImg = new Image();
@@ -7029,12 +7032,15 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCh
                                 battleVariables.decoyTime = canvas.brightness;
                             } else if (adventureVariables.specialty === 'FellBoss') {
                                 if (battleVariables.bossHealth <= FELLBOSS_THRESHOLD) {
+                                    canvas.brightness -= brightnessIncrement * 0.15;
                                     battleVariables.rainTime += brightnessIncrement * 0.4;
                                 } else {
                                     battleVariables.quicktime += brightnessIncrement * 0.5;
                                 }
 
                                 battleVariables.floatTime += brightnessIncrement * 0.6;
+                            } else if (adventureVariables.specialty === 'Workshop') {
+                                battleVariables.quicktime += brightnessIncrement * 2.5;
                             }
                         }
 
@@ -7579,7 +7585,352 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
     textOverlay.classList.add("text-overlay","cover-all","flex-row");
 
     const adventureVideo = document.getElementById('adventure-video');
-    if (variant === '-rain') {
+    if (variant === '-cytus') {
+        textOverlay.classList.add("flex-column");
+        textOverlay.style.justifyContent = 'space-around';
+        textOverlay.style.padding = '0 15%';
+        textOverlay.style.boxSizing = 'border-box';
+
+        const textBox = document.createElement('p');
+        textBox.classList.add('flex-column')
+        textBox.innerText = "Avoid being hit by the attacks!";
+        textBox.style.width = '50%'
+        textBox.style.height = '100%';
+        textOverlay.appendChild(textBox);
+
+        quicktimeBar.id = "quicktime-bar";
+        quicktimeBar.state = null;
+        quicktimeBar.classList.add("flex-row","quicktime-block");
+
+        const quickImg = new Image();
+        quickImg.src = "./assets/expedbg/quicktime-block.webp";
+        quickImg.classList.add("cover-all");
+        quickImg.style.zIndex = 1;
+
+        const quicktimeCytus = createDom('div', { class: ['quicktime-osu'] });
+        for (let i = 0; i < 3; i++) {
+            const cytusLine = createDom('b', {
+                class: ['cytus-line'],
+                style: {
+                    top: ((i + 1) * 25) + '%',
+                }
+            })
+            quicktimeCytus.append(cytusLine);
+        }
+
+        const adventureGif = document.getElementById('adventure-gif');
+        const cytusHead = adventureGif.cloneNode(false);
+        adventureGif.style.display = 'none';
+
+        cytusHead.classList.add('cytus-head');
+        cytusHead.style.top = '50%';
+        quicktimeCytus.appendChild(cytusHead);
+
+        let activeRow = 1;
+        let finalSequence = false;
+        let hitCount = 0;
+        let invincibleFrame = false;
+        const controlledRows = [[], [], []];
+
+        const arrowArray = ['down','up'];
+        for (let i = 1; i > -1; i--) {
+            const img = createDom('img', {
+                src: `./assets/expedbg/battle-${arrowArray[i]}${adventureScaraText}.webp`,
+                style: {
+                    height: '49%',
+                    position: 'unset',
+                }
+            });
+
+            img.addEventListener("click",() => {
+                if (i === 1) {
+                    activeRow = Math.max(--activeRow, 0);
+                } else {
+                    activeRow = Math.min(++activeRow, 2);
+                }
+
+                cytusHead.style.top = ((activeRow + 1) * 25) + '%';
+            })
+            textOverlay.appendChild(img);
+        }
+
+
+        const checkCollision = () => {
+            if (controlledRows[activeRow].length > 0) {
+                if (invincibleFrame) {
+                    return;
+                } else {
+                    invincibleFrame = true;
+                    cytusHead.classList.add("damaged");
+                    cytusHead.damagedState = setTimeout(() => {
+                        cytusHead.classList.remove("damaged");
+                        invincibleFrame = false;
+                        hitCount++;
+                    }, 300);
+                }
+            }
+        }
+
+        // 1ST POSITION IS FOR TIMING, 2ND IS FOR DELAY, X IS FOR OCCUPIED LANE, O IS FOR EMPTY LANE
+        const easyBeatDict = [[
+                [300, 20, 'OXO', 'Circle-', true],
+                [275, 25, 'XOX', 'Circle-'],
+                [225, 25, 'OXO', 'Circle-', true],
+                [325, 20, 'XOX', 'Bullet-'],
+                [325, 20, 'OXO', 'Bullet-', true],
+                [300, 10, 'XOX', 'Circle-'],
+            ], [
+                [175, 20, 'OXX', null, true],
+                [175, 35, 'XXO', null],
+                [175, 35, 'OXX', null, true],
+                [175, 35, 'XXO', null],
+                [250, 45, 'OOX', 'Boomer-'],
+                [325, 15, 'XOO', 'Bullet-', true],
+                [275, 5, 'OXX', 'Boomer-'],
+            ], [
+                [250, 0, 'OXO', 'Bullet-'], 
+                [300, 15, 'XOO', 'Bullet-'],
+                [300, 5, 'OOX', 'Bullet-', true], 
+                [300, 15, 'OXO', 'Bullet-'], 
+                [325, 15, 'XOX', 'Bullet-', true],
+                [300, 10, 'OXX', 'Bullet-'],
+                [350, 5, 'XOO', 'Bullet-', true],  
+            ], [
+                [175, 20, 'OXX', null, true],
+                [175, 30, 'XOX', null, true],
+                [175, 30, 'XXO', null, true],
+                [250, 55, 'OOX', 'Boomer-'],
+                [250, 20, 'OXO', 'Circle-'],
+                [250, 65, 'XOO', 'Boomer-', true],
+            ],
+        ];
+
+
+        const hardBeatDict = [[
+                [350, 20, 'XXO', null, true],
+                [300, 20, 'OOX', 'Circle-'],
+                [300, 25, 'OXX', 'Circle-'],
+                [300, 25, 'XOX', 'Circle-'],
+                [300, 25, 'XXO', 'Circle-'],
+                [300, 25, 'XOX', 'Circle-'],
+                [300, 85, 'OXO', 'Boomer-', true],
+                [300, 35, 'XOX', 'Boomer-'],
+                [300, 35, 'OXO', 'Boomer-', true],
+            ],[
+                [400, 0, 'OXO', 'Bullet-'], 
+                [300, 30, 'XXO', null],
+                [300, 20, 'OXX', 'Circle-'],
+                [300, 50, 'XOX', null],
+                [250, 30, 'OXX', 'Bullet-'],
+                [300, 15, 'XXO', null, true],
+                [300, 30, 'XOX', null, true],
+                [300, 55, 'OXX', 'Boomer-'],
+            ],[   
+                [300, 15, 'OXX', 'Bullet-'],
+                [350, 25, 'XOX', null],
+                [300, 25, 'XXO', 'Bullet-', true],
+                [300, 15, 'OXX', 'Bullet-'],
+                [500, 25, 'XXO', null],
+                [300, 15, 'XOX', 'Bullet-', true],
+                [400, 15, 'OXX', null],
+                [300, 25, 'XXO', 'Circle-', true],
+                [300, 35, 'OXX', 'Circle-'],
+                [300, 35, 'XXO', 'Circle-'],
+                [300, 35, 'XOX', 'Circle-', true],
+            ],[
+                [300, 20, 'OXX', null],
+                [300, 17, 'OOX', null],
+                [300, 17, 'XOX', null],
+                [300, 17, 'XOO', null],
+                [300, 0, 'OOX', 'Boomer-', true],
+                [300, 17, 'XXO', null],
+                [300, 17, 'XOO', null],
+                [300, 17, 'XOX', null],
+                [300, 17, 'OOX', null],
+                [300, 17, 'OXX', null],
+                [300, 17, 'OOX', null],
+                [300, 17, 'XOX', null],
+                [300, 0, 'XOO', 'Boomer-', true],
+                [300, 17, 'XOO', null],
+                [300, 17, 'XXO', null],
+                [300, 60, 'OXX', 'Bullet-', true],
+                [300, 10, 'XOX', 'Bullet-'],
+                [350, 10, 'OXX', 'Boomer-'],
+            ], [
+                [270, 20, 'XOX', 'Bullet-', true],
+                [270, 0, 'XOX', 'Bullet-'],
+                [270, 20, 'OXX', 'Boomer-', true],
+                [270, 0, 'OXX', 'Boomer-'],
+                [270, 35, 'XOX', 'Bullet-', true],
+                [270, 0, 'XOX', 'Bullet-'],
+                [270, 40, 'XXO', 'Boomer-', true],
+                [270, 0, 'XXO', 'Boomer-'],
+                [270, 20, 'XOX', 'Bullet-', true],
+                [270, 0, 'XOX', 'Bullet-'],
+                [250, 20, 'OXX', 'Circle-', true],
+                [250, 0, 'OXX', 'Circle-'],
+            ]
+        ];
+
+        const beatArray = rollArray(hardBeatDict);
+        const maxBeat = beatArray.length;
+        let mirrorAll = randomInteger(1, 3) === 1 ? true : false;
+        let beatCount = 10;
+
+        const spawnBeat = (counter) => {
+            const currentBeat = beatArray[0];
+            beatArray.shift();   
+
+            const re = new RegExp('X', 'g');
+            const XCount = currentBeat[2].match(re).length;
+
+            const activeBeats = [];
+            let progress = 0;
+            let spawnNextBeat = 0;
+            let spawnedAlready = false;
+
+            const modifier = currentBeat[3] === null ? '' : currentBeat[3];
+            let mirrorSequence = currentBeat[4] === undefined ? false : true;
+            mirrorSequence = mirrorAll === true ? !(mirrorSequence) : mirrorSequence;
+
+            for (let i = 0; i < currentBeat[2].length; i++) {
+                if (currentBeat[2][i] === 'X') {
+                    const rowBeat = createDom('img', {
+                        src: `./assets/expedbg/${modifier}Purple.webp`,
+                        row: i,
+                        class: ['cytus-beat'],
+                        style: {
+                            zIndex: beatCount,
+                            left: mirrorSequence ? 'unset' : 0,
+                            right: mirrorSequence ? 0 : 'unset',
+                            top: ((i + 1) * 25) + '%',
+                            transform: mirrorSequence ? `translate(50%, -55%) scaleX(-1)` : `translate(-50%, -55%)`,
+                        }
+                    });
+
+                    beatCount++;
+
+                    if (modifier === 'Bullet-') {
+                        rowBeat.style.transform = mirrorSequence ? 'translate(50%, -55%)' : `translate(-50%, -55%) scaleX(-1)`; 
+                        let warnImage = createDom('img', { 
+                            src: `./assets/expedbg/Warning-Purple.webp`,
+                            class: ["cytus-warn", 'cytus-beat'],
+                            style: {
+                                left: mirrorSequence ? 'unset' : 0,
+                                right: mirrorSequence ? 0 : 'unset',
+                                top: ((i + 1) * 25) + '%',
+                                transform: mirrorSequence ? `translate(50%, -55%) scaleX(-1)` : `translate(-50%, -55%)` ,
+                            }
+                        });
+
+                        warnImage.addEventListener('animationend', () => {
+                            quicktimeCytus.appendChild(rowBeat);
+                            activeBeats.push(rowBeat)
+                            warnImage.remove();
+                        })
+                        
+                        quicktimeCytus.append(warnImage);
+                    } else {
+                        rowBeat.onload = () => {
+                            activeBeats.push(rowBeat)
+                            quicktimeCytus.appendChild(rowBeat);
+                            
+                        }
+                    }
+                }
+            }
+
+            const interval = Math.floor(1000 / FRAMES_PER_SECOND);
+            let previousTime = performance.now();
+            let currentTime = 0;
+            let deltaTime = 0;
+            let thresholdReached = false;
+    
+            function animateMovement(timestamp) {
+                currentTime = timestamp;
+                deltaTime = currentTime - previousTime;
+                
+                if (deltaTime > interval) {
+                    activeBeats.forEach((beat) => {
+                        const progressIncrement = currentBeat[0] / 1000 / XCount;
+                        if (modifier === 'Boomer-') {
+                            if (thresholdReached) {
+                                beat.style.transform = `${mirrorSequence ? 'translate(50%, -55%)' : 'translate(-50%, -55%) scaleX(-1)'} rotate(${progress / 95 * 360 * 2}deg)`;
+                                progress -= progressIncrement * 1.7;
+                                spawnNextBeat += progressIncrement;
+                            } else if (progress < 95) {
+                                beat.style.transform = `${mirrorSequence ? 'translate(50%, -55%)' : 'translate(-50%, -55%) scaleX(-1)'} rotate(${progress / 95 * 360 * 2}deg)`;
+                                progress += progressIncrement * 1.4;
+                                spawnNextBeat += progressIncrement;
+                            } else {
+                                thresholdReached = true;
+                            }
+                        // ACCELERATIING AND DECELERATING MOTION
+                        } else if (modifier === 'Bullet-') {
+                            progress += progressIncrement * (3 - 0.8 * (progress / 100));
+                            spawnNextBeat += progressIncrement;
+                        } else if (modifier === 'Circle-') {
+                            progress += progressIncrement * (0.3 + 2 * (progress / 100));
+                            spawnNextBeat += progressIncrement;
+                        // STANDARD MOTION
+                        } else {
+                            progress += progressIncrement;
+                            spawnNextBeat += progressIncrement;
+                        }
+
+                        // progress += (currentBeat[0] / 1000 / XCount);
+                        // spawnNextBeat += (currentBeat[0] / 1000 / XCount)
+                        mirrorSequence === true ? (beat.style.right = progress + '%') : (beat.style.left = progress + '%');
+    
+                        if (progress > 41 && progress < 53) {
+                            if (!controlledRows[beat.row].includes(beat)) {
+                                controlledRows[beat.row].push(beat);
+                            }
+                        } else {
+                            if (controlledRows[beat.row].includes(beat)) {
+                                controlledRows[beat.row].splice(controlledRows[beat.row].indexOf(beat), 1);
+                            }
+
+                            if (progress > 100 || progress < 0) {
+                                beat.style.display = 'none';
+                                if (spawnedAlready) {
+                                    beat.remove();
+                                    return;
+                                } else if (maxBeat === counter && !finalSequence) {
+                                    beat.remove();
+                                    finalSequence = true;
+
+                                    textBox.innerHTML = `You were hit ${hitCount}</span> times!`;
+                                    setTimeout(() => {
+                                        quitQuicktime(advLevel, null, hitCount / 2, videoOverlay, textOverlay);
+                                        adventureGif.style.display = 'block';
+                                    }, 2000);
+                                    return;
+                                }
+                            }
+                        }
+                    })
+
+                    if (beatArray.length > 0 && !spawnedAlready && spawnNextBeat >= beatArray[0][1]) {
+                        counter++;
+                        spawnBeat(counter);
+                        spawnedAlready = true;
+                    }
+                }
+            
+                checkCollision();
+                window.requestAnimationFrame(animateMovement);
+            }
+
+            window.requestAnimationFrame(animateMovement);
+        }
+
+        setTimeout(() => {
+            spawnBeat(1);
+        }, 500)
+
+        quicktimeBar.append(quickImg, quicktimeCytus);
+    } else if (variant === '-rain') {
         const textBox = document.getElementById('fight-text');
         textBox.innerText = 'The Fellflower is dazed! Avoid all the spikes while catching all the falling spores!';
 
@@ -7693,17 +8044,12 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
         quickImg.style.zIndex = 1;
 
         const quicktimeOsu = createDom('div', { class: ['quicktime-osu'] });
-        // quicktimeOsu.addEventListener('click', (e) => {
-        //     const clickedCell = e.target;
-        //     // if (clickedCell.classList.contains('osu-beat')) {
-        //     //     const cellNumber = parseInt(clickedCell.cellNumber);
-        //     // }
-        // });
 
         quicktimeBar.append(quickImg, quicktimeOsu);
         let currentCellNumber = 0;     
         let placeholderTiming = 0;
-        let reverseMode = false;
+        let reverseMode = randomInteger(1, 3) === 1 ? false : true;
+        let mirrorMode = randomInteger(1, 3) === 1 ? false : true;
 
         // FORMAT: LEFT, TOP, TIMING (MS), DELAY (MS)
         const posArray = rollArray(enemyInfo.osuArray)
@@ -7715,7 +8061,8 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                 class: ['osu-beat'],
                 clicked: false,
                 style: {
-                    left: `${pos[0]}%`,
+                    right: mirrorMode ? `${pos[0]}%` : 'unset',
+                    left: mirrorMode ? 'unset': `${pos[0]}%`,
                     top: `${pos[1]}%`,
                     zIndex: (100 - index),
                     animation: `fadeOutCritOpacity ${timing * 3}ms linear reverse`,
@@ -7738,7 +8085,8 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                     src: './assets/event/cross.webp', 
                     class:['osu-cross'],
                     style: {
-                        left: `${pos[0]}%`,
+                        right: mirrorMode ? `${pos[0]}%` : 'unset',
+                        left: mirrorMode ? 'unset': `${pos[0]}%`,
                         top: `${pos[1]}%`,
                         zIndex: 10,
                         animation: `slideOutOsu ${Math.min(timing * 2, 1200)}ms linear forwards`,
@@ -7758,18 +8106,6 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                     beatImg.remove();
                 });
             }
-
-            // beatImg.gradientIncrease = setInterval(() => {
-            //     if (beatGradient.gradColor > 128) {
-            //         mistimeBeat();
-            //     } else if (beatGradient.gradColor > 100) {
-            //         beatGradient.style.background = `linear-gradient(to top, #ffffff00, #ffffff00 100%, #333333b8 100%)`;
-            //         beatGradient.gradColor++
-            //     } else {
-            //         beatGradient.style.background = `linear-gradient(to top, #ffffff00, #ffffff00 ${beatGradient.gradColor}%, #333333b8 ${beatGradient.gradColor + 1}%)`;
-            //         beatGradient.gradColor++
-            //     }
-            // }, timing / 55);
 
             if (!reverseMode && pos[3]) {
                 currentCellNumber = 1;
@@ -7810,7 +8146,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
             let currentTime = 0;
             let deltaTime = 0;
 
-            function animateGradient(timestamp) {
+            function animateMovement(timestamp) {
                 if (beatImg.clicked) {return};
 
                 currentTime = timestamp;
@@ -7829,15 +8165,14 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                     }
                 }
             
-                window.requestAnimationFrame(animateGradient);
+                window.requestAnimationFrame(animateMovement);
             }
             
-            window.requestAnimationFrame(animateGradient);
+            window.requestAnimationFrame(animateMovement);
         }
    
         setTimeout(() => {
             let index = 0;
-            reverseMode = randomInteger(1, 3) ? false : true;
 
             const processItem = () => {
                 if (reverseMode) {
@@ -7862,7 +8197,6 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                     } else {
                         setTimeout(processItem, posArray[index][2] + (posArray[index][3] ? posArray[index][3] : 0));
                     }
-                    
                 } else {
                     setTimeout(() => {
                         textBox.innerHTML = `You successfully countered <span style='color:#A97803'>${correctBeat}</span> out of <span style='color:#A97803'>${maxBeat}</span> ranged attacks!`;
@@ -8085,7 +8419,12 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                 break;
         }
 
-        atkNumber = atkNumber * (maxBeat - correctBeat);
+        if (maxBeat !== null) {
+            atkNumber = atkNumber * (maxBeat - correctBeat);
+        } else {
+            atkNumber *= correctBeat;
+        }
+        
         if (atkNumber > 0) {
             loseHP(Math.round(atkNumber * 10) / 10, "normal");
         }
@@ -11210,9 +11549,9 @@ function newPop(type) {
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
-// if (localStorage.getItem('beta') == 'true') {
-//     beta = true;
-// }
+if (localStorage.getItem('beta') == 'true') {
+    beta = true;
+}
 
 if (beta) {
     let warning = document.createElement('p');
@@ -11237,7 +11576,7 @@ if (beta) {
         });
           
         document.dispatchEvent(event);
-        document.getElementById('adv-button-27').click()
+        document.getElementById('adv-button-29').click()
         // document.getElementById('char-selected').click();
         // document.getElementById('char-select-0').click();
         // document.getElementById('char-selected').click();
