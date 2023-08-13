@@ -50,9 +50,16 @@ function getHighestKey(obj) {
     return parseInt(highestValue);
 }
 
-// RANDOM NUMBER GENERATOR (DOES NOT INCLUDE MAX)
-function randomInteger(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
+// RANDOM NUMBER GENERATOR (DOES NOT INCLUDE MAX), OPTIONAL INCLUSIVE BOUNDS
+function randomInteger(min, max, bounds) {
+    let numRoll = Math.floor(Math.random() * (max - min)) + min;
+    if (bounds !== undefined) {
+        while (numRoll > bounds[0] && numRoll < bounds[1]) {
+            numRoll = Math.floor(Math.random() * (max - min)) + min;
+        }
+    }
+
+    return numRoll;
 }
 
 // WRAPS RNG TO BOOLEAN
@@ -153,6 +160,30 @@ function updateObjectKeys(savedObject,referenceObject) {
 function rollArray(array, startingPos) {
     if (startingPos === undefined) {startingPos = 0}
     return array[randomInteger(startingPos, array.length)]
+}
+
+// RECURSIVELY COPIES OBJECTS AND ARRAYS
+// I HATE LINK BY REFERENCES
+function deepCopy(obj) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        const copyArray = [];
+        for (const item of obj) {
+            copyArray.push(deepCopy(item));
+        }
+        return copyArray;
+    }
+
+    const copyObj = {};
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            copyObj[key] = deepCopy(obj[key]);
+        }
+    }
+    return copyObj;
 }
 
 // REPLACES TEXT FOR USE IN INNERHTML
@@ -323,4 +354,4 @@ function convertTo24HourFormat(hours) {
     return `${formattedHours}:${formattedMinutes}`;
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat };
+export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };

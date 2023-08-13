@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat } from "./modules/functions.js"
+import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
@@ -6555,9 +6555,15 @@ function comboHandler(type, ele) {
 
 function spawnMob(adventureVideo, waveInfo, adjacentSibling) {
     let decoy = null;
-    if (typeof(waveInfo[1]) === 'string' && waveInfo[1].includes('decoy')) {
-        decoy = waveInfo[1].split('-')[1];
-        waveInfo.pop();
+    let arm = null;
+    if (typeof(waveInfo[1]) === 'string') {
+        if (waveInfo[1].includes('decoy')) {
+            decoy = waveInfo[1].split('-')[1];
+            waveInfo.pop();
+        } else if (waveInfo[1].includes('arm')) {
+            arm = waveInfo[1].split('-')[1];
+            waveInfo.pop(); 
+        }
     }
 
     for (let i = 0; i < waveInfo.length; i++) {
@@ -6566,8 +6572,14 @@ function spawnMob(adventureVideo, waveInfo, adjacentSibling) {
         let mobImg =  document.createElement("div");
         mobImg.classList.add("enemyImg");
 
-        let randMob = `${singleEnemyInfo.Type}-${singleEnemyInfo.Class}-${randomInteger(1,singleEnemyInfo.Variation+1)}`;
-        mobImg.style.backgroundImage = `url(./assets/expedbg/enemy/${randMob}.webp)`;
+        let randMob = `${singleEnemyInfo.Type}-${singleEnemyInfo.Class}-${randomInteger(1, singleEnemyInfo.Variation+1)}`;
+
+        if (arm === null) {
+            mobImg.style.backgroundImage = `url(./assets/expedbg/enemy/${randMob}.webp)`;
+        } else {
+            mobImg.style.backgroundImage = `url(./assets/expedbg/enemy/Workshop-Arm-${arm}.webp)`;
+        }
+        
         mobDiv.append(mobImg);
 
         mobDiv.decoyNumber = null;
@@ -6582,6 +6594,9 @@ function spawnMob(adventureVideo, waveInfo, adjacentSibling) {
                 break;
             case 'Minion':
                 mobDiv.classList.add("minion");
+                break;
+            case 'Arm':
+                mobDiv.classList.remove("wide-enemy");
                 break;
             default:
                 break;
@@ -6645,13 +6660,15 @@ function triggerFight() {
 
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo = comboHandler("create",adventureVideo);
+    let adventureVideoChildren = adventureVideo.children;
+
     battleVariables = {
         defenseMob: null,
         guardtime: 0,
         doubleAtkCooldown: 1,
         healthLost: 0,
         maxHealth: Math.ceil(5 + Math.floor(advDict.adventureRank / 4) * (activeLeader == "Nahida" ? 1.2 : 1)),
-        quicktime: adventureVariables.specialty === 'Unusual' || adventureVariables.specialty === 'Workshop' ? 100 : 0,
+        quicktime: adventureVariables.specialty === 'Unusual' ? 100 : 0,
         quicktimeAttack: false,
         summonTime: null,
         rainTime: null,
@@ -6659,7 +6676,10 @@ function triggerFight() {
         floatNumber: 0,
         decoyTime: null,
         decoyNumber: null,
+        chargeTime: null,
+        deflectTime: adventureVariables.specialty === 'Workshop' ? 0 : null,
         bossHealth: adventureVariables.advType === 14 ? 100 : null,
+        triggerConstants: [adventureVideoChildren.length, quicktimeCheck, summonMob, rainTimeCheck, floatTimeCheck],
     }
     
     let currentSong = randomInteger(1, 4); 
@@ -6668,13 +6688,6 @@ function triggerFight() {
     } else if (adventureVariables.advType >= 13) {
         currentSong = randomInteger(5, 7);
     }
-
-    let adventureVideoChildren = adventureVideo.children;
-    const triggerConstants = [adventureVideoChildren.length, quicktimeCheck, summonMob, rainTimeCheck, floatTimeCheck];
-    // LEFTOVER BGM FROM SCARA BOSS
-        // let mobDiv = adventureVideoChildren[2];
-        // if (mobDiv.enemyID.HP == 2666) {
-        //     currentSong = 4;
     
     bgmElement.pause();
     fightBgmElement.src = `./assets/sfx/battleTheme-${currentSong}.mp3`;
@@ -6808,7 +6821,7 @@ function triggerFight() {
         let mobDiv = adventureVideoChildren[i];
         if (mobDiv.tagName != 'DIV' || !mobDiv.classList.contains('enemy')) {continue};
 
-        activateMob(mobDiv, i, ...triggerConstants);
+        activateMob(mobDiv, i, ...battleVariables.triggerConstants);
     }
 
     // SPAWNS QUICKTIME EVENT AFTER TIME
@@ -6847,15 +6860,25 @@ function triggerFight() {
 
     // SUMMONS NEW MOBS 
     function summonMob(type) {
-        if (type !== 'decoy') {
+        if (type === 'Workshop') {
+            const bossEle = adventureVideo.querySelector('.megaboss');
+            for (let i = 0; i < 4; i++) {
+                const armEle = spawnMob(adventureVideo, [1422, `arm-${i + 1}`], bossEle);
+                armEle.classList.add('workshop-arm');
+                activateMob(armEle, i, ...battleVariables.triggerConstants);
+            }
+            return;
+        } else if (type === 'decoy') {
+            //pass
+        } else {
             if (battleVariables.summonTime === null || battleVariables.summonTime <= (2.5 * adventureVariables.maxEnemyAmount)) {return}
             if (adventureVariables.currentEnemyAmount >= 5) {
                 battleVariables.summonTime = 0;
                 return;
             }
             battleVariables.summonTime = 0;
-        }  
-        
+        }
+
         for (let i = 0; i < adventureVideoChildren.length; i++) {
             let mobDiv = adventureVideoChildren[i];
             if (mobDiv.classList.contains('enemy')) {
@@ -6863,12 +6886,12 @@ function triggerFight() {
 
                 if (type === 'decoy') {
                     for (let i = 0; i < 4; i++) {
-                        activateMob(spawnMob(adventureVideo, [1411, `decoy-${i + 1}`], mobDiv), bossEle, ...triggerConstants);
+                        activateMob(spawnMob(adventureVideo, [1411, `decoy-${i + 1}`], mobDiv), bossEle, ...battleVariables.triggerConstants);
                         adventureVariables.currentEnemyAmount++;
                     }
                     adventureVariables.currentEnemyAmount--;
                 } else {
-                    activateMob(spawnMob(adventureVideo, [1412], bossEle), 1, ...triggerConstants);
+                    activateMob(spawnMob(adventureVideo, [1412], bossEle), 1, ...battleVariables.triggerConstants);
                 }
                 adventureVariables.currentEnemyAmount++;
                 break;
@@ -6913,6 +6936,8 @@ function triggerFight() {
 // STARTS COMBAT FOR MOB
 function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCheck, summonMob, rainTimeCheck, floatTimeCheck) {
     const decoy = mobDiv.classList.contains('decoy') ? true : false;
+    const arm = mobDiv.classList.contains('workshop-arm') ? true : false;
+
     mobDiv.children[0].style.animation = `vibrate ${randomInteger(600,1200) / 100}s linear infinite both`;
         if (mobDiv.classList.contains('wide-enemy')) {
             mobDiv.children[0].style.animation = `vibrate ${randomInteger(2000,2400) / 100}s linear infinite both`;
@@ -6948,20 +6973,36 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCh
         let animationTime = singleEnemyInfo.AtkCooldown * (mobDiv.classList.contains('megaboss') ? 0.1 : (randomInteger(90, 110) / 1000));
         mobDiv.attackTime = animationTime;
 
-        let mobAtkIndicator = document.createElement("img");
-        mobAtkIndicator.skirmish = (adventureVariables.advType == 13) || (adventureVariables.specialty === 'FellBoss') ? true : false;
-        mobAtkIndicator.defence = false;
-        mobAtkIndicator.firstLoad = true;
-        mobAtkIndicator.doubleAtk = false;
+        let mobAtkIndicator = createDom('img', {
+            skirmish: (adventureVariables.advType == 13) || (adventureVariables.specialty === 'FellBoss') ? true : false,
+            defence: false,
+            firstLoad: true,
+            doubleAtk: false,
+        });
 
         let decoyLoad = false;
-        let canvas = document.createElement("canvas");
-        canvas.classList.add("atk-indicator");
-        mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+        const canvas = createDom("canvas", {
+            class: ["atk-indicator"],
+            brightness: 0 - 0.1 * (position * randomInteger(1, adventureVideoChildrenLength) - 2),
+            paused: false,
+        });
 
-        canvas.brightness = 0 - 0.1 * (position * randomInteger(1, adventureVideoChildrenLength) - 2); /// CHANGE THIS
-        canvas.brightness = adventureVariables.specialty === 'Unusual' ? 0.65 : canvas.brightness
+        switch (adventureVariables.specialty) {
+            case 'Unusual':
+                canvas.brightness = 0.65;
+                break;
+            case 'Workshop':
+                canvas.brightness = 0.15;
+                break;
+            default:
+                break;
+        }
+
+        if (arm) {
+            canvas.brightness -= 0.05 * randomInteger(1, position * 10);
+        }
         
+        mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
         mobAtkIndicator.onload = () => {
             canvas.width = mobAtkIndicator.naturalWidth;
             canvas.height = mobAtkIndicator.naturalHeight;
@@ -7000,6 +7041,11 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCh
                 // ATTACKS ARE FASTER WHEN MORE ENEMIES ARE DOWN
                 if (deltaTime > interval) {
                     previousTime = currentTime - (deltaTime % interval);
+                    if (canvas.paused) {
+                        window.requestAnimationFrame(increaseBrightness);
+                        return;
+                    }
+
                     const speedUpFactor = 1 + Math.max((adventureVariables.maxEnemyAmount - adventureVariables.currentEnemyAmount) * 0.75, 0);
                     if (mobAtkIndicator.defence) {
                         battleVariables.guardtime += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
@@ -7015,7 +7061,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCh
 
                     if (!battleVariables.quicktimeAttack) {
                         canvas.brightness += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100 * (mobAtkIndicator.doubleAtk == true ? 2.5 : 1));
-                        if (!mobDiv.classList.contains('minion')) battleVariables.quicktime += (brightnessIncrement * speedUpFactor);
+                        if (!mobDiv.classList.contains('minion') && !arm) battleVariables.quicktime += (brightnessIncrement * speedUpFactor);
                         
                         battleVariables.guardtime += (brightnessIncrement * speedUpFactor * randomInteger(95,106) / 100);
 
@@ -7041,6 +7087,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCh
                                 battleVariables.floatTime += brightnessIncrement * 0.6;
                             } else if (adventureVariables.specialty === 'Workshop') {
                                 battleVariables.quicktime += brightnessIncrement * 2.5;
+                                battleVariables.deflectTime += brightnessIncrement;
                             }
                         }
 
@@ -7237,8 +7284,91 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCh
             }
         }
 
+        const parriedCorrectly = (attackMultiplier, guardCheckBool) => {
+            canvas.attackState = false;
+            canvas.classList.remove("attack-ready");
+            mobDiv.children[0].classList.add("staggered");
+            
+            setTimeout(()=>{
+                mobDiv.children[0].classList.remove("staggered");
+            }, Math.max(animationTime * 150, 500));
+
+            if (battleVariables.decoyNumber != null) {
+                canvas.brightness = 0 - (randomInteger(0,10) / 10);
+            } else {
+                canvas.brightness = 0;
+            }
+            
+            canvas.style.transform = ``;
+            canvas.style.filter = `brightness(0)`;
+
+            if (mobAtkIndicator.doubleAtk === true) {
+                mobAtkIndicator.doubleAtk = false;
+                mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+
+                canvas.style.animation = ``;
+                void canvas.offsetWidth;
+            } else if (mobAtkIndicator.doubleAtk == "parry") {
+                mobAtkIndicator.doubleAtk = true;
+            }
+            
+            // CHECKS IF SKILL MARKED
+            if (mobDiv.children[0].querySelector('.skill-mark')) {
+                if (guardCheckBool) {
+                    mobHealth.health -= (battleVariables.currentATK * attackMultiplier);
+                    loseHP(mobHealth.atk / 2, "inverse");
+                } else {
+                    mobHealth.health -= (battleVariables.currentATK * attackMultiplier * 0.25);
+                }
+
+                mobDiv.children[0].querySelector('.skill-mark').remove()
+
+                const cooldown = document.getElementById('adventure-cooldown-1');
+                cooldown.amount += 15;
+            }
+
+            // CHECKS IF THERE IS AN ACTIVE GUARD
+            if (guardCheckBool) {
+                mobHealth.health -= (battleVariables.currentATK * attackMultiplier);
+                loseHP(mobHealth.atk / 2, "inverse");
+                createBattleText("counter", animationTime * 150 * 2, mobDiv);
+            } else {
+                mobHealth.health -= (battleVariables.currentATK * attackMultiplier * 0.25);
+                createBattleText("guard", animationTime * 150 * 2, mobDiv);
+            }
+
+            if (!advDict.rankDict[10].Locked) {
+                const cooldown = document.getElementById('adventure-cooldown-3');
+                if (adventureVariables.specialty === 'Unusual') {
+                    cooldown.amount += 15;
+                } else {
+                    cooldown.amount += 20 + (adventureVariables.advType === 13 ? 5 : 0);
+                }
+            }
+
+            // CHECKS IF DECOYS ARE PRESEENT
+            if (battleVariables.decoyTime != null) {
+                const bossEle = document.querySelector('.megaboss');
+                const bossEleCanvas = bossEle.querySelector('.atk-indicator');
+                bossEleCanvas.brightness = 0;
+                battleVariables.decoyTime = 0;
+
+                setTimeout(() => {
+                    let randomRoll = randomInteger(1, 4);
+                    while (battleVariables.decoyNumber == randomRoll) {
+                        randomRoll = randomInteger(1, 4);
+                    }
+                    battleVariables.decoyNumber = randomRoll;
+                }, 150)
+            }
+            
+            parrySuccess.load();
+            parrySuccess.play();
+            comboHandler("add");
+        }
+
         mobDiv.children[0].addEventListener("click", () => {
-            if (!adventureVariables.fightSceneOn || mobHealth.dead || battleVariables.quicktimeAttack) {return}
+            if (!adventureVariables.fightSceneOn || mobHealth.dead || battleVariables.quicktimeAttack || canvas.paused) {return}
             let attackMultiplier = 1;
             const guardCheckBool = guardCheck();
 
@@ -7247,86 +7377,95 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCh
                 if (activeLeader == "Ei") {attackMultiplier = 1.35}
                 // IF TIMING WAS CORRECT
                 if (canvas.classList.contains("attack-ready")) {
-                    canvas.attackState = false;
-                    canvas.classList.remove("attack-ready");
-                    mobDiv.children[0].classList.add("staggered");
-                    
-                    setTimeout(()=>{
-                        mobDiv.children[0].classList.remove("staggered");
-                    }, Math.max(animationTime * 150, 500));
+                    // FOR WHEN DEFLECTION IS AVAILABLE
+                    if (battleVariables.deflectTime !== null && battleVariables.deflectTime > 0 && mobHealth.health > 30) {
+                        let cooldown = document.getElementById('adventure-cooldown-1');
+                        cooldown.amount -= 100;
+                        dodgeOn("close");
 
-                    if (battleVariables.decoyNumber != null) {
-                        canvas.brightness = 0 - (randomInteger(0,10) / 10);
-                    } else {
-                        canvas.brightness = 0;
-                    }
-                    
-                    canvas.style.transform = ``;
-                    canvas.style.filter = `brightness(0)`;
+                        battleVariables.deflectTime = 0;
+                        canvas.paused = true;
+                        canvas.style.display = 'none';
 
-                    if (mobAtkIndicator.doubleAtk === true) {
-                        mobAtkIndicator.doubleAtk = false;
-                        mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                        const leftRoll = randomInteger(5, 75);
 
-                        canvas.style.animation = ``;
-                        void canvas.offsetWidth;
-                    } else if (mobAtkIndicator.doubleAtk == "parry") {
-                        mobAtkIndicator.doubleAtk = true;
-                    }
-                    
-                    // CHECKS IF SKILL MARKED
-                    if (mobDiv.children[0].querySelector('.skill-mark')) {
-                        if (guardCheckBool) {
-                            mobHealth.health -= (battleVariables.currentATK * attackMultiplier);
-                            loseHP(mobHealth.atk / 2, "inverse");
-                        } else {
-                            mobHealth.health -= (battleVariables.currentATK * attackMultiplier * 0.25);
-                        }
-
-                        mobDiv.children[0].querySelector('.skill-mark').remove()
-
-                        const cooldown = document.getElementById('adventure-cooldown-1');
-                        cooldown.amount += 15;
-                    }
-
-                    // CHECKS IF THERE IS AN ACTIVE GUARD
-                    if (guardCheckBool) {
-                        mobHealth.health -= (battleVariables.currentATK * attackMultiplier);
-                        loseHP(mobHealth.atk / 2, "inverse");
-                        createBattleText("counter", animationTime * 150 * 2, mobDiv);
-                    } else {
-                        mobHealth.health -= (battleVariables.currentATK * attackMultiplier * 0.25);
-                        createBattleText("guard", animationTime * 150 * 2, mobDiv);
-                    }
-
-                    if (!advDict.rankDict[10].Locked) {
-                        const cooldown = document.getElementById('adventure-cooldown-3');
-                        if (adventureVariables.specialty === 'Unusual') {
-                            cooldown.amount += 15;
-                        } else {
-                            cooldown.amount += 20 + (adventureVariables.advType === 13 ? 5 : 0);
-                        }
-                    }
-
-                    // CHECKS IF DECOYS ARE PRESEENT
-                    if (battleVariables.decoyTime != null) {
-                        const bossEle = document.querySelector('.megaboss');
-                        const bossEleCanvas = bossEle.querySelector('.atk-indicator');
-                        bossEleCanvas.brightness = 0;
-                        battleVariables.decoyTime = 0;
-
-                        setTimeout(() => {
-                            let randomRoll = randomInteger(1, 4);
-                            while (battleVariables.decoyNumber == randomRoll) {
-                                randomRoll = randomInteger(1, 4);
+                        const counterBar = createDom('div', {
+                            style: {
+                                position: 'absolute',
+                                top: 0,
+                                left: leftRoll + '%',
+                                width: '20%',
+                                height: '100%',
+                                backgroundColor: '#333455',
                             }
-                            battleVariables.decoyNumber = randomRoll;
-                        }, 150)
+                        });
+
+                        const counterImg = createDom('img', {
+                            src: `./assets/icon/selectIndicator${adventureScaraText}.webp`,
+                            style: {
+                                position: 'absolute',
+                                bottom: '115%',
+                                left: 0,
+                                transform: 'translateX(-50%)',
+                                width: 'auto',
+                                height: '150%',
+                                objectFit: 'contain',
+                            }
+                        })
+
+                        const interval = Math.floor(1000 / FRAMES_PER_SECOND);
+                        let previousTime = performance.now();
+                        let currentTime = 0;
+                        let deltaTime = 0;
+                        let thresholdReached = 5;
+                        let directionRight = true;
+                        let progress = 0;
+                
+                        function animateMovement(timestamp) {
+                            currentTime = timestamp;
+                            deltaTime = currentTime - previousTime;
+                            
+                            if (deltaTime > interval) {
+                                if (directionRight) {
+                                    progress += 0.4;
+                                } else {
+                                    progress -= 0.4; 
+                                }
+
+                                if (progress > 100 || progress < -1) {
+                                    directionRight = !directionRight;
+                                    thresholdReached--;
+                                }
+
+                                counterImg.style.left = progress + '%';
+                            }
+                        
+                            window.requestAnimationFrame(animateMovement);
+                        }
+                        window.requestAnimationFrame(animateMovement);
+
+                        const counterButton = createDom('button', {
+                            class:['counter-button']
+                        })
+
+                        counterButton.addEventListener('click', () => {
+                            if (progress >= leftRoll && progress <= (leftRoll + 25)) {
+                                counterBar.remove();
+                                counterImg.remove();
+                                counterButton.remove();
+
+                                canvas.paused = false;
+                                canvas.style.display = 'block';
+                                parriedCorrectly(attackMultiplier, guardCheckBool);
+                            }
+                        })
+
+                        mobHealth.append(counterBar, counterImg);
+                        mobDiv.appendChild(counterButton);
+                        return;
+                    } else {
+                        parriedCorrectly(attackMultiplier, guardCheckBool);
                     }
-                    
-                    parrySuccess.load();
-                    parrySuccess.play();
-                    comboHandler("add");
                 } else if (canvas.classList.contains("decoy-ready")) {
                     createBattleText("deflect", animationTime * 150 * 2, mobDiv);
                     loseHP(mobHealth.atk, "normal");
@@ -7371,8 +7510,8 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength, quicktimeCh
                 if (mobDiv.classList.contains('megaboss')) {
                     if (adventureVariables.specialty === 'Unusual') {
                         attackMultiplier *= (battleVariables.bossHealth > UNUSUAL_THRESHOLD) ? 2.25 : 1.75;
-                    } else if (adventureVariables.specialty === 'FellBoss') {
-                        attackMultiplier *= (battleVariables.bossHealth > FELLBOSS_THRESHOLD) ? 1 : 0.15;
+                    } else if (mobDiv.querySelector('.health-shield') !== null) {
+                        attackMultiplier *= 0.15;
                     }
                 }
 
@@ -7444,13 +7583,23 @@ function bossUpdate(updatedHealth) {
         bossEle.children[0].style.animation = 'vibrate 0.8s linear';
 
         if (specialty === 'FellBoss' || specialty === 'Workshop') {
+            const bossHealth = bossEle.querySelector('.health-bar, .health-bar-scara');
+
             if (specialty === 'FellBoss') {
-                const bossHealth = bossEle.querySelector('.health-bar');
                 bossHealth.style.backgroundImage = 'linear-gradient(to right, #272400, #FEE651)';
                 bossHealth.style.border = '0.1em outset #897C04';
 
                 const healthShield = createDom('img', { src: './assets/icon/health-shield.webp', class:['health-shield']});
                 bossHealth.appendChild(healthShield);
+            } else {
+                bossHealth.style.backgroundImage = 'linear-gradient(to right, #411758, #CCACE2)';
+                bossHealth.style.border = '0.1em outset #462B63';
+
+                const healthShield = createDom('img', { src: './assets/icon/health-shield-workshop.webp', class:['health-shield']});
+                bossHealth.appendChild(healthShield);
+
+                bossEle.classList.remove('wide-enemy');
+                battleVariables.triggerConstants[2]('Workshop');
             }
 
             bossEle.addEventListener('animationend', () => {
@@ -7480,6 +7629,12 @@ function bossUpdate(updatedHealth) {
     } else if (adventureVariables.specialty === 'FellBoss' && updatedHealth <= FELLBOSS_THRESHOLD) {
         if (battleVariables.rainTime === null) {
             battleVariables.rainTime = 0;
+
+            changeAnimation(2);
+        }
+    } else if (adventureVariables.specialty === 'Workshop' && updatedHealth <= WORKSHOP_THRESHOLD) {
+        if (battleVariables.chargeTime === null) {
+            battleVariables.chargeTime = 0;
 
             changeAnimation(2);
         }
@@ -7520,7 +7675,7 @@ function summonBattleFloat(HP, initialFactor) {
             filter: "drop-shadow(0 0 0.3em #a5d9e2)",
             zIndex: 5,
             width: '12.5%',
-            left: randomInteger(0, 85) + '%',
+            left: randomInteger(0, 85, [33, 60]) + '%',
             top: randomInteger(20, 60) + '%'
         }
     })
@@ -7571,7 +7726,7 @@ function summonBattleFloat(HP, initialFactor) {
 
 function quicktimeEvent(waveQuicktime, advLevel, variant) {
     if (!adventureVariables.fightSceneOn) {return}
-    // if (beta) {return}
+    if (beta) {return}
     battleVariables.quicktimeAttack = true;
 
     const quicktimeBar = document.createElement("div");
@@ -7671,108 +7826,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
             }
         }
 
-        // 1ST POSITION IS FOR TIMING, 2ND IS FOR DELAY, X IS FOR OCCUPIED LANE, O IS FOR EMPTY LANE
-        const easyBeatDict = [[
-                [300, 20, 'OXO', 'Circle-', true],
-                [275, 25, 'XOX', 'Circle-'],
-                [225, 25, 'OXO', 'Circle-', true],
-                [325, 20, 'XOX', 'Bullet-'],
-                [325, 20, 'OXO', 'Bullet-', true],
-                [300, 10, 'XOX', 'Circle-'],
-            ], [
-                [175, 20, 'OXX', null, true],
-                [175, 35, 'XXO', null],
-                [175, 35, 'OXX', null, true],
-                [175, 35, 'XXO', null],
-                [250, 45, 'OOX', 'Boomer-'],
-                [325, 15, 'XOO', 'Bullet-', true],
-                [275, 5, 'OXX', 'Boomer-'],
-            ], [
-                [250, 0, 'OXO', 'Bullet-'], 
-                [300, 15, 'XOO', 'Bullet-'],
-                [300, 5, 'OOX', 'Bullet-', true], 
-                [300, 15, 'OXO', 'Bullet-'], 
-                [325, 15, 'XOX', 'Bullet-', true],
-                [300, 10, 'OXX', 'Bullet-'],
-                [350, 5, 'XOO', 'Bullet-', true],  
-            ], [
-                [175, 20, 'OXX', null, true],
-                [175, 30, 'XOX', null, true],
-                [175, 30, 'XXO', null, true],
-                [250, 55, 'OOX', 'Boomer-'],
-                [250, 20, 'OXO', 'Circle-'],
-                [250, 65, 'XOO', 'Boomer-', true],
-            ],
-        ];
-
-
-        const hardBeatDict = [[
-                [350, 20, 'XXO', null, true],
-                [300, 20, 'OOX', 'Circle-'],
-                [300, 25, 'OXX', 'Circle-'],
-                [300, 25, 'XOX', 'Circle-'],
-                [300, 25, 'XXO', 'Circle-'],
-                [300, 25, 'XOX', 'Circle-'],
-                [300, 85, 'OXO', 'Boomer-', true],
-                [300, 35, 'XOX', 'Boomer-'],
-                [300, 35, 'OXO', 'Boomer-', true],
-            ],[
-                [400, 0, 'OXO', 'Bullet-'], 
-                [300, 30, 'XXO', null],
-                [300, 20, 'OXX', 'Circle-'],
-                [300, 50, 'XOX', null],
-                [250, 30, 'OXX', 'Bullet-'],
-                [300, 15, 'XXO', null, true],
-                [300, 30, 'XOX', null, true],
-                [300, 55, 'OXX', 'Boomer-'],
-            ],[   
-                [300, 15, 'OXX', 'Bullet-'],
-                [350, 25, 'XOX', null],
-                [300, 25, 'XXO', 'Bullet-', true],
-                [300, 15, 'OXX', 'Bullet-'],
-                [500, 25, 'XXO', null],
-                [300, 15, 'XOX', 'Bullet-', true],
-                [400, 15, 'OXX', null],
-                [300, 25, 'XXO', 'Circle-', true],
-                [300, 35, 'OXX', 'Circle-'],
-                [300, 35, 'XXO', 'Circle-'],
-                [300, 35, 'XOX', 'Circle-', true],
-            ],[
-                [300, 20, 'OXX', null],
-                [300, 17, 'OOX', null],
-                [300, 17, 'XOX', null],
-                [300, 17, 'XOO', null],
-                [300, 0, 'OOX', 'Boomer-', true],
-                [300, 17, 'XXO', null],
-                [300, 17, 'XOO', null],
-                [300, 17, 'XOX', null],
-                [300, 17, 'OOX', null],
-                [300, 17, 'OXX', null],
-                [300, 17, 'OOX', null],
-                [300, 17, 'XOX', null],
-                [300, 0, 'XOO', 'Boomer-', true],
-                [300, 17, 'XOO', null],
-                [300, 17, 'XXO', null],
-                [300, 60, 'OXX', 'Bullet-', true],
-                [300, 10, 'XOX', 'Bullet-'],
-                [350, 10, 'OXX', 'Boomer-'],
-            ], [
-                [270, 20, 'XOX', 'Bullet-', true],
-                [270, 0, 'XOX', 'Bullet-'],
-                [270, 20, 'OXX', 'Boomer-', true],
-                [270, 0, 'OXX', 'Boomer-'],
-                [270, 35, 'XOX', 'Bullet-', true],
-                [270, 0, 'XOX', 'Bullet-'],
-                [270, 40, 'XXO', 'Boomer-', true],
-                [270, 0, 'XXO', 'Boomer-'],
-                [270, 20, 'XOX', 'Bullet-', true],
-                [270, 0, 'XOX', 'Bullet-'],
-                [250, 20, 'OXX', 'Circle-', true],
-                [250, 0, 'OXX', 'Circle-'],
-            ]
-        ];
-
-        const beatArray = rollArray(hardBeatDict);
+        let beatArray = deepCopy(rollArray(enemyInfo.easyCytusDict, 0));
         const maxBeat = beatArray.length;
         let mirrorAll = randomInteger(1, 3) === 1 ? true : false;
         let beatCount = 10;
@@ -8717,14 +8771,20 @@ function attackAll() {
 
         if (mobDiv.classList.contains('megaboss')) {
             let canvas = mobDiv.querySelector('.atk-indicator');
-            canvas.brightness *= 0.35;
-            canvas.style.transform = ``;
-            canvas.style.filter = `brightness(0)`;
+
+            if (canvas) {
+                canvas.brightness *= 0.35;
+                canvas.style.transform = ``;
+                canvas.style.filter = `brightness(0)`;
+            }
         } else {
             let canvas = mobDiv.querySelector('.atk-indicator');
-            canvas.brightness = 0 - 0.05 * (i * randomInteger(1, adventureVideoChildren.length) - 2);
-            canvas.style.transform = ``;
-            canvas.style.filter = `brightness(${canvas.brightness})`;
+
+            if (canvas) {
+                canvas.brightness = 0 - 0.05 * (i * randomInteger(1, adventureVideoChildren.length) - 2);
+                canvas.style.transform = ``;
+                canvas.style.filter = `brightness(${canvas.brightness})`;
+            }
         }
     }
 }
@@ -8754,10 +8814,16 @@ function loseAdventure() {
     }
 
     const adventureVideo = document.getElementById("adventure-video");
-    let targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator, .raining-image');
+    const targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator, .raining-image, .health-bar, .health-bar-scara, .skill-mark');
     targetElements.forEach((item) => {
         item.remove();
     });
+
+    const leftOverEnemy = adventureVideo.querySelectorAll('.enemyImg');
+    leftOverEnemy.forEach((ele) => {
+        ele.style.animation = '';
+        ele.style.filter= 'grayscale(100%) brightness(20%)';
+    })
 
     let adventureFight = document.getElementById("adventure-fight");
     adventureFight.style.display = "none";
@@ -8897,9 +8963,9 @@ function winAdventure() {
     }
 
     nutReward.innerHTML = textReplacer({
-    "[s]":`<span style='color:#A97803'>`,
-    "[/s]":`</span>`,
-    },nutReward.innerHTML)
+        "[s]":`<span style='color:#A97803'>`,
+        "[/s]":`</span>`,
+    }, nutReward.innerHTML);
     adventureVideo.append(nutReward);
 
     function quitButton() {
@@ -8911,14 +8977,14 @@ function winAdventure() {
         updateMorale("recover",randomInteger(2,6));
 
         let level = imgKey[keyNumber].Level;
-        gainXP(Math.round(15*(2**(level >= 1 && level <= 5 ? level : 5)) * additionalXP));
+        gainXP(Math.round(15 * (2**(level >= 1 && level <= 5 ? level : 5)) * additionalXP));
 
         adventureChoiceOne.removeEventListener("click", quitButton);
         
         if (adventureRewards.children.length >= 0) {
             newPop(1);
             sortList("table2");
-            nutReward.gValue === 0 ? currencyPopUp("items") : currencyPopUp("items",0,"nuts",(nutReward.gValue));
+            nutReward.gValue === 0 ? currencyPopUp("items") : currencyPopUp("items", 0, "nuts", nutReward.gValue);
         }
 
         let rewardChildren = adventureRewards.children;
@@ -8927,10 +8993,16 @@ function winAdventure() {
         }
     }
 
-    let targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator, .raining-image');
+    const targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator, .raining-image, .health-bar, .health-bar-scara, .skill-mark');
     targetElements.forEach((item) => {
         item.remove();
     });
+
+    const leftOverEnemy = adventureVideo.querySelectorAll('.enemyImg');
+    leftOverEnemy.forEach((ele) => {
+        ele.style.animation = '';
+        ele.style.filter= 'grayscale(100%) brightness(20%)';
+    })
 
     const adventureFight = document.getElementById("adventure-fight");
     adventureFight.style.display = "none";

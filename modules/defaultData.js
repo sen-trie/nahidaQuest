@@ -293,21 +293,123 @@ const enemyInfo = {
         5:["Automaton-Boss.1","SAutomaton-Boss.2","Eremite-Boss.3"],
     },
 
-    osuArray: [[
-                [50, 30, 450], [45, 35, 450], [40, 40, 450], 
-                [20, 10, 400, 1000], [30, 15, 400], [40, 20, 400], 
-                [70, 50, 500, 1200], [60, 40, 500], [50, 50, 500], [40, 40, 500],
-                [60, 15, 450, 800], [50, 25, 450], [60, 35, 450], [50, 45, 450]],
-               [
-                [50, 30, 425], [40, 50, 425], [30, 30, 425],
-                [18, 30, 475, 800], [40, 60, 475], [62, 30, 475],
-                [65, 30, 475, 800], [40, 5, 475], [15, 30, 475], [40, 65, 475]
-               ],
-               [
-                [10, 10, 500], [18, 15, 500], [26, 20, 510],
-                [34, 25, 510], [42, 30, 520], [50, 35, 520],
-                [58, 40, 525], [66, 45, 525], [72, 50, 530],
-               ],
+    // 1ST POSITION IS FOR TIMING, 2ND IS FOR DELAY, X IS FOR OCCUPIED LANE, O IS FOR EMPTY LANE
+    easyCytusDict: [
+        [
+            [300, 20, 'OXO', 'Circle-', true],
+            [275, 25, 'XOX', 'Circle-'],
+            [225, 25, 'OXO', 'Circle-', true],
+            [325, 20, 'XOX', 'Bullet-'],
+            [325, 20, 'OXO', 'Bullet-', true],
+            [300, 10, 'XOX', 'Circle-'],
+        ], [
+            [175, 20, 'OXX', null, true],
+            [175, 35, 'XXO', null],
+            [175, 35, 'OXX', null, true],
+            [175, 35, 'XXO', null],
+            [250, 45, 'OOX', 'Boomer-'],
+            [325, 15, 'XOO', 'Bullet-', true],
+            [275, 5, 'OXX', 'Boomer-'],
+        ], [
+            [250, 0, 'OXO', 'Bullet-'], 
+            [300, 15, 'XOO', 'Bullet-'],
+            [300, 5, 'OOX', 'Bullet-', true], 
+            [300, 15, 'OXO', 'Bullet-'], 
+            [325, 15, 'XOX', 'Bullet-', true],
+            [300, 10, 'OXX', 'Bullet-'],
+            [350, 5, 'XOO', 'Bullet-', true],  
+        ], [
+            [175, 20, 'OXX', null, true],
+            [175, 30, 'XOX', null, true],
+            [175, 30, 'XXO', null, true],
+            [250, 55, 'OOX', 'Boomer-'],
+            [250, 20, 'OXO', 'Circle-'],
+            [250, 65, 'XOO', 'Boomer-', true],
+        ],
+    ],
+
+    hardCytusDict: [
+        [
+            [350, 20, 'XXO', null, true],
+            [300, 20, 'OOX', 'Circle-'],
+            [300, 25, 'OXX', 'Circle-'],
+            [300, 25, 'XOX', 'Circle-'],
+            [300, 25, 'XXO', 'Circle-'],
+            [300, 25, 'XOX', 'Circle-'],
+            [300, 85, 'OXO', 'Boomer-', true],
+            [300, 35, 'XOX', 'Boomer-'],
+            [300, 35, 'OXO', 'Boomer-', true],
+        ],[
+            [400, 0, 'OXO', 'Bullet-'], 
+            [300, 30, 'XXO', null],
+            [300, 20, 'OXX', 'Circle-'],
+            [300, 50, 'XOX', null],
+            [250, 30, 'OXX', 'Bullet-'],
+            [300, 15, 'XXO', null, true],
+            [300, 30, 'XOX', null, true],
+            [300, 55, 'OXX', 'Boomer-'],
+        ],[   
+            [300, 15, 'OXX', 'Bullet-'],
+            [350, 25, 'XOX', null],
+            [300, 25, 'XXO', 'Bullet-', true],
+            [300, 15, 'OXX', 'Bullet-'],
+            [500, 25, 'XXO', null],
+            [300, 15, 'XOX', 'Bullet-', true],
+            [400, 15, 'OXX', null],
+            [300, 25, 'XXO', 'Circle-', true],
+            [300, 35, 'OXX', 'Circle-'],
+            [300, 35, 'XXO', 'Circle-'],
+            [300, 35, 'XOX', 'Circle-', true],
+        ],[
+            [300, 20, 'OXX', null],
+            [300, 17, 'OOX', null],
+            [300, 17, 'XOX', null],
+            [300, 17, 'XOO', null],
+            [300, 0, 'OOX', 'Boomer-', true],
+            [300, 17, 'XXO', null],
+            [300, 17, 'XOO', null],
+            [300, 17, 'XOX', null],
+            [300, 17, 'OOX', null],
+            [300, 17, 'OXX', null],
+            [300, 17, 'OOX', null],
+            [300, 17, 'XOX', null],
+            [300, 0, 'XOO', 'Boomer-', true],
+            [300, 17, 'XOO', null],
+            [300, 17, 'XXO', null],
+            [300, 60, 'OXX', 'Bullet-', true],
+            [300, 10, 'XOX', 'Bullet-'],
+            [350, 10, 'OXX', 'Boomer-'],
+        ], [
+            [270, 20, 'XOX', 'Bullet-', true],
+            [270, 0, 'XOX', 'Bullet-'],
+            [270, 20, 'OXX', 'Boomer-', true],
+            [270, 0, 'OXX', 'Boomer-'],
+            [270, 35, 'XOX', 'Bullet-', true],
+            [270, 0, 'XOX', 'Bullet-'],
+            [270, 40, 'XXO', 'Boomer-', true],
+            [270, 0, 'XXO', 'Boomer-'],
+            [270, 20, 'XOX', 'Bullet-', true],
+            [270, 0, 'XOX', 'Bullet-'],
+            [250, 20, 'OXX', 'Circle-', true],
+            [250, 0, 'OXX', 'Circle-'],
+        ]
+    ],
+
+    osuArray: [
+        [
+            [50, 30, 450], [45, 35, 450], [40, 40, 450], 
+            [20, 10, 400, 1000], [30, 15, 400], [40, 20, 400], 
+            [70, 50, 500, 1200], [60, 40, 500], [50, 50, 500], [40, 40, 500],
+            [60, 15, 450, 800], [50, 25, 450], [60, 35, 450], [50, 45, 450]
+        ],[
+            [50, 30, 425], [40, 50, 425], [30, 30, 425],
+            [18, 30, 475, 800], [40, 60, 475], [62, 30, 475],
+            [65, 30, 475, 800], [40, 5, 475], [15, 30, 475], [40, 65, 475]
+        ],[
+            [10, 10, 500], [18, 15, 500], [26, 20, 510],
+            [34, 25, 510], [42, 30, 520], [50, 35, 520],
+            [58, 40, 525], [66, 45, 525], [72, 50, 530],
+        ],
     ],
 
     quicktimeDict: {
@@ -439,7 +541,8 @@ const enemyInfo = {
     1401:{Class:"Megaboss",       Variation:1,   Type:"FellBoss",      HP:7000,   ATK:2,     AtkCooldown:32.5},
     1411:{Class:"Megaboss",       Variation:1,   Type:"Unusual",      HP:8000,   ATK:0.5,     AtkCooldown:30},
     1412:{Class:"Minion",          Variation:3,   Type:"Unusual",      HP:850,   ATK:0.5,     AtkCooldown:45},
-    1421:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:3000,   ATK:2,     AtkCooldown:35},
+    1421:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:500,   ATK:2,     AtkCooldown:35},
+    1422:{Class:"Arm",           Variation:1,   Type:"Workshop",      HP:1000,   ATK:2,     AtkCooldown:65},
     1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:3000,   ATK:2,     AtkCooldown:35},
 }
 
