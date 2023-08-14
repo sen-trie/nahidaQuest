@@ -451,7 +451,7 @@ const enemyInfo = {
         }
     },
 
-    // LVL 1
+    // LVL 1, INCLUSIVE BG
     "1-Wave-1":{Wave:[101,101,101],         BG:[1,4]},
     "1-Wave-2":{Wave:[121,121,121],         BG:[1,4]},
     "1-Wave-3":{Wave:[111,111,111],         BG:[3,6]},
@@ -535,14 +535,14 @@ const enemyInfo = {
     1302:{Class:"Leader",       Variation:1,   Type:"Skirmish",      HP:1200,   ATK:1.5,     AtkCooldown:35},
     // LVL 14
     "14-Wave-1":{Wave:[1401],         BG:[1,1]},
-    "14-Wave-2":{Wave:[1411],         BG:[2,2]},
-    "14-Wave-3":{Wave:[1421],         BG:[3,3]},
-    "14-Wave-4":{Wave:[1431],         BG:[4,4]},
+    "14-Wave-2":{Wave:[1411],         BG:[2,3]},
+    "14-Wave-3":{Wave:[1421],         BG:[4,4]},
+    "14-Wave-4":{Wave:[1431],         BG:[5,5]},
     1401:{Class:"Megaboss",       Variation:1,   Type:"FellBoss",      HP:7000,   ATK:2,     AtkCooldown:32.5},
     1411:{Class:"Megaboss",       Variation:1,   Type:"Unusual",      HP:8000,   ATK:0.5,     AtkCooldown:30},
     1412:{Class:"Minion",          Variation:3,   Type:"Unusual",      HP:850,   ATK:0.5,     AtkCooldown:45},
-    1421:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:500,   ATK:2,     AtkCooldown:35},
-    1422:{Class:"Arm",           Variation:1,   Type:"Workshop",      HP:1000,   ATK:2,     AtkCooldown:65},
+    1421:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:2500,   ATK:2,     AtkCooldown:35},
+    1422:{Class:"Arm",           Variation:1,   Type:"Workshop",      HP:3000,   ATK:2,     AtkCooldown:70},
     1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:3000,   ATK:2,     AtkCooldown:35},
 }
 

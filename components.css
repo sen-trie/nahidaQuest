@@ -1183,6 +1183,7 @@
     filter: none;
     position: absolute;
     bottom: 10%;
+    pointer-events: none;
 }
 
 .select-indicator {
@@ -1550,6 +1551,18 @@
 
 .adventure-atk-cooldown > :last-child, .adventure-atk-cooldown-scara > :last-child{
     border-right: none;
+}
+
+.energy-burst {
+    position: absolute;
+    top: -12.5%;
+    left: 25%;
+    width: 50%;
+    transition: 0.3s ease;
+    height: auto;
+    aspect-ratio: 1;
+    animation: rotation 1.5s infinite linear forwards;
+    z-index: 10;
 }
 
 .cooldown-bit {

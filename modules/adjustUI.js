@@ -205,8 +205,12 @@ function createDom(elementType, attributes) {
         for (const attr in attributes) {
             if (cssProps.includes(attr)) {
                 console.warn(`Error putting CSS props: ${attr}`);
-            } else if ((attr === 'class' || attr === 'classList') && Array.isArray(attributes[attr])) {
-                element.classList.add(...attributes[attr]);
+            } else if ((attr === 'class' || attr === 'classList')) {
+                if (Array.isArray(attributes[attr])) {
+                    element.classList.add(...attributes[attr]);
+                } else {
+                    element.classList.add(attributes[attr]);
+                }
             } else if (attr === 'style' && typeof attributes[attr] === 'object') {
                 Object.assign(element.style, attributes[attr]);
             } else if (typeof attributes[attr] !== 'object' || attributes[attr] === null) {

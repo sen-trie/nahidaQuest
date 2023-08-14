@@ -3189,6 +3189,12 @@ table, button, label {
     100% {filter: brightness(1);}
 }
 
+@keyframes darkness-transition-slow {
+    0% {filter: brightness(1);}
+    40%, 65% {filter: brightness(0);}
+    100% {filter: brightness(1);}
+}
+
 @keyframes vignette-animation {
     0% { filter: opacity(1);}
     50% { filter: opacity(0.5);}
@@ -3365,6 +3371,20 @@ table, button, label {
     100% {
         filter: brightness(1) drop-shadow(0 0 0.2em #ffffff) drop-shadow(0 0 0.3em #ffffff);
         transform: scale(1.2);
+    }
+}
+
+@keyframes explosion {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        filter: brightness(1.35) drop-shadow(0 0 0.2em #BC86F0) drop-shadow(0 0 0.3em #BC86F0);
+        transform: scale(1.3);
+    }
+    100% {
+        filter: brightness(1.2) drop-shadow(0 0 0.2em #BC86F0) drop-shadow(0 0 0.3em #BC86F0);
+        transform: scale(1.8);
     }
 }
 
