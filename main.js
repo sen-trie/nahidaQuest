@@ -6675,7 +6675,7 @@ function triggerFight() {
         artificalSpeedUp: 0,
         quicktime: adventureVariables.specialty === 'Unusual' ? 100 : 0,
         quicktimeAttack: false,
-        summonTime: null,
+        summonTime: adventureVariables.specialty === 'Finale' ? 0 : null,
         rainTime: null,
         floatTime: null,
         floatNumber: 0,
@@ -6685,7 +6685,7 @@ function triggerFight() {
         currentDeflect: null,
         deflectTime: adventureVariables.specialty === 'Workshop' ? 0 : null,
         burstAttack: null,
-        burstTime: adventureVariables.specialty === 'Workshop' ? 0 : null,
+        burstTime: adventureVariables.specialty === 'Workshop' ? 0.25 : null,
         bossHealth: adventureVariables.advType === 14 ? 100 : null,
         triggerConstants: {quicktimeCheck, summonMob, rainTimeCheck, floatTimeCheck, burstTimeCheck, burstTimeEnd},
     }
@@ -6843,6 +6843,12 @@ function triggerFight() {
                 variant = '-osu';
             } else if (adventureVariables.specialty === 'Workshop') {
                 variant = '-cytus';
+            }  else if (adventureVariables.specialty === 'Finale') {
+                if (battleVariables.bossHealth <= FINALE_THRESHOLD_TWO) {
+                    variant = '-cytus';
+                } else if (battleVariables.bossHealth <= FINALE_THRESHOLD) {
+                    variant = '-osu';
+                }
             }
 
             let warningImg = new Image();
@@ -6899,9 +6905,12 @@ function triggerFight() {
                         adventureVariables.currentEnemyAmount++;
                     }
                     adventureVariables.currentEnemyAmount--;
+                } else if (adventureVariables.specialty === 'Finale') {
+                    activateMob(spawnMob(adventureVideo, [1432], bossEle), 1, adventureVideoChildren.length);
                 } else {
                     activateMob(spawnMob(adventureVideo, [1412], bossEle), 1, adventureVideoChildren.length);
                 }
+
                 adventureVariables.currentEnemyAmount++;
                 break;
             }
@@ -6920,13 +6929,26 @@ function triggerFight() {
     function floatTimeCheck() {
         if (battleVariables.floatTime > 1 && !document.getElementById('warning-quicktime')) {
             battleVariables.floatTime = 0;
-            summonBattleFloat(5, 1);
+            if (adventureVariables.specialty === 'FellBoss') {
+                summonBattleFloat(5, 1);
+                if (battleVariables.bossHealth <= FELLBOSS_THRESHOLD && randomInteger(1, 3) === 1) {
+                    summonBattleFloat(4, 1.5);
+                } else if (randomInteger(1, 4) === 1) {
+                    summonBattleFloat(6, 1);
+                }
+            } else {
+                if (battleVariables.bossHealth <= FINALE_THRESHOLD) {
+                    if (battleVariables.bossHealth <= FINALE_THRESHOLD_TWO) {
+                        summonBattleFloat(5, 1, true);
+                        battleVariables.floatTime = -0.15;
+                    }
 
-            if (battleVariables.bossHealth <= FELLBOSS_THRESHOLD && randomInteger(1, 3) === 1) {
-                summonBattleFloat(4, 1.5);
-            } else if (randomInteger(1, 4) === 1) {
-                summonBattleFloat(6, 1);
+                    summonBattleFloat(4, 1.5, true);
+                    summonBattleFloat(3, 2, true);
+                }
             }
+
+            
         }
     }
 
@@ -6934,7 +6956,7 @@ function triggerFight() {
     function burstTimeCheck() {
         if (battleVariables.burstTime > 1 && !document.getElementById('warning-quicktime')) {
             battleVariables.burstAttack = 0;
-            battleVariables.burstTime = -0.5;
+            battleVariables.burstTime = 0;
             battleVariables.currentDeflect = null;
             battleVariables.deflectTime = 0;
 
@@ -6954,6 +6976,8 @@ function triggerFight() {
 
             const bossEle = adventureVideo.querySelector('.megaboss');
             bossEle.style.pointerEvents = 'none';
+            const bossEleImg = bossEle.querySelector('.enemyImg');
+            bossEleImg.style.filter = 'grayscale(100%) brightness(20%)';
 
             const bossEleCanvas = bossEle.querySelector('.atk-indicator');
             bossEleCanvas.changeSrc(`./assets/icon/burstCharge.webp`);
@@ -6999,7 +7023,10 @@ function triggerFight() {
             canvas.style.transform = '';
             canvas.style.filter = 'brightness(0)';
         })
+
         const bossEle = adventureVideo.querySelector('.megaboss');
+        const bossEleImg = bossEle.querySelector('.enemyImg');
+        bossEleImg.style.filter = 'drop-shadow(0 0 0.3em rgba(255, 255, 255, 0.463))';
 
         setTimeout(() => {
             adventureVideo.style.animation = "darkness-transition-slow 4s ease-in-out";
@@ -7012,7 +7039,7 @@ function triggerFight() {
                 sapEnergy(energyBall.startingValue, 25);
 
                 battleVariables.burstAttack = null;
-                battleVariables.burstTime = -0.5;
+                battleVariables.burstTime = 0.15;
 
                 armEleCanvas.forEach((canvas) => {
                     canvas.brightness = -0.10 * randomInteger(0, 50) / 10;
@@ -7025,7 +7052,7 @@ function triggerFight() {
                 if (bossEleCanvas) {
                     bossEleCanvas.changeSrc(`./assets/icon/atkIndicator${adventureScaraText}.webp`);
                     bossEleCanvas.brightness = 0;
-                    fightText.innerText = 'You got this!';
+                    fightText.innerText = 'Take down its limbs to damage the core!';
                 }
 
                 energyBall.remove();
@@ -7054,19 +7081,30 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
     mobDiv.children[0].style.animation = `vibrate ${randomInteger(600,1200) / 100}s linear infinite both`;
         if (mobDiv.classList.contains('wide-enemy')) {
             mobDiv.children[0].style.animation = `vibrate ${randomInteger(2000,2400) / 100}s linear infinite both`;
-        } else if (adventureVariables.specialty === 'Unusual' && mobDiv.classList.contains('minion')) {
-            mobDiv.children[0].style.animation = 'slit-in-horizontal 0.6s ease-out both';
-            mobDiv.children[0].addEventListener('animationend', () => {
-                mobDiv.children[0].style.animation = '';
-                void mobDiv.children[0].offsetWidth;
-                mobDiv.children[0].style.animation = `vibrate ${randomInteger(600, 900) / 100}s linear infinite both`;
-            }, {once: true})
-        } else if (adventureVariables.specialty === 'Unusual' && mobDiv.classList.contains('decoy')) {
-            mobDiv.children[0].style.animation = 'slit-in-horizontal 0.6s ease-out both';
-            mobDiv.style.animation = `sway ${randomInteger(26, 46) / 10}s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite`;
         } else if (adventureVariables.specialty === 'Unusual') {
-            mobDiv.children[0].style.animation = 'unset';
-            mobDiv.style.animation = 'sway 3s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite';
+            if (mobDiv.classList.contains('minion')) {
+                mobDiv.children[0].style.animation = 'slit-in-horizontal 0.6s ease-out both';
+                mobDiv.children[0].addEventListener('animationend', () => {
+                    mobDiv.children[0].style.animation = '';
+                    void mobDiv.children[0].offsetWidth;
+                    mobDiv.children[0].style.animation = `vibrate ${randomInteger(600, 900) / 100}s linear infinite both`;
+                }, {once: true})
+            } else if (mobDiv.classList.contains('decoy')) {
+                mobDiv.children[0].style.animation = 'slit-in-horizontal 0.6s ease-out both';
+                mobDiv.style.animation = `sway ${randomInteger(26, 46) / 10}s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite`;
+            } else {
+                mobDiv.children[0].style.animation = 'unset';
+                mobDiv.style.animation = 'sway 3s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite';
+            }
+        } else if (adventureVariables.specialty === 'Finale') {
+            if (mobDiv.classList.contains('minion')) {
+                mobDiv.children[0].style.animation = 'slit-in-horizontal 0.6s ease-out both';
+                mobDiv.children[0].addEventListener('animationend', () => {
+                    mobDiv.children[0].style.animation = '';
+                    void mobDiv.children[0].offsetWidth;
+                    mobDiv.children[0].style.animation = `vibrate ${randomInteger(600, 900) / 100}s linear infinite both`;
+                }, {once: true})
+            }
         }
 
         let singleEnemyInfo = mobDiv.enemyID;
@@ -7212,17 +7250,23 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                                 battleVariables.floatTime += brightnessIncrement * 0.6;
                             } else if (adventureVariables.specialty === 'Workshop') {
                                 if (battleVariables.burstAttack !== null) {
-                                    canvas.brightness -= brightnessIncrement * 0.75;
+                                    canvas.brightness -= (brightnessIncrement * (speedUpFactor - 1) + brightnessIncrement * 0.75);
                                 } else {
-                                    battleVariables.quicktime += brightnessIncrement * 2.5;
-                                    battleVariables.deflectTime += brightnessIncrement * 1.5 * speedUpFactor;
+                                    battleVariables.deflectTime += brightnessIncrement * 2 * speedUpFactor;
                                     if (battleVariables.bossHealth <= WORKSHOP_THRESHOLD) {
                                         canvas.brightness -= brightnessIncrement * 0.25;
     
-                                        battleVariables.quicktime -= brightnessIncrement * 1.5;
                                         battleVariables.burstTime += brightnessIncrement * 0.2;
+                                        battleVariables.quicktime -= brightnessIncrement * (speedUpFactor - 1);
                                         battleVariables.triggerConstants.burstTimeCheck();
+                                    } else {
+                                        battleVariables.quicktime += brightnessIncrement * 0.4;
+                                        canvas.brightness += brightnessIncrement * 0.25;
                                     }
+                                }
+                            } else if (adventureVariables.specialty === 'Finale') {
+                                if (battleVariables.floatTime !== null) {
+                                    battleVariables.floatTime += brightnessIncrement * 0.9;
                                 }
                             }
                         }
@@ -7246,20 +7290,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                         } else if (!(guardCheck()) || adventureVariables.specialty === 'FellBoss') {
                             doubleAttack();
                         } else if (battleVariables.deflectTime !== null && battleVariables.deflectTime > 1 && battleVariables.burstAttack === null) {
-                            if (battleVariables.currentDeflect === null && (mobHealth.health / mobHealth.maxHP) > 0.35) {
-                                battleVariables.deflectTime = 0;
-                                battleVariables.currentDeflect = mobDiv;
-                                canvas.deflecting = true;
-    
-                                mobAtkIndicator.src = `./assets/icon/chargedAtk.webp`;
-                                canvas.style.animation = `tada ${randomInteger(12,18)/10}s linear`;
-                                canvas.addEventListener('animationend', () => {
-                                    canvas.style.animation = '';
-                                    void canvas.offsetWidth;
-                                }, { once: true });
-                            } else {
-                                battleVariables.deflectTime *= 0.75;
-                            }
+                            deflectStance();
                         }
 
                         const evadeRoll = randomInteger(1,101);
@@ -7448,6 +7479,24 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             }
         }
 
+        // CHANGES TO DEFLECT STANCE
+        function deflectStance() {
+            if (battleVariables.currentDeflect === null && (mobHealth.health / mobHealth.maxHP) > 0.35) {
+                battleVariables.deflectTime = 0;
+                battleVariables.currentDeflect = mobDiv;
+                canvas.deflecting = true;
+
+                mobAtkIndicator.src = `./assets/icon/chargedAtk.webp`;
+                canvas.style.animation = `tada ${randomInteger(12,18)/10}s linear`;
+                canvas.addEventListener('animationend', () => {
+                    canvas.style.animation = '';
+                    void canvas.offsetWidth;
+                }, { once: true });
+            } else {
+                battleVariables.deflectTime *= 0.75;
+            }
+        }
+
         const updateMobHealth = () => {
             if (mobHealth.health <= 0) {
                 fightEnemyDownElement.load();
@@ -7475,7 +7524,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             } else {
                 switch (type) {
                     case 'strong':
-                        canvas.brightness = 0 - randomInteger(10, 30) / 10;
+                        canvas.brightness = 0 - randomInteger(10, 20) / 10;
                         break;
                     case 'weak':
                         canvas.brightness = 0 + randomInteger(10, 30) / 10;
@@ -7487,6 +7536,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             }
 
             if (canvas.burstMode === true) {
+                attackMultiplier *= 0.65;
                 canvas.brightness -= randomInteger(0, 15) / 10;
             }
             
@@ -7533,6 +7583,10 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                     default:
                         createBattleText("counter", animationTime * 150 * 2, mobDiv);
                         break;
+                }
+
+                if (battleVariables.deflectTime !== null && battleVariables.deflectTime > 1 && battleVariables.burstAttack === null) {
+                    deflectStance();
                 }
             } else {
                 mobHealth.health -= (battleVariables.currentATK * attackMultiplier * 0.25);
@@ -7646,7 +7700,13 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                             deltaTime = currentTime - previousTime;
                             
                             if (deltaTime > interval) {
-                                if (!canvas.paused) {return};
+                                if (!canvas.paused) {
+                                    return
+                                } else if (battleVariables.quicktimeAttack) {
+                                    window.requestAnimationFrame(animateMovement);
+                                    return;
+                                };
+
                                 if (directionRight) {
                                     progress += 0.4 * speedUpFactor;
                                 } else {
@@ -7724,7 +7784,9 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
                 if (guardCheckBool) {
                     mobHealth.health -= battleVariables.currentATK;
-                    if (adventureVariables.specialty === 'FellBoss') {doubleAttack()}
+                    if (adventureVariables.specialty === 'FellBoss') {
+                        doubleAttack();
+                    }
                 } else {
                     mobHealth.health -= (battleVariables.currentATK * 0.25);
                     createBattleText("guard", animationTime * 150 * 2, mobDiv);
@@ -7744,6 +7806,8 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                     } else if (mobDiv.querySelector('.health-shield') !== null) {
                         attackMultiplier *= 0.15;
                     }
+                } else if (canvas.burstMode) {
+                    attackMultiplier *= 0.35;
                 }
 
                 if (guardCheckBool) {
@@ -7805,14 +7869,25 @@ function bossUpdate(updatedHealth) {
                     bossEle.style.animation = 'unset';
                     void bossEle.children[0].offsetWidth;
                     bossEle.children[0].style.animation = `vibrate ${randomInteger(2000,2400) / 100}s linear infinite both`;
-                }, { once: true });
+                });
             }, { once: true });
-        } else if (specialty === 'Unusual') {
-            const decoyEle = adventureVideo.querySelectorAll('.decoy');
+        } else if (specialty === 'Unusual' || specialty === 'Finale') {
+            const decoyEle = adventureVideo.querySelectorAll('.decoy, .minion');
             decoyEle.forEach((ele) => {
                 ele.remove();
                 adventureVariables.currentEnemyAmount--;
             })
+
+            if (specialty === 'Finale') {
+                bossEle.addEventListener('animationend', () => {
+                    setTimeout(() => {
+                        bossEle.children[0].style.animation = `unset`;
+                        bossEle.style.animation = 'unset';
+                        void bossEle.children[0].offsetWidth;
+                        bossEle.children[0].style.animation = `vibrate ${(4 - phase) * randomInteger(400, 600) / 100}s linear infinite both`;
+                    });
+                }, { once: true });
+            }
         }
     }
 
@@ -7820,22 +7895,32 @@ function bossUpdate(updatedHealth) {
         if (battleVariables.summonTime === null) {
             battleVariables.summonTime = 0;
             battleVariables.decoyTime = null;
-
             changeAnimation(2);
         }
     } else if (adventureVariables.specialty === 'FellBoss' && updatedHealth <= FELLBOSS_THRESHOLD) {
         if (battleVariables.rainTime === null) {
             battleVariables.rainTime = 0;
-
             changeAnimation(2);
         }
     } else if (adventureVariables.specialty === 'Workshop' && updatedHealth <= WORKSHOP_THRESHOLD) {
         if (battleVariables.chargeTime === null) {
             battleVariables.chargeTime = 0;
-
             changeAnimation(2);
         } else if (updatedHealth <= 0) {
             winAdventure();
+        }
+    } else if (adventureVariables.specialty === 'Finale' && updatedHealth <= FINALE_THRESHOLD) {
+        if (updatedHealth <= FINALE_THRESHOLD_TWO) {
+            if (battleVariables.summonTime === null) {
+                battleVariables.summonTime = 0;
+                changeAnimation(3);
+            }
+        } else {
+            if (battleVariables.summonTime !== null) {
+                battleVariables.summonTime = null;
+                battleVariables.floatTime = 0;
+                changeAnimation(2);
+            }
         }
     }
 }
@@ -7849,7 +7934,7 @@ function createBattleText(text, timer, container) {
     return container;
 }
 
-function summonBattleFloat(HP, initialFactor) {
+function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
     const adventureVideo = document.getElementById('adventure-video');
     if (!adventureVariables.fightSceneOn) {
         let targetElements = adventureVideo.querySelectorAll('.raining-image');
@@ -7871,13 +7956,20 @@ function summonBattleFloat(HP, initialFactor) {
         HP: HP,
         rotationNumber: 0,
         style: {
+            left: (ignoreSpace ? randomInteger(0, 85) : randomInteger(0, 85, [33, 60])) + '%',
+            top: randomInteger(20, 60) + '%',
+            animation: 'scaleIn 1s ease-in-out',
             filter: "drop-shadow(0 0 0.3em #a5d9e2)",
             zIndex: 5,
             width: '12.5%',
-            left: randomInteger(0, 85, [33, 60]) + '%',
-            top: randomInteger(20, 60) + '%'
+            pointerEvents: 'none',
         }
-    })
+    });
+
+    popImage.addEventListener('animationend', () => {
+        popImage.style.pointerEvents = 'auto';
+        window.requestAnimationFrame(animateSpin);
+    }, { once: true });
 
     popImage.addEventListener('click', () => {
         if (popImage.clicked) {return}
@@ -7919,7 +8011,6 @@ function summonBattleFloat(HP, initialFactor) {
     }
     
     battleVariables.floatNumber++;
-    window.requestAnimationFrame(animateSpin);
     adventureVideo.appendChild(popImage);
 }
 
@@ -8024,7 +8115,19 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
             }
         }
 
-        let beatArray = deepCopy(rollArray(battleVariables.bossHealth <= WORKSHOP_THRESHOLD ? enemyInfo.hardCytusDict : enemyInfo.easyCytusDict, 0));
+        let usedDict;
+        if (adventureVariables.specialty === 'Workshop') {
+            usedDict = battleVariables.bossHealth <= WORKSHOP_THRESHOLD ? enemyInfo.hardCytusDict : enemyInfo.easyCytusDict;
+        } else if (adventureVariables.specialty === 'Finale') {
+            if (battleVariables.bossHealth <= 1) {
+                usedDict = enemyInfo.veryHardCytusDict;
+            } else {
+                usedDict = enemyInfo.hardCytusDict;
+            }
+            
+        }
+
+        let beatArray = deepCopy(rollArray(usedDict, 0));
         const maxBeat = beatArray.length;
         let mirrorAll = randomInteger(1, 3) === 1 ? true : false;
         let beatCount = 10;
@@ -8304,7 +8407,15 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
         let mirrorMode = randomInteger(1, 3) === 1 ? false : true;
 
         // FORMAT: LEFT, TOP, TIMING (MS), DELAY (MS)
-        const posArray = rollArray(enemyInfo.osuArray)
+        let speedUpFactor = 1;
+        if (adventureVariables.specialty === 'Finale') {
+            speedUpFactor += 0.125;
+        }
+
+        reverseMode = false;
+        mirrorMode = false;
+
+        const posArray = rollArray(MOBILE ? enemyInfo.hardOsuArray : enemyInfo.easyOsuArray)
         let maxBeat = posArray.length;
         let correctBeat = 0;
 
@@ -8361,6 +8472,8 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
 
             if (!reverseMode && pos[3]) {
                 currentCellNumber = 1;
+            } else if (reverseMode && placeholderTiming > 0){
+                currentCellNumber = 1;
             } else {
                 currentCellNumber++;
             }
@@ -8410,10 +8523,10 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                         return;
                     } else if (beatGradient.gradColor > 100) {
                         beatGradient.style.background = `linear-gradient(to top, #ffffff00, #ffffff00 100%, #333333b8 100%)`;
-                        beatGradient.gradColor++
+                        beatGradient.gradColor += 1 / (timing / 450);
                     } else {
                         beatGradient.style.background = `linear-gradient(to top, #ffffff00, #ffffff00 ${beatGradient.gradColor}%, #333333b8 ${beatGradient.gradColor + 1}%)`;
-                        beatGradient.gradColor++
+                        beatGradient.gradColor += 1 / (timing / 450) * speedUpFactor;
                     }
                 }
             
@@ -8438,16 +8551,21 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                 if (index < posArray.length) {
                     if (reverseMode) {
                         setTimeout(() => {
-                            processItem();
-                            if (posArray[index][3] !== undefined) {
+                            if (posArray[index] && posArray[index][3] !== undefined) {
                                 placeholderTiming = posArray[index][3];
                             } else if (placeholderTiming > 0) {
-                                currentCellNumber = 0;
                                 placeholderTiming = 0;
                             }
-                        }, posArray[posArray.length - index - 1][2] + placeholderTiming);
+                            setTimeout(() => {
+                                processItem();
+                            }, placeholderTiming)
+                        }, posArray[posArray.length - index - 1][2]);
                     } else {
-                        setTimeout(processItem, posArray[index][2] + (posArray[index][3] ? posArray[index][3] : 0));
+                        if (posArray[index]) {
+                            setTimeout(processItem, posArray[index][2] + (posArray[index][3] ? posArray[index][3] : 0));
+                        } else {
+                            return;
+                        }
                     }
                 } else {
                     setTimeout(() => {
@@ -8462,6 +8580,11 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
         let textBox = document.createElement('p');
         textBox.innerText = "Counter with the right type at the center to avoid taking damage!";
         textOverlay.appendChild(textBox);
+
+        if (adventureVariables.specialty === 'Finale') {
+            const quicktimeArray = enemyInfo.quicktimeDict['Finale'];
+            waveQuicktime = quicktimeArray[randomInteger(1, Object.keys(quicktimeArray).length + 1)];
+        }
     
         let maxBeat = waveQuicktime.length;
         let currentBeat = 0;
@@ -8489,15 +8612,17 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
             let img = new Image();
             img.src = `./assets/expedbg/${colorArray[i]}.webp`;
             img.addEventListener("click",() => {
-                if (quicktimeBar.state == colorArray[i]) {
-                    correctBeat++;
-                } else {
-                    createBattleText("miss", 2000, videoOverlay);
-                } 
-                
-                quicktimeBar.state = null;
-                currentBeat++;
-                removeBeat = true;
+                if (quicktimeBar.state !== null) {
+                    if (quicktimeBar.state === colorArray[i]) {
+                        correctBeat++;
+                    } else {
+                        createBattleText("miss", 2000, videoOverlay);
+                    }
+
+                    quicktimeBar.state = null;
+                    currentBeat++;
+                    removeBeat = true;
+                }   
             })
             textOverlay.appendChild(img);
         }
@@ -8515,6 +8640,15 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                 if (battleVariables.bossHealth && battleVariables.bossHealth <= UNUSUAL_THRESHOLD && roll < 60) {
                     modifier = 'Boomer-';
                 } else if (battleVariables.bossHealth && battleVariables.bossHealth > UNUSUAL_THRESHOLD && roll < 40) {
+                    modifier = 'Bullet-';
+                } else if (roll < 85) {
+                    modifier = 'Circle-';
+                }
+            } else if ((adventureVariables.specialty === 'Finale')) {
+                let roll = randomInteger(1, 101);
+                if (roll < 25) {
+                    modifier = 'Boomer-';
+                } else if (roll < 55) {
                     modifier = 'Bullet-';
                 } else if (roll < 85) {
                     modifier = 'Circle-';
@@ -8701,7 +8835,7 @@ function sapEnergy(quantityAmount, energyAmount) {
 }
 
 function loseHP(ATK, type='normal', resetCombo=true) {
-    // if (beta) {return}
+    if (beta) {return}
     if (!adventureVariables.fightSceneOn) {return}
 
     const healthBar = document.getElementById('health-bar');
@@ -8715,7 +8849,7 @@ function loseHP(ATK, type='normal', resetCombo=true) {
         battleVariables.healthLost += ATK;
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
-        if (resetCombo) {comboHandler("reset");}
+        if (resetCombo && type !== 'inverse') {comboHandler("reset");}
 
         adventureHealth.style.animation = 'shake 1s infinite linear';
         setTimeout(()=>{
@@ -8909,7 +9043,9 @@ function attackAll() {
         if (battleVariables.defenseMob != null) {
             currentATK *= 0.5;
             critThreshold = -1;
-            createBattleText("guard",2000,mobDiv);
+            createBattleText("guard", 2000, mobDiv);
+        } else if (battleVariables.burstAttack !== null) {
+            currentATK *= 0.3;
         }
 
         const mobHealth = mobDiv.children[1];
@@ -8947,11 +9083,14 @@ function attackAll() {
                     canvas.style.filter = `brightness(${canvas.brightness})`;
                 }
             } else {
-                canvas.brightness = -0.1 * randomInteger(1, 50) / 10;
-                setTimeout(() => {
-                    canvas.style.transform = ``;
+                canvas.style.transform = ``;
+                if (battleVariables.burstAttack !== null) {
+                    canvas.brightness *= 0.3;
+                    canvas.style.filter = `brightness(${canvas.brightness})`;
+                } else {
+                    canvas.brightness = -0.1 * randomInteger(1, 50) / 10;
                     canvas.style.filter = `brightness(0)`;
-                }, 100)
+                }
             }
         }
     }
@@ -8977,7 +9116,7 @@ function killMob(mobDiv, mobHealth) {
     mobHealth.remove();
 
     if (!advDict.rankDict[8].Locked) {
-        mobDiv.classList.contains('minion') ? loseHP(0.5, "inverse") : loseHP(1, "inverse");
+        loseHP((mobDiv.classList.contains('minion') ? 0.5 : 1), "inverse");
     }
 
     let mobChildArray = mobDiv.children;
@@ -8989,6 +9128,10 @@ function killMob(mobDiv, mobHealth) {
         mobDiv.remove();
     } else if (mobDiv.classList.contains('workshop-arm')) {
         battleVariables.artificalSpeedUp += 0.5;
+        const bossEle = document.querySelector('.megaboss > .health-bar-scara');
+        bossEle.health -= 0.20 * bossEle.maxHP;
+        bossEle.style.width = `${bossEle.health / bossEle.maxHP * 100}%`
+        bossUpdate(bossEle.health);
     }
 
     if (adventureVariables.currentEnemyAmount === 0) {
@@ -9205,10 +9348,14 @@ function winAdventure() {
         item.remove();
     });
 
-    const leftOverEnemy = adventureVideo.querySelectorAll('.enemyImg');
+    const leftOverEnemy = adventureVideo.querySelectorAll('.enemy');
     leftOverEnemy.forEach((ele) => {
+        ele.style.filter = 'grayscale(100%) brightness(20%)';
+    })
+
+    const leftOverImg = adventureVideo.querySelectorAll('.enemyImg');
+    leftOverImg.forEach((ele) => {
         ele.style.animation = '';
-        ele.style.filter= 'grayscale(100%) brightness(20%)';
     })
 
     const adventureFight = document.getElementById("adventure-fight");
@@ -11843,7 +11990,7 @@ if (beta) {
         startButton.click();
         setTimeout(()=>{
             let startButton = document.getElementById("play-button");
-            startButton.click();
+            if (startButton) startButton.click();
             setTimeout(()=>{startingFunction();},500)
         },2500);
     },800);
@@ -11855,7 +12002,7 @@ if (beta) {
         });
           
         document.dispatchEvent(event);
-        document.getElementById('adv-button-29').click()
+        document.getElementById('adv-button-30').click()
         // document.getElementById('char-selected').click();
         // document.getElementById('char-select-0').click();
         // document.getElementById('char-selected').click();

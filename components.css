@@ -1162,6 +1162,7 @@
     background-position: center;
     background-size: contain;
     background-repeat: no-repeat;
+    transition: filter 0.3s ease;
 }
 
 .battle-text {
