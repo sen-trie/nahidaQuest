@@ -420,7 +420,7 @@ const enemyInfo = {
         [320, 15, 'OOX', 'Bullet-', true],
         [320, 20, 'OXO', 'Bullet-'],
         [320, 30, 'OXX', 'Circle-', true],
-        [300, 0, 'OXO', 'Boomer-'],
+        [300, 0, 'XXO', 'Boomer-'],
         [320, 20, 'OXO', 'Bullet-', true],
         [320, 1, 'XOO', 'Bullet-', true],
         [320, 20, 'XOX', 'Circle-'],
@@ -606,8 +606,8 @@ const enemyInfo = {
     1412:{Class:"Minion",          Variation:3,   Type:"Unusual",      HP:850,   ATK:0.5,     AtkCooldown:45},
     1421:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:9500,   ATK:2,     AtkCooldown:35},
     1422:{Class:"Arm",           Variation:1,   Type:"Workshop",      HP:4000,   ATK:2,     AtkCooldown:70},
-    1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:300,   ATK:2,     AtkCooldown:35},
-    1432:{Class:"Minion",          Variation:1,   Type:"Finale",      HP:850,   ATK:0.5,     AtkCooldown:45},
+    1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:300,   ATK:2,     AtkCooldown:32.5},
+    1432:{Class:"Minion",          Variation:1,   Type:"Finale",      HP:1850,   ATK:0.5,     AtkCooldown:30},
 }
 
 const upgradeDictDefault = {
