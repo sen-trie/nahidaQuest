@@ -6686,9 +6686,11 @@ function triggerFight() {
         deflectTime: adventureVariables.specialty === 'Workshop' ? 0 : null,
         burstAttack: null,
         burstTime: adventureVariables.specialty === 'Workshop' ? 0.25 : null,
+        eatTime: null,
+        currentEaten: null,
         bossHealth: adventureVariables.advType === 14 ? 100 : null,
         lastStand: false,
-        triggerConstants: {quicktimeCheck, summonMob, rainTimeCheck, floatTimeCheck, burstTimeCheck, burstTimeEnd},
+        triggerConstants: {quicktimeCheck, summonMob, rainTimeCheck, floatTimeCheck, burstTimeCheck, burstTimeEnd, eatTimeCheck},
     }
     
     let currentSong = randomInteger(1, 4); 
@@ -6928,6 +6930,7 @@ function triggerFight() {
 
     // FOR SCREEN TRAPS
     function floatTimeCheck() {
+        if (beta) {return}
         if (battleVariables.floatTime > 1 && !document.getElementById('warning-quicktime')) {
             battleVariables.floatTime = 0;
             if (adventureVariables.specialty === 'FellBoss') {
@@ -6940,7 +6943,7 @@ function triggerFight() {
             } else {
                 if (battleVariables.bossHealth <= FINALE_THRESHOLD) {
                     if (battleVariables.bossHealth <= FINALE_THRESHOLD_TWO) {
-                        battleVariables.floatTime = -0.15;
+                        battleVariables.floatTime = -0.5;
                     } else {
                         randomInteger(1, 3) === 1 ? summonBattleFloat(5, 0.75, true) : null;
                         
@@ -7063,6 +7066,74 @@ function triggerFight() {
         }, 2200);
     }
 
+    // EATING FUNCTION FOR FINALE
+    function eatTimeCheck() {
+        if (battleVariables.currentEaten !== null) {
+            const eatenMark = battleVariables.currentEaten.querySelector('.mark-button');
+            if (eatenMark) {
+                if (battleVariables.eatTime > 1) {
+                    battleVariables.eatTime = -0.5;
+                    eatenMark.remove();
+
+                    killMob(battleVariables.currentEaten, battleVariables.currentEaten.querySelector('.health-bar'))
+                    battleVariables.currentEaten = null;
+                } else if (battleVariables.eatTime > 0.95) {
+                    const enemyImg = battleVariables.currentEaten.querySelector('.enemyImg');
+                    if (enemyImg.style.transition !== 'filter 0.4s ease-out') {
+                        enemyImg.style.transition = 'filter 0.4s ease-out';
+                        enemyImg.style.filter = 'grayscale(1) brightness(0.7) sepia(1) hue-rotate(313deg) saturate(1.5)';
+                    }
+                } else if (battleVariables.eatTime > 0.8) {
+                    if (eatenMark.glowing === false) {
+                        eatenMark.style.transform = `translate(-50%, -65%) scale(1.2)`;
+                        eatenMark.style.filter = `brightness(0.99) contrast(1) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
+                        eatenMark.glowing = true;
+                    }
+                } else {
+                    eatenMark.style.filter = `brightness(${battleVariables.eatTime})`;
+                }
+
+                return;
+            } else {
+                const mobDiv = battleVariables.currentEaten;
+                if (battleVariables.defenseMob === mobDiv) {
+                    mobDiv.guardStance(mobDiv, "exit");
+                }
+
+                const eatenMark = createDom('div', {
+                    class: ['counter-button', 'mark-button'],
+                    glowing: false,
+                });
+    
+                mobDiv.append(eatenMark);
+            }
+        } else if (battleVariables.eatTime > 1 && !document.getElementById('warning-quicktime')) {
+            const currentEle = adventureVideo.querySelectorAll('.minion');
+            let foundHealthyEnemy = null;
+
+            for (let i = 0; i < currentEle.length; i++) {
+                const mobDiv = currentEle[i];
+                const currentEleHealth = mobDiv.querySelector('.health-bar');
+
+                if (currentEleHealth.health / currentEleHealth.maxHP > 0.70) {
+                    const currentEleCanvas = mobDiv.querySelector('.atk-indicator');
+                    if (!mobDiv.querySelector('.counter-img') && currentEleCanvas.eaten === false) {
+                        foundHealthyEnemy = mobDiv;
+                        currentEleCanvas.eaten = true;
+                        break;
+                    }
+                }
+            }
+
+            if (foundHealthyEnemy !== null) {
+                battleVariables.currentEaten = foundHealthyEnemy;
+                battleVariables.eatTime = 0;
+            } else {
+                battleVariables.eatTime = 0.7;
+            }
+        }
+    }
+
     // BOSS SPECIAL PROPS
     if (adventureVariables.specialty === 'Unusual') {
         setTimeout(() => {
@@ -7143,6 +7214,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             class: ["atk-indicator"],
             brightness: 0 - 0.1 * (position * randomInteger(1, adventureVideoChildrenLength) - 2),
             paused: false,
+            eaten: false,
             deflecting: false,
             burstMode: false,
             changeSrc: changeSrc,
@@ -7248,11 +7320,13 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                                 if (battleVariables.bossHealth <= FELLBOSS_THRESHOLD) {
                                     canvas.brightness -= brightnessIncrement * 0.15;
                                     battleVariables.rainTime += brightnessIncrement * 0.4;
+                                    battleVariables.triggerConstants.rainTimeCheck();
                                 } else {
                                     battleVariables.quicktime += brightnessIncrement * 0.5;
                                 }
 
                                 battleVariables.floatTime += brightnessIncrement * 0.6;
+                                battleVariables.triggerConstants.floatTimeCheck();
                             } else if (adventureVariables.specialty === 'Workshop') {
                                 if (battleVariables.burstAttack !== null) {
                                     canvas.brightness -= (brightnessIncrement * (speedUpFactor - 1) + brightnessIncrement * 0.75);
@@ -7271,17 +7345,28 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                                 }
                             } else if (adventureVariables.specialty === 'Finale') {
                                 if (battleVariables.floatTime !== null) {
-                                    battleVariables.floatTime += brightnessIncrement * 0.4;
-                                } else if (battleVariables.deflectTime !== null) {
+                                    battleVariables.floatTime += brightnessIncrement * 0.3;
+                                    battleVariables.triggerConstants.floatTimeCheck();
+                                }
+                                
+                                if (battleVariables.deflectTime !== null) {
                                     battleVariables.deflectTime += brightnessIncrement * 2.3;
+                                }
+
+                                if (battleVariables.eatTime !== null) {
+                                    if (battleVariables.currentEaten === null) {
+                                        battleVariables.eatTime += brightnessIncrement * 10.3;
+                                    } else {
+                                        battleVariables.eatTime += brightnessIncrement * 0.3;
+                                    }
+                                
+                                    battleVariables.triggerConstants.eatTimeCheck();
                                 }
                             }
                         }
 
                         battleVariables.triggerConstants.quicktimeCheck();
                         battleVariables.triggerConstants.summonMob();
-                        battleVariables.triggerConstants.rainTimeCheck();
-                        battleVariables.triggerConstants.floatTimeCheck();
                         if (canvas.brightness < 0.8 && adventureVariables.currentEnemyAmount > 1 && !mobDiv.classList.contains('megaboss')) guardStance(mobDiv,"check");
                     }
 
@@ -7294,10 +7379,10 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                             void canvas.offsetWidth;
                         } else if (mobAtkIndicator.doubleAtk == "parry") {
                             mobAtkIndicator.doubleAtk = true;
-                        } else if (!(guardCheck()) || adventureVariables.specialty === 'FellBoss') {
-                            doubleAttack();
                         } else if (battleVariables.deflectTime !== null && battleVariables.deflectTime > 1 && battleVariables.burstAttack === null) {
                             deflectStance();
+                        } else if (!(guardCheck()) || adventureVariables.specialty === 'FellBoss') {
+                            doubleAttack();
                         }
 
                         const evadeRoll = randomInteger(1,101);
@@ -7458,7 +7543,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
             } else if (type === "check") {
                 if (!(battleVariables.defenseMob)) {
-                    if (battleVariables.guardtime >= (2.5 * adventureVariables.currentEnemyAmount * 0.75)) {
+                    if (battleVariables.guardtime >= (2.5 * adventureVariables.currentEnemyAmount * 0.75) && battleVariables.currentEaten !== mobDiv) {
                         let guardRoll = randomInteger(1,101);
                         if (guardRoll > 1) {
                             battleVariables.defenseMob = mobDiv;
@@ -7480,7 +7565,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
         // CHANGES TO DEFLECT STANCE
         function deflectStance() {
-            if (battleVariables.currentDeflect === null && (mobHealth.health / mobHealth.maxHP) > 0.35) {
+            if (battleVariables.currentDeflect === null && canvas.eaten !== false && (mobHealth.health / mobHealth.maxHP) > 0.35) {
                 battleVariables.deflectTime = 0;
                 battleVariables.currentDeflect = mobDiv;
                 canvas.deflecting = true;
@@ -7632,7 +7717,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 if (activeLeader == "Ei") {attackMultiplier = 1.35}
                 // IF TIMING WAS CORRECT
                 if (canvas.classList.contains("attack-ready")) {
-                    // FOR WHEN DEFLECTION IS AVAILABLE
+                    // FOR WHEN DEFLECTION IS AVAILABLE (OVERRIDES EATEN)
                     if (canvas.deflecting === true) {
                         canvas.deflecting = false;
                         battleVariables.currentDeflect = null;
@@ -7663,15 +7748,10 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                         });
 
                         const counterImg = createDom('img', {
+                            class: ['counter-img'],
                             src: `./assets/icon/selectIndicator${adventureScaraText}.webp`,
                             style: {
-                                position: 'absolute',
-                                bottom: '115%',
                                 left: 0,
-                                transform: 'translateX(-50%)',
-                                width: 'auto',
-                                height: '150%',
-                                objectFit: 'contain',
                             }
                         });
                         
@@ -7918,6 +7998,8 @@ function bossUpdate(updatedHealth) {
                 winAdventure();
             } else if (battleVariables.summonTime === null) {
                 battleVariables.summonTime = 0;
+                battleVariables.eatTime = 0;
+
                 changeAnimation(3);
             }
         } else {
@@ -7933,6 +8015,7 @@ function bossUpdate(updatedHealth) {
                     const mobDiv = battleVariables.defenseMob;
                     mobDiv.guardStance(mobDiv, "exit");
                 }
+                battleVariables.defenseMob = null;
 
                 setTimeout(() => {battleVariables.floatTime = 10}, 3000)
             }
@@ -8041,6 +8124,7 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
 
 function quicktimeEvent(waveQuicktime, advLevel, variant) {
     if (!adventureVariables.fightSceneOn) {return}
+    if (beta) {return}
     battleVariables.quicktimeAttack = true;
 
     const quicktimeBar = document.createElement("div");

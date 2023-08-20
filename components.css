@@ -1767,7 +1767,24 @@
     aspect-ratio: 1;
     background: url(./assets/expedbg/Circle-Purple.webp) no-repeat center center / cover;
     filter: drop-shadow(0 0 0.1em white);
-    transform: translate(-50%, 25%);
+    transform: translate(-50%, 35%);
+}
+
+.counter-img {
+    position: absolute;
+    bottom: 115%;
+    left: 0;
+    transform: translateX(-50%);
+    width: auto;
+    height: 150%;
+    object-fit: contain;
+}
+
+.mark-button {
+    background-image: url(./assets/icon/target.webp);
+    transform: translate(-50%, -65%);
+    filter: brightness(0);
+    pointer-events: none;
 }
 
 /*/////////////////////////////// SETTINGS CSS ///////////////////////////////*/
