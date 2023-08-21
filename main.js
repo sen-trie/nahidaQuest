@@ -619,14 +619,36 @@ function loadSaveData() {
 // BIG BUTTON FUNCTIONS
 let clickAudioDelay = null;
 let currentClick = 1;
+
+let autoClick = null;
+let currentlyAutoClick = false;
+
 let demoImg = document.createElement("img");
 demoImg.src = settingsValues.preferOldPic ? "./assets/nahida.webp" : "./assets/nahidaTwo.webp";
 demoImg.classList.add("demo-img");
 demoImg.id = "demo-main-img";
 demoImg.critInARow = 0;
 
-demoContainer.addEventListener("mouseup",touchDemo);
+demoContainer.addEventListener('mousedown', () => {
+    if (settingsValues.autoClickBig) {
+        autoClick = setInterval(touchDemo, 300);
+        currentlyAutoClick = true;
+    }
+})
+
+demoContainer.addEventListener("mouseup", () => {
+    currentlyAutoClick = false;
+    touchDemo();
+});
+
 function touchDemo() {
+    if (settingsValues.autoClickBig) {
+        if (autoClick !== null && currentlyAutoClick === false) {
+            clearInterval(autoClick);
+            autoClick = null;
+        }
+    }
+
     let clickEarn;
     let crit = false;
     saveValues["clickCount"] += 1;
@@ -2805,9 +2827,60 @@ function settings() {
     settingButton.appendChild(settingButtonImg);
 
     // RELATED TO SETTINGS MENU
-    let settingsMenu = document.createElement("div");
-    settingsMenu.id = "settings-menu";
-    settingsMenu.classList.add("flex-column","settings-menu");
+    const settingsMenu = createDom('div', {
+        class:["flex-column","settings-menu"],
+        id: 'settings-menu'
+    });
+
+    const settingsNameObject = {'General': 'block', 'Advanced':'block', 'Saves':'flex', 'Console':'flex'};
+    const settingsTabArray = [];
+    const settingsButtonArray = [];
+    if (beta) {
+        const settingsHeader = createDom('div', {
+            classList: ['flex-row', 'settings-header']
+        })
+
+        settingsMenu.append(settingsHeader);
+
+        for (const [tabKey, styleValue] of Object.entries(settingsNameObject)) {
+            const tabMenu = createDom('div', {
+                class:['settings-tab', (styleValue === 'flex' ? 'flex-column' : null), (styleValue === 'flex' ? 'settings-tab-box' : null)],
+                id: `settings-tab-${tabKey.toLowerCase()}`,
+                defaultStyle: styleValue,
+                style: {
+                    display: tabKey === 'General' ? 'block' : 'none'
+                }
+            });
+
+            const tabButton = createDom('button', {
+                class:["settings-tab-button", (tabKey === 'General' ? null : 'inactive-tab')],
+                id: `settings-button-${tabKey.toLowerCase()}`,
+                innerText: tabKey,
+            });
+
+            tabButton.addEventListener('click', () => {
+                settingsTabArray.forEach((tab) => {
+                    tab.style.display = 'none';
+                })
+
+                settingsButtonArray.forEach((item) => {
+                    item.classList.add('inactive-tab');
+                });
+
+                if (tabButton.classList.contains('inactive-tab')) {
+                    tabButton.classList.remove('inactive-tab')
+                }
+
+                tabMenu.style.display = styleValue;
+            })
+
+            settingsButtonArray.push(tabButton)
+            settingsTabArray.push(tabMenu);
+
+            settingsHeader.append(tabButton);
+            settingsMenu.append(tabMenu);
+        }
+    }
 
     let settingsText = document.createElement("img");
     settingsText.classList.add("settings-text");
@@ -2845,16 +2918,16 @@ function settings() {
     volumeScrollerSFXContainer.append(volumeScrollerSFXText,volumeScrollerSFX);
     volumeScrollerContainer.append(volumeScrollerBGMContainer,volumeScrollerSFXContainer)
     
-    let settingsBottom = document.createElement("div");
-    settingsBottom.classList.add("flex-row","settings-bottom");
+    let settingsMiddle = document.createElement("div");
+    settingsMiddle.classList.add("flex-row","settings-bottom");
 
     // BOTTOM RIGHT OF SETTINGS
-    let settingsBottomRight = document.createElement("div");
-    settingsBottomRight.classList.add("settings-bottom-right");
+    let settingsMiddleRight = document.createElement("div");
+    settingsMiddleRight.classList.add("settings-bottom-right");
 
     let infoSetting = document.createElement("button");
     infoSetting.classList.add("setting-info");
-    infoSetting.addEventListener("click", ()=> {
+    infoSetting.addEventListener("click", () => {
         if (document.fullscreenEnabled) {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
@@ -2873,8 +2946,8 @@ function settings() {
     clearSetting.addEventListener("click",() => {deleteConfirmMenu("toggle","loaded")})
 
     // BOTTOM LEFT OF SETTINGS
-    let settingsBottomLeft = document.createElement("div");
-    settingsBottomLeft.classList.add("settings-bottom-left");
+    let settingsMiddleLeft = document.createElement("div");
+    settingsMiddleLeft.classList.add("settings-bottom-left");
 
     let label = document.createElement("label");
     label.innerText = "Combine Click Counts";
@@ -2921,9 +2994,8 @@ function settings() {
     creditsButton.innerText = "Credits";
     creditsButton.addEventListener("click",()=>{window.open('https://nahidaquest.com/credits',"_blank")})
 
-    settingsBottomLeft.append(label);
-    if (beta) settingsBottomLeft.append(advancedSettingButton);
-    settingsBottomLeft.append(errorButton, reportButton, extraButton);
+    settingsMiddleLeft.append(label);
+    settingsMiddleLeft.append(errorButton, reportButton, extraButton, creditsButton);
 
     const exportSaveSetting = document.createElement("div");
     exportSaveSetting.innerText = "Export Save";
@@ -2931,7 +3003,7 @@ function settings() {
     exportSaveSetting.addEventListener("click",()=>{settingsBox("toggle","export")})
 
     const importSaveSetting = document.createElement("div");
-    importSaveSetting.innerText = "Import Save";
+    importSaveSetting.innerText = "Import Data";
     importSaveSetting.classList.add("flex-row");
     importSaveSetting.addEventListener("click",()=>{settingsBox("toggle","import")})
 
@@ -2945,11 +3017,82 @@ function settings() {
 
     const patchNotesButton = document.createElement("button");
     patchNotesButton.classList.add("patch-button");
-    patchNotesButton.addEventListener("click",()=>{settingsBox("toggle","patch")})
+    
+    if (beta) {
+        const patchNotesDiv = document.getElementById('patch-container');
+        patchNotesDiv.style.display = 'none';
 
-    settingsBottomRight.append(importSaveSetting, exportSaveSetting, infoSetting, saveSetting, clearSetting);
-    settingsBottom.append(settingsBottomLeft, settingsBottomRight);
-    settingsMenu.append(settingsText, volumeScrollerContainer, settingsBottom, cancelButton, patchNotesButton);
+        const patchBack = createDom('button', {
+            innerText: 'Back'
+        });
+
+        patchBack.addEventListener('click', () => {
+            patchNotesDiv.style.display = patchNotesDiv.style.display === 'none' ? 'flex' : 'none';
+        })
+
+        patchNotesDiv.prepend(patchBack)
+        settingsTabArray[0].append(patchNotesDiv);
+
+        patchNotesButton.addEventListener("click", () => {
+            patchNotesDiv.style.display = patchNotesDiv.style.display === 'none' ? 'flex' : 'none';
+        })
+        patchNotesButton.classList.add("flex-row");
+
+        const patchNoteImg = createDom('img', {
+            src: './assets/icon/patch.webp'
+        })
+
+        const patchNoteText = createDom('p', {
+            innerText: 'Patch Notes',
+        })
+
+        patchNotesButton.append(patchNoteImg, patchNoteText)
+
+        settingsMiddleRight.append(infoSetting, saveSetting, clearSetting);
+        settingsMiddle.append(patchNotesButton, settingsMiddleRight);
+
+        const settingsBottom = createDom('div', {
+            class: ["flex-row", "settings-bottom"],
+        });
+
+        const settingsBottomBadge = createDom('div', {
+            class: ['settings-badges'],
+            id: 'badges-div'
+        })
+
+        const settingsBottomButtons = createDom('div', {
+            class: ['flex-column', 'settings-bottom-buttons']
+        })
+
+        const settingsCredit = createDom('button', {
+            innerText: 'Credits',
+            event: ['click', () => {window.open('https://nahidaquest.com/credits',"_blank")}]
+        })
+
+        const settingsHelp = createDom('button', {
+            innerText: 'Help!',
+            event: ['click', () => {console.log('HELP!!!')}]
+        })
+    
+        settingsBottomButtons.append(settingsHelp, settingsCredit)
+
+
+        const copyrightText = document.getElementById('copyright-number');
+        const versNumber = document.getElementById('vers-number');
+
+        settingsBottom.append(settingsBottomBadge, settingsBottomButtons)
+        settingsTabArray[0].append(settingsText, volumeScrollerContainer, settingsMiddle, settingsBottom, copyrightText, versNumber);
+        settingsMenu.append(cancelButton);
+    } else {
+        patchNotesButton.addEventListener("click", () => {settingsBox("toggle","patch")})
+
+        settingsMiddleRight.append(importSaveSetting, exportSaveSetting, infoSetting, saveSetting, clearSetting);
+        settingsMiddle.append(settingsMiddleLeft, settingsMiddleRight);
+        settingsMenu.append(settingsText, volumeScrollerContainer, settingsMiddle, cancelButton, patchNotesButton);
+    }
+
+
+
     mainBody.appendChild(settingsMenu);
 
     settingButton.addEventListener("click", () => {
@@ -2977,7 +3120,6 @@ function toggleSettings(closeOnly) {
 
 function settingsVolume() {
     let volumeScroller = document.getElementById('volume-scroller-bgm');
-    let bgmAudio = document.getElementById('bgm');
     volumeScroller.addEventListener("input", function() {
         bgmElement.volume = this.value / 100;
         fightBgmElement.volume = this.value / 100;
@@ -3005,13 +3147,13 @@ function settingsBox(type,eleId) {
         const exportBox = document.createElement("textarea");
         exportBox.value = "Save your game to export it!"
         const cancelExportButton = document.createElement("button");
-        cancelExportButton.addEventListener("click",()=>{
+        cancelExportButton.addEventListener("click",() => {
             exportBoxDiv.style.zIndex = -1;
         })
 
         const copyExportButton = document.createElement("button");
         copyExportButton.innerText = "Download Save";
-        copyExportButton.addEventListener("click",()=>{
+        copyExportButton.addEventListener("click",() => {
             let text = JSON.stringify(localStorage);
             text = JSON.stringify(JSON.parse(text), null, 2)
 
@@ -3034,7 +3176,7 @@ function settingsBox(type,eleId) {
         const textBox = document.createElement("textarea");
         textBox.placeholder = "Paste save data here.";
         const cancelButton = document.createElement("button");
-        cancelButton.addEventListener("click",()=>{
+        cancelButton.addEventListener("click",() => {
             importBoxDiv.style.zIndex = -1;
         })
 
@@ -3065,7 +3207,7 @@ function settingsBox(type,eleId) {
                             }
                             location.reload();
                         },
-                        function(error) {console.error("Error clearing local data")}
+                        function(err) {console.error("Error clearing local data")}
                     ); 
                 }
                 preventSave = false;
@@ -3086,10 +3228,10 @@ function settingsBox(type,eleId) {
 
         window.onerror = function(message, url, line, col, error) {
             errorBox.value += `${error}\nLine:${line}, Column:${col}\n\n`;
-          };
+        };
 
         const cancelErrorButton = document.createElement("button");
-        cancelErrorButton.addEventListener("click",()=>{
+        cancelErrorButton.addEventListener("click",() => {
             errorBoxDiv.style.zIndex = -1;
         })
         
@@ -3105,7 +3247,7 @@ function settingsBox(type,eleId) {
         const commandBox = document.createElement("textarea");
         commandBox.value = "Type your command here!";
         const cancelCmdButton = document.createElement("button");
-        cancelCmdButton.addEventListener("click",()=>{
+        cancelCmdButton.addEventListener("click",() => {
             commandDiv.style.zIndex = -1;
         })
 
@@ -3138,12 +3280,239 @@ function settingsBox(type,eleId) {
         drawUI.patchNotes(patchDiv,textReplacer);
 
         const patchCmdButton = document.createElement("button");
-        patchCmdButton.addEventListener("click",()=>{
+        patchCmdButton.addEventListener("click",() => {
             patchDiv.style.zIndex = -1;
         })
 
         patchDiv.append(patchCmdButton);
         mainBody.appendChild(patchDiv);
+
+        if (beta) {
+            setTimeout(() => {
+                const saveSettingsMenu = document.getElementById('settings-tab-saves');
+                const settingsHeader = createDom('div', { class: ['flex-row', 'settings-inner-tab', 'settings-header']});
+                const exportHeaderButton = createDom('button', { 
+                    class: ['settings-header-button', 'settings-tab-button', 'inactive-tab'],
+                    innerText: 'Export'
+                });
+
+                const importHeaderButton = createDom('button', { 
+                    class: ['settings-header-button', 'settings-tab-button'],
+                    innerText: 'Import'
+                });
+
+                const exportBox = createDom('div', {
+                    class: ['settings-box'],
+                    style: {
+                        display: 'none'
+                    }
+                });
+
+                const exportBoxText = createDom('textarea', {
+                    class: ['settings-textarea'],
+                    placeholder: "Save your game to export it!",
+                })
+
+                const exportBoxButton = createDom('button', {
+                    class: ['settings-inner-button'],
+                    innerText: 'Download Save'
+                })
+                
+                exportBoxButton.addEventListener("click",() => {
+                    let text = JSON.stringify(localStorage);
+                    text = JSON.stringify(JSON.parse(text), null, 2)
+        
+                    let blob = new Blob([text], {type: "text/plain"});
+                    let link = document.createElement("a");
+                    link.download = `NQ Save ${DBNUBMER}.txt`;
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                })
+
+                exportBox.append(exportBoxText, exportBoxButton);
+
+                const importBox = createDom('div', {
+                    class: ['settings-box'],
+                    style: {
+                        display: 'block'
+                    }
+                });
+
+                const importBoxText = createDom('textarea', {
+                    class: ['settings-textarea'],
+                    placeholder: "Paste save data here.",
+                })
+
+                const importBoxButton = createDom('button', {
+                    class: ['settings-inner-button'],
+                    innerText: 'Import Save'
+                })
+        
+                importBoxButton.addEventListener("click", () => {
+                    let promptSave = importBoxText.value;
+                    if (promptSave != null) {
+                        let localStorageTemp = tryParseJSONObject(promptSave);
+                        preventSave = true;
+                        if (localStorageTemp === false) {
+                            alert("Invalid save data.")
+                            console.error("Invalid save data.");
+                        } else {
+                            let clearPromise = new Promise(function(myResolve, myReject) {
+                                localStorage.clear();
+                                if (localStorage.length === 0) {
+                                    myResolve(); 
+                                } else {
+                                    myReject();
+                                }
+                            });
+                            
+                            clearPromise.then(
+                                function(value) {
+                                    for (let key in localStorageTemp) {
+                                         localStorage.setItem(key, localStorageTemp[key]);
+                                    }
+                                    location.reload();
+                                },
+                                function(err) {console.error("Error clearing local data")}
+                            ); 
+                        }
+                        preventSave = false;
+                    }
+                });
+                
+                importBox.append(importBoxText, importBoxButton)
+                
+                exportHeaderButton.addEventListener('click', () => {
+                    if (exportHeaderButton.classList.contains('inactive-tab')) {
+                        exportHeaderButton.classList.remove('inactive-tab');
+                        importHeaderButton.classList.add('inactive-tab')
+                    }
+
+                    importBox.style.display = 'none';
+                    exportBox.style.display = 'block';
+                    setTimeout(()=> {
+                        exportBoxText.value = `Please use a JSON reader like JSONHERO if you like to manipulate the save values. Beware! Directly changing 'realScore','rowCount' or adding non-integer values may result in the save file being corrupted!
+                                              \n---------------------------------
+                                              \n${JSON.stringify(localStorage)}\n\n`;
+                    }, 300);
+                })
+
+                importHeaderButton.addEventListener('click', () => {
+                    if (importHeaderButton.classList.contains('inactive-tab')) {
+                        importHeaderButton.classList.remove('inactive-tab');
+                        exportHeaderButton.classList.add('inactive-tab')
+                    }
+
+                    importBox.style.display = 'block';
+                    exportBox.style.display = 'none';
+                })
+
+                settingsHeader.append(importHeaderButton, exportHeaderButton);
+                saveSettingsMenu.append(settingsHeader, exportBox, importBox);
+
+                /////////////////// CONSOLE TAB ////////////////////////////////////////
+                const consoleSettingsMenu = document.getElementById('settings-tab-console');
+                const consoleHeader = createDom('div', { class: ['flex-row', 'settings-inner-tab', 'settings-header']});
+                const errorHeaderButton = createDom('button', { 
+                    class: ['settings-header-button', 'settings-tab-button'],
+                    innerText: 'Error Log'
+                });
+
+                const consoleHeaderButton = createDom('button', { 
+                    class: ['settings-header-button', 'settings-tab-button','inactive-tab'],
+                    innerText: 'Commands'
+                });
+
+                const errorBox = createDom('div', {
+                    class: ['settings-box'],
+                    style: {
+                        display: 'block'
+                    }
+                });
+
+                const errorBoxText = createDom('textarea', {
+                    class: ['settings-textarea'],
+                    value: `Any errors logged will appear below the line! Please report such errors through 'Report a Bug' at the bottom right. Thank you! :) 
+                            \n---------------------------------\n`,
+                    readOnly: true,
+                })
+
+                const errorBoxButton = createDom('button', {
+                    class: ['settings-inner-button'],
+                    innerText: 'Report a Bug!',
+                    event: ['click', () => {window.open('https://nahidaquest.com/feedback',"_blank")}]
+                })
+
+                window.onerror = (line, col, error) => {
+                    errorBoxText.value += `${error}\nLine:${line}, Column:${col}\n\n`;
+                  };
+        
+
+                errorBox.append(errorBoxText, errorBoxButton);
+
+                const consoleBox = createDom('div', {
+                    class: ['settings-box'],
+                    style: {
+                        display: 'none'
+                    }
+                });
+
+                const consoleBoxText = createDom('textarea', {
+                    class: ['settings-textarea'],
+                    placeholder: "Type your command here!",
+                    style: {
+                        fontSize: '1em'
+                    }
+                })
+
+                const consoleBoxButton = createDom('button', {
+                    class: ['settings-inner-button'],
+                    innerText: 'Execute Command'
+                })
+        
+                consoleBoxButton.addEventListener("click",() => {
+                    let commandText = consoleBoxText.value.toLowerCase();
+                    if (commandText === "transcend") {
+                        nutPopUp();
+                        toggleSettings(true);
+                    } else if (commandText === "beta on") {
+                        localStorage.setItem('beta', true);
+                        location.reload();
+                    } else if (commandText === "beta off") {
+                        localStorage.setItem('beta', false);
+                        location.reload();
+                    } else {
+                        alert("Invalid command.");
+                        console.error(`Invalid command: ${consoleBoxText.value}.`);
+                    }
+                });
+                
+                consoleBox.append(consoleBoxText, consoleBoxButton)
+                
+                errorHeaderButton.addEventListener('click', () => {
+                    if (errorHeaderButton.classList.contains('inactive-tab')) {
+                        errorHeaderButton.classList.remove('inactive-tab');
+                        consoleHeaderButton.classList.add('inactive-tab')
+                    }
+
+                    consoleBox.style.display = 'none';
+                    errorBox.style.display = 'block';
+                })
+
+                consoleHeaderButton.addEventListener('click', () => {
+                    if (consoleHeaderButton.classList.contains('inactive-tab')) {
+                        consoleHeaderButton.classList.remove('inactive-tab');
+                        errorHeaderButton.classList.add('inactive-tab')
+                    }
+
+                    consoleBox.style.display = 'block';
+                    errorBox.style.display = 'none';
+                })
+
+                consoleHeader.append(errorHeaderButton, consoleHeaderButton);
+                consoleSettingsMenu.append(consoleHeader, errorBox, consoleBox);
+            }, 500)
+        }
 
         // ADVANCED SETTINGS
         const advancedSettings = document.createElement("div");
@@ -3162,7 +3531,18 @@ function settingsBox(type,eleId) {
             {id: 'falling-preference',  default: 'showFallingNuts', text: "Spawn Falling Nuts on Click"},
             {id: 'clicking-preference',  default: 'combineFloatText', text: "Combine Click Counts"},
             {id: 'wish-preference',  default: 'showWishAnimation', text: "Show Wish Animation"},
+            {id: 'auto-preference',  default: 'autoClickBig', text: "Hold to Click 'Big Nahida'"},
+            {id: 'auto-combat-preference',  default: 'autoClickCombat', text: "Hold to Click during Combat"},
         ]
+
+        let advancedSettingsMenu;
+        let advancedSettingsGrid;
+        if (beta) {
+            setTimeout(() => {
+                advancedSettingsMenu = document.getElementById('settings-tab-advanced');
+                advancedSettingsGrid = createDom('div', { class: ['advanced-grid']})
+            }, 400)
+        }
 
         advSettingsDict.forEach(advItem => {
             const prefer = document.createElement('input');
@@ -3189,24 +3569,35 @@ function settingsBox(type,eleId) {
                         }
                     });
                     break;
-                case 'falling-preference':
-                case 'clicking-preference':
-                case 'wish-preference':
+                // case 'auto-preference':
+                // case 'falling-preference':
+                // case 'clicking-preference':
+                // case 'wish-preference':
+                default:
                     prefer.addEventListener('change', () => {
                         settingsValues[advItem.default] = prefer.checked;
                     });
-                    break;
-                default:
-                    console.error(`It seems the dev forgot to implement a setting for ${advItem.id}`);
                     break;
             }
             
             preferLabel.append(preferText, prefer, checkSpan)
             advancedMenu.append(preferLabel);
+
+            if (beta) {
+                setTimeout(() => {
+                    advancedSettingsGrid.append(preferLabel);
+                }, 500)
+            }
         });
 
+        if (beta) {
+            setTimeout(() => {
+                advancedSettingsMenu.append(advancedSettingsGrid);
+            }, 550)
+        }
+
         const closeAdvancedSettings = document.createElement("button");
-        closeAdvancedSettings.addEventListener("click", ()=>{
+        closeAdvancedSettings.addEventListener("click", () => {
             advancedSettings.style.zIndex = -1;
         })
 
@@ -7707,8 +8098,19 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             comboHandler("add");
         }
 
-        mobDiv.children[0].addEventListener("click", () => {
+        let autoClick = null;
+        let currentlyAutoClick = false;
+
+        const clickMob = () => {
+            if (settingsValues.autoClickBig) {
+                if (autoClick !== null && currentlyAutoClick === false) {
+                    clearInterval(autoClick);
+                    autoClick = null;
+                }
+            }
+
             if (!adventureVariables.fightSceneOn || mobHealth.dead || battleVariables.quicktimeAttack || canvas.paused) {return}
+            
             let attackMultiplier = 1;
             const guardCheckBool = guardCheck();
 
@@ -7902,6 +8304,18 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             }
 
             updateMobHealth();
+        }
+
+        mobDiv.children[0].addEventListener("mouseup", () => {
+            currentlyAutoClick = false;
+            clickMob();
+        })
+  
+        mobDiv.children[0].addEventListener('mousedown', () => {
+            if (settingsValues.autoClickCombat) {
+                autoClick = setInterval(clickMob, 400);
+                currentlyAutoClick = true;
+            }
         })
 
         if (decoy) {
@@ -12100,6 +12514,13 @@ let beta = false;
 // }
 
 if (beta) {
+    let link = document.createElement("link");
+    link.href = 'beta.css';
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+
+
     let warning = document.createElement('p');
     warning.innerText = 'BETA';
     warning.classList.add('beta-warning');

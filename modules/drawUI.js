@@ -390,6 +390,7 @@ const patchDict = {
 
 function patchNotes(parent,textReplacer) {
     let patchContainer = document.createElement("div");
+    patchContainer.id = 'patch-container'
     patchContainer.classList.add("flex-column");
 
     let title = new Image();

@@ -154,9 +154,11 @@ function choiceBox(mainBody, dialog, stopSpawnEvents, yesFunc, noFunc, extraEle,
     if (stopSpawnEvents) stopSpawnEvents = false;
 
     const choiceEle = document.createElement('div');
-    classes.forEach((item) => {
-        choiceEle.classList.add(item);
-    })
+    if (classes) {
+        classes.forEach((item) => {
+            choiceEle.classList.add(item);
+        })
+    }
 
     choiceEle.classList.add('flex-column');
     const choiceDiv = document.createElement('div');
@@ -213,6 +215,8 @@ function createDom(elementType, attributes) {
                 }
             } else if (attr === 'style' && typeof attributes[attr] === 'object') {
                 Object.assign(element.style, attributes[attr]);
+            } else if (attr === 'event') {
+                element.addEventListener(attributes[attr][0], () => {attributes[attr][1]()})
             } else if (typeof attributes[attr] !== 'object' || attributes[attr] === null) {
                 element[attr] = attributes[attr];
             } else {

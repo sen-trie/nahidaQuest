@@ -205,6 +205,8 @@ const SettingsDefault = {
     preferOldPic: true,
     showFallingNuts: true,
     showWishAnimation: true,
+    autoClickBig: false,
+    autoClickCombat: false,
 }
 
 const advDictDefault = {

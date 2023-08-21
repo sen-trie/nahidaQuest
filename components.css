@@ -1802,7 +1802,7 @@
     z-index: 1000;
 }
 
-.settings-button:hover{
+.settings-button:hover {
     filter: drop-shadow(0 0 0.4em #ffffff);
 }
 
@@ -1895,7 +1895,7 @@
     filter: drop-shadow(0.1em 0.2em 0.1em #474d45);
 }
 
-.patch-notes-div {
+#patch-container {
     background-color: #DAEACB;
     left: 50%;
     transform: translateX(-50%);
