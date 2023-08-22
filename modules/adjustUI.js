@@ -150,7 +150,7 @@ function inventoryFrame(ele, itemInfo, itemFrameColors) {
 }
 
 // CHOICE BOX (FOR ITEMS, PARENT CONTAINER MUST HAVE 'NOTIF-ITEM' CLASS)
-function choiceBox(mainBody, dialog, stopSpawnEvents, yesFunc, noFunc, extraEle, classes) {
+function choiceBox(mainBody, dialogObg, stopSpawnEvents, yesFunc, noFunc, extraEle, classes) {
     if (stopSpawnEvents) stopSpawnEvents = false;
 
     const choiceEle = document.createElement('div');
@@ -164,14 +164,19 @@ function choiceBox(mainBody, dialog, stopSpawnEvents, yesFunc, noFunc, extraEle,
     const choiceDiv = document.createElement('div');
     choiceDiv.classList.add('flex-column');
     const text = document.createElement('p');
-    text.innerHTML = dialog;
+    text.innerHTML = dialogObg.text;
 
     const choiceContainer = document.createElement('div');
     choiceContainer.classList.add('flex-row');
 
     const yesButton = document.createElement('button');
-    yesButton.innerText = 'Confirm';
-    if (noFunc === null)  yesButton.innerText = 'Okay';
+
+    if (dialogObg.yes) {
+        yesButton.innerText = dialogObg.yes;
+    } else {
+        yesButton.innerText = noFunc === null ? 'Okay' : 'Confirm';
+    }
+
     yesButton.addEventListener('click',() => {
         choiceEle.remove();
         if (stopSpawnEvents) stopSpawnEvents = true;
@@ -179,7 +184,7 @@ function choiceBox(mainBody, dialog, stopSpawnEvents, yesFunc, noFunc, extraEle,
     });
 
     const noButton = document.createElement('button');
-    noButton.innerText = 'Cancel';
+    noButton.innerText = dialogObg.no ? dialogObg.no : 'Cancel';
     noButton.addEventListener('click',() => {
         choiceEle.remove();
         if (stopSpawnEvents) stopSpawnEvents = true;

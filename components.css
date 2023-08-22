@@ -1840,10 +1840,10 @@
     aspect-ratio: 1;
     background: transparent url(./assets/icon/patch.webp) center/contain no-repeat;
     filter: drop-shadow(0 0 0.25em #4D613D);
+    transition: 0.3s ease;
 }
 
 .patch-button:hover {
-    transition: 0.3s ease;
     transform: scale(1.1);
 }
 

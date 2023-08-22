@@ -596,8 +596,29 @@ function loadSaveData() {
             persistentValues = JSON.parse(persistentDictTemp);
             updateObjectKeys(persistentValues, persistentValuesDefault);
             updateObjectKeys(persistentValues.ascendDict, persistentValuesDefault.ascendDict);
+
+            // FOR SAVE DATA BELOW 2.0.001 TO ADD NEW VALUES
+            if (parseInt(saveValues.versNumber) < 200001) {
+                if (persistentValues.lifetimeClicksValue === 0) {
+                    persistentValues.lifetimeClicksValue = saveValues.clickCount;
+                } 
+    
+                if (persistentValues.lifetimeLevelsValue === 0) {
+                    persistentValues.lifetimeLevelsValue = saveValues.heroesPurchased;
+                } 
+    
+                if (persistentValues.lifetimeEnergyValue === 0) {
+                    persistentValues.lifetimeEnergyValue = saveValues.energy;
+                } 
+    
+                if (persistentValues.lifetimePrimoValue === 0) {
+                    persistentValues.lifetimePrimoValue = saveValues.primogem;
+                }
+            }  
         }
     }
+
+    persistentValues.lastRecordedTime = getTime();
 
     if (beta) {
         if (persistentValues.challengeCheck === undefined) {
@@ -631,7 +652,7 @@ demoImg.critInARow = 0;
 
 demoContainer.addEventListener('mousedown', () => {
     if (settingsValues.autoClickBig) {
-        autoClick = setInterval(touchDemo, 300);
+        autoClick = setInterval(touchDemo, 440);
         currentlyAutoClick = true;
     }
 })
@@ -651,7 +672,8 @@ function touchDemo() {
 
     let clickEarn;
     let crit = false;
-    saveValues["clickCount"] += 1;
+    saveValues.clickCount++;
+    persistentValues.lifetimeClicksValue++
 
     let critRole = randomInteger(1,100);
     if (critRole <= clickCritRate) {
@@ -726,8 +748,11 @@ function energyRoll() {
     let randInt = Math.floor(Math.random() * 1000);
     clickDelay--;
     if (clickDelay < 1){
-        if (randInt < ENERGYCHANCE){
-            saveValues["energy"] += randomInteger(lowerEnergyRate, upperEnergyRate);
+        if (randInt < ENERGYCHANCE) {
+            const energyGain =  randomInteger(lowerEnergyRate, upperEnergyRate)
+            saveValues.energy += energyGain;
+            persistentValues.lifetimeEnergyValue += energyGain;
+
             challengeNotification(({category: 'energy', value: saveValues.energy}))
             clickDelay = 20;
         }
@@ -855,6 +880,10 @@ function randomEventTimer(timerSeconds) {
             eventTimes++;
             startRandomEvent();
             updateMorale("recover", 5);
+
+            const currentTime = getTime()
+            persistentValues.timeSpentValue += currentTime - persistentValues.lastRecordedTime;
+            persistentValues.lastRecordedTime = currentTime;
         }
         return;
     }
@@ -930,15 +959,11 @@ function clickedEvent(aranaraNumber) {
     eventDropdownImage.classList.add("event-dropdown-image");
     
     eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
-    // if (beta) {
-    //     eventDropdown.remove();
-    //     chooseEvent(aranaraNumber,specialEvent);
-    // } else {
-        eventDropdown.addEventListener("animationend", () => {
-            eventDropdown.remove();
-            chooseEvent(aranaraNumber, specialEvent);
-        });
-    // }
+    eventDropdown.addEventListener("animationend", () => {
+        persistentValues.aranaraEventValue++;
+        eventDropdown.remove();
+        chooseEvent(aranaraNumber, specialEvent);
+    });
     
     mainBody.appendChild(eventDropdown);
 }
@@ -1109,6 +1134,7 @@ function reactionFunction(eventBackdrop) {
     reactionStartElement.pause();
     reactionCorrectElement.load();
     if (reactionReady == false) {
+        persistentValues.aranaraLostValue++;
         outcomeText = "You missed!";
     } else if (reactionReady == true) {
         reactionCorrectElement.play();
@@ -1184,6 +1210,7 @@ function boxOpen(eventBackdrop,specialBox) {
         } else if (boxChance >= 15) {
             boxOutcome.src = "./assets/event/bad-" + randomInteger(1,6) + ".webp";
             outcomeText = "Uh oh, an enemy was hiding in the box!";
+            persistentValues.aranaraLostValue++;
         } else if (boxChance >= 5) {
             boxOutcome.src = "./assets/event/verygood-1.webp";
             outcomeText = "It had a precious gemstone!! (+Power for all characters)";
@@ -1192,6 +1219,7 @@ function boxOpen(eventBackdrop,specialBox) {
             boxOutcome.src = "./assets/event/verybad-" + randomInteger(1,5) + ".webp";
             let badOutcomePercentage = randomInteger(70,85);
             outcomeText = "Uh oh! Run away!! (Lost " +(100 - badOutcomePercentage)+ "% of Energy)";
+            persistentValues.aranaraLostValue++;
             outcomeNumber = badOutcomePercentage;
         }
     }
@@ -1349,6 +1377,7 @@ function minesweeperEvent() {
 
                     eventBackdrop.append(mineFileOutcome);
                     eventOutcome("The whopperflowers were alerted!",eventBackdrop);
+                    persistentValues.aranaraLostValue++;
                 } else {
                     revealCell(r, c);
                     td.style.backgroundImage = "url(./assets/event/mine-empty.webp)";
@@ -1788,6 +1817,7 @@ function simonEvent(hexMode) {
         for (let i = 0; i < saysContainer.activeArray.length; i++) {
             if (saysContainer.activeArray[i] !== saysContainer.sequenceArray[i]) {
                 let eventText = `You missed the sequence!`;
+                persistentValues.aranaraLostValue++;
                 eventOutcome(eventText,eventBackdrop,"simon");
                 return;
             }
@@ -2247,6 +2277,7 @@ function battleshipEvent() {
         if (type === 'friendly') {
             if (friendlyDiv.score === 0) {
                 eventOutcome("You lost! You didn't win any treasure...", eventBackdrop);
+                persistentValues.aranaraLostValue++;
                 battleshipContainer.gameStarted = false;
             }
         } else {
@@ -2590,8 +2621,13 @@ function customTutorial(tutorialFile,maxSlide,exitFunction) {
 
 function saveData(skip) {
     if (preventSave) {return};
-    saveValues["currentTime"] = getTime();
-    saveValues["versNumber"] = DBNUBMER;
+    const currentTime = getTime();
+
+    saveValues.currentTime = currentTime;
+    saveValues.versNumber = DBNUBMER;
+    persistentValues.timeSpentValue += currentTime - persistentValues.lastRecordedTime;
+    persistentValues.lastRecordedTime = getTime();
+
     if (!document.getElementById("currently-saving") && skip != true) {
         let saveCurrently = document.createElement("img");
         saveCurrently.src = "./assets/settings/saving.webp";
@@ -2871,6 +2907,30 @@ function settings() {
                     tabButton.classList.remove('inactive-tab')
                 }
 
+                if (tabKey === 'Advanced') {
+                    const advancedStats = document.getElementById('settings-stats');
+                    advancedStats.innerHTML = '';
+
+                    const statsArray = {
+                        'timeSpentValue': 'Time Spent:', 
+                        'lifetimeClicksValue': 'Big Nahida Clicks:',  
+                        'itemsUsedValue': 'Items Used:', 
+                        'lifetimeLevelsValue': 'Character Levels Purchased:', 
+                        'lifetimeEnergyValue': 'Cumulative Energy:', 
+                        'lifetimePrimoValue': 'Cumulative Primogems:', 
+                        'aranaraEventValue': 'Aranara Events Witnessed:', 
+                        'aranaraLostValue': 'Aranara Events Lost:', 
+                        'enemiesDefeatedValue': 'Enemies Defeated:', 
+                        'commissionsCompletedValue': 'Commisions Completed:', 
+                        'transcendValue': 'Times Transcended:',
+                        'harvestCount': 'Mature Trees Harvested:'
+                    };
+    
+                    for (const [key, value] of Object.entries(statsArray)) {
+                        advancedStats.innerHTML += `${value} ${key === 'timeSpentValue' ? convertTo24HourFormat(persistentValues[key] / 60) : persistentValues[key]}<br>`;
+                    }
+                }
+
                 tabMenu.style.display = styleValue;
             })
 
@@ -3060,6 +3120,36 @@ function settings() {
             id: 'badges-div'
         })
 
+        if (saveValues.goldenTutorial === true) {
+            const nutMedalImg = createDom('img', {
+                src: './assets/frames/medal-1-backing.webp'
+            })
+
+            const nutMedal = createDom('img', {
+                class: ['medal-img'],
+                src: './assets/frames/medal-1.webp',
+                event: ['click', () => {
+                    choiceBox(mainBody, {
+                        text: 'Golden Nut Reward',
+                        yes: 'Download',
+                        no: 'Go Back'
+                    }, stopSpawnEvents, () => {
+                        const imgSrc = './assets/frames/medal-1-backing.png';
+                        const imgFileName = imgSrc.substring(imgSrc.lastIndexOf('/') + 1);
+                        
+                        const link = document.createElement('a');
+                        link.href = imgSrc;
+                        link.download = imgFileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }, undefined, nutMedalImg, ['choice-ele', 'smaller-choice-ele']);
+                }]
+            });
+
+            settingsBottomBadge.append(nutMedal)
+        }
+
         const settingsBottomButtons = createDom('div', {
             class: ['flex-column', 'settings-bottom-buttons']
         })
@@ -3070,18 +3160,22 @@ function settings() {
         })
 
         const settingsHelp = createDom('button', {
-            innerText: 'Help!',
+            innerText: 'Wiki',
             event: ['click', () => {console.log('HELP!!!')}]
         })
     
-        settingsBottomButtons.append(settingsHelp, settingsCredit)
+        settingsBottomButtons.append(settingsHelp, settingsCredit);
 
+        const settingsCredits = createDom('div', {
+            class: ['flex-column', 'settings-bottom']
+        })
 
         const copyrightText = document.getElementById('copyright-number');
         const versNumber = document.getElementById('vers-number');
 
-        settingsBottom.append(settingsBottomBadge, settingsBottomButtons)
-        settingsTabArray[0].append(settingsText, volumeScrollerContainer, settingsMiddle, settingsBottom, copyrightText, versNumber);
+        settingsCredits.append(copyrightText, versNumber)
+        settingsBottom.append(settingsBottomBadge, settingsBottomButtons);
+        settingsTabArray[0].append(settingsText, volumeScrollerContainer, settingsMiddle, settingsBottom, settingsCredits);
         settingsMenu.append(cancelButton);
     } else {
         patchNotesButton.addEventListener("click", () => {settingsBox("toggle","patch")})
@@ -3532,7 +3626,6 @@ function settingsBox(type,eleId) {
             {id: 'clicking-preference',  default: 'combineFloatText', text: "Combine Click Counts"},
             {id: 'wish-preference',  default: 'showWishAnimation', text: "Show Wish Animation"},
             {id: 'auto-preference',  default: 'autoClickBig', text: "Hold to Click 'Big Nahida'"},
-            {id: 'auto-combat-preference',  default: 'autoClickCombat', text: "Hold to Click during Combat"},
         ]
 
         let advancedSettingsMenu;
@@ -3540,7 +3633,7 @@ function settingsBox(type,eleId) {
         if (beta) {
             setTimeout(() => {
                 advancedSettingsMenu = document.getElementById('settings-tab-advanced');
-                advancedSettingsGrid = createDom('div', { class: ['advanced-grid']})
+                advancedSettingsGrid = createDom('div', { class: ['advanced-grid']});
             }, 400)
         }
 
@@ -3592,7 +3685,31 @@ function settingsBox(type,eleId) {
 
         if (beta) {
             setTimeout(() => {
-                advancedSettingsMenu.append(advancedSettingsGrid);
+                const advancedStats = createDom('p', {
+                    id: 'settings-stats',
+                    class: ['settings-stats'],
+                });
+
+                const statsArray = {
+                    'timeSpentValue': 'Time Spent:', 
+                    'lifetimeClicksValue': 'Big Nahida Clicks:',  
+                    'itemsUsedValue': 'Items Used:', 
+                    'lifetimeLevelsValue': 'Character Levels Purchased:',
+                    'lifetimeEnergyValue': 'Cumulative Energy:', 
+                    'lifetimePrimoValue': 'Cumulative Primogems:', 
+                    'aranaraEventValue': 'Aranara Events Witnessed:', 
+                    'aranaraLostValue': 'Aranara Events Lost:', 
+                    'enemiesDefeatedValue': 'Enemies Defeated:', 
+                    'commissionsCompletedValue': 'Commisions Completed:', 
+                    'transcendValue': 'Times Transcended:',
+                    'harvestCount': 'Mature Trees Harvested:'
+                };
+
+                for (const [key, value] of Object.entries(statsArray)) {
+                    advancedStats.innerHTML += `${value} ${key === 'timeSpentValue' ? convertTo24HourFormat(persistentValues[key] / 60) : persistentValues[key]}<br>`;
+                }
+
+                advancedSettingsMenu.append(advancedSettingsGrid, advancedStats);
             }, 550)
         }
 
@@ -4010,7 +4127,8 @@ function upgrade(clicked_id) {
 
         upgradeDictTemp.Contribution += heroIncrease;
         upgradeDictTemp.Purchased += 1 * currentMultiplierLocal;
-        saveValues["heroesPurchased"] += 1 * currentMultiplierLocal;
+        saveValues.heroesPurchased += 1 * currentMultiplierLocal;
+        persistentValues.lifetimeLevelsValue += 1 * currentMultiplierLocal;
 
         if (clicked_id === 0 && upgradeDictTemp.Purchased >= 700) {challengeNotification(({category: 'specific', value: [4, 1]}))}
         if (clicked_id === 1 && upgradeDictTemp.Contribution >= 1e9) {challengeNotification(({category: 'specific', value: [2, 1]}))}
@@ -4543,7 +4661,10 @@ function itemUse(itemUniqueId) {
         refresh();
     // ENERGY POTS
     } else if (itemID >= 4011 && itemID < 4014){
-        saveValues["energy"] += energyBuffPercent[Inventory[itemID].Star];
+        const energyGain = energyBuffPercent[Inventory[itemID].Star]
+        saveValues.energy += energyGain;
+        persistentValues.lifetimeEnergyValue += energyGain;
+
         challengeNotification(({category: 'energy', value: saveValues.energy}))
         refresh();
     } else if (itemID === 4010) {
@@ -5403,7 +5524,8 @@ function createGuild() {
                         notifPop("clear","comm",commId[1]);
                     }
 
-                    choiceBox(mainBody, 'Loot obtained:', stopSpawnEvents, () => {addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
+                    persistentValues.commissionsCompletedValue++;
+                    choiceBox(mainBody, {text: 'Loot obtained:'}, stopSpawnEvents, () => {addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
                     document.getElementById('guild-button-comm').click();
                 }
             })
@@ -6342,6 +6464,8 @@ function notifPop(type,icon,count) {
         notifDiv.classList.add("flex-column");
         notifDiv.id = `${icon}-notif`;
 
+        if (document.getElementById(notifDiv.id)) {return};
+
         let notifContainer = document.createElement("div");
         notifContainer.classList.add("flex-row","notif-div");
         let notifImg = new Image();
@@ -6377,7 +6501,6 @@ function notifPop(type,icon,count) {
             })
         }
         
-        if (document.getElementById(notifDiv.id)) {return};
         notifContainer.append(notifText,notifImg)
         notifDiv.append(notifContainer);
         notifSelect.append(notifDiv);
@@ -6763,6 +6886,8 @@ function continueQuest(advType) {
         if (advType === "17_A" || advType === "3_A") {
             let energyRoll = Math.round(randomInteger(150,250) / 5) * 5;
             saveValues.energy += energyRoll;
+            persistentValues.lifetimeEnergyValue += energyRoll;
+
             challengeNotification(({category: 'energy', value: saveValues.energy}))
             currencyPopUp("energy",energyRoll);
         }
@@ -8098,17 +8223,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             comboHandler("add");
         }
 
-        let autoClick = null;
-        let currentlyAutoClick = false;
-
         const clickMob = () => {
-            if (settingsValues.autoClickBig) {
-                if (autoClick !== null && currentlyAutoClick === false) {
-                    clearInterval(autoClick);
-                    autoClick = null;
-                }
-            }
-
             if (!adventureVariables.fightSceneOn || mobHealth.dead || battleVariables.quicktimeAttack || canvas.paused) {return}
             
             let attackMultiplier = 1;
@@ -8307,15 +8422,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
         }
 
         mobDiv.children[0].addEventListener("mouseup", () => {
-            currentlyAutoClick = false;
             clickMob();
-        })
-  
-        mobDiv.children[0].addEventListener('mousedown', () => {
-            if (settingsValues.autoClickCombat) {
-                autoClick = setInterval(clickMob, 400);
-                currentlyAutoClick = true;
-            }
         })
 
         if (decoy) {
@@ -9648,7 +9755,9 @@ function killMob(mobDiv, mobHealth) {
         return;
     }
 
+    persistentValues.enemiesDefeatedValue++
     mobHealth.dead = true;
+
     mobDiv.style.animation = "";
     mobDiv.children[0].style.animation = "";
     mobDiv.style.filter = "grayscale(100%) brightness(20%)";
@@ -10349,7 +10458,10 @@ function popAchievement(achievement, loading) {
     achievementID += achievementType;
 
     if (loading != true) {
-        saveValues["primogem"] += Math.round(20 * additionalPrimo);
+        const gainPrimo = Math.round(20 * additionalPrimo)
+        saveValues.primogem += gainPrimo;
+        persistentValues.lifetimePrimoValue += gainPrimo;
+
         saveValues["achievementCount"]++;
         challengeNotification(({category: 'primogem', value: saveValues.primogem}))
 
@@ -10739,7 +10851,9 @@ function tooltipFunction() {
         let itemButton = document.getElementById(itemTooltip);
         let inventoryCount = InventoryMap.get(itemTooltip);
         inventoryCount--;
-        InventoryMap.set(itemTooltip,inventoryCount)
+        InventoryMap.set(itemTooltip,inventoryCount);
+
+        persistentValues.itemsUsedValue++;
 
         if (inventoryCount > 0) {
             changeTooltip(Inventory[itemTooltip],"item",itemTooltip);
@@ -11273,7 +11387,7 @@ function addNutStore() {
             listText = createDom('p', { id:'notif-list', innerText: 'Nothing...' });
         }
 
-        choiceBox(nutStoreTable, 'Top Contribution to \nCore Amounts:', stopSpawnEvents, ()=>{}, null, listText, ['notif-ele']);
+        choiceBox(nutStoreTable, {text: 'Top Contribution to \nCore Amounts:'}, stopSpawnEvents, ()=>{}, null, listText, ['notif-ele']);
     })
 
 
@@ -11515,7 +11629,9 @@ function transcendFunction() {
     let forceStop = true; 
     if (forceStop) {
         preventSave = true;
-        forceStop = false; 
+        forceStop = false;
+
+        persistentValues.transcendValue++;
         saveData(true);
         drawUI.preloadImage(1,"transcend",true);
 
@@ -11906,7 +12022,9 @@ function treeOptions(planted, optionsContainer, lastPhase) {
                     break;
                 case 2:
                     treeButton.addEventListener('click',() => {
-                        choiceBox(mainBody,'Are you sure you want to destroy the tree? This cannot be undone.', stopSpawnEvents, destroyTree, undefined, null, ['choice-ele']);
+                        choiceBox(mainBody,{
+                            text: 'Are you sure you want to destroy the tree? This cannot be undone.'
+                        }, stopSpawnEvents, destroyTree, undefined, null, ['choice-ele']);
                     })
                     break;
                 default:
@@ -11981,7 +12099,7 @@ function destroyTree() {
             }
         }
 
-        choiceBox(mainBody, 'Materials harvested:', stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
+        choiceBox(mainBody, {text: 'Materials harvested:'}, stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
     },100);
 }
 
@@ -12376,11 +12494,15 @@ function currencyPopUp(type1, amount1, type2, amount2) {
         currencyPopFirstImg.src = "./assets/icon/energyIcon.webp";
         currencyPopFirstImg.classList.add("icon");
         saveValues.energy += amount1;
+        persistentValues.lifetimeEnergyValue += amount1;
+
         challengeNotification(({category: 'energy', value: saveValues.energy}))
     } else if (type1 === "primogem") {
         currencyPopFirstImg.src = "./assets/icon/primogemIcon.webp";
         currencyPopFirstImg.classList.add("icon","primogem");
         saveValues.primogem += amount1;
+        persistentValues.lifetimePrimoValue += amount1;
+
         challengeNotification(({category: 'primogem', value: saveValues.primogem}))
     } else if (type1 === "nuts") {
         currencyPopFirstImg.src = "./assets/icon/goldenIcon.webp";
@@ -12411,11 +12533,15 @@ function currencyPopUp(type1, amount1, type2, amount2) {
             currencyPopSecondImg.src = "./assets/icon/energyIcon.webp";
             currencyPopSecondImg.classList.add("icon");
             saveValues.energy += amount2;
+            persistentValues.lifetimeEnergyValue += amount2;
+
             challengeNotification(({category: 'energy', value: saveValues.energy}))
         } else if (type2 === "primogem") {
             currencyPopSecondImg.src = "./assets/icon/primogemIcon.webp";
             currencyPopSecondImg.classList.add("icon","primogem");
             saveValues.primogem += amount2;
+            persistentValues.lifetimePrimoValue += amount2;
+
             challengeNotification(({category: 'primogem', value: saveValues.primogem}))
         } else if (type2 === "nuts") {
             currencyPopSecondImg.src = "./assets/icon/goldenIcon.webp";

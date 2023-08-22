@@ -1,5 +1,7 @@
 .settings-menu {
     row-gap: unset;
+    width: auto;
+    aspect-ratio: 1.35;
 }
 
 .settings-menu button {
@@ -40,10 +42,10 @@
     flex-grow: 1;
     width: 100%;
     overflow-y: auto;
+    overflow: hidden;
     box-sizing: border-box;
     padding: 0.25em 0.75em 0 0.75em;
     gap: 2%;
-    overflow-x: hidden;
 }
 
 .settings-tab * {
@@ -70,14 +72,19 @@
     height: unset;
     aspect-ratio: 6;
     box-sizing: border-box;
-    padding-bottom: 0.5rem;
+    padding: 0 1%;
     border-bottom: #8fa77e 0.3rem solid;
 }
 
-.settings-bottom:last-of-type {
+.settings-bottom:last-of-type, .settings-bottom:nth-last-of-type(2) {
     margin-top: 1rem;
     padding-bottom: unset;
     border-bottom: unset;
+}
+
+.settings-bottom:last-of-type {
+    aspect-ratio: 10;
+    position: relative;
 }
 
 .patch-button {
@@ -100,7 +107,8 @@
 }
 
 .settings-bottom-right {
-    width: fit-content;
+    width: auto;
+    aspect-ratio: 3.3;
 }
 
 .settings-bottom-right > button {
@@ -112,9 +120,7 @@
 }
 
 #settings-tab-advanced {
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 3em;
-    gap: 1em 0.5em;
+    overflow-y: auto;
 }
 
 .switch {   
@@ -138,6 +144,25 @@ input:checked + .slider {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: 3em;
     gap: 1em 0.5em;
+}
+
+#settings-tab-advanced {
+    grid-template-rows: auto 1fr;
+}
+
+.settings-wrapper {
+    width: 100%;
+    height: 100%;
+}
+
+
+.settings-stats {
+    font-size: 1em;
+    max-height: 100%;
+    margin-top: 2%;
+    padding: 2%;
+    border-top: #8fa77e 0.3rem solid;
+    overflow-y: auto;
 }
 
 .settings-inner-tab {
@@ -188,21 +213,21 @@ input:checked + .slider {
 }
 
 .copyright-text  {
-    position: fixed;
-    left: 0.5rem;
-    bottom: 0.5rem;
+    position: absolute;
+    left: 0;
+    bottom: 0;
     color: inherit;
     text-shadow: unset;
-    font-size: 1rem;
+    font-size: 0.8em;
 }
 
 .version-text {
-    position: fixed;
-    right: 0.5rem;
-    bottom: 0.25rem;
+    position: absolute;
+    right: 0;
+    bottom: 0.5em;
     color: inherit;
     text-shadow: unset;
-    font-size: 1.3rem;
+    font-size: 1em;
 }
 
 #patch-container {
@@ -213,11 +238,7 @@ input:checked + .slider {
     height: 100%;
     transform: unset;
     left: unset;
-    padding: unset;
     margin: -0.25em -0.75em 0 -0.75em;
-}
-
-#patch-container {
     overflow-y: auto;
     overflow-x: hidden;
     justify-content: unset;
@@ -271,7 +292,17 @@ input:checked + .slider {
 .settings-badges {
     height: 100%;
     flex-grow: 1;
-    overflow-y: auto;
+}
+
+.medal-img {
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.15em black);
+    transition: 0.3s ease;
+}
+
+.medal-img:hover, .settings-bottom-buttons > button:hover {
+    transform: scale(1.1);
 }
 
 .settings-bottom-buttons {
@@ -285,4 +316,5 @@ input:checked + .slider {
     padding: 0.5rem 0;
     background-color: #b3caa2;
     border: #4D613D 0.15em solid;
+    transition: 0.3s ease;
 }

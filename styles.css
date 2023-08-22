@@ -3073,6 +3073,17 @@ table, button, label {
     animation-delay: -0.7s;
 }
 
+.choice-ele > div > img {
+    width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.2em black);
+    margin-bottom: -1em;
+}
+
+.smaller-choice-ele > div {
+    padding: 1%;
+}
+
 .notif-ele > div {
     padding: 1%;
     width: 70%;
@@ -3135,6 +3146,7 @@ table, button, label {
     border-radius: 0.5em;
     color: white;
     width: fit-content;
+    white-space: nowrap;
 }
 
 .choice-ele > div > div > button:nth-of-type(2) {

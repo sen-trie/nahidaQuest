@@ -195,6 +195,18 @@ const persistentValuesDefault = {
         "Kirara":0,
     },
     commisionDict: commisionDict,
+    lastRecordedTime: null,
+    timeSpentValue: 0,
+    lifetimeClicksValue: 0, 
+    lifetimeLevelsValue: 0,
+    lifetimeEnergyValue: 0,
+    lifetimePrimoValue: 0,
+    itemsUsedValue: 0,
+    aranaraEventValue: 0,
+    aranaraLostValue: 0,
+    enemiesDefeatedValue: 0,
+    commissionsCompletedValue: 0,
+    transcendValue: 0,
 }
 
 const SettingsDefault = {
@@ -206,7 +218,6 @@ const SettingsDefault = {
     showFallingNuts: true,
     showWishAnimation: true,
     autoClickBig: false,
-    autoClickCombat: false,
 }
 
 const advDictDefault = {
