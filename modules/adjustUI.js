@@ -260,4 +260,46 @@ function createProgressBar(parentProps, childProps, dividerProps, dividerNumber,
     return parentEle;
 }
 
-export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom };
+const textDict = {
+    1:['Golden Nut Reward', '.png'], 
+    2:['Leyline Outbreak Reward', '.png'], 
+    3:['All Challenges Reward', '.mp4']}
+
+// CREATES MEDAL FOR SETTINGS MENU
+function createMedal(num, choiceBox, mainBody, stopSpawnEvents) {
+    const nutMedalImg = createDom('img', {
+        src: `./assets/frames/medal-${num}-backing.webp`
+    })
+
+    const nutMedal = createDom('img', {
+        class: ['medal-img'],
+        id: `medal-img-${num}`,
+        src: `./assets/frames/medal-${num}.webp`,
+        event: ['click', () => {
+            choiceBox(mainBody, {
+                text: textDict[num][0],
+                yes: 'Download',
+                no: 'Go Back'
+            }, stopSpawnEvents, () => {
+                const imgSrc = `./assets/frames/medal-${num}-backing${textDict[num][1]}`;
+                const imgFileName = imgSrc.substring(imgSrc.lastIndexOf('/') + 1);
+                
+                const link = document.createElement('a');
+                link.href = imgSrc;
+                link.download = imgFileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }, undefined, nutMedalImg, ['choice-ele', 'smaller-choice-ele']);
+        }]
+    });
+
+    const settingButton = document.getElementById('setting-button');
+    if (settingButton) {
+        settingButton.classList.add('settings-button-img-glow');
+    }
+
+    return nutMedal;
+}
+
+export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom,createMedal };

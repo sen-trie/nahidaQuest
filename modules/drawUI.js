@@ -315,6 +315,57 @@ function drawMailTable(table4) {
 }
 
 const patchDict = {
+    // "v.2-0 (30/8/23)":`
+    // Welcome to nahidaQuest 2.0! Please enjoy your stay!<br><br>
+
+    // <line>Bugs Fixed 🐞: </line><br><br>
+    //     </indent>
+    //     1. Flashing image<br>
+    //     Sometimes when switching tabs, there is a brief instance where a box is visible which quickly disappears.
+    //     </indent>
+
+    // <br><br><line>New Additions 💡: </line><br><br>
+    //     </indent>
+    //     1. Trees! (Extended endgame) <br>
+    //     After getting enough Golden Cores, you can grow Trees for the purposes of stopping an outbreak. Yes, the game now has an end objective as well!
+    //     </indent>
+
+    //     <br><br> 2. Bosses <br>
+    //     At certain thresholds, bosses will spawn in the Expedition map. These bosses introduce unique combat mechanics and are needed to be defeated to be progressed.
+    //     </indent>
+
+    //     <br><br> 3. Ascension <br>
+    //     After getting Golden Nuts, individual characters can be ascended using Tree rewards for a higher base power and better Golden Core amounts. New base power takes effect upon the next transcension.
+    //     </indent>
+
+    //     <br><br> 4. Commisions <br>
+    //     Unlocked at a certain Adventure Rank. By sending out Sumeru characters for some time, commisions provide specific items.
+    //     </indent>
+
+    //     <br><br> 5. Challenges <br>
+    //     Added 5 sets of 10 Challenges, with increasing difficulty per set. Unlike Achievements, Challenges do not reset and are persistent. Complete all of them for a final reward!
+    //     </indent>
+
+    //     <br><br> 6. New Aranara events <br>
+    //     Added 'Aranara Reveals' and 'Aranara Says'. After getting Golden Nuts, these events can spawn as a (¿).
+    //     </indent>
+
+    // <br><br><line>Systems Rework 🌰: </line><br><br>
+    //     </indent>
+    //     1. Removed portrait mode <br>
+    //     I am sorry to any mobile users who make use of potrait mode. Some of the content in this update heavily relies on a wide-aspect ratio (specifically combat) which would not work in a portrait mode. The overhead of maintaining two orientations was also becoming increasingly unmanageable, I hope you can understand. 
+
+    //     <br><br> 2. Settings menu rework <br>
+    //     Reworked the settings UI to accomodate additional options. Be sure to look through the 'Advanced' tab!
+    //     </indent>
+
+    //     <br><br> 3. Upgrades rework <br>
+    //     You now have a choice between using gems or (nuts + talent materials) when choosing to upgrades above Lvl 50, with the exception of the Traveller who can only use gems.
+    //     </indent>
+
+    // <br><br>Please report any bugs and stay tuned for more updates! Many thanks. [img]
+    // `,
+    
     "v.1-2 (27/5/23)":`
     <line>Bugs Fixed 🐞: </line><br><br>
         </indent>

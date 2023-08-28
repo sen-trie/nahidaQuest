@@ -207,6 +207,11 @@ const persistentValuesDefault = {
     enemiesDefeatedValue: 0,
     commissionsCompletedValue: 0,
     transcendValue: 0,
+    fellBossDefeat: false,
+    unusualBossDefeat: false,
+    workshopBossDefeat: false,
+    finaleBossDefeat: false,
+    allChallenges: false,
 }
 
 const SettingsDefault = {

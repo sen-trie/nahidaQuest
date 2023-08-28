@@ -51,7 +51,7 @@ button {
     bottom: 2%;
     font: inherit;
     font-size: 0.7em;
-    color: #ffffff;
+    color: white;
     text-align: center;
     filter: drop-shadow(0 0 0.15em rgba(0, 0, 0, 0.795)) drop-shadow(0 0 0.1em rgba(0, 0, 0, 0.604));
 }
@@ -80,6 +80,25 @@ button {
     --brightness:100%;
     --dropshadow:0 0 0 black;
     --grayscale:0%;
+    --light-green: #DEE3BA;
+    --bright-light-green: #ABD5A7;
+    --pale-light-green: #AAD4A5;
+    --pale-green: #DAEACB;
+    --dull-green: #2a3a16;
+    --olive-green: #50532c;
+    --bright-green: #A4C95F;
+    --medium-green: #8fa77e;
+    --bright-medium-green: #CEE573;
+    --pale-medium-green: #b3caa2;
+    --dark-green: #4D613D;
+    --bright-dark-green: #3D7250;
+    --very-dark-green: #1c2f0e;
+    --very-dark-red: #651418;
+    --light-brown: #E9D5C1;
+    --pale-brown: #B1A79A;
+    --medium-brown: #C9C0A1;
+    --dark-brown: #6e6240;
+    --very-dark-brown: #452b0a;
     --text-shadow-100:
         #3C3C3C 0.201em 0.064em 0, 
         #3C3C3C 0.114em 0.152em 0, 
@@ -781,7 +800,7 @@ table, button, label {
 .floatingText {
     font-size: 1em;
     color: #022107;
-    text-shadow: 0 0 0.25em #ffffff, 0 0 0.25em #ffffff, 0 0 0.15em #ffffff;
+    text-shadow: 0 0 0.25em white, 0 0 0.25em white, 0 0 0.15em white;
     position: absolute;
     animation: fadeOutOpacity 2.0s cubic-bezier(.02,.97,.91,.14) forwards;
     z-index: 10;
@@ -791,7 +810,7 @@ table, button, label {
 .floatingTextLow {
     font-size: 1.5em;
     color: #022107;
-    text-shadow: 0 0 0.25em #ffffff, 0 0 0.25em #ffffff, 0 0 0.15em #ffffff;
+    text-shadow: 0 0 0.25em white, 0 0 0.25em white, 0 0 0.15em white;
     position: absolute;
     animation: fadeOutCritOpacity 2.0s ease-out forwards;
     z-index: 10;
@@ -801,7 +820,7 @@ table, button, label {
 .floatingCritText {
     font-size: 2em;
     color: #032509;
-    text-shadow: 0 0 0.25em #ffffffa2, 0 0 0.35em #ffffff9a, 0 0 0.15em #ffffff8e, 0 0 0.15em #ffffff8e;
+    text-shadow: 0 0 0.25em whitea2, 0 0 0.35em white9a, 0 0 0.15em white8e, 0 0 0.15em white8e;
     position: absolute;
     animation: fadeOutCritOpacity 2.0s ease-out forwards;
     z-index: 11;
@@ -859,7 +878,7 @@ table, button, label {
 }
 
 .tab-button:hover{
-    filter: drop-shadow(0 0 0.3em #ffffff);
+    filter: drop-shadow(0 0 0.3em white);
 }
 
 /*/////////////////////////////// ALL POP UP CSS (New/Tut) ///////////////////////////////*/
@@ -1032,7 +1051,7 @@ table, button, label {
 
 .not-dim {
     transition: 0.3s ease;
-    --dropshadow:0 0 3px #000000;
+    --dropshadow:0 0 3px black;
 }
 
 .active-hero {
@@ -1098,10 +1117,10 @@ table, button, label {
 }
 
 .inventory-selected {
-    border: 0.5rem inset #867357;
-    border-radius: 1em;
+    border: 0.5rem inset var(--dark-brown);
+    border-radius: 1rem;
     transition: 0.2s ease;
-    transform: scale(1.20);
+    transform: scale(1.15);
 }
 
 .button-container {
@@ -1171,9 +1190,9 @@ table, button, label {
     bottom: 0;
     width: 69%;
     height: 8%;
-    background-color: #D0BEA1;
+    background-color: var(--light-brown);
     box-sizing: border-box;
-    border-top: 0.2em solid #A19883;
+    border-top: 0.2em solid var(--dark-brown);
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -1185,10 +1204,10 @@ table, button, label {
 .filter-row > button {
     height: 70%;
     width: 20%;
-    background-color: #C7C2B3;
+    background-color: var(--pale-brown);
     color: white;
     text-shadow: var(--text-shadow-075);
-    border: 0.15em solid #7C7768;
+    border: 0.15em solid var(--dark-brown);
     border-radius: 0.3em;
 }
 
@@ -1219,8 +1238,8 @@ table, button, label {
     grid-template-columns: repeat(auto-fill, minmax(3em, 1fr));
     box-sizing: border-box;
     transform: translate(-51%,0);
-    background-color: #423624;
-    border: 0.25em solid #7C7768;
+    background-color: var(--very-dark-brown);
+    border: 0.25em solid var(--dark-brown);
     border-radius: 0.4em;
     padding: 1%;
 }
@@ -1363,19 +1382,19 @@ table, button, label {
     height: 6%;
     bottom: 1%;
     left: 1%;
-    border: 0.1em solid #1d572e;
+    border: 0.1em solid var(--bright-dark-green);
     box-sizing: border-box;
-    background-color: #153d26;
+    background-color: var(--bright-dark-green);
 }
 
 .exped-xpbar > p {
     z-index: 3;
     width: auto;
     height: auto;
-    background-color: #94d25e;
-    border: 0.1em solid #1d572e;
+    background-color: var(--bright-green);
+    border: 0.1em solid var(--bright-dark-green);
     box-sizing: border-box;
-    color: #153d26;
+    color: var(--very-dark-green);
     padding: 1%;
     border-radius: 0.25em;
 }
@@ -1403,7 +1422,7 @@ table, button, label {
 
 .xpbar-bar {
     left: 0;
-    background-color: #ade17f;
+    background-color: var(--pale-medium-green);
     z-index: 2;
     transition: width 0.2s ease-in-out;
 }
@@ -1417,10 +1436,10 @@ table, button, label {
     display: flex;
     justify-content: center;
     color: white;
-    text-shadow: 0.1em 0.1em 0.25em #000000;
+    text-shadow: 0.1em 0.1em 0.25em black;
     font-size: inherit;
     background-color: #3E4659;
-    border: 0.2em solid #8B857C;
+    border: 0.2em solid var(--pale-brown);
 }
 
 .exped-table-img {
@@ -2056,7 +2075,7 @@ table, button, label {
 }
 
 .wish-button:hover{
-    filter: drop-shadow(0 0 0.2em #ffffff);
+    filter: drop-shadow(0 0 0.2em white);
     transition: .3s ease;
 }
 
@@ -2416,7 +2435,7 @@ table, button, label {
     flex-direction: column;
     gap: 1%;
     align-items: center;
-    color: #5c461f;
+    color: var(--very-dark-brown);
 }
 
 #table6 > div, form {
@@ -2569,17 +2588,17 @@ table, button, label {
 #tool-tip-button {
     position: absolute;
     top: 99%;
-    background-color: #867256;
-    border-top: 0.15em solid #51432f;
-    border-bottom: 0.15em solid #51432f;
+    background-color: var(--dark-brown);
+    border-top: 0.15em solid var(--very-dark-brown);
+    border-bottom: 0.15em solid var(--very-dark-brown);
     box-sizing: border-box;
     height: 13%;
     width: 100%;
     z-index: 5;
     font-family: gi-font;
     font-size: 1.4em;
-    color: #F8E8C7;
-    text-shadow: #2e2411 0.08em 0.08em 0.1em;
+    color: white;
+    text-shadow: var(--very-dark-brown) 0.08em 0.08em 0.1em;
 }
 
 #tool-tip-button:hover {
@@ -2622,12 +2641,12 @@ table, button, label {
     width: 20%;
     height: auto;
     aspect-ratio: 1;
-    background-color: #CEE573;
-    border: 0.2em solid #3B6F51;
+    background-color: var(--bright-medium-green);
+    border: 0.2em solid var(--bright-dark-green);
     border-radius: 1em;
     text-align: center;
     padding: 1%;
-    color: #163f26;
+    color: var(--very-dark-green);
     transition: 0.3s ease;
 }
 
@@ -2708,8 +2727,8 @@ table, button, label {
     height: auto;
     max-height: 5%;
     border-radius: 0.25em;
-    border: 0.12em solid #182c0a;
-    background-color: #316547;
+    border: 0.12em solid var(--very-dark-green);
+    background-color: var(--bright-dark-green);
 }
 
 .tree-progress-value {
@@ -2919,11 +2938,11 @@ table, button, label {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    background-color: #AAD4A5;
-    border: 0.2em solid #6e9168;
+    background-color: var(--pale-light-green);
+    border: 0.2em solid var(--bright-dark-green);
     box-sizing: border-box;
     border-radius: 0.2em;
-    color: #254620;
+    color: var(--very-dark-green);
 }
 
 #tree-offer-items > div:first-of-type > img:first-of-type {
@@ -2971,7 +2990,7 @@ table, button, label {
     padding-bottom: 0;
     width: 80%;
     color: white;
-    text-shadow: 0.1em 0.1em 0.25em #000000;
+    text-shadow: 0.1em 0.1em 0.25em black;
     font-size: inherit;
     background-color: #3E4659;
     border: 0.2em solid #8B857C;
@@ -3063,8 +3082,8 @@ table, button, label {
 .choice-ele > div, .notif-ele > div {
     position: relative;
     top: -5%;
-    background-color: #DEE3BA;
-    border: 0.2em solid #97b086;
+    background-color: var(--pale-green);
+    border: 0.2em solid var(--bright-dark-green);
     border-radius: 0.5em;
     padding: 2% 4% 1% 4%;
     max-width: 40%;
@@ -3077,6 +3096,7 @@ table, button, label {
     width: 100%;
     object-fit: contain;
     filter: drop-shadow(0 0 0.2em black);
+    margin-top: 0.5em;
     margin-bottom: -1em;
 }
 
@@ -3377,11 +3397,11 @@ table, button, label {
         transform: scale(1);
     }
     80.1% {
-        filter: brightness(1) drop-shadow(0 0 0.2em #ffffff) drop-shadow(0 0 0.3em #ffffff);
+        filter: brightness(1) drop-shadow(0 0 0.2em white) drop-shadow(0 0 0.3em white);
         transform: scale(1.2);
     }
     100% {
-        filter: brightness(1) drop-shadow(0 0 0.2em #ffffff) drop-shadow(0 0 0.3em #ffffff);
+        filter: brightness(1) drop-shadow(0 0 0.2em white) drop-shadow(0 0 0.3em white);
         transform: scale(1.2);
     }
 }

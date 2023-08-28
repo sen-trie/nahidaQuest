@@ -14,7 +14,7 @@
     padding-top: 0.2em;
     padding-left: 1em;
     justify-content: flex-start;
-    border-bottom: #8fa77e 0.5rem solid;
+    border-bottom: var(--medium-green) 0.5rem solid;
     box-sizing: border-box;
 }
 
@@ -24,14 +24,14 @@
     padding: 0 2%;
     font-size: 1.1em;
     margin-right: 0.5em;
-    border: #4D613D 0.15em solid;
+    border: var(--dark-green) 0.15em solid;
     border-bottom: none;
-    background-color: #8fa77e;
+    background-color: var(--medium-green);
 }
 
 .inactive-tab {
-    border-color: #8fa77e;
-    background-color: #4D613D;
+    border-color: var(--medium-green);
+    background-color: var(--dark-green);
     color: #DEE3BA !important;
 }
 
@@ -61,7 +61,7 @@
     height: auto;
     aspect-ratio: 5;
     padding-bottom: 0.5rem;
-    border-bottom: #8fa77e 0.3rem solid;
+    border-bottom: var(--medium-green) 0.3rem solid;
 }
 
 .volume-scroller-container-children {
@@ -73,7 +73,7 @@
     aspect-ratio: 6;
     box-sizing: border-box;
     padding: 0 1%;
-    border-bottom: #8fa77e 0.3rem solid;
+    border-bottom: var(--medium-green) 0.3rem solid;
 }
 
 .settings-bottom:last-of-type, .settings-bottom:nth-last-of-type(2) {
@@ -94,8 +94,8 @@
     background: unset;
     filter: unset;
     aspect-ratio: unset;
-    background-color: #b3caa2;
-    border: #4D613D 0.15em solid;
+    background-color: var(--pale-medium-green);
+    border: var(--dark-green) 0.15em solid;
     padding: 1%;
     padding-right: 2%;
     box-sizing: border-box;
@@ -127,12 +127,12 @@
     height: 100%;
     padding: 2%;
     box-sizing: border-box;
-    background-color: #b3caa2;
-    border: #4D613D 0.15em solid;
+    background-color: var(--pale-medium-green);
+    border: var(--dark-green) 0.15em solid;
 }
 
 input:checked + .slider {
-    background-color: #4D613D;
+    background-color: var(--dark-green);
 }
 
 .slider {
@@ -161,13 +161,13 @@ input:checked + .slider {
     max-height: 100%;
     margin-top: 2%;
     padding: 2%;
-    border-top: #8fa77e 0.3rem solid;
+    border-top: var(--medium-green) 0.3rem solid;
     overflow-y: auto;
 }
 
 .settings-inner-tab {
     padding: unset;
-    border-bottom: #8fa77e 0.3rem solid;
+    border-bottom: var(--medium-green) 0.3rem solid;
 }
 
 .settings-tab-box {
@@ -191,8 +191,8 @@ input:checked + .slider {
     padding: 0.3em;
     right: 0;
     bottom: 0;
-    border: #4D613D 0.15em solid;
-    background-color: #b3caa2;
+    border: var(--bright-dark-green) 0.15em solid;
+    background-color: var(--bright-light-green);
 }
 
 .settings-textarea {
@@ -203,13 +203,12 @@ input:checked + .slider {
     padding: 1%;
     box-sizing: border-box;
     font-size: 0.65em;
-    border: #8fa77e 0.4rem solid;
+    border: var(--medium-green) 0.4rem solid;
 }
 
 .settings-textarea:focus { 
     outline: none !important;
-    border-color: #4D613D;
-    box-shadow: 0 0 1rem #4d613d7e;
+    border-color: var(--dark-green);
 }
 
 .copyright-text  {
@@ -231,6 +230,7 @@ input:checked + .slider {
 }
 
 #patch-container {
+    background-color: var(--pale-green);
     position: absolute;
     border-radius: 1rem;
     z-index: 10;
@@ -248,9 +248,9 @@ input:checked + .slider {
 }
 
 #patch-container > p {
-    border: 0.1em solid #3b4f23;
+    border: 0.1em solid var(--dull-green);
     border-top:0;
-    color: #50532c;
+    color: var(--olive-green);
     padding: 1%;
     border-radius: 0 0 1em 1em;
     width: 92.5%;
@@ -258,13 +258,13 @@ input:checked + .slider {
 }
 
 #patch-container > p > line {
-    border-bottom: 0.15em Solid #5a5e32;
+    border-bottom: 0.15em solid var(--olive-green);
 }
 
 #patch-container > div {
-    background-color: #A4C95F;
-    border: 0.15em solid #3b4f23;
-    color: #36481f;
+    background-color: var(--bright-green);
+    border: 0.15em solid var(--dull-green);
+    color: var(--dull-green);
     padding: 1%;
     border-radius: 0 .5em .5em 0;
     width: 95%;
@@ -282,9 +282,9 @@ input:checked + .slider {
 }
 
 #patch-container > button {
-    background-color: #A4C95F;
-    border: 0.15em solid #3b4f23;
-    color: #36481f;
+    background-color: var(--bright-green);
+    border: 0.15em solid var(--dull-green);
+    color: var(--dull-green);
     width: fit-content;
     padding: 0.25em 0.5em;
 }
@@ -314,7 +314,7 @@ input:checked + .slider {
 .settings-bottom-buttons > button {
     width: 100%;
     padding: 0.5rem 0;
-    background-color: #b3caa2;
-    border: #4D613D 0.15em solid;
+    background-color: var(--pale-medium-green);
+    border: var(--dark-green) 0.15em solid;
     transition: 0.3s ease;
 }

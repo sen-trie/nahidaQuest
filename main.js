@@ -1,7 +1,7 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom,createMedal } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
 
@@ -199,6 +199,7 @@ let adventureType = 0;
 let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
+let timePassedSinceLast = null;
 const EVENTCOOLDOWN = 90;
 const BOUNTYCOOLDOWN = 60;
 const SHOPCOOLDOWN = 15;
@@ -618,7 +619,9 @@ function loadSaveData() {
         }
     }
 
-    persistentValues.lastRecordedTime = getTime();
+    const newTime = getTime();
+    timePassedSinceLast = newTime - persistentValues.lastRecordedTime;
+    persistentValues.lastRecordedTime = newTime;
 
     if (beta) {
         if (persistentValues.challengeCheck === undefined) {
@@ -2857,9 +2860,12 @@ function settings() {
     // JUST THE BUTTON FOR SETTING MENU
     let settingButton = document.createElement("button");
     settingButton.classList.add("settings-button");
+    settingButton.id = 'setting-button'
+
     let settingButtonImg = document.createElement("img");
     settingButtonImg.src = "./assets/settings/settings-logo.webp";
-    settingButtonImg.classList.add("settings-button-img")
+    settingButtonImg.classList.add("settings-button-img");
+    settingButtonImg.id = 'setting-button-img';
     settingButton.appendChild(settingButtonImg);
 
     // RELATED TO SETTINGS MENU
@@ -2927,7 +2933,7 @@ function settings() {
                     };
     
                     for (const [key, value] of Object.entries(statsArray)) {
-                        advancedStats.innerHTML += `${value} ${key === 'timeSpentValue' ? convertTo24HourFormat(persistentValues[key] / 60) : persistentValues[key]}<br>`;
+                        advancedStats.innerHTML += `${value} ${key === 'timeSpentValue' ? convertTo24HourFormat(persistentValues[key] / 60) + ' hrs' : persistentValues[key]}<br>`;
                     }
                 }
 
@@ -3120,34 +3126,16 @@ function settings() {
             id: 'badges-div'
         })
 
-        if (saveValues.goldenTutorial === true) {
-            const nutMedalImg = createDom('img', {
-                src: './assets/frames/medal-1-backing.webp'
-            })
+        if (saveValues.goldenTutorial) {
+            settingsBottomBadge.append(createMedal(1, choiceBox, mainBody, stopSpawnEvents))
+        }
 
-            const nutMedal = createDom('img', {
-                class: ['medal-img'],
-                src: './assets/frames/medal-1.webp',
-                event: ['click', () => {
-                    choiceBox(mainBody, {
-                        text: 'Golden Nut Reward',
-                        yes: 'Download',
-                        no: 'Go Back'
-                    }, stopSpawnEvents, () => {
-                        const imgSrc = './assets/frames/medal-1-backing.png';
-                        const imgFileName = imgSrc.substring(imgSrc.lastIndexOf('/') + 1);
-                        
-                        const link = document.createElement('a');
-                        link.href = imgSrc;
-                        link.download = imgFileName;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }, undefined, nutMedalImg, ['choice-ele', 'smaller-choice-ele']);
-                }]
-            });
+        if (persistentValues.finaleBossDefeat) {
+            settingsBottomBadge.append(createMedal(2, choiceBox, mainBody, stopSpawnEvents))
+        }
 
-            settingsBottomBadge.append(nutMedal)
+        if (persistentValues.allChallenges) {
+            settingsBottomBadge.append(createMedal(3, choiceBox, mainBody, stopSpawnEvents))
         }
 
         const settingsBottomButtons = createDom('div', {
@@ -3193,6 +3181,9 @@ function settings() {
         toggleSettings();
         let deleteBox = document.getElementById("confirm-box");
         if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+        if (settingButton.classList.contains('settings-button-img-glow')) {
+            settingButton.classList.remove('settings-button-img-glow')
+        }
     })
     multiplierButtonContainer.prepend(settingButton);
 }
@@ -8645,7 +8636,7 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
 
 function quicktimeEvent(waveQuicktime, advLevel, variant) {
     if (!adventureVariables.fightSceneOn) {return}
-    if (beta) {return}
+    // if (beta) {return}
     battleVariables.quicktimeAttack = true;
 
     const quicktimeBar = document.createElement("div");
@@ -9850,16 +9841,25 @@ function winAdventure() {
     adventureHeading.innerText = "You won! You received some loot:";
     switch (adventureVariables.specialty) {
         case 'FellBoss':
-            adventureHeading.innerText = "You have stopped the rampaging Whopperflower!"
+            adventureHeading.innerText = "You have stopped the rampaging Whopperflower!";
+            persistentValuesDefault.fellBossDefeat = true;
             break;
         case 'Unusual':
-            adventureHeading.innerText = "You have survived the Unusual Hilichurl's onslaught!"
+            adventureHeading.innerText = "You have survived the Unusual Hilichurl's onslaught!";
+            persistentValuesDefault.unusualBossDefeat = true;
             break;
         case 'Workshop':
-            adventureHeading.innerText = "You successfully put down the Shouki no Kami!"
+            adventureHeading.innerText = "You successfully put down the Shouki no Kami!";
+            persistentValuesDefault.workshopBossDefeat = true;
             break;
         case 'Finale':
-            adventureHeading.innerText = "You have stopped the Leyline Outbreak Experiment, once and for all."
+            adventureHeading.innerText = "You have stopped the Leyline Outbreak Experiment, once and for all.";
+            persistentValuesDefault.finaleBossDefeat = true;
+
+            const settingsBottomBadge = document.getElementById('badges-div');
+            if (!settingsBottomBadge.querySelector('medal-img-2')) {
+                settingsBottomBadge.append(createMedal(2, choiceBox, mainBody, stopSpawnEvents))
+            }
             break;
         default:
             break;
@@ -10312,7 +10312,6 @@ function achievementListload() {
     challengeDiv.innerText = "Development in progress. Stay tuned!";
     if (!beta) challengeDiv.style.color = 'black'
     if (beta) {
-        challengeTab.click();
         challengeDiv.innerText = '';
 
         let title = new Image();
@@ -10565,8 +10564,22 @@ function challengeNotification(value) {
             } else {
                 console.error(`Error getting Challenge Button ID: ${posArray}. Please inform the developer via the feedback form! :)`)
             }
-            
         });
+
+        let getAllAchievements = true;
+        for (let tier in challengeDict) {
+            for (let challenge in challengeDict[tier]) {
+                if (challenge === false) {getAllAchievements = false}
+            }
+        }
+
+        if (getAllAchievements) {
+            persistentValues.allChallenges = true;
+            const settingsBottomBadge = document.getElementById('badges-div');
+            if (!settingsBottomBadge.querySelector('medal-img-3')) {
+                settingsBottomBadge.append(createMedal(3, choiceBox, mainBody, stopSpawnEvents))
+            }
+        }
     }
 }
 
@@ -11722,7 +11735,11 @@ function nutPopUp() {
 
         setTimeout(()=>{
             addNutStore();
-            customTutorial("goldenNut",4);
+            customTutorial("goldenNut", 4);
+            const settingsBottomBadge = document.getElementById('badges-div');
+            if (!settingsBottomBadge.querySelector('medal-img-1')) {
+                settingsBottomBadge.append(createMedal(1, choiceBox, mainBody, stopSpawnEvents))
+            }
         },3000);
     }
 }
@@ -11776,6 +11793,10 @@ function createTreeMenu() {
     treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
     treeHealthContainer.append(treeNut,treeHealthText);
 
+    if (timePassedSinceLast) {
+        saveValues.treeObj.growth += (saveValues.treeObj.growthRate / 100) / 4 * timePassedSinceLast
+    }
+
     const treeProgressBar = createProgressBar(
         { class: ['tree-progress', 'healthbar-container'] },
         { id: 'tree-progress',
@@ -11813,8 +11834,6 @@ function createTreeMenu() {
         createCloud(num);
     })
 
-    // let chains = document.createElement('div');
-    // chains.classList.add('chain-lock','cover-all');
     treeContainer.appendChild(treeImg);
     treeSide.append(treeProgressBar,sandImg,treeContainer,treeHealthContainer,treeProgressValue);
 
@@ -11825,15 +11844,10 @@ function createTreeMenu() {
     optionsContainer.id = 'options-container';
     treeOptions(treeLevel === 0 ? false : true, optionsContainer)
 
-    // const affinityContainer = document.createElement('div');
-    // affinityContainer.classList.add('flex-row','affinity-container');
-    // affinityContainer.innerText = 'Element\n Affinity';
-
     let container = document.createElement('div');
     container.classList.add('flex-row');
     let element = rollArray(boxElement,1);
     container.style.background = `url(./assets/tooltips/elements/nut-${element.toLowerCase()}.webp) no-repeat center center/contain`;
-    // affinityContainer.appendChild(container);
     
     treeTable.append(palmText, optionsContainer);
     offerBox(treeTable, optionsContainer);
@@ -12645,7 +12659,6 @@ if (beta) {
     link.type = "text/css";
     link.rel = "stylesheet";
     document.head.appendChild(link);
-
 
     let warning = document.createElement('p');
     warning.innerText = 'BETA';
