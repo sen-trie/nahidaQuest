@@ -283,7 +283,8 @@ function challengeCheck(type, prop, prop2, objectInfo) {
 
         for (let j = 0; j < challengeInfo.length; j++) {
             for (let k = 0; k < challengeInfo[j].length; k++) {
-                if (challengeCheckDict[j][k] === undefined) {challengeCheckDict[j].push(false)}
+                if (challengeCheckDict[j][k] === undefined) {
+                    challengeCheckDict[j][k] = false}
             }
         }
         return challengeCheckDict;

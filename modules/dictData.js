@@ -1086,7 +1086,7 @@ const challengeInfo = [
         {'title': 'Until Til the End', 'desc': 'Survive a Skirmish battle with at most one HP remaining'}, // CH DONE
         {'title': 'Another Test Subject', 'desc': 'During a battle, reach a maximum combo of 20'}, // CH DONE
         {'title': 'Sumeru Police Force', 'desc': 'Clear out all Bounties'}, // CH DONE
-        {'title': 'Cheap and Tasty Chopsuey', 'desc': 'Eat 10 5-Star foods within 30 seconds'},
+        {'title': 'Subject Three', 'desc': 'Defeat the Overgrown Whopperflower'}, // CH DONE
         {'title': 'A Nut From Space', 'desc': 'Catch 60 raining nuts'}, // CH DONE
     ],[
         {'title': 'The Myth of Vahumana', 'desc': 'Transcend for over 15,000 Cores'}, // CH DONE
@@ -1094,7 +1094,7 @@ const challengeInfo = [
         {'title': 'Business as Usual', 'desc': 'Reach 7,500 energy in one run'}, // CH DONE
         {'title': 'Gem Empire', 'desc': 'Possess 4000 primogems in one run'}, // CH DONE
         {'title': 'Surging Forth', 'desc': 'Empower the Wanderer'}, // CH DONE
-        {'title': "Menace of the East", 'desc': 'Defeat the Unusual Hilichurl'},
+        {'title': "Chaos from the East", 'desc': 'Defeat the Menace of the Mansion'},  // CH DONE
         {'title': 'Golden Ticket', 'desc': 'Catch 16 Weasel Thieves'},  // CH DONE
         {'title': 'Sumeru Sales Specialist', 'desc': 'Reveal a field of Whopperflowers in under 15 seconds'}, // CH DONE
         {'title': 'Blessed Hamada', 'desc': "Harvest 25 fully-grown trees"},  // CH DONE
@@ -1105,16 +1105,16 @@ const challengeInfo = [
         {'title': 'House of Haravatat', 'desc': 'Possess 200 discounted levels'}, // CH DONE
         {'title': 'Song of Songs', 'desc': "Reach 15,000 energy in one run"}, // CH DONE
         {'title': 'Greater Vision', 'desc': 'Get a Crit on Big Nahida seven times in a row'},  // CH DONE
-        {'title': 'The Bestest Travel Companion', 'desc': 'Reach maximum affection with 10 characters'},
-        {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},
+        {'title': 'The Bestest Travel Companion', 'desc': 'Reach maximum affection with 10 characters'}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},   // CH DONE
         {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 40 fully-grown trees'},  // CH DONE
         {'title': 'Rooted Philanthropist', 'desc': 'Offer 35 times to a tree in a single cycle'}, // CH DONE
-        {'title': 'Pretty Patty', 'desc': "Use 1 of each type of Magic Seed when planting a tree"},
+        {'title': 'Pretty Patty', 'desc': "Use 1 of each type of Magic Seed when planting a tree"}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ], [
         {'title': 'Live and Let Live', 'desc': 'Transcend for over 100,000 Cores'}, // CH DONE
         {'title': 'Perspective of A God', 'desc': 'Level up Nahida 700 times'},  // CH DONE
-        {'title': 'Team All-Stars', 'desc': 'Ascend every character six times'},
-        {'title': 'Apex of Akasha', 'desc': 'Stop the evil responsible for the Leyline Outbreak'},
+        {'title': 'Team All-Stars', 'desc': 'Ascend every character seven times'},  // CH DONE
+        {'title': 'Apex of Akasha', 'desc': 'Stop the evil responsible for the Leyline Outbreak'},// CH DONE
         {'title': 'Stance of Impregnability', 'desc': 'During a battle, reach a maximum combo of 50'}, // CH DONE
         {'title': 'Rule of Nines', 'desc': "Within nine selections, reveal all of Arakarman's keys"},  // CH DONE
         {'title': 'Strikeout!', 'desc': "Finish Arakarman's game with less than three of your key tiles being revealed"}, // CH DONE
@@ -1137,94 +1137,68 @@ const commisionInfo = {
     'Lightweight':'[Lightweight]\nCommision time is reduced by 15%',
     'Scavenger':'[Scavenger]\nHas a chance for additional rewards',
     'Proficient':'[Proficient]\nCan prioritize certain items',
-    'Energized':'[Energized]\nStamina costs are reduced by 20%',
+    'Keen-Eyed':'[Keen-Eyed]\nItems can be one tier higher',
     'Alhaitham':{
-        foodLikes:[],
-        foodDisikes:[],
         charLikes:[],
-        charDislikes:[],
+        charDislikes:['Kaveh'],
         perk: 'Toughness',
     },
     'Candace':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
+        charLikes:['Dehya', 'Nilou'],
         charDislikes:[],
         perk: 'Toughness',
     },
     'Collei':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
+        charLikes:['Tighnari'],
         charDislikes:[],
         perk: 'Lightweight',
     },
     'Cyno':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
+        charLikes:['Tighnari', 'Collei'],
         charDislikes:[],
         perk: 'Scavenger',
     },
     'Dehya':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
+        charLikes:['Candace', "Nilou"],
         charDislikes:[],
         perk: 'Toughness',
     },
     'Dori':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
+        charLikes:['Kaveh'],
         charDislikes:[],
-        perk: 'Proficient',
+        perk: 'Keen-Eyed',
     },
     'Faruzan':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
+        charLikes:['Layla', 'Collei', 'Kaveh'],
         charDislikes:[],
         perk: 'Scavenger',
     },
     'Kaveh':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
-        charDislikes:[],
-        perk: 'Energized',
+        charLikes:['Tighnari'],
+        charDislikes:['Alhaitham'],
+        perk: 'Proficient',
     },
     'Layla':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
-        charDislikes:[],
+        charLikes:['Faruzan'],
+        charDislikes:['Dori'],
         perk: 'Proficient',
     },
     'Nahida':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
+        charLikes:['Wanderer', 'Cyno'],
         charDislikes:[], 
         perk: 'Scavenger',
     },
     'Nilou':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
+        charLikes:['Dehya', 'Candace'],
         charDislikes:[],
-        perk: 'Energized',
+        perk: 'Keen-Eyed',
     },
     'Tighnari':{
-        foodLikes:[],
-        foodDisikes:[],
-        charLikes:[],
+        charLikes:['Collei', 'Cyno'],
         charDislikes:[],
         perk: 'Lightweight',
     },
     'Wanderer':{
-        foodLikes:[],
-        foodDisikes:[],
         charLikes:[],
         charDislikes:[],
         perk: 'Lightweight',

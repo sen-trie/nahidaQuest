@@ -2,68 +2,43 @@
 const commisionDict = {
     'Alhaitham':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Candace':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Collei':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Cyno':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Dehya':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Dori':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Faruzan':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Kaveh':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Layla':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Nahida':{
         currentComm: '',
         affection: 50, 
-        stamina: 100,
     },
     'Nilou':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Tighnari':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
     'Wanderer':{
         currentComm: '',
-        affection: 0, 
-        stamina: 100,
     },
 }
 
@@ -101,7 +76,7 @@ const saveValuesDefault = {
     achievementCount: 0,
     treeObj: treeObj,
     baseCommisions: [],
-    extraCommisions: [],
+    commisionDict: commisionDict,
     currentCommisions: [],
 }
 
@@ -195,7 +170,6 @@ const persistentValuesDefault = {
         "Baizhu":0,
         "Kirara":0,
     },
-    commisionDict: commisionDict,
     lastRecordedTime: null,
     timeSpentValue: 0,
     lifetimeClicksValue: 0, 

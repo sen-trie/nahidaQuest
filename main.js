@@ -441,7 +441,10 @@ function timerEvents() {
     shopTimerFunction();
     checkTimerBounty();
     if (beta) {
-        growTree('add');
+        if (persistentValues.tutorialAscend) {
+            growTree('add');
+        }
+        activeLeader = 'Paimon'
         checkCommisions();
     };
 }
@@ -5382,9 +5385,10 @@ function createGuild() {
         commissionSetting.classList.add('commision-setting', 'flex-row');
 
         const commTitle = document.createElement('p');
-
-        const commItems = document.createElement('div');
-        commItems.classList.add('select-commision-items', 'flex-column');
+        const commItems = createDom('div', {
+            classList: ['select-commision-items', 'flex-column'],
+            id: 'select-comm-items'
+        })
         const commRewards = document.createElement('div');
         const commStars = document.createElement('img');
         commItems.append(commRewards, commStars)
@@ -5466,9 +5470,9 @@ function createGuild() {
                         commInfo = saveValues.baseCommisions[commId[1].split('-')[1]]
                     }
 
-                    for (let key in persistentValues.commisionDict) {
-                        if (persistentValues.commisionDict[key].currentComm === commId[1]) {
-                            persistentValues.commisionDict[key].currentComm = '';
+                    for (let key in saveValues.commisionDict) {
+                        if (saveValues.commisionDict[key].currentComm === commId[1]) {
+                            saveValues.commisionDict[key].currentComm = '';
                         }
                     }
 
@@ -5869,7 +5873,6 @@ function focusNewComm(forceShowComm, item) {
         })
     } else {
         if (saveValues.currentCommisions[0] != undefined && saveValues.currentCommisions[1] != undefined && saveValues.currentCommisions[2] != undefined) {return};
-
         footFeedback.chosenComm = item;
         commisionList.style.display = 'none';
         selectComission.style.display = 'flex';
@@ -5881,33 +5884,26 @@ function focusNewComm(forceShowComm, item) {
         item.possibleItems.forEach((reward) => {
             let itemPic = new Image();
             itemPic.src = `./assets/expedbg/loot/${reward}.webp`;
+            itemPic.name = reward;
             selectComissionChildren[1].firstChild.appendChild(itemPic);
         })
 
-        const commisionKeys = Object.keys(persistentValues.commisionDict)
+        const commisionKeys = Object.keys(saveValues.commisionDict)
         for (let key in upgradeInfo) {
             const name = upgradeInfo[key].Name;
-            if (commisionKeys.includes(name)) {
-                if (persistentValues.commisionDict[name].currentComm !== '') {continue}
+            if (commisionKeys.includes(name) && upgradeDict[key].Purchased >= 1) {
+                if (saveValues.commisionDict[name].currentComm !== '') {continue}
 
                 const charButton = createDom('button', { class:['flex-row','commision-button'] });
                 charButton.addEventListener('click', () => {selectCommHero(name)})
 
-                let charLeft = createDom('div', { class:['commision-picture'] });
-                let charImg = createDom('div', { style: { background: `url(./assets/tooltips/emoji/${name}.webp) no-repeat center center/cover`} });
-
-                let affinity = persistentValues.commisionDict[name].affection;
-                let charStar = createDom('img', { src: `./assets/icon/heart-${affinity >= 35 ? 'full' : 'empty'}.webp` });
-                let charStar2 = createDom('img', { src: `./assets/icon/heart-${affinity >= 65 ? 'full' : 'empty'}.webp` });
-                let charStar3 = createDom('img', { src: `./assets/icon/heart-${affinity >= 95 ? 'full' : 'empty'}.webp` });
+                let charLeft = createDom('div', { class:['commision-picture', 'flex-row'] });
+                let charImg = createDom('img', { src: `./assets/tooltips/emoji/${name}.webp`});
 
                 let charText = createDom('p');
-                charText.innerHTML = `${name}
-                                        <br><br>Boon: ${commisionInfo[name].perk}
-                                        <br>Stamina: ${persistentValues.commisionDict[name].stamina}
-                                        `
+                charText.innerHTML = `${name}<br><br> Boon: ${commisionInfo[name].perk}`
 
-                charLeft.append(charImg, charStar, charStar2, charStar3);
+                charLeft.append(charImg);
                 charButton.append(charLeft, charText);
                 commissionChar.append(charButton);
             }
@@ -5968,17 +5964,24 @@ function enterNewComm() {
     }
 
     const commId = footFeedback.chosenComm.id;
-    const type = commId.split('-')[0];
     const id = commId.split('-')[1];
 
     saveValues.baseCommisions[id].progress = 'ongoing';
-    
     saveValues.baseCommisions[id].endTime = getTime() + saveValues.baseCommisions[id].duration * 60 * (commisionInfo[heroLeader.hero].perk === 'Lightweight' ? 0.85 : 1)
     saveValues.baseCommisions[id].char = [heroLeader.hero, heroSupp.hero];
+    saveValues.baseCommisions[id].perk = commisionInfo[heroLeader.hero].perk;
+    saveValues.baseCommisions[id].priority = null;
 
-    persistentValues.commisionDict[heroLeader.hero].currentComm = commId;
-    persistentValues.commisionDict[heroSupp.hero].currentComm = commId;
+    saveValues.commisionDict[heroLeader.hero].currentComm = commId;
+    saveValues.commisionDict[heroSupp.hero].currentComm = commId;
     saveValues.currentCommisions.push(commId);
+
+    if (commisionInfo[heroLeader.hero].perk === 'Proficient') {
+        const commItems = document.getElementById('select-comm-items').firstChild;
+        const pickItems = commItems.cloneNode(true);
+        pickItems.id = 'pick-items';
+        saveValues.baseCommisions[id].priority = choiceBox(mainBody, {text: 'Pick one to prioritize:'}, stopSpawnEvents, () => {}, null, pickItems, ['notif-ele', 'pick-items']);
+    }
 
     heroLeader.style.background = `url(./assets/icon/charPlus.webp) no-repeat center center/contain`;
     heroLeader.style.animation = 'unset';
@@ -5991,7 +5994,6 @@ function enterNewComm() {
     heroSupp.offsetWidth;
 
     perkText.innerText = 'None Curently';
-
     focusNewComm(true, null);
 }
 
@@ -6098,13 +6100,13 @@ function expedInfo(butId) {
 
         if (level == 7) {
             if (saveValues.goldenTutorial === false) {
-                textHTML = 'Current Objective: Obtain a Golden Nut';
+                textHTML = 'Current Objective: Obtain a Golden Nut [Expedition]';
             } else if (persistentValues.tutorialAscend === false) {
-                textHTML = 'Current Objective: Get a lot of Golden Cores';
+                textHTML = 'Current Objective: Get a lot of Golden Cores [Transcend]';
             } else if (persistentValues.finaleBossDefeat === false) {
-                textHTML = 'Current Objective: Stop the Leyline Outbreak';
+                textHTML = 'Current Objective: Stop the Leyline Outbreak [Trees]';
             } else if (persistentValues.allChallenges === false) {
-                textHTML = 'Current Objective: Complete all Challenges';
+                textHTML = 'Current Objective: Complete all Challenges [5 Tiers]';
             } else {
                 textHTML = 'Current Objective: All done!';
             }
@@ -9876,14 +9878,17 @@ function winAdventure() {
         case 'FellBoss':
             adventureHeading.innerText = "You have stopped the rampaging Whopperflower!";
             persistentValuesDefault.fellBossDefeat = true;
+            challengeNotification(({category: 'specific', value: [1, 8]}))
             break;
         case 'Unusual':
             adventureHeading.innerText = "You have survived the Unusual Hilichurl's onslaught!";
             persistentValuesDefault.unusualBossDefeat = true;
+            challengeNotification(({category: 'specific', value: [2, 5]}))
             break;
         case 'Workshop':
             adventureHeading.innerText = "You successfully put down the Shouki no Kami!";
             persistentValuesDefault.workshopBossDefeat = true;
+            challengeNotification(({category: 'specific', value: [3, 6]}))
             break;
         case 'Finale':
             adventureHeading.innerText = "You have stopped the Leyline Outbreak Experiment, once and for all.";
@@ -9891,7 +9896,8 @@ function winAdventure() {
 
             const settingsBottomBadge = document.getElementById('badges-div');
             if (!settingsBottomBadge.querySelector('medal-img-2')) {
-                settingsBottomBadge.append(createMedal(2, choiceBox, mainBody, stopSpawnEvents))
+                settingsBottomBadge.append(createMedal(2, choiceBox, mainBody, stopSpawnEvents));
+                challengeNotification(({category: 'specific', value: [4, 3]}))
             }
             break;
         default:
@@ -10600,9 +10606,12 @@ function challengeNotification(value) {
         });
 
         let getAllAchievements = true;
-        for (let tier in challengeDict) {
+        outerLoop: for (let tier in challengeDict) {
             for (let challenge in challengeDict[tier]) {
-                if (challenge === false) {getAllAchievements = false}
+                if (challengeDict[tier][challenge] === false) {
+                    getAllAchievements = false;
+                    break outerLoop;
+                }
             }
         }
 
@@ -11579,7 +11588,15 @@ function addNutStore() {
             if (minCost <= persistentValues.ascendEle[ele]) {
                 persistentValues.ascendEle[ele] -= minCost;
                 persistentValues.ascendDict[heroName] += 1;
+
                 name.click();
+
+                for (let key in persistentValues.ascendDict) {
+                    if (persistentValues.ascendDict[key] <= 6) {
+                        return;
+                    }
+                }
+                challengeNotification(({category: 'specific', value: [4, 2]}));
             } else {
                 weaselDecoy.load();
                 weaselDecoy.play();
@@ -12681,9 +12698,8 @@ function newPop(type) {
     }    
 }
 
-    if (beta) {
+    if (persistentValues.tutorialAscend) {
         createTreeMenu();
-        activeLeader = "Paimon"
     }
 }
 
@@ -12722,10 +12738,8 @@ if (beta) {
         });
           
         document.dispatchEvent(event);
-        document.getElementById('adv-button-30').click()
-        // document.getElementById('char-selected').click();
-        // document.getElementById('char-select-0').click();
-        // document.getElementById('char-selected').click();
+        document.getElementById('adv-button-1').click();
+        document.getElementById('adventure-button').click();
 
         // BETA FUNCTIONS
         

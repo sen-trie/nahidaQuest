@@ -151,12 +151,17 @@ function inventoryFrame(ele, itemInfo, itemFrameColors) {
 
 // CHOICE BOX (FOR ITEMS, PARENT CONTAINER MUST HAVE 'NOTIF-ITEM' CLASS)
 function choiceBox(mainBody, dialogObg, stopSpawnEvents, yesFunc, noFunc, extraEle, classes) {
-    if (stopSpawnEvents) stopSpawnEvents = false;
+    if (stopSpawnEvents) {stopSpawnEvents = false;}
 
     const choiceEle = document.createElement('div');
+    choiceEle.choiceValue = null;
+    let pickChoice = false;
     if (classes) {
         classes.forEach((item) => {
             choiceEle.classList.add(item);
+            if (item.includes('pick')) {
+                pickChoice = true;
+            }
         })
     }
 
@@ -170,6 +175,27 @@ function choiceBox(mainBody, dialogObg, stopSpawnEvents, yesFunc, noFunc, extraE
     choiceContainer.classList.add('flex-row');
 
     const yesButton = document.createElement('button');
+    yesButton.style.pointerEvents = pickChoice ? 'none' : 'unset';
+    yesButton.style.filter = pickChoice ? 'brightness(0.6)' : 'unset';
+
+    // IF A CHOICE WAS GIVEN TO PICK BETWEEN ITEMS
+    if (pickChoice) {
+        const choiceEleChildren = Array.from(extraEle.children);
+        choiceEleChildren.forEach((item) => {
+            item.addEventListener('click', () => {
+                choiceEle.choiceValue = item.name;
+                yesButton.style.pointerEvents = 'auto';
+                yesButton.style.filter = 'unset';
+
+                choiceEleChildren.forEach((otherItem) => {
+                    otherItem.style.filter = 'brightness(0.2)';
+                })
+                item.style.filter = 'unset';
+            });
+
+            item.style.filter = 'brightness(0.2)';
+        })
+    }
 
     if (dialogObg.yes) {
         yesButton.innerText = dialogObg.yes;
@@ -181,6 +207,7 @@ function choiceBox(mainBody, dialogObg, stopSpawnEvents, yesFunc, noFunc, extraE
         choiceEle.remove();
         if (stopSpawnEvents) stopSpawnEvents = true;
         if (yesFunc) yesFunc();
+        return choiceEle.choiceValue;
     });
 
     const noButton = document.createElement('button');
