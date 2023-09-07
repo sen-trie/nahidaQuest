@@ -655,7 +655,7 @@ demoImg.critInARow = 0;
 
 demoContainer.addEventListener('mousedown', () => {
     if (settingsValues.autoClickBig) {
-        autoClick = setInterval(touchDemo, 440);
+        autoClick = setInterval(touchDemo, 400);
         currentlyAutoClick = true;
     }
 })
@@ -3617,6 +3617,7 @@ function settingsBox(type,eleId) {
             {id: 'clicking-preference',  default: 'combineFloatText', text: "Combine Click Counts"},
             {id: 'wish-preference',  default: 'showWishAnimation', text: "Show Wish Animation"},
             {id: 'auto-preference',  default: 'autoClickBig', text: "Hold to Click 'Big Nahida'"},
+            {id: 'wide-combat-preference',  default: 'wideCombatScreen', text: "Wide Battle Screen"},
         ]
 
         let advancedSettingsMenu;
@@ -3653,10 +3654,14 @@ function settingsBox(type,eleId) {
                         }
                     });
                     break;
-                // case 'auto-preference':
-                // case 'falling-preference':
-                // case 'clicking-preference':
-                // case 'wish-preference':
+                case 'wide-combat-preference':
+                    prefer.addEventListener('change', () => {
+                        const adventureVideo = document.getElementById('adventure-video');
+                        if (adventureVideo) {
+                            adventureVideo.style.width = prefer.checked ? '95%' : '60%';
+                        }
+                        settingsValues.wideCombatScreen = prefer.checked;
+                    });
                 default:
                     prefer.addEventListener('change', () => {
                         settingsValues[advItem.default] = prefer.checked;
@@ -6088,7 +6093,23 @@ function expedInfo(butId) {
             advButton.classList.add("expedition-selected");
         }
         expedRow1.innerHTML = `<p>${expeditionDictInfo[level]["Text"]}</p>`;
-        let textHTML = expeditionDictInfo[level]["Lore"].replace("[currentStats]",`<div style='height:1.4em;gap:2%;white-space: nowrap;' class='flex-row'></div>`);
+
+        let textHTML = expeditionDictInfo[level]["Lore"];
+
+        if (level == 7) {
+            if (saveValues.goldenTutorial === false) {
+                textHTML = 'Current Objective: Obtain a Golden Nut';
+            } else if (persistentValues.tutorialAscend === false) {
+                textHTML = 'Current Objective: Get a lot of Golden Cores';
+            } else if (persistentValues.finaleBossDefeat === false) {
+                textHTML = 'Current Objective: Stop the Leyline Outbreak';
+            } else if (persistentValues.allChallenges === false) {
+                textHTML = 'Current Objective: Complete all Challenges';
+            } else {
+                textHTML = 'Current Objective: All done!';
+            }
+        }
+        
         expedRow2.innerHTML = textHTML;
     } else if (level >= 8 && level <= 11) {
         expedRow1.innerHTML =  `<p>${expeditionDictInfo[level]["Text"]}</p>`;
@@ -6626,6 +6647,7 @@ function drawAdventure(advType, wave) {
     adventureVariables.nahidaMultiplier = nahidaMultiplier;
 
     let adventureVideo = document.getElementById("adventure-video");
+    if (settingsValues.wideCombatScreen) {adventureVideo.style.width = '95%'}
     const adventureFightImg = document.getElementById("adventure-fight").children;
 
     // SCARA MODE
@@ -7437,7 +7459,7 @@ function triggerFight() {
 
     // FOR SCREEN TRAPS
     function floatTimeCheck() {
-        if (beta) {return}
+        if (!beta) {return}
         if (battleVariables.floatTime > 1 && !document.getElementById('warning-quicktime')) {
             battleVariables.floatTime = 0;
             if (adventureVariables.specialty === 'FellBoss') {
@@ -7547,6 +7569,10 @@ function triggerFight() {
                 adventureVideo.style.animation = "none";
                 adventureVideo.style.pointerEvents = 'unset';
                 void adventureVideo.offsetWidth;
+
+                if (energyBall.startingValue > 0 && energyBall.startingValue <= 3) {
+                    energyBall.startingValue++
+                }
 
                 loseHP(energyBall.startingValue, 'normal');
                 sapEnergy(energyBall.startingValue, 25);
@@ -7818,11 +7844,10 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                             if (adventureVariables.specialty === 'Unusual') {
                                 if (battleVariables.bossHealth > UNUSUAL_THRESHOLD) {
                                     battleVariables.quicktime += brightnessIncrement * 0.3;
+                                    battleVariables.decoyTime = canvas.brightness;
                                 } else {
                                     canvas.brightness += (brightnessIncrement * speedUpFactor * 0.2);
                                 }
-
-                                battleVariables.decoyTime = canvas.brightness;
                             } else if (adventureVariables.specialty === 'FellBoss') {
                                 if (battleVariables.bossHealth <= FELLBOSS_THRESHOLD) {
                                     canvas.brightness -= brightnessIncrement * 0.15;
@@ -7925,8 +7950,10 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
                     if (decoy) {
                         canvas.brightness = battleVariables.decoyTime;
+                    } else if (canvas.deflecting) {
+                        canvas.brightness += 0.3 * brightnessIncrement;
                     }
-
+ 
                     if (canvas.brightness > maxBrightness) {
                         if (canvas.classList.contains("attack-ready")) {canvas.classList.remove("attack-ready")}
                         if (canvas.classList.contains("decoy-ready")) {canvas.classList.remove("decoy-ready")}
@@ -7950,35 +7977,37 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                             decoyLoad = true;
                         }
                     } else if (canvas.brightness > 0.8) {
-                        if (battleVariables.decoyTime != null && battleVariables.decoyNumber && battleVariables.decoyTime > 0.8) {
-                            decoyLoad = true;
+                        if (battleVariables.decoyTime != null) {
+                            if (battleVariables.decoyNumber && battleVariables.decoyTime > 0.8) {
+                                decoyLoad = true;
 
-                            if (battleVariables.decoyNumber == mobDiv.decoyNumber) {
-                                if (!mobAtkIndicator.src.includes(`/assets/icon/atkIndicator${adventureScaraText}.webp`)) {
-                                    mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                                if (battleVariables.decoyNumber == mobDiv.decoyNumber) {
+                                    if (!mobAtkIndicator.src.includes(`/assets/icon/atkIndicator${adventureScaraText}.webp`)) {
+                                        mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
+                                        canvas.style.transform = ``;
+                                    }
+    
+                                    if (!canvas.classList.contains("attack-ready")) {
+                                        canvas.classList.add("attack-ready");
+                                    }
+                                } else if (battleVariables.decoyNumber != mobDiv.decoyNumber && !mobAtkIndicator.src.includes(`/assets/icon/fakeAtk.webp`)) {
+                                    mobAtkIndicator.src = `./assets/icon/fakeAtk.webp`;
+                                    canvas.classList.add("decoy-ready");
                                     canvas.style.transform = ``;
                                 }
-
-                                if (!canvas.classList.contains("attack-ready")) {
-                                    canvas.classList.add("attack-ready");
+    
+                                canvas.style.transform = `scale(1.2)`;
+                                canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
+                            } else if (battleVariables.decoyTime < 0.2) {
+                                if (canvas.classList.contains("decoy-ready")) {canvas.classList.remove("decoy-ready")};
+                                if (!mobAtkIndicator.src.includes(`/assets/icon/atkIndicator${adventureScaraText}.webp`)) {
+                                    mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
                                 }
-                            } else if (battleVariables.decoyNumber != mobDiv.decoyNumber && !mobAtkIndicator.src.includes(`/assets/icon/fakeAtk.webp`)) {
-                                mobAtkIndicator.src = `./assets/icon/fakeAtk.webp`;
-                                canvas.classList.add("decoy-ready");
-                                canvas.style.transform = ``;
+                                
+                                canvas.brightness = 0;
+                                canvas.style.transform == ``;
+                                canvas.style.filter = `brightness(${canvas.brightness})`;
                             }
-
-                            canvas.style.transform = `scale(1.2)`;
-                            canvas.style.filter = `brightness(0.99) contrast(1.5) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
-                        } else if (battleVariables.decoyTime != null && battleVariables.decoyTime < 0.2) {
-                            if (canvas.classList.contains("decoy-ready")) {canvas.classList.remove("decoy-ready")};
-                            if (!mobAtkIndicator.src.includes(`/assets/icon/atkIndicator${adventureScaraText}.webp`)) {
-                                mobAtkIndicator.src = `./assets/icon/atkIndicator${adventureScaraText}.webp`;
-                            }
-                            
-                            canvas.brightness = 0;
-                            canvas.style.transform == ``;
-                            canvas.style.filter = `brightness(${canvas.brightness})`;
                         } else {
                             if (canvas.style.transform == ``) {
                                 canvas.style.transform = `scale(1.2)`;
@@ -8072,7 +8101,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
         // CHANGES TO DEFLECT STANCE
         function deflectStance() {
-            if (battleVariables.currentDeflect === null && canvas.eaten !== false && (mobHealth.health / mobHealth.maxHP) > 0.35) {
+            if (battleVariables.currentDeflect === null && canvas.eaten === false && (mobHealth.health / mobHealth.maxHP) > 0.35) {
                 battleVariables.deflectTime = 0;
                 battleVariables.currentDeflect = mobDiv;
                 canvas.deflecting = true;
@@ -8490,6 +8519,7 @@ function bossUpdate(updatedHealth) {
         if (battleVariables.summonTime === null) {
             battleVariables.summonTime = 0;
             battleVariables.decoyTime = null;
+            battleVariables.decoyNumber = null;
             changeAnimation(2);
         }
     } else if (adventureVariables.specialty === 'FellBoss' && updatedHealth <= FELLBOSS_THRESHOLD) {
@@ -8554,7 +8584,7 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
         return;
     }
 
-    let sizeVariable = 12.5;
+    let sizeVariable = 27.5;
     if (battleVariables.floatNumber > 10) {
         return;
     } else if (adventureVariables.specialty === 'Finale' && battleVariables.bossHealth <= FINALE_THRESHOLD_TWO) {
@@ -8564,18 +8594,14 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
     let speedUpFactor = 1;
     const popImage = createDom('img', {
         src: './assets/expedbg/core.webp',
-        class: ['raining-image'],
+        class: ['raining-image', 'combat-pop-up'],
         clicked: false,
         HP: HP,
         rotationNumber: 0,
         style: {
             left: (ignoreSpace ? randomInteger(0, 85) : randomInteger(0, 85, [33, 60])) + '%',
             top: randomInteger(20, 60) + '%',
-            animation: 'scaleIn 1s ease-in-out',
-            filter: "drop-shadow(0 0 0.3em #a5d9e2)",
-            zIndex: 5,
-            width: sizeVariable + '%',
-            pointerEvents: 'none',
+            height: sizeVariable + '%',
         }
     });
 
@@ -8877,8 +8903,10 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                                     setTimeout(() => {
                                         quitQuicktime(advLevel, null, hitCount / 2, videoOverlay, textOverlay);
                                         if (battleVariables.lastStand) {
-                                            const bossEleHealth = adventureVideo.querySelector('.megaboss > .health-bar')
-                                            bossEleHealth.style.width = `0%`;
+                                            const bossEleHealth = adventureVideo.querySelector('.megaboss > .health-bar');
+                                            if (bossEleHealth) {
+                                                bossEleHealth.style.width = `0%`;
+                                            }
                                             bossUpdate(0);
                                         }
                                         adventureGif.style.display = 'block';
@@ -8943,7 +8971,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
             const img = document.createElement("img");
             img.classList.add("raining-image");
 
-            if (type < 65) {
+            if (type < 50) {
                 img.src = "./assets/expedbg/spike.webp";
                 img.classList.add("raining-quicktime");
 
@@ -9742,8 +9770,13 @@ function killMob(mobDiv, mobHealth) {
 
             battleVariables.quicktime = 10000;
             battleVariables.lastStand = true;
+            return;
         }
-        return;
+    }
+
+    const canvas = mobDiv.querySelector('.atk-indicator');
+    if (canvas) {
+        canvas.remove()
     }
 
     persistentValues.enemiesDefeatedValue++
@@ -11219,10 +11252,11 @@ function nutCost(id) {
     let cost;
 
     if (scaleCeiling === 50) {
-        cost = Math.ceil((amount)**2.3) + 1;
+        cost = Math.ceil((amount)**2.6) + 1;
     } else if (scaleCeiling === 25) {
-        cost = Math.ceil((amount)**3) + 1;
+        cost = Math.ceil((amount)**3.3) + 1;
     }
+
     return cost;
 }
 
@@ -11362,7 +11396,7 @@ function addNutStore() {
     const transcendHelpbox = document.createElement("p");
     transcendHelpbox.style.display = "none";
     transcendHelpbox.innerText = `What is the Golden Core amount affected by? \n 
-                                Core Factor (V. High Priority)
+                                Character Ascensions (V. High Priority)
                                 Character Upgrades (V. High Priority)\n------------------------------
                                 Character Levels (High Priority)
                                 Achievements (High Priority)\n------------------------------
@@ -11405,12 +11439,18 @@ function addNutStore() {
 
 
     const trascendButton = document.createElement("button");
-    trascendButton.innerText = "Yes";
+    trascendButton.innerText = "Transcend";
     trascendButton.addEventListener("click",()=>{
         calculateGoldenCore();
         toggleTranscendMenu();
     })
-    nutTranscend.append(titleText,bodyText,bodyTextBottom,transcendStats,trascendButton,transcendHelpbox,transendHelp);
+
+    const transcendBottom = createDom('div', {
+        class: ['flex-row', 'transcend-bottom'],
+        child: [transcendStats, trascendButton]
+    })
+
+    nutTranscend.append(titleText,bodyText,bodyTextBottom,transcendBottom,transcendHelpbox,transendHelp);
 
     nutStoreTable.append(shopHeader,nutTranscend,nutShopDiv,nutAscend,nutButtonContainer,nutStoreCurrency);
     mainTable.appendChild(nutStoreTable);
@@ -11508,7 +11548,7 @@ function addNutStore() {
             ascendCurency.ele = ele;
             let text = `${name}
                         <br> Ascension ${level}
-                        <br>[yellow]Core Factor: ${1 + level * 0.5}</span>
+                        <br>[yellow]Golden Cores: ${1 + level * 0.5}x</span>
                         <br><br> ${100 + level * 10}% >> [green]${100 + (level + 1) * 10}</span>%
                         <br>Base ${name === "Nahida" ? "Nuts per Click" : "NpS"}
                         <br><br> ${100 + level * 2}% >> [red]${100 + (level + 1) * 2}</span>%

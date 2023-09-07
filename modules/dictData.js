@@ -655,7 +655,7 @@ const expeditionDictInfo = {
     4:{Text:"Hunt Boss Enemies | 750 "               ,Lore:"The last confirmed sighting of the Golden Nut was in the posession of some ferocious beasts. Their power may have stemmed from their ancestors consuming these fruits. It may well be the only stone left unturned."},
     5:{Text:"Abyss Diving | 1000 "                   ,Lore:"All trails seem to end here. With nowhere else to go, the Abyss is the sole place left where the fruit is likely to be. Search through the floors with the help of an unlikely ally."},
     6:{Text:"Locked"                                 ,Lore:"Perhaps this path will open after you get stronger..."            },
-    7:{Text:"Select an Expedition"                   ,Lore:"Go on Expeditions to get items to upgrade your characters! <br><br><br><br> [currentStats]"},
+    7:{Text:"Select an Expedition"                   ,Lore:"Go on Expeditions to get items to upgrade your characters!"},
     8:{Text:"Going on Expeditions"                   ,Lore:"Expeditions use Energy which can be obtained by clicking Big Nahida. Beware! You may encounter unexpected obstacles in your journey."},
     9:{Text:"Not enough Energy..."                   ,Lore:"Obtain more by clicking Big Nahida!"            },
     10:{Text:"Visit the Adventurers' Guild"          ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},

@@ -218,6 +218,14 @@ function createDom(elementType, attributes) {
                 } else {
                     element.classList.add(attributes[attr]);
                 }
+            } else if (attr === 'child' || attr === 'children') {
+                if (Array.isArray(attributes[attr])) {
+                    attributes[attr].forEach((child) => {
+                        element.appendChild(child)
+                    })
+                } else {
+                    element.appendChild(attributes[attr])
+                }
             } else if (attr === 'style' && typeof attributes[attr] === 'object') {
                 Object.assign(element.style, attributes[attr]);
             } else if (attr === 'event') {
