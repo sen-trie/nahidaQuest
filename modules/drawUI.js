@@ -331,7 +331,7 @@ const patchDict = {
     //     </indent>
 
     //     <br><br> 2. Bosses <br>
-    //     At certain thresholds, bosses will spawn in the Expedition map. These bosses introduce unique combat mechanics and are needed to be defeated to be progressed.
+    //     At certain thresholds, bosses will spawn in the Expedition map. These bosses introduce unique combat mechanics and are needed to be defeated to be progress.
     //     </indent>
 
     //     <br><br> 3. Ascension <br>
@@ -339,7 +339,7 @@ const patchDict = {
     //     </indent>
 
     //     <br><br> 4. Commisions <br>
-    //     Unlocked at a certain Adventure Rank. By sending out Sumeru characters for some time, commisions provide specific items.
+    //     Unlocked at a certain Adventure Rank. After sending out Sumeru characters for some time, commisions reward items.
     //     </indent>
 
     //     <br><br> 5. Challenges <br>

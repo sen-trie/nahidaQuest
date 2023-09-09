@@ -1003,7 +1003,7 @@ function chooseEvent(type,specialMode) {
             battleshipEvent();
             break;
         default:
-            console.error("Event error: Invalid event");
+            console.error(`Event error: Invalid event ${type}`);
             break;
     }
 }
@@ -5517,7 +5517,8 @@ function createGuild() {
                     const addLoot = (lootArray) => {
                         lootArray.forEach((item) => {
                             inventoryAdd(item);
-                        })
+                        });
+
                         newPop(1);
                         sortList("table2");
                         saveValues.baseCommisions[commId[1].split('-')[1]].progress = true;
@@ -5805,6 +5806,10 @@ function showCommisions() {
         }
     });
 
+    if (commisionList.children.length < 3) {
+        generateCommisions();
+    }
+
     for (let i = 0; i < 3; i++) {
         let commCell = document.getElementById(`commision-cell-${i}`);
         if (saveValues.currentCommisions[i] != undefined) {
@@ -6017,7 +6022,22 @@ function generateCommisions() {
     const baseCommisions = [];
     let textArray = [];
 
+    // CHECKS IF THERE ARE CURRENT COMMISSIONS
+    let currentCommisionsDict = {}
+    if (saveValues.baseCommisions.length > 1) {
+        for (let i = 0; i < saveValues.baseCommisions.length; i++) {
+            if (saveValues.baseCommisions[i].progress === 'ongoing') {
+                currentCommisionsDict[i] = saveValues.baseCommisions[i];
+            }
+        }
+    }
+
     for (let i = 0; i < 10; i++) {
+        if (currentCommisionsDict[i] !== undefined) {
+            baseCommisions.push(saveValues.baseCommisions[i])
+            continue;
+        }
+
         let text = '';
         while (textArray.includes(text) || text === '') {
             text = rollArray(commisionText, 0);
@@ -9893,6 +9913,7 @@ function winAdventure() {
         case 'Finale':
             adventureHeading.innerText = "You have stopped the Leyline Outbreak Experiment, once and for all.";
             persistentValuesDefault.finaleBossDefeat = true;
+            drawAranaraWish();
 
             const settingsBottomBadge = document.getElementById('badges-div');
             if (!settingsBottomBadge.querySelector('medal-img-2')) {
@@ -10187,7 +10208,80 @@ function drawWish() {
     } else if (saveValues["wishUnlocked"] === true) {
         wishUnlock();
         wishMultiplier = saveValues["wishCounterSaved"];
-    } 
+    }
+
+    drawAranaraWish()
+
+    if (persistentValues.finaleBossDefeat) {
+        drawAranaraWish();
+    }
+}
+
+function drawAranaraWish() {
+    const mailImageDiv = document.getElementById('mail-image-div');
+    const wishButton = document.getElementById('wishButton');
+    const wishAranara = wishButton.cloneNode(true);
+
+    const wishAranaraDiv = wishAranara.querySelector('#wishButtonText');
+    wishAranaraDiv.innerText = `Wish for dreams | ${WISHCOST}`
+    let wishButtonPrimo = document.createElement("img");
+    wishButtonPrimo.classList.add("wish-button-primo");
+    wishButtonPrimo.src = "./assets/icon/mailLogo.webp";
+    wishAranaraDiv.append(wishButtonPrimo);
+
+    wishAranara.classList.add('wish-button-aranara');
+    const pickItems = createDom('div', {classList: ['notif-item', 'aranara-grid']});
+    for (let i = 1; i < 9; i++) {
+        const aranaraImg = createDom('img', {
+            src: `./assets/tutorial/aranara-${i}.webp`,
+            classList: ['cover-all']
+        })
+
+        const aranaraText = createDom('p', {
+            classList: ['cover-all', 'flex-row'],
+            style: {
+                color: 'white',
+                fontSize: '1.6em',
+                textShadow: 'var(--text-shadow-075)',
+            }
+        })
+        if (i < 4) {
+            aranaraText.innerText = '?'
+        } else if (i < 7) {
+            aranaraText.innerText = '!'
+        } else {
+            aranaraText.innerText = '¿'
+        }
+
+        const aranaraDiv = createDom('div', {
+            name: i,
+            children: [aranaraImg, aranaraText],
+            style: {
+                backgroundColor: 'var(--pale-green)',
+                borderRadius: '1em',
+                transform: 'scale(0.95)'
+            },
+        });
+
+        pickItems.appendChild(aranaraDiv);
+    }
+
+
+    wishAranara.addEventListener('click', async () => {
+        if (saveValues["mailCore"] >= 1) {
+            mailElement.load();
+            mailElement.play();
+            saveValues["mailCore"] -= 1;
+            choiceBox(mainBody, {text: 'Pick one Aranara Event:'}, stopSpawnEvents, (value) => {clickedEvent(parseInt(value))}, null, pickItems, ['notif-ele', 'pick-items']);
+        } else {
+            weaselDecoy.load();
+            weaselDecoy.play();
+        }
+
+        updateWishDisplay();
+    })
+
+    mailImageDiv.append(wishAranara);
 }
 
 function updateWishDisplay() {

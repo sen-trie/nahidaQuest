@@ -2078,6 +2078,11 @@ table, button, label {
     text-shadow: #73603D 0.15em 0.15em 0.1em;
 }
 
+.wish-button-aranara {
+    top: unset;
+    bottom: 0%;
+}
+
 .wish-button-img {
     object-fit: contain;
 }
@@ -3137,7 +3142,7 @@ table, button, label {
     grid-auto-rows: auto;
 }
 
-.notif-item > div {
+.notif-item > div, .notif-item  > img {
     width: 95%;
     margin-bottom: 2%;
     max-width: unset;
