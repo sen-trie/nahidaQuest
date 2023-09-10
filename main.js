@@ -304,6 +304,11 @@ const moraleLore = [
     "Nahida feels [s]Neutral[/s] [mor]<br><br> No additional buffs to the party, <br> increase morale by eating food.",
     "Nahida feels [s]Sad[/s]... [mor]<br><br> XP gains are reduced by 15%, recover party morale <br> by resting or completing expeditions successfully.",
 ]
+const extraInfoDict = {
+    'Scavenger': '[Scavenger]: The party found additional items!',
+    'Toughness': '[Toughness]: The party endured an attack!',
+    'Loss': '[Attacked]: The party was attacked and lost some items...',
+}
 
 const possibleItems = ['Bow', 'Catalyst', 'Claymore', 'Polearm', 'Sword', 'Artifact', 'Food', 'DendroGeoAnemo', 'ElectroCryo', 'PyroHydro', 'Inazuma', 'Liyue', 'Mondstadt', 'Sumeru'];
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
@@ -457,13 +462,15 @@ function timerEventsLoading() {
 
 // SAVE DATA TIMER
 var savedTimes = 1;
+let saveTimeMin = 180 * savedTimes;
 function timerSave(timerSeconds) {
     // SAVES DATA EVERY 3 MINUTES
-    let saveTimeMin = 180 * savedTimes;
     if (timerSeconds > saveTimeMin) {
-        saveData();        
+        saveData();
         if (!beta) console.log("Saved!");
+
         savedTimes++;
+        saveTimeMin = 180 * savedTimes;
     }
 }
 
@@ -625,6 +632,10 @@ function loadSaveData() {
     const newTime = getTime();
     timePassedSinceLast = newTime - persistentValues.lastRecordedTime;
     persistentValues.lastRecordedTime = newTime;
+    
+    if (persistentValues.tutorialAscend) {
+        createTreeMenu();
+    }
 
     if (beta) {
         if (persistentValues.challengeCheck === undefined) {
@@ -640,7 +651,7 @@ function loadSaveData() {
     specialValuesUpgrade(true);
     if (saveValues.goldenTutorial === true) {
         addNutStore();
-    }    
+    }
 }
 
 // BIG BUTTON FUNCTIONS
@@ -2577,7 +2588,14 @@ function tutorial(idleAmount) {
                 saveValues.realScore += idleAmount;
 
                 // FOR GOLDEN CORE CHALLENGE
-                if (persistentValues.transitionCore != undefined || persistentValues.transitionCore != null) {
+                if (persistentValues.transitionCore !== undefined || persistentValues.transitionCore !== null) {
+                    if (persistentValues.tutorialAscend === false && persistentValues.goldenCore > 1000) {
+                        persistentValues.tutorialAscend = true;
+                        createChallenge();
+                        createAscend();
+                        createTreeMenu();
+                    }
+
                     challengeNotification(({category: 'core', value: persistentValues.transitionCore}));
                     delete persistentValues.transitionCore;
                 }
@@ -5478,6 +5496,9 @@ function createGuild() {
 
                     const lootContainer = createDom('div', { class:['notif-item'] });
                     let lootArray = [];
+                    let markedItems = [];
+                    let extraInfo = [];
+
                     commInfo.possibleItems.forEach((item) => {
                         let itemType;
                         let minLevel = commInfo.rating - 2;
@@ -5500,19 +5521,76 @@ function createGuild() {
 
                         const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
                         const itemId2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                        lootArray.push(itemId1, itemId2);
 
-                        if (randomInteger(1,3) === 1) {
-                            const itemId3 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                            lootArray.push(itemId3);
-                            lootContainer.append(inventoryFrame(document.createElement("div"),Inventory[itemId3],itemFrameColors));
+                        let lossRoll = randomInteger(1, 11);
+                        if (lossRoll < 3) {
+                            if (commInfo.perk === 'Toughness') {
+                                lossRoll = false;
+                                extraInfo.push('Toughness');
+                            } else {
+                                lossRoll = true;
+                                extraInfo.push('Loss');
+                            }
+                        } else {
+                            lossRoll = false;
                         }
 
-                        let rankInventoryRewards1 = inventoryFrame(document.createElement("div"),Inventory[itemId1],itemFrameColors);
-                        let rankInventoryRewards2 = inventoryFrame(document.createElement("div"),Inventory[itemId2],itemFrameColors);
+                        lootArray.push(itemId1);
+                        if (!lossRoll) {
+                            lootArray.push(itemId2);
+                        }
 
-                        lootContainer.append(rankInventoryRewards1, rankInventoryRewards2);
+                        if (randomInteger(1,3) === 1 && !lossRoll) {
+                            const itemId3 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                            lootArray.push(itemId3);
+                        }
+
+                        if (commInfo.perk === 'Scavenger' && randomInteger(1,4) === 1) {
+                            const itemId4 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                            lootArray.push(itemId4);
+                            markedItems.push(itemId4);
+                            
+                            extraInfo.push('Scavenger');
+                        }
                     });
+
+                    const postTreeItems = compareTreeItems(lootArray);
+                    lootArray = [];
+                    for (let key in postTreeItems) {
+                        const itemFrame = inventoryFrame(document.createElement("div"), Inventory[postTreeItems[key][0]],itemFrameColors);
+
+                        if (postTreeItems[key][1]) {
+                            itemFrame.classList.add('extra-item-tree');
+                        } else if (markedItems.includes(postTreeItems[key][0])) {
+                            markedItems.splice(markedItems.indexOf(postTreeItems[key][0]), 1);
+                            itemFrame.classList.add('extra-item');
+                        }
+                        
+                        lootArray.push(postTreeItems[key][0])
+                        lootContainer.append(itemFrame);
+                    }
+
+                    const lootText = createDom('p', {
+                        style: {
+                            color: 'var(--dull-green)',
+                            marginBottom: '1em'
+                        }
+                    });
+
+                    for (let text in extraInfoDict) {
+                        if (extraInfo.includes(text)) {
+                            lootText.innerText = `${extraInfoDict[text]}\n`
+                        }
+                    }
+
+                    const lootDiv = createDom('div', {
+                        class: ['flex-column'],
+                        children: [lootContainer, lootText],
+                        style: {
+                            width: '100%'
+                        }
+                    })
+
 
                     const addLoot = (lootArray) => {
                         lootArray.forEach((item) => {
@@ -5526,7 +5604,7 @@ function createGuild() {
                     }
 
                     persistentValues.commissionsCompletedValue++;
-                    choiceBox(mainBody, {text: 'Loot obtained:'}, stopSpawnEvents, () => {addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
+                    choiceBox(mainBody, {text: 'Loot obtained:'}, stopSpawnEvents, () => {addLoot(lootArray)}, null, lootDiv, ['notif-ele']);
                     document.getElementById('guild-button-comm').click();
                 }
             })
@@ -5985,7 +6063,8 @@ function enterNewComm() {
         const commItems = document.getElementById('select-comm-items').firstChild;
         const pickItems = commItems.cloneNode(true);
         pickItems.id = 'pick-items';
-        saveValues.baseCommisions[id].priority = choiceBox(mainBody, {text: 'Pick one to prioritize:'}, stopSpawnEvents, () => {}, null, pickItems, ['notif-ele', 'pick-items']);
+
+        choiceBox(mainBody, {text: 'Pick one to prioritize:'}, stopSpawnEvents, (value) => {saveValues.baseCommisions[id].priority = value}, null, pickItems, ['notif-ele', 'pick-items']);
     }
 
     heroLeader.style.background = `url(./assets/icon/charPlus.webp) no-repeat center center/contain`;
@@ -6056,6 +6135,7 @@ function generateCommisions() {
             rank: 5 + rating * 2 + extraItem * 2 + randomInteger(0,2),
             duration: (Math.round(randomInteger(2, 6) / 2 * 10) / 10),
             possibleItems: possibleCommItems,
+            priority: null,
             char: [],
             id: `base-${i}`,
             progress: false,
@@ -6100,7 +6180,7 @@ function clearExped() {
     }
 }
 
-const recommendedLevel = [0,1,4,7,10,13,20];
+const recommendedLevel = [0,1,4,7,10,13,16,20];
 function expedInfo(butId) {
     let expedRow1 = document.getElementById("exped-text");
     let expedRow2 = document.getElementById("exped-lore");
@@ -6161,7 +6241,7 @@ function expedInfo(butId) {
             enemyInfo.appendChild(img);
         }
 
-        let lootHTML = `<span style='font-size:1.2em'>Recommended Rank: ${recommendedLevel[level <= 5 && level > 1 ? level : 6]}</span>  <br> Max Potential Rewards: <br> [container]`;
+        let lootHTML = `<span style='font-size:1.2em'>Recommended Rank: ${recommendedLevel[level >= 13 ? (level - 7) : level]}</span>  <br> Max Potential Rewards: <br> [container]`;
         let lootTable = imgKey[id].Loot;
         let invDiv = document.createElement("div");
         invDiv.classList.add("inv-div","flex-row");
@@ -8684,7 +8764,7 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
 
 function quicktimeEvent(waveQuicktime, advLevel, variant) {
     if (!adventureVariables.fightSceneOn) {return}
-    // if (beta) {return}
+    if (beta) {return}
     battleVariables.quicktimeAttack = true;
 
     const quicktimeBar = document.createElement("div");
@@ -9745,7 +9825,6 @@ function attackAll() {
         
         if (mobHealth.health <= 0) {
             killMob(mobDiv, mobHealth);
-            continue;
         }
 
         let newHealth = Math.round(mobHealth.health/mobHealth.maxHP * 10000)/100;
@@ -9781,9 +9860,12 @@ function killMob(mobDiv, mobHealth) {
     } else if (mobDiv.classList.contains('workshop-arm')) {
         battleVariables.artificalSpeedUp += 0.5;
         const bossEle = document.querySelector('.megaboss > .health-bar-scara');
-        bossEle.health -= 0.20 * bossEle.maxHP;
-        bossEle.style.width = `${bossEle.health / bossEle.maxHP * 100}%`
-        bossUpdate(bossEle.health);
+
+        if (bossEle) {
+            bossEle.health -= 0.20 * bossEle.maxHP;
+            bossEle.style.width = `${bossEle.health / bossEle.maxHP * 100}%`
+            bossUpdate(bossEle.health);
+        }
     } else if (mobDiv.classList.contains('megaboss')) {
         if (adventureVariables.specialty === 'Finale') {
             mobHealth.health = 1;
@@ -9798,7 +9880,7 @@ function killMob(mobDiv, mobHealth) {
 
     const canvas = mobDiv.querySelector('.atk-indicator');
     if (canvas) {
-        canvas.remove()
+        canvas.remove();
     }
 
     persistentValues.enemiesDefeatedValue++
@@ -10198,7 +10280,7 @@ function drawWish() {
     let wishButtonImg = document.createElement("img");
     wishButtonImg.src = "./assets/frames/wishButton.webp";
     wishButtonImg.classList += " wish-button-img cover-all";
-    wishButton.append(wishButtonImg,wishButtonText)
+    wishButton.append(wishButtonImg, wishButtonText)
     mailImageDiv.append(wishButton);
 
     if (saveValues["wishCounterSaved"] === wishCounter) {
@@ -10210,8 +10292,6 @@ function drawWish() {
         wishMultiplier = saveValues["wishCounterSaved"];
     }
 
-    drawAranaraWish()
-
     if (persistentValues.finaleBossDefeat) {
         drawAranaraWish();
     }
@@ -10220,6 +10300,12 @@ function drawWish() {
 function drawAranaraWish() {
     const mailImageDiv = document.getElementById('mail-image-div');
     const wishButton = document.getElementById('wishButton');
+
+    const wishButtonText = document.getElementById('wishButtonText');
+    if (wishButtonText.innerText === '???') {
+        return;
+    }
+
     const wishAranara = wishButton.cloneNode(true);
 
     const wishAranaraDiv = wishAranara.querySelector('#wishButtonText');
@@ -10230,11 +10316,14 @@ function drawAranaraWish() {
     wishAranaraDiv.append(wishButtonPrimo);
 
     wishAranara.classList.add('wish-button-aranara');
-    const pickItems = createDom('div', {classList: ['notif-item', 'aranara-grid']});
+    const pickItems = createDom('div', {
+        classList: ['notif-item'],
+    });
+
     for (let i = 1; i < 9; i++) {
         const aranaraImg = createDom('img', {
             src: `./assets/tutorial/aranara-${i}.webp`,
-            classList: ['cover-all']
+            classList: ['cover-all'],
         })
 
         const aranaraText = createDom('p', {
@@ -10257,7 +10346,7 @@ function drawAranaraWish() {
             name: i,
             children: [aranaraImg, aranaraText],
             style: {
-                backgroundColor: 'var(--pale-green)',
+                backgroundColor: 'var(--bright-light-green)',
                 borderRadius: '1em',
                 transform: 'scale(0.95)'
             },
@@ -10442,86 +10531,12 @@ function achievementListload() {
 
     let challengeDiv = document.getElementById('challenge-div');
     challengeDiv.classList.add("flex-column");
-    challengeDiv.innerText = "Development in progress. Stay tuned!";
-    if (!beta) challengeDiv.style.color = 'black'
-    if (beta) {
-        challengeDiv.innerText = '';
+    challengeDiv.innerText = "\nLocked. Come back later!";
+    challengeDiv.id = 'challenge-div';
 
-        let title = new Image();
-        title.src = "./assets/settings/patchNotes.webp";
-        const romanNum = ["I: Initiate's Journey",'II: Skillful Endeavors','III: Challenging Pursuits',"IV: Elites' Quest",'V: Ultimate Challenge'];
-        let challengeDict = persistentValues.challengeCheck;
-
-        for (let i = 0; i < challengeInfo.length; i++) {
-            const tierButton = document.createElement("div");
-            tierButton.classList.add('tier-button');
-            tierButton.id = `tier-button-${i}`;
-            tierButton.activeButtons = [];
-            tierButton.innerText = 'Tier ' + romanNum[i];
-            tierButton.normalText = 'Tier ' + romanNum[i];
-
-            let tierContainer = document.createElement("div");
-            tierContainer.classList.add('tier-container');
-            tierContainer.style.display = "none";
-
-            const claimButton = (posArray) => {
-                if (challengeDict[posArray[0]][posArray[1]] === 'unclaimed') {
-                    const button = document.getElementById(`challenge-button-${posArray[0]}-${posArray[1]}`);
-                    button.innerText = 'Claimed';
-                    button.classList.remove('challenge-button-unclaimed');
-                    button.classList.add('challenge-button-claimed');
-
-                    challengeDict[posArray[0]][posArray[1]] = true;
-
-                    tierButton.activeButtons.splice(tierButton.activeButtons.indexOf(posArray), 1);
-                    tierButton.innerText = tierButton.normalText + (tierButton.activeButtons.length > 0 ? ' (Unclaimed)' : '')
-                }
-            }
-            
-            for (let j = 0; j < challengeInfo[i].length; j++) {
-                let challengeContainer = document.createElement("div");
-                challengeContainer.classList.add('flex-row')
-
-                const challengeInfoDiv = document.createElement("div");
-                let challengeTitle = document.createElement("p");
-                challengeTitle.id = `challenge-title-${i}-${j}`
-                challengeTitle.innerText = challengeDict[i][j] === false ? '???' : `${challengeInfo[i][j]['title']}`;
-                let challengeDesc = document.createElement("p");
-
-                challengeDesc.innerText = `${challengeInfo[i][j].desc}`;
-                const challengeButton = createDom('button', { id: `challenge-button-${i}-${j}`, class:['challenge-button']});
-                
-                if (challengeDict[i][j] === false) {
-                    challengeButton.innerText = 'Locked';
-                } else if (challengeDict[i][j] === 'unclaimed') {
-                    tierButton.activeButtons.push([i, j]);
-                    tierButton.innerText = tierButton.normalText + (tierButton.activeButtons.length > 0 ? ' (Unclaimed)' : '')
-
-                    challengeButton.innerText = 'Unclaimed';
-                    challengeButton.classList.add('challenge-button-unclaimed');
-                    challengeButton.addEventListener('click', () => {
-                        claimButton([i, j]);
-                    }, {once: true});
-                } else {
-                    challengeButton.innerText = 'Claimed';
-                    challengeButton.classList.add('challenge-button-claimed');
-                }
-
-                challengeInfoDiv.append(challengeTitle, challengeDesc)
-                challengeContainer.append(challengeButton, challengeInfoDiv);
-                tierContainer.append(challengeContainer)
-            }
-
-            tierButton.addEventListener("click", () => {
-                if (tierContainer.style.display === 'none') {
-                    tierContainer.style.display = 'block';
-                } else {
-                    tierContainer.style.display = 'none';
-                }
-            })
-
-            challengeDiv.append(tierButton,tierContainer)
-        }
+    if (!persistentValues.tutorialAscend) challengeDiv.style.color = 'black'
+    if (persistentValues.tutorialAscend) {
+        createChallenge();
     }
     
     function changeAchTab(ele) {
@@ -10545,6 +10560,88 @@ function achievementListload() {
     tabDiv.active = achievementTab;
     tabDiv.append(achievementTab,challengeTab)
     table5Image.append(tabDiv);
+}
+
+function createChallenge() {
+    if (document.getElementById('tier-button-0')) {return}
+
+    const challengeDiv = document.getElementById('challenge-div');
+    challengeDiv.innerText = '';
+    challengeDiv.style.color = '#D9BD85';
+
+    const romanNum = ["I: Initiate's Journey",'II: Skillful Endeavors','III: Challenging Pursuits',"IV: Elites' Quest",'V: Ultimate Challenge'];
+    let challengeDict = persistentValues.challengeCheck;
+
+    for (let i = 0; i < challengeInfo.length; i++) {
+        const tierButton = document.createElement("div");
+        tierButton.classList.add('tier-button');
+        tierButton.id = `tier-button-${i}`;
+        tierButton.activeButtons = [];
+        tierButton.innerText = 'Tier ' + romanNum[i];
+        tierButton.normalText = 'Tier ' + romanNum[i];
+
+        let tierContainer = document.createElement("div");
+        tierContainer.classList.add('tier-container');
+        tierContainer.style.display = "none";
+
+        const claimButton = (posArray) => {
+            if (challengeDict[posArray[0]][posArray[1]] === 'unclaimed') {
+                const button = document.getElementById(`challenge-button-${posArray[0]}-${posArray[1]}`);
+                button.innerText = 'Claimed';
+                button.classList.remove('challenge-button-unclaimed');
+                button.classList.add('challenge-button-claimed');
+
+                challengeDict[posArray[0]][posArray[1]] = true;
+
+                tierButton.activeButtons.splice(tierButton.activeButtons.indexOf(posArray), 1);
+                tierButton.innerText = tierButton.normalText + (tierButton.activeButtons.length > 0 ? ' (Unclaimed)' : '')
+            }
+        }
+        
+        for (let j = 0; j < challengeInfo[i].length; j++) {
+            let challengeContainer = document.createElement("div");
+            challengeContainer.classList.add('flex-row')
+
+            const challengeInfoDiv = document.createElement("div");
+            let challengeTitle = document.createElement("p");
+            challengeTitle.id = `challenge-title-${i}-${j}`
+            challengeTitle.innerText = challengeDict[i][j] === false ? '???' : `${challengeInfo[i][j]['title']}`;
+            let challengeDesc = document.createElement("p");
+
+            challengeDesc.innerText = `${challengeInfo[i][j].desc}`;
+            const challengeButton = createDom('button', { id: `challenge-button-${i}-${j}`, class:['challenge-button']});
+            
+            if (challengeDict[i][j] === false) {
+                challengeButton.innerText = 'Locked';
+            } else if (challengeDict[i][j] === 'unclaimed') {
+                tierButton.activeButtons.push([i, j]);
+                tierButton.innerText = tierButton.normalText + (tierButton.activeButtons.length > 0 ? ' (Unclaimed)' : '')
+
+                challengeButton.innerText = 'Unclaimed';
+                challengeButton.classList.add('challenge-button-unclaimed');
+                challengeButton.addEventListener('click', () => {
+                    claimButton([i, j]);
+                }, {once: true});
+            } else {
+                challengeButton.innerText = 'Claimed';
+                challengeButton.classList.add('challenge-button-claimed');
+            }
+
+            challengeInfoDiv.append(challengeTitle, challengeDesc)
+            challengeContainer.append(challengeButton, challengeInfoDiv);
+            tierContainer.append(challengeContainer)
+        }
+
+        tierButton.addEventListener("click", () => {
+            if (tierContainer.style.display === 'none') {
+                tierContainer.style.display = 'block';
+            } else {
+                tierContainer.style.display = 'none';
+            }
+        })
+
+        challengeDiv.append(tierButton,tierContainer)
+    }
 }
 
 
@@ -10658,7 +10755,7 @@ function checkAchievement() {
 }
 
 function challengeNotification(value) {
-    if (!beta) {return}
+    if (!persistentValues.tutorialAscend) {return}
     const res = challengeCheck('check', persistentValues.challengeCheck, null, value);
     const challengeDict = persistentValues.challengeCheck;
 
@@ -10742,7 +10839,6 @@ function challengePop(res) {
     }, 4000)
 
     challengePopUp.addEventListener('click', () => {
-        document.getElementById('tab-4').click();
         challengePopUp.remove();
         clearTimeout(challengePopUp.activeTime);
     });
@@ -11395,11 +11491,11 @@ function addNutStore() {
     nutTranscend.style.display = "none";
     const nutAscend = document.createElement("div");
     nutAscend.id = "nut-shop-ascend";
-    nutAscend.innerText = "??? \n\n Development in progress. \n Stay tuned!";
+    nutAscend.innerText = "\nLocked. Come back later!";
     
     let nutButtonContainer = document.createElement("div");
     nutButtonContainer.classList.add('flex-row','nut-button-container');
-    const buttonText = ["Blessings","Transcend","???"];
+    const buttonText = ["Blessings","Transcend","Ascend"];
     const nutArray = [nutShopDiv,nutTranscend,nutAscend];
     for (let i = 0; i < 3; i++) {
         let nutButton = document.createElement("button");
@@ -11559,146 +11655,156 @@ function addNutStore() {
     mainTable.appendChild(nutStoreTable);
     calculateGoldenCore();
 
-    if (beta) {
-        let ascend = document.getElementById('nut-shop-ascend');
-        ascend.innerText = '';
-        let ascendText = document.createElement('p');
-        ascendText.innerText = "Mark characters for Ascension";
+    if (persistentValues.tutorialAscend) {
+        createAscend();
+    }
+}
 
-        let elementContainer = document.createElement('div');
-        elementContainer.classList.add('flex-row');
-        elementContainer.activeElement;
+function createAscend() {
+    if (document.getElementById('ascend-text')) {return};
+
+    let ascend = document.getElementById('nut-shop-ascend');
+    ascend.innerText = '';
+
+    let ascendText = document.createElement('p');
+    ascendText.innerText = "Mark characters for Ascension";
+    ascendText.id = 'ascend-text'
+
+    let elementContainer = document.createElement('div');
+    elementContainer.classList.add('flex-row');
+    elementContainer.activeElement;
+    elementContainer.activeChar = null;
+    
+    const boxBeta = ["Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
+    for (let i = 0; i < boxBeta.length; i++) {
+        let text = document.createElement('img');
+        text.classList.add("nut-element",'dim-filter');
+        text.ele = boxBeta[i];
+        text.src = `./assets/tooltips/elements/nut-${boxBeta[i]}.webp`;
+        elementContainer.appendChild(text);
+
+        text.addEventListener('click',()=>{
+            if (elementContainer.activeElement) {
+                if (!elementContainer.activeElement.classList.contains('dim-filter')) elementContainer.activeElement.classList.add('dim-filter');
+            }
+
+            if (text.classList.contains('dim-filter')) text.classList.remove('dim-filter');
+            elementContainer.activeElement = text;
+            showChar(boxBeta[i]);
+        })
+    }
+
+    let characterContainer = document.createElement('div');
+    characterContainer.classList.add('flex-row');
+    let characterImgContainer = document.createElement('div');
+    characterImgContainer.classList.add('nut-char-container');
+    let ascendInfo = document.createElement('div');
+    ascendInfo.classList.add('ascend-info');
+    let ascendTooltips = document.createElement('p');
+
+    let ascendCurency = document.createElement('div');
+    ascendCurency.classList.add('flex-row');
+    ascendCurency.ele = null;
+    ascendCurency.addEventListener('click', (() => {ascendChar(elementContainer.activeChar)}))
+    let ascendNumber = document.createElement('p');
+    let ascendEle = new Image();
+    ascendEle.src = '';
+    ascendEle.classList.add('icon','primogem');
+
+    ascendCurency.append(ascendNumber,ascendEle);
+    ascendInfo.append(ascendTooltips,ascendCurency)
+    characterContainer.append(characterImgContainer,ascendInfo);
+    ascend.append(ascendText,elementContainer,characterContainer);
+
+    function showChar(ele) {
+        ascendTooltips.innerText = '';
+        ascendNumber.innerText = `${persistentValues.ascendEle[ele]}`;
+        ascendEle.src = `./assets/tooltips/inventory/solid${ele}.webp`;
+
+        characterImgContainer.style.opacity = 0;
         elementContainer.activeChar = null;
-        const boxBeta = ["Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
-        for (let i = 0; i < boxBeta.length; i++) {
-            let text = document.createElement('img');
-            text.classList.add("nut-element",'dim-filter');
-            text.ele = boxBeta[i];
-            text.src = `./assets/tooltips/elements/nut-${boxBeta[i]}.webp`;
-            elementContainer.appendChild(text);
-
-            text.addEventListener('click',()=>{
-                if (elementContainer.activeElement) {
-                    if (!elementContainer.activeElement.classList.contains('dim-filter')) elementContainer.activeElement.classList.add('dim-filter');
-                }
-
-                if (text.classList.contains('dim-filter')) text.classList.remove('dim-filter');
-                elementContainer.activeElement = text;
-                showChar(boxBeta[i]);
-            })
+        while (characterImgContainer.firstChild) {
+            characterImgContainer.removeChild(characterImgContainer.firstChild);
         }
 
-        let characterContainer = document.createElement('div');
-        characterContainer.classList.add('flex-row');
-        let characterImgContainer = document.createElement('div');
-        characterImgContainer.classList.add('nut-char-container');
-        let ascendInfo = document.createElement('div');
-        ascendInfo.classList.add('ascend-info');
-        let ascendTooltips = document.createElement('p');
+        const charArray = [];
+        for (let key in upgradeDict) {
+            if (upgradeDict[key].Purchased > 0 && (upgradeInfo[key].Ele === ele || upgradeInfo[key].Ele === "Any")) {
+                charArray.push(upgradeInfo[key].Name);
+                let charImg = new Image();
+                charImg.classList.add('dim-filter');
+                charImg.src = `./assets/tooltips/hero/${upgradeInfo[key].Name}.webp`;
+                charImg.addEventListener('click',()=>{
+                    let level = persistentValues.ascendDict[upgradeInfo[key].Name];
+                    ascendNumber.innerText = `${persistentValues.ascendEle[ele]} / ${(2**level)}`;
+                    charImg.classList.remove('dim-filter');
+                    ascendTooltipsInfo(upgradeInfo[key].Name, level, ele);
 
-        let ascendCurency = document.createElement('div');
-        ascendCurency.classList.add('flex-row');
-        ascendCurency.ele = null;
-        ascendCurency.addEventListener('click', (() => {ascendChar(elementContainer.activeChar)}))
-        let ascendNumber = document.createElement('p');
-        let ascendEle = new Image();
-        ascendEle.src = '';
-        ascendEle.classList.add('icon','primogem');
-
-        ascendCurency.append(ascendNumber,ascendEle);
-        ascendInfo.append(ascendTooltips,ascendCurency)
-        characterContainer.append(characterImgContainer,ascendInfo);
-        ascend.append(ascendText,elementContainer,characterContainer);
-
-        function showChar(ele) {
-            ascendTooltips.innerText = '';
-            ascendNumber.innerText = `${persistentValues.ascendEle[ele]}`;
-            ascendEle.src = `./assets/tooltips/inventory/solid${ele}.webp`;
-
-            characterImgContainer.style.opacity = 0;
-            elementContainer.activeChar = null;
-            while (characterImgContainer.firstChild) {
-                characterImgContainer.removeChild(characterImgContainer.firstChild);
-            }
-
-            const charArray = [];
-            for (let key in upgradeDict) {
-                if (upgradeDict[key].Purchased > 0 && (upgradeInfo[key].Ele === ele || upgradeInfo[key].Ele === "Any")) {
-                    charArray.push(upgradeInfo[key].Name);
-                    let charImg = new Image();
-                    charImg.classList.add('dim-filter');
-                    charImg.src = `./assets/tooltips/hero/${upgradeInfo[key].Name}.webp`;
-                    charImg.addEventListener('click',()=>{
-                        let level = persistentValues.ascendDict[upgradeInfo[key].Name];
-                        ascendNumber.innerText = `${persistentValues.ascendEle[ele]} / ${(2**level)}`;
-                        charImg.classList.remove('dim-filter');
-                        ascendTooltipsInfo(upgradeInfo[key].Name, level, ele);
-
-                        if (elementContainer.activeChar) {
-                            if (elementContainer.activeChar != charImg) elementContainer.activeChar.classList.add('dim-filter');
-                        }
-
-                        elementContainer.activeChar = charImg;
-                    })
-
-                    characterImgContainer.append(charImg);
-                }
-            }
-            setTimeout(()=>{characterImgContainer.style.opacity = 1;},100)
-        }
-
-        function ascendTooltipsInfo(name, level, ele) {
-            ascendCurency.ele = ele;
-            let text = `${name}
-                        <br> Ascension ${level}
-                        <br>[yellow]Golden Cores: ${1 + level * 0.5}x</span>
-                        <br><br> ${100 + level * 10}% >> [green]${100 + (level + 1) * 10}</span>%
-                        <br>Base ${name === "Nahida" ? "Nuts per Click" : "NpS"}
-                        <br><br> ${100 + level * 2}% >> [red]${100 + (level + 1) * 2}</span>%
-                        <br>Base Cost
-                        `;
-
-            text = textReplacer({
-                '[yellow]':`<span style='color:#b39300'>`,
-                '[green]':`<span style='color:#417428'>`,
-                '[red]':`<span style='color:#9E372D'>`,
-            },text)
-            ascendTooltips.innerHTML = text;
-        }
-
-        const ascendChar = (name) => {
-            // NAME IS THE IMAGE ELEMENT
-            if (name === null) {return}
-            const heroName = name.src.split('/').slice(-1)[0].replace('.webp','').replace('%20',' ');
-            const ele = ascendCurency.ele;
-
-            if (persistentValues.ascendDict[heroName] == undefined) {
-                persistentValues.ascendDict[heroName] = 0;
-            }
-
-            const level = persistentValues.ascendDict[heroName];
-            const minCost = 2**level;
-
-            if (minCost <= persistentValues.ascendEle[ele]) {
-                persistentValues.ascendEle[ele] -= minCost;
-                persistentValues.ascendDict[heroName] += 1;
-
-                name.click();
-
-                for (let key in persistentValues.ascendDict) {
-                    if (persistentValues.ascendDict[key] <= 6) {
-                        return;
+                    if (elementContainer.activeChar) {
+                        if (elementContainer.activeChar != charImg) elementContainer.activeChar.classList.add('dim-filter');
                     }
-                }
-                challengeNotification(({category: 'specific', value: [4, 2]}));
-            } else {
-                weaselDecoy.load();
-                weaselDecoy.play();
-                return;
+
+                    elementContainer.activeChar = charImg;
+                })
+
+                characterImgContainer.append(charImg);
             }
+        }
+        setTimeout(()=>{characterImgContainer.style.opacity = 1;},100)
+    }
+
+    function ascendTooltipsInfo(name, level, ele) {
+        ascendCurency.ele = ele;
+        let text = `${name}
+                    <br> Ascension ${level}
+                    <br>[yellow]Golden Cores: ${1 + level * 0.5}x</span>
+                    <br><br> ${100 + level * 10}% >> [green]${100 + (level + 1) * 10}</span>%
+                    <br>Base ${name === "Nahida" ? "Nuts per Click" : "NpS"}
+                    <br><br> ${100 + level * 2}% >> [red]${100 + (level + 1) * 2}</span>%
+                    <br>Base Cost
+                    `;
+
+        text = textReplacer({
+            '[yellow]':`<span style='color:#b39300'>`,
+            '[green]':`<span style='color:#417428'>`,
+            '[red]':`<span style='color:#9E372D'>`,
+        },text)
+        ascendTooltips.innerHTML = text;
+    }
+
+    const ascendChar = (name) => {
+        // NAME IS THE IMAGE ELEMENT
+        if (name === null) {return}
+        const heroName = name.src.split('/').slice(-1)[0].replace('.webp','').replace('%20',' ');
+        const ele = ascendCurency.ele;
+
+        if (persistentValues.ascendDict[heroName] == undefined) {
+            persistentValues.ascendDict[heroName] = 0;
+        }
+
+        const level = persistentValues.ascendDict[heroName];
+        const minCost = 2**level;
+
+        if (minCost <= persistentValues.ascendEle[ele]) {
+            persistentValues.ascendEle[ele] -= minCost;
+            persistentValues.ascendDict[heroName] += 1;
+
+            name.click();
+
+            for (let key in persistentValues.ascendDict) {
+                if (persistentValues.ascendDict[key] <= 6) {
+                    return;
+                }
+            }
+            challengeNotification(({category: 'specific', value: [4, 2]}));
+        } else {
+            weaselDecoy.load();
+            weaselDecoy.play();
+            return;
         }
     }
 }
+
 
 function calculateGoldenCore(type) {
     let calculateNuts = 0;
@@ -11905,14 +12011,16 @@ function updateCoreCounter() {
 //-------------------------------------------- TREES ------------------------------------------------------//
 function createTreeMenu() {
     const mainTable = rightDiv.childNodes[1];
+    if (document.getElementById('tree-table')) {return}
+
     const treeTable = document.createElement('div');
     treeTable.classList.add('flex-column','table-without-tooltip');
     treeTable.id = 'tree-table';
-    treeTable.style.display = "flex";
+    treeTable.style.display = "none";
     const treeSide = document.createElement('div');
     treeSide.classList.add('adventure-map');
     treeSide.id = 'tree-side';
-    treeSide.style.display = "flex";
+    treeSide.style.display = "none";
 
     const sandImg = new Image();
     sandImg.src = './assets/tree/sand.webp';
@@ -12009,9 +12117,10 @@ function createTreeMenu() {
 
     let nutStoreButton = document.createElement("button");
     nutStoreButton.classList.add("tree-access","nut-store-access");
-    nutStoreButton.addEventListener("click",()=>{
+    nutStoreButton.addEventListener("click", () => {
         universalStyleCheck(treeTable,"display","none","flex",true);
         universalStyleCheck(treeSide,"display","none","flex",true);
+        universalStyleCheck(document.getElementById('nut-store-table'),"display","flex","none",true);
     })
     leftDiv.appendChild(nutStoreButton);
 
@@ -12107,26 +12216,29 @@ function offerBox(treeTable, optionsContainer) {
 
 function offerItemFunction() {
     const treeMissingText = document.getElementById('tree-missing-text');
-    treeMissingText.innerText = ''
+    let treeInnerValue = '';
 
     if (saveValues.treeObj.offer[0] > persistentValues.goldenCore) {
-        treeMissingText.innerText += `You lack Golden Cores (${persistentValues.goldenCore}/${saveValues.treeObj.offer[0]})\n`;
+        treeInnerValue += `You lack Golden Cores (${persistentValues.goldenCore}/${saveValues.treeObj.offer[0]})\n`;
     }
     
     for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
         if (!InventoryMap.get(saveValues.treeObj.offer[i]) || InventoryMap.get(saveValues.treeObj.offer[i]) === 0) {
-            treeMissingText.innerText += `Missing item ${i}: '${Inventory[saveValues.treeObj.offer[i]].Name}'\n`;
+            treeInnerValue += `Missing item ${i}: '${Inventory[saveValues.treeObj.offer[i]].Name}'\n`;
         }
     }
 
-    if (treeMissingText.innerText !== '') {return}
-    saveValues.treeObj.offer[0] -= persistentValues.goldenCore;
-    for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
-        let itemNumber = saveValues.treeObj.offer[i];
-        let newAmount = InventoryMap.get(itemNumber) - 1;
-
-        InventoryMap.set(itemNumber, newAmount);
-        if (newAmount === 0) {(document.getElementById(itemNumber)).remove();}
+    treeMissingText.innerText = treeInnerValue;
+    if (!beta) {
+        if (treeInnerValue !== '') {return}
+        saveValues.treeObj.offer[0] -= persistentValues.goldenCore;
+        for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
+            let itemNumber = saveValues.treeObj.offer[i];
+            let newAmount = InventoryMap.get(itemNumber) - 1;
+    
+            InventoryMap.set(itemNumber, newAmount);
+            if (newAmount === 0) {(document.getElementById(itemNumber)).remove();}
+        }
     }
 
     saveValues.treeObj.offerAmount++;
@@ -12482,6 +12594,57 @@ function growTree(type, amount) {
     }
 }
 
+function getTreeItems() {
+    if (saveValues.treeObj.offer.length > 0) {
+        const treeOffer = [...saveValues.treeObj.offer];
+        treeOffer.shift();
+
+        let itemTypeDict = {}
+        treeOffer.forEach((item) => {
+            itemTypeDict[item] = {
+                Type: Inventory[item].Type,
+                Star: Inventory[item].Star,
+            }
+        });
+        
+        return itemTypeDict;
+    } else {
+        return null;
+    }
+}
+
+function compareTreeItems(itemArray) {
+    const treeOffer = getTreeItems();
+    if (treeOffer === null) {return};
+
+    const itemArrayCopy = [...itemArray];
+    let replacedTreeItems = {};
+
+    const sameTypeAndStar = (itemType, itemStar, i, itemArrayCopyItem) => {
+        for (let itemKey in treeOffer) {
+            if (treeOffer[itemKey].Type === itemType && treeOffer[itemKey].Star === itemStar) {
+                let replaceWithTreeItem = randomIntegerWrapper(35 + luckRate * 1.5, 100);
+                if (replaceWithTreeItem || parseInt(itemKey) === parseInt(itemArrayCopyItem)) {
+                    replacedTreeItems[i] = [parseInt(itemKey), true];
+                    return;
+                }
+            }
+        }
+
+        replacedTreeItems[i] = [itemArrayCopyItem, false];
+        return
+    }
+
+    for (let i = 0; i < itemArrayCopy.length; i++) {
+        let itemType = Inventory[itemArrayCopy[i]].Type;
+        let itemStar = Inventory[itemArrayCopy[i]].Star;
+
+        sameTypeAndStar(itemType, itemStar, i, itemArrayCopy[i]);
+    }
+
+    return replacedTreeItems;
+}
+
 function leylineCreate(treeTable, optionsContainer) {
     const leylineDisplay = createDom('div', {class:['flex-column'], id:'leyline-container', style:{ display:'none' }});
 
@@ -12792,9 +12955,6 @@ function newPop(type) {
     }    
 }
 
-    if (persistentValues.tutorialAscend) {
-        createTreeMenu();
-    }
 }
 
 // FOR TESTING PURPOSES ONLY

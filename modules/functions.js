@@ -63,14 +63,9 @@ function randomInteger(min, max, bounds) {
 }
 
 // WRAPS RNG TO BOOLEAN
-function randomIntegerWrapper(compare, max) {
+function randomIntegerWrapper(compare, max = 100) {
     // IF FIRST NUMBER LESS THAN MAX/100, RETURN TRUE
-    let randInt;
-    if (max > 0) {
-        randInt = randomInteger(1, max+1);
-    } else {
-        randInt = randomInteger(1, 101);
-    }
+    let randInt = randomInteger(1, max+1);
     
     if (randInt <= compare) {
         return true;
@@ -239,14 +234,14 @@ const challengeThreshold = {
     },
     'harvest': {
         1:[0,9],
-        25:[2,8],
-        40:[3,7],
-        100:[4,8]
+        15:[2,8],
+        30:[3,7],
+        60:[4,8]
     },
     'offer': {
-        20:[2,9],
-        35:[3,8],
-        50:[4,9]
+        15:[2,9],
+        25:[3,8],
+        35:[4,9]
     },
     'combo': {
         20:[1,6],
@@ -323,16 +318,22 @@ const rollDict = [
      ['artifact', 'weapon', 'food', 'gem'],
 ]
 
-// ROLLS FOR TREE ITEMS, BOUNDARIES EVERY FIVE LEVELS
+// ROLLS FOR TREE ITEMS, BOUNDARIES EVERY 3.5 LEVELS
 function createTreeItems(saveValues, randomInteger, inventoryDraw, rollArray) {
     const offer = saveValues.treeObj.offerAmount;
-    const boundary = Math.floor(saveValues.treeObj.offerAmount / 5);
+    let boundary = Math.floor(saveValues.treeObj.offerAmount / 3.5);
     const maxItem = Math.min(Math.max(boundary, 2), 5);
 
-    const goldCore = randomInteger(85, 116) / 100 * (offer + 5) * 5**(boundary / 2) ;
+    const goldCore = (randomInteger(85, 116) / 100) * (4.5 * offer) * 2.5**(boundary / 2);
     let itemArray = [Math.round(goldCore)];
 
     for (let i = 0; i < maxItem; i++) {
+        if (boundary < 3) {
+            boundary += 1;
+        } else if (boundary >= 5) {
+            boundary = (randomInteger(1, 3) === 1 ? 5 : 4)
+        }
+
         let itemRoll = rollDict[Math.min(boundary, 4)];
         itemArray.push(inventoryDraw(rollArray(itemRoll, 0), Math.min(Math.max(boundary - 1, 1), 5), Math.min(boundary + 1, 5), "shop"));
     }

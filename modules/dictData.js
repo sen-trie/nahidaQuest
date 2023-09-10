@@ -1097,8 +1097,8 @@ const challengeInfo = [
         {'title': "Chaos from the East", 'desc': 'Defeat the Menace of the Mansion'},  // CH DONE
         {'title': 'Golden Ticket', 'desc': 'Catch 16 Weasel Thieves'},  // CH DONE
         {'title': 'Sumeru Sales Specialist', 'desc': 'Reveal a field of Whopperflowers in under 15 seconds'}, // CH DONE
-        {'title': 'Blessed Hamada', 'desc': "Harvest 25 fully-grown trees"},  // CH DONE
-        {'title': 'Sylvan Samaritan', 'desc': "Offer 20 times to a tree in a single cycle"}, // CH DONE
+        {'title': 'Blessed Hamada', 'desc': "Harvest 15 fully-grown trees"},  // CH DONE
+        {'title': 'Sylvan Samaritan', 'desc': "Offer 15 times to a tree in a single cycle"}, // CH DONE
     ], [
         {'title': 'Weight of A Thousand Sumpter Beasts', 'desc': 'Transcend for over 35,000 Cores'}, // CH DONE
         {'title': 'At the Click of a Button', 'desc': 'Click for over one billion Nuts'},  // CH DONE
@@ -1107,8 +1107,8 @@ const challengeInfo = [
         {'title': 'Greater Vision', 'desc': 'Get a Crit on Big Nahida seven times in a row'},  // CH DONE
         {'title': 'The Bestest Travel Companion', 'desc': 'Reach maximum affection with 10 characters'}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},   // CH DONE
-        {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 40 fully-grown trees'},  // CH DONE
-        {'title': 'Rooted Philanthropist', 'desc': 'Offer 35 times to a tree in a single cycle'}, // CH DONE
+        {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 30 fully-grown trees'},  // CH DONE
+        {'title': 'Rooted Philanthropist', 'desc': 'Offer 25 times to a tree in a single cycle'}, // CH DONE
         {'title': 'Pretty Patty', 'desc': "Use 1 of each type of Magic Seed when planting a tree"}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ], [
         {'title': 'Live and Let Live', 'desc': 'Transcend for over 100,000 Cores'}, // CH DONE
@@ -1119,8 +1119,8 @@ const challengeInfo = [
         {'title': 'Rule of Nines', 'desc': "Within nine selections, reveal all of Arakarman's keys"},  // CH DONE
         {'title': 'Strikeout!', 'desc': "Finish Arakarman's game with less than three of your key tiles being revealed"}, // CH DONE
         {'title': 'THE GNOSIS IS REAL', 'desc': 'Catch 12 Golden Weasel Thieves'},  // CH DONE
-        {'title': '#teamtrees', 'desc': 'Harvest 100 fully-grown trees'},  // CH DONE
-        {'title': 'Aranara Thanks You', 'desc': 'Offer 50 times to a tree in a single cycle'}, // CH DONE
+        {'title': '#teamtrees', 'desc': 'Harvest 60 fully-grown trees'},  // CH DONE
+        {'title': 'Aranara Thanks You', 'desc': 'Offer 35 times to a tree in a single cycle'}, // CH DONE
     ]
 ]
 

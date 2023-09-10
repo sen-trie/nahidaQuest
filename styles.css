@@ -2464,6 +2464,7 @@ table, button, label {
     display: block;
     position: relative;
     width: 100%;
+    margin-bottom: 0.25em;
 }
 
 .prefer-container > input:checked ~ .checked-prefer {
@@ -2481,7 +2482,7 @@ table, button, label {
 }
 
 .prefer-container > .checked-prefer:after {
-    left: 50%;
+    left: calc(50% - 0.075em);
     top: 0.1em;
     width: 0.2em;
     height: 0.45em;
@@ -3140,6 +3141,7 @@ table, button, label {
     display: grid;
     grid-template-columns: repeat(5, 20%);
     grid-auto-rows: auto;
+    overflow: hidden;
 }
 
 .notif-item > div, .notif-item  > img {

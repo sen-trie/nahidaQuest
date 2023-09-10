@@ -1419,6 +1419,26 @@
     filter: drop-shadow(0 0 0.2em black);
 }
 
+.extra-item-tree::after, .extra-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4;
+    filter: drop-shadow(0 0 0.05em black);
+}
+
+.extra-item::after {
+    background: url(./assets/expedbg/bonus.webp) no-repeat center center/contain;
+}
+
+.extra-item-tree::after {
+    width: 70%;
+    aspect-ratio: 1.6;
+    background: url(./assets/expedbg/tree-item.webp) no-repeat center center/contain;
+}
+
 #adventure-encounter > button {
     width: 100%;
     height: 10%;

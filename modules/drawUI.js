@@ -320,14 +320,14 @@ const patchDict = {
 
     // <line>Bugs Fixed 🐞: </line><br><br>
     //     </indent>
-    //     1. Flashing image<br>
+    //     1. Flashing white box<br>
     //     Sometimes when switching tabs, there is a brief instance where a box is visible which quickly disappears.
     //     </indent>
 
     // <br><br><line>New Additions 💡: </line><br><br>
     //     </indent>
     //     1. Trees! (Extended endgame) <br>
-    //     After getting enough Golden Cores, you can grow Trees for the purposes of stopping an outbreak. Yes, the game now has an end objective as well!
+    //     After getting enough Golden Cores, you can grow Trees for the purposes of stopping an outbreak. Also, the game now has an end objective as well!
     //     </indent>
 
     //     <br><br> 2. Bosses <br>
@@ -339,7 +339,7 @@ const patchDict = {
     //     </indent>
 
     //     <br><br> 4. Commisions <br>
-    //     Unlocked at a certain Adventure Rank. After sending out Sumeru characters for some time, commisions reward items.
+    //     Unlocked at a certain Adventure Rank. By sending out Sumeru characters for some time, commisions reward items.
     //     </indent>
 
     //     <br><br> 5. Challenges <br>

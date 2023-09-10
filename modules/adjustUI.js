@@ -206,6 +206,7 @@ function choiceBox(mainBody, dialogObg, stopSpawnEvents, yesFunc, noFunc, extraE
     yesButton.addEventListener('click',() => {
         choiceEle.remove();
         if (stopSpawnEvents) stopSpawnEvents = true;
+        // YES FUNCTION IS ASYNC
         if (yesFunc) yesFunc(choiceEle.choiceValue === null ? null : choiceEle.choiceValue);
         return choiceEle.choiceValue;
     });
