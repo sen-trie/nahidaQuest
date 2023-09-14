@@ -2731,8 +2731,7 @@ table, button, label {
     height: auto;
     width: 33%;
     aspect-ratio: 4.61;
-    color: white;
-    text-shadow: var(--text-shadow-075);
+    color: #f0e5da;
 }
 
 #tree-side {

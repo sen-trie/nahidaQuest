@@ -12651,7 +12651,7 @@ function updateSeedContainer(updateValueOnly) {
             });
 
             backButton.addEventListener('click', () => {
-                updateTreeValues(false);
+                updateTreeValues(true);
                 seedContainer.remove();
                 treeOptions(false, document.getElementById('options-container'));
             })
@@ -13152,9 +13152,9 @@ function newPop(type) {
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
-if (localStorage.getItem('beta') == 'true') {
-    beta = true;
-}
+// if (localStorage.getItem('beta') == 'true') {
+//     beta = true;
+// }
 
 if (beta) {
     let link = document.createElement("link");
