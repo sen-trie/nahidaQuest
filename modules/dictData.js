@@ -879,14 +879,19 @@ const InventoryDefault = {
         3089: {Name:"Sweet Shrimp Sushi",           File:"sweetShrimpSushi",            Lore:"Decent food that [s]temporarily[/s] boosts NpS by [s][fBuff][/s]. \n\n Also, boosts [s]morale[/s] for expeditions.",        Star:1 ,      Type:"Food"                           },
         3090: {Name:"Teyvat Fried Egg",             File:"teyvatFriedEgg",              Lore:"Decent food that [s]temporarily[/s] boosts NpS by [s][fBuff][/s]. \n\n Also, boosts [s]morale[/s] for expeditions.",        Star:1 ,      Type:"Food"                             },
     // LEVEL ITEMS + SPECIAL ITEMS
-        4001: {File:"heroEXP",                 Name:"Hero's Wit",                        Lore:"Comprehensive papers that provide many [s]discounted levels[/s].\n \n (Discounted Levels return 50% of the Nuts used.)",               Star:4,  Type:"Level",   BuffLvlLow:4,BuffLvlHigh:6, },
-        4002: {File:"adventureEXP",            Name:"Adventurer's Experience",           Lore:"Elaborate papers that provide some [s]discounted levels[/s].\n \n (Discounted Levels return 50% of the Nuts used.)",                   Star:3,  Type:"Level",   BuffLvlLow:2,BuffLvlHigh:4,  },
-        4003: {File:"wandererEXP",             Name:"Wanderer's Advice",                 Lore:"A detailed paper that provides a few [s]discounted levels[/s].\n \n (Discounted Levels return 50% of the Nuts used.)",                 Star:2,  Type:"Level",   BuffLvlLow:1,BuffLvlHigh:2,  },
-        4010: {File:"mailLarge",               Name:"Enchanted Courier",                 Lore:"A magical letter that automatically seeks its recipient, no matter where they may be. \n\n (Adds a letter for wishing new characters.)",                                     Star:5,  Type:"Level" },
+        4001: {File:"heroEXP",                 Name:"Hero's Wit",                        Lore:"Comprehensive papers that provide many [s]discounted character levels[/s].\n \n (When purchasing characters, discounted levels return 50% of the Nuts used.)",               Star:4,  Type:"Level",   BuffLvlLow:4,BuffLvlHigh:6, },
+        4002: {File:"adventureEXP",            Name:"Adventurer's Experience",           Lore:"Elaborate papers that provide some [s]discounted character levels[/s].\n \n (When purchasing characters, discounted levels return 50% of the Nuts used.)",                   Star:3,  Type:"Level",   BuffLvlLow:2,BuffLvlHigh:4,  },
+        4003: {File:"wandererEXP",             Name:"Wanderer's Advice",                 Lore:"A detailed paper that provides a few [s]discounted character levels[/s].\n \n (When purchasing characters, discounted levels return 50% of the Nuts used.)",                 Star:2,  Type:"Level",   BuffLvlLow:1,BuffLvlHigh:2,  },
+        4010: {File:"mailLarge",               Name:"Enchanted Courier",                 Lore:"A magical letter that automatically seeks its recipient, no matter where they may be. \n\n (Adds a letter for wishing new characters.)", Star:5,  Type:"Level" },
         4011: {File:"sanctifyingOil",           Name:"Sanctifying Oil",                   Lore:"A rejuvenating potion that restores a [s]modest[/s] amount of [s]Energy[/s].",                                             Star:3,  Type:"Food"  },
         4012: {File:"sanctifyingUnction",       Name:"Sanctifying Unction",               Lore:"A rejuvenating concotion that restores a [s]considerable[/s] amount of [s]Energy[/s].",                                    Star:4,  Type:"Food"  },
         4013: {File:"sanctifyingEssence",       Name:"Sanctifying Essence",               Lore:"A rejuvenating elixir that restores a [s]substantial[/s] amount of [s]Energy[/s].",                                        Star:5,  Type:"Food"  },
-    // SHOP ITEMS vvv
+        4014: {File:"talentBundle1",            Name:"Talent Share Bundle",                 Lore:"The Guild will routinely share a few books on virtue, for virtue builds character.", Star:4,  Type:"Level" },
+        4015: {File:"talentBundle2",            Name:"Talent Mega Bundle",                 Lore:"The Guild will routinely share many books on virtue, for virtue builds character.", Star:5,  Type:"Level" },
+        4016: {File:"gemBundle1",               Name:"Gem Share Bundle",                 Lore:"A bundle of gems that the Guild routinely gives out, and which contain elemental power.", Star:4,  Type:"Level" },
+        4017: {File:"gemBundle2",               Name:"Gem Mega Bundle",                 Lore:"A big bundle of gems that the Guild routinely gives out, and which contain elemental power.", Star:5,  Type:"Level" },
+        4018: {File:"letterBundle",            Name:"Supply Share Bundle",                 Lore:"Supplies the Guild has prepared for those who harbor great ambition. They will certainly come into play.", Star:5,  Type:"Level" },
+        // SHOP ITEMS vvv
         5001: {File:"any5",          Name:"Brilliant Diamond Gemstone",                  Lore:"A shiny spectral gem that increases power of [s]all[/s] characters by [s][eBuff][/s] of their [s]base power[/s]. \n\n (Only characters currently purchased count.)",                       Star:6,       Type:"Gemstone",           element:"Any"          },
         5002: {File:"any4",          Name:"Brilliant Diamond Chunck",                    Lore:"A shiny mystical gem that increases power of [s]all[/s] characters by [s][4eBuff][/s] of their [s]base power[/s]. \n\n (Only characters currently purchased count.)",                        Star:5,        Type:"Gemstone",         element:"Any"          },
         5003: {File:"pyro5",         Name:"Agnidus Agate Gemstone",                      Lore:"A spectral red gem that increases power of [s]Pyro[/s] characters by [s][eBuff][/s] of their [s]base power[/s]. \n\n (Only characters currently purchased count.)",                        Star:5,        Type:"Gemstone",            element:"Pyro"         },
@@ -1067,7 +1072,7 @@ const eventText = {
 
 const challengeInfo = [
     [
-        {'title': 'Corps of Thousand', 'desc': 'Transcend for over 1,000 Cores'}, // CH DONE
+        {'title': 'Corps of Thousand', 'desc': 'Transcend for over 5,000 Cores'}, // CH DONE
         {'title': 'Breaking Impact', 'desc': 'Possess 1000 primogems in one run'}, // CH DONE
         {'title': 'Fungi On Seeds', 'desc': 'Reach 2,500 energy in one run'}, // CH DONE
         {'title': 'Rear of the Library', 'desc': 'Possess 50 discounted levels'}, // CH DONE
@@ -1078,7 +1083,7 @@ const challengeInfo = [
         {'title': 'The Commissioner', 'desc': 'Catch 13 Weasel Thieves'},  // CH DONE
         {'title': 'Green Bond', 'desc': 'Harvest a fully-grown tree for the first time'}, // CH DONE
     ], [
-        {'title': 'Reborn from Another', 'desc': 'Transcend for over 5,000 Cores'}, // CH DONE
+        {'title': 'Reborn from Another', 'desc': 'Transcend for over 25,000 Cores'}, // CH DONE
         {'title': 'Big Spender', 'desc': "Clear out Dori's regular shop"}, // CH DONE
         {'title': 'Speed Mail', 'desc': 'Wish for 10 characters in one run'}, // CH DONE
         {'title': 'Onyx Rank', 'desc': 'Reach level 20 Adventure Rank'}, // CH DONE
@@ -1089,7 +1094,7 @@ const challengeInfo = [
         {'title': 'Subject Three', 'desc': 'Defeat the Overgrown Whopperflower'}, // CH DONE
         {'title': 'A Nut From Space', 'desc': 'Catch 60 raining nuts'}, // CH DONE
     ],[
-        {'title': 'The Myth of Vahumana', 'desc': 'Transcend for over 15,000 Cores'}, // CH DONE
+        {'title': 'The Myth of Vahumana', 'desc': 'Transcend for over 50,000 Cores'}, // CH DONE
         {'title': 'Let Sleeping Travellers Rest', 'desc': 'Reach 1 billion NpS with the Traveller'}, // CH DONE
         {'title': 'Business as Usual', 'desc': 'Reach 7,500 energy in one run'}, // CH DONE
         {'title': 'Gem Empire', 'desc': 'Possess 4000 primogems in one run'}, // CH DONE
@@ -1100,7 +1105,7 @@ const challengeInfo = [
         {'title': 'Blessed Hamada', 'desc': "Harvest 15 fully-grown trees"},  // CH DONE
         {'title': 'Sylvan Samaritan', 'desc': "Offer 15 times to a tree in a single cycle"}, // CH DONE
     ], [
-        {'title': 'Weight of A Thousand Sumpter Beasts', 'desc': 'Transcend for over 35,000 Cores'}, // CH DONE
+        {'title': 'Weight of A Thousand Sumpter Beasts', 'desc': 'Transcend for over 100,000 Cores'}, // CH DONE
         {'title': 'At the Click of a Button', 'desc': 'Click for over one billion Nuts'},  // CH DONE
         {'title': 'House of Haravatat', 'desc': 'Possess 200 discounted levels'}, // CH DONE
         {'title': 'Song of Songs', 'desc': "Reach 15,000 energy in one run"}, // CH DONE
@@ -1111,7 +1116,7 @@ const challengeInfo = [
         {'title': 'Rooted Philanthropist', 'desc': 'Offer 25 times to a tree in a single cycle'}, // CH DONE
         {'title': 'Pretty Patty', 'desc': "Use 1 of each type of Magic Seed when planting a tree"}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ], [
-        {'title': 'Live and Let Live', 'desc': 'Transcend for over 100,000 Cores'}, // CH DONE
+        {'title': 'Live and Let Live', 'desc': 'Transcend for over 250,000 Cores'}, // CH DONE
         {'title': 'Perspective of A God', 'desc': 'Level up Nahida 700 times'},  // CH DONE
         {'title': 'Team All-Stars', 'desc': 'Ascend every character seven times'},  // CH DONE
         {'title': 'Apex of Akasha', 'desc': 'Stop the evil responsible for the Leyline Outbreak'},// CH DONE

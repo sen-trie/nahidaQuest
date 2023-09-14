@@ -100,7 +100,7 @@ function multiplierButtonAdjust(multiplierButton, int) {
 
     let multiplierButtonImg = document.createElement("img");
     multiplierButtonImg.src = "./assets/settings/multi-"+int+".webp";
-    multiplierButtonImg.classList.add("multiplier-button-img");
+    multiplierButtonImg.classList.add("multiplier-button-img", "clickable");
     multiplierButton.appendChild(multiplierButtonImg)
     return multiplierButton;
 }
@@ -308,7 +308,7 @@ function createMedal(num, choiceBox, mainBody, stopSpawnEvents) {
     })
 
     const nutMedal = createDom('img', {
-        class: ['medal-img'],
+        class: ['medal-img', 'clickable'],
         id: `medal-img-${num}`,
         src: `./assets/frames/medal-${num}.webp`,
         event: ['click', () => {

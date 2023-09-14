@@ -297,12 +297,12 @@ input:checked + .slider {
 .medal-img {
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 0 0.15em black);
+    filter: drop-shadow(0 0 0.05em black);
     transition: 0.3s ease;
 }
 
-.medal-img:hover, .settings-bottom-buttons > button:hover {
-    transform: scale(1.1);
+.medal-img:hover {
+    filter: drop-shadow(0 0 0.2em black);
 }
 
 .settings-bottom-buttons {
@@ -316,5 +316,4 @@ input:checked + .slider {
     padding: 0.5rem 0;
     background-color: var(--pale-medium-green);
     border: var(--dark-green) 0.15em solid;
-    transition: 0.3s ease;
 }

@@ -3105,7 +3105,7 @@ function settings() {
     })
 
     const patchNotesButton = document.createElement("button");
-    patchNotesButton.classList.add("patch-button");
+    patchNotesButton.classList.add("patch-button", 'clickable');
     
     if (beta) {
         const patchNotesDiv = document.getElementById('patch-container');
@@ -3162,7 +3162,7 @@ function settings() {
         }
 
         const settingsBottomButtons = createDom('div', {
-            class: ['flex-column', 'settings-bottom-buttons']
+            class: ['flex-column', 'settings-bottom-buttons', 'clickable']
         })
 
         const settingsCredit = createDom('button', {
@@ -4688,6 +4688,7 @@ function itemUse(itemUniqueId) {
         refresh();
     } else if (itemID === 4010) {
         saveValues["mailCore"]++;
+        newPop(3)
     // ELEMENT GEMS
     } else if (itemID === 5001 || itemID === 5002){
         let power = 1;
@@ -11236,24 +11237,10 @@ function setShop(type) {
     } else if (type === "add") {
         storeInventory.storedTime = getTime();
         let i = 10;
+        let upgradedShop = persistentValues.tutorialAscend === true;
+
         while (i--) {
-            let inventoryNumber;
-            if (i >= 7 && i <= 9) {
-                inventoryNumber = inventoryDraw("talent", 2,4, "shop");
-            } else if (i === 6) {
-                inventoryNumber = randomInteger(4011,4014);
-            } else if (i === 5) {
-                if (saveValues["wishUnlocked"] === true) {
-                    inventoryNumber = 4010;
-                } else {
-                    inventoryNumber = inventoryDraw("gem", 4,6, "shop");
-                }
-            } else if (i >= 2 && i <= 4) {
-                inventoryNumber = inventoryDraw("gem", 4,6, "shop");
-            } else {
-                inventoryNumber = inventoryDraw("weapon", 5,6, "shop")
-            }
-            createShopItems(shopDiv, i, inventoryNumber);
+            createShopItems(shopDiv, i, drawShopItem(i, upgradedShop));
         }
         saveData(true);
     }
@@ -11315,32 +11302,51 @@ function refreshShop(minutesPassed) {
     let shopContainer = document.getElementById("shop-container");
     shopContainer.innerHTML = "";
     let i = 10;
+    let upgradedShop = persistentValues.tutorialAscend === true;
+
     while (i--) {
-        let inventoryNumber;
-        if (i >= 7 && i <= 9) {
-            inventoryNumber = inventoryDraw("talent", 2, 4, "shop");
-        } else if (i === 6) {
-            inventoryNumber = randomInteger(4011,4014);
-        } else if (i === 5) {
-            if (saveValues["wishUnlocked"] === true) {
-                inventoryNumber = 4010;
-            } else {
-                inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
-            }
-        } else if (i >= 3 && i <= 4) {
-            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
-        } else if (i === 2) {
-            // if (saveValues.treeObj && saveValues.treeObj.offer) {
-            //     inventoryNumber = rollArray(saveValues.treeObj.offer, 1);
-            // } else {
-                inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
-            // }
-        } else {
-            inventoryNumber = inventoryDraw("weapon", 5, 6, "shop");
-        }
-        createShopItems(shopContainer, i, inventoryNumber);
+        createShopItems(shopContainer, i, drawShopItem(i, upgradedShop));
     }
     storeInventory.storedTime = getTime();
+}
+
+function drawShopItem(i, upgradedShop = false) {
+    let inventoryNumber;
+    if (i >= 7 && i <= 9) {
+        if (upgradedShop) {
+            if (i === 9) {
+                inventoryNumber = 4015;
+            } else {
+                inventoryNumber = 4014;
+            }
+        } else {
+            inventoryNumber = inventoryDraw("talent", 2, 4, "shop");
+        }
+    } else if (i === 6) {
+        inventoryNumber = randomInteger(4011,4014);
+    } else if (i === 5) {
+        if (upgradedShop) {
+            inventoryNumber = 4018;
+        } else if (saveValues["wishUnlocked"] === true) {
+            inventoryNumber = 4010;
+        } else {
+            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
+        }
+    } else if (i >= 3 && i <= 4) {
+        if (upgradedShop) {
+            if (i === 3) {
+                inventoryNumber = 4017;
+            } else {
+                inventoryNumber = 4016;
+            }
+        } else {
+            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
+        }
+    } else {
+        inventoryNumber = inventoryDraw("weapon", 5, 6, "shop");
+    }
+
+    return inventoryNumber;
 }
 
 function confirmPurchase(shopCost,id) {
@@ -11764,7 +11770,7 @@ function createAscend() {
 
     function showChar(ele) {
         ascendTooltips.innerText = '';
-        ascendNumber.innerText = `${persistentValues.ascendEle[ele]}`;
+        ascendNumber.innerText = `${abbrNum(persistentValues.ascendEle[ele], 2, true)}`;
         ascendEle.src = `./assets/tooltips/inventory/solid${ele}.webp`;
 
         characterImgContainer.style.opacity = 0;
@@ -11782,7 +11788,7 @@ function createAscend() {
                 charImg.src = `./assets/tooltips/hero/${upgradeInfo[key].Name}.webp`;
                 charImg.addEventListener('click',()=>{
                     let level = persistentValues.ascendDict[upgradeInfo[key].Name];
-                    ascendNumber.innerText = `${persistentValues.ascendEle[ele]} / ${(2**level)}`;
+                    ascendNumber.innerText = `${abbrNum(persistentValues.ascendEle[ele], 2, true)}/${(abbrNum(2**level, 2, true))}`;
                     charImg.classList.remove('dim-filter');
                     ascendTooltipsInfo(upgradeInfo[key].Name, level, ele);
 
@@ -12195,6 +12201,9 @@ function populateTreeItems() {
     const treeItem = document.getElementById('tree-offer-items');
 
     const coreContainer = document.createElement('div');
+    coreContainer.id = 'core-container';
+    coreContainer.currentItem = null;
+
     const coreContainerImg = new Image();
     coreContainerImg.src = "./assets/icon/core.webp"
     const coreContainerText = document.createElement('p');
@@ -12206,9 +12215,38 @@ function populateTreeItems() {
     coreContainer.append(coreContainerImg, coreContainerText);
     treeItem.append(coreContainer, plusImage);
 
+    const itemOfferArray = [];
     for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
         let itemContainer = document.createElement('div');
         itemContainer = inventoryFrame(itemContainer, Inventory[saveValues.treeObj.offer[i]], itemFrameColors);
+        itemContainer.classList.add('dim-filter', 'clickable');
+
+        let itemAmount = createDom('p', {
+            classList: ['item-frame-text'],
+            innerText: (!InventoryMap.get(saveValues.treeObj.offer[i]) || InventoryMap.get(saveValues.treeObj.offer[i]) === 0) ? 0 : InventoryMap.get(saveValues.treeObj.offer[i]),
+        });
+
+        itemContainer.addEventListener('click', () => {
+            coreContainer.currentItem = saveValues.treeObj.offer[i];
+
+            if (!InventoryMap.get(coreContainer.currentItem) || InventoryMap.get(coreContainer.currentItem) === 0) {
+                itemAmount.innerText = 0;
+            } else {
+                itemAmount.innerText = InventoryMap.get(saveValues.treeObj.offer[i]);
+            }
+
+
+            itemOfferArray.forEach((item) => {
+                if (itemContainer === item) {
+                    item.classList.remove('dim-filter');
+                } else {
+                    item.classList.add('dim-filter');
+                }
+            });
+        })
+        
+        itemContainer.append(itemAmount)
+        itemOfferArray.push(itemContainer)
         treeItem.append(itemContainer);
     }
 }
@@ -12261,16 +12299,19 @@ function offerBox(treeTable, optionsContainer) {
 }
 
 function offerItemFunction() {
+    const coreContainer = document.getElementById('core-container');
     const treeMissingText = document.getElementById('tree-missing-text');
     let treeInnerValue = '';
 
     if (saveValues.treeObj.offer[0] > persistentValues.goldenCore) {
         treeInnerValue += `You lack Golden Cores (${persistentValues.goldenCore}/${saveValues.treeObj.offer[0]})\n`;
     }
-    
-    for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
-        if (!InventoryMap.get(saveValues.treeObj.offer[i]) || InventoryMap.get(saveValues.treeObj.offer[i]) === 0) {
-            treeInnerValue += `Missing item ${i}: '${Inventory[saveValues.treeObj.offer[i]].Name}'\n`;
+
+    if (coreContainer.currentItem === null) {
+        treeInnerValue += `Pick an item to sacrifice\n`;
+    } else {
+        if (!InventoryMap.get(coreContainer.currentItem) || InventoryMap.get(coreContainer.currentItem) === 0) {
+            treeInnerValue += `Missing item: '${Inventory[coreContainer.currentItem].Name}'\n`;
         }
     }
 

@@ -1,5 +1,5 @@
 // ABBREVIATES NUMBERS TO SHORTER FORM
-function abbrNum(number,digits,short) {
+function abbrNum(number, digits = 1, short = false) {
     let decPlaces = Math.pow(10, 3);
     let abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion",
                   " Undecill", " Duodecill", " Tredecill", " Quattuordecill", " Quindecill", " Sexdecill"," Septendecill", " Octodecill",
@@ -209,11 +209,11 @@ function universalStyleCheck(ele, styleCheck, paramOn, paramOff, forced) {
 // MINUS ONE, FOLLOWS ARRAY INDEX
 const challengeThreshold = {
     'core':{
-        1000:[0,0],
-        5000:[1,0],
-        15000:[2,0],
-        35000:[3,0],
-        100000:[4,0],
+        5000:[0,0],
+        25000:[1,0],
+        50000:[2,0],
+        100000:[3,0],
+        250000:[4,0],
     },
     'primogem':{
         1000:[0,1],
