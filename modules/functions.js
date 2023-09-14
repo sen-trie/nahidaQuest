@@ -320,11 +320,11 @@ const rollDict = [
 
 // ROLLS FOR TREE ITEMS, BOUNDARIES EVERY 3.5 LEVELS
 function createTreeItems(saveValues, randomInteger, inventoryDraw, rollArray) {
-    const offer = saveValues.treeObj.offerAmount;
+    const offer = saveValues.treeObj.offerAmount + 1;
     let boundary = Math.floor(saveValues.treeObj.offerAmount / 3.5);
     const maxItem = Math.min(Math.max(boundary, 2), 5);
 
-    const goldCore = (randomInteger(85, 116) / 100) * (4.5 * offer) * 2.5**(boundary / 2);
+    const goldCore = Math.log(saveValues.treeObj.energy / 100) /  Math.log(1.1) * 2 * (randomInteger(85, 116) / 100) * (1 + 0.25 * offer) * 1.4**(boundary / 2);
     let itemArray = [Math.round(goldCore)];
 
     for (let i = 0; i < maxItem; i++) {

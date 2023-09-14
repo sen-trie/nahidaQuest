@@ -1137,7 +1137,7 @@ const commisionInfo = {
     'Lightweight':'[Lightweight]\nCommision time is reduced by 15%',
     'Scavenger':'[Scavenger]\nHas a chance for additional rewards',
     'Proficient':'[Proficient]\nCan prioritize certain items',
-    'Keen-Eyed':'[Keen-Eyed]\nItems can be one tier higher',
+    'Keen-Eyed':'[Keen-Eyed]\nItems can be some tiers higher',
     'Alhaitham':{
         charLikes:[],
         charDislikes:['Kaveh'],

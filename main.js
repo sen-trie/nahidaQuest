@@ -308,6 +308,8 @@ const extraInfoDict = {
     'Scavenger': '[Scavenger]: The party found additional items!',
     'Toughness': '[Toughness]: The party endured an attack!',
     'Loss': '[Attacked]: The party was attacked and lost some items...',
+    'Keen-Eyed': '[Keen-Eyed]: One of your items have been upgraded!',
+    'Proficient': '[Proficient] Certain items have been prioritized!'
 }
 
 const possibleItems = ['Bow', 'Catalyst', 'Claymore', 'Polearm', 'Sword', 'Artifact', 'Food', 'DendroGeoAnemo', 'ElectroCryo', 'PyroHydro', 'Inazuma', 'Liyue', 'Mondstadt', 'Sumeru'];
@@ -5499,6 +5501,11 @@ function createGuild() {
                     let markedItems = [];
                     let extraInfo = [];
 
+                    let upgradeItem = null;
+                    if (commInfo.perk === 'Keen-Eyed') {
+                        upgradeItem = rollArray(commInfo.possibleItems);
+                    }
+
                     commInfo.possibleItems.forEach((item) => {
                         let itemType;
                         let minLevel = commInfo.rating - 2;
@@ -5519,10 +5526,10 @@ function createGuild() {
                             itemType = item;
                         }
 
-                        const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                        let itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
                         const itemId2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
 
-                        let lossRoll = randomInteger(1, 11);
+                        let lossRoll = randomInteger(1, 15);
                         if (lossRoll < 3) {
                             if (commInfo.perk === 'Toughness') {
                                 lossRoll = false;
@@ -5535,21 +5542,47 @@ function createGuild() {
                             lossRoll = false;
                         }
 
-                        lootArray.push(itemId1);
+                        
                         if (!lossRoll) {
                             lootArray.push(itemId2);
                         }
 
+                        // LOSS ROLL
                         if (randomInteger(1,3) === 1 && !lossRoll) {
                             const itemId3 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
                             lootArray.push(itemId3);
                         }
 
+                        // KEEN-EYED PERK
+                        if (upgradeItem !== null && upgradeItem == item) {
+                            itemId1 = specialType ? inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'shop');
+                            markedItems.push(itemId1);
+                            extraInfo.push('Keen-Eyed');
+                        // 
+                        }
+                        
+                        if (commInfo.perk === 'Proficient') {
+                            if (commInfo.priority === item) {
+                                const itemIdPro1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                                const itemIdPro2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                                
+                                markedItems.push(itemIdPro1);
+                                markedItems.push(itemIdPro2);
+                                lootArray.push(itemIdPro1);
+                                lootArray.push(itemIdPro2);
+                                lootArray.push(itemId1);
+
+                                extraInfo.push('Proficient');
+                            }
+                        } else {
+                            lootArray.push(itemId1);
+                        }
+
+                        // SCAVENGER PERK
                         if (commInfo.perk === 'Scavenger' && randomInteger(1,4) === 1) {
                             const itemId4 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
                             lootArray.push(itemId4);
                             markedItems.push(itemId4);
-                            
                             extraInfo.push('Scavenger');
                         }
                     });
@@ -6059,7 +6092,7 @@ function enterNewComm() {
     saveValues.commisionDict[heroSupp.hero].currentComm = commId;
     saveValues.currentCommisions.push(commId);
 
-    if (commisionInfo[heroLeader.hero].perk === 'Proficient') {
+    if (commisionInfo[heroLeader.hero].perk === 'C') {
         const commItems = document.getElementById('select-comm-items').firstChild;
         const pickItems = commItems.cloneNode(true);
         pickItems.id = 'pick-items';
@@ -6359,6 +6392,7 @@ function createExpMap() {
     notifSelect.charArray = [];
     notifSelect.questArray = [];
     notifSelect.commArray = [];
+    notifSelect.bossArray = [];
     notifSelect.classList.add("flex-column","notif-select");
     
     let charMenu = document.createElement("div");
@@ -6440,9 +6474,7 @@ function createExpMap() {
     }
 
     for (let key in imgKey) {
-        if (!beta) {
-            if (key > 17) {break}
-        }
+        if (key > 17) {break}
         spawnKey(advImage,imgKey,key);
     }
 
@@ -6605,7 +6637,11 @@ function notifPop(type,icon,count) {
             notifImg.src = "./assets/icon/comm.webp";
             notifText.innerText = "Commision \n Complete";
             notifSelect.questArray.push(count);
-        } 
+        } else if (icon === "boss") {
+            notifImg.src = "./assets/expedbg/adv-14.webp";
+            notifText.innerText = "Boss \n Battle";
+            notifSelect.questArray.push(count);
+        }
 
         if (guildButton.includes(icon)) {
             notifDiv.addEventListener('click',()=>{
@@ -6892,7 +6928,6 @@ function spawnKey(advImage,imgKey,key,worldQuest) {
     return advImage;
 }
 
-
 function spawnWorldQuest() {
     if (document.getElementById("world-quest-button")) {
         document.getElementById("world-quest-button").remove();
@@ -6903,6 +6938,17 @@ function spawnWorldQuest() {
     let mapImage = document.getElementById('sumeru-map');
     spawnKey(mapImage, imgKey, rollQuest, true);
     notifPop("add", "quest", 1);
+}
+
+function spawnBossQuest(num) {
+    const val = 26 + num;
+    if (document.getElementById(`adv-button-${val}`)) {
+        return;
+    } else {
+        let mapImage = document.getElementById('sumeru-map');
+        spawnKey(mapImage, imgKey, val, true);
+        notifPop("add", "boss", val);
+    }
 }
 
 function drawWorldQuest(advType) {
@@ -12053,7 +12099,7 @@ function createTreeMenu() {
     treeHealthContainer.append(treeNut,treeHealthText);
 
     if (timePassedSinceLast) {
-        saveValues.treeObj.growth += (saveValues.treeObj.growthRate / 100) / 4 * timePassedSinceLast
+        saveValues.treeObj.growth += (saveValues.treeObj.growthRate / 100) / 2 * timePassedSinceLast;
     }
 
     const treeProgressBar = createProgressBar(
@@ -12182,8 +12228,8 @@ function offerBox(treeTable, optionsContainer) {
     nutStoreCurrency.appendChild(nutStoreCurrencyImage);
 
     const treeOfferText = document.createElement('p');
-    treeOfferText.innerHTML = `The Tree wishes for these items...
-                               <br><br><span style='font-size: 0.6em'>Note: Anytime you receive new loot, you have a higher chance to <br>get these items, which can increased through
+    treeOfferText.innerHTML = `The Tree wishes for power, pick one item to sacrifice.
+                               <br><span style='font-size: 0.6em'>Note: Anytime you receive new loot, you have a higher chance to <br>get these items, which can increased through
                                 your <span style='color:#b39300'>luck rate</span>!</span>
                                 `;
     const treeItem = document.createElement('div');
@@ -12243,7 +12289,8 @@ function offerItemFunction() {
 
     saveValues.treeObj.offerAmount++;
     challengeNotification(({category: 'offer', value: saveValues.treeObj.offerAmount}))
-    saveValues.treeObj.energy = Math.round(saveValues.treeObj.energy * randomInteger(115, 125) / 100);
+    saveValues.treeObj.energy = Math.round(saveValues.treeObj.energy * randomInteger(105, 110) / 100);
+
     const palmText = document.getElementById('palm-text');
     palmText.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
     rollTreeItems();
@@ -12340,6 +12387,24 @@ function destroyTree() {
     setTimeout(()=>{
         mailElement.load();
         mailElement.play();
+
+        let treeValue = saveValues.treeObj.energy * saveValues.treeObj.health / 100;
+        switch (saveValues.treeObj.level) {
+            case 5:
+                break;
+            case 4:
+                treeValue *= 0.5;
+                break;
+            case 3:
+                treeValue *= 0.25;
+                break;
+            case 2:
+                treeValue *= 0.1;
+                break;
+            default:
+                treeValue = 0;
+                break;
+        }
         
         let treeHealthText = document.getElementById('tree-health-text');
         saveValues.treeObj.health = 0;
@@ -12353,7 +12418,7 @@ function destroyTree() {
         saveValues.treeObj.defense = false;
 
         const lootContainer = createDom('div', { class:['notif-item']});
-        let lootArray = Array.from({ length: 7 }, () => randomInteger(1, 100));
+        let lootArray = Array.from({ length: 7 }, () => randomInteger(Math.round(treeValue * 0.4), Math.round(treeValue * 0.7)));
 
         for (let i = 0; i < lootArray.length; i++) {
             if (lootArray[i] !== 0) {
@@ -12377,6 +12442,9 @@ function destroyTree() {
         }
 
         choiceBox(mainBody, {text: 'Materials harvested:'}, stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
+        if (!beta) {
+            saveData(true);
+        }
     },100);
 }
 
@@ -12392,7 +12460,7 @@ function updateTreeValues(turnZero) {
         treeProgressValue.innerText = 'Growth: 0x';
         palmEnergy.innerText = 'Palm Energy: 0';
     } else {
-        treeProgressValue.rate = saveValues.treeObj.growthRate / 100;
+        treeProgressValue.rate = saveValues.treeObj.growthRate / 25;
         treeProgressValue.innerText = 'Growth: ' + saveValues.treeObj.growthRate + 'x';
         palmEnergy.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
     }
@@ -12484,8 +12552,8 @@ function updateSeedContainer(updateValueOnly) {
         if (updateValueOnly) {
 
         } else {
-            let seedAdded = [0,0,0,0,0];
-            for (let i = 0; i < 5; i++) {
+            let seedAdded = [0,0,0];
+            for (let i = 0; i < 3; i++) {
                 let seedColumnContainer = document.createElement('div');
                 seedColumnContainer.classList.add('seed-column')
                 
@@ -12494,46 +12562,86 @@ function updateSeedContainer(updateValueOnly) {
 
                 let seedNumber = document.createElement('p');
                 seedNumber.amount = 0;
-                seedNumber.innerText = `0 / ${10}`;
+                seedNumber.innerText = `0 / ${persistentValues.treeSeeds[i]}`;
 
                 let seedDecrement = document.createElement('button');
+                let seedIncrement = document.createElement('button');
+                let seedMegaDecrement = document.createElement('button');
+                let seedMegaIncrement = document.createElement('button');
+
+                const incrementValue = (change) => {
+                    if (seedNumber.amount + change >= 0 && seedNumber.amount + change <= persistentValues.treeSeeds[i]) {
+                        seedNumber.amount += change;
+                        seedNumber.innerText = `${seedNumber.amount} / ${persistentValues.treeSeeds[i]}`;
+                        seedAdded[i] = seedNumber.amount;
+                    }
+                }
+
+
                 seedDecrement.innerText = '-';
                 seedDecrement.addEventListener('click', () => {
-                    if (seedNumber.amount > 0) {
-                        seedNumber.amount--;
-                        seedNumber.innerText = `${seedNumber.amount} / ${10}`;
-                        seedAdded[i] = seedNumber.amount;
-                    }
-                })
-                let seedIncrement = document.createElement('button');
+                    incrementValue(-1);
+                });
+                
                 seedIncrement.innerText = '+';
                 seedIncrement.addEventListener('click', () => {
-                    if (seedNumber.amount < 10) {
-                        seedNumber.amount++;
-                        seedNumber.innerText = `${seedNumber.amount} / ${10}`;
-                        seedAdded[i] = seedNumber.amount;
-                    }
-                })
+                    incrementValue(1);
+                });
 
-                seedColumnContainer.append(seedImg, seedNumber, seedDecrement, seedIncrement);
+                seedMegaDecrement.innerText = '--';
+                seedMegaDecrement.addEventListener('click', () => {
+                    incrementValue(-10);
+                });
+
+                seedMegaIncrement.innerText = '++';
+                seedMegaIncrement.addEventListener('click', () => {
+                    incrementValue(10);
+                });
+
+                seedColumnContainer.append(seedImg, seedNumber, seedMegaDecrement, seedDecrement, seedIncrement, seedMegaIncrement);
                 seedContainer.append(seedColumnContainer)
             }
 
-            const plantButton = document.createElement('button');
-            plantButton.innerText = 'Plant!';
+            const backButton = createDom('button', {
+                innerText: 'Back',
+                style: {
+                    transform: 'translateX(-105%)',
+                }
+            });
+
+            backButton.addEventListener('click', () => {
+                updateTreeValues(false);
+                seedContainer.remove();
+                treeOptions(false, document.getElementById('options-container'));
+            })
+
+            const plantButton = createDom('button', {
+                innerText: 'Plant!',
+                style: {
+                    transform: 'translateX(5%)',
+                }
+            });
             plantButton.addEventListener('click', () => {
                 let seedValue = 0;
+                let seedNum = 1;
                 for (let i = 0; i < seedAdded.length; i++) {
-                    seedValue += (seedAdded[i] * (i + 1)**2)
+                    seedValue += seedAdded[i] * (i + 1)**3;
+                    seedNum *= Math.max(Math.log(((seedAdded[i] * (i + 1)) + 1)), 1);
                 }
 
                 if (seedValue > 0) {
-                    saveValues.treeObj.growthRate = seedValue;
+                    saveValues.treeObj.growthRate = Math.round(seedNum * 100) / 100;
                     seedContainer.remove();
+
+                    saveValues.treeObj.energy = 100 * seedValue;
                     growTree('level');
+
+                    for (let i = 0; i < 3; i++) {
+                        persistentValues.treeSeeds[i] -= seedAdded[i];
+                    }
                 }
             })
-            seedContainer.append(plantButton)
+            seedContainer.append(backButton, plantButton)
         }
     }
 }
@@ -12559,7 +12667,7 @@ function growTree(type, amount) {
             }
         }
     } else if (type === 'rate') {
-        treeProgressValue.rate += (amount / 100);
+        treeProgressValue.rate += (amount / 25);
     } else if (type === 'level') {
         const treeImg = document.getElementById('tree-img');
         const treeContainer = document.getElementById('tree-container');
@@ -12661,11 +12769,13 @@ function leylineCreate(treeTable, optionsContainer) {
      
     let text = `<br>Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
                 <br> cost of your tree's HP (More effective at higher phases)`
-    const leylineText = createDom('p', { innerHTML: text });
-    const leylineEnergy = createDom('p', { innerText: `Current Energy Levels: ${Math.ceil(persistentValues.leylinePower)}%`, progress: persistentValues.leylinePower });
+    const leylineText = createDom('p', { innerHTML: text, id:'leyline-text' });
+    const leylineEnergy = createDom('p', { innerText: `Current Energy Levels: ${Math.round(persistentValues.leylinePower * 10) / 10}%`, progress: persistentValues.leylinePower });
+    checkAbsorbThreshold();
 
     const absorbButton = document.createElement('button');
     absorbButton.innerText = 'Absorb';
+
     absorbButton.addEventListener('click', () => {
         if (saveValues.treeObj.health <= 15) {
             leylineText.innerText = 'The tree is too weak to absorb excess energy!'
@@ -12674,18 +12784,39 @@ function leylineCreate(treeTable, optionsContainer) {
             return;
         }
 
+        let treeAbsorbPower = Math.log(saveValues.treeObj.energy / 50) / (100 / persistentValues.leylinePower);
+        switch (saveValues.treeObj.level) {
+            case 5:
+                treeAbsorbPower = Math.max(treeAbsorbPower, 0.1);
+                break;
+            case 4:
+                treeAbsorbPower *= 0.5;
+                break;
+            case 3:
+                treeAbsorbPower *= 0.25;
+                break;
+            case 2:
+                treeAbsorbPower *= 0.1;
+                break;
+            default:
+                treeAbsorbPower *= 0.05;
+                break;
+        }
+
         let leylineProgress = document.getElementById('leyline-progress');
-        persistentValues.leylinePower -= 5;
+        persistentValues.leylinePower -= treeAbsorbPower;
+
+        checkAbsorbThreshold();
+
         leylineProgress.progress = parseFloat(persistentValues.leylinePower);
         leylineProgress.style.width = leylineProgress.progress + '%';
 
         let treeHealthText = document.getElementById('tree-health-text');
-        saveValues.treeObj.health = Math.max(saveValues.treeObj.health - randomInteger(10,20), 1);
+        saveValues.treeObj.health = Math.max(saveValues.treeObj.health - randomInteger(20, 40), 1);
         treeHealthText.health = saveValues.treeObj.health;
         treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
 
-        leylineEnergy.progress = persistentValues.leylinePower;
-        leylineEnergy.innerText = `Current Energy Levels: ${Math.ceil(leylineEnergy.progress)}%`
+        leylineEnergy.innerText = `Current Energy Levels: ${(Math.round(persistentValues.leylinePower * 10)/10)}%`
     });
 
     const backButton = document.createElement('button');
@@ -12701,6 +12832,27 @@ function leylineCreate(treeTable, optionsContainer) {
     
     leylineDisplay.append(leylineTitle, leylineBar, leylineEnergy, leylineText, buttonContainer);
     treeTable.append(leylineDisplay);
+}
+
+function checkAbsorbThreshold() {
+    const leylineText = document.getElementById('leyline-text');
+    if (persistentValues.leylinePower < 75 && persistentValues.fellBossDefeat === false) {
+        spawnBossQuest(1)
+        persistentValues.leylinePower = 75.0;
+        leylineText.innerText = 'A force of nature has awoken as its energy from the Leyline was cutoff!';
+    } else if (persistentValues.leylinePower < 50 && persistentValues.unusualBossDefeat === false) {
+        spawnBossQuest(2)
+        persistentValues.leylinePower = 50.0;
+        leylineText.innerText = 'A mysterious portal has emerged that needs immediate investigation!';
+    } else if (persistentValues.leylinePower < 25 && persistentValues.workshopBossDefeat === false) {
+        spawnBossQuest(3)
+        persistentValues.leylinePower = 25.0;
+        leylineText.innerText = 'A dreadful machine has re-awakened from the depths due to the energy given off by the Leyline!';
+    }  else if (persistentValues.leylinePower < 0 && persistentValues.finaleBossDefeat === false) {
+        spawnBossQuest(4)
+        persistentValues.leylinePower = 0;
+        leylineText.innerText = 'A powerful enemy has revealed itself as all energy from the leyline has stopped!';
+    }
 }
 
 //------------------------------------------------------------------------MISCELLANEOUS------------------------------------------------------------------------//
@@ -12959,9 +13111,9 @@ function newPop(type) {
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
-// if (localStorage.getItem('beta') == 'true') {
-//     beta = true;
-// }
+if (localStorage.getItem('beta') == 'true') {
+    beta = true;
+}
 
 if (beta) {
     let link = document.createElement("link");
@@ -12991,9 +13143,7 @@ if (beta) {
             key: '3',
         });
           
-        document.dispatchEvent(event);
-        document.getElementById('adv-button-1').click();
-        document.getElementById('adventure-button').click();
+        // document.dispatchEvent(event);
 
         // BETA FUNCTIONS
         

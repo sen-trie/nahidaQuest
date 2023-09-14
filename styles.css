@@ -2691,7 +2691,7 @@ table, button, label {
 .seed-column {
     padding: 1%;
     border-radius: 0.5em;
-    width: 20%;
+    width: 25%;
     text-align: center;
     border: 0.2em solid #88705B;
     border-radius: 0.3em;
@@ -2706,22 +2706,23 @@ table, button, label {
 }
 
 .seed-column > button {
-    width: 30%;
+    width: 20%;
+    margin-right: 2.5%;
     font-size: 1.2em;
     margin-top: 0.2em;
     background-color: #B1A79A;
     color: #48392b;
 }
 
-.seed-column > button:first-of-type {
-    margin-right: 2.5%;
+.seed-column > button:last-of-type {
+    margin-right: 0%;
 }
 
 #seed-container > button {
     position: absolute;
     top: 110%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, 100%);
     background: transparent url(./assets/tutorial/buttonBox.webp) center/contain no-repeat;
     height: auto;
     width: 33%;
@@ -2903,7 +2904,6 @@ table, button, label {
     font-size: 1.2em;
     margin: 0.4em;
     text-align: center;
-    line-height: 0.8em;
 }
 
 #tree-offer-container > p:last-of-type {
