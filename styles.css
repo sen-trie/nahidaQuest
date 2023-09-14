@@ -540,10 +540,6 @@ table, button, label {
     right: 1%;
 }
 
-.second-link:hover,.link:hover { 
-    transform: scale(1.05);
-}
-
 .second-link:visited,.link:visited { 
     color: #cee0d4;
 }
@@ -737,6 +733,14 @@ table, button, label {
     height: 100%;
     z-index: 1;
     border-radius: 0.2em;
+}
+
+.clickable {
+    transition: 0.3s ease;
+}
+
+.clickable:hover {
+    transform: scale(1.05);
 }
 
 /*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
@@ -2723,12 +2727,11 @@ table, button, label {
     top: 110%;
     left: 50%;
     transform: translate(-50%, 100%);
-    background: transparent url(./assets/tutorial/buttonBox.webp) center/contain no-repeat;
+    background: transparent url(./assets/tutorial/exped-button.webp) center/contain no-repeat;
     height: auto;
     width: 33%;
     aspect-ratio: 4.61;
-    color: white;
-    text-shadow: var(--text-shadow-075);
+    color: #f0e5da;
 }
 
 #tree-side {

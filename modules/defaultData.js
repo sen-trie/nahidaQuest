@@ -233,7 +233,7 @@ const advDictDefault = {
 
 const permUpgrades = {
     1:{Name:"Blessing of Vitality",        Effect:5,  Max:50,   Cap:false,   Description:"Increases Energy gained by clicking Big Nahida."},
-    2:{Name:"Blessing of Technique",       Effect:3,  Max:50,    Cap:true,   Description:"Increase clicking DMG during Combat Expeditions."},
+    2:{Name:"Blessing of Technique",       Effect:2,  Max:50,    Cap:true,   Description:"Increase clicking DMG during Combat Expeditions."},
     3:{Name:"Blessing of Wanderlust",      Effect:0.5, Max:50,   Cap:true,   Description:"Decreases base price of Wish characters."},
     4:{Name:"Blessing of Concession",      Effect:2,   Max:25,   Cap:true,   Description:"Decreases price of Dori's Shop items and random trades."},
     5:{Name:"Blessing of Might",           Effect:1,   Max:50,   Cap:true,   Description:"Increases critical rate amount for clicking Big Nahida.",   zeroDescription:"Enables critical hits for clicking Big Nahida."},

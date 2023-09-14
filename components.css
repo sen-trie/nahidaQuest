@@ -1419,6 +1419,12 @@
     filter: drop-shadow(0 0 0.2em black);
 }
 
+.item-frame-text {
+    color: white !important;
+    right: 5% !important;
+    font-size: 1.6em;
+}
+
 .extra-item-tree::after, .extra-item::after {
     content: '';
     position: absolute;
@@ -1880,11 +1886,6 @@
     aspect-ratio: 1;
     background: transparent url(./assets/icon/patch.webp) center/contain no-repeat;
     filter: drop-shadow(0 0 0.25em #4D613D);
-    transition: 0.3s ease;
-}
-
-.patch-button:hover {
-    transform: scale(1.1);
 }
 
 .settings-text {
@@ -2682,6 +2683,7 @@ input:checked + .slider:before {
 .ascend-info {
     display: flex;
     flex-direction: column;
+    position: relative;
     width: 45%;
     height: 100%;
     border: 0.2em solid var(--dark-brown);
@@ -2707,9 +2709,10 @@ img[src=""] {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
-    width: auto;
+    width: 98%;
     height: auto;
-    background: url(./assets/tutorial/exped-button.webp) center / contain no-repeat;
+    aspect-ratio: 6;
+    background: url(./assets/tutorial/exped-button-long.webp) center / contain no-repeat;
     margin-bottom: 2%;
     transition: 0.2s ease;
 }
@@ -2758,10 +2761,6 @@ img[src=""] {
 
 .nut-button-container > button {
     transition: 0.15s ease;
-}
-
-.nut-button-container > button:hover {
-    filter: drop-shadow(0 0 0.2em #685024);
 }
 
 .nut-shop-button {
