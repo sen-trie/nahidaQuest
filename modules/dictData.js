@@ -1189,7 +1189,7 @@ const commisionInfo = {
         perk: 'Proficient',
     },
     'Nahida':{
-        charLikes:['Wanderer', 'Cyno'],
+        charLikes:[],
         charDislikes:[], 
         perk: 'Scavenger',
     },

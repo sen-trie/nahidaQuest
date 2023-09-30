@@ -24,26 +24,28 @@
     <meta http-equiv='pragma' content='no-cache'>
 </head>
 <body>
-    <div id="start-screen" class="cover-all flex-column">
-        <img alt="Start Screen Background" src="./assets/start.webp" importance="high">
-        <img id="start-image" alt="Nahida Quest Title" src="./assets/settings/nahidaQuest.webp" importance="high">
-        <button id="start-button" class="dim-filter">Continue</button>
-        <button id="start-delete">New Game</button>
-        <p id="vers-number-start"></p>
-        <a class="link clickable" href="https://nahidaquest.com/feedback">Feedback</a>
-        <a class="link second-link clickable" href="https://nahidaquest.com/credits">Credits</a>
-    </div>
-    <div id="game" class="prevent-select">
-        <div id="loading" class="cover-all flex-row overlay">
-            <img src="./assets/loading.webp" alt="Nahida Quest Loading Screen" class="overlay-tutorial" importance="high">
-            <p id="loading-number" loadingValue="0">0%</p>
+    <div id="game-wrapper">
+        <div id="start-screen" class="cover-all flex-column">
+            <img alt="Start Screen Background" src="./assets/start.webp" importance="high">
+            <img id="start-image" alt="Nahida Quest Title" src="./assets/settings/nahidaQuest.webp" importance="high">
+            <button id="start-button" class="dim-filter">Continue</button>
+            <button id="start-delete">New Game</button>
+            <p id="vers-number-start"></p>
+            <a class="link clickable" href="https://nahidaquest.com/feedback">Feedback</a>
+            <a class="link second-link clickable" href="https://nahidaquest.com/credits">Credits</a>
         </div>
-    </div>
-    <p id="vers-number"></p>
-    <p id="copyright-number"></p>
-    <div class="unsupported flex-column">
-        <img alt="Unsupported image" src="./assets/error.webp">
-        <p>Your device's screen is too narrow for nahidaQuest. Please switch to landscape mode.</p>
+        <div id="game" class="prevent-select">
+            <div id="loading" class="cover-all flex-row overlay">
+                <img src="./assets/loading.webp" alt="Nahida Quest Loading Screen" class="overlay-tutorial" importance="high">
+                <p id="loading-number" loadingValue="0">0%</p>
+            </div>
+            <p id="vers-number"></p>
+            <p id="copyright-number"></p>
+        </div>
+        <div class="unsupported flex-column">
+            <img alt="Unsupported image" src="./assets/error.webp">
+            <p>Your device's screen is too narrow for nahidaQuest. Please switch to landscape mode.</p>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js" async></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js" async></script> -->

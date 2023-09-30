@@ -309,7 +309,9 @@ const extraInfoDict = {
     'Toughness': '[Toughness]: The party endured an attack!',
     'Loss': '[Attacked]: The party was attacked and lost some items...',
     'Keen-Eyed': '[Keen-Eyed]: One of your items have been upgraded!',
-    'Proficient': '[Proficient] Certain items have been prioritized!'
+    'Proficient': '[Proficient] Certain items have been prioritized!',
+    'Anti-Sync': "[Anti-Sync] It seems that the two of them didn't get along well...",
+    'Sync': '[Sync] The two of them got along pretty well!'
 }
 
 const possibleItems = ['Bow', 'Catalyst', 'Claymore', 'Polearm', 'Sword', 'Artifact', 'Food', 'DendroGeoAnemo', 'ElectroCryo', 'PyroHydro', 'Inazuma', 'Liyue', 'Mondstadt', 'Sumeru'];
@@ -2819,7 +2821,11 @@ function tabChange(x) {
         }
     } else if (x == 5) {
         let dialog = document.getElementById("table7-text");
-        dialog.innerText = "Welcome! Feel free to have a look. I'll even help package up your purchase, free of charge."
+        if (persistentValues.tutorialAscend) {
+            dialog.innerText = "Welcome back! I'm sure you'll be delighted to see my expanded catalogue! Hehehe."
+        } else {
+            dialog.innerText = "Welcome! Feel free to have a look. I'll even help package up your purchase, free of charge."
+        }
     }
 
     if (x != 3 && wishCounter != saveValues["wishCounterSaved"]) {
@@ -3153,7 +3159,7 @@ function settings() {
             settingsBottomBadge.append(createMedal(1, choiceBox, mainBody, stopSpawnEvents))
         }
 
-        if (persistentValues.finaleBossDefeat) {
+        if (persistentValues.finaleBossDefeat || beta) {
             settingsBottomBadge.append(createMedal(2, choiceBox, mainBody, stopSpawnEvents))
         }
 
@@ -3162,16 +3168,18 @@ function settings() {
         }
 
         const settingsBottomButtons = createDom('div', {
-            class: ['flex-column', 'settings-bottom-buttons', 'clickable']
+            class: ['flex-column', 'settings-bottom-buttons']
         })
 
         const settingsCredit = createDom('button', {
             innerText: 'Credits',
+            class: ['clickable'],
             event: ['click', () => {window.open('https://nahidaquest.com/credits',"_blank")}]
         })
 
         const settingsHelp = createDom('button', {
             innerText: 'Wiki',
+            class: ['clickable'],
             event: ['click', () => {console.log('HELP!!!')}]
         })
     
@@ -3499,7 +3507,7 @@ function settingsBox(type,eleId) {
                     importBox.style.display = 'none';
                     exportBox.style.display = 'block';
                     setTimeout(()=> {
-                        exportBoxText.value = `Please use a JSON reader like JSONHERO if you like to manipulate the save values. Beware! Directly changing 'realScore','rowCount' or adding non-integer values may result in the save file being corrupted!
+                        exportBoxText.value = `I AM NOT RESPONSIBLE FOR ANY DAMAGES CAUSED BY EDITING SAVES. Beware! Directly changing 'realScore','rowCount' or adding non-integer values may result in the save file being corrupted!
                                               \n---------------------------------
                                               \n${JSON.stringify(localStorage)}\n\n`;
                     }, 300);
@@ -4678,17 +4686,61 @@ function itemUse(itemUniqueId) {
         saveValues["freeLevels"] += randomInteger(Inventory[itemID].BuffLvlLow,Inventory[itemID].BuffLvlHigh);
         challengeNotification(({category: 'discount', value: saveValues.freeLevels}))
         refresh();
+    } else if (itemID === 4010) {
+        saveValues["mailCore"]++;
+        newPop(3)
     // ENERGY POTS
-    } else if (itemID >= 4011 && itemID < 4014){
+    } else if (itemID >= 4011 && itemID < 4014) {
         const energyGain = energyBuffPercent[Inventory[itemID].Star]
         saveValues.energy += energyGain;
         persistentValues.lifetimeEnergyValue += energyGain;
 
         challengeNotification(({category: 'energy', value: saveValues.energy}))
         refresh();
-    } else if (itemID === 4010) {
-        saveValues["mailCore"]++;
-        newPop(3)
+    // BUNDLES
+    } else if (itemID >= 4014 && itemID < 4018) {
+        switch (itemID) {
+            case 4014:
+                inventoryDraw("talent", 2, 2);
+                inventoryDraw("talent", 2, 3);
+                inventoryDraw("talent", 3, 3);
+                break;
+            case 4015:
+                inventoryDraw("talent", 2, 2);
+                inventoryDraw("talent", 3, 3);
+                inventoryDraw("talent", 3, 3);
+                inventoryDraw("talent", 4, 4);
+                inventoryDraw("talent", 4, 4);
+                break;
+            case 4016:
+                inventoryDraw("gem", 3, 3);
+                inventoryDraw("gem", 3, 4);
+                inventoryDraw("gem", 4, 4);
+                break;
+            case 4017:
+                inventoryDraw("gem", 3, 3);
+                inventoryDraw("gem", 3, 4);
+                inventoryDraw("gem", 4, 4);
+                inventoryDraw("gem", 5, 5);
+                inventoryDraw("gem", 5, 5);
+                break;
+            default:
+                break;
+        }
+
+        newPop(1);
+        currencyPopUp("items", 0);
+        sortList("table2");
+    } else if (itemID === 4018) {
+        inventoryDraw("xp", 2, 3);
+        inventoryDraw("xp", 2, 3);
+        inventoryDraw("xp", 3, 3);
+        inventoryAdd(4010);
+        inventoryAdd(4010);
+
+        newPop(1);
+        currencyPopUp("mail", 2, "items", 0);
+        sortList("table2");
     // ELEMENT GEMS
     } else if (itemID === 5001 || itemID === 5002){
         let power = 1;
@@ -5486,6 +5538,7 @@ function createGuild() {
 
                     const commId = currentCommisionsTime.commId.split('/');
                     let commInfo;
+                    
                     if (commId[1].includes('base')) {
                         saveValues.currentCommisions.splice(saveValues.currentCommisions.indexOf(commId[1]), 1)
                         commInfo = saveValues.baseCommisions[commId[1].split('-')[1]]
@@ -5531,6 +5584,25 @@ function createGuild() {
                         const itemId2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
 
                         let lossRoll = randomInteger(1, 15);
+                        // SYNC AND ANTI-SYNC
+                        if ((commInfo.char[0] === 'Nahida' || commInfo.char[1] === 'Nahida') && randomInteger(1, 5) === 1) {
+                            const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                            lootArray.push(itemId1);
+                            markedItems.push(itemId1);
+                            extraInfo.push('Sync');
+                        } else if (commInfo.char[1] === 'Wanderer' || commInfo.char[0] === 'Wanderer') {
+                            lossRoll -= 5;
+                            extraInfo.push('Anti-Sync');
+                        } else if (commisionInfo[commInfo.char[0]].charLikes.includes(commInfo.char[1]) && randomInteger(1, 5) === 1) {
+                            const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                            lootArray.push(itemId1);
+                            markedItems.push(itemId1);
+                            extraInfo.push('Sync');
+                        } else if (commisionInfo[commInfo.char[0]].charDislikes.includes(commInfo.char[1])) {
+                            lossRoll -= 5;
+                            extraInfo.push('Anti-Sync');
+                        }
+
                         if (lossRoll < 3) {
                             if (commInfo.perk === 'Toughness') {
                                 lossRoll = false;
@@ -5559,7 +5631,6 @@ function createGuild() {
                             itemId1 = specialType ? inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'shop');
                             markedItems.push(itemId1);
                             extraInfo.push('Keen-Eyed');
-                        // 
                         }
                         
                         if (commInfo.perk === 'Proficient') {
@@ -10339,7 +10410,7 @@ function drawWish() {
         wishMultiplier = saveValues["wishCounterSaved"];
     }
 
-    if (persistentValues.finaleBossDefeat) {
+    if (persistentValues.finaleBossDefeat || beta) {
         drawAranaraWish();
     }
 }
@@ -11281,12 +11352,22 @@ function buyShop(id,shopCost) {
     }
 
     if (shopId == id) {
-        dialog.innerText = "Any questions or troubles? I'm here to personally assist you!";
+        if (persistentValues.tutorialAscend) {
+            dialog.innerText = "Dori's Deals now come with extra value!";
+        } else {
+            dialog.innerText = "Any questions or troubles? I'm here to personally assist you!";
+        }
+        
         shopId = null;
         let confirmButtonNew = confirmButton.cloneNode(true);
         confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
     } else {
-        dialog.innerText = "Are you sure? Remember, no refunds!";
+        if (persistentValues.tutorialAscend) {
+            dialog.innerText = "Maybe if you beg, I'll allow a refund within 24 hours! Hehe, just kidding."
+        } else {
+            dialog.innerText = "Are you sure? Remember, no refunds!";
+        }
+        
         button.classList.add("shadow-pop-tr");
         confirmButton.addEventListener("click", function() {
             confirmPurchase(shopCost,id);
@@ -11366,7 +11447,11 @@ function confirmPurchase(shopCost,id) {
         let confirmButton = document.getElementById("shop-confirm");
         let confirmButtonNew = confirmButton.cloneNode(true);
         confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
-        dialog.innerText = "Hehe, you've got good eyes.";
+        if (persistentValues.tutorialAscend) {
+            dialog.innerText = "See you again soon! Hehe."
+        } else {
+            dialog.innerText = "Hehe, you've got good eyes.";
+        }
 
         shopElement.load();
         shopElement.play();
@@ -11385,7 +11470,11 @@ function confirmPurchase(shopCost,id) {
             challengeNotification(({category: 'specific', value: [1, 1]}));
         }
     } else {
-        dialog.innerText = "Hmph, come back when you're a little richer."
+        if (persistentValues.tutorialAscend) {
+            dialog.innerText = "Now, now, I can't make it any cheaper than that. It'll be daylight robbery!"
+        } else {
+            dialog.innerText = "Hmph, come back when you're a little richer."
+        }
         return;
     }
 }
@@ -12613,9 +12702,14 @@ function updateSeedContainer(updateValueOnly) {
                 const incrementValue = (change) => {
                     if (seedNumber.amount + change >= 0 && seedNumber.amount + change <= persistentValues.treeSeeds[i]) {
                         seedNumber.amount += change;
-                        seedNumber.innerText = `${seedNumber.amount} / ${persistentValues.treeSeeds[i]}`;
-                        seedAdded[i] = seedNumber.amount;
+                    } else if (change > 1 && persistentValues.treeSeeds[i] - seedNumber.amount < change) {
+                        seedNumber.amount = persistentValues.treeSeeds[i];
+                    } else if (change < -1 && seedNumber.amount < (change * -1)) {
+                        seedNumber.amount = 0;
                     }
+
+                    seedNumber.innerText = `${seedNumber.amount} / ${persistentValues.treeSeeds[i]}`;
+                    seedAdded[i] = seedNumber.amount;
                 }
 
 
@@ -12720,6 +12814,9 @@ function growTree(type, amount) {
             saveValues.treeObj.health = 100;
             treeHealthText.health = saveValues.treeObj.health;
             treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
+
+            const leylineText = document.getElementById('leyline-text');
+            leylineText.innerText = '';
 
             updateTreeValues(false);
             saveValues.treeObj.defense = randomIntegerWrapper(0);
@@ -12837,10 +12934,14 @@ function leylineCreate(treeTable, optionsContainer) {
                 treeAbsorbPower *= 0.25;
                 break;
             case 2:
-                treeAbsorbPower *= 0.1;
-                break;
-            default:
                 treeAbsorbPower *= 0.05;
+                break;
+            case 1:
+                treeAbsorbPower *= 0;
+                leylineText.innerText = 'A seed is too weak to absorb anything!'
+                return;
+            default:
+                treeAbsorbPower *= 0;
                 break;
         }
 
