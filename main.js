@@ -10694,27 +10694,11 @@ function createChallenge() {
         const tierButton = document.createElement("div");
         tierButton.classList.add('tier-button');
         tierButton.id = `tier-button-${i}`;
-        tierButton.activeButtons = [];
         tierButton.innerText = 'Tier ' + romanNum[i];
-        tierButton.normalText = 'Tier ' + romanNum[i];
 
         let tierContainer = document.createElement("div");
         tierContainer.classList.add('tier-container');
         tierContainer.style.display = "none";
-
-        const claimButton = (posArray) => {
-            if (challengeDict[posArray[0]][posArray[1]] === 'unclaimed') {
-                const button = document.getElementById(`challenge-button-${posArray[0]}-${posArray[1]}`);
-                button.innerText = 'Claimed';
-                button.classList.remove('challenge-button-unclaimed');
-                button.classList.add('challenge-button-claimed');
-
-                challengeDict[posArray[0]][posArray[1]] = true;
-
-                tierButton.activeButtons.splice(tierButton.activeButtons.indexOf(posArray), 1);
-                tierButton.innerText = tierButton.normalText + (tierButton.activeButtons.length > 0 ? ' (Unclaimed)' : '')
-            }
-        }
         
         for (let j = 0; j < challengeInfo[i].length; j++) {
             let challengeContainer = document.createElement("div");
@@ -10731,15 +10715,6 @@ function createChallenge() {
             
             if (challengeDict[i][j] === false) {
                 challengeButton.innerText = 'Locked';
-            } else if (challengeDict[i][j] === 'unclaimed') {
-                tierButton.activeButtons.push([i, j]);
-                tierButton.innerText = tierButton.normalText + (tierButton.activeButtons.length > 0 ? ' (Unclaimed)' : '')
-
-                challengeButton.innerText = 'Unclaimed';
-                challengeButton.classList.add('challenge-button-unclaimed');
-                challengeButton.addEventListener('click', () => {
-                    claimButton([i, j]);
-                }, {once: true});
             } else {
                 challengeButton.innerText = 'Claimed';
                 challengeButton.classList.add('challenge-button-claimed');
@@ -10876,42 +10851,17 @@ function challengeNotification(value) {
     if (!persistentValues.tutorialAscend) {return}
     const res = challengeCheck('check', persistentValues.challengeCheck, null, value);
     const challengeDict = persistentValues.challengeCheck;
-
-    const claimButton = (posArray, tierButton, challengeButton) => {
-        if (challengeDict[posArray[0]][posArray[1]] === 'unclaimed') {
-            // challengeDict[posArray[0]][posArray[1]] = true;
-
-            challengeButton.innerText = 'Claimed';
-            challengeButton.classList.remove('challenge-button-unclaimed');
-            challengeButton.classList.add('challenge-button-claimed');
-
-            tierButton.activeButtons.splice(tierButton.activeButtons.indexOf(posArray), 1);
-            tierButton.innerText = tierButton.normalText + (tierButton.activeButtons.length > 0 ? ' (Unclaimed)' : '');
-        }
-    }
     
     if (res !== false) {
         newPop(4);
         challengePop(res);
         res.forEach((posArray) => {
             const challengeButton = document.getElementById(`challenge-button-${posArray[0]}-${posArray[1]}`);
-            challengeButton.innerText = 'Unclaimed';
+            challengeButton.innerText = 'Claimed';
             challengeButton.classList.add('challenge-button-unclaimed');
 
             const challengeTitle = document.getElementById(`challenge-title-${posArray[0]}-${posArray[1]}`)
             challengeTitle.innerText = `${challengeInfo[posArray[0]][posArray[1]].title}`;
-
-            const tierButton = document.getElementById(`tier-button-${posArray[0]}`);
-            tierButton.activeButtons.push(posArray);
-            tierButton.innerText = tierButton.normalText + (tierButton.activeButtons.length > 0 ? ' (Unclaimed)' : '');
-    
-            if (challengeButton) {
-                challengeButton.addEventListener('click', () => {
-                    claimButton(posArray, tierButton, challengeButton);
-                }, {once: true});
-            } else {
-                console.error(`Error getting Challenge Button ID: ${posArray}. Please inform the developer via the feedback form! :)`)
-            }
         });
 
         let getAllAchievements = true;
@@ -13253,9 +13203,9 @@ function newPop(type) {
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
-// if (localStorage.getItem('beta') == 'true') {
-//     beta = true;
-// }
+if (localStorage.getItem('beta') == 'true') {
+    beta = true;
+}
 
 if (beta) {
     let link = document.createElement("link");

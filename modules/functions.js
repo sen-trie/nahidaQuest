@@ -295,13 +295,13 @@ function challengeCheck(type, prop, prop2, objectInfo) {
                 if (parseInt(objectInfo.value) < parseInt(key)) {
                     break;
                 } else if (challengeCheckDict[value[0]][value[1]] === false) {
-                    challengeCheckDict[value[0]][value[1]] = 'unclaimed';
+                    challengeCheckDict[value[0]][value[1]] = true;
                     challengeComplete.push([value[0], value[1]]);
                 }
             }
         } else {
             if (challengeCheckDict[objectInfo.value[0]][objectInfo.value[1]] === false) {
-                challengeCheckDict[objectInfo.value[0]][objectInfo.value[1]] = 'unclaimed';
+                challengeCheckDict[objectInfo.value[0]][objectInfo.value[1]] = true;
                 challengeComplete.push([objectInfo.value[0], objectInfo.value[1]]);
             }
         }
