@@ -1110,19 +1110,19 @@ const challengeInfo = [
         {'title': 'House of Haravatat', 'desc': 'Possess 200 discounted levels'}, // CH DONE
         {'title': 'Song of Songs', 'desc': "Reach 15,000 energy in one run"}, // CH DONE
         {'title': 'Greater Vision', 'desc': 'Get a Crit on Big Nahida seven times in a row'},  // CH DONE
-        {'title': 'The Bestest Travel Companion', 'desc': 'Reach maximum affection with 10 characters'}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        {'title': 'The Bestest Travel Companion', 'desc': 'Ascend Nahida 10 times'}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},   // CH DONE
         {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 30 fully-grown trees'},  // CH DONE
         {'title': 'Rooted Philanthropist', 'desc': 'Offer 25 times to a tree in a single cycle'}, // CH DONE
-        {'title': 'Pretty Patty', 'desc': "Use 1 of each type of Magic Seed when planting a tree"}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        {'title': 'Defender of Nature', 'desc': 'During a tree defense, do not let the tree get attacked once'}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ], [
         {'title': 'Live and Let Live', 'desc': 'Transcend for over 250,000 Cores'}, // CH DONE
         {'title': 'Perspective of A God', 'desc': 'Level up Nahida 700 times'},  // CH DONE
         {'title': 'Team All-Stars', 'desc': 'Ascend every character seven times'},  // CH DONE
         {'title': 'Apex of Akasha', 'desc': 'Stop the evil responsible for the Leyline Outbreak'},// CH DONE
         {'title': 'Stance of Impregnability', 'desc': 'During a battle, reach a maximum combo of 50'}, // CH DONE
-        {'title': 'Rule of Nines', 'desc': "Within nine selections, reveal all of Arakarman's keys"},  // CH DONE
-        {'title': 'Strikeout!', 'desc': "Finish Arakarman's game with less than three of your key tiles being revealed"}, // CH DONE
+        {'title': 'Rule of Twelves', 'desc': "Within 12 selections, reveal all of Arakarman's keys"},  // CH DONE
+        {'title': 'Strikeout!', 'desc': "Finish Arakarman's game with three or less of your key tiles being revealed"}, // CH DONE
         {'title': 'THE GNOSIS IS REAL', 'desc': 'Catch 12 Golden Weasel Thieves'},  // CH DONE
         {'title': '#teamtrees', 'desc': 'Harvest 60 fully-grown trees'},  // CH DONE
         {'title': 'Aranara Thanks You', 'desc': 'Offer 35 times to a tree in a single cycle'}, // CH DONE

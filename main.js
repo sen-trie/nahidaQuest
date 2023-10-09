@@ -2308,12 +2308,12 @@ function battleshipEvent() {
 
                 let finalHealth = friendlyDiv.score;
                 setTimeout(() => {
-                    if (finalHealth >= 4 && choicesTaken <= 9) {
+                    if (finalHealth >= 4 && choicesTaken <= 12) {
                         challengeNotification(({category: 'specific', value: [4, 5]}));
                         challengeNotification(({category: 'specific', value: [4, 6]}));
                     } else if (finalHealth >= 4) {
                         challengeNotification(({category: 'specific', value: [4, 6]}));
-                    } else if (choicesTaken <= 9) {
+                    } else if (choicesTaken <= 12) {
                         challengeNotification(({category: 'specific', value: [4, 5]}));
                     }
                 }, 3750)
@@ -12935,15 +12935,15 @@ function checkAbsorbThreshold() {
     } else if (persistentValues.leylinePower < 50 && persistentValues.unusualBossDefeat === false) {
         spawnBossQuest(2)
         persistentValues.leylinePower = 50.0;
-        leylineText.innerText = 'A mysterious portal has emerged that needs immediate investigation!';
+        leylineText.innerText = 'A mysterious portal has emerged, maybe it has something to do with the Leyline?';
     } else if (persistentValues.leylinePower < 25 && persistentValues.workshopBossDefeat === false) {
         spawnBossQuest(3)
         persistentValues.leylinePower = 25.0;
-        leylineText.innerText = 'A dreadful machine has re-awakened from the depths due to the energy given off by the Leyline!';
+        leylineText.innerText = 'A dreadful roar was heard from the depths due to the energy given off by the Leyline!';
     }  else if (persistentValues.leylinePower < 0 && persistentValues.finaleBossDefeat === false) {
         spawnBossQuest(4)
         persistentValues.leylinePower = 0;
-        leylineText.innerText = 'A powerful enemy has revealed itself as all energy from the leyline has stopped!';
+        leylineText.innerText = 'A powerful enemy has revealed itself as soon as all energy from the Leyline stopped!';
     }
 }
 
