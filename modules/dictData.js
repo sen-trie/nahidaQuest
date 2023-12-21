@@ -1089,8 +1089,8 @@ const challengeInfo = [
         {'title': 'Onyx Rank', 'desc': 'Reach level 20 Adventure Rank'}, // CH DONE
         {'title': 'Barely a Scratch', 'desc': 'Defeat the Abyss without losing any HP'}, // CH DONE
         {'title': 'Until Til the End', 'desc': 'Survive a Skirmish battle with at most one HP remaining'}, // CH DONE
-        {'title': 'Another Test Subject', 'desc': 'During a battle, reach a maximum combo of 20'}, // CH DONE
-        {'title': 'Sumeru Police Force', 'desc': 'Clear out all Bounties'}, // CH DONE
+        {'title': 'Another Test Subject', 'desc': 'During a battle, reach a counter combo of 20'}, // CH DONE
+        {'title': 'Sumeru Police Force', 'desc': "Clear out all Bounties in the Adventurer's Guild"}, // CH DONE
         {'title': 'Subject Three', 'desc': 'Defeat the Overgrown Whopperflower'}, // CH DONE
         {'title': 'A Nut From Space', 'desc': 'Catch 60 raining nuts'}, // CH DONE
     ],[
@@ -1110,7 +1110,7 @@ const challengeInfo = [
         {'title': 'House of Haravatat', 'desc': 'Possess 200 discounted levels'}, // CH DONE
         {'title': 'Song of Songs', 'desc': "Reach 15,000 energy in one run"}, // CH DONE
         {'title': 'Greater Vision', 'desc': 'Get a Crit on Big Nahida seven times in a row'},  // CH DONE
-        {'title': 'The Bestest Travel Companion', 'desc': 'Ascend Nahida 10 times'}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        {'title': 'Follow Me!', 'desc': 'Collect 1400 points while leading the Aranara'}, // CH DONE
         {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},   // CH DONE
         {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 30 fully-grown trees'},  // CH DONE
         {'title': 'Rooted Philanthropist', 'desc': 'Offer 25 times to a tree in a single cycle'}, // CH DONE
@@ -1120,9 +1120,9 @@ const challengeInfo = [
         {'title': 'Perspective of A God', 'desc': 'Level up Nahida 700 times'},  // CH DONE
         {'title': 'Team All-Stars', 'desc': 'Ascend every character seven times'},  // CH DONE
         {'title': 'Apex of Akasha', 'desc': 'Stop the evil responsible for the Leyline Outbreak'},// CH DONE
-        {'title': 'Stance of Impregnability', 'desc': 'During a battle, reach a maximum combo of 50'}, // CH DONE
+        {'title': 'Stance of Impregnability', 'desc': 'During a battle, reach a counter combo of 50'}, // CH DONE
         {'title': 'Rule of Twelves', 'desc': "Within 12 selections, reveal all of Arakarman's keys"},  // CH DONE
-        {'title': 'Strikeout!', 'desc': "Finish Arakarman's game with three or less of your key tiles being revealed"}, // CH DONE
+        {'title': 'Leader of the Tribe', 'desc': "Collect 2000 points while leading the Aranara"}, // CH DONE
         {'title': 'THE GNOSIS IS REAL', 'desc': 'Catch 12 Golden Weasel Thieves'},  // CH DONE
         {'title': '#teamtrees', 'desc': 'Harvest 60 fully-grown trees'},  // CH DONE
         {'title': 'Aranara Thanks You', 'desc': 'Offer 35 times to a tree in a single cycle'}, // CH DONE

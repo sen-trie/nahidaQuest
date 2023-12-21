@@ -776,42 +776,49 @@
     filter: drop-shadow(0 0 0.2em white);
 }
 
-.pinball-container {
-    position: absolute;
-    z-index: 1001;
-    top: 4em;
-    height: 85%;
-    width: auto;
-    max-width: 90%;
-    aspect-ratio: 0.7;
-    background: url(./assets/expedbg/choice/11_B_Fail.webp) no-repeat center center/cover;
-}
-
-.launch-button {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background-color: yellow;
-    width: 15%;
-    height: 10%;
-}
-
-.launch-button:last-of-type {
-    position: absolute;
-    bottom: 10%;
-    right: 0;
-    background-color: green;
-    width: 15%;
-    height: 10%;
-}
-
-.pinball-container::before {
-    content: '';
-    position: absolute;
+.snake-button-container {
     width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+.snake-button-container > button {
+    width: 100%;
+    aspect-ratio: 1;
+    color: var(--very-dark-green);
+    background-color: var(--bright-light-green);
+    border: 0.15em solid var(--bright-dark-green);
+    box-sizing: border-box;
+    border-radius: 0.3em;
+}
+
+.snake-right-div {
+    row-gap: 2%;
     height: 100%;
-    z-index: -1;
-    background-color: rgba(0, 0, 0, 0.25);
+    text-align: center;
+    z-index: 10001;
+    width: 25%;
+}
+
+.snake-right-div > p {
+    font-size: 2rem;
+    color: white;
+    text-shadow: var(--text-shadow-075);
+}
+
+.snake-start {
+    width: 80%;
+    aspect-ratio: 4.5;
+    border: 0.1rem solid grey;
+    border-radius: 0.75rem;
+}
+
+.snake-heart {
+    height: 3rem;
+    width: 100%;
+    object-fit: contain;
+    margin-bottom: 5rem;
 }
 
 /*/////////////////////////////// ADVENTURE CSS ///////////////////////////////*/

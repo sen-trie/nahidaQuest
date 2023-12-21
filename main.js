@@ -455,6 +455,8 @@ function timerEvents() {
         }
         activeLeader = 'Paimon'
         checkCommisions();
+
+        randomEventTimer(999)
     };
 }
 
@@ -694,7 +696,7 @@ function touchDemo() {
     let clickEarn;
     let crit = false;
     saveValues.clickCount++;
-    persistentValues.lifetimeClicksValue++
+    persistentValues.lifetimeClicksValue++;
 
     let critRole = randomInteger(1,100);
     if (critRole <= clickCritRate) {
@@ -728,11 +730,11 @@ function touchDemo() {
 
     if (clickAudioDelay === null) {
         if (timerSeconds !== 0) {
-            let randomInt = (randomInteger(9,15) / 10);
             demoElement.load();
-            demoElement.playbackRate = randomInt;
             demoElement.play();
-            clickAudioDelay = setTimeout(function() {clickAudioDelay = null}, 75);
+
+            clickAudioDelay = true;
+            setTimeout(() => {clickAudioDelay = null}, 155);
         }
     }
 
@@ -902,12 +904,13 @@ function randomEventTimer(timerSeconds) {
             startRandomEvent();
             updateMorale("recover", 5);
 
-            const currentTime = getTime()
+            const currentTime = getTime();
             persistentValues.timeSpentValue += currentTime - persistentValues.lastRecordedTime;
             persistentValues.lastRecordedTime = currentTime;
         }
         return;
     }
+    
     if (timerSeconds > eventTimeMin) {eventChance = randomInteger(0,100)}
 }
 
@@ -966,7 +969,7 @@ function clickedEvent(aranaraNumber) {
         }
     }
 
-    // if (beta) aranaraNumber = 8;
+    if (beta) aranaraNumber = 9;
 
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
@@ -979,12 +982,18 @@ function clickedEvent(aranaraNumber) {
     eventDropdownImage.style.backgroundRepeat = "no-repeat";
     eventDropdownImage.classList.add("event-dropdown-image");
     
-    eventDropdown.append(eventDropdownBackground, eventDropdownText,eventDropdownImage);
-    eventDropdown.addEventListener("animationend", () => {
+    eventDropdown.append(eventDropdownBackground, eventDropdownText, eventDropdownImage);
+    if (beta) {
         persistentValues.aranaraEventValue++;
         eventDropdown.remove();
         chooseEvent(aranaraNumber, specialEvent);
-    });
+    } else {
+        eventDropdown.addEventListener("animationend", () => {
+            persistentValues.aranaraEventValue++;
+            eventDropdown.remove();
+            chooseEvent(aranaraNumber, specialEvent);
+        });
+    }
     
     mainBody.appendChild(eventDropdown);
 }
@@ -1016,6 +1025,9 @@ function chooseEvent(type,specialMode) {
             break;
         case 8:
             battleshipEvent();
+            break;
+        case 9:
+            snakeEvent();
             break;
         default:
             console.error(`Event error: Invalid event ${type}`);
@@ -1124,7 +1136,7 @@ function reactionEvent() {
     });
 
     let randomTime = randomInteger(6000,9500);
-    setTimeout(()=>{
+    setTimeout(() => {
         if (reactionGame === true) {
             reactionStartElement.pause();
             reactionReady = true;
@@ -1139,7 +1151,7 @@ function reactionEvent() {
                 }
             }, 800 * randomInteger(90,110) / 100)
         }
-    },randomTime);
+    }, randomTime);
     
     reactionImage.append(reactionImageBottom,reactionImageArrow,reactionImageTop)
     eventBackdrop.append(eventDescription,reactionImage,reactionButton);
@@ -1166,7 +1178,7 @@ function reactionFunction(eventBackdrop) {
 
     reactionReady = false;
     reactionGame = false;
-    eventOutcome(outcomeText,eventBackdrop,"reaction",primogem);
+    eventOutcome(outcomeText, eventBackdrop, "reaction", primogem);
 }
 
 // EVENT 3 (7 BOXES)
@@ -1245,7 +1257,7 @@ function boxOpen(eventBackdrop,specialBox) {
         }
     }
 
-    eventOutcome(outcomeText,eventBackdrop,"box",outcomeNumber);
+    eventOutcome(outcomeText, eventBackdrop, "box", outcomeNumber);
     boxOuterNew.appendChild(boxOutcome);
     setTimeout(()=> {
         boxOuterNew.remove();
@@ -1405,7 +1417,7 @@ function minesweeperEvent() {
                 }
 
                 if (cellsLeft <= 0) {
-                    let randomPrimo = randomInteger(200,400);
+                    let randomPrimo = randomInteger(200, 400);
                     adventure("10-");
                     newPop(1);
                     sortList("table2");
@@ -1471,7 +1483,7 @@ function weaselEvent(specialWeasel) {
     }
 
     let delay = 2000;
-    setTimeout(()=>{
+    setTimeout(() => {
         addWeasel(weaselBack,delay,specialWeasel);
         weaselBurrow.load();
         weaselBurrow.play();
@@ -1494,12 +1506,12 @@ function weaselEvent(specialWeasel) {
     let weaselTimerImage = document.createElement("img");
     weaselTimerImage.src = "./assets/event/timer-sand.webp";
     weaselTimerImage.classList.add("weasel-sand");
-    weaselTimerImage.addEventListener("animationend",()=> {
+    weaselTimerImage.addEventListener("animationend",() => {
         let eventText = `You caught ${weaselCount} weasel thieves!`;
         if (goldWeaselCount > 0) {
-            eventOutcome(eventText,eventBackdrop,"weasel",weaselCount,goldWeaselCount);
+            eventOutcome(eventText, eventBackdrop, "weasel", weaselCount, goldWeaselCount);
         } else {
-            eventOutcome(eventText,eventBackdrop,"weasel",weaselCount, 0);
+            eventOutcome(eventText, eventBackdrop, "weasel", weaselCount, 0);
         }
     })
 
@@ -1519,11 +1531,12 @@ function addWeasel(weaselBack,delay,specialWeasel) {
     let weaselDiv = weaselBack.children;
     let realWeasel = randomInteger(0,18);
     let specialWeaselSpawns = false;
-    if (specialWeasel) {specialWeaselSpawns = randomIntegerWrapper(luckRate*6,200)}
+    if (specialWeasel) {specialWeaselSpawns = randomIntegerWrapper(luckRate*6, 200)}
 
     for (let i = 0, len = weaselDiv.length; i < len; i++) {
         let weaselImage = weaselDiv[i].querySelector('img');
         if (i === realWeasel) {
+            weaselImage.style.filter = 'unset';
             if (specialWeaselSpawns) {
                 weaselImage.src = "./assets/event/weasel-1.webp";
             } else {
@@ -1534,7 +1547,7 @@ function addWeasel(weaselBack,delay,specialWeasel) {
             let springInterval = (randomInteger(20,25) / 100);
             weaselImage.classList.add("spring");
             weaselImage.style["animation-duration"] = springInterval + "s";
-            weaselImage.addEventListener("click",()=>{
+            weaselImage.addEventListener("click",() => {
                 mailElement.load();
                 mailElement.playbackRate = 1.35;
                 mailElement.play();
@@ -1542,7 +1555,7 @@ function addWeasel(weaselBack,delay,specialWeasel) {
                 delay *= 0.65;
                 if (delay <= 450) {delay = 450}
 
-                clearWeasel(weaselBack,delay,specialWeasel);
+                clearWeasel(weaselBack, delay, specialWeasel);
                 weaselCount++;
                 if (specialWeaselSpawns) {goldWeaselCount++}
 
@@ -1552,9 +1565,10 @@ function addWeasel(weaselBack,delay,specialWeasel) {
         } else {
             let emptyWeasel = randomInteger(7,11);
             if (emptyWeasel != 10 & emptyWeasel != 9) {
-                let springInterval = (randomInteger(15,20) / 100);
+                let springInterval = (randomInteger(15, 20) / 100);
                 weaselImage.classList.add("spring");
                 weaselImage.style["animation-duration"] = springInterval + "s";
+                weaselImage.style.filter = `brightness(${randomInteger(65, 90) / 100})`;
             }
             weaselImage.src = "./assets/event/weasel-"+emptyWeasel+".webp"
         }
@@ -1563,12 +1577,14 @@ function addWeasel(weaselBack,delay,specialWeasel) {
     let fakeAmount = Math.floor(2000/delay + 0.3);
     if (fakeAmount > 10) {fakeAmount = 10}
     let combination = generateCombination(fakeAmount);
-    for (let j=0, len=combination.length; j < len; j++) {
+    for (let j = 0, len = combination.length; j < len; j++) {
         if ((combination[j] - 1) === realWeasel) {continue}
         let weaselImage = weaselDiv[combination[j] - 1].querySelector('img');
-        let fakeWeasel = randomInteger(5,7);
-        if (specialWeasel) {fakeWeasel = randomInteger(4,7)}
+        let fakeWeasel = randomInteger(5, 7);
+        if (specialWeasel) {fakeWeasel = randomInteger(4, 7)}
+
         weaselImage.src = "./assets/event/weasel-"+fakeWeasel+".webp";
+        weaselImage.style.filter = 'unset';
 
         let springInterval = (randomInteger(15,35) / 100)
         weaselImage.classList.add("spring");
@@ -1576,7 +1592,7 @@ function addWeasel(weaselBack,delay,specialWeasel) {
         weaselImage.addEventListener("click",()=> {
             let fakeWeaselAlert = document.getElementById("fake-weasel-alert");
             fakeWeaselAlert.style.animation = "none";
-            setTimeout(()=>{fakeWeaselAlert.style.animation = "fadeOutWeasel 3s linear forwards"},10)
+            setTimeout(() => { fakeWeaselAlert.style.animation = "fadeOutWeasel 3s linear forwards"}, 10)
             weaselDecoy.load();
             weaselDecoy.play();
             clearWeasel(weaselBack, delay, specialWeasel);
@@ -1839,7 +1855,7 @@ function simonEvent(hexMode) {
             if (saysContainer.activeArray[i] !== saysContainer.sequenceArray[i]) {
                 let eventText = `You missed the sequence!`;
                 persistentValues.aranaraLostValue++;
-                eventOutcome(eventText,eventBackdrop,"simon");
+                eventOutcome(eventText, eventBackdrop, "simon");
                 return;
             }
         }
@@ -1848,7 +1864,7 @@ function simonEvent(hexMode) {
             activeElement.style.filter = 'brightness(0.1)';
             if (saysContainer.activeArray.length >= requiredAmount) {
                 let eventText = `You win!`;
-                eventOutcome(eventText,eventBackdrop,"simon");
+                eventOutcome(eventText, eventBackdrop, "simon");
                 return;
             } else if (saysContainer.sequenceArray.length === saysContainer.activeArray.length) {
                 setTimeout(()=>{
@@ -2329,19 +2345,432 @@ function battleshipEvent() {
     mainBody.append(eventBackdrop);
 }
 
+// EVENT 9
+function snakeEvent() {
+    stopSpawnEvents = true;
+    let eventBackdrop = document.createElement("div");
+    eventBackdrop.classList.add("cover-all","flex-column","event-dark","minesweeper-backdrop");
+    eventBackdrop.style.columnGap = "1%";
+
+    const eventDescription = createDom('p', {
+        innerText: 'Collect as many fruits as you can!',
+        classList: ['event-description'],
+        style: {
+            width: '100%',
+            flexBasis: 'unset',
+            top: '4.5%'
+        }
+    });
+
+    const canvasRatio = [8, 5];
+    const imgArray = [];
+    const foodArray = [];
+    const cellCount = 15; // ON HEIGHT SIDE
+
+    let width;
+    let height;
+    let cellLength;
+    let currentFruit = 0;
+
+    let loadedImageCount = 0;
+    const allImagesLoaded = () => {
+        setTimeout(() => {
+            width = canvas.offsetWidth;
+            height = canvas.offsetHeight;
+            cellLength = height / cellCount;
+
+            generateRandomFood();
+            canvas.width = width;
+            canvas.height = height;
+            draw();
+        }, 100);
+    }
+
+    for (let i = 1; i < 10; i++) {
+        const aranaraImg = createDom('img', {
+            src: `./assets/tutorial/aranara-${10 - i}.webp`,
+        })
+
+        imgArray.push(aranaraImg);
+        aranaraImg.onload = () => {
+            loadedImageCount++;
+            if (loadedImageCount === 14) {
+                allImagesLoaded();
+            }
+        }
+    }
+
+    for (let j = 1; j < 6; j++) {
+        const foodImg = createDom('img', {
+            src: `./assets/event/snake-fruit-${j}.webp`,
+        })
+
+        foodArray.push(foodImg);
+        foodImg.onload = () => {
+            loadedImageCount++;
+            if (loadedImageCount === 14) {
+                allImagesLoaded();
+            }
+        }
+    }
+
+    const canvas = createDom('canvas', {
+        brightness: 0,
+        style: {
+            aspectRatio: canvasRatio[0] / canvasRatio[1],
+            background: 'url(./assets/event/snake-bg.webp) no-repeat center center/cover',
+            height: '85%',
+            border: '0.2rem solid var(--bright-dark-green)'
+        }
+    });
+
+    const ctx = canvas.getContext("2d");
+    let foodPosition;
+    let initSnake = [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+    ];
+    
+    let snake = [...initSnake];
+    let frameCount = 0;
+    let extraLife = true;
+    let stopGame = false;
+
+    let direction = "right";
+    let canChangeDirection = false;
+    const changeDirection = (dir) => {
+        switch (dir) {
+            case "up":
+              if (direction === "down" || !canChangeDirection) return
+              direction = "up";
+              canChangeDirection = false;
+              break
+            case "down":
+              if (direction === "up" || !canChangeDirection) return
+              direction = "down";
+              canChangeDirection = false;
+              break
+            case "left":
+              if (direction === "right" || !canChangeDirection) return
+              direction = "left";
+              canChangeDirection = false;
+              break
+            case "right":
+              if (direction === "left" || !canChangeDirection) return
+              direction = "right";
+              canChangeDirection = false;
+              break
+        }
+    };
+
+    document.addEventListener("keydown", (e) => {
+        switch (e.key) {
+            case "ArrowUp":
+            case "w":
+                changeDirection("up");
+                break;
+            case "ArrowDown":
+            case "s":
+                changeDirection("down");
+                break;
+            case "ArrowLeft":
+            case "a":
+                changeDirection("left");
+                break;
+            case "ArrowRight":
+            case "d":
+                changeDirection("right");
+                break;
+        }
+    });
+
+    let heartCounter = createDom('img', {
+        src: './assets/icon/heart-full.webp',
+        classList: ['snake-heart'],
+        style: {
+            filter: 'none'
+        }
+    })
+  
+    // snake
+    function drawSnake() {
+        frameCount++;
+        for (let i = 0; i < snake.length; i++) {
+            ctx.shadowBlur = 3;
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+            ctx.shadowOffsetX = cellLength * 0.075;
+            ctx.shadowOffsetY = cellLength * 0.075;
+
+            ctx.drawImage(
+                imgArray[Math.min(8, (snake.length - i - 1) % 9)], 
+                snake[i][0] * cellLength - cellLength * 0.125, snake[i][1] * cellLength - cellLength * 0.125,
+                cellLength * 1.25, cellLength * 1.25
+            );
+        }
+    }
+    
+    // random food position
+    function generateRandomFood() {
+        const randomX = randomInteger(0, width / cellLength);
+        const randomY = randomInteger(0, height / cellLength);
+
+        if ((randomX === 0 || randomX === Math.ceil(width / cellLength - 1)) || (randomY === 0 || randomY === Math.ceil(height / cellLength - 1))) {
+            return generateRandomFood();
+        }
+
+        for (let i = 0; i < snake.length; i++) {
+            if (snake[i][0] === randomX && snake[i][1] === randomY) {
+                return generateRandomFood();
+            }
+        };
+
+        foodPosition = [randomX, randomY];
+        currentFruit = randomInteger(0, 5);
+    }
+    
+    // draw food
+    function drawFood() {
+        ctx.shadowBlur = 2;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+        ctx.shadowOffsetX = cellLength * 0.05;
+        ctx.shadowOffsetY = cellLength * 0.05;
+
+        ctx.drawImage(
+            foodArray[currentFruit], 
+            foodPosition[0] * cellLength - cellLength * 0.125, foodPosition[1] * cellLength - cellLength * 0.125,
+            cellLength * 1.25, cellLength * 1.25
+        );
+    }
+
+    function snakeMove() {
+        let next;
+        let last = snake[snake.length - 1];
+        // set new snake head by direction
+        switch (direction) {
+            case "up":
+                next = [last[0], last[1] - 1];
+                break;
+            case "down":
+                next = [last[0], last[1] + 1];
+                break;
+            case "left":
+                next = [last[0] - 1, last[1]];
+                break;
+            case "right": 
+                next = [last[0] + 1, last[1]];
+                break;
+            default:
+                break;
+        }
+      
+        // boundary collision
+        const boundary =
+            next[0] < 0 ||
+            next[0] >= width / cellLength ||
+            next[1] < 0 ||
+            next[1] >= height / cellLength
+        
+        // self collision
+        const selfCollision = snake.some(([x, y]) => next[0] === x && next[1] === y);
+      
+        // if collision, restart
+        if (boundary || selfCollision) {
+            stopGame = true;
+            if (extraLife) {
+                return restart();
+            } else {
+                eventDescription.innerText = 'Game Over!';
+                heartCounter.style.opacity = '0.2';
+                canvas.style.filter = 'brightness(0.6) saturate(0.5)';
+                setTimeout(() => {
+                    eventOutcome("", eventBackdrop, "snake", scoreCounter.realScore);
+                }, 300)
+            }
+        }
+      
+        snake.push(next);
+      
+        // if next movement is food, push head, do not shift
+        if (next[0] === foodPosition[0] && next[1] === foodPosition[1]) {
+            updateScore();
+            generateRandomFood();
+
+            if (snake.length < ((cellCount - 1) * (cellCount / canvasRatio[1] * canvasRatio[0] - 1) - 5)) {
+                return;
+            }
+        }
+
+        snake.shift();
+        canChangeDirection = true;
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    const FRAMES_PER_SECOND = 60;
+    const interval = Math.floor(1000 / FRAMES_PER_SECOND);
+    let startTime = performance.now();
+    let previousTime = startTime;
+
+    let currentTime = 0;
+    let deltaTime = 0;
+
+    function animate() {
+        function loop(timestamp) {
+            currentTime = timestamp;
+            deltaTime = currentTime - previousTime;
+            if (deltaTime > interval) {
+                if (stopGame) {
+                    return;
+                }
+
+                let scoreMultiplier = Math.min(MOBILE ? 10 : 12, scoreCounter.score * (MOBILE ? 0.3 : 0.4))
+                canvas.brightness += 0.03 + 0.005 * (scoreMultiplier);
+
+                if (canvas.brightness > 1) {
+                    snakeMove();
+                    clearCanvas();
+                    draw();
+                    canvas.brightness = 0;
+                }
+            }
+            window.requestAnimationFrame(loop);
+        }
+        window.requestAnimationFrame(loop);
+    }
+
+    // MINIGAME EVENT LOOP
+    const draw = () => {
+        drawSnake();
+        drawFood();
+    }
+
+    const startButton = createDom('button', {
+        innerText: 'Start!',
+        classList: ['snake-start'],
+    });
+
+    const restart = () => {
+        snake = [...initSnake];
+        direction = "right";
+        generateRandomFood();
+
+        heartCounter.src = './assets/icon/heart-empty.webp';
+        scoreCounter.score = 0;
+        canvas.brightness = 0;
+        extraLife = false;
+
+        startButton.innerText = 'Start Again!';
+        startButton.addEventListener('click', () => {
+            stopGame = false;
+            canChangeDirection = true;
+            direction = "right";
+
+            animate();
+            updateStartButton();
+        }, {once : true});
+    }
+
+    // BUTTONS UI
+    const controlsBox = createDom('div', {
+        class: ['snake-button-container'],
+    });
+
+    const buttonDirections = ["up", "left", "down", "right"];
+    const directionKey = ["W", "A", "S", "D"];
+    for (let i = 0; i < buttonDirections.length; i++) {
+        const str = buttonDirections[i] + '<br/>' + (!MOBILE ? `(${directionKey[i]})` : '');
+        let emptyCell = createDom('b');
+        let dirButton = createDom('button', {
+            innerHTML: str,
+        });
+
+        dirButton.addEventListener('click', () => {
+            changeDirection(buttonDirections[i]);
+        });
+
+        if (buttonDirections[i] === "up" || buttonDirections[i] === "left") {
+            controlsBox.append(emptyCell, dirButton);
+        } else {
+            controlsBox.append(dirButton);
+        }
+    };
+
+    const scoreCounter = createDom('p', {
+        innerHTML: 'Score: 0',
+        score: 0,
+        realScore: 0,
+    });
+
+    const updateStartButton = () => {
+        if (scoreCounter.realScore > 1000) {
+            startButton.innerHTML = "Max Reward";
+        } else if (scoreCounter.realScore > 650) {
+            startButton.innerHTML = "High Reward";
+        } else if (scoreCounter.realScore > 300) {
+            startButton.innerHTML = "Medium Reward";
+        } else if (scoreCounter.realScore > 150) {
+            startButton.innerHTML = "Low Reward";
+        } else {
+            startButton.innerHTML = "No Reward...";
+        }
+    }
+
+    startButton.addEventListener('click', () => {
+        animate();
+        canChangeDirection = true;
+        startButton.innerHTML = 'No Reward...';
+    }, { once : true });
+
+
+    const updateScore = () => {
+        scoreCounter.score++;
+        scoreCounter.realScore += (10 + Math.floor(scoreCounter.score / 4) * 5);
+        scoreCounter.innerHTML = 'Score: ' + scoreCounter.realScore;
+        updateStartButton();
+    };
+
+    const snakeRightDiv = createDom('div', {
+        class: ['snake-right-div', 'flex-column'],
+        children: [scoreCounter, startButton, heartCounter, controlsBox],
+    });
+
+    const snakeBottomDiv = createDom('div', {
+        style: {
+            width: '100%',
+            flexBasis: '100%',
+            zIndex: '10001',
+            columnGap: '2%'
+        },
+        class: ['flex-row'],
+        child: [canvas, snakeRightDiv]
+    });
+
+    const cancelBox = document.createElement("button");
+    cancelBox.classList.add("cancel-event");
+    cancelBox.innerText = "Give Up...";
+    cancelBox.addEventListener("click", () => {
+        if (eventBackdrop != null) {
+            eventBackdrop.remove();
+            stopSpawnEvents = false;
+        }
+    });
+
+    eventBackdrop.append(eventDescription, snakeBottomDiv, cancelBox);
+    mainBody.append(eventBackdrop);
+}
+
 // EVENT OUTCOME (BLACK BAR THAT APPEARS IN THE MIDDLE OF SCREEN)
-function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
+function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
     stopSpawnEvents = false;
-    let removeClick = document.createElement("div");
-    let boxText = document.createElement("div");
+    let removeClick = createDom('div', { class: ["cover-all"], id: "prevent-clicker" });
+    let boxText = createDom('div', { class: ["event-rain-text"], id: "outcome-text" });
     let boxTextDiv = document.createElement("p");
     let outcomeDelay = 500;
 
-    removeClick.classList.add("cover-all");
-    removeClick.id = "prevent-clicker";
-    boxText.classList.add("event-rain-text");
-    boxText.id = "outcome-text";
-    if (type == "weasel") {
+    if (type === "weasel") {
         outcomeDelay = 0;
         let weaselCount = amount;
         let innerTextTemp;
@@ -2349,10 +2778,12 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
 
         if (weaselCount >= 10) {
             innerTextTemp = `\n You received some items!`;
+            adventure("10-");
             newPop(1);
             amount = randomInteger(100,140);
         } else if (weaselCount >= 7) {
             innerTextTemp = `\n You received a few items!`;
+            adventure("10-");
             newPop(1);
             amount = randomInteger(60,100);
         } else if (weaselCount >= 4) {
@@ -2380,20 +2811,48 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
         }
 
         innerText += innerTextTemp;
-    } else if (type == "reaction") {
+    } else if (type === "snake") {
+        let snakeScore = amount;
+        if (snakeScore > 1000) {
+            innerText += "You received the max reward!!";
+            amount = randomInteger(220,300);
+        } else if (snakeScore > 650) {
+            innerText += "You received a high reward!";
+            amount = randomInteger(140,220);
+        } else if (snakeScore > 300) {
+            innerText += "You received a medium reward!";
+            amount = randomInteger(80,140);
+        } else if (snakeScore > 150) {
+            innerText += "You received a low reward!";
+            amount = randomInteger(40,80);
+        } else {
+            innerText += "You received no reward...";
+            amount = 0;
+        }
+
+        if (snakeScore >= 2000) {
+            challengeNotification(({category: 'specific', value: [3, 5]}));
+            challengeNotification(({category: 'specific', value: [4, 6]}));
+        } else if (snakeScore >= 1400) {
+            challengeNotification(({category: 'specific', value: [3, 5]}));
+        }
+
+
+    } else if (type === "reaction") {
         outcomeDelay = 0;
     }
 
     boxTextDiv.innerText = innerText;
     boxText.append(boxTextDiv);
-    setTimeout(()=> {
+    setTimeout(() => {
         removeClick.append(boxText);
         mainBody.appendChild(removeClick);
-        setTimeout(()=> {
+        setTimeout(() => {
             boxText.classList.add("slide-out-animation");
-            setTimeout(()=> {
+            setTimeout(() => {
                 removeClick.style.pointerEvents = "none";
             },1500)
+
             boxText.addEventListener("animationend",() => {
                 if (type === "primogem") {
                     currencyPopUp("primogem",amount);
@@ -2415,7 +2874,6 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
                     }  else if (amount < 140) {
                         currencyPopUp("primogem",amount,"items",0);
                     } 
-
                 } else if (type === "box") {
                     if (amount < 40 && amount > 0) {
                         currencyPopUp("nuts",amount);
@@ -2429,6 +2887,26 @@ function eventOutcome(innerText,eventBackdrop,type,amount,amount2) {
                 } else if (type === "reaction") {
                     if (amount != 0) {
                         currencyPopUp("items",0,"primogem",amount);
+                    }
+                } else if (type === "snake") {
+                    if (amount < 80 && amount > 0) {
+                        currencyPopUp("primogem",amount);
+                    }  else if (amount < 140) {
+                        currencyPopUp("primogem",amount,"items",0);
+                        adventure("10-");
+                        newPop(1);
+                        sortList("table2");
+                    }  else if (amount < 220) {
+                        currencyPopUp("primogem",amount,"items",0);
+                        adventure("10-");
+                        newPop(1);
+                        sortList("table2");
+                    } else if (amount < 305) {
+                        currencyPopUp("primogem",amount,"items",0);
+                        adventure("10-");
+                        adventure("10-");
+                        newPop(1);
+                        sortList("table2");
                     }
                 }
                 removeClick.remove();
@@ -6934,7 +7412,7 @@ function drawAdventure(advType, wave) {
 
         adventureTextBox.style.animation = "";
         adventureChoiceOne.pressAllowed = true;
-        adventureTextBox.removeEventListener("animationend", textFadeIn,true);
+        adventureTextBox.removeEventListener("animationend", textFadeIn, true);
 
         if (specialty === 'Unusual') {
             setTimeout(() => {
@@ -7572,7 +8050,7 @@ function triggerFight() {
                         advImage.classList.add('dim-filter')}
                 }
             }
-            window.requestAnimationFrame(increaseCooldownBar)
+            window.requestAnimationFrame(increaseCooldownBar);
         }
         adventureFightImg[i].appendChild(adventureAtkCooldown);
     }
@@ -13137,7 +13615,7 @@ function currencyPopUp(type1, amount1, type2, amount2) {
 
     setTimeout(()=> {
         currencyPop.style.animation = "fadeOut 2s cubic-bezier(.93,-0.24,.93,.81) forwards";
-        currencyPop.addEventListener("animationend",()=>{
+        currencyPop.addEventListener("animationend",() => {
             currencyPop.remove();
         })
     },1000)
