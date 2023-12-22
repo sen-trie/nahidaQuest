@@ -292,7 +292,7 @@ function challengeCheck(type, prop, prop2, objectInfo) {
             const cat = objectInfo.category;
             for (let key in challengeThreshold[cat]) {
                 let value = challengeThreshold[cat][key];
-                if (parseInt(objectInfo.value) < parseInt(key)) {
+                if (parseInt(objectInfo.value) < parseInt(key) || typeof(objectInfo.value) !== 'number') {
                     break;
                 } else if (challengeCheckDict[value[0]][value[1]] === false) {
                     challengeCheckDict[value[0]][value[1]] = true;

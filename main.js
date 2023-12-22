@@ -440,10 +440,13 @@ function timerEvents() {
     timerSeconds += timeRatioTemp;
     
     saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff;
-    checkAchievement();
-    refresh();
-    dimHeroButton();
-    addNewRow(true);
+    if (!stopSpawnEvents) {
+        checkAchievement();
+        refresh();
+        dimHeroButton();
+        addNewRow(true);
+    }
+    
     randomEventTimer(timerSeconds);
     timerSave(timerSeconds);
     shopCheck();
@@ -453,10 +456,7 @@ function timerEvents() {
         if (persistentValues.tutorialAscend) {
             growTree('add');
         }
-        activeLeader = 'Paimon'
         checkCommisions();
-
-        randomEventTimer(999)
     };
 }
 
@@ -681,18 +681,18 @@ demoContainer.addEventListener('mousedown', () => {
 })
 
 demoContainer.addEventListener("mouseup", () => {
-    currentlyAutoClick = false;
     touchDemo();
 });
 
-function touchDemo() {
-    if (settingsValues.autoClickBig) {
-        if (autoClick !== null && currentlyAutoClick === false) {
-            clearInterval(autoClick);
-            autoClick = null;
-        }
+document.addEventListener("mouseup", () => {
+    currentlyAutoClick = false;
+    if (autoClick !== null) {
+        clearInterval(autoClick);
+        autoClick = null;
     }
+});
 
+function touchDemo() {
     let clickEarn;
     let crit = false;
     saveValues.clickCount++;
@@ -969,31 +969,26 @@ function clickedEvent(aranaraNumber) {
         }
     }
 
-    if (beta) aranaraNumber = 9;
-
     let eventDropdownText = document.createElement("div");
     eventDropdownText.innerText = eventText[aranaraNumber];
     eventDropdownText.classList.add("flex-column","event-dropdown-text");
 
-    let eventDropdownImage = document.createElement("div");
-    eventDropdownImage.style.background = "url(./assets/tutorial/aranara-"+(aranaraNumber)+".webp)";
-    eventDropdownImage.style.backgroundPosition = "center";
-    eventDropdownImage.style.backgroundSize = "contain";
-    eventDropdownImage.style.backgroundRepeat = "no-repeat";
-    eventDropdownImage.classList.add("event-dropdown-image");
+    let eventDropdownImage = createDom('div', {
+        classList: ["event-dropdown-image"],
+        style: {
+            background: "url(./assets/tutorial/aranara-"+(aranaraNumber)+".webp)",
+            backgroundPosition: "center",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat"
+        }
+    })
     
     eventDropdown.append(eventDropdownBackground, eventDropdownText, eventDropdownImage);
-    if (beta) {
+    eventDropdown.addEventListener("animationend", () => {
         persistentValues.aranaraEventValue++;
         eventDropdown.remove();
         chooseEvent(aranaraNumber, specialEvent);
-    } else {
-        eventDropdown.addEventListener("animationend", () => {
-            persistentValues.aranaraEventValue++;
-            eventDropdown.remove();
-            chooseEvent(aranaraNumber, specialEvent);
-        });
-    }
+    });
     
     mainBody.appendChild(eventDropdown);
 }
@@ -3852,6 +3847,9 @@ function settingsBox(type,eleId) {
             if (commandText === "transcend") {
                 nutPopUp();
                 toggleSettings(true);
+            } else if (commandText === "ascend skip") {
+                persistentValues.tutorialAscend = true;
+                saveData();
             } else if (commandText === "beta tools activate") {
                 localStorage.setItem('beta', true);
                 location.reload();
@@ -4069,6 +4067,10 @@ function settingsBox(type,eleId) {
                     if (commandText === "transcend") {
                         nutPopUp();
                         toggleSettings(true);
+                    } else if (commandText === "ascend skip") {
+                        persistentValues.tutorialAscend = true;
+                        saveData();
+                        location.reload();
                     } else if (commandText === "beta on") {
                         localStorage.setItem('beta', true);
                         location.reload();
@@ -7278,6 +7280,7 @@ function drawAdventure(advType, wave) {
 
     if (adventureScene) {return}
     adventureScene = true;
+    stopSpawnEvents = true;
 
     let removeEle = document.querySelectorAll('.adventure-atk-cooldown, .adventure-atk-cooldown-scara');
     removeEle.forEach((element) => {
@@ -10763,6 +10766,7 @@ function quitAdventure(wonBattle) {
     const comboNumber = document.getElementById("combo-number");
     comboNumber.remove();
     challengeNotification(({category: 'combo', value: comboNumber.maxCombo}));
+    stopSpawnEvents = false;
 
     if (wonBattle) {
         if (adventureVariables.advType === 5 && battleVariables.healthLost === 0) {
@@ -11127,10 +11131,10 @@ function achievementListload() {
 
     let challengeDiv = document.getElementById('challenge-div');
     challengeDiv.classList.add("flex-column");
-    challengeDiv.innerText = "\nLocked. Come back later!";
+    challengeDiv.innerText = "\n[Locked. Come back later!]";
     challengeDiv.id = 'challenge-div';
 
-    if (!persistentValues.tutorialAscend) challengeDiv.style.color = 'black'
+    if (!persistentValues.tutorialAscend) challengeDiv.style.color = '#343030';
     if (persistentValues.tutorialAscend) {
         createChallenge();
     }
@@ -12060,7 +12064,7 @@ function addNutStore() {
     nutTranscend.style.display = "none";
     const nutAscend = document.createElement("div");
     nutAscend.id = "nut-shop-ascend";
-    nutAscend.innerText = "\nLocked. Come back later!";
+    nutAscend.innerText = "\n[Locked. Come back later!]";
     
     let nutButtonContainer = document.createElement("div");
     nutButtonContainer.classList.add('flex-row','nut-button-container');
@@ -13431,7 +13435,7 @@ function refresh() {
     let formatScore = abbrNum(saveValues["realScore"]);
     score.innerText = `${formatScore} Nut${saveValues["realScore"] !== 1 ? 's' : ''}`;
     let formatDps = abbrNum(saveValues["dps"] * foodBuff);
-    dpsDisplay.innerText = formatDps + (MOBILE ? "/s" : " per second") ;
+    dpsDisplay.innerText = `${formatDps} per second`;
 
     energyDisplay.innerText = saveValues["energy"];
     primogemDisplay.innerText = saveValues["primogem"];

@@ -1123,7 +1123,7 @@ table, button, label {
 }
 
 .inventory-selected {
-    border: 0.5rem inset var(--dark-brown);
+    border: 0.35rem inset var(--dark-brown);
     border-radius: 1rem;
     transition: 0.2s ease;
     transform: scale(1.15);
