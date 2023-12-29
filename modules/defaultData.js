@@ -199,6 +199,7 @@ const SettingsDefault = {
     showWishAnimation: true,
     autoClickBig: false,
     wideCombatScreen: false,
+    leftHandMode: false,
 }
 
 const advDictDefault = {

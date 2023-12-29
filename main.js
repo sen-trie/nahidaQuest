@@ -659,6 +659,9 @@ function loadSaveData() {
     if (saveValues.goldenTutorial === true) {
         addNutStore();
     }
+
+    const leftHandCSS = document.getElementById('toggle-css');
+    leftHandCSS.disabled = (settingsValues.leftHandMode ? undefined : 'disabled');
 }
 
 // BIG BUTTON FUNCTIONS
@@ -1457,7 +1460,7 @@ function weaselEvent(specialWeasel) {
     goldWeaselCount = 0;
 
     let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all","event-dark","flex-row","event-dark-row");
+    eventBackdrop.classList.add("cover-all","event-dark","flex-row","event-dark-row","weasel-backdrop");
     eventBackdrop.style.flexWrap = "wrap";
     let eventDescription = document.createElement("p");
     eventDescription.innerText = "Catch the glowing weasel!";
@@ -1756,17 +1759,25 @@ function simonEvent(hexMode) {
     eventBackdrop.classList.add("cover-all","flex-column","event-dark");
 
     let eventDescription = document.createElement("p");
-    eventDescription.innerText = "Follow the sequence! [1]";
+    eventDescription.innerText = "Follow the sequence!";
     eventDescription.classList.add("event-description");
     eventDescription.style.position = "absolute";
-    eventDescription.style.top = "1%";
+    eventDescription.style.top = "2%";
     eventBackdrop.append(eventDescription);
 
     let saysContainer = document.createElement('div');
     saysContainer.sequenceArray = [];
     saysContainer.activeArray = [];
     saysContainer.ready = false;
+
+    let scoreCounter = createDom('p', {
+        class: ['simon-class', 'flex-row'],
+        innerText: '[1]'
+    });
+
+    let currentScore = 1;
     let requiredAmount;
+    let firstTime = true;
 
     if (hexMode) {
         requiredAmount = 7;
@@ -1795,7 +1806,7 @@ function simonEvent(hexMode) {
             saysImg.id = `says-${i}`;
             saysImg.classList.add('say-img');
             saysImg.style.filter = 'brightness(0.1)';
-            saysImg.style.transform = `translate(${(((i === 1) || (i === 4)) ? -1 : 1) * 50}%, ${(i < 3 ? -1 : 1) * 50}%)`;
+            saysImg.style.transform = `translate(${(((i === 1) || (i === 4)) ? -1 : 1) * 55}%, ${(i < 3 ? -1 : 1) * 55}%)`;
             saysImg.addEventListener('click',()=>{
                 saysClick(i);
             })
@@ -1819,10 +1830,20 @@ function simonEvent(hexMode) {
         setTimeout(()=>{
             activeElement.style.filter = 'brightness(0.1)';
             array.shift();
-            if (array.length === 0) {
+            if (currentScore === 1) {
                 saysContainer.ready = true;
+                setTimeout(() => {
+                    if (firstTime) {
+                        saysContainer.ready = false;
+                        showSequence([colorPick]);
+                    }
+                }, 2550);   
             } else {
-                setTimeout(() => {showSequence(array);},550);   
+                if (array.length === 0) {
+                    saysContainer.ready = true;
+                } else {
+                    setTimeout(() => {showSequence(array);}, 550);   
+                }
             }
         },750);
     }
@@ -1840,6 +1861,8 @@ function simonEvent(hexMode) {
         saysContainer.ready = false;
         saysContainer.activeArray.push(number);
 
+        if (firstTime) {!firstTime};
+
         let activeElement = document.getElementById(`says-${number}`);
         activeElement.style.filter = 'brightness(1)';
 
@@ -1851,29 +1874,33 @@ function simonEvent(hexMode) {
             if (saysContainer.activeArray[i] !== saysContainer.sequenceArray[i]) {
                 let eventText = `You missed the sequence!`;
                 persistentValues.aranaraLostValue++;
-                eventOutcome(eventText, eventBackdrop, "simon");
+                eventOutcome(eventText, eventBackdrop, "simon", 0);
                 return;
             }
         }
         
         setTimeout(()=>{
             activeElement.style.filter = 'brightness(0.1)';
-            if (saysContainer.activeArray.length >= requiredAmount) {
-                let eventText = `You win!`;
-                eventOutcome(eventText, eventBackdrop, "simon");
-                return;
-            } else if (saysContainer.sequenceArray.length === saysContainer.activeArray.length) {
+            if (saysContainer.sequenceArray.length === saysContainer.activeArray.length) {
                 setTimeout(()=>{
                     saysContainer.activeArray = [];
-                    eventDescription.innerText = `Follow the sequence! [${saysContainer.sequenceArray.length+1}]`;
-                    addSequence();
-                },500)
+                    currentScore++;
+                    if (currentScore >= requiredAmount) {
+                        let eventText = `You win!`;
+                        eventOutcome(eventText, eventBackdrop, "simon", hexMode ? randomInteger(120, 160) : randomInteger(90, 130));
+                        return;
+                    } else {
+                        scoreCounter.innerText = `[${currentScore}]`;
+                        addSequence();
+                    }
+                }, 300)
             } else {
                 saysContainer.ready = true;
             }
-        },350);
+        },300);
     }
 
+    saysContainer.append(scoreCounter);
     eventBackdrop.append(saysContainer);
     mainBody.append(eventBackdrop);
 }
@@ -2309,13 +2336,13 @@ function battleshipEvent() {
     function checkScore(type) {
         if (type === 'friendly') {
             if (friendlyDiv.score === 0) {
-                eventOutcome("You lost! You didn't win any treasure...", eventBackdrop);
+                eventOutcome("You lost! You didn't win any treasure...", eventBackdrop, 0);
                 persistentValues.aranaraLostValue++;
                 battleshipContainer.gameStarted = false;
             }
         } else {
             if (enemyDiv.score === 0) {
-                eventOutcome("You won! You earned some treasure!", eventBackdrop);
+                eventOutcome("You won! You earned some treasure!", eventBackdrop, "battleships", 1);
                 battleshipContainer.gameStarted = false;
 
                 let finalHealth = friendlyDiv.score;
@@ -2344,9 +2371,13 @@ function battleshipEvent() {
 // EVENT 9
 function snakeEvent() {
     stopSpawnEvents = true;
-    let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all","flex-column","event-dark","minesweeper-backdrop");
-    eventBackdrop.style.columnGap = "1%";
+    let eventBackdrop = createDom('div', {
+        classList: ["cover-all","flex-column","event-dark","minesweeper-backdrop"],
+        style: {
+            columnGap: '1%',
+            flexDirection: 'column'
+        }
+    })
 
     const eventDescription = createDom('p', {
         innerText: 'Collect as many fruits as you can!',
@@ -2734,13 +2765,7 @@ function snakeEvent() {
     });
 
     const snakeBottomDiv = createDom('div', {
-        style: {
-            width: '100%',
-            flexBasis: '100%',
-            zIndex: '10001',
-            columnGap: '2%'
-        },
-        class: ['flex-row'],
+        class: ['flex-row', 'snake-description'],
         child: [canvas, snakeRightDiv]
     });
 
@@ -2832,8 +2857,6 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
         } else if (snakeScore >= 1400) {
             challengeNotification(({category: 'specific', value: [3, 5]}));
         }
-
-
     } else if (type === "reaction") {
         outcomeDelay = 0;
     }
@@ -2883,6 +2906,22 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
                 } else if (type === "reaction") {
                     if (amount != 0) {
                         currencyPopUp("items",0,"primogem",amount);
+                    }
+                } else if (type === "simon") {
+                    if (amount != 0) {
+                        currencyPopUp("primogem",amount,"items",0);
+                        adventure("10-");
+                        newPop(1);
+                        sortList("table2");
+                    }
+                } else if (type === "battleship") {
+                    if (amount != 0) {
+                        currencyPopUp("items",0);
+                        adventure("10-");
+                        adventure("10-");
+                        adventure("10-");
+                        newPop(1);
+                        sortList("table2");
                     }
                 } else if (type === "snake") {
                     if (amount < 80 && amount > 0) {
@@ -4130,6 +4169,7 @@ function settingsBox(type,eleId) {
             {id: 'wish-preference',  default: 'showWishAnimation', text: "Show Wish Animation"},
             {id: 'auto-preference',  default: 'autoClickBig', text: "Hold to Click 'Big Nahida'"},
             {id: 'wide-combat-preference',  default: 'wideCombatScreen', text: "Wide Battle Screen"},
+            {id: 'left-hand-mode',  default: 'leftHandMode', text: "Left Handed Mode"},
         ]
 
         let advancedSettingsMenu;
@@ -4173,6 +4213,16 @@ function settingsBox(type,eleId) {
                             adventureVideo.style.width = prefer.checked ? '95%' : '60%';
                         }
                         settingsValues.wideCombatScreen = prefer.checked;
+                    });
+                case 'left-hand-mode':
+                    prefer.addEventListener('change', () => {
+                        const leftHandCSS = document.getElementById('toggle-css');
+                        if (prefer.checked) {
+                            leftHandCSS.disabled = undefined;
+                        } else {
+                            leftHandCSS.disabled = 'disabled';
+                        }
+                        settingsValues.leftHandMode = prefer.checked;
                     });
                 default:
                     prefer.addEventListener('change', () => {
@@ -13748,15 +13798,18 @@ function newPop(type) {
     }    
 }
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'f') {
-        for (let i = 0; i < 5; i++) {
-            for (let j = 0; j < 10; j++) {
-                challengeNotification(({category: 'specific', value: [i, j]}));
-            }
+if (beta) {
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'f') {
+            // for (let i = 0; i < 5; i++) {
+            //     for (let j = 0; j < 10; j++) {
+            //         challengeNotification(({category: 'specific', value: [i, j]}));j
+            //     }
+            // }
+            simonEvent(true);
         }
-    }
-})
+    })    
+}
 
 }
 

@@ -618,14 +618,38 @@
 }
 
 .say-container {
-    background: url(./assets/event/says-0.webp) no-repeat center center/cover;
+    position: relative;
+}
+
+.say-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background: url(./assets/event/says-0.webp) no-repeat center center/contain;
+    transform: scale(0.75);
+    pointer-events: none;
 }
 
 .hex-container {
     background: url(./assets/event/hex-0.webp) no-repeat center center/contain;
 }
 
+.simon-class {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-shadow: var(--text-shadow-075);
+    color: white;
+    z-index: 11;
+    font-size: 2rem;
+    pointer-events: none;
+}
+
 .say-img {
+    z-index: 1;
     position: absolute;
     height: 100%;
     object-fit: contain;
@@ -819,6 +843,13 @@
     width: 100%;
     object-fit: contain;
     margin-bottom: 5rem;
+}
+
+.snake-description {
+    width: 100%;
+    flex-basis: 100%;
+    z-index: 10001;
+    column-gap: 2%
 }
 
 /*/////////////////////////////// ADVENTURE CSS ///////////////////////////////*/

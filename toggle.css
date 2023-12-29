@@ -1,0 +1,43 @@
+
+.left-area {
+    left: unset;
+    right: 0.2%;
+}
+
+.right-area {
+    right: unset;
+    left: 0;
+}
+
+.middle-area {
+    left: unset;
+    right: 35.2%;
+}
+
+.main-table {
+    flex-direction: row-reverse;
+}
+
+.char-select {
+    left: unset;
+    right: 1%;
+}
+
+.char-menu {
+    left: unset;
+    right: 2%;
+}
+
+.notif-select {
+    right: unset;
+    left: 3%;
+}
+
+.currency-pop {
+    left: unset;
+    right: 32%;
+}
+
+.minesweeper-backdrop, .weasel-backdrop, .adventure-fight, .battleship-div, .snake-description {
+    flex-direction: row-reverse;
+}
