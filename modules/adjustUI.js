@@ -303,9 +303,19 @@ const textDict = {
 
 // CREATES MEDAL FOR SETTINGS MENU
 function createMedal(num, choiceBox, mainBody, stopSpawnEvents) {
-    const nutMedalImg = createDom('img', {
-        src: `./assets/frames/medal-${num}-backing.webp`
-    })
+    let nutMedalImg;
+    if (num === 3) {
+        nutMedalImg = createDom('video', {
+            src: `./assets/frames/medal-${num}-backing.webm`,
+            autoplay: true,
+            controls: true,
+        })
+    } else {
+        nutMedalImg = createDom('img', {
+            src: `./assets/frames/medal-${num}-backing.webp`,
+        })
+    }
+    nutMedalImg.classList.add('medal-backing');
 
     const nutMedal = createDom('img', {
         class: ['medal-img', 'clickable'],
@@ -317,12 +327,13 @@ function createMedal(num, choiceBox, mainBody, stopSpawnEvents) {
                 yes: 'Download',
                 no: 'Go Back'
             }, stopSpawnEvents, () => {
-                const imgSrc = `./assets/frames/medal-${num}-backing${textDict[num][1]}`;
+                const imgSrc = `./assets/frames/${textDict[num][0] + textDict[num][1]}`;
                 const imgFileName = imgSrc.substring(imgSrc.lastIndexOf('/') + 1);
                 
                 const link = document.createElement('a');
                 link.href = imgSrc;
                 link.download = imgFileName;
+
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);

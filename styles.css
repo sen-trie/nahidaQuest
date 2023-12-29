@@ -2351,6 +2351,14 @@ table, button, label {
     transform: translateZ(0);
 }
 
+.challenge-text {
+    padding: 1rem;
+    padding-bottom: 0rem;
+    box-sizing: border-box;
+    width: 100%;
+    color: var(--very-dark-brown);
+}
+
 .tier-button {
     background-color: #1F2834;
     border: 0.2em solid #333D47;
@@ -2358,6 +2366,7 @@ table, button, label {
     width: 95%;
     padding: 1%;
     box-sizing: border-box;
+    justify-content: space-between;
 }
 
 .tier-button:first-of-type {
@@ -2737,7 +2746,9 @@ table, button, label {
 }
 
 #tree-side {
-    background: linear-gradient(to bottom, #ACA9FC, #D2EEFC);
+    background: url(./assets/tree/weather.png) no-repeat center center/cover;
+    background-position: 0% 0%;
+    animation: movingBG 120s infinite;
 }
 
 .tree-progress, .leyline-progress {
@@ -2816,6 +2827,10 @@ table, button, label {
     position: relative;
 }
 
+#leyline-text {
+    margin-top: 2rem;
+}
+
 .tree-2::before, .tree-3::before, .tree-4::before {
     content: "";
     position: absolute;
@@ -2862,15 +2877,15 @@ table, button, label {
     height: 75%;
 }
 
-.cloud {
+/* .cloud {
     z-index: -1;
     right: 100%;
     position: absolute;
     width: 20%;
     height: auto;
     touch-action: none;
-    /* right: 100%; */
-}
+    right: 100%;
+} */
 
 .affinity-container {
     width: auto;
@@ -3111,7 +3126,7 @@ table, button, label {
     animation-delay: -0.7s;
 }
 
-.choice-ele > div > img {
+.medal-backing {
     width: 100%;
     object-fit: contain;
     filter: drop-shadow(0 0 0.2em black);
@@ -3597,6 +3612,30 @@ table, button, label {
     }
       50% {
         transform: translateY(-5%);
+    }
+}
+
+@keyframes glowEnhance {
+    0% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.4) saturate(2);
+    }
+    100% {
+        filter: brightness(1);
+    }
+}
+
+@keyframes movingBG {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 60% 0%;
+    }
+    100% {
+        background-position: 0% 0%;
     }
 }
 

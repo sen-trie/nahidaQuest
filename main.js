@@ -281,6 +281,7 @@ let achievementData = {
     achievementTypeGolden:        [1,10,25,50,100,200,350,500,750,1000],
 }
 let scoreAchievement = [1,101,201,301,401];
+let challengeMultiplier = 0;
 
 let foodBuff = 1;
 let clickerEvent = "none";
@@ -439,7 +440,7 @@ function timerEvents() {
     let timeRatioTemp = timeRatio / 1000;
     timerSeconds += timeRatioTemp;
     
-    saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff;
+    saveValues["realScore"] += timeRatioTemp * saveValues["dps"] * foodBuff * (100 + challengeMultiplier) / 100;
     if (!stopSpawnEvents) {
         checkAchievement();
         refresh();
@@ -2926,7 +2927,7 @@ function loadingAnimation() {
     let value = parseInt(loadingNumber.loadingValue);
     let preloadArray = drawUI.preloadMinimumArray(upgradeInfo);
     preloadStart.fetch(preloadArray).then(() => {
-        setTimeout(() => {removeLoading(loadingNumber)}, 300);
+        setTimeout(() => {removeLoading(loadingNumber)}, 2000);
     });
 
     preloadStart.onprogress = event => {
@@ -11168,15 +11169,50 @@ function createChallenge() {
     const challengeDiv = document.getElementById('challenge-div');
     challengeDiv.innerText = '';
     challengeDiv.style.color = '#D9BD85';
+    
+    const challengeText = createDom('p', {
+        id: 'challenge-text',
+        classList: ['challenge-text'],
+        innerHTML: ``
+    });
+
+    challengeText.updateNumber = () => {
+        challengeText.innerHTML =  `Earn Global NpS multipliers through challenges!
+        Current Multiplier: [s]${challengeMultiplier}%[/s]`
+
+        challengeText.innerHTML = textReplacer({
+            "[s]":`<span style='color:#A97803'>`,
+            "[/s]":`</span>`,
+            "\n":`<br>`,
+        }, challengeText.innerHTML);
+    }
+
+    challengeDiv.append(challengeText);
 
     const romanNum = ["I: Initiate's Journey",'II: Skillful Endeavors','III: Challenging Pursuits',"IV: Elites' Quest",'V: Ultimate Challenge'];
     let challengeDict = persistentValues.challengeCheck;
 
     for (let i = 0; i < challengeInfo.length; i++) {
-        const tierButton = document.createElement("div");
-        tierButton.classList.add('tier-button');
-        tierButton.id = `tier-button-${i}`;
-        tierButton.innerText = 'Tier ' + romanNum[i];
+        const tierButton = createDom('div', {
+            classList: ['tier-button', 'flex-row'],
+            id: `tier-button-${i}`,
+            challengeCount: 0,
+        });
+
+        const tierText = createDom('p', {
+            innerText: 'Tier ' + romanNum[i]
+        });
+
+        const tierCount = createDom('p');
+
+        tierButton.append(tierText, tierCount);
+        tierButton.updateChallengeCount = () => {
+            tierCount.innerText = `[${tierButton.challengeCount}/10]`
+            if (tierButton.challengeCount === 10) {
+                tierCount.innerText = '[MAX]'
+                challengeMultiplier += 50;
+            }
+        }
 
         let tierContainer = document.createElement("div");
         tierContainer.classList.add('tier-container');
@@ -11198,7 +11234,9 @@ function createChallenge() {
             if (challengeDict[i][j] === false) {
                 challengeButton.innerText = 'Locked';
             } else {
-                challengeButton.innerText = 'Claimed';
+                tierButton.challengeCount++;
+                challengeMultiplier += (i + 1) * 5;
+                challengeButton.innerText = 'Unlocked';
                 challengeButton.classList.add('challenge-button-claimed');
             }
 
@@ -11207,6 +11245,7 @@ function createChallenge() {
             tierContainer.append(challengeContainer)
         }
 
+        tierButton.updateChallengeCount();
         tierButton.addEventListener("click", () => {
             if (tierContainer.style.display === 'none') {
                 tierContainer.style.display = 'block';
@@ -11215,8 +11254,9 @@ function createChallenge() {
             }
         })
 
-        challengeDiv.append(tierButton,tierContainer)
+        challengeDiv.append(tierButton,tierContainer);
     }
+    challengeText.updateNumber();
 }
 
 
@@ -11339,12 +11379,19 @@ function challengeNotification(value) {
         challengePop(res);
         res.forEach((posArray) => {
             const challengeButton = document.getElementById(`challenge-button-${posArray[0]}-${posArray[1]}`);
-            challengeButton.innerText = 'Claimed';
+            challengeButton.innerText = 'Unlocked';
             challengeButton.classList.add('challenge-button-unclaimed');
+
+            let tierButton = document.getElementById(`tier-button-${posArray[0]}`);
+            tierButton.challengeCount++;
+            tierButton.updateChallengeCount();
+            challengeMultiplier += (posArray[0] + 1) * 5;
 
             const challengeTitle = document.getElementById(`challenge-title-${posArray[0]}-${posArray[1]}`)
             challengeTitle.innerText = `${challengeInfo[posArray[0]][posArray[1]].title}`;
         });
+
+        document.getElementById('challenge-text').updateNumber();
 
         let getAllAchievements = true;
         outerLoop: for (let tier in challengeDict) {
@@ -12081,15 +12128,13 @@ function addNutStore() {
             }
             nutArray[i].style.display = "flex";
         })
-
         nutButtonContainer.appendChild(nutButton);
     }
 
-    
-
-    let nutStoreButton = document.createElement("button");
-    nutStoreButton.classList = "nut-store-access";
-    nutStoreButton.addEventListener("click",()=>{
+    let nutStoreButton = createDom('button', {
+        classList: ["nut-store-access"],
+    });
+    nutStoreButton.addEventListener("click",() => {
         calculateGoldenCore();
         universalStyleCheck(nutStoreTable,"display","flex","none");
     })
@@ -12605,6 +12650,7 @@ function createTreeMenu() {
     const treeImg = new Image();
     let treeLevel = saveValues.treeObj.level;
     treeImg.id = 'tree-img';
+    treeImg.style.animation = 'unset';
     treeImg.classList.add('tree-image');
 
     if (treeLevel !== 0) {
@@ -12643,28 +12689,28 @@ function createTreeMenu() {
     treeProgressValue.id = 'tree-progress-value';
     treeProgressValue.rate;
 
-    function createCloud(range) {
-        let cloudImg = new Image();
-        cloudImg.classList.add('cloud');
-        cloudImg.style.top = (randomInteger(range * 100, (range + 1) * 100)/10) + '%';
-        cloudImg.style.animation = `slide ${randomInteger(2000,9000)/100}s linear`;
-        cloudImg.style.width = `${randomInteger(150,350)/10}%`;
-        cloudImg.src = `assets/tree/cloud${randomInteger(1,5)}.webp`;
+    // function createCloud(range) {
+    //     let cloudImg = new Image();
+    //     cloudImg.classList.add('cloud');
+    //     cloudImg.style.top = (randomInteger(range * 100, (range + 1) * 100)/10) + '%';
+    //     cloudImg.style.animation = `slide ${randomInteger(2000,9000)/100}s linear`;
+    //     cloudImg.style.width = `${randomInteger(150,350)/10}%`;
+    //     cloudImg.src = `assets/tree/cloud${randomInteger(1,5)}.webp`;
 
-        cloudImg.addEventListener('animationend',() => {
-            cloudImg.style.animation = 'unset';
-            void cloudImg.offsetWidth;
-            cloudImg.style.top = (randomInteger(range * 100, (range + 1) * 100)/10) + '%';
-            cloudImg.style.animation = `slide ${randomInteger(2000,9000)/100}s linear`;
-            cloudImg.style.width = `${randomInteger(150,350)/10}%`;
-        })
-        treeSide.appendChild(cloudImg);
-    }
+    //     cloudImg.addEventListener('animationend',() => {
+    //         cloudImg.style.animation = 'unset';
+    //         void cloudImg.offsetWidth;
+    //         cloudImg.style.top = (randomInteger(range * 100, (range + 1) * 100)/10) + '%';
+    //         cloudImg.style.animation = `slide ${randomInteger(2000,9000)/100}s linear`;
+    //         cloudImg.style.width = `${randomInteger(150,350)/10}%`;
+    //     })
+    //     treeSide.appendChild(cloudImg);
+    // }
 
-    const cloudArray = [0,0.5,1,1.5,2.5,4];
-    cloudArray.forEach((num) => {
-        createCloud(num);
-    })
+    // const cloudArray = [0,0.5,1,1.5,2.5,4];
+    // cloudArray.forEach((num) => {
+    //     createCloud(num);
+    // })
 
     treeContainer.appendChild(treeImg);
     treeSide.append(treeProgressBar,sandImg,treeContainer,treeHealthContainer,treeProgressValue);
@@ -12801,8 +12847,10 @@ function offerBox(treeTable, optionsContainer) {
     const buttonContainer = document.createElement('container');
     buttonContainer.classList.add('flex-row')
 
-    const backButton = document.createElement('button');
-    backButton.innerText = 'Back';
+    const backButton = createDom('button', {
+        innerText: 'Back',
+        id: 'tree-offer-button'
+    });
     backButton.addEventListener('click', () => {
         universalStyleCheck(optionsContainer,"display","flex","none");
         universalStyleCheck(treeOffer,"display","none","flex");
@@ -12848,6 +12896,15 @@ function offerItemFunction() {
             if (newAmount === 0) {(document.getElementById(itemNumber)).remove();}
         }
     }
+
+    const treeImg = document.getElementById('tree-img');
+    treeImg.style.animation = 'glowEnhance 0.7s linear';
+    treeImg.addEventListener('animationend', () => {
+        treeImg.style.animation = 'unset';
+    }, { once: true });
+
+    saveValues.treeObj.growthRate = Math.round(saveValues.treeObj.growthRate * 1.05 * 100) / 100;
+    updateTreeValues(false);
 
     saveValues.treeObj.offerAmount++;
     challengeNotification(({category: 'offer', value: saveValues.treeObj.offerAmount}))
@@ -13010,7 +13067,7 @@ function destroyTree() {
     },100);
 }
 
-function updateTreeValues(turnZero) {
+function updateTreeValues(turnZero = false) {
     const treeProgress = document.getElementById('tree-progress');
     const treeProgressValue = document.getElementById('tree-progress-value');
     const palmEnergy = document.getElementById('palm-text');
@@ -13196,6 +13253,8 @@ function updateSeedContainer(updateValueOnly) {
                     seedNum *= Math.max(Math.log(((seedAdded[i] * (i + 1)) + 1)), 1);
                 }
 
+                if (beta) {seedValue = 99}
+
                 if (seedValue > 0) {
                     saveValues.treeObj.growthRate = Math.round(seedNum * 100) / 100;
                     seedContainer.remove();
@@ -13225,6 +13284,10 @@ function growTree(type, amount) {
             if (treeProgress.progress > 100) {
                 // REMOVE MAXED TREE
                 if (saveValues.treeObj.level === 4) {
+                    let treeOfferContainer = document.getElementById('tree-offer-container')
+                    if (treeOfferContainer.style.display !== 'none') {
+                        document.getElementById('tree-offer-button').click();
+                    }
                     saveValues.treeObj.level = 5;
                     treeOptions(true, document.getElementById('options-container'), true);
                 } else {
@@ -13325,7 +13388,6 @@ function compareTreeItems(itemArray) {
 
 function leylineCreate(treeTable, optionsContainer) {
     const leylineDisplay = createDom('div', {class:['flex-column'], id:'leyline-container', style:{ display:'none' }});
-
     const leylineTitle = createDom('p', { innerHTML: 'Leyline Outbreak Energy Level' });
     const leylineBar = createProgressBar(
         { class: ['leyline-progress', 'healthbar-container'] },
@@ -13337,10 +13399,15 @@ function leylineCreate(treeTable, optionsContainer) {
         { src: './assets/tree/skull.webp'}
     );
      
-    let text = `<br>Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
-                <br> cost of your tree's HP (More effective at higher phases)`
+    let text = `Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
+                <br> cost of your tree's HP`
     const leylineText = createDom('p', { innerHTML: text, id:'leyline-text' });
-    const leylineEnergy = createDom('p', { innerText: `Current Energy Levels: ${Math.round(persistentValues.leylinePower * 10) / 10}%`, progress: persistentValues.leylinePower });
+    const leylineEnergy = createDom('p', { innerHTML: `
+        Current Energy Levels: ${Math.round(persistentValues.leylinePower * 10) / 10}%
+        <br><span style='font-size: 0.6em'>Note: Energy levels correspond to the amount of rewards after harvesting. 
+        <br>Trees have the highest energy absorption rate when mature.</span>
+    `, progress: persistentValues.leylinePower });
+
     checkAbsorbThreshold();
 
     const absorbButton = document.createElement('button');
@@ -13434,7 +13501,7 @@ function checkAbsorbThreshold() {
 function refresh() {
     let formatScore = abbrNum(saveValues["realScore"]);
     score.innerText = `${formatScore} Nut${saveValues["realScore"] !== 1 ? 's' : ''}`;
-    let formatDps = abbrNum(saveValues["dps"] * foodBuff);
+    let formatDps = abbrNum(saveValues["dps"] * foodBuff * (100 + challengeMultiplier) / 100);
     dpsDisplay.innerText = `${formatDps} per second`;
 
     energyDisplay.innerText = saveValues["energy"];
@@ -13681,6 +13748,16 @@ function newPop(type) {
     }    
 }
 
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'f') {
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 10; j++) {
+                challengeNotification(({category: 'specific', value: [i, j]}));
+            }
+        }
+    }
+})
+
 }
 
 // FOR TESTING PURPOSES ONLY
@@ -13708,15 +13785,14 @@ if (beta) {
             let startButton = document.getElementById("play-button");
             if (startButton) startButton.click();
             setTimeout(()=>{startingFunction();},500)
-        },2500);
-    },800);
+        }, 3500);
+    }, 800);
 
     function startingFunction() {
         // PRESS A KEY
         const event = new KeyboardEvent('keydown', {
             key: '3',
         });
-          
         // document.dispatchEvent(event);
 
         // BETA FUNCTIONS
