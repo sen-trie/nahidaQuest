@@ -75,35 +75,42 @@ function randomIntegerWrapper(compare, max = 100) {
 }
 
 // GENERATE BASE ATK AND COSTS OF NON-WISH HEROES (IF SAVE NOT FOUND)
-function generateHeroPrices(upgradeDict, NONWISHHEROMAX) {
+function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo) {
     let initBaseCost = 50;
     let multiplierBaseCost = 3;
     let initATKCost = 1;
     let multiplierATKCost = 1.5;
+
     let currentHero = 1;
-    let currentKey = 1;
+    let laggingKey = 0;
 
-    for (let i = 1; i < NONWISHHEROMAX + 1; i++) {
-        if (upgradeDict[i] === undefined) {continue}
-        if (upgradeDict[i].Locked === true) {continue}
+    for (let key in upgradeInfo) {
+        const currentKey = parseInt(key);
+        if (currentKey === 0) {
+            continue;
+        } else {
+            upgradeDict[currentKey] = {Row: -1};
+            if (currentKey < NONWISHHEROMAX) {
+                upgradeDict[currentKey].Purchased = -1;
 
-        let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero-1)*1.3)));
-        let baseATK = Math.round(initATKCost * (multiplierATKCost **((currentHero-1)*3.3)));
-        let baseLevel = Math.round(0.75 * baseCost);
-        upgradeDict[i]["BaseCost"] = baseCost;
-        upgradeDict[i]["Level"] = baseLevel.toExponential(3);
-        upgradeDict[i]["Factor"] = baseATK;
+                let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero - 1) * 1.3)));
+                let baseATK = Math.round(initATKCost * (multiplierATKCost ** ((currentHero - 1) * 3.3)));
 
-        if (currentKey > 1) {
-            upgradeDict[i]["BaseCost"] = Math.round(baseCost + upgradeDict[currentKey]["BaseCost"] * 6);
-            upgradeDict[i]["Level"] = Math.round(upgradeDict[i]["BaseCost"] * 0.75);
-            upgradeDict[i]["Factor"] = Math.round(baseATK + upgradeDict[currentKey]["Factor"] * 4.5);
+                // INCLUDES COST OF PREVIOUS HERO
+                upgradeDict[currentKey]["BaseCost"] = Math.round(baseCost + upgradeDict[laggingKey]["BaseCost"] * 6);
+                upgradeDict[currentKey]["Level"] = Math.round(upgradeDict[currentKey]["BaseCost"] * 0.75);
+                upgradeDict[currentKey]["Factor"] = Math.round(baseATK + upgradeDict[laggingKey]["Factor"] * 4.5 + 0.05 * upgradeDict[laggingKey]["BaseCost"]);
+
+                upgradeDict[currentKey]["BaseFactor"] = upgradeDict[currentKey]["Factor"];
+                upgradeDict[currentKey]["Contribution"] = 0;
+
+                laggingKey = currentKey;
+                currentHero++;
+            } else {
+                upgradeDict[currentKey].Purchased = -10;
+                upgradeDict[currentKey].Level = 0;
+            }
         }
-        
-        upgradeDict[i]["BaseFactor"] = upgradeDict[i]["Factor"];
-        upgradeDict[i]["Contribution"] = 0;
-        currentHero++;
-        currentKey = i;
     }
 
     return upgradeDict;

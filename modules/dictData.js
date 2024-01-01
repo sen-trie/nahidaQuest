@@ -499,8 +499,6 @@ const upgradeInfo = {
         Ele: "Dendro",
         Nation: "Inazuma"
     },
-
-    // 161, 200 - 205
     200: {
         Name: "Furina",
         Lore: "Listen carefully, desserts are like operas... Everything from choosing the characters to imagining the setting requires a lot of effort in order to make the final performance a hit!",
@@ -512,21 +510,21 @@ const upgradeInfo = {
         Name: "Lynette",
         Lore: "I'm not accustomed to expressing myself, but I consider myself a good listener. If you have any troubles, come find me. I'll guard your secrets.",
         Type: "Sword",
-        Ele: "Hydro",
+        Ele: "Anemo",
         Nation: "Fontaine"
     },
     202: {
         Name: "Lyney",
         Lore: "The wind is really picking up... Ah, all my magic cards! Wait! No, no, not that way, come back! Come to Lyney!!!",
         Type: "Bow",
-        Ele: "Hydro",
+        Ele: "Pyro",
         Nation: "Fontaine"
     },
     203: {
         Name: "Freminet",
         Lore: "If you look up at the sky from far enough underwater, even the sun is soft on the eyes. That's why I like it down there.",
         Type: "Claymore",
-        Ele: "Hydro",
+        Ele: "Cryo",
         Nation: "Fontaine"
     },
     204: {
@@ -540,10 +538,9 @@ const upgradeInfo = {
         Name: "Charlotte",
         Lore: "People aren't always very fond of journalists. You know what they say — lies are soft and malleable, but the truth is sharp and inflexible.",
         Type: "Catalyst",
-        Ele: "Hydro",
+        Ele: "Cryo",
         Nation: "Fontaine"
     },
-
     // RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS
     800: {
         Name: "Wanderer",
@@ -708,21 +705,21 @@ const achievementListDefault = {
     213: {Name:"Kernel Keeper",                       Description:"Click 35,000 times"                         },
     214: {Name:"Greatest Challenge",                  Description:"Click 40,000 times"                         },
     215: {Name:"The Master of Cultivation",           Description:"Click 50,000 times"                         },
-    301: {Name:"Lvl.1 Grunt",                         Description:"Upgrade 1 time"                             },
-    302: {Name:"Clan Leader",                         Description:"Upgrade 10 times"                           },
-    303: {Name:"Peas in a Pod",                       Description:"Upgrade 100 times"                          },
-    304: {Name:"Flourishing Green",                   Description:"Upgrade 250 times"                          },
-    305: {Name:"Sumerian City",                       Description:"Upgrade 500 times"                          },
-    306: {Name:"Lvl.10 Knight",                       Description:"Upgrade 750 time"                           }, 
-    307: {Name:"Eon's Elite",                         Description:"Upgrade 1000 times"                         },
-    308: {Name:"Witch of the Rose",                   Description:"Upgrade 1250 times"                         },
-    309: {Name:"Philosophies of Ingenuity",           Description:"Upgrade 1500 times"                         },
-    310: {Name:"Team Sigil",                          Description:"Upgrade 1750 times"                         },
-    311: {Name:"Powers Combined",                     Description:"Upgrade 2000 times"                         },
-    312: {Name:"Ajilenakh Knight",                    Description:"Upgrade 2250 times"                         },
-    313: {Name:"Queen of Heroes",                     Description:"Upgrade 2500 times"                         },
-    314: {Name:"Lvl.100 Shogun",                      Description:"Upgrade 2750 times"                         },
-    315: {Name:"A Heart of Dendro",                   Description:"Upgrade 3000 times"                         },
+    301: {Name:"Lvl.1 Grunt",                         Description:"Level 1 time"                             },
+    302: {Name:"Clan Leader",                         Description:"Level 10 times"                           },
+    303: {Name:"Peas in a Pod",                       Description:"Level 100 times"                          },
+    304: {Name:"Flourishing Green",                   Description:"Level 250 times"                          },
+    305: {Name:"Sumerian City",                       Description:"Level 500 times"                          },
+    306: {Name:"Lvl.10 Knight",                       Description:"Level 750 times"                          }, 
+    307: {Name:"Eon's Elite",                         Description:"Level 1000 times"                         },
+    308: {Name:"Witch of the Rose",                   Description:"Level 1250 times"                         },
+    309: {Name:"Philosophies of Ingenuity",           Description:"Level 1500 times"                         },
+    310: {Name:"Team Sigil",                          Description:"Level 1750 times"                         },
+    311: {Name:"Powers Combined",                     Description:"Level 2000 times"                         },
+    312: {Name:"Ajilenakh Knight",                    Description:"Level 2250 times"                         },
+    313: {Name:"Queen of Heroes",                     Description:"Level 2500 times"                         },
+    314: {Name:"Lvl.100 Shogun",                      Description:"Level 2750 times"                         },
+    315: {Name:"A Heart of Dendro",                   Description:"Level 3000 times"                         },
     401: {Name:"Struck Gold",                         Description:"Obtain 1 Golden Nut"                        },
     402: {Name:"Golden Vow",                          Description:"Obtain 10 Golden Nuts"                       },
     403: {Name:"Golden Harvest",                      Description:"Obtain 25 Golden Nuts"                       },

@@ -515,7 +515,7 @@ function loadSaveData() {
     }
     // LOAD HEROES DATA
     if (localStorage.getItem("upgradeDictSave") === null) {
-        let upgradeDictTemp = generateHeroPrices(upgradeDictDefault,NONWISHHEROMAX);
+        let upgradeDictTemp = generateHeroPrices(upgradeDictDefault, NONWISHHEROMAX, upgradeInfo);
         upgradeDict = upgradeDictTemp;
     } else {
         let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
@@ -565,6 +565,11 @@ function loadSaveData() {
     }
     // LOAD ADVENTURE DATA
     if (localStorage.getItem("advDictSave") == null) {
+        let rankTemp = [null, true];
+        for (let j = 0; j < 19; i++) {
+            rankTemp.push(false);
+        }
+
         advDict = advDictDefault;
     } else {
         let advDictTemp = localStorage.getItem("advDictSave");
@@ -575,6 +580,15 @@ function loadSaveData() {
             for (let key in advDict.rankDict) {
                 advDict.rankDict[key].Locked = true;
             }
+        }
+
+        // FOR SAVE DATA BELOW 2.0.001 TO CHANGE VALUES
+        if (parseInt(saveValues.versNumber) < 200001 && !Array.isArray(advDict.rankDict)) {
+            let rankTemp = [null];
+            for (let j = 0; j < 20; j++) {
+                rankTemp.push(advDict.rankDict[j + 1].Locked);
+            }
+            advDict.rankDict = rankTemp;
         }
     }
     // LOAD ACHIEVEMENT DATA
@@ -589,11 +603,13 @@ function loadSaveData() {
         achievementMap = new Map(JSON.parse(achievementListTemp));
     }
 
-    
-
     // LOAD PERSISTENT VALUES 
     if (localStorage.getItem("persistentValues") == null) {
         persistentValues = persistentValuesDefault;
+        for (let key in upgradeInfo) {
+            let heroName = upgradeInfo[key].Name;
+            persistentValues.ascendDict[heroName] = 0;
+        }
     } else {
         let persistentDictTemp = localStorage.getItem("persistentValues");
         if (persistentDictTemp == "undefined") {
@@ -601,7 +617,13 @@ function loadSaveData() {
         } else {
             persistentValues = JSON.parse(persistentDictTemp);
             updateObjectKeys(persistentValues, persistentValuesDefault);
-            updateObjectKeys(persistentValues.ascendDict, persistentValuesDefault.ascendDict);
+            
+            for (let key in upgradeInfo) {
+                let heroName = upgradeInfo[key].Name;
+                if (persistentValues.ascendDict[heroName] === undefined) {
+                    persistentValues.ascendDict[heroName] = 0;
+                }
+            }
 
             // FOR SAVE DATA BELOW 2.0.001 TO ADD NEW VALUES
             // ALSO TO REMOVE PURCHASED
@@ -622,10 +644,14 @@ function loadSaveData() {
                     persistentValues.lifetimePrimoValue = saveValues.primogem;
                 }
 
-                for (let i = 1; i < 13; i++) {
-                    let tempItem = persistentValues[`upgrade${i}`].Purchased;
-                    if (tempItem === undefined) {tempItem = 0}
-                    persistentValues[`upgrade${i}`] = tempItem;
+                let tempArray = persistentValues.upgrade;
+                if (tempArray === undefined) {
+                    tempArray = [null];
+                    for (let i = 1; i < 13; i++) {
+                        let tempItem = persistentValues[`upgrade${i}`].Purchased;
+                        if (tempItem) tempArray.push(tempItem);
+                    }
+                    persistentValues.upgrade = tempArray;
                 }
             }  
         }
@@ -832,59 +858,59 @@ function resetAnimationListener(elem) {
 // UPDATES VALUES WITH PERSISTENT VALUES
 function specialValuesUpgrade(loading = false, valueUpdate) {
     if (loading === true) {
-        upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade1) / 10);
+        upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade[1]) / 10);
         lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
-        specialClick = (1 + (persistentValues.upgrade2)/10).toFixed(3);
-        wishPower = (1 - (persistentValues.upgrade3)/200).toFixed(3);
-        costDiscount = (1 - (persistentValues.upgrade4)/50).toFixed(3);
-        clickCritRate = persistentValues.upgrade5;
-        clickCritDmg = Math.round((Math.log(persistentValues.upgrade5 + 1) * 18));
-        idleRate = (persistentValues.upgrade6/100).toFixed(2);
-        luckRate = persistentValues.upgrade7/2;
-        eventCooldownDecrease = (1 - persistentValues.upgrade8/50).toFixed(1);
-        additionalPrimo = (1 + persistentValues.upgrade9/10).toFixed(3);
-        additionalStrength = (1 + persistentValues.upgrade10/10).toFixed(3);
-        additionalDefense = (1 + persistentValues.upgrade11/10).toFixed(3);
-        additionalXP = (1 + persistentValues.upgrade12/50).toFixed(3);
+        specialClick = (1 + (persistentValues.upgrade[2])/10).toFixed(3);
+        wishPower = (1 - (persistentValues.upgrade[3])/200).toFixed(3);
+        costDiscount = (1 - (persistentValues.upgrade[4])/50).toFixed(3);
+        clickCritRate = persistentValues.upgrade[5];
+        clickCritDmg = Math.round((Math.log(persistentValues.upgrade[5] + 1) * 18));
+        idleRate = (persistentValues.upgrade[6]/100).toFixed(2);
+        luckRate = persistentValues.upgrade[7]/2;
+        eventCooldownDecrease = (1 - persistentValues.upgrade[8]/50).toFixed(1);
+        additionalPrimo = (1 + persistentValues.upgrade[9]/10).toFixed(3);
+        additionalStrength = (1 + persistentValues.upgrade[10]/10).toFixed(3);
+        additionalDefense = (1 + persistentValues.upgrade[11]/10).toFixed(3);
+        additionalXP = (1 + persistentValues.upgrade[12]/50).toFixed(3);
     } else if (loading == false) {
         switch (valueUpdate) {
             case 1:
-                upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade1) / 10);
+                upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade[1]) / 10);
                 lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
                 break;
             case 2:
-                specialClick = (1 + (persistentValues.upgrade2)/10).toFixed(3);
+                specialClick = (1 + (persistentValues.upgrade[2])/10).toFixed(3);
                 break;
             case 3:
-                wishPower = (1 - (persistentValues.upgrade3)/200).toFixed(3);
+                wishPower = (1 - (persistentValues.upgrade[3])/200).toFixed(3);
                 break;
             case 4:
-                costDiscount = (1 - (persistentValues.upgrade4)/50).toFixed(3);
+                costDiscount = (1 - (persistentValues.upgrade[4])/50).toFixed(3);
                 break;
             case 5:
-                clickCritRate = persistentValues.upgrade5;
-                clickCritDmg = Math.round((Math.log(persistentValues.upgrade5 + 1) * 18));
+                clickCritRate = persistentValues.upgrade[5];
+                clickCritDmg = Math.round((Math.log(persistentValues.upgrade[5] + 1) * 18));
                 break;
             case 6:
-                idleRate = (persistentValues.upgrade6/100).toFixed(2);
+                idleRate = (persistentValues.upgrade[6]/100).toFixed(2);
                 break;
             case 7:
-                luckRate = (persistentValues.upgrade7/2).toFixed(3);
+                luckRate = (persistentValues.upgrade[7]/2).toFixed(3);
                 break;
             case 8:
-                eventCooldownDecrease = (1 - persistentValues.upgrade8/50).toFixed(1);
+                eventCooldownDecrease = (1 - persistentValues.upgrade[8]/50).toFixed(1);
                 break;
             case 9:
-                additionalPrimo = (1 + persistentValues.upgrade9/10).toFixed(3);
+                additionalPrimo = (1 + persistentValues.upgrade[9]/10).toFixed(3);
                 break;
             case 10:
-                additionalStrength = (1 + persistentValues.upgrade10/10).toFixed(3);
+                additionalStrength = (1 + persistentValues.upgrade[10]/10).toFixed(3);
                 break;
             case 11:
-                additionalDefense = (1 + persistentValues.upgrade11/10).toFixed(3);
+                additionalDefense = (1 + persistentValues.upgrade[11]/10).toFixed(3);
                 break;
             case 12:
-                additionalXP = (1 + persistentValues.upgrade1/50).toFixed(3);
+                additionalXP = (1 + persistentValues.upgrade[12]/50).toFixed(3);
                 break;
             default:
                 console.error('Upgrade error: Invalid value to update');
@@ -1434,7 +1460,7 @@ function minesweeperEvent() {
                     eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop);
                     const endTimestamp = performance.now();
                     setTimeout(()=> {
-                        currencyPopUp("items",0,"primogem", randomPrimo);
+                        currencyPopUp("items", 0, "primogem", randomPrimo);
                         if (endTimestamp - startTimestamp < 15 * 1000) {
                             challengeNotification(({category: 'specific', value: [2, 7]}));
                         }
@@ -3004,7 +3030,7 @@ function removeLoading(loadingNumber) {
         overlay.removeChild(overlay.firstElementChild);
         overlay.classList.remove("overlay");
         loadingNumber.remove();
-        if (persistentValues.upgrade6 > 0) {
+        if (persistentValues.upgrade[6] > 0) {
             idleAmount = idleCheck(idleAmount);
         }
 
@@ -4553,6 +4579,10 @@ function loadRow() {
     for (let j = 0, len=rowTempDict.length; j < len; j++) {
         let loadedHeroID = rowTempDict[j];
         let heroTextLoad;
+        let heroID = "but-" + j;
+        
+        if (document.getElementById(heroID)) {continue}
+
         let upgradeDictTemp = upgradeDict[loadedHeroID];
         let formatCost = upgradeDictTemp["BaseCost"];
         let formatATK = upgradeDictTemp["Factor"];
@@ -4585,8 +4615,7 @@ function loadRow() {
                 heroTextLoad = "Call for " + upgradeInfo[loadedHeroID].Name + "'s help... (" + abbrNum(formatCost,2) + ")";
             }
         }
-       
-        let heroID = "but-" + j;
+
         let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
         heroButtonContainer.addEventListener("click", () => {
             changeTooltip(upgradeInfo[loadedHeroID], "hero", loadedHeroID);
@@ -4645,7 +4674,7 @@ function addNewRow(onlyOnce) {
             }
             
             let heroID = "but-" + saveValues["rowCount"];
-            if (document.getElementById('heroID')) {
+            if (document.getElementById(heroID)) {
                 continue;
             }
 
@@ -5184,6 +5213,23 @@ function inventoryAdd(idNum, type) {
     table2.appendChild(buttonInv);
 }
 
+// SKIPS PARTS OF HERO DICTIONARY
+function heroSkipper(itemFunction, itemID) {
+    for (let i = 0, len = WISHHEROMAX; i < len; i++) {
+        if (upgradeDict[i] == undefined) continue;
+        if (upgradeDict[i].Locked === true) continue;
+        if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
+            i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
+            continue;
+        };
+
+        let upgradeDictTemp = upgradeDict[i];
+        if (upgradeDictTemp.Purchased > 0) {
+            itemFunction(i, upgradeDictTemp, itemID);
+        }
+    }
+}
+
 // INVENTORY FUNCTIONALITY
 function itemUse(itemUniqueId) {
     let itemID;
@@ -5194,44 +5240,11 @@ function itemUse(itemUniqueId) {
     }
     
     // WEAPON
-    if (itemID >= 1001 && itemID < WEAPONMAX){
-        for (let i = 0, len=WISHHEROMAX; i < len; i++) {
-            if (upgradeDict[i] == undefined) continue;
-            if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
-                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
-                continue;
-            };
-            let upgradeDictTemp = upgradeDict[i];
-            if (upgradeDictTemp.Purchased > 0){
-                if (upgradeInfo[i].Type == Inventory[itemID].Type){
-                    let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (weaponBuffPercent[Inventory[itemID].Star] - 1));
-                    additionPower = Math.round(additionPower * additionalStrength);
-
-                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
-                    upgradeDict[i]["Contribution"] += additionPower;
-                    upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
-
-                    if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(({category: 'specific', value: [2, 1]}))}
-
-                    refresh("hero", i);
-                    updatedHero(i);
-                }
-            }
-        }
-    // ARTIFACT
-    } else if (itemID >= 2001 && itemID < ARTIFACTMAX){
-        for (let i = 0, len=WISHHEROMAX; i < len; i++) {
-            if (upgradeDict[i] == undefined) continue;
-            if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
-                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
-                continue;
-            };
-            let upgradeDictTemp = upgradeDict[i];
-            if (upgradeDictTemp.Purchased > 0){
-                let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (artifactBuffPercent[Inventory[itemID].Star] - 1));
-                additionPower = Math.round(additionPower * additionalDefense);
+    if (itemID >= 1001 && itemID < WEAPONMAX) {
+        const weaponFunction = (i, upgradeDictTemp) => {
+            if (upgradeInfo[i].Type == Inventory[itemID].Type) {
+                let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (weaponBuffPercent[Inventory[itemID].Star] - 1));
+                additionPower = Math.round(additionPower * additionalStrength);
 
                 if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
                 upgradeDict[i]["Contribution"] += additionPower;
@@ -5240,8 +5253,27 @@ function itemUse(itemUniqueId) {
                 if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(({category: 'specific', value: [2, 1]}))}
 
                 refresh("hero", i);
+                updatedHero(i);
             }
         }
+
+        heroSkipper(weaponFunction);
+    // ARTIFACT
+    } else if (itemID >= 2001 && itemID < ARTIFACTMAX){
+        const artifactFunction = (i, upgradeDictTemp) => {
+            let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (artifactBuffPercent[Inventory[itemID].Star] - 1));
+            additionPower = Math.round(additionPower * additionalDefense);
+
+            if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
+            upgradeDict[i]["Contribution"] += additionPower;
+            upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+
+            if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(({category: 'specific', value: [2, 1]}))}
+
+            refresh("hero", i);
+        }
+
+        heroSkipper(artifactFunction);
     // FOOD
     } else if (itemID >= 3001 && itemID < FOODMAX){
         foodButton(1);
@@ -5310,22 +5342,29 @@ function itemUse(itemUniqueId) {
         sortList("table2");
     // ELEMENT GEMS
     } else if (itemID === 5001 || itemID === 5002){
-        let power = 1;
-        if (Inventory[itemID].Star === 5) {
-            power = 2;
-        } else {
-            power = 3;
+        const gemFunction = (i, upgradeDictTemp, itemID) => {
+            let power = (Inventory[itemID].Star === 5) ? 2 : 3;
+            let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (power - 1));
+            additionPower = Math.round(additionPower * additionalDefense);
+
+            if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
+            upgradeDict[i]["Contribution"] += additionPower;
+            upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+
+            if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(({category: 'specific', value: [2, 1]}))}
+
+            refresh("hero", i);
         }
 
-        for (let i = 0, len=WISHHEROMAX; i < len; i++) {
-            if (upgradeDict[i] == undefined) continue;
-            if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
-                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
-                continue;
-            };
-            let upgradeDictTemp = upgradeDict[i];
-            if (upgradeDictTemp.Purchased > 0){
+        heroSkipper(gemFunction, itemID);
+        clearTooltip();
+    // ELEMENT GEMS
+    } else if (itemID >= 5001 && itemID < 5050){
+        const gemFunction = (i, upgradeDictTemp, itemID) => {
+            let power = elementBuffPercent[Inventory[itemID].Star];
+            let elem = Inventory[itemID].element;
+
+            if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
                 let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (power - 1));
                 additionPower = Math.round(additionPower * additionalDefense);
 
@@ -5336,69 +5375,36 @@ function itemUse(itemUniqueId) {
                 if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(({category: 'specific', value: [2, 1]}))}
 
                 refresh("hero", i);
+                updatedHero(i);
             }
         }
 
+        heroSkipper(gemFunction, itemID);
         clearTooltip();
-        return;
-    // ELEMENT GEMS
-    } else if (itemID >= 5001 && itemID < 5050){
-        let power = elementBuffPercent[Inventory[itemID].Star];
-        let elem = Inventory[itemID].element;
-
-        for (let i = 0, len=WISHHEROMAX; i < len; i++) {
-            if (upgradeDict[i] == undefined) continue;
-            if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX) {
-                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
-                continue;
-            };
-            if (upgradeDict[i].Purchased > 0) {
-                if (upgradeInfo[i].Ele == elem || upgradeInfo[i].Ele == "Any") {
-                    let upgradeDictTemp = upgradeDict[i];
-                    let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (power - 1));
-                    additionPower = Math.round(additionPower * additionalDefense);
-    
-                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
-                    upgradeDict[i]["Contribution"] += additionPower;
-                    upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
-
-                    if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(({category: 'specific', value: [2, 1]}))}
-    
-                    refresh("hero", i);
-                    updatedHero(i);
-                }
-            }
-        }
     // NATION BOOKS
     } else if (itemID >= 6001 && itemID < 6050){
-        let power;
-        let nation = Inventory[itemID].nation;
-        power = nationBuffPercent[Inventory[itemID].Star]
-        for (let i = 0, len=WISHHEROMAX; i < len; i++) {
-            if (upgradeDict[i] == undefined) continue;
-            if (upgradeDict[i].Locked === true) continue;
-            if (i < WISHHEROMIN && i > NONWISHHEROMAX && i != 1) {
-                i -= (WISHHEROMIN - NONWISHHEROMAX - 2);
-                continue;
-            };
-            if (upgradeDict[i].Purchased > 0){
-                if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
-                    let upgradeDictTemp = upgradeDict[i];
-                    let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (power - 1));
-                    additionPower = Math.round(additionPower * additionalStrength);
-    
-                    if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
-                    upgradeDict[i]["Contribution"] += additionPower;
-                    upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+        const bookFunction = (i, upgradeDictTemp, itemID) => {
+            let power = nationBuffPercent[Inventory[itemID].Star];
+            let nation = Inventory[itemID].nation;
 
-                    if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(({category: 'specific', value: [2, 1]}))}
-    
-                    refresh("hero", i);
-                    updatedHero(i);
-                }
+            if (upgradeInfo[i].Nation === nation || upgradeInfo[i].Nation == "Any") {
+                let additionPower = Math.ceil(upgradeDictTemp["BaseFactor"] * upgradeDictTemp.Purchased * (power - 1));
+                additionPower = Math.round(additionPower * additionalStrength);
+
+                if (i !== 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower}
+                upgradeDict[i]["Contribution"] += additionPower;
+                upgradeDict[i]["Factor"] = parseInt(upgradeDict[i]["Factor"]) + Math.ceil(additionPower / upgradeDictTemp.Purchased);
+
+                if (i === 1 && upgradeDict[i]["Contribution"] >= 1e9) {challengeNotification(({category: 'specific', value: [2, 1]}))}
+
+                refresh("hero", i);
+                updatedHero(i);
             }
         }
+
+        heroSkipper(bookFunction, itemID);
+        clearTooltip();
+        return;
     }
     clearTooltip();
 }
@@ -5416,10 +5422,10 @@ function updatedHero(i) {
 }
 
 function foodButton(type) {
-    let container = document.getElementById("app"+type);
+    let container = document.getElementById("app" + type);
     let foodCooldown = document.createElement("div");
 
-    if (type == 1) {
+    if (type === 1) {
         container.innerHTML = '';
         foodCooldown = countdownText(foodCooldown, 1);
         foodCooldown.addEventListener("animationend",() => {
@@ -5427,7 +5433,7 @@ function foodButton(type) {
             foodBuff = 1;
         })
         container.appendChild(foodCooldown);
-    } else if (type =2) {
+    } else if (type === 2) {
         container.innerHTML = '';
         foodCooldown = countdownText(foodCooldown, 2);
         foodCooldown.addEventListener("animationend",() => {
@@ -5911,18 +5917,18 @@ function createGuild() {
         rankText.innerText = i;
         rankButton.append(rankImg,rankText);
 
-        if (advDict.adventureRank < i && advDict.rankDict[i].Locked == true) {
+        if (advDict.adventureRank < i && advDict.rankDict[i] == true) {
             let rankIco = new Image();
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/lock.webp";
             rankButton.append(rankIco);
-        } else if (advDict.rankDict[i].Locked == false) {
+        } else if (advDict.rankDict[i] == false) {
             let rankIco = new Image();
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/tick.webp";
             rankButton.append(rankIco);
         } else {
-            advDict.rankDict[i].Locked = "unclaimed";
+            advDict.rankDict[i] = "unclaimed";
             notifPop("add","rank",i);
         }
         
@@ -5949,12 +5955,12 @@ function createGuild() {
 
             if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
             rankClaim.buttonLevel = i;
-            if (advDict.rankDict[i].Locked == true) {
+            if (advDict.rankDict[i] == true) {
                 rankClaim.innerText = "Locked";
                 rankClaim.available = false;
                 rankClaim.classList.add("rank-button-claimed");
                 if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
-            } else if (advDict.rankDict[i].Locked == false) {
+            } else if (advDict.rankDict[i] == false) {
                 rankClaim.innerText = "Rank Claimed";
                 rankClaim.available = false;
                 rankClaim.classList.add("rank-button-claimed");
@@ -5981,7 +5987,7 @@ function createGuild() {
             rankClaim.available = false;
             rankClaim.classList.add("rank-button-claimed");
             if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
-            advDict.rankDict[level].Locked = false;
+            advDict.rankDict[level] = false;
 
             
             let itemArray = advInfo[level].Item;
@@ -6486,10 +6492,10 @@ function completeBounty(bountyID,type,ele) {
     claim.primoReward = bountyObject[bountyID].primoReward;
     claim.xpReward = bountyObject[bountyID].xpReward;
 
-    if (!advDict.rankDict[11].Locked) {
+    if (!advDict.rankDict[11]) {
         claim.xpReward *= 1.15;
         claim.primoReward *= 1.15;
-    } else if (!advDict.rankDict[3].Locked) {
+    } else if (!advDict.rankDict[3]) {
         claim.xpReward *= 1.05;
         claim.primoReward *= 1.05;
     }
@@ -7197,7 +7203,7 @@ function gainXP(xpAmount, multiplier) {
         }
     
         advDict.adventureRank++;
-        advDict.rankDict[advDict.adventureRank].Locked = "unclaimed";
+        advDict.rankDict[advDict.adventureRank] = "unclaimed";
         let rankButton = document.getElementById(`rank-button-${advDict.adventureRank}`);
         rankButton.lastChild.remove();
         notifPop("add", "rank", advDict.adventureRank);
@@ -7964,7 +7970,7 @@ function spawnMob(adventureVideo, waveInfo, adjacentSibling) {
 function triggerFight() {
     if (!adventureScene) {return}
     adventureVariables.fightSceneOn = true;
-    adventureVariables.pheonixMode = advDict.rankDict[20].Locked ? false : true;
+    adventureVariables.pheonixMode = advDict.rankDict[20] ? false : true;
 
     skillCooldownReset = false;
 
@@ -8073,15 +8079,15 @@ function triggerFight() {
         if (i == 1) {
             amountInterval *= 4;
             normalAtkCooldown.maxAmount = 2;
-            if (!advDict.rankDict[16].Locked) {
+            if (!advDict.rankDict[16]) {
                 amountInterval *= 1.1;
             }
 
-            if (!advDict.rankDict[9].Locked) {
+            if (!advDict.rankDict[9]) {
                 normalAtkCooldown.maxAmount = 3;
             }
 
-            if (!advDict.rankDict[2].Locked) {
+            if (!advDict.rankDict[2]) {
                 normalAtkCooldown.amount = 100 * normalAtkCooldown.maxAmount;
             }
 
@@ -8090,12 +8096,12 @@ function triggerFight() {
             }
         } else if (i == 2) {
             amountInterval *= 0.65;
-            if (advDict.rankDict[5].Locked) {
+            if (advDict.rankDict[5]) {
                 advImage.classList.add('dim-filter');
                 continue;
             }
         } else if (i == 3) {
-            if (advDict.rankDict[10].Locked) {
+            if (advDict.rankDict[10]) {
                 advImage.classList.add('dim-filter');
                 continue;
             } else {
@@ -8715,11 +8721,11 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
                         const evadeRoll = randomInteger(1,101);
                         let evadeMax = -1;
-                        if (!advDict.rankDict[19].Locked) {
+                        if (!advDict.rankDict[19]) {
                             evadeMax = 15;
-                        } else if (!advDict.rankDict[13].Locked) {
+                        } else if (!advDict.rankDict[13]) {
                             evadeMax = 10;
-                        } else if (!advDict.rankDict[6].Locked) {
+                        } else if (!advDict.rankDict[6]) {
                             evadeMax = 5;
                         }
 
@@ -9006,7 +9012,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 createBattleText("guard", animationTime * 150 * 2, mobDiv);
             }
 
-            if (!advDict.rankDict[10].Locked) {
+            if (!advDict.rankDict[10]) {
                 const cooldown = document.getElementById('adventure-cooldown-3');
                 if (adventureVariables.specialty === 'Unusual') {
                     cooldown.amount += 15;
@@ -9174,7 +9180,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                     parryFailure.play();
                     comboHandler("reset");
 
-                    if (!advDict.rankDict[10].Locked) {
+                    if (!advDict.rankDict[10]) {
                         const cooldown = document.getElementById('adventure-cooldown-3');
                         cooldown.amount += 15;
                     }
@@ -9185,7 +9191,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                     parryFailure.load();
                     parryFailure.play();
                     comboHandler("reset");
-                    if (!advDict.rankDict[10].Locked) {
+                    if (!advDict.rankDict[10]) {
                         const cooldown = document.getElementById('adventure-cooldown-3');
                         cooldown.amount += 10;
                     }
@@ -9200,7 +9206,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                     mobHealth.health -= (battleVariables.currentATK * 0.25);
                     createBattleText("guard", animationTime * 150 * 2, mobDiv);
                     doubleAttack();
-                    if (!advDict.rankDict[10].Locked) {
+                    if (!advDict.rankDict[10]) {
                         const cooldown = document.getElementById('adventure-cooldown-3');
                         cooldown.amount += 10;
                     }
@@ -10370,7 +10376,7 @@ function dodgeOn(type) {
 }
 
 function skillUse() {
-    if (!adventureVariables.fightSceneOn || advDict.rankDict[5].Locked || battleVariables.quicktimeAttack) {return}
+    if (!adventureVariables.fightSceneOn || advDict.rankDict[5] || battleVariables.quicktimeAttack) {return}
     
     const adventureVideoChildren = Array.from(document.getElementById("adventure-video").children).filter((child) => child.tagName === "DIV");
     const cooldown = document.getElementById('adventure-cooldown-2');
@@ -10380,9 +10386,9 @@ function skillUse() {
     let resetRoll = -1;
     if (skillCooldownReset) {
         resetRoll = -1;
-    } else if (!advDict.rankDict[14].Locked) {
+    } else if (!advDict.rankDict[14]) {
         resetRoll = 50;
-    } else if (!advDict.rankDict[7].Locked) {
+    } else if (!advDict.rankDict[7]) {
         resetRoll = 20;
     }
 
@@ -10457,7 +10463,7 @@ function skillUse() {
 }
 
 function attackAll() {
-    if (!adventureVariables.fightSceneOn || advDict.rankDict[10].Locked || battleVariables.quicktimeAttack) {return}
+    if (!adventureVariables.fightSceneOn || advDict.rankDict[10] || battleVariables.quicktimeAttack) {return}
 
     const cooldown = document.getElementById('adventure-cooldown-3');
     if (cooldown.amount < 100) {return}
@@ -10487,9 +10493,9 @@ function attackAll() {
 
         let critRoll = randomInteger(1,101);
         let critThreshold = -1;
-        if (!advDict.rankDict[18].Locked) {
+        if (!advDict.rankDict[18]) {
             critThreshold = 20;
-        } else if (!advDict.rankDict[15].Locked) {
+        } else if (!advDict.rankDict[15]) {
             critThreshold = 10;
         }
 
@@ -10597,7 +10603,7 @@ function killMob(mobDiv, mobHealth) {
         battleVariables.guardtime = 0;
     }
 
-    if (!advDict.rankDict[8].Locked) {
+    if (!advDict.rankDict[8]) {
         loseHP((mobDiv.classList.contains('minion') ? 0.5 : 1), "inverse");
     }
 
@@ -10715,12 +10721,12 @@ function winAdventure() {
     let itemSecondRoll = randomInteger(1,101);
     let itemSecondThreshold = 101;
 
-    if (!advDict.rankDict[17].Locked) {
+    if (!advDict.rankDict[17]) {
         itemSecondThreshold = 70;
         itemFirstThreshold = 65;
-    } else if (!advDict.rankDict[12].Locked) {
+    } else if (!advDict.rankDict[12]) {
         itemFirstThreshold = 70;
-    } else if (!advDict.rankDict[4].Locked) {
+    } else if (!advDict.rankDict[4]) {
         itemFirstThreshold = 90;
     }
 
@@ -11867,7 +11873,7 @@ function setShop(type) {
     shopImg.src = "./assets/icon/shop-start.webp";
 
     shopTimerElement = document.createElement("div");
-    shopTimerElement.classList.add("flex-column","store-timer","background-image-cover");
+    shopTimerElement.classList.add("flex-column", "store-timer", "background-image-cover");
     shopTimerElement.id = "shop-timer";
     let minutesPassed = (getTime() / (1000 * 60));
     shopTimerElement.innerText = "Inventory resets in: " + (SHOPCOOLDOWN - (storeInventory.storedTime - minutesPassed)) + " minutes";
@@ -11898,6 +11904,7 @@ function setShop(type) {
     shopDialogueButton.classList.add("flex-row","store-buy");
     shopDialogueButton.innerText = "Confirm Purchase";
     shopDialogueButton.id = "shop-confirm";
+
     let shopDialogueText = document.createElement("div");
     shopDialogueText.classList.add("flex-column");
     shopDialogueText.id = "table7-text";
@@ -12054,26 +12061,9 @@ function confirmPurchase(shopCost,id) {
     }
 }
 
-function createShopItems(shopDiv, i, inventoryNumber) {
-    let shopButton = document.createElement("div");
-    shopButton.classList.add("flex-column","shop-button");
-    let inventoryTemp = Inventory[inventoryNumber];
-
-    let shopButtonImage = document.createElement("img");
-    shopButtonImage.src = "./assets/tooltips/inventory/" + inventoryTemp.File + ".webp";
-
-    let shopButtonImageContainer = document.createElement("div");
-    shopButtonImageContainer.classList.add("flex-column","shop-button-container");
-    shopButtonImageContainer.style.background = "url(./assets/frames/background-" + inventoryTemp.Star + ".webp)";
-    shopButtonImageContainer.style.backgroundSize = "cover";
-    shopButtonImageContainer.style.backgroundPosition = "center center";
-    shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
-    
-    let shopButtonText = document.createElement("div");
-    shopButtonText.classList.add("flex-row","shop-button-text");
-
+function calculateShopCost(star) {
     let shopCost = 0;
-    switch (inventoryTemp.Star) {
+    switch (star) {
         case 2:
             shopCost = Math.round(randomInteger(35,55) * costDiscount / 5) * 5;
             break;
@@ -12090,72 +12080,70 @@ function createShopItems(shopDiv, i, inventoryNumber) {
             shopCost = Math.round(randomInteger(600,750) * costDiscount / 5) * 5;
             break;
         default:
-            console.error("Shop error: Invalid shop cost");
+            console.error(`calculateShopCost error: Invalid shop cost ${star}`);
             break;
     }
 
-    let shopButtonPrimo = document.createElement("img");
-    shopButtonPrimo.classList.add("shop-button-primo");
-    shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
-    shopButtonText.innerText = shopCost;
-    shopButtonText.appendChild(shopButtonPrimo);
+    return shopCost;
+}
 
-    shopButton.id = ("shop-" + (i + 1) + "-" + inventoryNumber + "-" + shopCost);
-    shopButton.addEventListener("click", function() {
-        buyShop(shopButton.id,shopCost)
+function createShopButton(inventoryTemp, inventoryNumber, shopCost, purchased = false, slotNumber) {
+    const shopButton = createDom('div', { 
+        classList: ["flex-column", "shop-button"],
+        id: `shop-${slotNumber + 1}-${inventoryNumber}-${shopCost}`
+    });
+    const shopButtonImage = createDom('img', { src: `./assets/tooltips/inventory/${inventoryTemp.File}.webp` });
+
+    const shopButtonImageContainer = createDom('div', {
+        classList: ["flex-column", "shop-button-container"],
+        style: { background: `url(./assets/frames/background-${inventoryTemp.Star}.webp) center center / cover no-repeat` }
+    });
+
+    const shopButtonPrimo = createDom('img', {
+        classList: ["shop-button-primo"],
+        src: './assets/icon/primogemIcon.webp',
     })
+
+    const shopButtonText = createDom('div', { 
+        classList: ["flex-row","shop-button-text"],
+        innerText: shopCost,
+        child: [shopButtonPrimo]
+    });
+
+    if (!purchased) {
+        shopButton.addEventListener("click", function() {
+            buyShop(shopButton.id, shopCost);
+        })
+    }
     
     shopButtonImageContainer.appendChild(shopButtonImage);
-    shopButton.append(shopButtonImageContainer,shopButtonText);
+    shopButton.append(shopButtonImageContainer, shopButtonText);
+    return shopButton;
+}
+
+function createShopItems(shopDiv, i, inventoryNumber) {
+    const inventoryTemp = Inventory[inventoryNumber];
+
+    const shopCost = calculateShopCost(inventoryTemp.Star)
+    const shopButton = createShopButton(inventoryTemp, inventoryNumber, shopCost, false, i);
     shopDiv.append(shopButton);
 
-    storeInventory[i+1].Purchased = false;
-    storeInventory[i+1].Item = inventoryNumber;
-    storeInventory[i+1].Cost = shopCost;
+    storeInventory[i + 1].Purchased = false;
+    storeInventory[i + 1].Item = inventoryNumber;
+    storeInventory[i + 1].Cost = shopCost;
 
     return shopDiv;
 }
 
 function loadShopItems(shopDiv, i, inventoryArray) {
-    let purchased = inventoryArray.Purchased;
-    let shopCost = inventoryArray.Cost;
-    let inventoryNumber = inventoryArray.Item;
+    const purchased = inventoryArray.Purchased;
+    const shopCost = inventoryArray.Cost;
+    const inventoryNumber = inventoryArray.Item;
 
-    let shopButton = document.createElement("div");
-    shopButton.classList.add("flex-column","shop-button");
-    let inventoryTemp = Inventory[inventoryNumber];
-
-    let shopButtonImage = document.createElement("img");
-    shopButtonImage.src = "./assets/tooltips/inventory/"+ inventoryTemp.File + ".webp";
-
-    let shopButtonImageContainer = document.createElement("div");
-    shopButtonImageContainer.classList.add("flex-column","shop-button-container");
-    shopButtonImageContainer.style.background = "url(./assets/frames/background-" +inventoryTemp.Star+ ".webp)";
-    shopButtonImageContainer.style.backgroundSize = "cover";
-    shopButtonImageContainer.style.backgroundPosition = "center center";
-    shopButtonImageContainer.style.backgroundRepeat = "no-repeat";
-    
-    let shopButtonText = document.createElement("div");
-    shopButtonText.classList.add("flex-row","shop-button-text");
-
-    let shopButtonPrimo = document.createElement("img");
-    shopButtonPrimo.classList.add("shop-button-primo");
-    shopButtonPrimo.src = "./assets/icon/primogemIcon.webp";
-    shopButtonText.innerText = shopCost;
-    shopButtonText.appendChild(shopButtonPrimo);
-
-    shopButton.id = ("shop-" + i + "-" + inventoryNumber + "-" + shopCost);
-    if (purchased == false) {
-        shopButton.addEventListener("click", function() {
-            buyShop(shopButton.id,shopCost)
-        })
-    } else {
-        shopButton.classList.add("purchased");
-    }
-    
-    shopButtonImageContainer.appendChild(shopButtonImage);
-    shopButton.append(shopButtonImageContainer,shopButtonText);
+    const inventoryTemp = Inventory[inventoryNumber];
+    const shopButton = createShopButton(inventoryTemp, inventoryNumber, shopCost, purchased, i);
     shopDiv.append(shopButton);
+
     return shopDiv;
 }
 
@@ -12519,7 +12507,6 @@ function createAscend() {
     }
 }
 
-
 function calculateGoldenCore(type) {
     let calculateNuts = 0;
     if (saveValues.realScore > 1e6) {calculateNuts = Math.log(saveValues.realScore) / Math.log(1.7)}
@@ -12530,7 +12517,6 @@ function calculateGoldenCore(type) {
     }
 
     let goldenNutValue = contributionDict['Regular Nuts'] + contributionDict['Golden Nuts'] + contributionDict['Achievements'];
-    let heroCount = 1;
 
     const sortByNestedValues = (obj) => {
         const filteredEntries = Object.entries(obj).filter(([, value]) => value.Row >= 0 && value.Purchased >= 1);
@@ -12538,25 +12524,22 @@ function calculateGoldenCore(type) {
         return Object.fromEntries(sortedEntries);
     }
 
-    const filteredDict = sortByNestedValues(upgradeDict)
+    const filteredDict = sortByNestedValues(upgradeDict);
     for (let key in filteredDict) {
         let corePerHero = 0;
-        corePerHero += (Math.floor(upgradeDict[key].Purchased / 25) + 1);
+        corePerHero += (Math.floor(filteredDict[key].Purchased / 25) + 1);
         let name = upgradeInfo[parseInt(key)].Name;
 
-        if (upgradeDict[key].Purchased <= 0) {continue}
-        heroCount++;
-
         let upgradeCore = 1;
-        for (let Nestedkey in upgradeDict[key].milestone) {
-            if (upgradeDict[key].milestone[Nestedkey]) {
+        for (let Nestedkey in filteredDict[key].milestone) {
+            if (filteredDict[key].milestone[Nestedkey]) {
                 upgradeCore += 1 * Math.max(upgradeCore / 2, 1);
             }
         }
 
         corePerHero *= upgradeCore;
         corePerHero *= (1 + persistentValues.ascendDict[name] * 0.5);
-        corePerHero *= (1 + Math.floor(heroCount / 4.5)**1.6);
+        corePerHero *= (1 + Math.floor((upgradeDict[parseInt(key)].Row + 1) / 4.5)**1.6);
 
         goldenNutValue += Math.round(corePerHero);
         contributionDict[name] = Math.round(corePerHero);
@@ -12793,29 +12776,6 @@ function createTreeMenu() {
     treeProgressValue.classList.add('tree-progress-value');
     treeProgressValue.id = 'tree-progress-value';
     treeProgressValue.rate;
-
-    // function createCloud(range) {
-    //     let cloudImg = new Image();
-    //     cloudImg.classList.add('cloud');
-    //     cloudImg.style.top = (randomInteger(range * 100, (range + 1) * 100)/10) + '%';
-    //     cloudImg.style.animation = `slide ${randomInteger(2000,9000)/100}s linear`;
-    //     cloudImg.style.width = `${randomInteger(150,350)/10}%`;
-    //     cloudImg.src = `assets/tree/cloud${randomInteger(1,5)}.webp`;
-
-    //     cloudImg.addEventListener('animationend',() => {
-    //         cloudImg.style.animation = 'unset';
-    //         void cloudImg.offsetWidth;
-    //         cloudImg.style.top = (randomInteger(range * 100, (range + 1) * 100)/10) + '%';
-    //         cloudImg.style.animation = `slide ${randomInteger(2000,9000)/100}s linear`;
-    //         cloudImg.style.width = `${randomInteger(150,350)/10}%`;
-    //     })
-    //     treeSide.appendChild(cloudImg);
-    // }
-
-    // const cloudArray = [0,0.5,1,1.5,2.5,4];
-    // cloudArray.forEach((num) => {
-    //     createCloud(num);
-    // })
 
     treeContainer.appendChild(treeImg);
     treeSide.append(treeProgressBar,sandImg,treeContainer,treeHealthContainer,treeProgressValue);
@@ -13154,7 +13114,6 @@ function destroyTree() {
 
                 lootContainer.append(rankInventoryReward);
             }
-            
         }
 
         const addLoot = (lootArray) => {
@@ -13704,94 +13663,75 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
 }
 
 // POP UPS FOR SPECIAL CURRENCY
-function currencyPopUp(type1, amount1, type2, amount2) {
-    if (type1 === 'primogem') {amount1 = Math.round(amount1 * additionalPrimo)};
-    if (type2 === 'primogem') {amount2 = Math.round(amount2 * additionalPrimo)};
-    let currencyPop = document.createElement("div");
-    currencyPop.classList.add("flex-column","currency-pop");
-    currencyPop.innerText = 'Obtained';
+const createPopEle = (type, amount, additionalClass) => {
+    let currencyPop = createDom('div', {
+        classList: ["flex-row", ...additionalClass],
+        innerHTML: `${amount}   `
+    });
 
-    let currencyPopFirst = document.createElement("div");
-    currencyPopFirst.classList.add("flex-row","currency-pop-first");
-    currencyPopFirst.innerHTML = amount1 + "   ";
-    let currencyPopFirstImg = document.createElement("img");
-
-    if (type1 === "energy") {
-        currencyPopFirstImg.src = "./assets/icon/energyIcon.webp";
-        currencyPopFirstImg.classList.add("icon");
-        saveValues.energy += amount1;
-        persistentValues.lifetimeEnergyValue += amount1;
-
-        challengeNotification(({category: 'energy', value: saveValues.energy}))
-    } else if (type1 === "primogem") {
-        currencyPopFirstImg.src = "./assets/icon/primogemIcon.webp";
-        currencyPopFirstImg.classList.add("icon","primogem");
-        saveValues.primogem += amount1;
-        persistentValues.lifetimePrimoValue += amount1;
-
-        challengeNotification(({category: 'primogem', value: saveValues.primogem}))
-    } else if (type1 === "nuts") {
-        currencyPopFirstImg.src = "./assets/icon/goldenIcon.webp";
-        currencyPopFirstImg.classList.add("icon","primogem");
-        saveValues.goldenNut += amount1;
-        persistentValues.goldenCore += amount1;
-        updateCoreCounter();
-        nutPopUp();
-    } else if (type1 === "mail") {
-        currencyPopFirstImg.src = "./assets/icon/mailLogo.webp";
-        currencyPopFirstImg.classList.add("icon","primogem");
-        saveValues.mailCore += amount1;
-    } else if (type1 === "items") {
-        currencyPopFirst.innerText = "Items";
-        currencyPopFirstImg.src = "./assets/icon/item.webp";
-        currencyPopFirstImg.classList.add("icon","primogem");
-    }
-
-    currencyPopFirst.append(currencyPopFirstImg);
-    currencyPop.append(currencyPopFirst);
-    if (type2 !== undefined) {
-        let currencyPopSecond = document.createElement("div");
-        currencyPopSecond.classList.add("flex-row","currency-pop-first");
-        currencyPopSecond.innerHTML = amount2 + "   ";
-
-        let currencyPopSecondImg = document.createElement("img");
-        if (type2 === "energy") {
-            currencyPopSecondImg.src = "./assets/icon/energyIcon.webp";
-            currencyPopSecondImg.classList.add("icon");
-            saveValues.energy += amount2;
-            persistentValues.lifetimeEnergyValue += amount2;
-
-            challengeNotification(({category: 'energy', value: saveValues.energy}))
-        } else if (type2 === "primogem") {
-            currencyPopSecondImg.src = "./assets/icon/primogemIcon.webp";
-            currencyPopSecondImg.classList.add("icon","primogem");
-            saveValues.primogem += amount2;
-            persistentValues.lifetimePrimoValue += amount2;
-
-            challengeNotification(({category: 'primogem', value: saveValues.primogem}))
-        } else if (type2 === "nuts") {
-            currencyPopSecondImg.src = "./assets/icon/goldenIcon.webp";
-            currencyPopSecondImg.classList.add("icon","primogem");
-            saveValues.goldenNut += amount2;
-            persistentValues.goldenCore += amount2;
+    let currencyPopImg = createDom('img', { classList: ['icon']});
+    switch (type) {
+        case 'energy':
+            currencyPopImg.src = "./assets/icon/energyIcon.webp";
+            saveValues.energy += amount;
+            persistentValues.lifetimeEnergyValue += amount;
+            challengeNotification(({category: 'energy', value: saveValues.energy}));
+            break;
+        case 'primogem':
+            currencyPopImg.src = "./assets/icon/primogemIcon.webp";
+            currencyPopImg.classList.add("primogem");
+            saveValues.primogem += amount;
+            persistentValues.lifetimePrimoValue += amount;
+            challengeNotification(({category: 'primogem', value: saveValues.primogem}));
+            break;
+        case 'nuts':
+            currencyPopImg.src = "./assets/icon/goldenIcon.webp";
+            currencyPopImg.classList.add("primogem");
+            saveValues.goldenNut += amount;
+            persistentValues.goldenCore += amount;
             updateCoreCounter();
             nutPopUp();
-        } else if (type2 === "items") {
-            currencyPopSecond.innerText = "Items";
-            currencyPopSecondImg.src = "./assets/icon/item.webp";
-            currencyPopSecondImg.classList.add("icon","primogem");
-        }
+            break;
+        case 'mail':
+            currencyPopImg.src = "./assets/icon/mailLogo.webp";
+            currencyPopImg.classList.add("primogem");
+            saveValues.mailCore += amount;
+            break;
+        case 'items':
+            currencyPop.innerHTML = "Items";
+            currencyPopImg.src = "./assets/icon/item.webp";
+        default:
+            console.error(`currencyPopUp Error: ${type, amount, additionalClass}`);
+            break;
+    }
+
+    currencyPop.append(currencyPopImg);
+    return currencyPop;
+}
+
+function currencyPopUp(type1, amount1 = 0, type2 = undefined, amount2 = 0) {
+    let currencyPop = createDom('div', {
+        class: ["flex-column","currency-pop"],
+        innerText: 'Obtained'
+    });
+
+    if (type1 === 'primogem') {amount1 = Math.round(amount1 * additionalPrimo)};
+    const currencyPopFirst = createPopEle(type1, amount1, ["currency-pop-first"]);
+    currencyPop.append(currencyPopFirst);
+
+    if (type2 !== undefined) {
+        const currencyPopSecond = createPopEle(type1, amount1, ["currency-pop-first"]);
+        if (type2 === 'primogem') {amount2 = Math.round(amount2 * additionalPrimo)};
 
         currencyPop.style.height = "13%"
         currencyPopFirst.style.height = "30%";
         currencyPopSecond.style.height = "30%";
-        currencyPopSecond.append(currencyPopSecondImg);
         currencyPop.append(currencyPopSecond);
     }
 
     setTimeout(()=> {
         currencyPop.style.animation = "fadeOut 2s cubic-bezier(.93,-0.24,.93,.81) forwards";
-        currencyPop.addEventListener("animationend",() => {
+        currencyPop.addEventListener("animationend", () => {
             currencyPop.remove();
         })
     },1000)
