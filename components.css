@@ -994,6 +994,10 @@
     overflow-y: auto;
 }
 
+.char-select, .notif-div, .drag-icon, .char-menu {
+    cursor: url(./assets/icon/cursor.webp), auto;
+}
+
 .char-selected {
     color: #2a2a2a;
     text-shadow: 0.1em 0.1em 0.25em #ffffff7b;
@@ -1854,7 +1858,7 @@
 
 .mark-button {
     background-image: url(./assets/icon/target.webp);
-    transform: translate(-50%, -65%);
+    transform: translate(-50%, 0%);
     filter: brightness(0);
     pointer-events: none;
 }

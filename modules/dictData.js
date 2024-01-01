@@ -198,11 +198,18 @@ const upgradeInfo = {
         Ele: "Dendro",
         Nation: "Sumeru"
     },
+    11: {
+        Name: "Kaveh",
+        Lore: "This isn't my first trek into the desert, but I can never get used to the heat... *sigh* Is there no shade anywhere...?",
+        Type: "Claymore",
+        Ele: "Dendro",
+        Nation: "Sumeru"
+    },
     50: {
-        Name: "Amber",
-        Lore: "Outrider Amber reporting for duty! Just say the word if you ever need my help!",
+        Name: "Venti",
+        Lore: "My tummy is rumbling, but I can't get caught pilfering food again... Oh, it's you! Where are you heading? May I join?",
         Type: "Bow",
-        Ele: "Pyro",
+        Ele: "Anemo",
         Nation: "Mondstadt"
     },
     51: {
@@ -263,7 +270,7 @@ const upgradeInfo = {
     },
     59: {
         Name: "Fischl",
-        Lore: "Remember thou this, that I, Fischl, am the Prinzessin der Verurteilung, Sovereign of Immernachtreich, omniscient and eminent judge of all the world's iniquity!",
+        Lore: "To condemn the guilty, to sanctify the just, and to draw all castaway dreams into the embrace of the infinite Immernachtreich. This is the birthright of the Prinzessin der Verurteilung, and her burden. None may gainsay it.",
         Type: "Bow",
         Ele: "Electro",
         Nation: "Mondstadt"
@@ -297,17 +304,24 @@ const upgradeInfo = {
         Nation: "Mondstadt"
     },
     64: {
-        Name: "Venti",
-        Lore: "My tummy is rumbling, but I can't get caught pilfering food again... Oh, it's you! Where are you heading? May I join?",
+        Name: "Amber",
+        Lore: "Outrider Amber reporting for duty! Just say the word if you ever need my help!",
         Type: "Bow",
-        Ele: "Anemo",
+        Ele: "Pyro",
+        Nation: "Mondstadt"
+    },
+    65: {
+        Name: "Mika",
+        Lore: "Oh, please wait a moment, our meal's almost ready! Field ration no.3 — it's the Reconnaissance Company's favorite.",
+        Type: "Polearm",
+        Ele: "Cryo",
         Nation: "Mondstadt"
     },
     101: {
-        Name: "Xiangling",
-        Lore: "I'm much better at cooking than navigating... but if you do go out, definitely take me with you!",
+        Name: "Zhongli",
+        Lore: "A new contract? Okay. I'm still on leave, but I can accompany you for a while.",
         Type: "Polearm",
-        Ele: "Pyro",
+        Ele: "Geo",
         Nation: "Liyue"
     },
     102: {
@@ -388,24 +402,31 @@ const upgradeInfo = {
         Nation: "Liyue"
     },
     113: {
-        Name: "Zhongli",
-        Lore: "A new contract? Okay. I'm still on leave, but I can accompany you for a while.",
+        Name: "Xiangling",
+        Lore: "I'm much better at cooking than navigating... but if you do go out, definitely take me with you!",
         Type: "Polearm",
-        Ele: "Geo",
+        Ele: "Pyro",
+        Nation: "Liyue"
+    },
+    114: {
+        Name: "Baizhu",
+        Lore: "It might sound ironic, but even I don't like taking bitter medicine. I've been routinely taking medicine for some years now. All I can really do is eat some candied fruit afterward to get rid of the bitter aftertaste.",
+        Type: "Catalyst",
+        Ele: "Dendro",
         Nation: "Liyue"
     },
     150: {
+        Name: "Ei",
+        Lore: "Do you wish to know the truth about the shooting stars at night? Haha, they are but fleeting moments of luminosity.",
+        Type: "Polearm",
+        Ele: "Electro",
+        Nation: "Inazuma"
+    },
+    151: {
         Name: "Thoma",
         Lore: "Anything I can lend a hand with, just say the word. A conversation? I see, I see. That's a little different from what I'm used to, but I'm all for it.",
         Type: "Polearm",
         Ele: "Pyro",
-        Nation: "Inazuma"
-    },
-    151: {
-        Name: "Ayaka",
-        Lore: "'Was it one's thoughts that drew him to my dreams? Had I known it a dream, one would not have awakened.' Hehe, I love that poem.",
-        Type: "Sword",
-        Ele: "Cryo",
         Nation: "Inazuma"
     },
     152: {
@@ -416,10 +437,10 @@ const upgradeInfo = {
         Nation: "Inazuma"
     },
     153: {
-        Name: "Sayu",
-        Lore: "Hey, will you do me a favor and let me know if you see the shrine maiden coming? I'm just gonna, um... rest my eyes for a moment.",
-        Type: "Claymore",
-        Ele: "Anemo",
+        Name: "Ayaka",
+        Lore: "'Was it one's thoughts that drew him to my dreams? Had I known it a dream, one would not have awakened.' Hehe, I love that poem.",
+        Type: "Sword",
+        Ele: "Cryo",
         Nation: "Inazuma"
     },
     154: {
@@ -451,10 +472,10 @@ const upgradeInfo = {
         Nation: "Inazuma"
     },
     158: {
-        Name: "Itto",
-        Lore: "The first and greatest head of the Arataki Gang, Arataki 'Numero Uno' Itto, here in the flesh! Hahaha... *cough*",
+        Name: "Sayu",
+        Lore: "Hey, will you do me a favor and let me know if you see the shrine maiden coming? I'm just gonna, um... rest my eyes for a moment.",
         Type: "Claymore",
-        Ele: "Geo",
+        Ele: "Anemo",
         Nation: "Inazuma"
     },
     159: {
@@ -465,12 +486,64 @@ const upgradeInfo = {
         Nation: "Inazuma"
     },
     160: {
-        Name: "Ei",
-        Lore: "Do you wish to know the truth about the shooting stars at night? Haha, they are but fleeting moments of luminosity.",
-        Type: "Polearm",
-        Ele: "Electro",
+        Name: "Itto",
+        Lore: "The first and greatest head of the Arataki Gang, Arataki 'Numero Uno' Itto, here in the flesh! Hahaha... *cough*",
+        Type: "Claymore",
+        Ele: "Geo",
         Nation: "Inazuma"
     },
+    161: {
+        Name: "Kirara",
+        Lore: "My boots? Oh, they're my paws, actually. I can use my youkai powers to turn them into human feet, but I feel way more at ease walking with my claws and paw pads.",
+        Type: "Sword",
+        Ele: "Dendro",
+        Nation: "Inazuma"
+    },
+
+    // 161, 200 - 205
+    200: {
+        Name: "Furina",
+        Lore: "Listen carefully, desserts are like operas... Everything from choosing the characters to imagining the setting requires a lot of effort in order to make the final performance a hit!",
+        Type: "Sword",
+        Ele: "Hydro",
+        Nation: "Fontaine"
+    },
+    201: {
+        Name: "Lynette",
+        Lore: "I'm not accustomed to expressing myself, but I consider myself a good listener. If you have any troubles, come find me. I'll guard your secrets.",
+        Type: "Sword",
+        Ele: "Hydro",
+        Nation: "Fontaine"
+    },
+    202: {
+        Name: "Lyney",
+        Lore: "The wind is really picking up... Ah, all my magic cards! Wait! No, no, not that way, come back! Come to Lyney!!!",
+        Type: "Bow",
+        Ele: "Hydro",
+        Nation: "Fontaine"
+    },
+    203: {
+        Name: "Freminet",
+        Lore: "If you look up at the sky from far enough underwater, even the sun is soft on the eyes. That's why I like it down there.",
+        Type: "Claymore",
+        Ele: "Hydro",
+        Nation: "Fontaine"
+    },
+    204: {
+        Name: "Neuvillette",
+        Lore: "I find that the, um... beauty of bright sunlight is best appreciated from the indoors through a window.",
+        Type: "Catalyst",
+        Ele: "Hydro",
+        Nation: "Fontaine"
+    },
+    205: {
+        Name: "Charlotte",
+        Lore: "People aren't always very fond of journalists. You know what they say — lies are soft and malleable, but the truth is sharp and inflexible.",
+        Type: "Catalyst",
+        Ele: "Hydro",
+        Nation: "Fontaine"
+    },
+
     // RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS
     800: {
         Name: "Wanderer",
@@ -562,6 +635,20 @@ const upgradeInfo = {
         Type: "Claymore",
         Ele: "Pyro",
         Nation: "Sumeru",
+    },
+    813: {
+        Name: "Wriothesley",
+        Lore: "They say it's best to begin a friendship when there's no conflict of interest. Seems like the appropriate time has come.",
+        Type: "Catalyst",
+        Ele: "Cryo",
+        Nation: "Fontaine",
+    },
+    814: {
+        Name: "Navia",
+        Lore: "Look at that scorching sun, it's like a blast furnace! You know what this means? It means we have to drop everything, right now, and make a run for the ice cream store!",
+        Type: "Claymore",
+        Ele: "Geo",
+        Nation: "Fontaine",
     },
 }
 
@@ -659,7 +746,7 @@ const expeditionDictInfo = {
     8:{Text:"Going on Expeditions"                   ,Lore:"Expeditions use Energy which can be obtained by clicking Big Nahida. Beware! You may encounter unexpected obstacles in your journey."},
     9:{Text:"Not enough Energy..."                   ,Lore:"Obtain more by clicking Big Nahida!"            },
     10:{Text:"Visit the Adventurers' Guild"          ,Lore:"Tapping into the resources of the Adventurer's Guild's network is one way to widen the scope of the search as the more eyes, the better."},
-    11:{Text:"No Party Leader selected"              ,Lore:"Please select one at the top left of the map before going on Expeditions."            },
+    11:{Text:"No Party Leader selected"              ,Lore:"Please select one at the top of the map before going on Expeditions."            },
     12:{Text:"Random World Quest"                    ,Lore:"These quests are random encounters that the you can run into while roaming around the world of Teyvat."            },
     13:{Text:"Skirmish Quest | 1000"                 ,Lore:"The combat abilities of these monsters have been enhanced as the result of the Ley Line Overflow. Your Burst also appears to recharge faster due to the presence of latent energy."},
     14:{Text:"Leyline Boss | 2500"                   ,Lore:"The following monsters have absorbed a tremendous amount of energy from the Ley Line Overflow. Be extremely cautious of any extra abilities they may possess."}

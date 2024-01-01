@@ -318,6 +318,16 @@ const rollDict = [
      ['artifact', 'weapon', 'food', 'gem'],
 ]
 
+// AUDIO PLAYER
+function audioPlay(audioElement) {
+    try {
+        audioElement.load();
+        audioElement.play();
+    } catch (err) {
+        console.warn(err);
+    }
+}
+
 // ROLLS FOR TREE ITEMS, BOUNDARIES EVERY 3.5 LEVELS
 function createTreeItems(saveValues, randomInteger, inventoryDraw, rollArray) {
     const offer = saveValues.treeObj.offerAmount + 1;
@@ -356,4 +366,4 @@ function convertTo24HourFormat(hours) {
     return `${formattedHours}:${formattedMinutes}`;
 }
 
-export { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };
+export { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };

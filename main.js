@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
-import { abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
+import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom,createMedal } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
@@ -189,7 +189,7 @@ const ARTIFACTMAX = 2150;
 const FOODMAX = 3150;
 const XPMAX = 4004;
 
-const NONWISHHEROMAX = 200;
+const NONWISHHEROMAX = 250;
 const WISHHEROMIN = 800;
 
 const WISHCOST = 1;
@@ -298,7 +298,7 @@ let activeLeader;
 let bountyObject = {};
 let lootArray = {};
 let selectHeroType = null;
-const upgradeThreshold = [0,0,64,113,160];
+const upgradeThreshold = [0,0,50,101,150,200];
 const moraleLore = [
     "Nahida is feeling [s]Really Happy[/s]! [mor]<br><br> XP gains are increased by 10% and party <br> deals 10% additional DMG in combat.",
     "Nahida is feeling [s]Happy[/s]! [mor]<br><br> XP gains are increased by 5%.",
@@ -588,21 +588,9 @@ function loadSaveData() {
         let achievementListTemp = localStorage.getItem("achievementListSave");
         achievementMap = new Map(JSON.parse(achievementListTemp));
     }
-    // LOAD STORE DATA
-    if (localStorage.getItem("storeInventory") == null) {
-        storeInventory = storeInventoryDefault;
-    } else {
-        // FOR SAVE DATA BELOW 0.3.411 TO FIX STORE BUG
-        if (parseInt(saveValues.versNumber) < 34112) {
-            storeInventory = storeInventoryDefault;
-        } else {
-            let localStoreTemp = localStorage.getItem("storeInventory");
-            storeInventory = JSON.parse(localStoreTemp);
-            if (storeInventory.active == true) {
-                setShop("load");
-            }
-        }
-    }
+
+    
+
     // LOAD PERSISTENT VALUES 
     if (localStorage.getItem("persistentValues") == null) {
         persistentValues = persistentValuesDefault;
@@ -616,23 +604,45 @@ function loadSaveData() {
             updateObjectKeys(persistentValues.ascendDict, persistentValuesDefault.ascendDict);
 
             // FOR SAVE DATA BELOW 2.0.001 TO ADD NEW VALUES
+            // ALSO TO REMOVE PURCHASED
             if (parseInt(saveValues.versNumber) < 200001) {
                 if (persistentValues.lifetimeClicksValue === 0) {
                     persistentValues.lifetimeClicksValue = saveValues.clickCount;
-                } 
+                }
     
                 if (persistentValues.lifetimeLevelsValue === 0) {
                     persistentValues.lifetimeLevelsValue = saveValues.heroesPurchased;
-                } 
+                }
     
                 if (persistentValues.lifetimeEnergyValue === 0) {
                     persistentValues.lifetimeEnergyValue = saveValues.energy;
-                } 
+                }
     
                 if (persistentValues.lifetimePrimoValue === 0) {
                     persistentValues.lifetimePrimoValue = saveValues.primogem;
                 }
+
+                for (let i = 1; i < 13; i++) {
+                    let tempItem = persistentValues[`upgrade${i}`].Purchased;
+                    if (tempItem === undefined) {tempItem = 0}
+                    persistentValues[`upgrade${i}`] = tempItem;
+                }
             }  
+        }
+    }
+    // LOAD STORE DATA
+    if (localStorage.getItem("storeInventory") == null) {
+        storeInventory = storeInventoryDefault;
+    } else {
+        // FOR SAVE DATA BELOW 0.3.411 TO FIX STORE BUG
+        if (parseInt(saveValues.versNumber) < 34112) {
+            storeInventory = storeInventoryDefault;
+        } else {
+            let localStoreTemp = localStorage.getItem("storeInventory");
+            storeInventory = JSON.parse(localStoreTemp);
+            if (storeInventory.active == true) {
+                setShop("load");
+            }
         }
     }
 
@@ -655,6 +665,7 @@ function loadSaveData() {
     }
 
     achievementListload();
+
     specialValuesUpgrade(true);
     if (saveValues.goldenTutorial === true) {
         addNutStore();
@@ -734,8 +745,7 @@ function touchDemo() {
 
     if (clickAudioDelay === null) {
         if (timerSeconds !== 0) {
-            demoElement.load();
-            demoElement.play();
+            audioPlay(demoElement);
 
             clickAudioDelay = true;
             setTimeout(() => {clickAudioDelay = null}, 155);
@@ -820,61 +830,61 @@ function resetAnimationListener(elem) {
 }
 
 // UPDATES VALUES WITH PERSISTENT VALUES
-function specialValuesUpgrade(loading, valueUpdate) {
+function specialValuesUpgrade(loading = false, valueUpdate) {
     if (loading === true) {
-        upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade1.Purchased) / 10);
+        upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade1) / 10);
         lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
-        specialClick = (1 + (persistentValues.upgrade2.Purchased)/10).toFixed(3);
-        wishPower = (1 - (persistentValues.upgrade3.Purchased)/200).toFixed(3);
-        costDiscount = (1 - (persistentValues.upgrade4.Purchased)/50).toFixed(3);
-        clickCritRate = persistentValues.upgrade5.Purchased;
-        clickCritDmg = Math.round((Math.log(persistentValues.upgrade5.Purchased + 1) * 18));
-        idleRate = (persistentValues.upgrade6.Purchased/100).toFixed(2);
-        luckRate = persistentValues.upgrade7.Purchased/2;
-        eventCooldownDecrease = (1 - persistentValues.upgrade8.Purchased/50).toFixed(1);
-        additionalPrimo = (1 + persistentValues.upgrade9.Purchased/10).toFixed(3);
-        additionalStrength = (1 + persistentValues.upgrade10.Purchased/10).toFixed(3);
-        additionalDefense = (1 + persistentValues.upgrade11.Purchased/10).toFixed(3);
-        additionalXP = (1 + persistentValues.upgrade12.Purchased/50).toFixed(3);
+        specialClick = (1 + (persistentValues.upgrade2)/10).toFixed(3);
+        wishPower = (1 - (persistentValues.upgrade3)/200).toFixed(3);
+        costDiscount = (1 - (persistentValues.upgrade4)/50).toFixed(3);
+        clickCritRate = persistentValues.upgrade5;
+        clickCritDmg = Math.round((Math.log(persistentValues.upgrade5 + 1) * 18));
+        idleRate = (persistentValues.upgrade6/100).toFixed(2);
+        luckRate = persistentValues.upgrade7/2;
+        eventCooldownDecrease = (1 - persistentValues.upgrade8/50).toFixed(1);
+        additionalPrimo = (1 + persistentValues.upgrade9/10).toFixed(3);
+        additionalStrength = (1 + persistentValues.upgrade10/10).toFixed(3);
+        additionalDefense = (1 + persistentValues.upgrade11/10).toFixed(3);
+        additionalXP = (1 + persistentValues.upgrade12/50).toFixed(3);
     } else if (loading == false) {
         switch (valueUpdate) {
             case 1:
-                upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade1.Purchased) / 10);
+                upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade1) / 10);
                 lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
                 break;
             case 2:
-                specialClick = (1 + (persistentValues.upgrade2.Purchased)/10).toFixed(3);
+                specialClick = (1 + (persistentValues.upgrade2)/10).toFixed(3);
                 break;
             case 3:
-                wishPower = (1 - (persistentValues.upgrade3.Purchased)/200).toFixed(3);
+                wishPower = (1 - (persistentValues.upgrade3)/200).toFixed(3);
                 break;
             case 4:
-                costDiscount = (1 - (persistentValues.upgrade4.Purchased)/50).toFixed(3);
+                costDiscount = (1 - (persistentValues.upgrade4)/50).toFixed(3);
                 break;
             case 5:
-                clickCritRate = persistentValues.upgrade5.Purchased;
-                clickCritDmg = Math.round((Math.log(persistentValues.upgrade5.Purchased + 1) * 18));
+                clickCritRate = persistentValues.upgrade5;
+                clickCritDmg = Math.round((Math.log(persistentValues.upgrade5 + 1) * 18));
                 break;
             case 6:
-                idleRate = (persistentValues.upgrade6.Purchased/100).toFixed(2);
+                idleRate = (persistentValues.upgrade6/100).toFixed(2);
                 break;
             case 7:
-                luckRate = (persistentValues.upgrade7.Purchased/2).toFixed(3);
+                luckRate = (persistentValues.upgrade7/2).toFixed(3);
                 break;
             case 8:
-                eventCooldownDecrease = (1 - persistentValues.upgrade8.Purchased/50).toFixed(1);
+                eventCooldownDecrease = (1 - persistentValues.upgrade8/50).toFixed(1);
                 break;
             case 9:
-                additionalPrimo = (1 + persistentValues.upgrade9.Purchased/10).toFixed(3);
+                additionalPrimo = (1 + persistentValues.upgrade9/10).toFixed(3);
                 break;
             case 10:
-                additionalStrength = (1 + persistentValues.upgrade10.Purchased/10).toFixed(3);
+                additionalStrength = (1 + persistentValues.upgrade10/10).toFixed(3);
                 break;
             case 11:
-                additionalDefense = (1 + persistentValues.upgrade11.Purchased/10).toFixed(3);
+                additionalDefense = (1 + persistentValues.upgrade11/10).toFixed(3);
                 break;
             case 12:
-                additionalXP = (1 + persistentValues.upgrade12.Purchased/50).toFixed(3);
+                additionalXP = (1 + persistentValues.upgrade1/50).toFixed(3);
                 break;
             default:
                 console.error('Upgrade error: Invalid value to update');
@@ -2994,7 +3004,7 @@ function removeLoading(loadingNumber) {
         overlay.removeChild(overlay.firstElementChild);
         overlay.classList.remove("overlay");
         loadingNumber.remove();
-        if (persistentValues.upgrade6.Purchased > 0) {
+        if (persistentValues.upgrade6 > 0) {
             idleAmount = idleCheck(idleAmount);
         }
 
@@ -4117,11 +4127,31 @@ function settingsBox(type,eleId) {
                     } else if (commandText === "beta off") {
                         localStorage.setItem('beta', false);
                         location.reload();
+                    } else if (commandText === "max level") {
+                        document.getElementById('tab-2').click();
+                        gainXP(99999);
+                        consoleBoxText.value = '';
+                    } else if (commandText.startsWith("spawn boss") && !isNaN(commandText.slice(-1))) {
+                        let bossNumber = Math.round(commandText.slice(-1));
+                        if (bossNumber > 0 && bossNumber < 5) {
+                            document.getElementById('tab-2').click();
+                            spawnBossQuest(bossNumber);
+                            consoleBoxText.value = '';
+                        } else {
+                            invalidCommand();
+                        }
+                    } else if (commandText === "skip nuts") {
+                        saveValues.realScore += 1e100;
+                        consoleBoxText.value = '';
                     } else {
-                        alert("Invalid command.");
-                        console.error(`Invalid command: ${consoleBoxText.value}.`);
+                        invalidCommand();
                     }
                 });
+
+                const invalidCommand = () => {
+                    alert("Invalid command.");
+                    console.warn(`Invalid command: ${consoleBoxText.value}.`);
+                }
                 
                 consoleBox.append(consoleBoxText, consoleBoxButton)
                 
@@ -4214,6 +4244,7 @@ function settingsBox(type,eleId) {
                         }
                         settingsValues.wideCombatScreen = prefer.checked;
                     });
+                    break;
                 case 'left-hand-mode':
                     prefer.addEventListener('change', () => {
                         const leftHandCSS = document.getElementById('toggle-css');
@@ -4224,6 +4255,7 @@ function settingsBox(type,eleId) {
                         }
                         settingsValues.leftHandMode = prefer.checked;
                     });
+                    break;
                 default:
                     prefer.addEventListener('change', () => {
                         settingsValues[advItem.default] = prefer.checked;
@@ -4557,9 +4589,8 @@ function loadRow() {
         let heroID = "but-" + j;
         let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
         heroButtonContainer.addEventListener("click", () => {
-            changeTooltip(upgradeInfo[loadedHeroID], "hero",loadedHeroID);
+            changeTooltip(upgradeInfo[loadedHeroID], "hero", loadedHeroID);
             if (heroTooltip !== -1) {
-                
                 if (upgradeDict[heroTooltip] != undefined) {
                     heroTooltip = upgradeDict[heroTooltip].Row;
                     let removeActiveHero = document.getElementById(`but-${heroTooltip}`);
@@ -4614,6 +4645,10 @@ function addNewRow(onlyOnce) {
             }
             
             let heroID = "but-" + saveValues["rowCount"];
+            if (document.getElementById('heroID')) {
+                continue;
+            }
+
             let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
             saveValues["rowCount"]++;
 
@@ -4650,6 +4685,7 @@ function upgrade(clicked_id) {
     let upgradeDictTemp = upgradeDict[clicked_id];
     var butIdArray = "but-" + upgradeDictTemp.Row;
     let realScoreCurrent = saveValues["realScore"];
+
     let costCurrent;
     let currentPurchasedLocal = upgradeDictTemp.Purchased;
     let currentMultiplierLocal = currentMultiplier;
@@ -7116,7 +7152,7 @@ function createExpMap() {
     })
 }
 
-function gainXP(xpAmount,multiplier) {
+function gainXP(xpAmount, multiplier) {
     if (xpAmount == "variable") {
         if (advDict.adventureRank > 15) {
             xpAmount = 55;
@@ -8362,6 +8398,12 @@ function triggerFight() {
 
                     killMob(battleVariables.currentEaten, battleVariables.currentEaten.querySelector('.health-bar'))
                     battleVariables.currentEaten = null;
+
+                    const bossEle = document.querySelector('.megaboss > .health-bar');
+                    bossEle.health += 0.10 * bossEle.maxHP;
+                    bossEle.health = Math.min(bossEle.health, FINALE_THRESHOLD_TWO)
+                    bossEle.style.width = `${bossEle.health / bossEle.maxHP * 100}%`
+                    bossUpdate(bossEle.health);
                 } else if (battleVariables.eatTime > 0.95) {
                     const enemyImg = battleVariables.currentEaten.querySelector('.enemyImg');
                     if (enemyImg.style.transition !== 'filter 0.4s ease-out') {
@@ -8370,7 +8412,7 @@ function triggerFight() {
                     }
                 } else if (battleVariables.eatTime > 0.8) {
                     if (eatenMark.glowing === false) {
-                        eatenMark.style.transform = `translate(-50%, -65%) scale(1.2)`;
+                        eatenMark.style.transform = `translate(-50%, 0) scale(1.2)`;
                         eatenMark.style.filter = `brightness(0.99) contrast(1) drop-shadow(0 0 5px #ffffff) drop-shadow(0 0 4px #ffffff)`;
                         eatenMark.glowing = true;
                     }
@@ -8590,11 +8632,12 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                         // FOR BOSSES ONLY
                         if (mobDiv.classList.contains('megaboss')) {
                             if (battleVariables.summonTime !== null) {
-                                battleVariables.summonTime += (brightnessIncrement * speedUpFactor * 1.7);
+                                battleVariables.summonTime += (brightnessIncrement * speedUpFactor * 0.8);
                             }
                             
                             if (adventureVariables.specialty === 'Unusual') {
                                 if (battleVariables.bossHealth > UNUSUAL_THRESHOLD) {
+                                    battleVariables.summonTime += (brightnessIncrement * speedUpFactor * 0.5);
                                     battleVariables.quicktime += brightnessIncrement * 0.3;
                                     battleVariables.decoyTime = canvas.brightness;
                                 } else {
@@ -8638,6 +8681,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                                 }
 
                                 if (battleVariables.eatTime !== null) {
+                                    battleVariables.summonTime += (brightnessIncrement * speedUpFactor * 0.2);
                                     if (battleVariables.currentEaten === null) {
                                         battleVariables.eatTime += brightnessIncrement * 10.3;
                                     } else {
@@ -8871,9 +8915,6 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
         const updateMobHealth = () => {
             if (mobHealth.health <= 0) {
-                fightEnemyDownElement.load();
-                fightEnemyDownElement.play();
-
                 killMob(mobDiv, mobHealth);
             }
 
@@ -9414,7 +9455,7 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
 
 function quicktimeEvent(waveQuicktime, advLevel, variant) {
     if (!adventureVariables.fightSceneOn) {return}
-    if (beta) {return}
+    if (disableQuicktime && beta) {return}
     battleVariables.quicktimeAttack = true;
 
     const quicktimeBar = document.createElement("div");
@@ -10232,9 +10273,13 @@ function sapEnergy(quantityAmount, energyAmount) {
     const cooldown2 = document.getElementById('adventure-cooldown-2');
     const cooldown3 = document.getElementById('adventure-cooldown-3');
 
-    cooldown.amount = Math.max(cooldown.amount - quantityAmount * energyAmount, 0);
-    cooldown2.amount = Math.max(cooldown2.amount - quantityAmount * (energyAmount / 3), 0);
-    cooldown3.amount = Math.max(cooldown3.amount - quantityAmount * (energyAmount / 10), 0);
+    try {
+        cooldown.amount = Math.max(cooldown.amount - quantityAmount * energyAmount, 0);
+        if (cooldown2) cooldown2.amount = Math.max(cooldown2.amount - quantityAmount * (energyAmount / 3), 0);
+        if (cooldown3) cooldown3.amount = Math.max(cooldown3.amount - quantityAmount * (energyAmount / 10), 0);
+    } catch (err) {
+        console.warn(err)
+    }
 }
 
 function loseHP(ATK, type='normal', resetCombo=true) {
@@ -10535,6 +10580,8 @@ function killMob(mobDiv, mobHealth) {
 
     persistentValues.enemiesDefeatedValue++
     mobHealth.dead = true;
+    fightEnemyDownElement.load();
+    fightEnemyDownElement.play();
 
     mobDiv.style.animation = "";
     mobDiv.children[0].style.animation = "";
@@ -10643,7 +10690,7 @@ function winAdventure() {
             challengeNotification(({category: 'specific', value: [3, 6]}))
             break;
         case 'Finale':
-            adventureHeading.innerText = "You have stopped the Leyline Outbreak Experiment, once and for all.";
+            adventureHeading.innerText = "You have ended the Leyline Outbreak Experiment, once and for all.";
             persistentValuesDefault.finaleBossDefeat = true;
             drawAranaraWish();
 
@@ -11364,8 +11411,7 @@ function popAchievement(achievement, loading) {
             achievementPopUp.addEventListener("click", () => {achievementPopUp.remove()});
             achievementPopUp.addEventListener('animationend', () => {achievementPopUp.remove()});
             leftDiv.appendChild(achievementPopUp);
-            achievementElement.load();
-            achievementElement.play();
+            audioPlay(achievementElement);
         }
     }
 
@@ -11830,14 +11876,14 @@ function setShop(type) {
     shopDiv.classList.add("store-div");
     shopDiv.id = "shop-container";
 
-    if (type === "load") {
+    if (type === "load" && storeInventory.storedTime !== 0) {
         for (let i = Object.keys(storeInventory).length - 2; i > 0; i--) {
             loadShopItems(shopDiv, i, storeInventory[i]);
         }
-    } else if (type === "add") {
+    } else if (type === "add" || storeInventory.storedTime === 0) {
         storeInventory.storedTime = getTime();
         let i = 10;
-        let upgradedShop = persistentValues.tutorialAscend === true;
+        let upgradedShop = persistentValues.tutorialAscend;
 
         while (i--) {
             createShopItems(shopDiv, i, drawShopItem(i, upgradedShop));
@@ -12080,7 +12126,7 @@ function loadShopItems(shopDiv, i, inventoryArray) {
     let inventoryTemp = Inventory[inventoryNumber];
 
     let shopButtonImage = document.createElement("img");
-    shopButtonImage.src = "./assets/tooltips/inventory/"+ inventoryTemp.File+ ".webp";
+    shopButtonImage.src = "./assets/tooltips/inventory/"+ inventoryTemp.File + ".webp";
 
     let shopButtonImageContainer = document.createElement("div");
     shopButtonImageContainer.classList.add("flex-column","shop-button-container");
@@ -12116,7 +12162,7 @@ function loadShopItems(shopDiv, i, inventoryArray) {
 //------------------------------------------------------------------------ GOLDEN NUT STORE ------------------------------------------------------------------------//
 // COSTS OF NUT PURCHASE
 function nutCost(id) {
-    let amount = persistentValues["upgrade"+id].Purchased;
+    let amount = persistentValues["upgrade"+id];
     let scaleCeiling = permUpgrades[id].Max;
     let cost;
 
@@ -12212,27 +12258,27 @@ function addNutStore() {
 
         let nutShopLevel = document.createElement("p");
         if (permUpgrades[i].Cap === true) {
-            if (persistentValues["upgrade"+i].Purchased >= permUpgrades[i].Max) {
+            if (persistentValues["upgrade"+i] >= permUpgrades[i].Max) {
                 nutShopLevel.innerText = `Level MAX`;
                 nutShopButtonBottom.innerText = "MAXED";
             } else {
-                nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i].Purchased}`;
+                nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i]}`;
                 nutShopButton.addEventListener("click",()=>{nutPurchase(nutShopItem.id)});
             }
         } else {
-            nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i].Purchased}`;
+            nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i]}`;
             nutShopButton.addEventListener("click",()=>{nutPurchase(nutShopItem.id)})
         }
         
         let nutShopImg = new Image();
         nutShopImg.src = "./assets/tooltips/nut-shop-" +i+ ".webp";
         let nutShopDesc = document.createElement("p");
-        if (permUpgrades[i]["zeroDescription"] !== undefined && persistentValues["upgrade"+i].Purchased <= 0) {
+        if (permUpgrades[i]["zeroDescription"] !== undefined && persistentValues["upgrade"+i] <= 0) {
             nutShopDesc.innerText = `${permUpgrades[i]["zeroDescription"]}
-                                    (Effect: ${permUpgrades[i].Effect*persistentValues["upgrade"+i].Purchased}%)`;
+                                    (Effect: ${permUpgrades[i].Effect*persistentValues["upgrade"+i]}%)`;
         } else {
             nutShopDesc.innerText = `${permUpgrades[i]["Description"]}
-                                    (Effect: ${permUpgrades[i].Effect*persistentValues["upgrade"+i].Purchased}%)`;
+                                    (Effect: ${permUpgrades[i].Effect*persistentValues["upgrade"+i]}%)`;
         }
         
         nutShopButton.append(nutShopButtonTop,nutShopButtonBottom);
@@ -12584,7 +12630,7 @@ function transcendFunction() {
             });
             
             clearPromise.then(
-                function(value) {
+                () => {
                     let overlay = document.getElementById("loading");
                     overlay.style.zIndex = 100000;
                     overlay.children[0].style.backgroundImage = "url(./assets/bg/wood.webp)";
@@ -12605,8 +12651,17 @@ function transcendFunction() {
 
                     let newSaveValues = saveValuesDefault;
                     newSaveValues.goldenTutorial = true;
+                    newSaveValues.wishUnlocked = true;
                     newSaveValues.versNumber = DBNUBMER;
                     localStorage.setItem("saveValuesSave", JSON.stringify(newSaveValues));
+
+                    let newlocalStore = storeInventoryDefault;
+                    newlocalStore.active = true;
+                    localStorage.setItem("storeInventory", JSON.stringify(newlocalStore));
+
+                    if (beta) {
+                        localStorage.setItem("beta", "true")
+                    }
                     
                     setTimeout(()=>{
                         location.reload();
@@ -12624,28 +12679,28 @@ function nutPurchase(fullId) {
     if (persistentValues.goldenCore >= cost) {
         upgradeElement.load();
         upgradeElement.play();
-        persistentValues["upgrade"+id].Purchased++;
+        persistentValues["upgrade"+id]++;
         persistentValues.goldenCore -= cost;
 
         let childArray = document.getElementById(fullId).children;
-        childArray[1].innerText = `Level ${persistentValues["upgrade"+id].Purchased}`;
+        childArray[1].innerText = `Level ${persistentValues["upgrade"+id]}`;
         childArray[3].innerText = `${permUpgrades[id]["Description"]}
-                                    (Effect: ${permUpgrades[id]["Effect"] * persistentValues["upgrade"+id]["Purchased"]}%)`;
+                                    (Effect: ${permUpgrades[id]["Effect"] * persistentValues["upgrade"+id]}%)`;
         childArray[4].children[1].innerHTML = childArray[4].children[1].innerHTML.replace(/[^<]+</g, `${abbrNum(nutCost(id),2,true)}<`);
         updateCoreCounter();
         specialValuesUpgrade(false,parseInt(id));
 
         if (permUpgrades[id].Cap === true) {
-            if (persistentValues["upgrade"+id].Purchased >= permUpgrades[id].Max) {
+            if (persistentValues["upgrade"+id] >= permUpgrades[id].Max) {
                 childArray[1].innerText = `Level MAX`;
                 let buttonNew = childArray[4].cloneNode(true);
                 childArray[4].parentNode.replaceChild(buttonNew, childArray[4]);
                 childArray[4].children[1].innerText = "MAXED";
             } else {
-                childArray[1].innerText = `Level ${persistentValues["upgrade"+id].Purchased}`;
+                childArray[1].innerText = `Level ${persistentValues["upgrade"+id]}`;
             }
         } else {
-            childArray[1].innerText = `Level ${persistentValues["upgrade"+id].Purchased}`;
+            childArray[1].innerText = `Level ${persistentValues["upgrade"+id]}`;
         }
         
     }
@@ -13528,19 +13583,19 @@ function leylineCreate(treeTable, optionsContainer) {
 function checkAbsorbThreshold() {
     const leylineText = document.getElementById('leyline-text');
     if (persistentValues.leylinePower < 75 && persistentValues.fellBossDefeat === false) {
-        spawnBossQuest(1)
+        spawnBossQuest(1);
         persistentValues.leylinePower = 75.0;
         leylineText.innerText = 'A force of nature has awoken as its energy from the Leyline was cutoff!';
     } else if (persistentValues.leylinePower < 50 && persistentValues.unusualBossDefeat === false) {
-        spawnBossQuest(2)
+        spawnBossQuest(2);
         persistentValues.leylinePower = 50.0;
         leylineText.innerText = 'A mysterious portal has emerged, maybe it has something to do with the Leyline?';
     } else if (persistentValues.leylinePower < 25 && persistentValues.workshopBossDefeat === false) {
-        spawnBossQuest(3)
+        spawnBossQuest(3);
         persistentValues.leylinePower = 25.0;
         leylineText.innerText = 'A dreadful roar was heard from the depths due to the energy given off by the Leyline!';
     }  else if (persistentValues.leylinePower < 0 && persistentValues.finaleBossDefeat === false) {
-        spawnBossQuest(4)
+        spawnBossQuest(4);
         persistentValues.leylinePower = 0;
         leylineText.innerText = 'A powerful enemy has revealed itself as soon as all energy from the Leyline stopped!';
     }
@@ -13815,6 +13870,7 @@ if (beta) {
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
+let disableQuicktime = false;
 if (localStorage.getItem('beta') == 'true') {
     beta = true;
 }
