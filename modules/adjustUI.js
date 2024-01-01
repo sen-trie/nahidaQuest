@@ -1,3 +1,5 @@
+import { randomInteger } from "./functions.js";
+
 // ADD TO INVENTORY BUTTON ADJUST
 function inventoryAddButton(buttonInv, Item) {
     let buttonInvFrame = document.createElement("img");
@@ -150,8 +152,8 @@ function inventoryFrame(ele, itemInfo, itemFrameColors) {
 }
 
 // CHOICE BOX (FOR ITEMS, PARENT CONTAINER MUST HAVE 'NOTIF-ITEM' CLASS)
-function choiceBox(mainBody, dialogObg, stopSpawnEvents, yesFunc, noFunc, extraEle, classes) {
-    if (stopSpawnEvents) {stopSpawnEvents = false;}
+function choiceBox(mainBody, dialogObg, stopSpawnEvents, yesFunc, noFunc, extraEle, classes, returnEle = false) {
+    if (stopSpawnEvents) {stopSpawnEvents = false}
 
     const choiceEle = document.createElement('div');
     choiceEle.choiceValue = null;
@@ -229,7 +231,74 @@ function choiceBox(mainBody, dialogObg, stopSpawnEvents, yesFunc, noFunc, extraE
         choiceDiv.append(choiceContainer);
     }
     
-    choiceEle.append(choiceDiv)
+    choiceEle.append(choiceDiv);
+
+    if (returnEle) {
+        return choiceEle;
+    } else {
+        mainBody.append(choiceEle);
+    }
+}
+
+// ALL CHILD ELEMENTS NEED SUBTITLE PROP
+function slideBox(mainBody, childArray, stopSpawnEvents) {
+    if (stopSpawnEvents) {stopSpawnEvents = false}
+    let childEleArray = [];
+    let buttonArray = [];
+
+    const choiceEle = createDom('div', {
+        class: ['flex-column', 'notif-ele']
+    });
+
+    const buttonDiv = createDom('div', {
+        class: ['flex-row', 'slide-button-container']
+    });
+
+    childArray.forEach((childEle) => {
+        const childContainer = createDom('div', {
+            class: ['flex-row', 'slide-box-child'],
+            style: { display: 'none' },
+            child: [childEle]
+        });
+
+        childEleArray.push(childContainer);
+        const childButton = createDom('button', {
+            innerText: childEle.subtitle,
+            class: ['box-button'],
+            style: { filter: 'grayscale(1)' }
+        })
+
+        childButton.addEventListener('click', () => {
+            childEleArray.forEach((childEle) => {
+                childEle.style.display = 'none';
+            });
+
+            buttonArray.forEach((button) => {
+                button.style.filter = 'grayscale(1)';
+            })
+
+            childContainer.style.display = 'flex';
+            childButton.style.filter = 'grayscale(0)';
+        });
+
+        buttonArray.push(childButton);
+        choiceEle.appendChild(childContainer);
+        buttonDiv.appendChild(childButton);
+    });
+
+    const exitButton = createDom('button', {
+        innerText: 'Exit',
+        class: ['box-button', 'exit-button']
+    })
+    exitButton.addEventListener('click', () => {
+        choiceEle.remove();
+        if (stopSpawnEvents) stopSpawnEvents = true;
+    })
+    buttonDiv.appendChild(exitButton);
+
+    childEleArray[0].style.display = 'flex';
+    buttonArray[0].style.filter = 'grayscale(0)';
+    choiceEle.append(buttonDiv);
     mainBody.append(choiceEle);
 }
 
@@ -349,4 +418,4 @@ function createMedal(num, choiceBox, mainBody, stopSpawnEvents) {
     return nutMedal;
 }
 
-export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom,createMedal };
+export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal };

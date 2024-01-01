@@ -1205,7 +1205,7 @@ const challengeInfo = [
         {'title': 'Team All-Stars', 'desc': 'Ascend every character seven times'},  // CH DONE
         {'title': 'Apex of Akasha', 'desc': 'Stop the evil responsible for the Leyline Outbreak'},// CH DONE
         {'title': 'Stance of Impregnability', 'desc': 'During a battle, reach a counter combo of 50'}, // CH DONE
-        {'title': 'Rule of Twelves', 'desc': "Within 12 selections, reveal all of Arakarman's keys"},  // CH DONE
+        {'title': 'Rule of Twelves', 'desc': "Within 10 selections, reveal all of Arakarman's keys"},  // CH DONE
         {'title': 'Leader of the Tribe', 'desc': "Collect 2000 points while leading the Aranara"}, // CH DONE
         {'title': 'THE GNOSIS IS REAL', 'desc': 'Catch 12 Golden Weasel Thieves'},  // CH DONE
         {'title': '#teamtrees', 'desc': 'Harvest 60 fully-grown trees'},  // CH DONE

@@ -1,7 +1,7 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,choiceBox,createProgressBar,createDom,createMedal } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
 
@@ -446,6 +446,8 @@ function timerEvents() {
         refresh();
         dimHeroButton();
         addNewRow(true);
+    } else {
+        console.log('stopSpawnEvents is enabled!')
     }
     
     randomEventTimer(timerSeconds);
@@ -2381,14 +2383,8 @@ function battleshipEvent() {
                 eventOutcome("You won! You earned some treasure!", eventBackdrop, "battleships", 1);
                 battleshipContainer.gameStarted = false;
 
-                let finalHealth = friendlyDiv.score;
                 setTimeout(() => {
-                    if (finalHealth >= 4 && choicesTaken <= 12) {
-                        challengeNotification(({category: 'specific', value: [4, 5]}));
-                        challengeNotification(({category: 'specific', value: [4, 6]}));
-                    } else if (finalHealth >= 4) {
-                        challengeNotification(({category: 'specific', value: [4, 6]}));
-                    } else if (choicesTaken <= 12) {
+                    if (choicesTaken <= 10) {
                         challengeNotification(({category: 'specific', value: [4, 5]}));
                     }
                 }, 3750)
@@ -7064,7 +7060,7 @@ function createExpMap() {
             }
         }
     
-        charDiv.addEventListener("click",()=>{
+        charDiv.addEventListener("click",() => {
             if (!charDiv.locked) {
                 charSelect.innerText = "";
                 charSelect.style.backgroundImage = `url(./assets/expedbg/leader-${k}.webp)`;
@@ -7290,9 +7286,19 @@ function notifPop(type,icon,count) {
 
         if (guildButton.includes(icon)) {
             notifDiv.addEventListener('click',()=>{
-                let guildTable = document.getElementById("guild-table");
-                guildTable.open();
-                document.getElementById(`guild-button-${icon}`).click();
+                if (!activeLeader) {
+                    let advButton = document.getElementById("adventure-button");
+                    adventureType = 0;
+                    advButton.key = 0;
+                    expedInfo("exped-11");
+                    if (advButton.classList.contains("expedition-selected")) {
+                        advButton.classList.remove("expedition-selected");
+                    }
+                } else {
+                    let guildTable = document.getElementById("guild-table");
+                    guildTable.open();
+                    document.getElementById(`guild-button-${icon}`).click();
+                }
             })
         }
         
@@ -11577,6 +11583,34 @@ function createTooltip() {
     tooltipElementImg = document.createElement("img");
     tooltipExtraImg.append(tooltipWeaponImg,tooltipElementImg);
 
+    const breakdownButton = createDom('button', {
+        class: ['flex-column', 'clickable'],
+        innerText: 'Breakdown',
+        id: 'hero-breakdown',
+        style: {
+            display: 'none'
+        }
+    });
+
+    breakdownButton.addEventListener('click', () => {
+        if (heroTooltip !== -1) {
+            let upgradeCount = 0;
+            for (let key in upgradeDict[heroTooltip]["milestone"]) {
+                if (upgradeDict[heroTooltip]["milestone"][key]) {upgradeCount++};
+            }
+
+            let listText = createDom('p', { 
+                id:'notif-list', 
+                innerText: 
+                `Base NpS: ${abbrNum(upgradeDict[heroTooltip].BaseFactor, 2)} (No Item Buffs)\n
+                Buffed NpS: ${abbrNum(upgradeDict[heroTooltip].Factor, 2)} (With Item Buffs)\n
+                Upgrades: ${upgradeCount} (Built into Base NpS)\n
+                Overall: ${abbrNum(upgradeDict[heroTooltip].Contribution, 2)} (${(Math.round(upgradeDict[heroTooltip].Contribution / saveValues.dps * 100 * 100) / 100)}% of total NpS)`
+            });
+            choiceBox(document.getElementById('main-table'), {text: upgradeInfo[heroTooltip].Name}, stopSpawnEvents, ()=>{}, null, listText, ['notif-ele', 'hero-breakdown']);
+        }
+    })
+
     const upgradeSelection = document.createElement("form");
     upgradeSelection.classList.add('flex-column');
     upgradeSelection.id = 'upgrade-selection';
@@ -11628,7 +11662,7 @@ function createTooltip() {
     table6Background.src = "./assets/tooltips/background.webp"
     table6Background.classList.add("table6-background");
     toolInfo.append(toolImgContainer,tooltipText,tooltipExtraImg);
-    table6.append(tooltipName, toolInfo, tooltipLore, upgradeSelection, table6Background, tooltipButton);
+    table6.append(tooltipName, toolInfo, breakdownButton, tooltipLore, upgradeSelection, table6Background, tooltipButton);
 }
 
 var tooltipInterval = null;
@@ -11657,6 +11691,7 @@ function changeTooltip(dict, type, number) {
     }
 
     if (type == "hero") {
+        universalStyleCheck(document.getElementById('hero-breakdown'), 'display', 'none', 'flex', true);
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
         let tooltipTextLocal = "Level: " + upgradeDict[number]["Purchased"] + 
                                 "\n Discounted Lvls: " + saveValues["freeLevels"] + 
@@ -11673,6 +11708,7 @@ function changeTooltip(dict, type, number) {
         
         tooltipText.innerText = tooltipTextLocal;
     } else if (type == "milestone") {
+        universalStyleCheck(document.getElementById('hero-breakdown'), 'display', 'flex', 'none', true);
         toolImgOverlay.src = "./assets/tooltips/hero/"+dict.Name+".webp";
 
         let upgradeLevel = 50;
@@ -11755,6 +11791,7 @@ function clearTooltip() {
     tooltipInterval = setTimeout(() => {
         if (table1.style.display !== "none") {
             tooltipName.innerText = "Tap a character for more info!";
+            universalStyleCheck(document.getElementById('hero-breakdown'), 'display', 'flex', 'none', true);
         }
 
         if (table2.style.display !== "none") {
@@ -12293,32 +12330,19 @@ function addNutStore() {
     const bodyTextBottom = document.createElement("p");
     bodyTextBottom.innerText = "Gain more by upgrading heroes, getting \nachievements & nuts (golden or otherwise).";
 
-    const transendHelp = document.createElement("button");
     const transcendHelpbox = document.createElement("p");
-    transcendHelpbox.style.display = "none";
-    transcendHelpbox.innerText = `What is the Golden Core amount affected by? \n 
-                                Character Ascensions (V. High Priority)
-                                Character Upgrades (V. High Priority)\n------------------------------
-                                Character Levels (High Priority)
-                                Achievements (High Priority)\n------------------------------
-                                Golden Nuts (Low Priority)
-                                Regular Nuts (Low Priority)`;
+    transcendHelpbox.id = 'transcend-helpbox';
+    transcendHelpbox.style.display = 'block';
+    transcendHelpbox.subtitle = 'Extra Info';
+    transcendHelpbox.innerHTML = `What is the Golden Core amount affected by? <br/>------------------------------<br/>
+                                Character Ascensions (V. High Priority)<br/>
+                                Character Upgrades (V. High Priority)<br/>------------------------------<br/>
+                                Character Levels (High Priority)<br/>
+                                Achievements (High Priority)<br/>------------------------------<br/>
+                                Golden Nuts (Low Priority)<br/>
+                                Regular Nuts (Low Priority)</span>`;
 
-    transendHelp.addEventListener("click",()=>{
-        if (transcendHelpbox.style.display == "none") {
-            transcendHelpbox.style.display = "block";
-            if (!nutTranscend.classList.contains("transcend-dark")) {
-                nutTranscend.classList.add("transcend-dark");
-            }
-        } else {
-            transcendHelpbox.style.display = "none";
-            if (nutTranscend.classList.contains("transcend-dark")) {
-                nutTranscend.classList.remove("transcend-dark");
-            }
-        }
-    });
-
-    const transcendStats = createDom('button', { innerText:'Stats' })
+    const transcendStats = createDom('button', { innerText:'Breakdown' })
     transcendStats.addEventListener('click', () => {
         const mostContributeDict = calculateGoldenCore('highestAmount');
         let listText;
@@ -12327,6 +12351,7 @@ function addNutStore() {
             sortedEntries = sortedEntries.slice(0, 5);
            
             let listInnerText = '';
+            listInnerText += 'Golden Core Amounts: \n'
             for (let i = 0; i < sortedEntries.length; i++) {
                 listInnerText += `${(i + 1)}. ${sortedEntries[i][0]}: ${abbrNum(sortedEntries[i][1],2,true)}\n`;
             }
@@ -12335,12 +12360,13 @@ function addNutStore() {
             listText = createDom('p', { id:'notif-list', innerText: 'Nothing...' });
         }
 
-        choiceBox(nutStoreTable, {text: 'Top Contribution to \nCore Amounts:'}, stopSpawnEvents, ()=>{}, null, listText, ['notif-ele']);
+        listText.subtitle = 'Amounts';
+        slideBox(mainBody, [listText, transcendHelpbox], stopSpawnEvents);
     })
 
 
     const trascendButton = document.createElement("button");
-    trascendButton.innerText = "Transcend";
+    trascendButton.innerText = "Transcend!";
     trascendButton.addEventListener("click",()=>{
         calculateGoldenCore();
         toggleTranscendMenu();
@@ -12351,7 +12377,7 @@ function addNutStore() {
         child: [transcendStats, trascendButton]
     })
 
-    nutTranscend.append(titleText,bodyText,bodyTextBottom,transcendBottom,transcendHelpbox,transendHelp);
+    nutTranscend.append(titleText,bodyText,bodyTextBottom,transcendBottom);
 
     nutStoreTable.append(shopHeader,nutTranscend,nutShopDiv,nutAscend,nutButtonContainer,nutStoreCurrency);
     mainTable.appendChild(nutStoreTable);
@@ -13663,13 +13689,13 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
 }
 
 // POP UPS FOR SPECIAL CURRENCY
-const createPopEle = (type, amount, additionalClass) => {
+const createPopEle = (type, amount) => {
     let currencyPop = createDom('div', {
-        classList: ["flex-row", ...additionalClass],
+        classList: ["currency-pop-first", "flex-row"],
         innerHTML: `${amount}   `
     });
 
-    let currencyPopImg = createDom('img', { classList: ['icon']});
+    let currencyPopImg = createDom('img');
     switch (type) {
         case 'energy':
             currencyPopImg.src = "./assets/icon/energyIcon.webp";
@@ -13679,14 +13705,12 @@ const createPopEle = (type, amount, additionalClass) => {
             break;
         case 'primogem':
             currencyPopImg.src = "./assets/icon/primogemIcon.webp";
-            currencyPopImg.classList.add("primogem");
             saveValues.primogem += amount;
             persistentValues.lifetimePrimoValue += amount;
             challengeNotification(({category: 'primogem', value: saveValues.primogem}));
             break;
         case 'nuts':
             currencyPopImg.src = "./assets/icon/goldenIcon.webp";
-            currencyPopImg.classList.add("primogem");
             saveValues.goldenNut += amount;
             persistentValues.goldenCore += amount;
             updateCoreCounter();
@@ -13694,14 +13718,14 @@ const createPopEle = (type, amount, additionalClass) => {
             break;
         case 'mail':
             currencyPopImg.src = "./assets/icon/mailLogo.webp";
-            currencyPopImg.classList.add("primogem");
             saveValues.mailCore += amount;
             break;
         case 'items':
             currencyPop.innerHTML = "Items";
             currencyPopImg.src = "./assets/icon/item.webp";
+            break;
         default:
-            console.error(`currencyPopUp Error: ${type, amount, additionalClass}`);
+            console.error(`currencyPopUp Error: ${type} ${amount} ${additionalClass}`);
             break;
     }
 
@@ -13709,25 +13733,21 @@ const createPopEle = (type, amount, additionalClass) => {
     return currencyPop;
 }
 
-function currencyPopUp(type1, amount1 = 0, type2 = undefined, amount2 = 0) {
-    let currencyPop = createDom('div', {
-        class: ["flex-column","currency-pop"],
-        innerText: 'Obtained'
+function currencyPopUp(type1, amount1=0, type2=undefined, amount2=0, type3=undefined, amount3=0, type4=undefined, amount4=0) {
+    const currencyPop = createDom('div', {
+        class: ["currency-pop"],
+        child: [createDom('p', { classList: ['flex-row'], innerText: 'Obtained: '})]
     });
 
-    if (type1 === 'primogem') {amount1 = Math.round(amount1 * additionalPrimo)};
-    const currencyPopFirst = createPopEle(type1, amount1, ["currency-pop-first"]);
-    currencyPop.append(currencyPopFirst);
+    const processCurrencyItem = (type, amount) => {
+        if (type === 'primogem') amount = Math.round(amount * additionalPrimo);
+        currencyPop.append(createPopEle(type, amount));
+    };
 
-    if (type2 !== undefined) {
-        const currencyPopSecond = createPopEle(type1, amount1, ["currency-pop-first"]);
-        if (type2 === 'primogem') {amount2 = Math.round(amount2 * additionalPrimo)};
-
-        currencyPop.style.height = "13%"
-        currencyPopFirst.style.height = "30%";
-        currencyPopSecond.style.height = "30%";
-        currencyPop.append(currencyPopSecond);
-    }
+    processCurrencyItem(type1, amount1);
+    if (type2 !== undefined) processCurrencyItem(type2, amount2);
+    if (type3 !== undefined) processCurrencyItem(type3, amount3);
+    if (type4 !== undefined) processCurrencyItem(type4, amount4);
 
     setTimeout(()=> {
         currencyPop.style.animation = "fadeOut 2s cubic-bezier(.93,-0.24,.93,.81) forwards";
@@ -13796,12 +13816,7 @@ function newPop(type) {
 if (beta) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            // for (let i = 0; i < 5; i++) {
-            //     for (let j = 0; j < 10; j++) {
-            //         challengeNotification(({category: 'specific', value: [i, j]}));j
-            //     }
-            // }
-            simonEvent(true);
+            weaselEvent()
         }
     })    
 }

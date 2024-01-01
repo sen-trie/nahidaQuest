@@ -2949,31 +2949,27 @@ img[src=""] {
     background: transparent url("./assets/tutorial/nutPill.webp") center/contain no-repeat;
 }
 
+.slide-button-container {
+    column-gap: 1rem;
+}
+
+.box-button {
+    font-size: 1.1em;
+    padding: 0.25em;
+    background-color: var(--bright-dark-green);
+    border-radius: 0.5em;
+    color: white;
+    width: fit-content;
+    white-space: nowrap;
+}
+
+.exit-button {
+    background-color: var(--medium-red);
+}
+
 .nut-transcend > button {
     transition: 0.15s ease;
     background: transparent url("./assets/tutorial/buttonBox.webp") center/contain no-repeat;
-}
-
-.nut-transcend > :nth-last-child(2) {
-    position: absolute;
-    font-size: 1.1em;
-    background-color: #99B589;
-    border: 0.2em solid #5B7B49;
-    text-shadow: var(--text-shadow-075);
-    padding: 2%;
-    z-index: 2;
-    line-height: 1.4em;
-}
-
-.nut-transcend > :last-child {
-    position: absolute;
-    height: 10%;
-    width: auto;
-    aspect-ratio: 1;
-    top: 1%;
-    right:1%;
-    background: transparent url("./assets/icon/help.webp") center/contain no-repeat;
-    z-index: 2;
 }
 
 .nut-transcend > button:hover {

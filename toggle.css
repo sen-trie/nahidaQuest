@@ -12,6 +12,7 @@
 .middle-area {
     left: unset;
     right: 35.2%;
+    z-index: 10;
 }
 
 .main-table {
@@ -40,4 +41,9 @@
 
 .minesweeper-backdrop, .weasel-backdrop, .adventure-fight, .battleship-div, .snake-description {
     flex-direction: row-reverse;
+}
+
+.weasel-back, .weasel-timer-div {
+    left: unset;
+    right: 4%;
 }

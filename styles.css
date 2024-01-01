@@ -95,6 +95,7 @@ button {
     --dark-green: #4D613D;
     --bright-dark-green: #3D7250;
     --very-dark-green: #1c2f0e;
+    --medium-red: #a2443b;
     --very-dark-red: #651418;
     --light-brown: #E9D5C1;
     --pale-brown: #B1A79A;
@@ -913,30 +914,43 @@ table, button, label {
 }
 
 .currency-pop {
-    top: 11%;
-    left: 32%;
-    width: 10%;
-    height: 9%;
-    color: #385225;
-    background-color: #CEE375;
-    border-radius: 1em;
-    border: 0.20em solid #6f895d;
+    display: grid;
+    text-align: center;
     position: absolute;
-    row-gap: 2%;
+    top: 11%;
+    left: 31%;
+    width: 12%;
+    color: var(--dull-green);
+    background-color: var(--bright-medium-green);
+    border-radius: 1rem;
+    border: 0.20em solid var(--bright-dark-green);
     z-index: 150;
-    font-size: 1em;
+    font-size: 1.3rem;
     animation: slidedown-pop 0.8s ease-in-out both;
     pointer-events: none;
 }
 
-.currency-pop-first {
-    height: 50%;
-    column-gap: 2%;
+.currency-pop > * {
+    height: 2.2rem;
+    width: 100%;
+    border-top: 0.15rem solid var(--bright-dark-green);
 }
 
-.currency-pop-first > .icon {
-    position: relative;
-    left: 10%;
+.currency-pop > p {
+    color: var(--bright-medium-green);
+    background-color: var(--bright-dark-green);
+    border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.currency-pop-first > img {
+    height: 1.5rem;
+    aspect-ratio: 1;
+    filter: drop-shadow(0 0 0.1em rgba(0, 0, 0, 0.795));
+    margin-left: 0.35rem;
+}
+
+.currency-pop > :last-child {
+    margin-bottom: 0.2rem;
 }
 
 /*/////////////////////////////// TUTORIAL CSS ///////////////////////////////*/
@@ -2475,6 +2489,32 @@ table, button, label {
     width: 100%;
 }
 
+#hero-breakdown {
+    z-index: 5;
+    color: var(--light-brown);
+    background-color: var(--very-dark-brown);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.5rem;
+    margin-top: 0.4rem;
+}
+
+.hero-breakdown > div {
+    border: 0.2em solid var(--very-dark-brown) !important;
+    background-color: var(--light-brown) !important;
+    max-width: 75% !important;
+}
+
+.hero-breakdown > div > #notif-list {
+    color: var(--very-dark-brown);
+    font-size: 1em !important;
+    margin: 0.5em;
+    padding-left: unset;
+}
+
+.hero-breakdown > div > div > button {
+    background-color: var(--very-dark-brown) !important;
+}
+
 .prefer-container {
     display: block;
     position: relative;
@@ -3143,7 +3183,7 @@ table, button, label {
     width: 70%;
 }
 
-#notif-list {
+#notif-list, #transcend-helpbox {
     font-size: 1.2em;
     margin: 1em;
     width: 100%;
@@ -3151,6 +3191,12 @@ table, button, label {
     text-shadow: unset;
     text-align: left;
     padding-left: 1em;
+}
+
+#transcend-helpbox {
+    font-size: 1em;
+    margin: 0.5em;
+    padding-left: 0;
 }
 
 .notif-item {
@@ -3205,7 +3251,7 @@ table, button, label {
 }
 
 .choice-ele > div > div > button:nth-of-type(2) {
-    background-color: #a2443b;
+    background-color: var(--medium-red);
 }
 
 .choice-ele:before, .notif-ele:before {
