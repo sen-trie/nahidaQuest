@@ -1,4 +1,9 @@
-import { textReplacer } from "./functions.js";
+function textReplacerCopy(dictReplace, originalText) {
+    for (let key in dictReplace) {
+        originalText = originalText.replaceAll(key,dictReplace[key]);
+    }
+    return originalText;
+}
 
 const filePath = "./assets/";
 const uniqueFileArray = {
@@ -472,7 +477,7 @@ function patchNotes(parent, showImgTitle = true, onlyOneOpen = false) {
 
         let patchInfo = document.createElement("p");
         patchInfo.classList.add('patch-info');
-        let text = textReplacer({
+        let text = textReplacerCopy({
             '[img]':nahidaImg.outerHTML,
         },patchDict[key]);
         patchInfo.innerHTML = text;

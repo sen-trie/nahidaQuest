@@ -6,15 +6,26 @@
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
 
+
 <url>
   <loc>https://nahidaquest.com/</loc>
-  <lastmod>2023-04-03T14:51:14+00:00</lastmod>
+  <lastmod>2024-01-04T12:39:58+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://nahidaquest.com/feedback.html</loc>
-  <lastmod>2023-04-03T14:51:14+00:00</lastmod>
+  <loc>https://nahidaquest.com/play.html</loc>
+  <lastmod>2024-01-04T12:39:58+00:00</lastmod>
   <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://nahidaquest.com/feedback</loc>
+  <lastmod>2024-01-04T12:39:58+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://nahidaquest.com/credits</loc>
+  <lastmod>2024-01-04T12:39:58+00:00</lastmod>
+  <priority>0.64</priority>
 </url>
 
 
