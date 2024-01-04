@@ -337,6 +337,19 @@ function createDom(elementType, attributes) {
     return element;
 }
 
+// CREATE BUTTON WITH TOGGLEABLE CLASS
+function createButton(clickedClass, attributes) {
+    const buttonEle = createDom('button', attributes);
+    buttonEle.addEventListener('click', () => {
+        if (buttonEle.classList.contains(clickedClass)) {
+            buttonEle.classList.remove(clickedClass);
+        } else {
+            buttonEle.classList.add(clickedClass);
+        }
+    })
+    return buttonEle
+}
+
 // CREATES PROGRESS BAR
 function createProgressBar(parentProps, childProps, dividerProps, dividerNumber, imgProps) {
     const parentEle = createDom('div', parentProps);
@@ -418,4 +431,4 @@ function createMedal(num, choiceBox, mainBody, stopSpawnEvents) {
     return nutMedal;
 }
 
-export { inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal };
+export { createButton,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal };

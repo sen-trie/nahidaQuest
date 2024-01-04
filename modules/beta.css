@@ -1,0 +1,320 @@
+.settings-menu {
+    row-gap: unset;
+    width: auto;
+    aspect-ratio: 1.35;
+}
+
+.settings-menu button {
+    color: inherit;
+}
+
+.settings-header {
+    width: 100%;
+    height: 2em;
+    padding-top: 0.2em;
+    padding-left: 1em;
+    justify-content: flex-start;
+    border-bottom: var(--medium-green) 0.5rem solid;
+    box-sizing: border-box;
+}
+
+.settings-tab-button {
+    width: fit-content;
+    height: 100%;
+    padding: 0 2%;
+    font-size: 1.1em;
+    margin-right: 0.5em;
+    border: var(--dark-green) 0.15em solid;
+    border-bottom: none;
+    background-color: var(--medium-green);
+}
+
+.inactive-tab {
+    border-color: var(--medium-green);
+    background-color: var(--dark-green);
+    color: #DEE3BA !important;
+}
+
+.settings-tab {
+    position: relative;
+    padding-top: 0.5em;
+    box-sizing: border-box;
+    flex-grow: 1;
+    width: 100%;
+    overflow-y: auto;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 0.25em 0.75em 0 0.75em;
+    gap: 2%;
+}
+
+.settings-tab * {
+    z-index: 1;
+}
+
+.settings-text {
+    display: none;
+}
+
+.volume-scroller-container {
+    display: block;
+    height: auto;
+    aspect-ratio: 5;
+    padding-bottom: 0.5rem;
+    border-bottom: var(--medium-green) 0.3rem solid;
+}
+
+.volume-scroller-container-children {
+    height: 50%;
+}
+
+.settings-bottom {
+    height: unset;
+    aspect-ratio: 6;
+    box-sizing: border-box;
+    padding: 0 1%;
+    border-bottom: var(--medium-green) 0.3rem solid;
+}
+
+.settings-bottom:last-of-type, .settings-bottom:nth-last-of-type(2) {
+    margin-top: 0.5rem;
+    padding-bottom: unset;
+    border-bottom: unset;
+}
+
+.settings-bottom:last-of-type {
+    aspect-ratio: 10;
+    position: relative;
+}
+
+.patch-button {
+    position: unset;
+    width: fit-content;
+    height: 75%;
+    background: unset;
+    filter: unset;
+    aspect-ratio: unset;
+    background-color: var(--pale-medium-green);
+    border: var(--dark-green) 0.15em solid;
+    padding: 1%;
+    padding-right: 2%;
+    box-sizing: border-box;
+    border-radius: 0.3em;
+}
+
+.patch-button > img {
+    height: 3em;
+}
+
+.settings-bottom-right {
+    width: auto;
+    aspect-ratio: 3.3;
+}
+
+.settings-bottom-right > button {
+    height: 80%;
+    width: auto;
+    aspect-ratio: 1;
+    margin: unset;
+    margin-left: 1em;
+}
+
+#settings-tab-advanced {
+    overflow-y: auto;
+}
+
+.switch {   
+    height: 100%;
+    padding: 2%;
+    box-sizing: border-box;
+    background-color: var(--pale-medium-green);
+    border: var(--dark-green) 0.15em solid;
+}
+
+input:checked + .slider {
+    background-color: var(--dark-green);
+}
+
+.slider {
+    height: 70%;
+}
+
+.advanced-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 3em;
+    gap: 1em 0.5em;
+}
+
+#settings-tab-advanced {
+    grid-template-rows: auto 1fr;
+}
+
+.settings-wrapper {
+    width: 100%;
+    height: 100%;
+}
+
+
+.settings-stats {
+    font-size: 1em;
+    max-height: 100%;
+    margin-top: 2%;
+    padding: 2%;
+    border-top: var(--medium-green) 0.3rem solid;
+    overflow-y: auto;
+}
+
+.settings-inner-tab {
+    padding: unset;
+    border-bottom: var(--medium-green) 0.3rem solid;
+}
+
+.settings-tab-box {
+    overflow: hidden;
+    padding-bottom: 2%;
+}
+
+.settings-box {
+    width: 100%;
+    flex-grow: 1;
+    /* background-color: rgb(30, 255, 0); */
+    padding: 1%;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.settings-inner-button {
+    position: absolute;
+    width: fit-content;
+    height: fit-content;
+    padding: 0.3em;
+    right: 0;
+    bottom: 0;
+    border: var(--bright-dark-green) 0.15em solid;
+    background-color: var(--bright-light-green);
+}
+
+.settings-textarea {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    font-family: inherit;
+    padding: 1%;
+    box-sizing: border-box;
+    font-size: 0.65em;
+    border: var(--medium-green) 0.4rem solid;
+}
+
+.settings-textarea:focus { 
+    outline: none !important;
+    border-color: var(--dark-green);
+}
+
+.copyright-text  {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    color: inherit;
+    text-shadow: unset;
+    font-size: 0.8rem;
+}
+
+.version-text {
+    position: absolute;
+    right: 0;
+    bottom: 0.5em;
+    color: inherit;
+    text-shadow: unset;
+    font-size: 1em;
+}
+
+#patch-container {
+    background-color: var(--pale-green);
+    position: absolute;
+    border-radius: 1rem;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    transform: unset;
+    left: unset;
+    margin: -0.25em -0.75em 0 -0.75em;
+    overflow-y: auto;
+    overflow-x: hidden;
+    justify-content: unset;
+    align-items: unset;
+    padding: 1%;
+    box-sizing: border-box;
+}
+
+.patch-info {
+    border: 0.1em solid var(--dull-green);
+    border-top:0;
+    color: var(--olive-green);
+    padding: 1%;
+    border-radius: 0 0 1em 1em;
+    width: 92.5%;
+    font-size: 0.9em;
+}
+
+.patch-info > line {
+    border-bottom: 0.15em solid var(--olive-green);
+}
+
+.patch-div {
+    background-color: var(--bright-green);
+    border: 0.15em solid var(--dull-green);
+    color: var(--dull-green);
+    padding: 1%;
+    border-radius: 0 .5em .5em 0;
+    width: 95%;
+    font-size: 1em;
+    margin-top: 0.5em;
+}
+
+.patch-info > img {
+    position: relative;
+    top:0.5%;
+    height: 1.4em;
+    width: auto;
+    object-fit: contain;
+    transform: scale(1.3);
+}
+
+#patch-container > button {
+    background-color: var(--bright-green);
+    border: 0.15em solid var(--dull-green);
+    color: var(--dull-green);
+    width: fit-content;
+    padding: 0.25em 0.5em;
+}
+
+.settings-badges {
+    height: 100%;
+    flex-grow: 1;
+}
+
+.medal-img {
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.05em black);
+    transition: 0.3s ease;
+}
+
+.medal-img:hover {
+    filter: drop-shadow(0 0 0.2em black);
+}
+
+.settings-bottom-buttons {
+    height: 100%;
+    width: 10rem;
+    justify-content: space-around;
+    gap: 1%;
+}
+
+.settings-bottom-buttons > button {
+    width: 100%;
+    padding: 0.5rem 0;
+    background-color: var(--pale-medium-green);
+    border: var(--dark-green) 0.15em solid;
+}

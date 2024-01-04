@@ -1,7 +1,7 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
-import { screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
+import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal } from "./modules/adjustUI.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
 
@@ -225,7 +225,7 @@ let adventureTreeDefense = false;
 let worldQuestDict = {};
 const transitionScene = ["0_Meeting", "0_Trade_Wait", "0_LuckCheck_Success", "0_LuckCheck_Failure"];
 
-const FELLBOSS_THRESHOLD = 50;
+const FELLBOSS_THRESHOLD = 65;
 const UNUSUAL_THRESHOLD = 65;
 const WORKSHOP_THRESHOLD = 75;
 const FINALE_THRESHOLD = 65;
@@ -605,6 +605,24 @@ function loadSaveData() {
         achievementMap = new Map(JSON.parse(achievementListTemp));
     }
 
+    const updateBlackMarket = (persistentBlackMarket) => {
+        for (let key in blackShopDict) {
+            if (persistentBlackMarket[key] === undefined) {
+                generateBlackItem(key, persistentBlackMarket);
+            }
+        }
+    }
+
+    const generateBlackItem = (key, persistentBlackMarket) => {
+        let blackItemTemp = blackShopDict[key];
+        persistentBlackMarket[key] = {
+            cost: Math.ceil(Math.round(blackItemTemp.cost * randomInteger(80, 120) / 100) / 5) * 5,
+            costElement: rollArray(boxElement, 1),
+            purchased: false,
+            level: blackItemTemp.level,
+        }
+    }
+
     // LOAD PERSISTENT VALUES 
     if (localStorage.getItem("persistentValues") == null) {
         persistentValues = persistentValuesDefault;
@@ -619,7 +637,13 @@ function loadSaveData() {
         } else {
             persistentValues = JSON.parse(persistentDictTemp);
             updateObjectKeys(persistentValues, persistentValuesDefault);
+
+            console.log(persistentValues)
+
+            updateBlackMarket(persistentValues.blackMarketDict);
+
             
+
             for (let key in upgradeInfo) {
                 let heroName = upgradeInfo[key].Name;
                 if (persistentValues.ascendDict[heroName] === undefined) {
@@ -711,10 +735,15 @@ let autoClick = null;
 let currentlyAutoClick = false;
 
 let demoImg = document.createElement("img");
-demoImg.src = settingsValues.preferOldPic ? "./assets/nahida.webp" : "./assets/nahidaTwo.webp";
+demoImg.skin = settingsValues.preferOldPic ? 'New' : 'Old';
+demoImg.src = `./assets/bg/nahida${demoImg.skin}.webp`;
 demoImg.classList.add("demo-img");
 demoImg.id = "demo-main-img";
 demoImg.critInARow = 0;
+
+demoImg.revertPicture = () => {
+    demoImg.src = `./assets/bg/nahida${demoImg.skin}.webp`;
+}
 
 demoContainer.addEventListener('mousedown', () => {
     if (settingsValues.autoClickBig) {
@@ -1118,7 +1147,7 @@ function stopClickEvent() {
 
         let leftBG = document.getElementById("left-bg");
         setTimeout(()=>{
-            button.src = settingsValues.preferOldPic ? "./assets/nahida.webp" : "./assets/nahidaTwo.webp";
+            button.revertPicture();
             leftBG.src = "./assets/bg/bg.webp";
         },150)
     } else {
@@ -1303,11 +1332,12 @@ function boxOpen(eventBackdrop,specialBox) {
 }
 
 // EVENT 4 (MINESWEEPER)
-const ROWS = 8;
-const COLS = 8;
 function minesweeperEvent() {
+    let ROWS = 8;
+    let COLS = 8;
+    let mines = randomInteger(6,10);
+
     stopSpawnEvents = true;
-    const mines = randomInteger(6,8);
     const startTimestamp = performance.now();
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","flex-row","event-dark","minesweeper-backdrop");
@@ -1328,6 +1358,13 @@ function minesweeperEvent() {
     mineInfo.append(mineInfoTop,mineInfoBot)
     
     let mineBackground = document.createElement("table");
+    // if (beta) {
+    //     ROWS = 8;
+    //     COLS = 12;
+    //     mines = randomInteger(10,14);
+    //     mineBackground.style.aspectRatio = '1.5';
+    // }
+
     let board;
     let firstClick = true;
     let cellsLeft = ROWS * COLS - mines;
@@ -1410,7 +1447,12 @@ function minesweeperEvent() {
     for (let r = 0; r < ROWS; r++) {
         const tr = document.createElement("tr");
         for (let c = 0; c < COLS; c++) {
-            const td = document.createElement("td");
+            const td = createDom('td', {
+                style: {
+                    width: 100/COLS + '%',
+                    height: 100/ROWS + '%',
+                }
+            });
             td.innerText = board[r][c].revealed
                 ? countAdjacentMines(r, c) || "-"
                 : "";
@@ -1819,6 +1861,10 @@ function simonEvent(hexMode) {
 
     if (hexMode) {
         requiredAmount = 7;
+        if (beta) {
+            requiredAmount = 11;
+        }
+
         saysContainer.classList.add('hex-container');
         const hexArray = {
             1:[-46,-74.5], 2:[53.5,-74.5], 3:[103,0], 4:[53,74.5], 5:[-47,74], 6:[-96,0]
@@ -1837,6 +1883,10 @@ function simonEvent(hexMode) {
         }
     } else {
         requiredAmount = 8;
+        if (beta) {
+            requiredAmount = 12;
+        }
+
         saysContainer.classList.add('say-container');
         for (let i = 1; i < 5; i++) {
             let saysImg = document.createElement('img');
@@ -1883,7 +1933,7 @@ function simonEvent(hexMode) {
                     setTimeout(() => {showSequence(array);}, 550);   
                 }
             }
-        },750);
+        }, 750);
     }
 
     function addSequence() {
@@ -1896,10 +1946,9 @@ function simonEvent(hexMode) {
 
     function saysClick(number) {
         if (!saysContainer.ready) {return}
+        if (firstTime) {!firstTime};
         saysContainer.ready = false;
         saysContainer.activeArray.push(number);
-
-        if (firstTime) {!firstTime};
 
         let activeElement = document.getElementById(`says-${number}`);
         activeElement.style.filter = 'brightness(1)';
@@ -3941,7 +3990,7 @@ function settingsBox(type,eleId) {
         patchDiv.id = "patch-box";
         patchDiv.style.zIndex = -1;
 
-        drawUI.patchNotes(patchDiv,textReplacer);
+        drawUI.patchNotes(patchDiv);
 
         const patchCmdButton = document.createElement("button");
         patchCmdButton.addEventListener("click",() => {
@@ -4163,7 +4212,7 @@ function settingsBox(type,eleId) {
                             invalidCommand();
                         }
                     } else if (commandText === "skip nuts") {
-                        saveValues.realScore += 1e100;
+                        saveValues.realScore += 1e40;
                         consoleBoxText.value = '';
                     } else {
                         invalidCommand();
@@ -4253,8 +4302,9 @@ function settingsBox(type,eleId) {
                     prefer.addEventListener('change', () => {
                         settingsValues.preferOldPic = prefer.checked;
                         let demoImg = document.getElementById('demo-main-img');
+                        demoImg.skin = prefer.checked ? 'New' : 'Old';
                         if (demoImg.src != "./assets/event/scara.webp") {
-                            demoImg.src = settingsValues.preferOldPic ? "./assets/nahida.webp" : "./assets/nahidaTwo.webp";
+                            demoImg.revertPicture();
                         }
                     });
                     break;
@@ -5334,7 +5384,7 @@ function itemUse(itemUniqueId) {
         inventoryAdd(4010);
 
         newPop(1);
-        currencyPopUp("mail", 2, "items", 0);
+        currencyPopUp("items", 0);
         sortList("table2");
     // ELEMENT GEMS
     } else if (itemID === 5001 || itemID === 5002){
@@ -10295,7 +10345,6 @@ function sapEnergy(quantityAmount, energyAmount) {
 }
 
 function loseHP(ATK, type='normal', resetCombo=true) {
-    if (beta) {return}
     if (!adventureVariables.fightSceneOn) {return}
 
     const healthBar = document.getElementById('health-bar');
@@ -11906,18 +11955,20 @@ function addShop() {
 
 function setShop(type) {
     table7.classList.add("table-without-tooltip");
-    let shopImg = document.createElement("img");
+    const shopImg = document.createElement("img");
     shopImg.src = "./assets/icon/shop-start.webp";
 
+    const minutesPassed = (getTime() / (1000 * 60));
     shopTimerElement = document.createElement("div");
     shopTimerElement.classList.add("flex-column", "store-timer", "background-image-cover");
     shopTimerElement.id = "shop-timer";
-    let minutesPassed = (getTime() / (1000 * 60));
     shopTimerElement.innerText = "Inventory resets in: " + (SHOPCOOLDOWN - (storeInventory.storedTime - minutesPassed)) + " minutes";
 
-    let shopDiv = document.createElement("div");
-    shopDiv.classList.add("store-div");
-    shopDiv.id = "shop-container";
+    const shopDiv = createDom("div", {
+        class: ["store-div"],
+        id: "shop-container",
+        style: { display: 'flex' }
+    });
 
     if (type === "load" && storeInventory.storedTime !== 0) {
         for (let i = Object.keys(storeInventory).length - 2; i > 0; i--) {
@@ -11934,20 +11985,80 @@ function setShop(type) {
         saveData(true);
     }
 
-    let shopDialogueDiv = document.createElement("div");
+    const shopDialogueDiv = document.createElement("div");
     shopDialogueDiv.classList.add("flex-row","store-dialog");
 
-    let shopDialogueButton = document.createElement("div");
+    const shopDialogueButton = document.createElement("div");
     shopDialogueButton.classList.add("flex-row","store-buy");
     shopDialogueButton.innerText = "Confirm Purchase";
     shopDialogueButton.id = "shop-confirm";
 
-    let shopDialogueText = document.createElement("div");
+    const shopDialogueText = document.createElement("div");
     shopDialogueText.classList.add("flex-column");
     shopDialogueText.id = "table7-text";
 
+    const shopBackdoor = createButton('dim-button', {
+        class: ['shop-backdoor']
+    });
+
+    const shopBlackDiv = createDom("div", {
+        class: ["store-div","store-black"],
+        id: "shop-black",
+        style: { display: 'none' }
+    });
+
+    for (let key in blackShopDict) {
+        let itemDict = persistentValues.blackMarketDict[key];
+        const eleImage = createDom('img', {
+            src: `./assets/${blackShopDict[key].file}`,
+            class: ['black-image']
+        });
+
+        eleImage.addEventListener('click', () => {
+            let demoButton = document.getElementById('demo-main-img');
+            if (demoButton.skin === key) {
+                demoButton.skin = settingsValues.preferOldPic ? 'New' : 'Old';
+            } else {
+                demoButton.skin = key;
+            }
+            demoButton.revertPicture();
+        })
+
+        const elePrice = createDom('div', {
+            class: ['flex-row', 'black-div'],
+            child: [
+                createDom('p', {
+                    innerText: itemDict.cost
+                }),
+                createDom('img', {
+                    class: ['black-currency'],
+                    src: `./assets/tooltips/inventory/solid${itemDict.costElement}.webp`
+                })
+            ]
+        })
+
+        const element = createDom('div', {
+            class: ['shop-black-card', 'flex-column'],
+            child: [eleImage, elePrice]
+        });
+        shopBlackDiv.appendChild(element)
+    }
+
+    shopBackdoor.addEventListener('click', () => {
+        if (table7.classList.contains('table7-bg')) {
+            table7.classList.add('table7-alt');
+            table7.classList.remove('table7-bg');
+        } else {
+            table7.classList.add('table7-bg');
+            table7.classList.remove('table7-alt');
+        }
+
+        universalStyleCheck(shopBlackDiv, 'display', 'flex', 'none');
+        universalStyleCheck(shopDiv, 'display', 'none', 'flex');
+    })
+
     shopDialogueDiv.append(shopDialogueText,shopDialogueButton);
-    table7.append(shopImg,shopTimerElement,shopDiv,shopDialogueDiv);
+    table7.append(shopImg,shopTimerElement,shopDiv,shopBlackDiv,shopDialogueDiv,shopBackdoor);
 }
 
 var shopId = null;
@@ -12151,6 +12262,8 @@ function createShopButton(inventoryTemp, inventoryNumber, shopCost, purchased = 
         shopButton.addEventListener("click", function() {
             buyShop(shopButton.id, shopCost);
         })
+    } else {
+        shopButton.classList.add('purchased');
     }
     
     shopButtonImageContainer.appendChild(shopButtonImage);
@@ -12348,7 +12461,7 @@ function addNutStore() {
         let listText;
         if (mostContributeDict !== 'Nothing') {
             let sortedEntries = Object.entries(mostContributeDict).sort((a, b) => b[1] - a[1]);
-            sortedEntries = sortedEntries.slice(0, 5);
+            sortedEntries = sortedEntries.slice(0, 7);
            
             let listInnerText = '';
             listInnerText += 'Golden Core Amounts: \n'
@@ -13816,7 +13929,7 @@ function newPop(type) {
 if (beta) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            weaselEvent()
+            spawnBossQuest(1)
         }
     })    
 }
@@ -13832,7 +13945,7 @@ if (localStorage.getItem('beta') == 'true') {
 
 if (beta) {
     let link = document.createElement("link");
-    link.href = 'beta.css';
+    link.href = './modules/beta.css';
     link.type = "text/css";
     link.rel = "stylesheet";
     document.head.appendChild(link);
@@ -13863,3 +13976,5 @@ if (beta) {
         
     }
 }
+
+// TODO: FIX AUTO CLICK BUG AGAIN

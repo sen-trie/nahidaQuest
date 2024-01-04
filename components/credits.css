@@ -1,0 +1,84 @@
+main {
+    flex-grow: 1;
+    overflow: hidden;
+    padding: 1em;
+}
+
+main > div {
+    display: block;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    color: var(--dark-grey);
+    text-overflow: ellipsis; 
+}
+
+main div {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    flex-grow: 1;
+    width: 100%;
+    max-height: 100%;
+    background: url(../assets/bg/main-bar.webp) center center/cover no-repeat;
+    border: 0.2rem solid var(--dark-brown);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+top {
+    display: inline-block;
+    width: fit-content;
+    padding: 1.6rem;
+    height: auto;
+    aspect-ratio: 43 / 7;
+    font-size: 1.4rem;
+    text-decoration: none;
+    color: white;
+    text-shadow: var(--text-shadow-100);
+    background: url(../assets/frames/button.webp) center center/contain no-repeat;
+    margin-bottom: -0.25rem;
+}
+
+block {
+    display: inline-block;
+    padding: 0.8rem;
+    width: 100%;
+    background-color: #C9C0A1;
+}
+
+block > a:hover {
+    text-decoration: underline;
+}
+
+main div a {
+    color: var(--dark-brown);
+}
+
+@media (min-width: 1200px) {
+    main {
+        width: 75%;
+    }
+}
+
+@media (max-width: 1200px) {
+    main {
+        width: 80%;
+    }
+}
+
+@media (max-width: 992px) {
+    main {
+        width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        width: 100%;
+    }
+
+    top {
+        font-size: 1.2rem;
+        justify-content: flex-start !important;
+    }
+}

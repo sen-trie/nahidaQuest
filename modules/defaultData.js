@@ -91,6 +91,7 @@ const persistentValuesDefault = {
     harvestCount: 0,
     ascendEle:{"Pyro":0, "Hydro":0, "Dendro":0, "Electro":0, "Anemo":0, "Cryo":0, "Geo":0},
     ascendDict:{},
+    blackMarketDict:{},
     lastRecordedTime: null,
     timeSpentValue: 0,
     lifetimeClicksValue: 0, 

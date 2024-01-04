@@ -1,61 +1,126 @@
-<!doctype html> 
-<html lang="en"> 
-<head> 
-    <meta charset="UTF-8"/>
-    <title>nahidaQuest! - A Genshin-Impact Webgame Starring Nahida</title>
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-    <meta name="google-site-verification" content="0t3askxEnPVFJR9Weog42wM1qUF5l0nH63GhSrtzCfg" />
-    <meta name="description" content="Help Nahida on her quest to obtain riches! Call upon the assistance of allies to gain power in this quest! Fight against monsters in various expeditions to gain loot!"/>
-    <meta name="theme-color" content="#CFE275">
-    <meta name="msapplication-navbutton-color" content="#CFE275">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#CFE275">
-    <meta property="og:image" content="https://nahidaquest.com/assets/logo.webp" />
-    <link rel="stylesheet" type="text/css" href="styles.css?v=7e711f8c5c9ed243456e6286878a8118">
-    <link rel="stylesheet" type="text/css" href="components.css?v=7e711f8c5c9ed243456e6286878a8118" media="print" onload="this.media='all'">
-    <link rel="stylesheet" type="text/css" href="mobile.css?v=7e711f8c5c9ed243456e6286878a8118" media="screen and (max-aspect-ratio: 11.5/9)">
-    <link rel="stylesheet" type="text/css" href="mobile.css?v=7e711f8c5c9ed243456e6286878a8118" media="(device-width: 768px) and (device-height: 1024px) and (orientation:portrait)">
-    <link rel="stylesheet" type="text/css" href="toggle.css?v=7e711f8c5c9ed243456e6286878a8118" id='toggle-css' disabled="disabled">
-    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
-    <link rel="apple-touch-icon" href="./assets/apple-touch-icon-iphone-60x60.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="./assets/apple-touch-icon-ipad-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="./assets/apple-touch-icon-iphone-retina-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="./assets/apple-touch-icon-ipad-retina-152x152.png">
-    <meta http-equiv='cache-control' content='no-cache'> 
-    <meta http-equiv='expires' content='0'> 
-    <meta http-equiv='pragma' content='no-cache'>
-</head>
-<body>
-    <div id="game-wrapper">
-        <div id="start-screen" class="cover-all flex-column">
-            <img alt="Start Screen Background" src="./assets/start.webp" importance="high">
-            <img id="start-image" alt="Nahida Quest Title" src="./assets/settings/nahidaQuest.webp" importance="high">
-            <button id="start-button" class="dim-filter">Continue</button>
-            <button id="start-delete">New Game</button>
-            <p id="vers-number-start"></p>
-            <a class="link clickable" href="https://nahidaquest.com/feedback">Feedback</a>
-            <a class="link second-link clickable" href="https://nahidaquest.com/credits">Credits</a>
-        </div>
-        <div id="game" class="prevent-select">
-            <div id="loading" class="cover-all flex-row overlay">
-                <img src="./assets/loading.webp" alt="Nahida Quest Loading Screen" class="overlay-tutorial" importance="high">
-                <p id="loading-number" loadingValue="0">0%</p>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>nahidaQuest! - A Genshin-Impact Webgame Starring Nahida</title>
+        <meta name="description" content="Help Nahida on her quest to obtain riches! Call upon the assistance of allies to gain power in this quest! Fight against monsters in various expeditions to gain loot!"/>
+        <meta name="theme-color" content="#CFE275">
+        <meta name="msapplication-navbutton-color" content="#CFE275">
+        <meta name="apple-mobile-web-app-status-bar-style" content="#CFE275">
+        <link rel="stylesheet" type="text/css" href="./components/shared.css?v=3a619e704dc6351feec682b95180a14c">
+        <link rel="stylesheet" type="text/css" href="./components/index.css?v=3a619e704dc6351feec682b95180a14c">
+        <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+        <link rel="apple-touch-icon" href="./assets/apple-touch-icon-iphone-60x60.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="./assets/apple-touch-icon-ipad-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="./assets/apple-touch-icon-iphone-retina-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="./assets/apple-touch-icon-ipad-retina-152x152.png">
+        <meta http-equiv='cache-control' content='no-cache'> 
+        <meta http-equiv='expires' content='0'> 
+        <meta http-equiv='pragma' content='no-cache'>
+        <script src="./components/header.js?v=3a619e704dc6351feec682b95180a14c" type="text/javascript" defer></script>
+    </head>
+    <body>
+        <header-component></header-component>
+        <container>
+            <hero class="flex-column">
+                <img src='../assets/settings/nahidaQuest.webp' alt='nahidaQuest logo'>
+                <p class="game-title">
+                    An incremental clicker game based on Genshin Impact. <br/> 
+                    Embark on an adventure to find the <span style='color: #dba320'>Golden Ajilenakh Nut</span>,  <br/> 
+                    a mythical fruit that Sumeru has taught to be lost to time.
+                </p>
+                <a class="play-button flex-row index-play-button" href="./play.html">
+                    Play Now!
+                </a>
+            </hero>
+            <div class="video-block">
+                <div class="flex-column card">
+                    <div class="flex-row card-img">
+                        <video id="card-img-1" src="./assets/title/card-img-1.webm" alt="video trailer for upgrading" muted></video>
+                        <divider></divider>
+                        <video id="card-img-2" src="./assets/title/card-img-2.webm" alt="video trailer for wishing" muted></video>
+                    </div>
+                    <p class="title-card">Call upon different characters to increase your Nuts per Seconds (NpS)!</p>
+                    <p class="title-block" id="title-block-1">
+                        Unlock and level more than 70 characters from Genshin Impact.
+                        At certain levels, powerful upgrades become available that provide significant increases to NpS. 
+                    </p>
+                </div>
+                <div class="flex-column card">
+                    <div class="flex-row card-img">
+                        <video id="card-img-3" src="./assets/title/card-img-3.webm" alt="video trailer for battling" muted></video>
+                        <divider></divider>
+                        <video id="card-img-4" src="./assets/title/card-img-4.webm" alt="video trailer for bosses" muted></video>
+                    </div>
+                    <p class="title-card">Take on expeditions to battle monsters and win loot!</p>
+                    <p class="title-block" id="title-block-2">
+                        Initiate combat against various monsters with a variety of tools at your disposal. 
+                        Gain adventure XP to get item rewards and get stronger in battle.
+                        Develop your own strategy to take on bosses as you grow stronger!</p>
+                </div>
+                <div class="flex-column card">
+                    <div class="flex-row card-img">
+                        <video id="card-img-5" src="./assets/title/card-img-5.webm" alt="video trailer for minesweeper minigame" muted></video>
+                        <divider></divider>
+                        <video id="card-img-6" src="./assets/title/card-img-6.webm" alt="video trailer for snake minigame" muted></video>
+                    </div>
+                    <p class="title-card">Try out a variety of minigames (led by the friendly Aranara)!</p>
+                    <p class="title-block" id="title-block-3">
+                        As you play, random events as well as world quests can randomly spawn. 
+                        Some of these can provide rewards and include a minigame. 
+                        These minigames vary in complexity - see if you can find all of them!
+                    </p>
+                </div>
+                <div class="flex-column card">
+                    <div class="flex-row card-img">
+                        <video id="card-img-7" src="./assets/title/card-img-7.webm" alt="video trailer for transceding" muted></video>
+                        <divider></divider>
+                        <video id="card-img-8" src="./assets/title/card-img-8.webm" alt="video trailer for challenges" muted></video>
+                    </div>
+                    <p class="title-card">Level and upgrade until you reach the pinnacle of Sumeru!</p>
+                    <p class="title-block" id="title-block-4">
+                        With many features and sub-systems in place, there are many ways to gain power.
+                        Take on unique challenges to prove your abilities. 
+                        There is never a lack of things to do.
+                    </p>
+                </div>
             </div>
-            <p id="vers-number"></p>
-            <p id="copyright-number"></p>
-        </div>
-        <div class="unsupported flex-column">
-            <img alt="Unsupported image" src="./assets/error.webp">
-            <p>Your device's screen is too narrow for nahidaQuest. Please switch to landscape mode.</p>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js" async></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js" async></script> -->
-    <!-- <script src="https://unpkg.com/konva@9.0.1/konva.min.js"></script> -->
-    <script type="module" src="main.js?v=7e711f8c5c9ed243456e6286878a8118"></script>
-    <noscript style="height: 100%; width: 100%; z-index: 9999999999; position: absolute;">
-        <div style="text-align: center; padding: 20px; background-color: #ffcccc; height: 100%; width: 100%;">
-          <p>This website requires JavaScript to be enabled. Please enable JavaScript in your browser settings.</p>
-        </div>
-    </noscript>
-</body>
+            <div id="patch-notes" class="patch-notes">
+                <p class="patch-title">Patch Notes</p>
+                <div id="patch-container"></div>
+            </div>
+            <div class="tech-block flex-column">
+                <p class="patch-title">Game Details</p>
+                <div class="flex-column creator-div">
+                    <div class="flex-row">
+                        <img class='img-filter' src='./assets/title/creator.jpg' alt="creator picture">
+                        <p class="tech-desc">Created and maintained by IAM_Sentry</p>
+                        <a class="tech-button flex-column" href="https://linktr.ee/sentrie">[Linktree]</a>
+                    </div>
+                    <div class="flex-row">
+                        <img class='img-filter' src='./assets/title/github.webp' alt="github picture">
+                        <p class="tech-desc">Hosted on a public Github Repo</p>
+                        <a class="tech-button flex-column" href="https://github.com/bobbaID/nahidaQuest">[Github]</a>
+                    </div>
+                </div>
+                <div class="flex-row tech-used">
+                    <p class="flex-column">Built Using:</p>
+                    <img src='./assets/title/html.webp' alt="html logo">
+                    <img src='./assets/title/css.webp' alt="css logo">
+                    <img src='./assets/title/js.webp' alt="javascript logo">
+                </div>
+                <p class="flex-column">nahidaQuest! runs on any major browser <br>(Both Mobile & Desktop)</p>
+            </div>
+            <div class="final-block flex-column">
+                <p>
+                    This game contains official media, game graphic, and game audio from Genshin Impact, an RPG game copyrighted (©) by HoYoverse. All rights reserved. 
+                    <br>HoYoverse and Genshin Impact are trademarks, services marks, or registered trademarks of HoYoverse.
+                </p>
+            </div>
+        </container>
+        <script type="module" src="./components/index.js" type="module"></script>
+    </body>
 </html>
+

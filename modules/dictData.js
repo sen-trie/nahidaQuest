@@ -1213,6 +1213,36 @@ const challengeInfo = [
     ]
 ]
 
+const blackShopDict = {
+    'Skin1': {
+        cost: 600,
+        type: 'cosmetic',
+        subtype: 'bigNahida',
+        title: 'Starry Eyed',
+        desc: 'Unlocks a new variant of Big Nahida!',
+        file: 'bg/nahidaSkin1.webp',
+        level: null
+    },
+    'Skin2': {
+        cost: 600,
+        type: 'cosmetic',
+        subtype: 'bigNahida',
+        title: 'Happy Faced',
+        desc: 'Unlocks a new variant of Big Nahida!',
+        file: 'bg/nahidaSkin2.webp',
+        level: null
+    },
+    'Skin3': {
+        cost: 600,
+        type: 'cosmetic',
+        subtype: 'bigNahida',
+        title: 'Paimon Faced',
+        desc: 'Unlocks a new variant of Big Nahida!',
+        file: 'bg/nahidaSkin3.webp',
+        level: null
+    },
+}
+
 const commisionText = [
     'Yasna Monument', 'Gandha Hill', 'Yazadaha Pool','Sobek Oasis','Samudra Coast',
     'Dar al-Shifa', 'Valley of Dahri', 'Sands of Al-Azif', 'Mawtiyima Forest','Dunes of Steel','Chinbat Ravine','Ruins of Dahri','Apam Woods',
@@ -1294,4 +1324,4 @@ const commisionInfo = {
     },
 }
 
-export {screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo, commisionText, commisionInfo}
+export {blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo, commisionText, commisionInfo}

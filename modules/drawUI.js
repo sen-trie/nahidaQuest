@@ -1,3 +1,5 @@
+import { textReplacer } from "./functions.js";
+
 const filePath = "./assets/";
 const uniqueFileArray = {
     "bg/":["achievementBG","bg","closed","dori-back","left","main-bar","middle","nutShop","nutShopInterior","open","right","wish-bg","wood"],
@@ -183,7 +185,7 @@ function drawMainBody() {
 
     // TABLE 7
     let table7 = document.createElement("div");
-    table7.classList.add("flex-column");
+    table7.classList.add("flex-column", 'table7-bg');
     table7.id = "table7";
 
     // FILTER BUTTON
@@ -315,58 +317,70 @@ function drawMailTable(table4) {
 }
 
 const patchDict = {
-    // "v.2-0 (30/8/23)":`
-    // Welcome to nahidaQuest 2.0! Please enjoy your stay!<br><br>
+    "v.2-0":`
+    Welcome to nahidaQuest 2.0! Please enjoy your stay!<br><br>
 
-    // <line>Bugs Fixed 🐞: </line><br><br>
-    //     </indent>
-    //     1. Flashing white box<br>
-    //     Sometimes when switching tabs, there is a brief instance where a box is visible which quickly disappears.
-    //     </indent>
+    <line>Bugs Fixed 🐞: </line><br><br>
+        </indent>
+        1. Flashing white box<br>
+        Sometimes when switching tabs, there is a brief instance where a box is visible which quickly disappears.
+        </indent>
 
-    // <br><br><line>New Additions 💡: </line><br><br>
-    //     </indent>
-    //     1. Trees! (Extended endgame) <br>
-    //     After getting enough Golden Cores, you can grow Trees for the purposes of stopping an outbreak. Also, the game now has an end objective as well!
-    //     </indent>
+    <br><br><line>New Additions 💡: </line><br><br>
+        </indent>
+        1. Trees! (Extended Endgame) <br>
+        After getting enough Golden Cores, you can grow Trees for the purposes of stopping an outbreak. Also, the game now has an end objective as well!
+        </indent>
 
-    //     <br><br> 2. Bosses <br>
-    //     At certain thresholds, bosses will spawn in the Expedition map. These bosses introduce unique combat mechanics and are needed to be defeated to be progress.
-    //     </indent>
+        <br><br> 2. Bosses (Extended Endgame) <br>
+        At certain thresholds, bosses will spawn in the world map. These bosses introduce unique combat mechanics and are needed to be defeated to be progress.
+        </indent>
 
-    //     <br><br> 3. Ascension <br>
-    //     After getting Golden Nuts, individual characters can be ascended using Tree rewards for a higher base power and better Golden Core amounts. New base power takes effect upon the next transcension.
-    //     </indent>
+        <br><br> 3. Ascension <br>
+        After getting Golden Nuts, individual characters can be ascended using Tree rewards for a higher base power and better Golden Core amounts. New base power takes effect upon the next transcension.
+        </indent>
 
-    //     <br><br> 4. Commisions <br>
-    //     Unlocked at a certain Adventure Rank. By sending out Sumeru characters for some time, commisions reward items.
-    //     </indent>
+        <br><br> 4. Commisions <br>
+        Unlocked at a certain Adventure Rank. By sending out Sumeru characters, commissions reward items.
+        </indent>
 
-    //     <br><br> 5. Challenges <br>
-    //     Added 5 sets of 10 Challenges, with increasing difficulty per set. Unlike Achievements, Challenges do not reset and are persistent. Complete all of them for a final reward!
-    //     </indent>
+        <br><br> 5. Challenges <br>
+        Added 5 sets of 10 Challenges, with increasing difficulty per set. Completing challenges give a small boost to global NpS. Unlike Achievements, Challenges do not reset and are persistent. Complete all of them for a final reward!
+        </indent>
 
-    //     <br><br> 6. New Aranara events <br>
-    //     Added 'Aranara Reveals' and 'Aranara Says'. After getting Golden Nuts, these events can spawn as a (¿).
-    //     </indent>
+        <br><br> 6. New Aranara events <br>
+        Added 'Aranara Reveals', 'Aranara Says' and 'Aranara Snake'. These events randomly spawn as a (¿).
+        </indent>
 
-    // <br><br><line>Systems Rework 🌰: </line><br><br>
-    //     </indent>
-    //     1. Removed portrait mode <br>
-    //     I am sorry to any mobile users who make use of potrait mode. Some of the content in this update heavily relies on a wide-aspect ratio (specifically combat) which would not work in a portrait mode. The overhead of maintaining two orientations was also becoming increasingly unmanageable, I hope you can understand. 
+        <br><br> 7. Dori's Black Market <br>
+        After unlocking it, palyers can buy exclusive items from Dori using drops from Trees. These items are both visual and functional.
+        </indent>
 
-    //     <br><br> 2. Settings menu rework <br>
-    //     Reworked the settings UI to accomodate additional options. Be sure to look through the 'Advanced' tab!
-    //     </indent>
+        <br><br> 8. New Characters <br>
+        Updated to include all characters up to version 4.4.
+        </indent>
 
-    //     <br><br> 3. Upgrades rework <br>
-    //     You now have a choice between using gems or (nuts + talent materials) when choosing to upgrades above Lvl 50, with the exception of the Traveller who can only use gems.
-    //     </indent>
+    <br><br><line>Systems Rework 🌰: </line><br><br>
+        </indent>
+        1. Removed portrait mode <br>
+        I am sorry to any mobile users who make use of potrait mode. Some of the content in this update heavily relies on a wide-aspect ratio (specifically combat) which would not work in a portrait mode. The overhead of maintaining two orientations was also becoming increasingly unmanageable, I hope you can understand. 
 
-    // <br><br>Please report any bugs and stay tuned for more updates! Many thanks. [img]
-    // `,
+        <br><br> 2. Settings menu rework <br>
+        Cleaned up the settings UI to accomodate additional options and to make it easier to navigate. Be sure to look through the 'Advanced' tab!
+        </indent>
+
+        <br><br> 3. Upgrades rework <br>
+        You now have a choice between using gems or (nuts + talent materials) when choosing to upgrades above Lvl 50, with the exception of the Traveller who can only use gems.
+        </indent>
+
+        <br><br> 4. Information breakdown for characters and golden cores <br>
+        There is a now button under each character, giving more detailed stats. Similarly, at the transcend menu, golden cores now have a breakdown for the top 7 sources.
+        </indent>
+
+    <br><br>Please report any bugs and I hope you enjoy this dump of content! Many thanks. [img]
+    `,
     
-    "v.1-2 (27/5/23)":`
+    "v.1-2":`
     <line>Bugs Fixed 🐞: </line><br><br>
         </indent>
         1. Expedition Combat<br>
@@ -396,12 +410,12 @@ const patchDict = {
     <br><br>Please report any bugs and stay tuned for more updates! Many thanks. [img]
     `,
 
-    "v.1-1 (15/5/23)":`
-    Note: If your save has any NaN values present, please type 'transcend' into the command console under 'Settings' and transcend from the appropriate menu. Any current NaN values may result in 0 NpS. <br><br>
-    Please note that you WILL lose all of your current progress after transcending.
+    "v.1-1":`
+    Note: If your save has any NaN values present, please type 'transcend' into the command console under 'Settings' and transcend from the appropriate menu. 
+    Any current NaN values may result in 0 NpS. Please note that you WILL lose all of your current progress after transcending.
 
     <br><br><line>Bugs Fixed 🐞:</line><br><br>
-        <indent>
+        </indent>
         1. NaN Bug for Wish Characters <br>
         Newly spawned Wished Characters will have their appropriate NpS and can have items freely applied.
 
@@ -420,6 +434,7 @@ const patchDict = {
         <br><br> 3. Reset map position <br>
         If your expedition map goes off-screen for whatever reason, clicking the 'reset icon' on the bottom right will recenter the map position.
         </indent>
+
     <br><br><line>Systems Rework 🌰: </line><br><br>
         </indent>
         1. XP Books rework <br>
@@ -434,12 +449,13 @@ const patchDict = {
     <br><br>Please report any bugs and tell me what you feel about this update! Many thanks. [img]
     `,
 
-    "v.1-0 (6/5/23)":`
+    "v.1-0":`
     First Release 🎆<br>
     Thank you to all players!`,
 }
 
-function patchNotes(parent,textReplacer) {
+function patchNotes(parent, showImgTitle = true, onlyOneOpen = false) {
+    const allPatchInfos = [];
     let patchContainer = document.createElement("div");
     patchContainer.id = 'patch-container'
     patchContainer.classList.add("flex-column");
@@ -451,25 +467,53 @@ function patchNotes(parent,textReplacer) {
 
     for (let key in patchDict) {
         let patchButton = document.createElement("div");
+        patchButton.classList.add('patch-div');
         patchButton.innerText = key;
 
         let patchInfo = document.createElement("p");
+        patchInfo.classList.add('patch-info');
         let text = textReplacer({
             '[img]':nahidaImg.outerHTML,
         },patchDict[key]);
         patchInfo.innerHTML = text;
         patchInfo.style.display = "none";
 
-        patchButton.addEventListener("click",()=>{
-            if (patchInfo.style.display === 'none') {
-                patchInfo.style.display = 'block';
-              } else {
-                patchInfo.style.display = 'none';
-              }
-        })
+        const toggleHide = () => {
+            if (onlyOneOpen) {
+                allPatchInfos.forEach((ele) => {
+                    if (ele !== patchInfo) {
+                        if (ele.style.display === 'block') {
+                            ele.style.display = 'none';
+                        }
+                    } else {
+                        if (patchInfo.style.display === 'none') {
+                            patchInfo.style.display = 'block';
+                        } else {
+                            patchInfo.style.display = 'none';
+                        }
+                    }
+                })
+            } else {
+                if (patchInfo.style.display === 'none') {
+                    patchInfo.style.display = 'block';
+                } else {
+                    patchInfo.style.display = 'none';
+                }
+            }
+        }
+
+        patchInfo.addEventListener("click", () => { toggleHide() })
+        patchButton.addEventListener("click",() => { toggleHide() });
+
+        allPatchInfos.push(patchInfo)
         patchContainer.append(patchButton,patchInfo)
     }
-    return parent.append(title,patchContainer);
+
+    if (showImgTitle) {
+        parent.append(title);
+    }
+
+    return parent.append(patchContainer);
 }
 
 export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadMinimumArray,preloadImage,patchNotes }

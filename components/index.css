@@ -1,0 +1,287 @@
+hero {
+    width: 100%;
+    gap: 2rem;
+    margin: 10rem 0;
+}
+
+hero > img {
+    max-width: 90%;
+}
+
+.game-title {
+    color: var(--light-grey);
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.game-title > span {
+    font-size: 1.2rem;
+}
+
+.index-play-button {
+    height: 4rem;
+    background: url(../assets/frames/wishButton.webp) center center/contain no-repeat;
+    cursor: url(../assets/icon/cursor.webp), auto;
+    aspect-ratio: 4.1;
+}
+
+container {
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-color: var(--bright-green) var(--very-dark-green);
+}
+
+::-webkit-scrollbar {
+    width: 0.75rem;
+    background-color: var(--light-green)
+}
+
+container::-webkit-scrollbar-thumb {
+    background-color: var(--bright-green);
+    border-radius: 1rem;
+}
+  
+container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--very-dark-green);
+}
+
+.tech-block, .video-block, .final-block, .patch-notes {
+    position: relative;
+    width: 100%;
+    padding: 2rem;
+    border-top: 0.1rem solid var(--bright-brown);
+}
+
+.video-block::before, .tech-block::before, .final-block::before, .patch-notes::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: brightness(0.3);
+    background: url(../assets/bg/tree-bg.jpg) center center/cover no-repeat;
+}
+
+.video-block {
+    display: grid;
+    column-gap: 1.5rem;
+    row-gap: 3rem;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.card {
+    height: fit-content;
+    text-align: center;
+    width: 100%;
+    color: var(--light-grey);
+}
+
+.card-img {
+    background-color: var(--bright-green);
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2;
+    border: 0.2rem solid var(--bright-brown);
+}
+
+.card-img > video {
+    width: 49.75%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.5s ease;
+    filter: brightness(0.6);
+}
+
+divider {
+    flex-grow: 1;
+    height: 100%;
+    background-color: var(--bright-brown);
+}
+
+.tech-block, .patch-title {
+    padding: 4rem 2rem;
+    position: relative;
+    color: white;
+    text-shadow: var(--text-shadow-100);
+    gap: 3rem;
+}
+
+.patch-title {
+    width: 100%;
+    padding: 2rem 0rem;
+    font-size: 2rem !important;
+    text-align: center;
+}
+
+.tech-block > .patch-title {
+    padding: 0;
+}
+
+.title-card {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #ae765c;
+}
+
+.title-block {
+    color: white;
+    padding: 1rem;
+    padding-top: 0.5rem;
+    text-align: left;
+    hyphens: none;
+    opacity: 0;
+    transition: 0.8s ease;
+    background-color: #6E4431;
+}
+
+
+.tech-block > p {
+    text-align: center;
+    font-size: 1.6rem;
+}
+
+.creator-div {
+    gap: 1.5rem;
+}
+
+.creator-div > div {
+    width: 100%;
+    gap: 3rem;
+    height: 6rem;
+}
+
+.img-filter {
+    border-radius: 50%;
+    height: inherit;
+    object-fit: contain;
+    filter: drop-shadow(0.2rem 0.2rem 0.2rem black);
+}
+
+.creator-div > div > p {
+    flex-grow: 1;
+}
+
+#patch-container {
+    gap: 1rem;
+}
+
+.patch-info {
+    max-height: 25rem;
+    overflow-y: auto;
+}
+
+.patch-notes {
+    height: 60rem;
+    max-height: 60rem;
+    overflow-y: auto;
+}
+
+.patch-notes::before {
+    background: url(../assets/bg/nutShop.webp) center center/cover no-repeat;
+}
+
+.patch-info {
+    background-color: var(--light-green);
+    border: 0.25rem solid var(--bright-green);
+    border-top:0;
+    padding: 1rem 2rem;
+    border-radius: 0 0 1rem 1rem;
+    width: 92.5%;
+    margin-top: -1rem;
+    font-size: 1.2rem;
+}
+
+.patch-info > line {
+    font-size: 1.4rem;
+    border-bottom: 0.15rem solid var(--very-dark-green);
+}
+
+.patch-div {
+    background-color: var(--bright-green);
+    border: 0.25rem solid var(--light-green);
+    color: var(--light-grey);
+    padding: 1rem;
+    width: 95%;
+    font-size: 1.8rem;
+}
+
+.patch-info > img {
+    position: relative;
+    left: 1rem;
+    height: 1rem;
+    width: auto;
+    object-fit: contain;
+    transform-origin: center;
+    transform: scale(3);
+}
+
+.tech-button {
+    margin-left: 1rem;
+    font-size: 1.2rem;
+    text-shadow: none;
+}
+
+.tech-button:hover {
+    text-decoration: underline;
+}
+
+.tech-used {
+    width: 100%;
+    gap: 1rem;
+}
+
+.tech-desc {
+    font-size: 1.4rem;
+}
+
+.tech-used > p {
+    font-size: 2rem;
+    text-align: center;
+    margin-right: 2rem;
+}
+
+.tech-block::before {
+    background: url(../assets/bg/exped-bg.webp) center center/cover no-repeat;
+}
+
+.tech-used > * {
+    height: 5rem;
+    aspect-ratio: 1;
+}
+
+.tech-used > img {
+    object-fit: contain;
+    filter: drop-shadow(0.1rem 0.1rem 0.1rem black);
+}
+
+.final-block {
+    color: var(--light-grey);
+    padding: 0.5rem;
+}
+
+.final-block > p {
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+.final-block::before {
+    background: var(--very-dark-green)
+}
+
+@media (max-width: 768px) {
+    .video-block {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .game-title {
+        padding: 0 1rem;
+        font-size: 1rem;
+    }
+
+    .game-title > span {
+        font-size: 1rem;
+    }
+}
