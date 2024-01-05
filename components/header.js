@@ -19,19 +19,19 @@ class Header extends HTMLElement {
             <header>
                 <img src='../assets/settings/nahidaQuest.webp' alt='nahidaQuest logo'>
                 <nav>
-                    <a href="./index.html">home</a>
-                    <a href="./feedback.html">feedback</a>
-                    <a href="./credits.html">credits</a>
+                    <a href="https://nahidaquest.com/">home</a>
+                    <a href="./feedback">feedback</a>
+                    <a href="./credits">credits</a>
                     <div class='flex-row play-button'>
-                        <a href="./play.html">Play!</a>
+                        <a href="./play">Play!</a>
                     </div>
                 </nav>
                 <button class='burger' onClick='toggleMenu()'>Menu</button>
                 <div id='burgerMenu' class='mobile-hidden'>
-                    <a class='flex-column' href="./index.html">home</a>
-                    <a class='flex-column' href="./feedback.html">feedback</a>
-                    <a class='flex-column' href="./credits.html">credits</a>
-                    <a class='flex-column' href="./play.html">Play!</a>
+                    <a class='flex-column' href="./index">home</a>
+                    <a class='flex-column' href="./feedback">feedback</a>
+                    <a class='flex-column' href="./credits">credits</a>
+                    <a class='flex-column' href="./play">Play!</a>
                 </div>
             </header>
         `;

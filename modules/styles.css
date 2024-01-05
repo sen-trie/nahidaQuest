@@ -563,7 +563,7 @@ table, button, label {
 
 #start-image {
     position: relative;
-    bottom: 14%;
+    bottom: 5%;
     width: 60%;
     object-fit: contain;
 	-webkit-animation: pulsate-fwd 3s ease-in-out infinite both;
@@ -2697,7 +2697,7 @@ table, button, label {
     top: 0;
     z-index: -1;
     filter: opacity(0.9);
-    background: url(../assets/bg/tree-bg.jpg) no-repeat center center/cover;
+    background: url(../assets/bg/tree-bg.webp) no-repeat center center/cover;
 }
 
 #tree-table > p {

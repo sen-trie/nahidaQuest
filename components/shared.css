@@ -9,6 +9,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    scrollbar-width: thin;
     scrollbar-color: var(--bright-brown) var(--very-dark-brown);
 }
 
@@ -26,13 +27,13 @@
 }
 
 ::-webkit-scrollbar {
-    width: 0.75rem;
+    width: 12px;
     background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--bright-brown);
-  border-radius: 1rem;
+    background-color: var(--bright-brown);
+    border-radius: 1rem;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -44,8 +45,8 @@ html {
     cursor: url(../assets/icon/cursor.webp), auto;
     overflow: hidden;
     font-family: 'gi-font';
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
 }
 
 html::before {
@@ -65,10 +66,15 @@ body {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    width: 100vw;
-    height: 100vh;
-    max-width: 100vw;
-    max-height: 100vh;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+body > main {
+    margin-top: 3.5rem;
 }
 
 button {
@@ -80,16 +86,17 @@ button {
 
 p {
     overflow-wrap: break-word;
-    hyphens: auto;
+    hyphens: none;
 }
 
 header-component {
-    position: relative;
+    position: fixed;
     width: 100%;
     background-color: var(--bright-green);
     padding: 0.5rem;
     height: 3.5rem;
     border-bottom: 0.2rem solid var(--very-dark-green);
+    z-index: 10;
 }
 
 header {

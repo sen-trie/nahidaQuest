@@ -325,10 +325,10 @@ const patchDict = {
     "v.2-0":`
     Welcome to nahidaQuest 2.0! Please enjoy your stay!<br><br>
 
-    <line>Bugs Fixed 🐞: </line><br><br>
+    <line>Major Bugs Fixed 🐞: </line><br><br>
         </indent>
         1. Flashing white box<br>
-        Sometimes when switching tabs, there is a brief instance where a box is visible which quickly disappears.
+        Sometimes when switching browser tabs, there is a brief instance where a box is visible which quickly disappears.
         </indent>
 
     <br><br><line>New Additions 💡: </line><br><br>
@@ -358,11 +358,11 @@ const patchDict = {
         </indent>
 
         <br><br> 7. Dori's Black Market <br>
-        After unlocking it, palyers can buy exclusive items from Dori using drops from Trees. These items are both visual and functional.
+        After unlocking it, palyers can buy exclusive items from Dori using drops from Trees. These items can be either visual or functional.
         </indent>
 
         <br><br> 8. New Characters <br>
-        Updated to include all characters up to version 4.4.
+        Updated roster to include all characters up to version 4.4.
         </indent>
 
     <br><br><line>Systems Rework 🌰: </line><br><br>
@@ -379,14 +379,14 @@ const patchDict = {
         </indent>
 
         <br><br> 4. Information breakdown for characters and golden cores <br>
-        There is a now button under each character, giving more detailed stats. Similarly, at the transcend menu, golden cores now have a breakdown for the top 7 sources.
+        When selecting a character, there is an additional button in the tooltips, which gives detailed stats. Similarly, at the transcend menu, the amount of golden cores now have a breakdown for the top 7 sources.
         </indent>
 
     <br><br>Please report any bugs and I hope you enjoy this dump of content! Many thanks. [img]
     `,
     
     "v.1-2":`
-    <line>Bugs Fixed 🐞: </line><br><br>
+    <line>Major Bugs Fixed 🐞: </line><br><br>
         </indent>
         1. Expedition Combat<br>
         When there's text on the monster like 'Dodge' or 'Counter', it can block player input like clicking damage.
@@ -419,7 +419,7 @@ const patchDict = {
     Note: If your save has any NaN values present, please type 'transcend' into the command console under 'Settings' and transcend from the appropriate menu. 
     Any current NaN values may result in 0 NpS. Please note that you WILL lose all of your current progress after transcending.
 
-    <br><br><line>Bugs Fixed 🐞:</line><br><br>
+    <br><br><line>Major Bugs Fixed 🐞:</line><br><br>
         </indent>
         1. NaN Bug for Wish Characters <br>
         Newly spawned Wished Characters will have their appropriate NpS and can have items freely applied.

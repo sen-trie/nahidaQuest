@@ -13955,15 +13955,15 @@ if (beta) {
     warning.classList.add('beta-warning');
     mainBody.append(warning);
 
-    setTimeout(()=>{
-        let startButton = document.getElementById("start-button");
-        startButton.click();
-        setTimeout(()=>{
-            let startButton = document.getElementById("play-button");
-            if (startButton) startButton.click();
-            setTimeout(()=>{startingFunction();},500)
-        }, 3500);
-    }, 800);
+    // setTimeout(()=>{
+    //     let startButton = document.getElementById("start-button");
+    //     startButton.click();
+    //     setTimeout(()=>{
+    //         let startButton = document.getElementById("play-button");
+    //         if (startButton) startButton.click();
+    //         setTimeout(()=>{startingFunction();},500)
+    //     }, 3500);
+    // }, 800);
 
     function startingFunction() {
         // PRESS A KEY

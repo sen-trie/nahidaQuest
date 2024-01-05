@@ -10,8 +10,8 @@
         <meta name="msapplication-navbutton-color" content="#CFE275">
         <meta name="apple-mobile-web-app-status-bar-style" content="#CFE275">
         <meta property="og:image" content="https://nahidaquest.com/assets/logo.webp">
-        <link rel="stylesheet" type="text/css" href="./components/shared.css?v=3a619e704dc6351feec682b951180a14c">
-        <link rel="stylesheet" type="text/css" href="./components/index.css?v=3a619e704dc6351feec682b951180a14c">
+        <link rel="stylesheet" type="text/css" href="./components/shared.css?v=da9d437474da2e8d8aa6d2d8ba3be46c">
+        <link rel="stylesheet" type="text/css" href="./components/index.css?v=da9d437474da2e8d8aa6d2d8ba3be46c" defer>
         <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
         <link rel="apple-touch-icon" href="./assets/apple-touch-icon-iphone-60x60.png">
         <link rel="apple-touch-icon" sizes="60x60" href="./assets/apple-touch-icon-ipad-76x76.png">
@@ -20,28 +20,34 @@
         <meta http-equiv='cache-control' content='no-cache'> 
         <meta http-equiv='expires' content='0'> 
         <meta http-equiv='pragma' content='no-cache'>
-        <script src="./components/header.js?v=3a619e704dc6351feec682b951180a14c" type="text/javascript" defer></script>
+        <script src="./components/header.js?v=da9d437474da2e8d8aa6d2d8ba3be46c" type="text/javascript" defer></script>
     </head>
     <body>
         <header-component></header-component>
-        <container>
+        <main>
             <hero class="flex-column">
-                <img src='../assets/settings/nahidaQuest.webp' alt='nahidaQuest logo'>
+                <img src='../assets/title/logo.webp' alt='nahidaQuest logo'>
                 <p class="game-title">
-                    An incremental clicker game based on Genshin Impact. <br/> 
-                    Embark on an adventure to find the <span style='color: #dba320'>Golden Ajilenakh Nut</span>,  <br/> 
+                    An incremental clicker game based on Genshin Impact.
+                    Embark on an adventure to find the <span style='color: #dba320'>Golden Ajilenakh Nut</span>,
                     a mythical fruit that Sumeru has taught to be lost to time.
                 </p>
-                <a class="play-button flex-row index-play-button" href="./play.html">
+                <a class="play-button flex-row index-play-button" href="./play">
                     Play Now!
                 </a>
             </hero>
-            <div class="video-block">
+            <div class="video-block div-block">
                 <div class="flex-column card">
                     <div class="flex-row card-img">
-                        <video id="card-img-1" src="./assets/title/card-img-1.webm" alt="video trailer for upgrading" muted></video>
+                        <video id="card-img-1" alt="video trailer for upgrading" muted>
+                            <source src="./assets/title/card-img-1.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                         <divider></divider>
-                        <video id="card-img-2" src="./assets/title/card-img-2.webm" alt="video trailer for wishing" muted></video>
+                        <video id="card-img-2" alt="video trailer for wishing" muted>
+                            <source src="./assets/title/card-img-2.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                     <p class="title-card">Call upon different characters to increase your Nuts per Seconds (NpS)!</p>
                     <p class="title-block" id="title-block-1">
@@ -51,9 +57,15 @@
                 </div>
                 <div class="flex-column card">
                     <div class="flex-row card-img">
-                        <video id="card-img-3" src="./assets/title/card-img-3.webm" alt="video trailer for battling" muted></video>
+                        <video id="card-img-3" alt="video trailer for battling" muted>
+                            <source src="./assets/title/card-img-3.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                         <divider></divider>
-                        <video id="card-img-4" src="./assets/title/card-img-4.webm" alt="video trailer for bosses" muted></video>
+                        <video id="card-img-4" alt="video trailer for bosses" muted>
+                            <source src="./assets/title/card-img-4.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                     <p class="title-card">Take on expeditions to battle monsters and win loot!</p>
                     <p class="title-block" id="title-block-2">
@@ -63,9 +75,15 @@
                 </div>
                 <div class="flex-column card">
                     <div class="flex-row card-img">
-                        <video id="card-img-5" src="./assets/title/card-img-5.webm" alt="video trailer for minesweeper minigame" muted></video>
+                        <video id="card-img-5" alt="video trailer for minesweeper minigame" muted>
+                            <source src="./assets/title/card-img-5.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                         <divider></divider>
-                        <video id="card-img-6" src="./assets/title/card-img-6.webm" alt="video trailer for snake minigame" muted></video>
+                        <video id="card-img-6" alt="video trailer for snake minigame" muted>
+                            <source src="./assets/title/card-img-6.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                     <p class="title-card">Try out a variety of minigames (led by the friendly Aranara)!</p>
                     <p class="title-block" id="title-block-3">
@@ -76,9 +94,15 @@
                 </div>
                 <div class="flex-column card">
                     <div class="flex-row card-img">
-                        <video id="card-img-7" src="./assets/title/card-img-7.webm" alt="video trailer for transceding" muted></video>
+                        <video id="card-img-7" alt="video trailer for transceding" muted>
+                            <source src="./assets/title/card-img-7.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                         <divider></divider>
-                        <video id="card-img-8" src="./assets/title/card-img-8.webm" alt="video trailer for challenges" muted></video>
+                        <video id="card-img-8" alt="video trailer for challenges" muted>
+                            <source src="./assets/title/card-img-8.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                     <p class="title-card">Level and upgrade until you reach the pinnacle of Sumeru!</p>
                     <p class="title-block" id="title-block-4">
@@ -88,21 +112,20 @@
                     </p>
                 </div>
             </div>
-            <div id="patch-notes" class="patch-notes">
+            <div id="patch-notes" class="patch-notes div-block">
                 <p class="patch-title">Patch Notes</p>
-                <div id="patch-container"></div>
             </div>
-            <div class="tech-block flex-column">
+            <div class="tech-block flex-column div-block">
                 <p class="patch-title">Game Details</p>
                 <div class="flex-column creator-div">
                     <div class="flex-row">
                         <img class='img-filter' src='./assets/title/creator.jpg' alt="creator picture">
-                        <p class="tech-desc">Created and maintained by IAM_Sentry</p>
+                        <p class="tech-desc">Created and maintained by <a class="mobile-link" href="https://linktr.ee/sentrie">IAM_Sentry</a></p>
                         <a class="tech-button flex-column" href="https://linktr.ee/sentrie">[Linktree]</a>
                     </div>
                     <div class="flex-row">
                         <img class='img-filter' src='./assets/title/github.webp' alt="github picture">
-                        <p class="tech-desc">Hosted on a public Github Repo</p>
+                        <p class="tech-desc">Hosted on a public <a class="mobile-link" href="https://github.com/bobbaID/nahidaQuest">Github Repo</a></p>
                         <a class="tech-button flex-column" href="https://github.com/bobbaID/nahidaQuest">[Github]</a>
                     </div>
                 </div>
@@ -112,15 +135,15 @@
                     <img src='./assets/title/css.webp' alt="css logo">
                     <img src='./assets/title/js.webp' alt="javascript logo">
                 </div>
-                <p class="flex-column">nahidaQuest! runs on any major browser <br>(Both Mobile & Desktop)</p>
+                <p class="flex-column">nahidaQuest! runs on any major browser (Both Mobile & Desktop)</p>
             </div>
-            <div class="final-block flex-column">
+            <div class="final-block flex-column div-block">
                 <p>
                     This game contains official media, game graphic, and game audio from Genshin Impact, an RPG game copyrighted (©) by HoYoverse. All rights reserved. 
-                    <br>HoYoverse and Genshin Impact are trademarks, services marks, or registered trademarks of HoYoverse.
+                    HoYoverse and Genshin Impact are trademarks, services marks, or registered trademarks of HoYoverse.
                 </p>
             </div>
-        </container>
+        </main>
         <script type="module" src="./components/index.js" type="module"></script>
     </body>
 </html>
