@@ -7,6 +7,7 @@ hero {
 hero > img {
     max-width: 50%;
     max-height: 350px;
+    animation: pulsate-fwd 3s ease-in-out infinite both;
 }
 
 .game-title {
@@ -367,4 +368,10 @@ divider {
     .tech-block > p {
         font-size: 1.2rem;
     }
+}
+
+@keyframes pulsate-fwd {
+    0% { transform: scale(1)}
+    50% { transform: scale(1.035)}
+    100% { transform: scale(1)}
 }

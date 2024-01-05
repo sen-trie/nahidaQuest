@@ -17,9 +17,11 @@ class Header extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <header>
-                <img src='../assets/settings/nahidaQuest.webp' alt='nahidaQuest logo'>
+                <a class='logo-link clickable' href="https://nahidaquest.com/">
+                    <img src='../assets/settings/nahidaQuest.webp' alt='nahidaQuest logo'>
+                </a>
                 <nav>
-                    <a href="https://nahidaquest.com/">home</a>
+                    <a href="./wiki">wiki</a>
                     <a href="./feedback">feedback</a>
                     <a href="./credits">credits</a>
                     <div class='flex-row play-button'>
@@ -28,7 +30,8 @@ class Header extends HTMLElement {
                 </nav>
                 <button class='burger' onClick='toggleMenu()'>Menu</button>
                 <div id='burgerMenu' class='mobile-hidden'>
-                    <a class='flex-column' href="./index">home</a>
+                    <a class='flex-column' href=".https://nahidaquest.com/">home</a>
+                    <a class='flex-column' href="./wiki">home</a>
                     <a class='flex-column' href="./feedback">feedback</a>
                     <a class='flex-column' href="./credits">credits</a>
                     <a class='flex-column' href="./play">Play!</a>

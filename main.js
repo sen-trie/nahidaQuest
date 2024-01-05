@@ -3774,7 +3774,7 @@ function settings() {
         const settingsHelp = createDom('button', {
             innerText: 'Wiki',
             class: ['clickable'],
-            event: ['click', () => {console.log('HELP!!!')}]
+            event: ['click', () => {window.open('https://nahidaquest.com/wiki',"_blank")}]
         })
     
         settingsBottomButtons.append(settingsHelp, settingsCredit);
@@ -4191,6 +4191,12 @@ function settingsBox(type,eleId) {
                     } else if (commandText === "ascend skip") {
                         persistentValues.tutorialAscend = true;
                         saveData();
+                        location.reload();
+                    } else if (commandText === "tester on") {
+                        localStorage.setItem('tester', true);
+                        location.reload();
+                    } else if (commandText === "tester off") {
+                        localStorage.setItem('tester', false);
                         location.reload();
                     } else if (commandText === "beta on") {
                         localStorage.setItem('beta', true);
@@ -4771,10 +4777,10 @@ function upgrade(clicked_id) {
     }
     
     if (currentMultiplierLocal != 1) {
-        costCurrent = Math.round(upgradeDictTemp["BaseCost"] * ((COSTRATIO**currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO));
+        costCurrent = Math.round(upgradeDictTemp["BaseCost"] * ((COSTRATIO** currentPurchasedLocal) - COSTRATIO**(currentPurchasedLocal + currentMultiplierLocal)) / (1 - COSTRATIO));
         requiredFree = currentMultiplierLocal;
     } else {
-        costCurrent = Math.round(upgradeDictTemp["BaseCost"] * (COSTRATIO **currentPurchasedLocal));
+        costCurrent = Math.round(upgradeDictTemp["BaseCost"] * (COSTRATIO ** currentPurchasedLocal));
         requiredFree = 1;
     }
 
@@ -11648,13 +11654,22 @@ function createTooltip() {
                 if (upgradeDict[heroTooltip]["milestone"][key]) {upgradeCount++};
             }
 
+            let overallText;
+            if (upgradeDict[heroTooltip].Purchased === 0) {
+                overallText = 0;
+            } else if (saveValues.dps === 0) {
+                overallText = 100;
+            } else {
+                overallText = (Math.round(upgradeDict[heroTooltip].Contribution / saveValues.dps * 100 * 100) / 100);
+            }
+
             let listText = createDom('p', { 
                 id:'notif-list', 
                 innerText: 
-                `Base NpS: ${abbrNum(upgradeDict[heroTooltip].BaseFactor, 2)} (No Item Buffs)\n
-                Buffed NpS: ${abbrNum(upgradeDict[heroTooltip].Factor, 2)} (With Item Buffs)\n
-                Upgrades: ${upgradeCount} (Built into Base NpS)\n
-                Overall: ${abbrNum(upgradeDict[heroTooltip].Contribution, 2)} (${(Math.round(upgradeDict[heroTooltip].Contribution / saveValues.dps * 100 * 100) / 100)}% of total NpS)`
+                `${heroTooltip === 0 ? 'Base Nuts/Click' : "Base NpS"}: ${abbrNum(upgradeDict[heroTooltip].BaseFactor, 2)} (No Item Buffs)\n
+                ${heroTooltip === 0 ? 'Buffed Nuts/Click' : 'Buffed NpS'}: ${abbrNum(upgradeDict[heroTooltip].Factor, 2)} (With Item Buffs)\n
+                Upgrades: ${upgradeCount} (Built into ${heroTooltip === 0 ? 'Base Nuts/Click' : 'Base NpS'})\n
+                Overall: ${abbrNum(upgradeDict[heroTooltip].Contribution, 2)} (${overallText}% of total NpS)`
             });
             choiceBox(document.getElementById('main-table'), {text: upgradeInfo[heroTooltip].Name}, stopSpawnEvents, ()=>{}, null, listText, ['notif-ele', 'hero-breakdown']);
         }
@@ -12782,7 +12797,11 @@ function transcendFunction() {
                     localStorage.setItem("storeInventory", JSON.stringify(newlocalStore));
 
                     if (beta) {
-                        localStorage.setItem("beta", "true")
+                        localStorage.setItem("beta", "true");
+                    }
+
+                    if (tester) {
+                        localStorage.setItem('tester', true);
                     }
                     
                     setTimeout(()=>{
@@ -13938,10 +13957,16 @@ if (beta) {
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
+let testing = false;
 let disableQuicktime = false;
-if (localStorage.getItem('beta') == 'true') {
+if (localStorage.getItem('beta') === 'true') {
     beta = true;
 }
+if (localStorage.getItem('testing') === 'true') {
+    testing = true;
+}
+
+
 
 if (beta) {
     let link = document.createElement("link");
@@ -13955,15 +13980,15 @@ if (beta) {
     warning.classList.add('beta-warning');
     mainBody.append(warning);
 
-    // setTimeout(()=>{
-    //     let startButton = document.getElementById("start-button");
-    //     startButton.click();
-    //     setTimeout(()=>{
-    //         let startButton = document.getElementById("play-button");
-    //         if (startButton) startButton.click();
-    //         setTimeout(()=>{startingFunction();},500)
-    //     }, 3500);
-    // }, 800);
+    setTimeout(()=>{
+        let startButton = document.getElementById("start-button");
+        startButton.click();
+        setTimeout(()=>{
+            let startButton = document.getElementById("play-button");
+            if (startButton) startButton.click();
+            setTimeout(()=>{startingFunction();},500)
+        }, 3500);
+    }, 800);
 
     function startingFunction() {
         // PRESS A KEY

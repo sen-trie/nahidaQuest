@@ -74,6 +74,7 @@ body {
 }
 
 body > main {
+    position: relative;
     margin-top: 3.5rem;
 }
 
@@ -112,10 +113,23 @@ header, nav {
     font-size: calc(1rem * var(--golden-ratio))
 }
 
-header > img {
+.clickable {
+    transition: 0.3s ease;
+}
+
+.clickable:hover {
+    transform: scale(1.1);
+}
+
+header img {
     height: 100%;
     max-width: 50vw;
     object-fit: contain;
+    
+}
+
+.logo-link {
+    height: inherit;
 }
 
 nav {
@@ -192,6 +206,30 @@ nav > a:hover {
     margin-bottom: 0.5rem;
 }
 
+.hide-tester::before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: var(--very-dark-green);
+}
+
+.hide-tester::after {
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    max-height: 500px;
+    aspect-ratio: 10 / 7;
+    z-index: 100;
+    transform: translate(-50%, -60%);
+    background: url(../assets/title/construction.webp) center center/contain no-repeat
+}
+
 /* ---------MOBILE CSS--------- */
 @media only screen and (max-width: 1200px) {
     header {
@@ -212,5 +250,10 @@ nav > a:hover {
 
     nav {
         display: none;
+    }
+
+    .hide-tester::after {
+        width: 100%;
+        max-height: 70%;
     }
 }

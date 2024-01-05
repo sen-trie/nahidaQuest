@@ -6,6 +6,9 @@
         }
     ],
     "settings": {
-        "liveServer.settings.port": 5558
+        "liveServer.settings.port": 5558,
+        "cSpell.words": [
+            "nahida"
+        ]
     }
 }

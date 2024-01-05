@@ -31,6 +31,13 @@
         text-shadow: var(--text-shadow-100);
     }
 
+    main {
+        flex-grow: 1;
+        overflow: hidden;
+        padding: 1rem;
+        justify-content: flex-start !important;
+    }
+
     /* ---------MOBILE CSS--------- */
     @media only screen and (max-width: 1200px) {
         .error-img  {
@@ -50,7 +57,9 @@
 </style>
     <body>
         <header-component></header-component>
-        <img class="error-img" src="./assets/error.webp">
-        <p class="error-text">Oops! That page cannot be found!</p>
+        <main class="flex-column">
+            <img class="error-img" src="./assets/error.webp">
+            <p class="error-text">Oops! That page cannot be found!</p>
+        </main>
     </body>
 </html>
