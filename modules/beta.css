@@ -87,6 +87,19 @@
     position: relative;
 }
 
+.settings-tab {
+    scrollbar-color: var(--light-green) var(--very-dark-green);
+}
+
+.settings-tab::-webkit-scrollbar {
+    background-color: var(--light-green)
+}
+
+.settings-tab::-webkit-scrollbar-thumb {
+    background-color: var(--bright-dark-green);
+    border-radius: 1rem;
+}
+
 .patch-button {
     position: unset;
     width: fit-content;

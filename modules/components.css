@@ -2444,6 +2444,10 @@ input:checked + .slider:before {
     filter: drop-shadow(0.2em 0.3em 0.2em rgba(0, 0, 0, 0.56));
 }
 
+#table7 > .notif-ele {
+    position: absolute;
+}
+
 #table7 > img {
     filter: drop-shadow(0.1em 0.1em 0.2em #340650ab);
 }
@@ -2455,63 +2459,144 @@ input:checked + .slider:before {
     color: #4e363c;
 }
 
-.store-div {
-    width: 95%;
-    height: 65%;
-    gap: 1%;
-    border: 0.5em outset var(--bright-brown);
-    background-color: var(--dark-bright-brown);
-    border-radius: 1em;
-    
+.shop-black-div, .store-div {
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content:space-evenly;
     align-items: center;
+}
+
+.store-div {
+    width: 99%;
+    height: 65%;
+    gap: 1%;
+    border: 0.5rem solid var(--bright-brown);
+    background-color: var(--dark-bright-brown);
+    border-radius: 1em;
     animation: slide-down 0.9s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
 }
 
 .store-black {
-    border: 0.5em outset var(--dark-bright-brown);
+    border: 0.5rem outset var(--dark-bright-brown);
     background-color: var(--bright-brown);
     justify-content: flex-start;
     overflow-y: scroll;
     gap: 0.75rem;
     padding: 1rem;
-    
 }
 
 .shop-black-card {
-    aspect-ratio: 9 / 12.5;
-    flex-basis: 32%;
+    width: 33%;
     background-color: wheat;
-    border: 0.2em groove var(--dark-bright-brown);
-    padding: 1%;
+    border: 0.2rem groove var(--dark-bright-brown);
     box-sizing: border-box;
     font-size: 1.6rem;
-    row-gap: 0.5rem;
 }
 
-.black-div {
-    background-color: green;
+.black-card-top {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 14rem;
+    border-bottom: 0.2rem solid var(--dark-bright-brown);
+}
+
+.black-card-top::before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: opacity(0.5);
+    background: url(../assets/bg/black-back.webp) center center/cover no-repeat;
+}
+
+.black-card-bottom {
+    width: 100%;
+    height: 4rem;
+    padding: 0.5rem 0;
+    justify-content: flex-start;
 }
 
 .black-image {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1.5;
+    width: auto;
+    max-width: 100%;
+    height: 85%;
+    aspect-ratio: 1;
     object-fit: contain;
-    background-color: yellow;
-    padding: 0.2rem;
     box-sizing: border-box;
+    filter: drop-shadow(0 0 0.4rem black);
+}
+
+#shop-black {
+    justify-content: space-between;
+    gap: 0;
+}
+
+#shop-black > div {
+    width: 100%;
+}
+
+.shop-black-div {
+    padding: 0.75rem;
+}
+
+.black-currency-container {
+    height: 2rem;
+    background-color: var(--bright-brown);
+}
+
+.black-currency-cell {
+    height: inherit;
+    width: calc(100% / 7);
+}
+
+.black-currency-cell > p {
+    color: var(--medium-brown);
+    font-size: 1.3rem;
+}
+
+.black-currency-cell > img {
+    height: inherit;
+    width: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    filter: drop-shadow(0 0 0.1rem black);
+}
+
+.black-div > p, .black-button {
+    color: var(--very-dark-brown);
+    font-size: 1.4rem;
+}
+
+.black-button {
+    width: 60%;
+    padding: 0.25rem 1rem;
+    border-radius: 1rem;
+    color: white;
+    background-color: var(--very-dark-brown);
 }
 
 .black-currency {
-    height: 2.5rem;
+    height: 1.8rem;
     width: auto;
     transform: translateY(-0.1rem);
     filter: drop-shadow(0 0 0.1rem black);
+}
+
+.black-info-button {
+    position: absolute;
+    z-index: 10;
+    bottom: 0.1rem;
+    left: 0.2rem;
+    color: #31185f;
+    background-color: #b79de6;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.75rem;
+    font-size: 1.3rem;
 }
 
 .shop-button {
@@ -2609,6 +2694,21 @@ input:checked + .slider:before {
     height: 10%;
     aspect-ratio: 1;
     background: url(../assets/icon/black-market.webp) center center/contain no-repeat;
+}
+
+#table7 .notif-ele > div {
+    border-color: var(--dark-bright-brown);
+    background-color: var(--bright-brown);
+    gap: 1rem;
+}
+
+#table7 .notif-ele button {
+    background-color: var(--very-dark-brown);
+}
+
+#table7 .black-info {
+    font-size: 1.4rem;
+    text-shadow: none;
 }
 
 /*/////////////////////// NUT SHOP CSS ///////////////////////////////*/

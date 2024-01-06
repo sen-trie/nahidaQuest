@@ -94,12 +94,12 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo) {
                 upgradeDict[currentKey].Purchased = -1;
 
                 let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero - 1) * 1.3)));
-                let baseATK = Math.round(initATKCost * (multiplierATKCost ** ((currentHero - 1) * 3.3)));
+                let baseATK = Math.round(initATKCost * (multiplierATKCost ** ((currentHero - 1) * 4.2)));
 
                 // INCLUDES COST OF PREVIOUS HERO
                 upgradeDict[currentKey]["BaseCost"] = Math.round(baseCost + upgradeDict[laggingKey]["BaseCost"] * 6);
                 upgradeDict[currentKey]["Level"] = Math.round(upgradeDict[currentKey]["BaseCost"] * 0.75);
-                upgradeDict[currentKey]["Factor"] = Math.round(baseATK + upgradeDict[laggingKey]["Factor"] * 4.5 + 0.05 * upgradeDict[laggingKey]["BaseCost"]);
+                upgradeDict[currentKey]["Factor"] = Math.round(baseATK + upgradeDict[laggingKey]["Factor"] * 1.5 + 0.01 * upgradeDict[laggingKey]["BaseCost"]);
 
                 upgradeDict[currentKey]["BaseFactor"] = upgradeDict[currentKey]["Factor"];
                 upgradeDict[currentKey]["Contribution"] = 0;

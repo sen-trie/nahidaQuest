@@ -152,7 +152,7 @@ function inventoryFrame(ele, itemInfo, itemFrameColors) {
 }
 
 // CHOICE BOX (FOR ITEMS, PARENT CONTAINER MUST HAVE 'NOTIF-ITEM' CLASS)
-function choiceBox(mainBody, dialogObg, stopSpawnEvents, yesFunc, noFunc, extraEle, classes, returnEle = false) {
+function choiceBox(mainBody, dialogObg, stopSpawnEvents = undefined, yesFunc, noFunc, extraEle, classes, returnEle = false) {
     if (stopSpawnEvents) {stopSpawnEvents = false}
 
     const choiceEle = document.createElement('div');

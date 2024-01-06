@@ -2,6 +2,7 @@ import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,save
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal } from "./modules/adjustUI.js"
+import * as Shop from "./modules/features/shop.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
 
@@ -305,6 +306,7 @@ const moraleLore = [
     "Nahida feels [s]Neutral[/s] [mor]<br><br> No additional buffs to the party, <br> increase morale by eating food.",
     "Nahida feels [s]Sad[/s]... [mor]<br><br> XP gains are reduced by 15%, recover party morale <br> by resting or completing expeditions successfully.",
 ]
+
 const extraInfoDict = {
     'Scavenger': '[Scavenger]: The party found additional items!',
     'Toughness': '[Toughness]: The party endured an attack!',
@@ -314,6 +316,11 @@ const extraInfoDict = {
     'Anti-Sync': "[Anti-Sync] It seems that the two of them didn't get along well...",
     'Sync': '[Sync] The two of them got along pretty well!'
 }
+
+const blackMarketFunctions = {
+    changeBigNahida: changeBigNahida,
+    buyShop: buyShop
+};
 
 const possibleItems = ['Bow', 'Catalyst', 'Claymore', 'Polearm', 'Sword', 'Artifact', 'Food', 'DendroGeoAnemo', 'ElectroCryo', 'PyroHydro', 'Inazuma', 'Liyue', 'Mondstadt', 'Sumeru'];
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
@@ -604,25 +611,6 @@ function loadSaveData() {
         let achievementListTemp = localStorage.getItem("achievementListSave");
         achievementMap = new Map(JSON.parse(achievementListTemp));
     }
-
-    const updateBlackMarket = (persistentBlackMarket) => {
-        for (let key in blackShopDict) {
-            if (persistentBlackMarket[key] === undefined) {
-                generateBlackItem(key, persistentBlackMarket);
-            }
-        }
-    }
-
-    const generateBlackItem = (key, persistentBlackMarket) => {
-        let blackItemTemp = blackShopDict[key];
-        persistentBlackMarket[key] = {
-            cost: Math.ceil(Math.round(blackItemTemp.cost * randomInteger(80, 120) / 100) / 5) * 5,
-            costElement: rollArray(boxElement, 1),
-            purchased: false,
-            level: blackItemTemp.level,
-        }
-    }
-
     // LOAD PERSISTENT VALUES 
     if (localStorage.getItem("persistentValues") == null) {
         persistentValues = persistentValuesDefault;
@@ -637,12 +625,7 @@ function loadSaveData() {
         } else {
             persistentValues = JSON.parse(persistentDictTemp);
             updateObjectKeys(persistentValues, persistentValuesDefault);
-
-            console.log(persistentValues)
-
-            updateBlackMarket(persistentValues.blackMarketDict);
-
-            
+            Shop.updateBlackMarket(persistentValues.blackMarketDict);
 
             for (let key in upgradeInfo) {
                 let heroName = upgradeInfo[key].Name;
@@ -731,11 +714,9 @@ function loadSaveData() {
 let clickAudioDelay = null;
 let currentClick = 1;
 
-let autoClick = null;
-let currentlyAutoClick = false;
-
+let autoClick = undefined;
 let demoImg = document.createElement("img");
-demoImg.skin = settingsValues.preferOldPic ? 'New' : 'Old';
+demoImg.skin = persistentValues.nahidaSkin;
 demoImg.src = `./assets/bg/nahida${demoImg.skin}.webp`;
 demoImg.classList.add("demo-img");
 demoImg.id = "demo-main-img";
@@ -747,8 +728,9 @@ demoImg.revertPicture = () => {
 
 demoContainer.addEventListener('mousedown', () => {
     if (settingsValues.autoClickBig) {
-        autoClick = setInterval(touchDemo, 400);
-        currentlyAutoClick = true;
+        if (autoClick === undefined) {
+            autoClick = setInterval(touchDemo, 400);
+        }
     }
 })
 
@@ -757,10 +739,9 @@ demoContainer.addEventListener("mouseup", () => {
 });
 
 document.addEventListener("mouseup", () => {
-    currentlyAutoClick = false;
-    if (autoClick !== null) {
+    if (autoClick !== undefined) {
         clearInterval(autoClick);
-        autoClick = null;
+        autoClick = undefined;
     }
 });
 
@@ -819,7 +800,7 @@ function touchDemo() {
         }
     }
 
-    if (settingsValues.showFallingNuts) {spawnFallingNut()};
+    if (!settingsValues.showFallingNuts) {spawnFallingNut()};
 };
 
 drawUI.demoFunction(demoContainer,demoImg);
@@ -4271,9 +4252,9 @@ function settingsBox(type,eleId) {
 
         const advSettingsDict = [
             {id: 'nahida-preference',  default: 'preferOldPic', text: "Prefer Old 'Big Nahida'"},
-            {id: 'falling-preference',  default: 'showFallingNuts', text: "Spawn Falling Nuts on Click"},
+            {id: 'falling-preference',  default: 'showFallingNuts', text: "No Falling Nuts on Click"},
             {id: 'clicking-preference',  default: 'combineFloatText', text: "Combine Click Counts"},
-            {id: 'wish-preference',  default: 'showWishAnimation', text: "Show Wish Animation"},
+            {id: 'wish-preference',  default: 'showWishAnimation', text: "No Wish Animation"},
             {id: 'auto-preference',  default: 'autoClickBig', text: "Hold to Click 'Big Nahida'"},
             {id: 'wide-combat-preference',  default: 'wideCombatScreen', text: "Wide Battle Screen"},
             {id: 'left-hand-mode',  default: 'leftHandMode', text: "Left Handed Mode"},
@@ -4308,7 +4289,9 @@ function settingsBox(type,eleId) {
                     prefer.addEventListener('change', () => {
                         settingsValues.preferOldPic = prefer.checked;
                         let demoImg = document.getElementById('demo-main-img');
-                        demoImg.skin = prefer.checked ? 'New' : 'Old';
+                        demoImg.skin = prefer.checked ? 'Old' : 'New';
+                        persistentValues.nahidaSkin = demoImg.skin;
+
                         if (demoImg.src != "./assets/event/scara.webp") {
                             demoImg.revertPicture();
                         }
@@ -11144,7 +11127,7 @@ function updateWishDisplay() {
         if (saveValues["wishCounterSaved"] >= wishCounter) {
             wishNpsDisplay.innerText = "All Wish Heroes obtained!";
         } else {
-            wishNpsDisplay.innerText = `Next character's NpS: ${abbrNum(Math.round(saveValues["dps"] * 0.01 * (STARTINGWISHFACTOR + wishMultiplier)/2500 + 1))}`;
+            wishNpsDisplay.innerText = `Next character's NpS: ${abbrNum(Math.round(saveValues["dps"] * 0.01 * (STARTINGWISHFACTOR + wishMultiplier)/2 + 1))}`;
         }
         let wishCurrency = document.getElementById("wish-counter-display");
         wishCurrency.innerHTML = wishCurrency.innerHTML.replace(/[^<]+</g, `${saveValues.mailCore}<`);
@@ -11197,7 +11180,7 @@ function wish() {
             } else {
                 let upgradeDictTemp = upgradeDict[randomWishHero];
                 upgradeDictTemp.Purchased = -1;
-                upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * 0.01 * (STARTINGWISHFACTOR + wishMultiplier)/2500 + 1);
+                upgradeDictTemp["Factor"] = Math.round(saveValues["dps"] * 0.01 * (STARTINGWISHFACTOR + wishMultiplier)/2 + 1);
                 upgradeDictTemp["BaseCost"] = Math.round(saveValues["dps"] * (65) * wishPower + 1);
                 upgradeDictTemp["BaseFactor"] = upgradeDictTemp["Factor"];
                 upgradeDictTemp["Contribution"] = 0;
@@ -11211,7 +11194,7 @@ function wish() {
 
                 let mailImageTemp = document.getElementById("mailImageID");
                 mailImageTemp.style.opacity = 0;
-                if (settingsValues.showWishAnimation) {
+                if (!settingsValues.showWishAnimation) {
                     wishAnimation(randomWishHero);
                 } else {
                     stopWishAnimation = false;
@@ -11943,7 +11926,7 @@ function shopTimerFunction() {
         let time_passed = Math.floor(getTime() - parseInt(storeInventory.storedTime));
         shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
         if (time_passed >= SHOPCOOLDOWN) {
-            refreshShop(getTime());
+            refreshShop();
         }
     }
 }
@@ -11961,11 +11944,23 @@ function addShop() {
     tabButton.id = "tab-" + (5);
 
     tabButton.addEventListener('click', () =>{
-            tabChange(6);
+        tabChange(6);
     })
 
     tabButton.appendChild(tabButtonImage);
     tabFlex.appendChild(tabButton);
+}
+
+function changeBigNahida(key) {
+    let demoButton = document.getElementById('demo-main-img');
+    if (demoButton.skin === key) {
+        demoButton.skin = settingsValues.preferOldPic ? 'Old' : 'New';
+    } else {
+        demoButton.skin = key;
+    }
+
+    persistentValues.nahidaSkin = demoButton.skin;
+    demoButton.revertPicture();
 }
 
 function setShop(type) {
@@ -12016,49 +12011,7 @@ function setShop(type) {
         class: ['shop-backdoor']
     });
 
-    const shopBlackDiv = createDom("div", {
-        class: ["store-div","store-black"],
-        id: "shop-black",
-        style: { display: 'none' }
-    });
-
-    for (let key in blackShopDict) {
-        let itemDict = persistentValues.blackMarketDict[key];
-        const eleImage = createDom('img', {
-            src: `./assets/${blackShopDict[key].file}`,
-            class: ['black-image']
-        });
-
-        eleImage.addEventListener('click', () => {
-            let demoButton = document.getElementById('demo-main-img');
-            if (demoButton.skin === key) {
-                demoButton.skin = settingsValues.preferOldPic ? 'New' : 'Old';
-            } else {
-                demoButton.skin = key;
-            }
-            demoButton.revertPicture();
-        })
-
-        const elePrice = createDom('div', {
-            class: ['flex-row', 'black-div'],
-            child: [
-                createDom('p', {
-                    innerText: itemDict.cost
-                }),
-                createDom('img', {
-                    class: ['black-currency'],
-                    src: `./assets/tooltips/inventory/solid${itemDict.costElement}.webp`
-                })
-            ]
-        })
-
-        const element = createDom('div', {
-            class: ['shop-black-card', 'flex-column'],
-            child: [eleImage, elePrice]
-        });
-        shopBlackDiv.appendChild(element)
-    }
-
+    const shopBlackContainer = Shop.drawBlackMarket(persistentValues, blackMarketFunctions, choiceBox, );
     shopBackdoor.addEventListener('click', () => {
         if (table7.classList.contains('table7-bg')) {
             table7.classList.add('table7-alt');
@@ -12068,16 +12021,20 @@ function setShop(type) {
             table7.classList.remove('table7-alt');
         }
 
-        universalStyleCheck(shopBlackDiv, 'display', 'flex', 'none');
+        if (document.getElementById('black-market-currency')) {
+            document.getElementById('black-market-currency').updateValues();
+        }
+
+        universalStyleCheck(shopBlackContainer, 'display', 'flex', 'none');
         universalStyleCheck(shopDiv, 'display', 'none', 'flex');
     })
 
     shopDialogueDiv.append(shopDialogueText,shopDialogueButton);
-    table7.append(shopImg,shopTimerElement,shopDiv,shopBlackDiv,shopDialogueDiv,shopBackdoor);
+    table7.append(shopImg,shopTimerElement,shopDiv,shopBlackContainer,shopDialogueDiv,shopBackdoor);
 }
 
 var shopId = null;
-function buyShop(id,shopCost) {
+function buyShop(id, shopCost, blackDict) {
     let dialog = document.getElementById("table7-text");
     let button = document.getElementById(id);
     let confirmButton = document.getElementById("shop-confirm");
@@ -12097,42 +12054,40 @@ function buyShop(id,shopCost) {
     }
 
     if (shopId == id) {
-        if (persistentValues.tutorialAscend) {
-            dialog.innerText = "Dori's Deals now come with extra value!";
-        } else {
-            dialog.innerText = "Any questions or troubles? I'm here to personally assist you!";
-        }
+        changeStoreDialog(persistentValues.tutorialAscend ? 'ascendLoad' : 'normalLoad');
         
         shopId = null;
         let confirmButtonNew = confirmButton.cloneNode(true);
         confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
     } else {
-        if (persistentValues.tutorialAscend) {
-            dialog.innerText = "Maybe if you beg, I'll allow a refund within 24 hours! Hehe, just kidding."
-        } else {
-            dialog.innerText = "Are you sure? Remember, no refunds!";
-        }
+        changeStoreDialog(persistentValues.tutorialAscend ? 'retryAscendConfirm' : 'retryConfirm');
         
         button.classList.add("shadow-pop-tr");
         confirmButton.addEventListener("click", function() {
-            confirmPurchase(shopCost,id);
+            confirmPurchase(shopCost, id, blackDict);
         })
         shopId = id;
     }
 }
 
-function refreshShop(minutesPassed) {
-    shopTime = minutesPassed;
+function refreshShop() {
+    shopTime = getTime();
     shopId = null;
+
+    let pressedButton = document.querySelector('.shadow-pop-tr');
+    if (pressedButton) { pressedButton.classList.remove('shadow-pop-tr') }
 
     let shopContainer = document.getElementById("shop-container");
     shopContainer.innerHTML = "";
-    let i = 10;
-    let upgradedShop = persistentValues.tutorialAscend === true;
 
+    let i = 10;
     while (i--) {
-        createShopItems(shopContainer, i, drawShopItem(i, upgradedShop));
+        createShopItems(shopContainer, i, drawShopItem(i, persistentValues.tutorialAscend));
     }
+
+    changeStoreDialog('clear');
+    Shop.regenBlackPrice(persistentValues.blackMarketDict);
+
     storeInventory.storedTime = getTime();
 }
 
@@ -12175,51 +12130,109 @@ function drawShopItem(i, upgradedShop = false) {
     return inventoryNumber;
 }
 
-function confirmPurchase(shopCost,id) {
-    let mainButton = document.getElementById(id);
+function changeStoreDialog(typeText) {
     let dialog = document.getElementById("table7-text");
+    let newText;
+
+    switch (typeText) {
+        case ('clear'):
+        case ('normalLoad'):
+            newText = "Any questions or troubles? I'm here to personally assist you!";
+            break;
+        case ('ascendLoad'):
+            newText = "Dori's Deals now come with extra value!";
+            break;
+        case ('retryConfirm'):
+            newText = "Are you sure? Remember, no refunds!";
+            break;
+        case ('retryAscendConfirm'):
+            newText = "Maybe if you ask nicely, I'll even allow a refund within 24 hours! Hehe, just kidding.";
+            break;
+        case ('purchaseSuccessAscend'):
+            newText = 'See you again soon! Hehe.';
+            break;
+        case ('purchaseSuccessRegular'):
+            newText = "Hehe, you've got good eyes.";
+            break;
+        case ('purchaseFailAscend'):
+            newText = "Now, now, I can't make it any cheaper than that. It'll be daylight robbery!";
+            break;
+        case ('purchaseFailRegular'):
+            newText = "Hmph, come back when you're a little richer.";
+            break;
+        default:
+            console.error(`changeStoreDialog Error: ${dialog}`);
+            break;
+    }
+
+    dialog.innerText = newText;
+}
+
+function confirmPurchase(shopCost, id, blackDict) {
+    let mainButton = document.getElementById(id);
+    saveValues.primogem += shopCost * 2
     if (saveValues.primogem >= shopCost) {
+        let typeShop = id.split("-")[0];
         let saveId = id.split("-")[1];
         let itemId = id.split("-")[2];
-        
-        newPop(1);
-        inventoryAdd(itemId);
-        sortList("table2");
-        mainButton.classList.remove("shadow-pop-tr");
-        mainButton.classList.add("purchased");
-        saveValues.primogem -= shopCost;
 
-        let confirmButton = document.getElementById("shop-confirm");
-        let confirmButtonNew = confirmButton.cloneNode(true);
-        confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
-        if (persistentValues.tutorialAscend) {
-            dialog.innerText = "See you again soon! Hehe."
-        } else {
-            dialog.innerText = "Hehe, you've got good eyes.";
-        }
+        if (typeShop === 'black') {
+            // persistentValues.ascendEle[blackDict.ele] >= blackDict.eleCost
+            if (1) {
+                persistentValues.ascendEle[blackDict.ele] -= blackDict.eleCost;
+                saveValues.primogem -= shopCost;
+                document.getElementById('black-market-currency').updateValues();
 
-        shopElement.load();
-        shopElement.play();
+                mainButton.classList.remove("shadow-pop-tr");
+                let confirmButton = document.getElementById("shop-confirm");
+                let confirmButtonNew = confirmButton.cloneNode(true);
+                confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
 
-        storeInventory[parseInt(saveId)].Purchased = true;
-        let allItemsPurchased = true;
+                persistentValues.blackMarketDict[saveId].level++;
+                let blackCard = document.getElementById(id);
+                blackCard.level = persistentValues.blackMarketDict[saveId].level;
+                if (persistentValues.blackMarketDict[saveId].level === persistentValues.blackMarketDict[saveId].maxLevel) {
+                    blackCard.removeCost();
+                }
 
-        for (let key in storeInventory) {
-            if (storeInventory[key].Purchased !== undefined && storeInventory[key].Purchased === false) {
-                allItemsPurchased = false;
-                break;
+                changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseSuccessAscend' : 'purchaseSuccessRegular');
+                shopElement.load();
+                shopElement.play();
+            } else {
+                changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseFailAscend' : 'purchaseFailRegular');
+                return;
+            }
+        } else if (typeShop === 'shop') {
+            newPop(1);
+            inventoryAdd(itemId);
+            sortList("table2");
+            mainButton.classList.remove("shadow-pop-tr");
+            mainButton.classList.add("purchased");
+            saveValues.primogem -= shopCost;
+    
+            let confirmButton = document.getElementById("shop-confirm");
+            let confirmButtonNew = confirmButton.cloneNode(true);
+            confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
+    
+            changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseSuccessAscend' : 'purchaseSuccessRegular');
+            shopElement.load();
+            shopElement.play();
+    
+            storeInventory[parseInt(saveId)].Purchased = true;
+            let allItemsPurchased = true;
+            for (let key in storeInventory) {
+                if (storeInventory[key].Purchased !== undefined && storeInventory[key].Purchased === false) {
+                    allItemsPurchased = false;
+                    break;
+                }
+            }
+    
+            if (allItemsPurchased) {
+                challengeNotification(({category: 'specific', value: [1, 1]}));
             }
         }
-
-        if (allItemsPurchased) {
-            challengeNotification(({category: 'specific', value: [1, 1]}));
-        }
     } else {
-        if (persistentValues.tutorialAscend) {
-            dialog.innerText = "Now, now, I can't make it any cheaper than that. It'll be daylight robbery!"
-        } else {
-            dialog.innerText = "Hmph, come back when you're a little richer."
-        }
+        changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseFailAscend' : 'purchaseFailRegular');
         return;
     }
 }
@@ -12800,7 +12813,7 @@ function transcendFunction() {
                         localStorage.setItem("beta", "true");
                     }
 
-                    if (tester) {
+                    if (testing) {
                         localStorage.setItem('tester', true);
                     }
                     
@@ -13948,7 +13961,7 @@ function newPop(type) {
 if (beta) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            spawnBossQuest(1)
+            refreshShop(getTime())
         }
     })    
 }
@@ -13962,10 +13975,16 @@ let disableQuicktime = false;
 if (localStorage.getItem('beta') === 'true') {
     beta = true;
 }
-if (localStorage.getItem('testing') === 'true') {
+if (localStorage.getItem('tester') === 'true') {
     testing = true;
 }
 
+if (testing) {
+    let tester = document.createElement('p');
+    tester.innerText = 'TESTER';
+    tester.classList.add('test-warning');
+    mainBody.append(tester); 
+}
 
 
 if (beta) {
@@ -13998,8 +14017,5 @@ if (beta) {
         // document.dispatchEvent(event);
 
         // BETA FUNCTIONS
-        
     }
 }
-
-// TODO: FIX AUTO CLICK BUG AGAIN

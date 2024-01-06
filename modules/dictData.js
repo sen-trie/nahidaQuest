@@ -1215,31 +1215,37 @@ const challengeInfo = [
 
 const blackShopDict = {
     'Skin1': {
-        cost: 600,
+        cost: 1000,
+        primoCost: 500,
+        type: 'cosmetic',
+        subtype: 'bigNahida',
+        title: '4th NA',
+        desc: 'Unlocks a new variant of Big Nahida!',
+        file: 'bg/nahidaSkin1.webp',
+        level: 0,
+        maxLevel: 1,
+    },
+    'Skin2': {
+        cost: 1000,
+        primoCost: 500,
+        type: 'cosmetic',
+        subtype: 'bigNahida',
+        title: 'Festival Utsava',
+        desc: 'Unlocks a new variant of Big Nahida!',
+        file: 'bg/nahidaSkin2.webp',
+        level: 0,
+        maxLevel: 1,
+    },
+    'Skin3': {
+        cost: 1000,
+        primoCost: 500,
         type: 'cosmetic',
         subtype: 'bigNahida',
         title: 'Starry Eyed',
         desc: 'Unlocks a new variant of Big Nahida!',
-        file: 'bg/nahidaSkin1.webp',
-        level: null
-    },
-    'Skin2': {
-        cost: 600,
-        type: 'cosmetic',
-        subtype: 'bigNahida',
-        title: 'Happy Faced',
-        desc: 'Unlocks a new variant of Big Nahida!',
-        file: 'bg/nahidaSkin2.webp',
-        level: null
-    },
-    'Skin3': {
-        cost: 600,
-        type: 'cosmetic',
-        subtype: 'bigNahida',
-        title: 'Paimon Faced',
-        desc: 'Unlocks a new variant of Big Nahida!',
         file: 'bg/nahidaSkin3.webp',
-        level: null
+        level: 0,
+        maxLevel: 1,
     },
 }
 

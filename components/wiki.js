@@ -1,10 +1,10 @@
 import { upgradeInfo, InventoryDefault } from "../modules/dictData.js";
 
 let testing = (localStorage.getItem('tester') === 'true') ? true : false;
-// if (testing) {
-//     const mainEle = document.querySelector('.hide-tester');
-//     mainEle.classList.remove('hide-tester');
-// }
+if (testing) {
+    const mainEle = document.querySelector('.hide-tester');
+    mainEle.classList.remove('hide-tester');
+}
 
 const createTable = (parentEle, dict, dir, imageDir, itemProps) => {
     for (let key in dict) {

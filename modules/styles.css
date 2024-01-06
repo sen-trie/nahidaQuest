@@ -3148,6 +3148,15 @@ table, button, label {
     pointer-events: none;
 }
 
+.test-warning {
+    position: absolute;
+    left: 50%;
+    z-index: 99999999;
+    background-color: purple;
+    color: yellow;
+    pointer-events: none;
+}
+
 .choice-ele, .notif-ele {
     position: absolute;
     z-index: 10000;
