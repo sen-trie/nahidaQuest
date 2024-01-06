@@ -300,6 +300,10 @@ divider {
     hero > img {
         max-width: 90%;
     }
+    
+    .patch-notes {
+        height: 55rem;
+    }
 
     .patch-title {
         padding: 1rem 0;
@@ -315,6 +319,7 @@ divider {
         width: 97.5%;
         font-size: 0.9rem;
         padding: 0.5rem 0.5rem;
+        border-radius: 0;
     }
 
     .patch-info > line {
@@ -342,6 +347,7 @@ divider {
     .tech-desc {
         font-size: 1rem;
         text-shadow: none;
+        text-align: center;
     }
 
     .tech-button {
@@ -357,6 +363,7 @@ divider {
     .mobile-link {
         font-size: 1rem;
         text-shadow: var(--text-shadow-100);
+        color: var(--light-green);
     }
 
     .tech-used > * {
@@ -365,8 +372,8 @@ divider {
         aspect-ratio: 1;
     }
 
-    .tech-block > p {
-        font-size: 1.2rem;
+    .tech-block > .patch-title, .tech-block > p {
+        font-size: 1.2rem !important;
     }
 }
 

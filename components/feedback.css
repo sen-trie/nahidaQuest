@@ -100,7 +100,12 @@ form > button:hover {
 
 @media (max-width: 992px) {
     main {
+        padding: 0.1rem;
         width: 90%;
+    }
+
+    form {
+        padding: 0.5rem;
     }
 }
 
@@ -112,5 +117,9 @@ form > button:hover {
     top {
         font-size: 1.2rem;
         justify-content: flex-start !important;
+    }
+
+    label {
+        font-size: 1rem;
     }
 }
