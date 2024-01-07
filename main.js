@@ -575,7 +575,7 @@ function loadSaveData() {
     // LOAD ADVENTURE DATA
     if (localStorage.getItem("advDictSave") == null) {
         let rankTemp = [null, true];
-        for (let j = 0; j < 19; i++) {
+        for (let j = 0; j < 19; j++) {
             rankTemp.push(false);
         }
 
@@ -5746,7 +5746,7 @@ function inventoryDraw(itemType, min, max, type, itemClass){
     while (true){
         attempts++;
         if (attempts >= 2000) {
-            console.error(`Error drawing item with properties [${itemType},${type}${itemClass ? `,${itemClass}` : ','}]. Please inform the developer using the feedback form :)`);
+            console.error(`Error drawing item with properties [${itemType},${type}${itemClass ? `,${itemClass}` : ','}]. Please submit this bug in the feedback form`);
             return;
         }
 
@@ -12054,13 +12054,13 @@ function buyShop(id, shopCost, blackDict) {
     }
 
     if (shopId == id) {
-        changeStoreDialog(persistentValues.tutorialAscend ? 'ascendLoad' : 'normalLoad');
+        Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'ascendLoad' : 'normalLoad');
         
         shopId = null;
         let confirmButtonNew = confirmButton.cloneNode(true);
         confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
     } else {
-        changeStoreDialog(persistentValues.tutorialAscend ? 'retryAscendConfirm' : 'retryConfirm');
+        Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'retryAscendConfirm' : 'retryConfirm');
         
         button.classList.add("shadow-pop-tr");
         confirmButton.addEventListener("click", function() {
@@ -12085,7 +12085,7 @@ function refreshShop() {
         createShopItems(shopContainer, i, drawShopItem(i, persistentValues.tutorialAscend));
     }
 
-    changeStoreDialog('clear');
+    Shop.changeStoreDialog('clear');
     Shop.regenBlackPrice(persistentValues.blackMarketDict);
 
     storeInventory.storedTime = getTime();
@@ -12130,44 +12130,6 @@ function drawShopItem(i, upgradedShop = false) {
     return inventoryNumber;
 }
 
-function changeStoreDialog(typeText) {
-    let dialog = document.getElementById("table7-text");
-    let newText;
-
-    switch (typeText) {
-        case ('clear'):
-        case ('normalLoad'):
-            newText = "Any questions or troubles? I'm here to personally assist you!";
-            break;
-        case ('ascendLoad'):
-            newText = "Dori's Deals now come with extra value!";
-            break;
-        case ('retryConfirm'):
-            newText = "Are you sure? Remember, no refunds!";
-            break;
-        case ('retryAscendConfirm'):
-            newText = "Maybe if you ask nicely, I'll even allow a refund within 24 hours! Hehe, just kidding.";
-            break;
-        case ('purchaseSuccessAscend'):
-            newText = 'See you again soon! Hehe.';
-            break;
-        case ('purchaseSuccessRegular'):
-            newText = "Hehe, you've got good eyes.";
-            break;
-        case ('purchaseFailAscend'):
-            newText = "Now, now, I can't make it any cheaper than that. It'll be daylight robbery!";
-            break;
-        case ('purchaseFailRegular'):
-            newText = "Hmph, come back when you're a little richer.";
-            break;
-        default:
-            console.error(`changeStoreDialog Error: ${dialog}`);
-            break;
-    }
-
-    dialog.innerText = newText;
-}
-
 function confirmPurchase(shopCost, id, blackDict) {
     let mainButton = document.getElementById(id);
     saveValues.primogem += shopCost * 2
@@ -12195,11 +12157,11 @@ function confirmPurchase(shopCost, id, blackDict) {
                     blackCard.removeCost();
                 }
 
-                changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseSuccessAscend' : 'purchaseSuccessRegular');
+                Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseSuccessAscend' : 'purchaseSuccessRegular');
                 shopElement.load();
                 shopElement.play();
             } else {
-                changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseFailAscend' : 'purchaseFailRegular');
+                Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseFailAscend' : 'purchaseFailRegular');
                 return;
             }
         } else if (typeShop === 'shop') {
@@ -12214,7 +12176,7 @@ function confirmPurchase(shopCost, id, blackDict) {
             let confirmButtonNew = confirmButton.cloneNode(true);
             confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
     
-            changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseSuccessAscend' : 'purchaseSuccessRegular');
+            Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseSuccessAscend' : 'purchaseSuccessRegular');
             shopElement.load();
             shopElement.play();
     
@@ -12232,35 +12194,9 @@ function confirmPurchase(shopCost, id, blackDict) {
             }
         }
     } else {
-        changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseFailAscend' : 'purchaseFailRegular');
+        Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseFailAscend' : 'purchaseFailRegular');
         return;
     }
-}
-
-function calculateShopCost(star) {
-    let shopCost = 0;
-    switch (star) {
-        case 2:
-            shopCost = Math.round(randomInteger(35,55) * costDiscount / 5) * 5;
-            break;
-        case 3: 
-            shopCost = Math.round(randomInteger(70,100) * costDiscount / 5) * 5;
-            break;
-        case 4:
-            shopCost = Math.round(randomInteger(140,210) * costDiscount / 5) * 5;
-            break;
-        case 5:
-            shopCost = Math.round(randomInteger(300,400) * costDiscount / 5) * 5;
-            break;
-        case 6:
-            shopCost = Math.round(randomInteger(600,750) * costDiscount / 5) * 5;
-            break;
-        default:
-            console.error(`calculateShopCost error: Invalid shop cost ${star}`);
-            break;
-    }
-
-    return shopCost;
 }
 
 function createShopButton(inventoryTemp, inventoryNumber, shopCost, purchased = false, slotNumber) {
@@ -12302,7 +12238,7 @@ function createShopButton(inventoryTemp, inventoryNumber, shopCost, purchased = 
 function createShopItems(shopDiv, i, inventoryNumber) {
     const inventoryTemp = Inventory[inventoryNumber];
 
-    const shopCost = calculateShopCost(inventoryTemp.Star)
+    const shopCost = Shop.calculateShopCost(inventoryTemp.Star, costDiscount);
     const shopButton = createShopButton(inventoryTemp, inventoryNumber, shopCost, false, i);
     shopDiv.append(shopButton);
 
@@ -12319,8 +12255,7 @@ function loadShopItems(shopDiv, i, inventoryArray) {
     const inventoryNumber = inventoryArray.Item;
 
     const inventoryTemp = Inventory[inventoryNumber];
-    const shopButton = createShopButton(inventoryTemp, inventoryNumber, shopCost, purchased, i);
-    shopDiv.append(shopButton);
+    shopDiv.append(createShopButton(inventoryTemp, inventoryNumber, shopCost, purchased, i));
 
     return shopDiv;
 }

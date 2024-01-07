@@ -43,6 +43,68 @@ const regenBlackPrice = (persistentBlackMarket) => {
     }
 }
 
+const changeStoreDialog = (typeText) => {
+    let dialog = document.getElementById("table7-text");
+    let newText;
+
+    switch (typeText) {
+        case ('clear'):
+        case ('normalLoad'):
+            newText = "Any questions or troubles? I'm here to personally assist you!";
+            break;
+        case ('ascendLoad'):
+            newText = "Dori's Deals now come with extra value!";
+            break;
+        case ('retryConfirm'):
+            newText = "Are you sure? Remember, no refunds!";
+            break;
+        case ('retryAscendConfirm'):
+            newText = "Maybe if you ask nicely, I'll even allow a refund within 24 hours! Hehe, just kidding.";
+            break;
+        case ('purchaseSuccessAscend'):
+            newText = 'See you again soon! Hehe.';
+            break;
+        case ('purchaseSuccessRegular'):
+            newText = "Hehe, you've got good eyes.";
+            break;
+        case ('purchaseFailAscend'):
+            newText = "Now, now, I can't make it any cheaper than that. It'll be daylight robbery!";
+            break;
+        case ('purchaseFailRegular'):
+            newText = "Hmph, come back when you're a little richer.";
+            break;
+        default:
+            console.error(`changeStoreDialog Error: ${dialog}`);
+            break;
+    }
+    dialog.innerText = newText;
+}
+
+const calculateShopCost = (star, costDiscount = 1) => {
+    let shopCost = 0;
+    switch (star) {
+        case 2:
+            shopCost = Math.round(randomInteger(35,55) * costDiscount / 5) * 5;
+            break;
+        case 3: 
+            shopCost = Math.round(randomInteger(70,100) * costDiscount / 5) * 5;
+            break;
+        case 4:
+            shopCost = Math.round(randomInteger(140,210) * costDiscount / 5) * 5;
+            break;
+        case 5:
+            shopCost = Math.round(randomInteger(300,400) * costDiscount / 5) * 5;
+            break;
+        case 6:
+            shopCost = Math.round(randomInteger(600,750) * costDiscount / 5) * 5;
+            break;
+        default:
+            console.error(`calculateShopCost error: Invalid shop cost ${star}`);
+            break;
+    }
+
+    return shopCost;
+}
 
 // SINGLE-USE FUNCTIONS
 const useItem = (key, buttonFunctions) => {
@@ -205,4 +267,4 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
     return shopBlackContainer;
 }
 
-export { drawBlackMarket, updateBlackMarket, regenBlackPrice }
+export { drawBlackMarket, updateBlackMarket, regenBlackPrice, changeStoreDialog, calculateShopCost }

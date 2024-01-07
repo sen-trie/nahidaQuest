@@ -86,6 +86,15 @@ form > button:hover {
     color: black;
 }
 
+.file-submit {
+    width: 100%;
+}
+
+input[type="file"] {
+    font: inherit;
+    color: var(--very-dark-green);
+}
+
 @media (min-width: 1200px) {
     main {
         width: 75%;

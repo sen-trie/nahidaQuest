@@ -25,6 +25,12 @@
       "type": "image/x-icon"
     },
     {
+      "src": "./assets/maskable-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "./assets/apple-touch-icon-iphone-60x60.png",
       "type": "image/png",
       "sizes": "60x60"
