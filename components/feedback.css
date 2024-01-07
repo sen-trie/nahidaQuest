@@ -2,16 +2,20 @@ main {
     flex-grow: 1;
     overflow: hidden;
     padding: 1rem;
+    position: relative;
 }
 
-form {
+form, #questionForm {
     width: 100%;
     height: 100%;
+    padding: 1rem;
     background-color: var(--light-green);
     border: 0.25em solid var(--bright-green);
     border-radius: 1em;
     box-sizing: border-box;
-    padding: 1rem;
+}
+
+form {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -95,6 +99,51 @@ input[type="file"] {
     color: var(--very-dark-green);
 }
 
+[type=radio] { 
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+  
+[type=radio] + img {
+    width: 100%;
+    height: inherit;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+[type=radio]:checked + img {
+    outline: 0.2rem solid var(--bright-green);
+}
+
+#questionForm {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    justify-content: flex-start;
+    gap: 0.6rem;
+    height: fit-content;
+    filter: drop-shadow(0 0 1rem black) drop-shadow(0 0 1rem black);
+}
+
+.question-div {
+    width: 100%;
+    gap: 1%;
+}
+
+.question-div > label {
+    width: 25%;
+    height: 15rem;
+}
+
+.title {
+    font-size: 1.8rem;
+    text-shadow: var(--text-shadow-100);
+    color: white;
+}
+
 @media (min-width: 1200px) {
     main {
         width: 75%;
@@ -113,8 +162,13 @@ input[type="file"] {
         width: 90%;
     }
 
-    form {
+    form, #questionForm  {
         padding: 0.5rem;
+    }
+
+    .question-div > label {
+        width: 25%;
+        height: 5rem;
     }
 }
 
