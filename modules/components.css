@@ -2488,9 +2488,9 @@ input:checked + .slider:before {
 }
 
 .shop-black-card {
-    width: 33%;
+    width: 30%;
     background-color: wheat;
-    border: 0.2rem groove var(--dark-bright-brown);
+    border: 0.2rem solid var(--very-dark-brown);
     box-sizing: border-box;
     font-size: 1.6rem;
 }

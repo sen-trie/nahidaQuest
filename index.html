@@ -17,6 +17,7 @@
         <link rel="apple-touch-icon" sizes="60x60" href="./assets/apple-touch-icon-ipad-76x76.png">
         <link rel="apple-touch-icon" sizes="114x114" href="./assets/apple-touch-icon-iphone-retina-120x120.png">
         <link rel="apple-touch-icon" sizes="144x144" href="./assets/apple-touch-icon-ipad-retina-152x152.png">
+        <link rel="manifest" href="./manifest.json">
         <meta http-equiv='cache-control' content='no-cache'> 
         <meta http-equiv='expires' content='0'> 
         <meta http-equiv='pragma' content='no-cache'>
@@ -179,6 +180,17 @@
             </div>
         </main>
         <script type="module" src="./components/index.js" type="module"></script>
+        <script>
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/service-worker.js')
+                .then((registration) => {
+                  console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch((error) => {
+                  console.error('Service Worker registration failed:', error);
+                });
+            }
+          </script>
     </body>
 </html>
 
