@@ -102,8 +102,46 @@ const calculateShopCost = (star, costDiscount = 1) => {
             console.error(`calculateShopCost error: Invalid shop cost ${star}`);
             break;
     }
-
     return shopCost;
+}
+
+const drawShopItem = (i, upgradedShop = false, inventoryDraw, saveValues) => {
+    let inventoryNumber;
+    if (i >= 7 && i <= 9) {
+        if (upgradedShop) {
+            if (i === 9) {
+                inventoryNumber = 4015;
+            } else {
+                inventoryNumber = 4014;
+            }
+        } else {
+            inventoryNumber = inventoryDraw("talent", 2, 4, "shop");
+        }
+    } else if (i === 6) {
+        inventoryNumber = randomInteger(4011,4014);
+    } else if (i === 5) {
+        if (upgradedShop) {
+            inventoryNumber = 4018;
+        } else if (saveValues["wishUnlocked"] === true) {
+            inventoryNumber = 4010;
+        } else {
+            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
+        }
+    } else if (i >= 3 && i <= 4) {
+        if (upgradedShop) {
+            if (i === 3) {
+                inventoryNumber = 4017;
+            } else {
+                inventoryNumber = 4016;
+            }
+        } else {
+            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
+        }
+    } else {
+        inventoryNumber = inventoryDraw("weapon", 5, 6, "shop");
+    }
+
+    return inventoryNumber;
 }
 
 // SINGLE-USE FUNCTIONS
@@ -267,4 +305,24 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
     return shopBlackContainer;
 }
 
-export { drawBlackMarket, updateBlackMarket, regenBlackPrice, changeStoreDialog, calculateShopCost }
+// ADDS MID-GAME SHOP TAB
+const addShop = (tabChange) => {
+    let tabFlex = document.getElementById("flex-container-TAB");
+    let tabButton = document.createElement("div");
+    tabButton.classList += " tab-button-div";
+    tabButton.id = "tab-5";
+
+    let tabButtonImage = document.createElement("img");
+    tabButtonImage.src = "./assets/icon/tab7.webp";
+    tabButtonImage.classList += " tab-button";
+    tabButtonImage.classList.add("darken")
+
+    tabButton.addEventListener('click', () =>{
+        tabChange(6);
+    })
+
+    tabButton.appendChild(tabButtonImage);
+    tabFlex.appendChild(tabButton);
+}
+
+export { drawBlackMarket, updateBlackMarket, regenBlackPrice, changeStoreDialog, calculateShopCost, addShop, drawShopItem }

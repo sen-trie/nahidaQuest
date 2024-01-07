@@ -68,14 +68,14 @@ const imgKey = {
     15:{Left:"51",  Top:"18",   Level:4,    Wave:[1],               Heads:[11,13]           ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Catalyst:[4,"4-Star \n Catalyst"],    ElectroCryo:      [5,"5-Star \n Electro / Cryo \n Gem"],           Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
     16:{Left:"88",  Top:"45",   Level:4,    Wave:[4,5],             Heads:[18,19]           ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Claymore:[4,"4-Star \n Claymore"],    DendroGeoAnemo:   [5,"5-Star \n Dendro / Geo / Anemo \n Gem"],    Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
     17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,4,5,6,7,8],   Heads:[15,16,17,18,20]  ,Loot:{Artifact:[5,"5-Star \n Artifacts"],  Weapon:[5,"5-Star \n Weapon"],        Talent:           [4,"4-Star \n Talent"],                         Gemstone: [5,"5-Star \n Gem"],                   Level: [4,"4-Star \n Level \n Books"],   Food: [5,"5-Star \n Food \n Item"]}},
-    18:{Left:"53",  Top:"38",   Level:12,   Wave:["1_B","2_B","17_A"]},
-    19:{Left:"80",  Top:"18",   Level:12,   Wave:["6_A","3_A","4_A"]},
-    20:{Left:"81",  Top:"27",   Level:12,   Wave:["7_A","18_A","21_A"]},
-    21:{Left:"77",  Top:"53",   Level:12,   Wave:["5_A","6_A","22_A"]},
-    22:{Left:"43",  Top:"72",   Level:12,   Wave:["8_A","9_A","10_A","12_A"]},
-    23:{Left:"30",  Top:"37",   Level:12,   Wave:["11_B","13_A","14_A"]},
-    24:{Left:"55",  Top:"24",   Level:12,   Wave:["15_B","20_A"]},
-    25:{Left:"66",  Top:"41",   Level:12,   Wave:["16_A","19_A"]},
+    18:{Left:"53",  Top:"38",   Level:12,   Wave:[1,2,17]},
+    19:{Left:"80",  Top:"18",   Level:12,   Wave:[6,3,4]},
+    20:{Left:"81",  Top:"27",   Level:12,   Wave:[7,18,21]},
+    21:{Left:"77",  Top:"53",   Level:12,   Wave:[5,6,22]},
+    22:{Left:"43",  Top:"72",   Level:12,   Wave:[8,9,10,12]},
+    23:{Left:"30",  Top:"37",   Level:12,   Wave:[11,13,14]},
+    24:{Left:"55",  Top:"24",   Level:12,   Wave:[15,20]},
+    25:{Left:"66",  Top:"41",   Level:12,   Wave:[16,19]},
     26:{Left:"78",  Top:"48",   Level:13,   Wave:[1],  Heads:[18,19]        ,Loot:{}},
     27:{Left:"20",  Top:"57",   Level:14,   Wave:[1],  Heads:[26]           ,Loot:{}},
     28:{Left:"80",  Top:"35",   Level:14,   Wave:[2],  Heads:[26]           ,Loot:{}},
@@ -83,41 +83,128 @@ const imgKey = {
     30:{Left:"50",  Top:"29",   Level:14,   Wave:[4],  Heads:[26]           ,Loot:{}},
 }
 
-const sceneInfo = {
-    "0_Meeting":{Type:"Meeting"},
-    "0_Trade_Wait":{Type:"Trade"},
-    "0_LuckCheck_Success":{Type:"LuckCheck"},
-    "0_LuckCheck_Failure":{Type:"LuckCheck"},
-    "1_B":{Type:"LuckCheck"                 ,Lore:"You encountered the [s]Dreadful Withering[/s] as you were exploring. <br><br>Its spread appears to have been localized to this area."},
-    "1_B_Fail":{Type:"LuckCheckFail"        ,Lore:"Oh no! The decay was too overwhelming and you were forced to run away."},
-    "1_B_Success":{Type:"LuckCheckSuccess"  ,Lore:"With your efforts, you were successful in clearing the decay!"},
-    "2_B":{Type:"LuckCheck"                 ,Lore:"You encountered the [s]Dreadful Withering[/s] as you were exploring. <br><br>Some of the nearby fungi have been enraged."},
-    "2_B_Fail":{Type:"LuckCheckFail"        ,Lore:"Oh no! The enraged fungi were too overpowering so you were forced to back away."},
-    "2_B_Success":{Type:"LuckCheckSuccess"  ,Lore:"With your power, you were successful in clearing the decay!"},
-    "3_A":{Type:"Exploration"               ,Lore:"You were able to secure an abandoned boat to sail through the rivers in Sumeru. <br><br>As you sailed along the winding rivers, the sound of the rippling waters provided a calming respite."},
-    "4_A":{Type:"Meeting"                   ,Lore:"The [s]Aranara[/s] were delighted to see a visitor in Vanarana. <br><br>You played games with them, taking a break from your adventure."},
-    "5_A":{Type:"Meeting"                   ,Lore:"You came across [s]Paimon[/s], [s]Bongo-Head[/s] and [s]Kindlejoy[/s] hanging around in Port Ormos. <br><br>Unfortunately, [s]Paimon[/s] doesn't seem to understand what the fungi are saying."},
-    "6_A":{Type:"Trade"                     ,Lore:"Eyeing your wares, a shopkeeper appears to be interested in trading with you. <br><br>Will you accept the deal?"},
-    "7_A":{Type:"Treasure"                  ,Lore:"In a strange commission that you received, the researcher invites you to a delicious meal.<br><br> You happily ate to your hearts content."},
-    "8_A":{Type:"Meeting"                   ,Lore:"While in Aaru Village, you crossed paths with [s]Candace[/s] and [s]Setaria[/s], who are engaged in a conversation. <br><br>You joined in on their chatter."},
-    "9_A":{Type:"Treasure"                  ,Lore:"While trekking in the desert, you came across a caravan that was more than happy to setup camp with your party. <br><br>Both parties exchange stories about their trip."},
-    "10_A":{Type:"Treasure"                 ,Lore:"You stumbled across a [s]Precious Chest[/s] as you were wandering the desert. <br><br>It appears to have all sorts of goodies."},
-    "11_B":{Type:"LuckCheck"                ,Lore:"There's appears to be something [s]shining[/s] underneath the sand. <br><br>Maybe there's burried [s]treasure[/s]?"},
-    "11_B_Fail":{Type:"LuckCheckFail"       ,Lore:"A [s]Wenut[/s] was hiding underneath! <br><br>You were unable to dodge its unexpected charge."},
-    "11_B_Success":{Type:"LuckCheckSuccess" ,Lore:"A [s]Wenut[/s] was hiding underneath! <br><br>You managed to get away with the hidden item in time."},
-    "12_A":{Type:"Meeting"                  ,Lore:"Some strange device appears to be floating around Aaru Village. <br><br>You ponder what its usage was for."},
-    "13_A":{Type:"Exploration"              ,Lore:"While inside, you rack your brain trying to understand the mechanism behind the giant [s]Ruin Guard[/s]. <br><br>Too bad the documentation is long lost by now."},
-    "14_A":{Type:"Meeting"                  ,Lore:"While you were setting up camp, [s]Jeht[/s] and [s]Benben[/s], who were in the area, suddenly appeared. <br><br>They came over to greet you and offered to help setup."},
-    "15_B":{Type:"LuckCheck"                ,Lore:"Deep underground, the [s]Jadeplume Terrorshroom[/s] is guarding something that will be useful to your journey. <br><br>If you're lucky, you can snatch the item without it noticing."},
-    "15_B_Fail":{Type:"LuckCheckFail"       ,Lore:"Unfortunately, the [s]Jadeplume Terrorshroom[/s] noticed your presence before you could get the item."},
-    "15_B_Success":{Type:"LuckCheckSuccess" ,Lore:"With your reflexes, you were able to evade the [s]Jadeplume Terrorshroom's[/s] barrage as you swiped the item right underneath it."},
-    "16_A":{Type:"Meeting"                  ,Lore:"You encountered an unsual [s]Ruin Defender[/s] with a unique color scheme at Pardis Dhyai. <br><br>Somehow, it seems to understand what you are saying."},
-    "17_A":{Type:"Exploration"              ,Lore:"You came across a strange [s]Aranara[/s] that was medidating underneath a waterfall. As a wise forest spirit, it imparts counsel to those who seek it. <br><br>After listening to its advice, you feel [s]invigorated[/s]."},
-    "18_A":{Type:"Exploration"              ,Lore:"[s]Bongo-Head[/s] appears to really want to join you in your adventure. Citing potential dangers, you refuse it from joining. <br><br>After promising some gifts, the fungi eventually gives in."},
-    "19_A":{Type:"Meeting"                  ,Lore:"As you were navigating Sumeru, you were suddenly ambushed by a sudden beam of energy! <br><br>Luckily, you managed to dodge it in time."},
-    "20_A":{Type:"Meeting"                  ,Lore:"Some wild fungi suddenly appeared out of the grass. <br><br>Seeing that you were not hostile, they offered a few of the fruits they gathered."},
-    "21_A":{Type:"Meeting"                  ,Lore:"A suspicious man was spotted on the streets of Sumeru City with a killer's intent on his face. Fortunately, it turned out to be just the [s]Wanderer[/s]. <br><br>You gave him some advice on how to avoid such situations, which he begrudgingly accepted."},
-    "22_A":{Type:"Trade"                    ,Lore:"[s]Dori[/s], the elusive merchant, approaches you with what she calls a [s]'fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal'[/s]. <br><br>Will you accept?"},
+const sceneInfo = { 
+    1: {
+        Scenes: 1,
+        Type: 'LuckCheck',
+        Lore: ["Nahida encountered the [s]Dreadful Withering[/s] as she was exploring. <br><br>Its spread appears to have been localized to this area."],
+        FailLore: "Oh no! The decay was too overwhelming and Nahida was forced to run away.",
+        SuccessLore: "With your efforts, Nahida was successful in clearing the decay!",
+    },
+    2: {
+        Scenes: 1,
+        Type: 'LuckCheck',
+        Lore: ["Nahida encountered the [s]Dreadful Withering[/s] as she was exploring. <br><br>Some of the nearby fungi have been enraged."],
+        FailLore: "Oh no! The enraged fungi were too overpowering so Nahida was forced to back away.",
+        SuccessLore: "With her power, Nahida was successful in clearing the decay!",
+    },
+    3: {
+        Scenes: 1,
+        Type: 'Exploration',
+        Lore: ["Nahida was able to secure an abandoned boat to sail through the rivers in Sumeru. <br><br>As she sailed along the winding rivers, the sound of the rippling waters provided a calming respite."]
+    },
+    4: {
+        Scenes: 1,
+        Type: 'Meeting',
+        Lore: ["The [s]Aranara[/s] were delighted to see a visitor in Vanarana. <br><br>Nahida played games with them, taking a break from the adventure."]
+    },
+    5: {
+        Scenes: 1,
+        Type: 'Meeting',
+        Lore: ["Nahida came across [s]Paimon[/s], [s]Bongo-Head[/s] and [s]Kindlejoy[/s] hanging around in Port Ormos. <br><br>Unfortunately, [s]Paimon[/s] doesn't seem to understand what the fungi are saying."]
+    },
+    6: {
+        Scenes: 1,
+        Type: 'Trade',
+        Lore: ["Eyeing Nahida's wares, a shopkeeper appears to be interested in trading with her. <br><br>Will Nahida accept the deal?"]
+    },
+    7: {
+        Scenes: 1,
+        Type: 'Treasure',
+        Lore: ["In a strange commission that Nahida received, the researcher invites her to a delicious meal.<br><br> Nahida happily ate to her hearts content."]
+    },
+    8: {
+        Scenes: 1,
+        Type: 'Meeting',
+        Lore: ["While in Aaru Village, Nahida crossed paths with [s]Candace[/s] and [s]Setaria[/s], who are engaged in a conversation. <br><br>Nahida joined in on their chatter."]
+    },
+    9: {
+        Scenes: 1,
+        Type: 'Treasure',
+        Lore: ["While trekking in the desert, Nahida came across a caravan that was more than happy to setup camp with her party. <br><br>Both parties exchange stories about their trip."]
+    },
+    10: {
+        Scenes: 1,
+        Type: 'Treasure',
+        Lore: ["Nahida stumbled across a [s]Precious Chest[/s] as she was wandering the desert. <br><br>It appears to have all sorts of goodies."]
+    },
+    11: {
+        Scenes: 1,
+        Type: 'LuckCheck',
+        Lore: ["There's appears to be something [s]shining[/s] underneath the sand. <br><br>Maybe there's burried [s]treasure[/s]?"],
+        FailLore: "A [s]Wenut[/s] was hiding underneath! <br><br>Nahida was unable to dodge its unexpected charge.",
+        SuccessLore: "A [s]Wenut[/s] was hiding underneath! <br><br>Nahida managed to get away with the hidden item in time.",
+    },
+    12: {
+        Scenes: 1,
+        Type: 'Meeting',
+        Lore: ["Some strange device appears to be floating around Aaru Village. <br><br>Nahida ponders what its usage was for."]
+    },
+    13: {
+        Scenes: 1,
+        Type: 'Exploration',
+        Lore: ['While inside, Nahida racks her brain trying to understand the mechanism behind the giant [s]Ruin Guard[/s]. <br><br>Too bad the documentation is long lost by now.']
+    },
+    14: {
+        Scenes: 1,
+        Type: 'Meeting',
+        Lore: ['While Nahida was setting up camp, [s]Jeht[/s] and [s]Benben[/s], who were in the area, suddenly appeared. <br><br>They came over to greet Nahida and offered to help setup.']
+    },
+    15: {
+        Scenes: 1,
+        Type: 'LuckCheck',
+        Lore: ["Deep underground, the [s]Jadeplume Terrorshroom[/s] is guarding something that will be useful to Nahida's journey. <br><br>If she's lucky, Nahida can snatch the item without it noticing."],
+        FailLore: "Unfortunately, the [s]Jadeplume Terrorshroom[/s] noticed Nahida's presence before you could get the item.",
+        SuccessLore: "With Nahida's reflexes, she was able to evade the [s]Jadeplume Terrorshroom's[/s] barrage as she swiped the item right underneath it."
+    },
+    16: {
+        Scenes: 1,
+        Type: 'Meeting',
+        Lore: ["Nahida encountered an unsual [s]Ruin Defender[/s] with a unique look at Pardis Dhyai. <br><br>Somehow, it seems to understand what Nahida is saying."]
+    },
+    17: {
+        Scenes: 1,
+        Type: 'Exploration',
+        Lore: ["Nahida came across a strange [s]Aranara[/s] that was medidating underneath a waterfall. As a wise forest spirit, it imparts counsel to those who seek it. <br><br>After listening to its advice, Nahida felt [s]invigorated[/s]."]
+    },
+    18: {
+        Scenes: 1,
+        Type: 'Exploration',
+        Lore: ['[s]Bongo-Head[/s] appears to really want to join Nahida in her adventure. Worried for its safety, Nahida refused it from joining. <br><br>After promising stories, the fungi eventually gives in.']
+    },
+    19: {
+        Scenes: 1,
+        Type: 'Meeting',
+        Lore: ["As Nahida was navigating Sumeru, Nahida was suddenly ambushed by a sudden beam of energy! <br><br>Luckily, she managed to dodge it in time."]
+    },
+    20: {
+        Scenes: 1,
+        Type: 'Meeting',
+        Lore: ["Some wild fungi suddenly appeared out of the grass. <br><br>Seeing that Nahida was not hostile, they offered a few of the fruits they gathered."]
+    },
+    21: {
+        Scenes: 3,
+        Type: 'Meeting',
+        Lore: ["As Nahida was walking the streets of Sumeru City, she heard rumours of a 'flying man' cruising around the city's perimeter.",
+               "A recent newspaper article shows a picture of this flying person. His figure seems familiar to Nahida.",
+               "The next day, Nahida managed to catch the Wanderer by surprise. She lectures him on the dangers of flying recklessly."
+        ]
+    },
+    22: {
+        Scenes: 1,
+        Type: 'Trade',
+        Lore: ["[s]Dori[/s], the elusive merchant, approaches you with what she calls a [s]'fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal'[/s]. <br><br>Will you accept?"]
+    },
 }
 
 const upgradeInfo = {
@@ -1162,7 +1249,7 @@ const challengeInfo = [
         {'title': 'Rear of the Library', 'desc': 'Possess 50 discounted levels'}, // CH DONE
         {'title': 'Lucky Hits', 'desc': 'Get a Crit on Big Nahida three times in a row'},  // CH DONE
         {'title': 'Living on the Edge', 'desc': 'Escape from the nest of a Jadeplume Terrorshroom'}, // CH DONE
-        {'title': 'Compulsive Shopper', 'desc': "Accept someone's fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal"}, // CH DONE
+        {'title': 'Impulsive Shopper', 'desc': "Accept someone's fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal"}, // CH DONE
         {'title': 'Bug in a Bottle', 'desc': 'Catch 15 raining scarabs'}, // CH DONE
         {'title': 'The Commissioner', 'desc': 'Catch 13 Weasel Thieves'},  // CH DONE
         {'title': 'Green Bond', 'desc': 'Harvest a fully-grown tree for the first time'}, // CH DONE

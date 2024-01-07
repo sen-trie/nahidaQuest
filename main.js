@@ -2,7 +2,8 @@ import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,save
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal } from "./modules/adjustUI.js"
-import * as Shop from "./modules/features/shop.js"
+import * as Shop from "./modules/features/shop.js";
+import * as Expedition from "./modules/features/expedition.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
 // import * as drawUI from "./modules/drawUI.js"
 
@@ -381,7 +382,7 @@ saveValues["realScore"]--;
 createMultiplierButton();
 createExpMap();
 createExpedition();
-expedInfo("exped-7");
+Expedition.expedInfo("exped-7", expeditionDict, saveValues, persistentValues);
 let advButtonTemp = document.getElementById("adventure-button");
 advButtonTemp.classList.remove("expedition-selected");
 
@@ -442,8 +443,8 @@ window.oncontextmenu = function (){
 }
 
 // ALL TIME-EVENTS SYNC TO THIS FUNCTION (TIME REFRESH FREQUENCY SET TO TIME RATIO)
+// 1 timerSeconds = 1 SECOND IN REAL TIME
 function timerEvents() {
-    // 1 timerSeconds = 1 SECOND IN REAL TIME
     let timeRatioTemp = timeRatio / 1000;
     timerSeconds += timeRatioTemp;
     
@@ -954,7 +955,7 @@ function randomEventTimer(timerSeconds) {
             eventChance = 0;
             eventTimes++;
             startRandomEvent();
-            updateMorale("recover", 5);
+            updateMorale("recover", 3);
 
             const currentTime = getTime();
             persistentValues.timeSpentValue += currentTime - persistentValues.lastRecordedTime;
@@ -1218,7 +1219,7 @@ function reactionFunction(eventBackdrop) {
         outcomeText = "You missed!";
     } else if (reactionReady == true) {
         reactionCorrectElement.play();
-        adventure("10-");
+        genericItemLoot();
         primogem = randomInteger(40,60);
         outcomeText = "You did it!";
     }
@@ -1269,7 +1270,7 @@ function boxOpen(eventBackdrop,specialBox) {
     if (specialBox) {
         let randomSpecial = randomInteger(2,6);
         outcomeNumber = randomInteger(5,15);
-        adventure("10-");
+        genericItemLoot();
         boxOutcome.src = `./assets/event/verygood-${randomSpecial}.webp`;
         outcomeText = specialText[randomSpecial-2];
     } else {
@@ -1478,7 +1479,7 @@ function minesweeperEvent() {
 
                 if (cellsLeft <= 0) {
                     let randomPrimo = randomInteger(200, 400);
-                    adventure("10-");
+                    genericItemLoot();
                     newPop(1);
                     sortList("table2");
 
@@ -2861,12 +2862,12 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
 
         if (weaselCount >= 10) {
             innerTextTemp = `\n You received some items!`;
-            adventure("10-");
+            genericItemLoot();
             newPop(1);
             amount = randomInteger(100,140);
         } else if (weaselCount >= 7) {
             innerTextTemp = `\n You received a few items!`;
-            adventure("10-");
+            genericItemLoot();
             newPop(1);
             amount = randomInteger(60,100);
         } else if (weaselCount >= 4) {
@@ -2972,16 +2973,16 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
                 } else if (type === "simon") {
                     if (amount != 0) {
                         currencyPopUp("primogem",amount,"items",0);
-                        adventure("10-");
+                        genericItemLoot();
                         newPop(1);
                         sortList("table2");
                     }
                 } else if (type === "battleship") {
                     if (amount != 0) {
                         currencyPopUp("items",0);
-                        adventure("10-");
-                        adventure("10-");
-                        adventure("10-");
+                        genericItemLoot();
+                        genericItemLoot();
+                        genericItemLoot();
                         newPop(1);
                         sortList("table2");
                     }
@@ -2990,18 +2991,18 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
                         currencyPopUp("primogem",amount);
                     }  else if (amount < 140) {
                         currencyPopUp("primogem",amount,"items",0);
-                        adventure("10-");
+                        genericItemLoot();
                         newPop(1);
                         sortList("table2");
                     }  else if (amount < 220) {
                         currencyPopUp("primogem",amount,"items",0);
-                        adventure("10-");
+                        genericItemLoot();
                         newPop(1);
                         sortList("table2");
                     } else if (amount < 305) {
                         currencyPopUp("primogem",amount,"items",0);
-                        adventure("10-");
-                        adventure("10-");
+                        genericItemLoot();
+                        genericItemLoot();
                         newPop(1);
                         sortList("table2");
                     }
@@ -3279,7 +3280,7 @@ function createTabs() {
     }
 
     if (storeInventory.active == true) {
-        addShop();
+        Shop.addShop(tabChange);
     }
 }
 
@@ -5484,49 +5485,50 @@ function foodButton(type) {
 const ADVENTURECOSTS = [0, 100, 250, 500, 750, 1000];
 function adventure(advType) {
     let type = parseInt(advType.split("-")[0]);
-    if (type !== 10 && expeditionDict[type] != '1') {
-        let wave = rollArray(JSON.parse(advType.split("-")[1]),0);
+    if (expeditionDict[type] != '1') {
+        let wave = rollArray(JSON.parse(advType.split("-")[1]), 0);
         if (saveValues["energy"] >= ADVENTURECOSTS[type <= 5 && type > 1 ? type : 0]) {
             adventureElement.load();
             adventureElement.play();
             saveValues["energy"] -= ADVENTURECOSTS[type <= 5 && type > 1  ? type : 0];
-            updateMorale("add",(randomInteger(7,10) * -1));
+            updateMorale("add",(randomInteger(7, 15) * -1));
 
             if (activeLeader == "Paimon" && type <= 5 && type > 1) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.15)}
 
             if (!persistentValues.tutorialBasic) {
-                customTutorial("advTut", 6, ()=>{drawAdventure(type,wave)});
+                customTutorial("advTut", 6, () => { drawAdventure(type, wave) });
                 persistentValues.tutorialBasic = true;
             } else if (type >= 3 && type < 6 && persistentValues.tutorialRanged != true) {
-                customTutorial("rangTut", 2, ()=>{drawAdventure(type,wave)});
+                customTutorial("rangTut", 2, () => { drawAdventure(type, wave) });
                 persistentValues.tutorialRanged = true;
             } else {
-                drawAdventure(type,wave);
+                drawAdventure(type, wave);
             }
         } else {
-            expedInfo("exped-9");
+            Expedition.expedInfo("exped-9", expeditionDict, saveValues, persistentValues);
             weaselDecoy.load();
             weaselDecoy.play();
-        }
-    } else if (type === 10) {
-        if (expeditionDict[5] != '1') {
-            type = 5;
-        } else if (expeditionDict[4] != '1') {
-            type = 4;
-        } else if (expeditionDict[3] != '1') {
-            type = 3;
-        } else {
-            type = 2;
-        }
-
-        drawLoot(type);
-        sortList("table2");
-        newPop(1);
-    } else if (expeditionDict[type] == '1'){
+        } 
+    } else {
         console.error(`Invalid Expedition Type: ${type}`);
         return;  
     }
 } 
+
+function genericItemLoot() {
+    let type = 2;
+    if (expeditionDict[5] != '1') {
+        type = 5;
+    } else if (expeditionDict[4] != '1') {
+        type = 4;
+    } else if (expeditionDict[3] != '1') {
+        type = 3;
+    }
+
+    drawLoot(type);
+    sortList("table2");
+    newPop(1);
+}
 
 function drawLoot(type) {
     let randomDraw = randomInteger(1,3);
@@ -5588,90 +5590,28 @@ function drawLoot(type) {
 
 // ADVENTURE SEGMENT DRAW
 function createAdventure() {
-    let adventureArea = document.createElement("div");
-    adventureArea.id = "adventure-area";
-    adventureArea.style.zIndex = -1;
-    adventureArea.classList.add("adventure-area","flex-column");
+    const adventureVideo = Expedition.createTopHalf();
+    const adventureTextBox = createDom('div', {
+        id: "adventure-text",
+        class: ["adventure-text", "flex-row"],
+        questNumber: null,
+    });
 
-    let adventureVideo = document.createElement("div");
-    adventureVideo.id = "adventure-video";
-    adventureVideo.classList.add("adventure-video","flex-row");
+    const [adventureEncounter, adventureChoiceOne] = Expedition.createEncounterHalf();
+    const [adventureFightDiv, adventureFightDodge, adventureFightSkill, adventureFightBurst] = Expedition.createBattleHalf(MOBILE);
 
-    let adventureTextBox = document.createElement("div");
-    adventureTextBox.id = "adventure-text";
-    adventureTextBox.classList.add("adventure-text","flex-row");
-    adventureTextBox.questNumber = null;
-
-    let adventureTextBG = new Image();
-    adventureTextBG.src = "./assets/expedbg/table.webp";
-    let adventureHealth = document.createElement("div");
-    adventureHealth.id = "adventure-health";
-    adventureHealth.classList.add("flex-row");
-    adventureHealth.style.opacity = 0;
-    let adventureHealthbarDiv = document.createElement("div");
-    adventureHealthbarDiv.id = "health-bar";
-    
-    adventureHealth.append(adventureHealthbarDiv);
-    let adventureGif = new Image();
-    adventureGif.id = "adventure-gif";
-    adventureGif.classList.add('adventure-gif');
-    adventureGif.src = "./assets/expedbg/exped-Nahida.webp";
-    adventureVideo.append(adventureGif, adventureHealth);
-
-    let adventureEncounter = document.createElement("div");
-    adventureEncounter.id = "adventure-encounter";
-    adventureEncounter.classList.add("flex-column");
-    adventureEncounter.style.display = "flex";
-
-    let adventureHeading = document.createElement("p");
-    adventureHeading.id = "adventure-header";
-    let adventureRewards = document.createElement("div");
-    adventureRewards.classList.add("adventure-rewards","flex-row");
-    adventureRewards.id = "adventure-rewards";
-    let adventureChoiceOne = document.createElement("button");
-    adventureChoiceOne.innerText = "Fight!";
-    adventureChoiceOne.id = "adv-button-one";
-    adventureChoiceOne.pressAllowed = false;
-    // let adventureChoiceTwo = document.createElement("button");
-    // adventureChoiceTwo.id = "adv-button-two";
-
-    let adventureFight = document.createElement("div");
-    adventureFight.id = "adventure-fight";
-    adventureFight.classList.add("adventure-fight");
-    adventureFight.style.display = "none";
-
-    let fightTextbox = document.createElement("p");
-    fightTextbox.classList.add("flex-column")
-    fightTextbox.id = "fight-text";
-    fightTextbox.innerText = "Prepare for a fight!";
-
-    let adventureFightDodge = document.createElement("div");
-    let adventureFightDodgeImg = new Image();
-    adventureFightDodgeImg.src = "./assets/expedbg/battle1.webp";
-    adventureFightDodge.append(adventureFightDodgeImg);
-
-    adventureFightDodge.id = "battle-toggle";
     adventureFightDodge.addEventListener("click",()=>{
-        dodgeOn("toggle",adventureFightDodge);
-    })
-    
-    let adventureFightSkill = document.createElement("div");
-    adventureFightSkill.id = "battle-skill";
-    let adventureFightSkillImg = new Image();
-    adventureFightSkillImg.src = "./assets/expedbg/battle2.webp";
-    adventureFightSkill.append(adventureFightSkillImg);
+        dodgeOn("toggle", adventureFightDodge);
+    });
+
     adventureFightSkill.addEventListener("click",()=>{
         skillUse();
-    })
+    });
 
-    let adventureFightBurst = document.createElement("div");
-    let adventureFightBurstImg = new Image();
-    adventureFightBurstImg.src = "./assets/expedbg/battle3.webp";
-    adventureFightBurst.append(adventureFightBurstImg)
     adventureFightBurst.addEventListener("click",()=>{
         attackAll(adventureFightBurst);
-    })
-
+    });
+    
     document.addEventListener("keydown", function(event) {
         if (adventureScene) {
             if (event.key === "z" || event.key === "q") {
@@ -5680,45 +5620,54 @@ function createAdventure() {
                 adventureFightSkill.click();
             } else if (event.key === "c" || event.key === "e") {
                 adventureFightBurst.click();
-         
             }
         }
-    })
+    });
 
-    adventureFight.append(fightTextbox,adventureFightDodge,adventureFightSkill,adventureFightBurst);
-    adventureFight.style.display = "none";
-    const adventureFightChild = adventureFight.childNodes;
-    const keyCodes = [0,"Q","W","E"];
-    for (let i = 0; i < adventureFightChild.length; i++) {
-        if (adventureFightChild[i].tagName === "DIV") {
-            if (!MOBILE) {
-                let keyImg = document.createElement("p");
-                keyImg.innerText = keyCodes[i];
-                adventureFightChild[i].appendChild(keyImg);
-            }
-        }
+    adventureTextBox.switchToBattle = () => {
+        adventureEncounter.style.display = "none";
+        adventureChoiceOne.style.display = "none";
+        adventureFightDiv.style.display = "flex";
     }
 
+    adventureChoiceOne.switchWorldQuest = (advType) => {
+        adventureChoiceOne.style.display = "block";
+        adventureChoiceOne.pressAllowed = false;
+        adventureChoiceOne.innerText = "Next";
+        adventureChoiceOne.advType = advType;
+        adventureChoiceOne.maxScene = null;
+        adventureChoiceOne.currentScene = null;
+    }
 
     adventureChoiceOne.addEventListener("click",()=>{
         if (adventureChoiceOne.pressAllowed) {
             if (adventureChoiceOne.advType != 12) {
                 adventureChoiceOne.pressAllowed = false;
                 triggerFight();
-                adventureEncounter.style.display = "none";
-                adventureFight.style.display = "flex";
-                adventureChoiceOne.style.display = "none";
+                adventureTextBox.switchToBattle();
             } else {
-                if (!transitionScene.includes(adventureTextBox.questNumber)) {worldQuestDict.currentWorldQuest = adventureTextBox.questNumber}
-                continueQuest(adventureTextBox.questNumber);
+                if (adventureChoiceOne.currentScene === 'Finale') {
+                    return;
+                } else if (adventureChoiceOne.currentScene < adventureChoiceOne.maxScene) {
+                    continueQuest(adventureTextBox.questNumber);
+                } else if (adventureChoiceOne.currentScene === adventureChoiceOne.maxScene) {
+                    finishQuest(adventureTextBox.questNumber);
+                } else {
+                    console.error(`drawWorldQuest Error: ${adventureTextBox.questNumber}`)
+                }
             }
         }
-    })
-
-    adventureEncounter.append(adventureHeading,adventureRewards,adventureChoiceOne);
-    adventureTextBox.append(adventureTextBG,adventureEncounter,adventureFight)
-    adventureArea.append(adventureVideo,adventureTextBox)
-    mainBody.append(adventureArea);
+    });
+    
+    adventureTextBox.append((createDom('img', { src: './assets/expedbg/table.webp' })), adventureEncounter, adventureFightDiv);
+    mainBody.append(
+        createDom('div', {
+            id: "adventure-area",
+            class: ["adventure-area", "flex-column"],
+            style: { zIndex: -1 },
+            child: [adventureVideo, adventureTextBox]
+        })
+    );
 }
 
 
@@ -5835,17 +5784,19 @@ function createExpedition() {
     charMorale.classList.add("char-morale");
     let moraleLore = document.createElement("p");
     moraleLore.style.display = "none";
-    charMorale.append(moraleLore);
 
+    charMorale.append(moraleLore);
     charMorale.addEventListener("click",()=>{
         universalStyleCheck(moraleLore,"display","block","none");
     })
 
     let guildTable = createGuild();
-    let advButton = document.createElement("div");
-    advButton.id = "adventure-button";
-    advButton.classList.add("background-image-cover");
-    advButton.innerText = "Adventure!"
+    let advButton = createDom("div", {
+        id: "adventure-button",
+        class: ["background-image-cover"],
+        innerText: 'Adventure!'
+    });
+
     advButton.addEventListener("click",() => {
         if (adventureType != 0) {
             if (adventureType == "10-[]") {
@@ -5858,12 +5809,15 @@ function createExpedition() {
         }
     })
 
-    let advTutorial = document.createElement("img");
-    advTutorial.src = "./assets/icon/help.webp";
-    advTutorial.id = "adventure-tutorial";
+    let advTutorial = createDom("img", {
+        src: './assets/icon/help.webp',
+        id: 'adventure-tutorial'
+    });
+
     advTutorial.addEventListener("click", () => {
-        customTutorial("advTut",6)
+        customTutorial("advTut", 6);
     })
+
     table3.append(charMorale,advButton,advTutorial);
     updateMorale("load");
 }
@@ -5910,7 +5864,7 @@ function createGuild() {
     guildTable.classList.add("flex-row","guild-table","cover-all");
     guildTable.style.display = "none";
     guildTable.toggle = function() {
-        universalStyleCheck(this,"display","flex","none");
+        universalStyleCheck(this, "display", "flex", "none");
     }
 
     guildTable.close = function() {
@@ -6885,7 +6839,7 @@ function clearExped() {
             old_exped.classList.remove("expedition-selected");
         }
         adventureType = 0;
-        expedInfo("exped-7");
+        Expedition.expedInfo("exped-7", expeditionDict, saveValues, persistentValues);
         let advButton = document.getElementById("adventure-button");
             if (advButton.classList.contains("expedition-selected")) {
                 advButton.classList.remove("expedition-selected");
@@ -6893,130 +6847,6 @@ function clearExped() {
     }
 }
 
-const recommendedLevel = [0,1,4,7,10,13,16,20];
-function expedInfo(butId) {
-    let expedRow1 = document.getElementById("exped-text");
-    let expedRow2 = document.getElementById("exped-lore");
-    let expedBottom = document.getElementById("exped-bottom");
-
-    let level = butId.split("-")[1];
-    let id = butId.split("-")[2];
-
-    if (expeditionDict[level] == 0 || level == 7) {
-        let advButton = document.getElementById("adventure-button");
-        if (!advButton.classList.contains("expedition-selected")) {
-            advButton.classList.add("expedition-selected");
-        }
-        expedRow1.innerHTML = `<p>${expeditionDictInfo[level]["Text"]}</p>`;
-
-        let textHTML = expeditionDictInfo[level]["Lore"];
-
-        if (level == 7) {
-            if (saveValues.goldenTutorial === false) {
-                textHTML = 'Current Objective: Obtain a Golden Nut [Expedition]';
-            } else if (persistentValues.tutorialAscend === false) {
-                textHTML = 'Current Objective: Get a lot of Golden Cores [Transcend]';
-            } else if (persistentValues.finaleBossDefeat === false) {
-                textHTML = 'Current Objective: Stop the Leyline Outbreak [Trees]';
-            } else if (persistentValues.allChallenges === false) {
-                textHTML = 'Current Objective: Complete all Challenges [5 Tiers]';
-            } else {
-                textHTML = 'Current Objective: All done!';
-            }
-        }
-        
-        expedRow2.innerHTML = textHTML;
-    } else if (level >= 8 && level <= 11) {
-        expedRow1.innerHTML =  `<p>${expeditionDictInfo[level]["Text"]}</p>`;
-        expedRow2.innerHTML = expeditionDictInfo[level]["Lore"];
-    } else {
-        expedRow1.innerHTML = `<p>${expeditionDictInfo[6]["Text"]}</p>`;
-        expedRow2.innerHTML = expeditionDictInfo[6]["Lore"];
-    }
-
-    let enemyInfo = document.getElementById("exped-container");
-    let lootInfo = document.getElementById("exped-loot");
-    let expedImg = document.getElementById("exped-img");
-    if (enemyInfo.currentWave != id) {
-        while (enemyInfo.firstChild) {
-            enemyInfo.removeChild(enemyInfo.firstChild);
-        }
-        lootInfo.innerText = "";
-    } 
-
-    if ((level < 6 && level > 0) || level >= 13) {
-        expedRow1.innerHTML += `<img class="icon primogem" src="./assets/icon/energyIcon.webp"></img>`;
-        let heads = imgKey[id].Heads;
-        for (let j = 0; j < heads.length; j++) {
-            let img = new Image();
-            img.classList.add("enemy-head");
-            img.src = `./assets/expedbg/heads/${heads[j]}.webp`;
-            enemyInfo.appendChild(img);
-        }
-
-        let lootHTML = `<span style='font-size:1.2em'>Recommended Rank: ${recommendedLevel[level >= 13 ? (level - 7) : level]}</span>  <br> Max Potential Rewards: <br> [container]`;
-        let lootTable = imgKey[id].Loot;
-        let invDiv = document.createElement("div");
-        invDiv.classList.add("inv-div","flex-row");
-        invDiv.activeInfo = null;
-        invDiv.activeImg = null;
-        for (let key in lootTable) {
-            let lootDiv = document.createElement("div");
-            lootDiv.classList.add('flex-column');
-            let img = new Image();
-            img.src = `./assets/expedbg/loot/${key}.webp`;
-            img.addEventListener("click",()=>{
-                let popUpLoot = document.createElement("div");
-                popUpLoot.classList.add("flex-column",'pop-up-loot');
-                popUpLoot.innerText = lootTable[key][1];
-
-                if (invDiv.activeInfo != null) {
-                    if (invDiv.activeInfo.outerHTML == popUpLoot.outerHTML) {
-                        invDiv.activeInfo.remove();
-                        invDiv.activeInfo = null;
-    
-                        invDiv.activeImg.style.filter = "none";
-                        invDiv.activeImg = null;
-                        return;
-                    } else {
-                        invDiv.activeImg.style.filter = "none";
-                        invDiv.activeInfo.remove();
-                    }
-                }
-
-                img.style.filter = "brightness(0.1)";
-                invDiv.activeImg = img;
-                lootDiv.appendChild(popUpLoot);
-                invDiv.activeInfo = popUpLoot;
-            })
-            let star = new Image();
-            star.src = `./assets/frames/star-${lootTable[key][0]}.webp`;
-
-            lootDiv.append(star, img);
-            invDiv.appendChild(lootDiv);
-        }
-
-        lootHTML = lootHTML.replace('[container]','');
-        lootInfo.innerHTML = `${lootHTML}`;
-        lootInfo.appendChild(invDiv)
-
-        expedImg.src = `./assets/expedbg/header/${id}.webp`;
-        expedRow2.style.borderBottom = "0.2em solid #8B857C";
-        enemyInfo.style.borderRight = "0.2em solid #8B857C";
-        expedBottom.style.display = "flex";
-    } else if (level == 10) {
-        expedImg.src = `./assets/expedbg/header/1.webp`;
-        expedRow2.style.borderBottom = "none";
-        enemyInfo.style.borderRight = "none";
-        expedBottom.style.display = "none";
-    } else {
-        expedImg.src = `./assets/expedbg/header/0.webp`;
-        expedRow2.style.borderBottom = "none";
-        enemyInfo.style.borderRight = "none";
-        expedBottom.style.display = "none";
-    }
-    enemyInfo.currentWave = id;
-}
 
 //------------------------------------------------ ADVENTURE & FIGHTS ----------------------------------------------------------//
 function createExpMap() {
@@ -7154,7 +6984,7 @@ function createExpMap() {
     }
 
     for (let key in imgKey) {
-        if (key > 17) {break}
+        // if (key > 17) {break}
         spawnKey(advImage,imgKey,key);
     }
 
@@ -7329,7 +7159,7 @@ function notifPop(type,icon,count) {
                     let advButton = document.getElementById("adventure-button");
                     adventureType = 0;
                     advButton.key = 0;
-                    expedInfo("exped-11");
+                    Expedition.expedInfo("exped-11", expeditionDict, saveValues, persistentValues);
                     if (advButton.classList.contains("expedition-selected")) {
                         advButton.classList.remove("expedition-selected");
                     }
@@ -7393,7 +7223,7 @@ function unlockExpedition(i,expeditionDict) {
                 button.addEventListener("click",()=>{
                     if (adventureType == `${button.level}-[${button.wave}]`) {
                         adventureType = 0;
-                        expedInfo("exped-7");
+                        Expedition.expedInfo("exped-7", expeditionDict, saveValues, persistentValues);
                         let advButton = document.getElementById("adventure-button");
                         if (advButton.classList.contains("expedition-selected")) {
                             advButton.classList.remove("expedition-selected");
@@ -7401,7 +7231,7 @@ function unlockExpedition(i,expeditionDict) {
                     } else {
                         clearExped();
                         adventureType = `${button.level}-[${button.wave}]`;
-                        expedInfo(`exped-${button.level}-${j+1}`);
+                        Expedition.expedInfo(`exped-${button.level}-${j+1}`, expeditionDict, saveValues, persistentValues);
                     }  
                 })
             }
@@ -7413,10 +7243,10 @@ function unlockExpedition(i,expeditionDict) {
 const adventurePreload = new Preload();
 const adventureWorker = new Worker('./modules/workers.js');
 function drawAdventure(advType, wave) {
+    if (adventureScene) {return}
     adventureScaraText = (advType === 5 || (advType === 14 && wave === 3)) ? "-scara" : "";
     lootArray = {};
 
-    if (adventureScene) {return}
     adventureScene = true;
     stopSpawnEvents = true;
 
@@ -7595,7 +7425,7 @@ function spawnKey(advImage,imgKey,key,worldQuest) {
             if (!activeLeader) {
                 adventureType = 0;
                 advButton.key = 0;
-                expedInfo("exped-11");
+                Expedition.expedInfo("exped-11", expeditionDict, saveValues, persistentValues);
                 if (advButton.classList.contains("expedition-selected")) {
                     advButton.classList.remove("expedition-selected");
                 }
@@ -7603,7 +7433,7 @@ function spawnKey(advImage,imgKey,key,worldQuest) {
                 adventureType = 0;
                 advButton.key = 0;
                 clearExped();
-                expedInfo("exped-7");
+                Expedition.expedInfo("exped-7", expeditionDict, saveValues, persistentValues);
                 if (advButton.classList.contains("expedition-selected")) {
                     advButton.classList.remove("expedition-selected");
                 }
@@ -7611,7 +7441,7 @@ function spawnKey(advImage,imgKey,key,worldQuest) {
                 clearExped();
                 adventureType = `${level}-[${wave}]`;
                 advButton.key = key;
-                expedInfo(`exped-${level}-${key}`);
+                Expedition.expedInfo(`exped-${level}-${key}`, expeditionDict, saveValues, persistentValues);
             }  
         })
     }
@@ -7625,7 +7455,7 @@ function spawnWorldQuest() {
         notifPop("clearAll","quest");
     }
 
-    let rollQuest = randomInteger(18,26);
+    let rollQuest = randomInteger(18, 26);
     let mapImage = document.getElementById('sumeru-map');
     spawnKey(mapImage, imgKey, rollQuest, true);
     notifPop("add", "quest", 1);
@@ -7644,30 +7474,28 @@ function spawnBossQuest(num) {
 
 function drawWorldQuest(advType) {
     let adventureChoiceOne = document.getElementById("adv-button-one");
-    adventureChoiceOne.style.display = "block";
-    adventureChoiceOne.pressAllowed = false;
-    adventureChoiceOne.innerText = "Next";
-    adventureChoiceOne.advType = advType.split("-")[0];
+    adventureChoiceOne.switchWorldQuest(advType.split("-")[0]);
 
     advType = advType.split("-")[1];
-    advType = advType.substring(1, advType.length-1).split(",");
-    advType = rollArray(advType,0);
+    advType = JSON.parse(advType).map(Number);
+    const questId = rollArray(advType, 0);
+
+    let adventureVideo = document.getElementById("adventure-video");
+    adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${questId}-1.webp`;
 
     let adventureArea = document.getElementById("adventure-area");
     let adventureTextBox = document.getElementById("adventure-text");
-    adventureTextBox.questNumber = advType;
+    adventureTextBox.questNumber = questId;
     let adventureRewards = document.getElementById("adventure-rewards");
     adventureRewards.style.opacity = "0";
     adventureRewards.style.flexGrow = "0";
-
-    let adventureVideo = document.getElementById("adventure-video");
-    adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${advType}.webp`;
+    
     let adventureHeading = document.getElementById("adventure-header");
     adventureHeading.style.flexGrow = "1";
     adventureHeading.style.overflowY = "auto";
 
     let preloadedImage = new Image();
-    preloadedImage.src = `./assets/expedbg/choice/${advType}.webp`;
+    preloadedImage.src = `./assets/expedbg/choice/${questId}-1.webp`;
     preloadedImage.onload = ()=> {
         adventureArea.style.zIndex = 500;
         adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
@@ -7675,67 +7503,85 @@ function drawWorldQuest(advType) {
     }
     
     function textFadeIn() {
+        let sceneDict = sceneInfo[questId];
+
         adventureHeading.style.top = "10%";
         adventureHeading.style.animation = "fadeOut 0.8s ease-out reverse";
+        adventureChoiceOne.maxScene = sceneDict.Scenes;
+        adventureChoiceOne.currentScene = 1;
         adventureChoiceOne.pressAllowed = true;
 
-        let text = sceneInfo[advType].Lore;
+        let text = sceneDict.Lore[0];
         adventureHeading.innerHTML = textReplacer({
             "[s]":`<span style='color:#A97803'>`,
             "[/s]":`</span>`,
         },text)
 
         adventureTextBox.style.animation = "";
-        adventureTextBox.removeEventListener("animationend", textFadeIn,true);
+        adventureTextBox.removeEventListener("animationend", textFadeIn, true);
     }
 }
 
 function continueQuest(advType) {
+    const adventureChoiceOne = document.getElementById('adv-button-one');
+
+    let infoDict = sceneInfo[advType].Lore;
+    let adventureVideo = document.getElementById("adventure-video");
+    adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${advType}-${adventureChoiceOne.currentScene + 1}.webp`;
+
+    let adventureHeading = document.getElementById("adventure-header");
+    adventureHeading.innerHTML = textReplacer({
+        "[s]":`<span style='color:#A97803'>`,
+        "[/s]":`</span>`,
+    }, infoDict[adventureChoiceOne.currentScene]);
+
+    adventureChoiceOne.currentScene++;
+}
+
+function finishQuest(advType) {
+    const adventureChoiceOne = document.getElementById('adv-button-one');
+    adventureChoiceOne.currentScene = 'Finale';
+
     let infoDict = sceneInfo[advType];
     if (infoDict.Type === "LuckCheck") {
-        if (advType === "0_LuckCheck_Failure") {
-            saveValues.energy -= 100;
-            saveValues.energy = Math.max(saveValues.energy, 0);
-            quitQuest();
-            return;
-        } else if (advType === "0_LuckCheck_Success") {
-            gainXP("variable",2);
-            quitQuest();
-
-            if (worldQuestDict.currentWorldQuest === "15_B") {
-                challengeNotification(({category: 'specific', value: [0,5]}))
-            }
-            return;
-        }
-
-        let adventureVideo = document.getElementById("adventure-video");
-        let adventureHeading = document.getElementById("adventure-header");
-        let adventureTextBox = document.getElementById("adventure-text");
-
         let rollChance = randomInteger(1,101) + luckRate;
         let rollOutcome;
         if (rollChance > 50) {
             rollOutcome = "Success";
-            adventureTextBox.questNumber = "0_LuckCheck_Success";
         } else {
             rollOutcome = "Fail";
-            adventureTextBox.questNumber = "0_LuckCheck_Failure";
         }
 
-        adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${advType}_${rollOutcome}.webp`;
-        let text = sceneInfo[`${advType}_${rollOutcome}`].Lore;
+        let res = () => {
+            if (rollOutcome === "Fail") {
+                saveValues.energy -= 100;
+                saveValues.energy = Math.max(saveValues.energy, 0);
+            } else {
+                gainXP("variable", 2);
+                if (worldQuestDict.currentWorldQuest === "15_B") {
+                    challengeNotification(({category: 'specific', value: [0,5]}))
+                }
+            }
+        }
+       
+        let adventureVideo = document.getElementById("adventure-video");
+        adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${advType}-${rollOutcome}.webp`;
+
+        let adventureHeading = document.getElementById("adventure-header");
         adventureHeading.innerHTML = textReplacer({
             "[s]":`<span style='color:#A97803'>`,
             "[/s]":`</span>`,
-        },text);
+        }, infoDict[rollOutcome === "Fail" ? 'FailLore' : 'SuccessLore']);
+
+        adventureChoiceOne.addEventListener('click', () => {quitQuest(res)}, { once: true });
     } else if (infoDict.Type === "Meeting") {
-        updateMorale("add",randomInteger(6,10));
+        updateMorale("add", randomInteger(6,10));
         quitQuest();
         gainXP("variable");
     } else if (infoDict.Type === "Exploration") {
         quitQuest();
         gainXP("variable");
-        if (advType === "17_A" || advType === "3_A") {
+        if (advType === 17 || advType === 3) {
             let energyRoll = Math.round(randomInteger(150,250) / 5) * 5;
             saveValues.energy += energyRoll;
             persistentValues.lifetimeEnergyValue += energyRoll;
@@ -7745,13 +7591,13 @@ function continueQuest(advType) {
         }
     } else if (infoDict.Type === "Treasure") {
         quitQuest();
-        if (advType === "10_A") {
-            adventure("10-");
+        if (advType === 10) {
+            genericItemLoot();
 
             currencyPopUp("items",0);
             newPop(1);
             sortList("table2");
-        } else if (advType === "7_A" || advType === "9_A") {
+        } else if (advType === 7 || advType === 9) {
             inventoryDraw("food", 2, 4);
             inventoryDraw("food", 2, 4);
 
@@ -7760,7 +7606,79 @@ function continueQuest(advType) {
             sortList("table2");
         }
     } else if (infoDict.Type === "Trade") {
-        if (advType === "0_Trade_Wait") {
+        let adventureHeading = document.getElementById("adventure-header");
+        let adventureVideo = document.getElementById("adventure-video")
+        adventureVideo.classList.add("transcend-dark");
+
+        let inventoryOffer = document.createElement("div");
+        inventoryOffer.id = "inventory-offer";
+        inventoryOffer.offer = null;
+        let offerCurrency = document.createElement("p");
+        offerCurrency.value = 0;
+        offerCurrency.id = "offer-amount";
+
+        let acceptButton = new Image();
+        acceptButton.src = "./assets/icon/thumbsUp.webp";
+        acceptButton.classList.add("dim-filter");
+        let rejectButton = new Image();
+        rejectButton.classList.add("dim-filter");
+        rejectButton.src = "./assets/icon/thumbsDown.webp";
+
+        acceptButton.addEventListener("click",() => {
+            if (saveValues.primogem > offerCurrency.value) {
+                inventoryOffer.offer = true;
+                adventureHeading.innerHTML = "You are accepting the trade. <br><br>Click 'Next' to confirm.";
+                if (acceptButton.classList.contains("dim-filter")) {acceptButton.classList.remove("dim-filter")}
+                if (!rejectButton.classList.contains("dim-filter")) {rejectButton.classList.add("dim-filter")}
+            } else {
+                adventureHeading.innerHTML = "You do not have enough primogems for the trade.";
+                weaselDecoy.load();
+                weaselDecoy.play();
+            }
+        });
+
+        rejectButton.addEventListener("click",()=>{
+            inventoryOffer.offer = false;
+            adventureHeading.innerHTML = "You are rejecting the trade. <br><br>Click 'Next' to confirm.";
+            if (!acceptButton.classList.contains("dim-filter")) {acceptButton.classList.add("dim-filter")}
+            if (rejectButton.classList.contains("dim-filter")) {rejectButton.classList.remove("dim-filter")}
+        });
+
+        let currencyAmount = document.createElement("div");
+        currencyAmount.innerText = saveValues.primogem;
+        currencyAmount.classList.add("flex-row")
+        currencyAmount.id = "currency-amount";
+
+        let primogem = new Image();
+        primogem.src = "./assets/icon/primogemIcon.webp";
+        currencyAmount.appendChild(primogem);
+        
+        const itemRoll = ["weapon","gem","artifact"]
+        for (let i = 0; i < 3; i++) {
+            let itemNumber;
+            if (advType === 6) {
+                itemNumber = inventoryDraw("gem", 3, 5, "shop");
+            } else if (advType === 22) {
+                let maxStar = 5;
+                let item = rollArray(itemRoll,0)
+                if (item === "weapon" || item === 'gem') {
+                    maxStar = 6;
+                }
+                itemNumber = inventoryDraw(item,5,maxStar, "shop");
+            }
+
+            let offerItem = document.createElement("div");
+            offerItem = inventoryFrame(offerItem,Inventory[itemNumber],itemFrameColors);
+            offerCurrency.value += Math.round(Shop.calculateShopCost(Inventory[itemNumber].Star) * costDiscount / 5 * 0.30) * 5;
+            inventoryOffer.appendChild(offerItem);
+            lootArray[i] = itemNumber;
+        }
+
+        offerCurrency.innerText = `Cost: \n ${offerCurrency.value} Primogems`;
+        inventoryOffer.append(offerCurrency, acceptButton, rejectButton);
+        adventureVideo.append(inventoryOffer, currencyAmount);
+
+        adventureChoiceOne.addEventListener('click', () => {
             let tradeOffer = document.getElementById('inventory-offer');
             if (tradeOffer.offer === null) {return}
 
@@ -7780,9 +7698,7 @@ function continueQuest(advType) {
             }
 
             let adventureVideo = document.getElementById("adventure-video");
-            if (adventureVideo.classList.contains("transcend-dark")) {
-                adventureVideo.classList.remove("transcend-dark");
-            }
+            if (adventureVideo.classList.contains("transcend-dark")) { adventureVideo.classList.remove("transcend-dark")}
             
             document.getElementById('currency-amount').remove();
             document.getElementById('inventory-offer').remove();
@@ -7792,93 +7708,10 @@ function continueQuest(advType) {
                 challengeNotification(({category: 'specific', value: [0, 6]}))
             }
             return;
-        }
-
-        let adventureHeading = document.getElementById("adventure-header");
-        let adventureVideo = document.getElementById("adventure-video")
-        adventureVideo.classList.add("transcend-dark");
-
-        let inventoryOffer = document.createElement("div");
-        inventoryOffer.id = "inventory-offer";
-        inventoryOffer.offer = null;
-        let offerCurrency = document.createElement("p");
-        offerCurrency.value = 0;
-        offerCurrency.id = "offer-amount";
-
-        let acceptButton = new Image();
-        acceptButton.src = "./assets/icon/thumbsUp.webp";
-        acceptButton.classList.add("dim-filter");
-        let rejectButton = new Image();
-        rejectButton.classList.add("dim-filter");
-        rejectButton.src = "./assets/icon/thumbsDown.webp";
-
-        acceptButton.addEventListener("click",()=>{
-            if (saveValues.primogem > offerCurrency.value) {
-                inventoryOffer.offer = true;
-                adventureHeading.innerHTML = "You are accepting the trade. <br><br>Click 'Next' to confirm.";
-                if (acceptButton.classList.contains("dim-filter")) {
-                    acceptButton.classList.remove("dim-filter");
-                }
-                if (!rejectButton.classList.contains("dim-filter")) {
-                    rejectButton.classList.add("dim-filter");
-                }
-            } else {
-                adventureHeading.innerHTML = "You do not have enough primogems for the trade.";
-                weaselDecoy.load();
-                weaselDecoy.play();
-            }
-        });
-
-        rejectButton.addEventListener("click",()=>{
-            inventoryOffer.offer = false;
-            adventureHeading.innerHTML = "You are rejecting the trade. <br><br>Click 'Next' to confirm.";
-            if (!acceptButton.classList.contains("dim-filter")) {
-                acceptButton.classList.add("dim-filter");
-            }
-            if (rejectButton.classList.contains("dim-filter")) {
-                rejectButton.classList.remove("dim-filter");
-            }
-        });
-
-        let currencyAmount = document.createElement("div");
-        currencyAmount.innerText = saveValues.primogem;
-        currencyAmount.classList.add("flex-row")
-        currencyAmount.id = "currency-amount";
-        let primogem = new Image();
-        primogem.src = "./assets/icon/primogemIcon.webp";
-        currencyAmount.appendChild(primogem);
-        
-        const itemCost = [0,0,0,70,140,300,600];
-        const itemRoll = ["weapon","gem","artifact"]
-        for (let i = 0; i < 3; i++) {
-            let itemNumber;
-            if (advType === "6_A") {
-                itemNumber = inventoryDraw("gem", 3,5, "shop");
-            } else if (advType === "22_A") {
-                let maxStar = 5;
-                let item = rollArray(itemRoll,0)
-                if (item === "weapon" || item === 'gem') {
-                    maxStar = 6;
-                }
-                itemNumber = inventoryDraw(item,5,maxStar, "shop");
-            }
-
-            let offerItem = document.createElement("div");
-            offerItem = inventoryFrame(offerItem,Inventory[itemNumber],itemFrameColors);
-
-            offerCurrency.value += Math.round(itemCost[Inventory[itemNumber].Star] * costDiscount / 5 * 0.65) * 5;
-            inventoryOffer.appendChild(offerItem);
-            lootArray[i] = itemNumber;
-        }
-        offerCurrency.innerText = `Cost: \n ${offerCurrency.value} Primogems`;
-
-        inventoryOffer.append(offerCurrency, acceptButton, rejectButton);
-        adventureVideo.append(inventoryOffer, currencyAmount);
-        let adventureTextBox = document.getElementById("adventure-text");
-        adventureTextBox.questNumber = "0_Trade_Wait";
+        }, { once: true });
     }
 
-    function quitQuest() {
+    function quitQuest(res) {
         let adventureArea = document.getElementById("adventure-area");
         adventureArea.style.zIndex = -1;
         let adventureHeading = document.getElementById("adventure-header");
@@ -7889,41 +7722,13 @@ function continueQuest(advType) {
             document.getElementById("world-quest-button").remove();
             notifPop("clear","quest",1);
         }
+
+        if (res) {
+            res();
+        }
     }
 }
 
-function comboHandler(type, ele) {
-    if (type === "create") {
-        let comboNumber = document.createElement("p");
-        comboNumber.id = "combo-number";
-        comboNumber.combo = 0;
-        comboNumber.maxCombo = 0;
-        comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
-        ele.appendChild(comboNumber);
-        return ele;
-    } else if (type === "add") {
-        let comboNumber = document.getElementById("combo-number");
-        comboNumber.combo++;
-        comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
-        if (comboNumber.maxCombo < comboNumber.combo) {comboNumber.maxCombo = comboNumber.combo}
-
-        comboNumber.style.animation = "";
-        void comboNumber.offsetWidth;
-        comboNumber.style.animation = "tallyCount 1s ease";
-    } else if (type === "reset") {
-        let comboNumber = document.getElementById("combo-number");
-        comboNumber.combo = 0;
-        comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
-
-        comboNumber.style.animation = "";
-        void comboNumber.offsetWidth;
-        comboNumber.style.animation = "tallyCount 1s ease";
-    } else if (type === "check") {
-        let comboNumber = document.getElementById("combo-number");
-        let multiplierThreshold = Math.floor(comboNumber.combo / 3) * 0.25;
-        return (ele + multiplierThreshold);
-    }
-}
 
 function spawnMob(adventureVideo, waveInfo, adjacentSibling) {
     let decoy = null;
@@ -8031,7 +7836,7 @@ function triggerFight() {
     }
 
     let adventureVideo = document.getElementById("adventure-video");
-    adventureVideo = comboHandler("create",adventureVideo);
+    adventureVideo = Expedition.comboHandler("create",adventureVideo);
     let adventureVideoChildren = adventureVideo.children;
 
     battleVariables = {
@@ -8414,7 +8219,7 @@ function triggerFight() {
                 }
 
                 loseHP(energyBall.startingValue, 'normal');
-                sapEnergy(energyBall.startingValue, 25);
+                Expedition.sapEnergy(energyBall.startingValue, 25);
 
                 battleVariables.burstAttack = null;
                 battleVariables.burstTime = 0.15;
@@ -8778,14 +8583,14 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                             battleVariables.triggerConstants.burstTimeEnd();
                         } else {
                             if (evadeRoll <= evadeMax && !decoy) {
-                                createBattleText("dodge", animationTime * 150 * 2, mobDiv);
+                                Expedition.createBattleText("dodge", animationTime * 150 * 2, mobDiv);
                             } else {
                                 if (canvas.burstMode) {
                                     const energyBurst = document.getElementById('energy-ball');
                                     energyBurst.startingValue++;
                                     energyBurst.changeValue();
 
-                                    createBattleText("chargedMiss", animationTime * 150 * 2, mobDiv);
+                                    Expedition.createBattleText("chargedMiss", animationTime * 150 * 2, mobDiv);
                                 } else {
                                     loseHP(mobHealth.atk, "normal");
                                 }
@@ -9039,13 +8844,13 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
                 switch (type) {
                     case 'strong':
-                        createBattleText("strongCounter", animationTime * 150 * 2, mobDiv);
+                        Expedition.createBattleText("strongCounter", animationTime * 150 * 2, mobDiv);
                         break;
                     case 'weak':
-                        createBattleText("weakCounter", animationTime * 150 * 2, mobDiv);
+                        Expedition.createBattleText("weakCounter", animationTime * 150 * 2, mobDiv);
                         break;
                     default:
-                        createBattleText("counter", animationTime * 150 * 2, mobDiv);
+                        Expedition.createBattleText("counter", animationTime * 150 * 2, mobDiv);
                         break;
                 }
 
@@ -9054,7 +8859,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 }
             } else {
                 mobHealth.health -= (battleVariables.currentATK * attackMultiplier * 0.25);
-                createBattleText("guard", animationTime * 150 * 2, mobDiv);
+                Expedition.createBattleText("guard", animationTime * 150 * 2, mobDiv);
             }
 
             if (!advDict.rankDict[10]) {
@@ -9084,7 +8889,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             
             parrySuccess.load();
             parrySuccess.play();
-            comboHandler("add");
+            Expedition.comboHandler("add");
         }
 
         const clickMob = () => {
@@ -9218,12 +9023,12 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                         parriedCorrectly(attackMultiplier, guardCheckBool);
                     }
                 } else if (canvas.classList.contains("decoy-ready")) {
-                    createBattleText("deflect", animationTime * 150 * 2, mobDiv);
+                    Expedition.createBattleText("deflect", animationTime * 150 * 2, mobDiv);
                     loseHP(mobHealth.atk, "normal");
 
                     parryFailure.load();
                     parryFailure.play();
-                    comboHandler("reset");
+                    Expedition.comboHandler("reset");
 
                     if (!advDict.rankDict[10]) {
                         const cooldown = document.getElementById('adventure-cooldown-3');
@@ -9235,7 +9040,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
                     parryFailure.load();
                     parryFailure.play();
-                    comboHandler("reset");
+                    Expedition.comboHandler("reset");
                     if (!advDict.rankDict[10]) {
                         const cooldown = document.getElementById('adventure-cooldown-3');
                         cooldown.amount += 10;
@@ -9249,7 +9054,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                     }
                 } else {
                     mobHealth.health -= (battleVariables.currentATK * 0.25);
-                    createBattleText("guard", animationTime * 150 * 2, mobDiv);
+                    Expedition.createBattleText("guard", animationTime * 150 * 2, mobDiv);
                     doubleAttack();
                     if (!advDict.rankDict[10]) {
                         const cooldown = document.getElementById('adventure-cooldown-3');
@@ -9262,7 +9067,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 dodgeOn("close");
             } else {
                 // NO PARRY IS BEING USED
-                attackMultiplier = comboHandler("check", attackMultiplier);
+                attackMultiplier = Expedition.comboHandler("check", attackMultiplier);
 
                 if (mobDiv.classList.contains('megaboss')) {
                     if (adventureVariables.specialty === 'Unusual') {
@@ -9407,15 +9212,6 @@ function bossUpdate(updatedHealth) {
             }
         }
     }
-}
-
-function createBattleText(text, timer, container) {
-    let textBox = document.createElement("img");
-    textBox.classList.add("flex-column","battle-text")
-    textBox.src = `./assets/expedbg/${text}.webp`;
-    setTimeout(()=>{textBox.remove()}, timer);
-    container.append(textBox);
-    return container;
 }
 
 function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
@@ -9869,7 +9665,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                 videoOverlay.remove();
 
                 loseHP(spikeCaught, 'normal');
-                sapEnergy(spikeCaught, 50);
+                Expedition.sapEnergy(spikeCaught, 50);
 
                 bossHealth.health -= (bossHealth.maxHP / 100 * Math.min((pollenCaught * 1), 15));
                 if (bossHealth.health <= 0) {bossHealth.health = 1;}
@@ -10111,7 +9907,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                     if (quicktimeBar.state === colorArray[i]) {
                         correctBeat++;
                     } else {
-                        createBattleText("miss", 2000, videoOverlay);
+                        Expedition.createBattleText("miss", 2000, videoOverlay);
                     }
 
                     quicktimeBar.state = null;
@@ -10249,7 +10045,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                         } else if (leftPos < -15 || leftPos > 115) {
                             currentBeat++;
                             quicktimeBar.state = null;
-                            createBattleText("miss", 2000, videoOverlay);
+                            Expedition.createBattleText("miss", 2000, videoOverlay);
                             outcomeCheck(advLevel, currentBeat, maxBeat);
                             return;
                         } else {
@@ -10319,20 +10115,6 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
     adventureVideo.appendChild(videoOverlay);
 }
 
-function sapEnergy(quantityAmount, energyAmount) {
-    const cooldown = document.getElementById('adventure-cooldown-1');
-    const cooldown2 = document.getElementById('adventure-cooldown-2');
-    const cooldown3 = document.getElementById('adventure-cooldown-3');
-
-    try {
-        cooldown.amount = Math.max(cooldown.amount - quantityAmount * energyAmount, 0);
-        if (cooldown2) cooldown2.amount = Math.max(cooldown2.amount - quantityAmount * (energyAmount / 3), 0);
-        if (cooldown3) cooldown3.amount = Math.max(cooldown3.amount - quantityAmount * (energyAmount / 10), 0);
-    } catch (err) {
-        console.warn(err)
-    }
-}
-
 function loseHP(ATK, type='normal', resetCombo=true) {
     if (!adventureVariables.fightSceneOn) {return}
 
@@ -10347,7 +10129,7 @@ function loseHP(ATK, type='normal', resetCombo=true) {
         battleVariables.healthLost += ATK;
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
-        if (resetCombo && type !== 'inverse') {comboHandler("reset");}
+        if (resetCombo && type !== 'inverse') {Expedition.comboHandler("reset");}
 
         adventureHealth.style.animation = 'shake 1s infinite linear';
         setTimeout(()=>{
@@ -10363,7 +10145,7 @@ function loseHP(ATK, type='normal', resetCombo=true) {
 
             healthBar.currentWidth += (hpInterval * 3);
             healthBar.style.width = `${healthBar.currentWidth}%`;
-            createBattleText("endure",2000,document.getElementById('adventure-video'));
+            Expedition.createBattleText("endure",2000,document.getElementById('adventure-video'));
         } else {
             loseAdventure();
         }
@@ -10517,7 +10299,7 @@ function attackAll() {
     if (activeLeader == "Zhongli") {currentATK *= 1.50};
     if (advDict.morale > 80) {currentATK *= 1.10};
 
-    let attackMultiplier = comboHandler("check", 1);
+    let attackMultiplier = Expedition.comboHandler("check", 1);
     currentATK *= attackMultiplier;
 
     let cooldownTime;
@@ -10546,14 +10328,14 @@ function attackAll() {
         if (battleVariables.defenseMob != null) {
             currentATK *= 0.5;
             critThreshold = -1;
-            createBattleText("guard", 2000, mobDiv);
+            Expedition.createBattleText("guard", 2000, mobDiv);
         } else if (battleVariables.burstAttack !== null) {
             currentATK *= 0.3;
         }
 
         const mobHealth = mobDiv.children[1];
         if (critRoll <= critThreshold && !decoy) {
-            createBattleText("crit", 2000, mobDiv);
+            Expedition.createBattleText("crit", 2000, mobDiv);
             mobHealth.health -= (currentATK * 4 * 1.5);
         } else {
             mobHealth.health -= (currentATK * 4);
@@ -10666,53 +10448,18 @@ function loseAdventure() {
     adventureHeading.innerText = "You passed out...";
 
     const adventureChoiceOne = document.getElementById("adv-button-one");
-    adventureChoiceOne.style.display = "block";
-    adventureChoiceOne.innerText = "Leave";
-    adventureChoiceOne.addEventListener("click", quitButton);
-
-    let advButton = document.getElementById("adventure-button");
-    let keyNumber = advButton.key;
-    function quitButton() {
-        let level = imgKey[keyNumber].Level;
-        let xp = 5*(2**(level >= 1 && level <= 5 ? level : 5)) * additionalXP;
+    adventureChoiceOne.addEventListener("click", () => {
+        let level = imgKey[document.getElementById("adventure-button").key].Level;
+        let xp = 5*(2**(level >= 1 && level <= 5 ? level : 7)) * additionalXP;
         gainXP(Math.round(xp));
 
         quitAdventure(false);
-        adventureChoiceOne.removeEventListener("click", quitButton);
-    }
-
-    const adventureVideo = document.getElementById("adventure-video");
-    const targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator, .raining-image, .health-bar, .health-bar-scara, .skill-mark, .counter-button, .energy-burst');
-    targetElements.forEach((item) => {
-        item.remove();
-    });
-
-    // const leftOverEnemy = adventureVideo.querySelectorAll('.enemyImg');
-    // leftOverEnemy.forEach((ele) => {
-    //     ele.style.animation = '';
-    //     ele.style.filter= 'grayscale(100%) brightness(20%)';
-    // })
-
-    let adventureFight = document.getElementById("adventure-fight");
-    adventureFight.style.display = "none";
-    let adventureEncounter = document.getElementById("adventure-encounter");
-    adventureEncounter.style.display = "flex";
-    let imageGif = document.getElementById("adventure-gif");
-    if (adventureScaraText) {
-        imageGif.src = "./assets/expedbg/exped-scara-loss.webp"} 
-    else {
-        imageGif.src = "./assets/expedbg/exped-Nahida-loss.webp";
-    }
+    }, { once: true });
     
-    setTimeout(()=>{
-        dodgeOn("close");
-        fightBgmElement.pause();
-        fightLoseElement.load();
-        fightLoseElement.play();
-        fightLoseElement.addEventListener('ended',()=>{
-            setTimeout(()=>{if (!adventureVariables.fightSceneOn) {bgmElement.play()}},300)
-        })
-    },300)
+    let imageGif = document.getElementById("adventure-gif");
+    imageGif.src = `./assets/expedbg/exped-${adventureScaraText ? 'scara' : 'Nahida'}-loss.webp`;
+
+    Expedition.resetAdventure(dodgeOn, fightBgmElement, fightWinElement, adventureVariables, bgmElement);
 }
 
 function winAdventure() {
@@ -10720,9 +10467,11 @@ function winAdventure() {
     adventureVariables.fightSceneOn = false;
 
     const keyNumber = document.getElementById("adventure-button").key;
-    let adventureHeading = document.getElementById("adventure-header");
+
+    const adventureHeading = document.getElementById("adventure-header");
     adventureHeading.style.top = "1%";
     adventureHeading.innerText = "You won! You received some loot:";
+
     switch (adventureVariables.specialty) {
         case 'FellBoss':
             adventureHeading.innerText = "You have stopped the rampaging Whopperflower!";
@@ -10742,12 +10491,12 @@ function winAdventure() {
         case 'Finale':
             adventureHeading.innerText = "You have ended the Leyline Outbreak Experiment, once and for all.";
             persistentValuesDefault.finaleBossDefeat = true;
+            challengeNotification(({category: 'specific', value: [4, 3]}))
             drawAranaraWish();
 
             const settingsBottomBadge = document.getElementById('badges-div');
             if (!settingsBottomBadge.querySelector('medal-img-2')) {
                 settingsBottomBadge.append(createMedal(2, choiceBox, mainBody, stopSpawnEvents));
-                challengeNotification(({category: 'specific', value: [4, 3]}))
             }
             break;
         default:
@@ -10820,11 +10569,6 @@ function winAdventure() {
         adventureRewards.style.flexGrow = "1";
     }
 
-    const adventureChoiceOne = document.getElementById("adv-button-one");
-    adventureChoiceOne.style.display = "block";
-    adventureChoiceOne.innerText = "Leave";
-    adventureChoiceOne.addEventListener("click", quitButton);
-
     const adventureVideo = document.getElementById('adventure-video');
     const nutReward = document.createElement('p');
     nutReward.classList.add("adventure-currency");
@@ -10850,7 +10594,8 @@ function winAdventure() {
     }, nutReward.innerHTML);
     adventureVideo.append(nutReward);
 
-    function quitButton() {
+    const adventureChoiceOne = document.getElementById("adv-button-one");
+    adventureChoiceOne.addEventListener("click", () => {
         saveValues["realScore"] += nutReward.value;
         nutReward.remove();
 
@@ -10860,8 +10605,6 @@ function winAdventure() {
 
         let level = imgKey[keyNumber].Level;
         gainXP(Math.round(15 * (2**(level >= 1 && level <= 5 ? level : 5)) * additionalXP));
-
-        adventureChoiceOne.removeEventListener("click", quitButton);
         
         if (adventureRewards.children.length >= 0) {
             newPop(1);
@@ -10873,36 +10616,9 @@ function winAdventure() {
         while (rewardChildren.length > 0) {
             rewardChildren[0].remove();
         }
-    }
+    }, { once: true });
 
-    const targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator, .raining-image, .health-bar, .health-bar-scara, .skill-mark, .counter-button, .energy-burst');
-    targetElements.forEach((item) => {
-        item.remove();
-    });
-
-    const leftOverEnemy = adventureVideo.querySelectorAll('.enemy');
-    leftOverEnemy.forEach((ele) => {
-        ele.style.filter = 'grayscale(100%) brightness(20%)';
-    })
-
-    const leftOverImg = adventureVideo.querySelectorAll('.enemyImg');
-    leftOverImg.forEach((ele) => {
-        ele.style.animation = '';
-    })
-
-    const adventureFight = document.getElementById("adventure-fight");
-    adventureFight.style.display = "none";
-    const adventureEncounter = document.getElementById("adventure-encounter");
-    adventureEncounter.style.display = "flex";
-
-    setTimeout(()=>{
-        fightBgmElement.pause();
-        fightWinElement.load();
-        fightWinElement.play();
-        fightWinElement.addEventListener('ended',()=>{
-            setTimeout(()=>{if (!adventureVariables.fightSceneOn) {bgmElement.play()}},300)
-        })
-    },300)
+    Expedition.resetAdventure(dodgeOn, fightBgmElement, fightWinElement, adventureVariables, bgmElement);
 }
 
 function quitAdventure(wonBattle) {
@@ -11703,7 +11419,7 @@ function createTooltip() {
     tooltipButton.id = "tool-tip-button";
     tooltipButton.classList.add("background-image-cover");
     tooltipButton.innerText = "Purchase";
-    tooltipButton.addEventListener("click",()=>{tooltipFunction()})
+    tooltipButton.addEventListener("click",() => { tooltipFunction() })
 
     table6Background = document.createElement("img");
     table6Background.src = "./assets/tooltips/background.webp"
@@ -11909,7 +11625,7 @@ function shopCheck() {
     if (storeInventory.active == false) {
         if (saveValues["primogem"] > SHOP_THRESHOLD) {
             // GENERATING A LOCAL SHOP
-            addShop();
+            Shop.addShop(tabChange);
             shopTime = getTime();
             storeInventory.storedTime = getTime();
             storeInventory.active = true;
@@ -11929,26 +11645,6 @@ function shopTimerFunction() {
             refreshShop();
         }
     }
-}
-
-// ADDS MID-GAME SHOP TAB
-function addShop() {
-    let tabFlex = document.getElementById("flex-container-TAB");
-    let tabButton = document.createElement("div");
-    tabButton.classList += " tab-button-div";
-
-    let tabButtonImage = document.createElement("img");
-    tabButtonImage.src = "./assets/icon/tab"+ (7) +".webp";
-    tabButtonImage.classList += " tab-button";
-    tabButtonImage.classList.add("darken")
-    tabButton.id = "tab-" + (5);
-
-    tabButton.addEventListener('click', () =>{
-        tabChange(6);
-    })
-
-    tabButton.appendChild(tabButtonImage);
-    tabFlex.appendChild(tabButton);
 }
 
 function changeBigNahida(key) {
@@ -11990,7 +11686,7 @@ function setShop(type) {
         let upgradedShop = persistentValues.tutorialAscend;
 
         while (i--) {
-            createShopItems(shopDiv, i, drawShopItem(i, upgradedShop));
+            createShopItems(shopDiv, i, Shop.drawShopItem(i, upgradedShop, inventoryDraw, saveValues));
         }
         saveData(true);
     }
@@ -12035,7 +11731,6 @@ function setShop(type) {
 
 var shopId = null;
 function buyShop(id, shopCost, blackDict) {
-    let dialog = document.getElementById("table7-text");
     let button = document.getElementById(id);
     let confirmButton = document.getElementById("shop-confirm");
 
@@ -12048,6 +11743,10 @@ function buyShop(id, shopCost, blackDict) {
         if (oldButton.classList.contains("shadow-pop-tr")) {
             oldButton.classList.remove("shadow-pop-tr");
         }
+        if (oldButton.classList.contains("glowing-pop")) {
+            oldButton.classList.remove("glowing-pop");
+        }
+        
         let confirmButtonNew = confirmButton.cloneNode(true);
         confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
         confirmButton = confirmButtonNew;
@@ -12062,7 +11761,13 @@ function buyShop(id, shopCost, blackDict) {
     } else {
         Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'retryAscendConfirm' : 'retryConfirm');
         
-        button.classList.add("shadow-pop-tr");
+        let itemType = id.split('-')[0];
+        if (itemType === 'black') {
+            button.classList.add("glowing-pop");
+        } else {
+            button.classList.add("shadow-pop-tr");
+        }
+        
         confirmButton.addEventListener("click", function() {
             confirmPurchase(shopCost, id, blackDict);
         })
@@ -12074,60 +11779,42 @@ function refreshShop() {
     shopTime = getTime();
     shopId = null;
 
-    let pressedButton = document.querySelector('.shadow-pop-tr');
-    if (pressedButton) { pressedButton.classList.remove('shadow-pop-tr') }
+    let pressedButton = document.querySelector('.shadow-pop-tr, .glowing-pop');
+    if (pressedButton) { 
+        if (pressedButton.classList.contains('shadow-pop-tr')) {
+            pressedButton.classList.remove('shadow-pop-tr'); 
+        } else {
+            pressedButton.classList.remove('glowing-pop'); 
+        }
+    }
 
     let shopContainer = document.getElementById("shop-container");
     shopContainer.innerHTML = "";
 
     let i = 10;
     while (i--) {
-        createShopItems(shopContainer, i, drawShopItem(i, persistentValues.tutorialAscend));
+        createShopItems(shopContainer, i, Shop.drawShopItem(i, persistentValues.tutorialAscend, inventoryDraw, saveValues));
     }
 
     Shop.changeStoreDialog('clear');
     Shop.regenBlackPrice(persistentValues.blackMarketDict);
-
     storeInventory.storedTime = getTime();
 }
 
-function drawShopItem(i, upgradedShop = false) {
-    let inventoryNumber;
-    if (i >= 7 && i <= 9) {
-        if (upgradedShop) {
-            if (i === 9) {
-                inventoryNumber = 4015;
-            } else {
-                inventoryNumber = 4014;
-            }
-        } else {
-            inventoryNumber = inventoryDraw("talent", 2, 4, "shop");
-        }
-    } else if (i === 6) {
-        inventoryNumber = randomInteger(4011,4014);
-    } else if (i === 5) {
-        if (upgradedShop) {
-            inventoryNumber = 4018;
-        } else if (saveValues["wishUnlocked"] === true) {
-            inventoryNumber = 4010;
-        } else {
-            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
-        }
-    } else if (i >= 3 && i <= 4) {
-        if (upgradedShop) {
-            if (i === 3) {
-                inventoryNumber = 4017;
-            } else {
-                inventoryNumber = 4016;
-            }
-        } else {
-            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
-        }
+function successPurchase(mainButton) {
+    if (mainButton.classList.contains('shadow-pop-tr')) {
+        mainButton.classList.remove('shadow-pop-tr'); 
     } else {
-        inventoryNumber = inventoryDraw("weapon", 5, 6, "shop");
+        mainButton.classList.remove('glowing-pop'); 
     }
 
-    return inventoryNumber;
+    let confirmButton = document.getElementById("shop-confirm");
+    let confirmButtonNew = confirmButton.cloneNode(true);
+    confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
+
+    Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseSuccessAscend' : 'purchaseSuccessRegular');
+    shopElement.load();
+    shopElement.play();
 }
 
 function confirmPurchase(shopCost, id, blackDict) {
@@ -12139,16 +11826,10 @@ function confirmPurchase(shopCost, id, blackDict) {
         let itemId = id.split("-")[2];
 
         if (typeShop === 'black') {
-            // persistentValues.ascendEle[blackDict.ele] >= blackDict.eleCost
-            if (1) {
+            if (persistentValues.ascendEle[blackDict.ele] >= blackDict.eleCost) {
                 persistentValues.ascendEle[blackDict.ele] -= blackDict.eleCost;
                 saveValues.primogem -= shopCost;
                 document.getElementById('black-market-currency').updateValues();
-
-                mainButton.classList.remove("shadow-pop-tr");
-                let confirmButton = document.getElementById("shop-confirm");
-                let confirmButtonNew = confirmButton.cloneNode(true);
-                confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
 
                 persistentValues.blackMarketDict[saveId].level++;
                 let blackCard = document.getElementById(id);
@@ -12157,9 +11838,7 @@ function confirmPurchase(shopCost, id, blackDict) {
                     blackCard.removeCost();
                 }
 
-                Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseSuccessAscend' : 'purchaseSuccessRegular');
-                shopElement.load();
-                shopElement.play();
+                successPurchase(mainButton);
             } else {
                 Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseFailAscend' : 'purchaseFailRegular');
                 return;
@@ -12168,17 +11847,11 @@ function confirmPurchase(shopCost, id, blackDict) {
             newPop(1);
             inventoryAdd(itemId);
             sortList("table2");
-            mainButton.classList.remove("shadow-pop-tr");
+            
             mainButton.classList.add("purchased");
             saveValues.primogem -= shopCost;
     
-            let confirmButton = document.getElementById("shop-confirm");
-            let confirmButtonNew = confirmButton.cloneNode(true);
-            confirmButton.parentNode.replaceChild(confirmButtonNew, confirmButton);
-    
-            Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseSuccessAscend' : 'purchaseSuccessRegular');
-            shopElement.load();
-            shopElement.play();
+            successPurchase(mainButton);
     
             storeInventory[parseInt(saveId)].Purchased = true;
             let allItemsPurchased = true;
@@ -13914,13 +13587,16 @@ if (localStorage.getItem('tester') === 'true') {
     testing = true;
 }
 
+if (testing || beta) {
+    document.getElementById('testerScreen').remove();
+} 
+
 if (testing) {
     let tester = document.createElement('p');
     tester.innerText = 'TESTER';
     tester.classList.add('test-warning');
     mainBody.append(tester); 
 }
-
 
 if (beta) {
     let link = document.createElement("link");

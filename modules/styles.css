@@ -87,6 +87,8 @@ button {
     --brightness:100%;
     --dropshadow:0 0 0 black;
     --grayscale:0%;
+    --dark-purple: #31185f;
+    --medium-purple: #b79de6;
     --light-green: #DEE3BA;
     --bright-light-green: #ABD5A7;
     --pale-light-green: #AAD4A5;
@@ -3654,6 +3656,17 @@ table, button, label {
     }
 }
 
+@keyframes glowing-border {
+    0%, 100% {
+        transform: scale(0.95);
+        border: 0.2rem solid var(--dark-purple);
+    }
+    50% {
+        transform: scale(1.02);
+        border: 0.2rem solid var(--medium-purple);
+    }
+}
+
 @keyframes slit-in-horizontal {
     0% {
       transform: translateZ(-6em) rotateX(90deg);
@@ -3741,4 +3754,28 @@ body {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+}
+
+#testerScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999999999999;
+    background-color: var(--very-dark-green);
+}
+
+.hide-tester::after {
+    position: absolute;
+    content: '';
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    max-height: 500px;
+    aspect-ratio: 10 / 7;
+    z-index: 99999999999999999999999;
+    transform: translate(-50%, -60%);
+    
+    background: url(../assets/title/construction.webp) center center/contain no-repeat
 }

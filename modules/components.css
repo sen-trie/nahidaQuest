@@ -2658,6 +2658,20 @@ input:checked + .slider:before {
 	        animation: shadow-pop-tr 0.3s cubic-bezier(0.470, 0.000, 0.745, 0.715) both;
 }
 
+.glowing-pop {
+    animation: glowing-border 2s infinite;
+    background-color: var(--medium-purple);
+}
+
+.glowing-pop > .black-card-top {
+    border-bottom: 0.2rem solid var(--dark-purple);
+}
+
+.glowing-pop .black-div > p, .glowing-pop .black-button {
+    color: var(--dark-purple);
+}
+
+
 .store-buy {
     text-align: center;
     width: 20%;

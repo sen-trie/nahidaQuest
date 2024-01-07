@@ -39,7 +39,7 @@
     right: 32%;
 }
 
-.minesweeper-backdrop, .weasel-backdrop, .adventure-fight, .battleship-div, .snake-description {
+.minesweeper-backdrop, .weasel-backdrop, .battleship-div, .snake-description {
     flex-direction: row-reverse;
 }
 
