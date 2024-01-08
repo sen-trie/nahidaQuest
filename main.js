@@ -202,6 +202,8 @@ let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
 let timePassedSinceLast = null;
+let foodTimer = null;
+let autoClickTimer = null;
 const EVENTCOOLDOWN = 90;
 const BOUNTYCOOLDOWN = 60;
 const SHOPCOOLDOWN = 15;
@@ -225,7 +227,6 @@ let adventureScaraText = "";
 let skillCooldownReset;
 let adventureTreeDefense = false;
 let worldQuestDict = {};
-const transitionScene = ["0_Meeting", "0_Trade_Wait", "0_LuckCheck_Success", "0_LuckCheck_Failure"];
 
 const FELLBOSS_THRESHOLD = 65;
 const UNUSUAL_THRESHOLD = 65;
@@ -320,7 +321,9 @@ const extraInfoDict = {
 
 const blackMarketFunctions = {
     changeBigNahida: changeBigNahida,
-    buyShop: buyShop
+    buyShop: buyShop,
+    autoConsumeFood: autoConsumeFood,
+    autoClickNahida: autoClickNahida,
 };
 
 const possibleItems = ['Bow', 'Catalyst', 'Claymore', 'Polearm', 'Sword', 'Artifact', 'Food', 'DendroGeoAnemo', 'ElectroCryo', 'PyroHydro', 'Inazuma', 'Liyue', 'Mondstadt', 'Sumeru'];
@@ -454,8 +457,8 @@ function timerEvents() {
         refresh();
         dimHeroButton();
         addNewRow(true);
-    } else {
-        console.log('stopSpawnEvents is enabled!')
+    } else if (beta) {
+        console.log('stopSpawnEvents is enabled!');
     }
     
     randomEventTimer(timerSeconds);
@@ -3184,6 +3187,14 @@ function tutorial(idleAmount) {
 
         tutorialDark.appendChild(playButton);
         overlay.append(tutorialDark);
+
+        // POST-SETUP GAME CONFIG
+        if (persistentValues.autoFood) {
+            autoConsumeFood('check');
+        }
+        if (persistentValues.autoClickNahida) {
+            autoClickNahida('use');
+        }
     }
 }
 
@@ -3410,6 +3421,7 @@ function tabChange(x) {
     }
     updateWishDisplay();
 
+    universalStyleCheck(document.getElementById('hero-breakdown'), 'display', 'flex', 'none', true);
     if (document.getElementById("adventure-map")) {
         if (x == 2) {
             document.getElementById("adventure-map").style.zIndex = 11;
@@ -5459,7 +5471,11 @@ function updatedHero(i) {
 
 function foodButton(type) {
     let container = document.getElementById("app" + type);
-    let foodCooldown = document.createElement("div");
+    let currentTime = getTime();
+    let foodCooldown = createDom('div', {
+        id: `temp-buff-${type}`,
+        creationTime: currentTime
+    });
 
     if (type === 1) {
         container.innerHTML = '';
@@ -5491,7 +5507,7 @@ function adventure(advType) {
             adventureElement.load();
             adventureElement.play();
             saveValues["energy"] -= ADVENTURECOSTS[type <= 5 && type > 1  ? type : 0];
-            updateMorale("add",(randomInteger(7, 15) * -1));
+            updateMorale("add", (randomInteger(7, 15) * -1));
 
             if (activeLeader == "Paimon" && type <= 5 && type > 1) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.15)}
 
@@ -7293,7 +7309,7 @@ function drawAdventure(advType, wave) {
         waveType: waveType, // TWO ARRAYS
         currentEnemyAmount: waveType.Wave.length,
         maxEnemyAmount: waveType.Wave.length,
-        lootArray: {},
+        // lootArray: {},
         fightSceneOn: false,
         pheonixMode: false,
     }
@@ -11368,7 +11384,7 @@ function createTooltip() {
                 `${heroTooltip === 0 ? 'Base Nuts/Click' : "Base NpS"}: ${abbrNum(upgradeDict[heroTooltip].BaseFactor, 2)} (No Item Buffs)\n
                 ${heroTooltip === 0 ? 'Buffed Nuts/Click' : 'Buffed NpS'}: ${abbrNum(upgradeDict[heroTooltip].Factor, 2)} (With Item Buffs)\n
                 Upgrades: ${upgradeCount} (Built into ${heroTooltip === 0 ? 'Base Nuts/Click' : 'Base NpS'})\n
-                Overall: ${abbrNum(upgradeDict[heroTooltip].Contribution, 2)} (${overallText}% of total NpS)`
+                Overall: ${abbrNum(upgradeDict[heroTooltip].Contribution, 2)} (${overallText}% of total NpS before global buffs)`
             });
             choiceBox(document.getElementById('main-table'), {text: upgradeInfo[heroTooltip].Name}, stopSpawnEvents, ()=>{}, null, listText, ['notif-ele', 'hero-breakdown']);
         }
@@ -11574,6 +11590,37 @@ function clearTooltip() {
     }, 100)
 }
 
+function reduceItem(itemTooltip, usingTooltip = false) {
+    let itemButton = document.getElementById(itemTooltip);
+    let inventoryCount = InventoryMap.get(itemTooltip);
+    inventoryCount--;
+    InventoryMap.set(itemTooltip,inventoryCount);
+
+    persistentValues.itemsUsedValue++;
+
+    if (usingTooltip) {
+        if (inventoryCount > 0) {
+            changeTooltip(Inventory[itemTooltip],"item",itemTooltip);
+        } else if (inventoryCount <= 0) {
+            let nextButton = itemButton.nextSibling;
+            itemButton.remove();
+            if (nextButton) {
+                let idNum = parseInt(nextButton.id);
+                itemTooltip = idNum;
+                changeTooltip(Inventory[idNum],"item",idNum);
+                nextButton.classList.add("inventory-selected");
+            } else {
+                itemTooltip = -1;
+                clearTooltip();
+            }
+        }
+    } else {
+        if (inventoryCount <= 0) {
+            itemButton.remove();
+        }
+    }
+}
+
 function tooltipFunction() {
     if (tooltipTable == 1) {
         if (heroTooltip === -1) {return}
@@ -11590,30 +11637,9 @@ function tooltipFunction() {
             upgradeElement.load();
             upgradeElement.play();
         }
+
         itemUse(itemTooltip);
-        
-        let itemButton = document.getElementById(itemTooltip);
-        let inventoryCount = InventoryMap.get(itemTooltip);
-        inventoryCount--;
-        InventoryMap.set(itemTooltip,inventoryCount);
-
-        persistentValues.itemsUsedValue++;
-
-        if (inventoryCount > 0) {
-            changeTooltip(Inventory[itemTooltip],"item",itemTooltip);
-        } else if (inventoryCount <= 0) {
-            let nextButton = itemButton.nextSibling;
-            itemButton.remove();
-            if (nextButton) {
-                let idNum = parseInt(nextButton.id);
-                itemTooltip = idNum;
-                changeTooltip(Inventory[idNum],"item",idNum);
-                nextButton.classList.add("inventory-selected");
-            } else {
-                itemTooltip = -1;
-                clearTooltip();
-            }
-        }
+        reduceItem(itemTooltip, true);
     } else {
         return;
     }
@@ -11707,7 +11733,7 @@ function setShop(type) {
         class: ['shop-backdoor']
     });
 
-    const shopBlackContainer = Shop.drawBlackMarket(persistentValues, blackMarketFunctions, choiceBox, );
+    const shopBlackContainer = Shop.drawBlackMarket(persistentValues, blackMarketFunctions, choiceBox);
     shopBackdoor.addEventListener('click', () => {
         if (table7.classList.contains('table7-bg')) {
             table7.classList.add('table7-alt');
@@ -11827,6 +11853,7 @@ function confirmPurchase(shopCost, id, blackDict) {
 
         if (typeShop === 'black') {
             if (persistentValues.ascendEle[blackDict.ele] >= blackDict.eleCost) {
+                shopId = null;
                 persistentValues.ascendEle[blackDict.ele] -= blackDict.eleCost;
                 saveValues.primogem -= shopCost;
                 document.getElementById('black-market-currency').updateValues();
@@ -11834,8 +11861,11 @@ function confirmPurchase(shopCost, id, blackDict) {
                 persistentValues.blackMarketDict[saveId].level++;
                 let blackCard = document.getElementById(id);
                 blackCard.level = persistentValues.blackMarketDict[saveId].level;
+
                 if (persistentValues.blackMarketDict[saveId].level === persistentValues.blackMarketDict[saveId].maxLevel) {
-                    blackCard.removeCost();
+                    blackCard.increaseLevel(persistentValues.blackMarketDict, saveId, false);
+                } else {
+                    blackCard.increaseLevel(persistentValues.blackMarketDict, saveId, true);
                 }
 
                 successPurchase(mainButton);
@@ -11844,6 +11874,7 @@ function confirmPurchase(shopCost, id, blackDict) {
                 return;
             }
         } else if (typeShop === 'shop') {
+            shopId = null;
             newPop(1);
             inventoryAdd(itemId);
             sortList("table2");
@@ -11931,6 +11962,93 @@ function loadShopItems(shopDiv, i, inventoryArray) {
     shopDiv.append(createShopButton(inventoryTemp, inventoryNumber, shopCost, purchased, i));
 
     return shopDiv;
+}
+
+//------------------------------------------------------------------------ BLACK MARKET ITEMS ------------------------------------------------------------------------//
+const mousedownEvent = new Event('mousedown', {
+    bubbles: true,
+    cancelable: true,
+    button: 0, 
+});
+
+const mouseupEvent = new Event('mouseup', {
+    bubbles: true,
+    cancelable: true,
+    button: 0,
+});
+
+function autoClickNahida(type = 'use') {
+    if (type === 'equip') {
+        persistentValues.autoClickNahida = !persistentValues.autoClickNahida;
+        autoClickNahida('use');
+        return persistentValues.autoClickNahida;
+    } else {
+        if (!persistentValues.autoClickNahida) {return}
+        if (type === 'use') {
+            if (autoClickTimer !== null) {
+                clearTimeout(autoClickTimer);
+                autoClickTimer = null;
+            }
+
+            let delay;
+            if (persistentValues.blackMarketDict['materialCollector'].level === 3) {
+                delay = 750;
+            } else if (persistentValues.blackMarketDict['materialCollector'].level === 2) {
+                delay = 1000;
+            } else if (persistentValues.blackMarketDict['materialCollector'].level === 1) {
+                delay = 1250;
+            }
+
+            let demoButton = document.getElementById('demo-main-img');
+            demoButton.dispatchEvent(mousedownEvent);
+            setTimeout(() => {
+                demoButton.dispatchEvent(mouseupEvent);
+                autoClickTimer = setTimeout(() => {autoClickNahida('use')}, delay);
+            }, 100)
+        }
+    }
+}
+
+function autoConsumeFood(type = 'check', foodID = null) {
+    if (type === 'equip') {
+        persistentValues.autoFood = !persistentValues.autoFood;
+        autoConsumeFood('check');
+        return persistentValues.autoFood;
+    } else {
+        if (!persistentValues.autoFood) {return}
+        if (type === 'check') {
+            if (foodTimer !== null) {
+                clearTimeout(foodTimer);
+                foodTimer = null;
+            }
+    
+            // ALREADY CONSUMED FOOD
+            const foodEle = document.getElementById('temp-buff-1');
+            if (foodEle) {
+                const timeElapsed = (getTime() - foodEle.creationTime) * 60;
+                setTimeout(() => {autoConsumeFood('check')}, 1005 * (30 - timeElapsed));
+                return;
+            }
+    
+            const itemChildren = table2.children;
+            // FOUND FOOD
+            for (let i = 0; i < itemChildren.length; i++) {
+                const childId = parseInt(itemChildren[i].id);
+                if (!isNaN(childId) && childId >= 3001 && childId <= 4000) {
+                    autoConsumeFood('use', childId);
+                    return;
+                }
+            }
+    
+            // DID NOT FIND FOOD
+            foodTimer = setTimeout(() => {autoConsumeFood('check')}, 1000 * 45);
+        } else if (type === 'use') {
+            console.log(`Auto Consuming Food: ${foodID}`);
+            itemUse(foodID);
+            reduceItem(foodID, false);
+            foodTimer = setTimeout(() => {autoConsumeFood('check')}, 1005 * 30);
+        }
+    }
 }
 
 //------------------------------------------------------------------------ GOLDEN NUT STORE ------------------------------------------------------------------------//
@@ -13569,7 +13687,7 @@ function newPop(type) {
 if (beta) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            refreshShop(getTime())
+            Shop.regenBlackPrice(persistentValues.blackMarketDict);
         }
     })    
 }

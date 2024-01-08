@@ -2493,13 +2493,14 @@ input:checked + .slider:before {
     border: 0.2rem solid var(--very-dark-brown);
     box-sizing: border-box;
     font-size: 1.6rem;
+    transition: 0.5s ease;
 }
 
 .black-card-top {
     position: relative;
     width: 100%;
     max-width: 100%;
-    height: 14rem;
+    height: 12rem;
     border-bottom: 0.2rem solid var(--dark-bright-brown);
 }
 
@@ -2518,10 +2519,23 @@ input:checked + .slider:before {
     width: 100%;
     height: 4rem;
     padding: 0.5rem 0;
+    gap: 0.2rem;
     justify-content: flex-start;
 }
 
+.black-level {
+    height: 2rem;
+    font-size: 1.4rem;
+    color: var(--light-brown);
+    background-color: var(--bright-brown);
+    border-bottom: 0.2rem solid var(--dark-bright-brown);
+    width: 100%;
+    transition: 0.5s ease;
+}
+
 .black-image {
+    position: relative;
+    bottom: 0.5rem;
     width: auto;
     max-width: 100%;
     height: 85%;
@@ -2542,6 +2556,10 @@ input:checked + .slider:before {
 
 .shop-black-div {
     padding: 0.75rem;
+    overflow-y: auto;
+    max-height: calc(100% - 2rem);
+    justify-content: flex-start;
+    gap: 1rem 1.5rem;
 }
 
 .black-currency-container {
@@ -2663,12 +2681,20 @@ input:checked + .slider:before {
     background-color: var(--medium-purple);
 }
 
-.glowing-pop > .black-card-top {
+.glowing-pop > .black-card-top, .glowing-pop .black-level {
     border-bottom: 0.2rem solid var(--dark-purple);
 }
 
-.glowing-pop .black-div > p, .glowing-pop .black-button {
+.glowing-pop .black-div > p, .glowing-pop .black-button, .glowing-pop .black-level {
     color: var(--dark-purple);
+}
+
+.glowing-pop .black-button, .glowing-pop .black-level {
+    background-color: var(--bright-pink);
+}
+
+.glowing-pop .black-image-spin {
+    animation: rotation 18s infinite linear forwards;
 }
 
 

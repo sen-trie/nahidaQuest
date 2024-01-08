@@ -3,43 +3,27 @@ import { blackShopDict } from "../dictData.js";
 import { createDom, choiceBox } from "../adjustUI.js";
 
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
+// REUSED FUNCTIONS
+const calculateBlackCost = (persistentDictTemp, type, key) => {
+    let blackItemTemp = blackShopDict[key];
+    if (type === 'cost') {
+        return Math.ceil(Math.round(blackItemTemp.cost * randomInteger(70, 140) / 100) * 1.5**(persistentDictTemp.level) / 5) * 5;
+    } else if (type === 'primoCost') {
+        return Math.ceil(Math.round(blackItemTemp.primoCost * randomInteger(80, 120) / 100) * 1.5**(persistentDictTemp.level)/ 5) * 5;
+    } else {
+        console.error(`calculateBlackCost: Missing ${type}`);
+    }
+}
 
 const generateBlackItem = (key, persistentBlackMarket) => {
     let blackItemTemp = blackShopDict[key];
     persistentBlackMarket[key] = {
-        cost: Math.ceil(Math.round(blackItemTemp.cost * randomInteger(70, 140) / 100) / 5) * 5,
-        primoCost: Math.ceil(Math.round(blackItemTemp.primoCost * randomInteger(80, 120) / 100) / 5) * 5,
+        cost: calculateBlackCost(blackItemTemp, 'cost', key),
+        primoCost: calculateBlackCost(blackItemTemp, 'primoCost', key),
         costElement: rollArray(boxElement, 1),
-        level: blackItemTemp.level,
-        maxLevel: blackItemTemp.maxLevel
-    }
-}
-
-// REUSED FUNCTIONS
-const updateBlackMarket = (persistentBlackMarket) => {
-    for (let key in blackShopDict) {
-        if (persistentBlackMarket[key] === undefined) {
-            generateBlackItem(key, persistentBlackMarket);
-        }
-    }
-}
-
-const regenBlackPrice = (persistentBlackMarket) => {
-    for (let key in persistentBlackMarket) {
-        let blackItemTemp = blackShopDict[key];
-        if (persistentBlackMarket[key].level < persistentBlackMarket[key].maxLevel) {
-            const oldDict = Object.assign({}, persistentBlackMarket[key])
-
-            persistentBlackMarket[key] = {
-                cost: Math.ceil(Math.round(blackItemTemp.cost * randomInteger(70, 140) / 100) / 5) * 5,
-                primoCost: Math.ceil(Math.round(blackItemTemp.primoCost * randomInteger(80, 120) / 100) / 5) * 5,
-                level: oldDict.level,
-                costElement: rollArray(boxElement, 1),
-                maxLevel: blackItemTemp.maxLevel,
-            }
-
-            document.getElementById(`black-${key}`).updateCost(persistentBlackMarket[key]);
-        }
+        level: 0,
+        maxLevel: blackItemTemp.maxLevel,
+        active: false,
     }
 }
 
@@ -53,7 +37,9 @@ const changeStoreDialog = (typeText) => {
             newText = "Any questions or troubles? I'm here to personally assist you!";
             break;
         case ('ascendLoad'):
-            newText = "Dori's Deals now come with extra value!";
+            newText = rollArray(
+                ["Dori's Deals now come with extra value!",
+                "What will it be today, friend? Please take your time!"]);
             break;
         case ('retryConfirm'):
             newText = "Are you sure? Remember, no refunds!";
@@ -62,7 +48,9 @@ const changeStoreDialog = (typeText) => {
             newText = "Maybe if you ask nicely, I'll even allow a refund within 24 hours! Hehe, just kidding.";
             break;
         case ('purchaseSuccessAscend'):
-            newText = 'See you again soon! Hehe.';
+            newText = rollArray(
+                ['See you again soon! Hehe.', 
+                "Thank you kindly. Can I interest you in anything else?"]);
             break;
         case ('purchaseSuccessRegular'):
             newText = "Hehe, you've got good eyes.";
@@ -144,25 +132,86 @@ const drawShopItem = (i, upgradedShop = false, inventoryDraw, saveValues) => {
     return inventoryNumber;
 }
 
-// SINGLE-USE FUNCTIONS
-const useItem = (key, buttonFunctions) => {
-    buttonFunctions.changeBigNahida(key);
+const updateBlackMarket = (persistentBlackMarket) => {
+    for (let key in blackShopDict) {
+        if (persistentBlackMarket[key] === undefined) {
+            generateBlackItem(key, persistentBlackMarket);
+        } else {
+            persistentBlackMarket[key].maxLevel = blackShopDict[key].maxLevel;
+        }
+    }
 }
 
-const createEquipButton = (key, buttonFunctions) => {
+const regenOnePrice = (persistentBlackMarket, key) => {
+    let blackItemTemp = blackShopDict[key];
+    if (persistentBlackMarket[key].level < persistentBlackMarket[key].maxLevel) {
+        const oldDict = Object.assign({}, persistentBlackMarket[key])
+
+        persistentBlackMarket[key] = {
+            cost: calculateBlackCost(oldDict, 'cost', key),
+            primoCost: calculateBlackCost(oldDict, 'primoCost', key),
+            level: oldDict.level,
+            costElement: rollArray(boxElement, 1),
+            maxLevel: blackItemTemp.maxLevel,
+            active: oldDict.active,
+        }
+
+        document.getElementById(`black-${key}`).updateCost(persistentBlackMarket[key]);
+    }
+}
+
+const regenBlackPrice = (persistentBlackMarket, particularKey = null) => {
+    if (particularKey) {
+        regenOnePrice(persistentBlackMarket, particularKey);
+    } else {
+        for (let key in persistentBlackMarket) {
+            regenOnePrice(persistentBlackMarket, key);
+        }
+    }
+}
+
+// SINGLE-USE FUNCTIONS
+const useItem = (key, buttonFunctions) => {
+    if (blackShopDict[key].subtype === 'bigNahida') {
+        buttonFunctions.changeBigNahida(key);
+    } else if (blackShopDict[key].type === 'functional') {
+        let equipState;
+        if (blackShopDict[key].subtype === 'autoFood') {
+            equipState = buttonFunctions.autoConsumeFood('equip');
+        } else if (blackShopDict[key].subtype === 'autoClick') {
+            equipState = buttonFunctions.autoClickNahida('equip');
+        }
+        
+        const equipButton = document.getElementById(`black-card-${key}`);
+        equipButton.innerText = equipState ? 'Equipped' : 'Equip';
+    }
+}
+
+const createEquipButton = (key, buttonFunctions, persistentValues = null) => {
     const equipButton = createDom('p', {
         class: ['flex-row', 'black-button', 'black-equip', 'clickable'],
-        innerText: 'Equip'
+        id: `black-card-${key}`,
+        innerText: (blackShopDict[key].type === 'cosmetic') ? 'Change' : 'Equip'
     });
 
-    equipButton.addEventListener('click', () => {
+    equipButton.addEventListener('click', (event) => {
         useItem(key, buttonFunctions);
+        event.stopPropagation();
     });
+
+    if (persistentValues) {
+        if (blackShopDict[key].subtype === 'autoFood' && persistentValues.autoFood) {
+            equipButton.innerText = 'Equipped';
+        }
+        if (blackShopDict[key].subtype === 'autoClick' && persistentValues.autoClickNahida) {
+            equipButton.innerText = 'Equipped';
+        }
+    }
 
     return equipButton;
 }
 
-const drawBlackMarket = (persistentValues, buttonFunctions) => {
+const drawTopBlackMarket = (persistentValues) => {
     // FOR CURRENCIES ONLY
     const elementCurrency = createDom('div', {
         id: 'black-market-currency',
@@ -193,17 +242,23 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
         });
     }
 
+    return elementCurrency;
+}
+
+const drawBlackMarket = (persistentValues, buttonFunctions) => {
+    const elementCurrency = drawTopBlackMarket(persistentValues)
     const shopBlackDiv = createDom("div", {
         id: "shop-black-div",
         class: ['shop-black-div']
     });
-
+    
     const shopBlackContainer = createDom("div", {
         class: ["store-div"],
         id: "shop-black",
         style: { display: 'none' },
         child: [elementCurrency, shopBlackDiv]
     });
+    
 
     // INDIVIDUAL ITEM CARDS
     for (let key in blackShopDict) {
@@ -220,15 +275,20 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
             class: ['flex-column', 'black-card-bottom'],
         });
 
+        const levelCount = createDom('p', {
+            innerText: `${itemDict.level} / ${itemDict.maxLevel}`,
+            class: ['black-level', 'flex-row']
+        });
+
         const eleImage = createDom('img', {
             src: `./assets/${blackShopDict[key].file}`,
-            class: ['black-image']
+            class: blackShopDict[key].subtype === 'bigNahida' ? ['black-image-spin', 'black-image'] : ['black-image']
         });
 
         const infoButton = createDom('button', {
             class: ['black-info-button', 'clickable'],
             innerText: 'Info'
-        })
+        });
 
         infoButton.addEventListener('click', (event) => {
             let info = createDom('p', {
@@ -272,6 +332,15 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
             }   
         }
 
+        shopBlackCard.increaseLevel = (persistentBlackMarket, keyId, updateCost = true) => {
+            levelCount.innerText = `${persistentBlackMarket[keyId].level} / ${persistentBlackMarket[keyId].maxLevel}`;
+            if (updateCost) {
+                regenBlackPrice(persistentBlackMarket, keyId);
+            } else {
+                shopBlackCard.removeCost();
+            }
+        } 
+
         shopBlackCard.addEventListener('click', () => {
             if (shopBlackCard.level < shopBlackCard.maxLevel) {
                 buttonFunctions.buyShop(
@@ -287,9 +356,9 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
         if (itemDict.level === 0) {
             childrenArray = [elePrice];
         } else if (itemDict.level === itemDict.maxLevel) {
-            childrenArray = [createEquipButton(key, buttonFunctions)];
+            childrenArray = [createEquipButton(key, buttonFunctions, persistentValues)];
         } else {
-            childrenArray =  [elePrice, createEquipButton(key, buttonFunctions)];
+            childrenArray =  [elePrice, createEquipButton(key, buttonFunctions, persistentValues)];
         }
         
         let blackCardTop = createDom('div', {
@@ -298,7 +367,7 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
         });
         
         blackCardBottom.append(...childrenArray)
-        shopBlackCard.append(blackCardTop, blackCardBottom)
+        shopBlackCard.append(levelCount, blackCardTop, blackCardBottom)
         shopBlackDiv.appendChild(shopBlackCard);
     }
 

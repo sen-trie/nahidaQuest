@@ -65,7 +65,7 @@ const expedInfo = (butId, expeditionDict, saveValues, persistentValues) => {
             enemyInfo.appendChild(img);
         }
 
-        let lootHTML = `<span style='font-size:1.2em'>Recommended Rank: ${recommendedLevel[level >= 13 ? (level - 7) : level]}</span>  <br> Max Potential Rewards: <br> [container]`;
+        let lootHTML = `<span style='font-size:1.2em'>Recommended Rank: ${recommendedLevel[level >= 13 ? (level - 7) : level]}</span>  <br> Potential Rewards: <br> [container]`;
         let lootTable = imgKey[id].Loot;
         let invDiv = createDom("div");
         invDiv.classList.add("inv-div","flex-row");

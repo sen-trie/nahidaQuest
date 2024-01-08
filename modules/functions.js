@@ -159,8 +159,7 @@ function updateObjectKeys(savedObject,referenceObject) {
 }
 
 // ROLLS RANDOM INT IN AN ARRAY
-function rollArray(array, startingPos) {
-    if (startingPos === undefined) {startingPos = 0}
+function rollArray(array, startingPos = 0) {
     return array[randomInteger(startingPos, array.length)]
 }
 
