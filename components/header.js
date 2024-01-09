@@ -24,9 +24,7 @@ class Header extends HTMLElement {
                     <a href="./wiki">wiki</a>
                     <a href="./feedback">feedback</a>
                     <a href="./credits">credits</a>
-                    <div class='flex-row play-button'>
-                        <a href="./play">Play!</a>
-                    </div>
+                    <a class='flex-row play-button' href="./play">Play!</a>
                 </nav>
                 <button class='burger' onClick='toggleMenu()'>Menu</button>
                 <div id='burgerMenu' class='mobile-hidden'>

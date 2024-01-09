@@ -162,8 +162,12 @@ input[type="file"] {
         width: 90%;
     }
 
+    form {
+        gap: 0;
+    }
+
     form, #questionForm  {
-        padding: 0.5rem;
+        padding: 0.25rem;
     }
 
     .question-div > label {

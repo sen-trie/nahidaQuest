@@ -1,4 +1,8 @@
 .settings-menu {
+    left: 50%;
+    top: 50%;
+    height: 80%;
+    transform: translate(-50%, -50%);
     row-gap: unset;
     width: auto;
     aspect-ratio: 1.35;
@@ -22,8 +26,7 @@
     width: fit-content;
     height: 100%;
     padding: 0 2%;
-    font-size: 1.1em;
-    margin-right: 0.5em;
+    font-size: 1rem;
     border: var(--dark-green) 0.15em solid;
     border-bottom: none;
     background-color: var(--medium-green);
@@ -148,6 +151,13 @@ input:checked + .slider {
     background-color: var(--dark-green);
 }
 
+#font-size-level {
+    opacity: 1;
+    font: inherit;
+    width: 2rem;
+    height: 1.6rem;
+}
+
 .slider {
     height: 70%;
 }
@@ -157,6 +167,10 @@ input:checked + .slider {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: 3em;
     gap: 1em 0.5em;
+}
+
+.advanced-grid p {
+    flex-grow: 1;
 }
 
 #settings-tab-advanced {
@@ -170,7 +184,7 @@ input:checked + .slider {
 
 
 .settings-stats {
-    font-size: 1em;
+    font-size: 1rem;
     max-height: 100%;
     margin-top: 2%;
     padding: 2%;
@@ -215,7 +229,7 @@ input:checked + .slider {
     font-family: inherit;
     padding: 1%;
     box-sizing: border-box;
-    font-size: 0.65em;
+    font-size: 0.8rem;
     border: var(--medium-green) 0.4rem solid;
 }
 
@@ -239,7 +253,7 @@ input:checked + .slider {
     bottom: 0.5em;
     color: inherit;
     text-shadow: unset;
-    font-size: 1em;
+    font-size: 0.8rem;
 }
 
 #patch-container {
@@ -267,7 +281,7 @@ input:checked + .slider {
     padding: 1%;
     border-radius: 0 0 1em 1em;
     width: 92.5%;
-    font-size: 0.9em;
+    font-size: 0.9rem;
 }
 
 .patch-info > line {
@@ -281,7 +295,7 @@ input:checked + .slider {
     padding: 1%;
     border-radius: 0 .5em .5em 0;
     width: 95%;
-    font-size: 1em;
+    font-size: 1rem;
     margin-top: 0.5em;
 }
 

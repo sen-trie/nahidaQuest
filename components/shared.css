@@ -164,6 +164,10 @@ nav > a:hover {
 }
 
 .play-button:hover {
+    border-bottom: unset;
+}
+
+.play-button:hover {
     filter: drop-shadow(0 0 0.2rem #F8E8C7);
     transition: .3s ease;
 }

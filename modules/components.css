@@ -26,7 +26,7 @@
     left: 25%;
     z-index: 250;
     opacity: 1;
-    font-size: 1em;
+    font-size: 1rem;
     text-align: center;
     animation: slidedown 5s cubic-bezier(.17,.67,.33,.83) both;
     pointer-events: none;
@@ -38,7 +38,7 @@
     z-index: 151;
     color: #1d3011;
     text-shadow: 0.05em 0.05em 0.2em #658054bc;
-    font-size: 1.2em;
+    font-size: 1.2rem;
 } 
 
 .event-dropdown-text {
@@ -131,7 +131,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2.3em;
+    font-size: 2rem;
     color: white;
     text-align: center;
     background-color: #000000c4;
@@ -233,7 +233,7 @@
     background-image: url(../assets/tutorial/tut-button.webp);
     color: white;
     text-shadow: #3C3C3C 0.21375em 0 0, #3C3C3C 0.20102554875em 0.06442056725em 0, #3C3C3C 0.16545309125em 0.125256034375em 0, #3C3C3C 0.114100525em 0.17245005em 0, #3C3C3C 0.0495299125em 0.1929347625em 0, #3C3C3C -0.020926788125em 0.1987703525em 0, #3C3C3C -0.08683835em 0.182958245em 0, #3C3C3C -0.140307092em 0.145025515em 0, #3C3C3C -0.18035769em 0.09045148em 0, #3C3C3C -0.209242475em 0.025948895em 0, #3C3C3C -0.20681056375em -0.0373652975em 0, #3C3C3C -0.18052885375em -0.0934511275em 0, #3C3C3C -0.1379573405em -0.138057635em 0, #3C3C3C -0.0800555925em -0.159165915em 0, #3C3C3C -0.0164290525em -0.165675565em 0, #3C3C3C 0.0535315125em -0.1594206825em 0, #3C3C3C 0.1188833225em -0.1486998625em 0, #3C3C3C 0.15738429125em -0.102757115em 0, #3C3C3C 0.1825355875em -0.05246907125em 0;
-    font-size: 1.4em;
+    font-size: 1.4rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -241,7 +241,7 @@
 
 #outcome-text {
     bottom: 50%;
-    font-size: 1.7em;
+    font-size: 1.7rem;
     text-shadow: 0.05em 0.05em  #000000;
     background-color: #000000ee;
 }
@@ -339,7 +339,7 @@
     left: -10%;
     width: 120%;
     aspect-ratio: 1.2;
-    font-size: 1.7em;
+    font-size: 1.7rem;
     z-index: 1005;
     display: flex;
     justify-content: center;
@@ -377,7 +377,7 @@
     background-color: #673f31;
     border: 0.25em solid #371a10;
     border-radius: 1em;
-    font-size: 1.1em;
+    font-size: 1.1rem;
     text-shadow: 0.075em 0.075em  #000000;
     color: white;
     pointer-events: none;
@@ -486,7 +486,7 @@
     z-index: 10006;
     background-color: #000000e0;
     background-size: cover;
-    font-size: 0.7em;
+    font-size: 0.7rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -700,7 +700,7 @@
 .key-container > button:last-of-type {
     width: 100%;
     height: 100%;
-    font-size: 0.9em;
+    font-size: 0.9rem;
     color: #f0e5da;
     background: url(../assets/tutorial/exped-button.webp) no-repeat center center/contain;
     
@@ -710,7 +710,7 @@
     width: 100%;
     transform: translateY(30%);
     text-align: center;
-    font-size: 1.8em;
+    font-size: 1.8rem;
     color: white;
     text-shadow: var(--text-shadow-075);
 }
@@ -897,7 +897,7 @@
     background-color: transparent;
     color: #2b583c;
     margin-top: 2%;
-    font-size: 2vw;
+    font-size: 1rem;
 }
 
 .char-select {
@@ -913,8 +913,6 @@
     background-size: contain;
     background-color: #73879C;
     border: 0.2em solid #334a63;
-    color: #112338;
-    font-size: 0.8em;
 }
 
 .notif-select {
@@ -927,7 +925,7 @@
     right: 3%;
     top: 1%;
     box-sizing: border-box;
-    font-size: 0.8em;
+    font-size: 0.6rem;
 }
 
 .notif-select > div {
@@ -1028,7 +1026,7 @@
     flex-grow: 1;
     height: 100%;
     object-fit: contain;
-    font-size: 0.9em;
+    font-size: 0.75rem;
     align-items: flex-start;
 }
 
@@ -1323,7 +1321,7 @@
     height: auto;
     box-sizing: border-box;
     color: #442d10;
-    font-size: 1.2em;
+    font-size: 1.2rem;
     overflow-y: auto;
     padding: 1%;
 }
@@ -1344,7 +1342,7 @@
     width: 100%;
     bottom: 110%;
     color: white;
-    font-size: 1.5em;
+    font-size: 1.5rem;
     text-shadow: var(--text-shadow-075);
 }
 
@@ -1389,7 +1387,7 @@
     gap: 1%;
     padding: 0 1% 0 1%;
     text-align: center;
-    font-size: 1.8em;
+    font-size: 1.8rem;
 }
 
 
@@ -1462,7 +1460,7 @@
 .item-frame-text {
     color: white !important;
     right: 5% !important;
-    font-size: 1.6em;
+    font-size: 1.6rem;
 }
 
 .extra-item-tree::after, .extra-item::after {
@@ -1709,7 +1707,7 @@
     background: url('../assets/expedbg/Beat.webp') no-repeat center center/cover;
     font: inherit;
     color: white;
-    font-size: 1.3em;
+    font-size: 1.3rem;
     text-shadow: var(--text-shadow-075);
     overflow: hidden;
 } 
@@ -1805,7 +1803,7 @@
     padding: 0 2%;
     width: 100%;
     height: 30%;
-    font-size: 1.1em;
+    font-size: 1.1rem;
     text-align: center;
 }
 
@@ -1941,7 +1939,7 @@
     height: fit-content !important;
     top: 30% !important;
     transform: translate(-50% -50%) !important;
-    font-size: 1em !important;
+    font-size: 1rem !important;
 }
 
 .advanced-menu-form {
@@ -2025,7 +2023,7 @@
     padding: 1%;
     border-radius: 0 0 1em 1em;
     width: 85%;
-    font-size: 1em;
+    font-size: 1rem;
 }
 
 .patch-notes-div > div > p > line {
@@ -2056,7 +2054,7 @@
     padding: 1%;
     border-radius: 0 .5em .5em 0;
     width: 90%;
-    font-size: 1.4em;
+    font-size: 1.4rem;
     margin-top: 0.5em;
 }
 
@@ -2492,7 +2490,6 @@ input:checked + .slider:before {
     background-color: wheat;
     border: 0.2rem solid var(--very-dark-brown);
     box-sizing: border-box;
-    font-size: 1.6rem;
     transition: 0.5s ease;
 }
 
@@ -2525,7 +2522,7 @@ input:checked + .slider:before {
 
 .black-level {
     height: 2rem;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     color: var(--light-brown);
     background-color: var(--bright-brown);
     border-bottom: 0.2rem solid var(--dark-bright-brown);
@@ -2574,12 +2571,12 @@ input:checked + .slider:before {
 
 .black-currency-cell > p {
     color: var(--medium-brown);
-    font-size: 1.3rem;
+    font-size: 1rem;
 }
 
 .black-currency-cell > img {
-    height: inherit;
-    width: auto;
+    height: auto;
+    width: 1.2rem;
     aspect-ratio: 1;
     object-fit: contain;
     filter: drop-shadow(0 0 0.1rem black);
@@ -2587,7 +2584,7 @@ input:checked + .slider:before {
 
 .black-div > p, .black-button {
     color: var(--very-dark-brown);
-    font-size: 1.4rem;
+    font-size: 1rem;
 }
 
 .black-button {
@@ -2614,7 +2611,7 @@ input:checked + .slider:before {
     background-color: #b79de6;
     padding: 0.2rem 0.4rem;
     border-radius: 0.75rem;
-    font-size: 1.3rem;
+    font-size: 1rem;
 }
 
 .shop-button {
@@ -2667,7 +2664,7 @@ input:checked + .slider:before {
     padding: 1.5%;
     width: 70%;
     height: 100%;
-    font-size: 1.1em;
+    font-size: 0.9rem;
     color: var(--very-dark-brown);
 }
 
@@ -2846,7 +2843,7 @@ input:checked + .slider:before {
 }
 
 #nut-shop-ascend > p {
-    font-size: 1.4em;
+    font-size: 1.2rem;
     color: white;
     text-align: center;
     text-shadow: var(--text-shadow-075);
@@ -2909,7 +2906,7 @@ input:checked + .slider:before {
     height: auto;
     width: 40%;
     aspect-ratio: 4.61;
-    font-size: 1em;
+    font-size: 0.9rem;
     color: white;
     text-shadow: var(--text-shadow-075);
     background: transparent url(../assets/tutorial/buttonBox.webp) center/contain no-repeat;
@@ -3020,7 +3017,7 @@ img[src=""] {
 .nut-shop-button > p:first-of-type {
     height: 25%;
     width: 70%;
-    font-size: 1.2em;
+    font-size: 0.8rem;
     color: var(--very-dark-brown);
     border-bottom: 0.1em Solid var(--very-dark-brown);
 }
@@ -3031,7 +3028,7 @@ img[src=""] {
     height: 25%;
     width: 30%;
     text-align: right;
-    font-size: 1.2em;
+    font-size: 1rem;
     color: white;
     text-shadow: var(--text-shadow-075);
 }
@@ -3052,12 +3049,10 @@ img[src=""] {
 
 .nut-shop-button > div {
     position: relative;
-    top: 2.5%;
     height: 60%;
     width: 25%;
-    row-gap: 2%;
     font: inherit;
-    font-size: 1.1em;
+    font-size: 0.8rem;
     color: var(--very-dark-green);
     background-color: var(--bright-light-green);
     border: 0.2em solid var(--dark-green);
@@ -3076,7 +3071,7 @@ img[src=""] {
     position: relative;
     display: flex;
     justify-content: center;
-    font-size: 0.9em;
+    font-size: 0.8rem;
     align-items: center;
 }
 
@@ -3111,7 +3106,7 @@ img[src=""] {
 }
 
 .nut-transcend > p {
-    font-size: 1.6em;
+    font-size: 1rem;
     color: white;
     text-align: center;
     text-shadow: var(--text-shadow-075);
@@ -3127,7 +3122,7 @@ img[src=""] {
     width: 45%;
     height: 100%;
     text-align: center;
-    font-size: 1.2em;
+    font-size: 1rem;
     background-color: var(--bright-light-green);
     border: 0.2em solid var(--dark-green);
     box-sizing: border-box;
@@ -3140,7 +3135,7 @@ img[src=""] {
     width: auto;
     max-width: 33%;
     aspect-ratio: 4.61;
-    font-size: 1em;
+    font-size: 1rem;
     color: white;
     text-shadow: var(--text-shadow-075);
     background: transparent url("../assets/tutorial/nutPill.webp") center/contain no-repeat;
@@ -3151,7 +3146,7 @@ img[src=""] {
 }
 
 .box-button {
-    font-size: 1.1em;
+    font-size: 1.2rem;
     padding: 0.25em;
     background-color: var(--bright-dark-green);
     border-radius: 0.5em;

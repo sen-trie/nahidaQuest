@@ -794,17 +794,19 @@ function touchDemo() {
         }
     }
 
-    if (crit) {
-        floatText("crit",true,leftDiv,clickEarn,randomInteger(40,55),60,abbrNum,clickerEvent);
-    } else {
-        if (settingsValues.combineFloatText) {
-            floatText("normal",true,leftDiv,clickEarn,43,43,abbrNum,clickerEvent);
+    if (document.visibilityState === 'visible') {
+        if (crit) {
+            floatText("crit",true,leftDiv,clickEarn,randomInteger(40,55),60,abbrNum,clickerEvent);
         } else {
-            floatText("normal",false,leftDiv,clickEarn,randomInteger(30,70),randomInteger(50,70),abbrNum,clickerEvent);
+            if (settingsValues.combineFloatText) {
+                floatText("normal",true,leftDiv,clickEarn,43,43,abbrNum,clickerEvent);
+            } else {
+                floatText("normal",false,leftDiv,clickEarn,randomInteger(30,70),randomInteger(50,70),abbrNum,clickerEvent);
+            }
         }
+        if (!settingsValues.showFallingNuts) {spawnFallingNut()};
     }
-
-    if (!settingsValues.showFallingNuts) {spawnFallingNut()};
+    
 };
 
 drawUI.demoFunction(demoContainer,demoImg);
@@ -4271,6 +4273,7 @@ function settingsBox(type,eleId) {
             {id: 'auto-preference',  default: 'autoClickBig', text: "Hold to Click 'Big Nahida'"},
             {id: 'wide-combat-preference',  default: 'wideCombatScreen', text: "Wide Battle Screen"},
             {id: 'left-hand-mode',  default: 'leftHandMode', text: "Left Handed Mode"},
+            {id: 'font-size-level',  default: 'fontSizeLevel', text: "Font Size"},
         ]
 
         let advancedSettingsMenu;
@@ -4283,19 +4286,34 @@ function settingsBox(type,eleId) {
         }
 
         advSettingsDict.forEach(advItem => {
-            const prefer = document.createElement('input');
-            prefer.checked = settingsValues[advItem.default];
-            prefer.type = 'checkbox';
-            prefer.id = advItem.id;
-    
             const preferLabel = document.createElement('label');
             preferLabel.classList.add('switch', 'flex-row');
             preferLabel.setAttribute('for', advItem.id);
     
             const preferText = document.createElement('p');
             preferText.innerText = advItem.text;
-            const checkSpan = document.createElement('span');
-            checkSpan.classList.add('slider');
+
+            const prefer = document.createElement('input');
+            if (advItem.id === 'font-size-level') {
+                prefer.classList.add('font-setting-input', 'flex-row');
+                prefer.value = settingsValues[advItem.default];
+                prefer.type = 'number';
+                prefer.min = 1;
+                prefer.max = 10;
+                prefer.id = advItem.id;
+
+                preferLabel.append(preferText, prefer);
+            } else {
+                const checkSpan = document.createElement('span');
+                checkSpan.classList.add('slider');
+
+                prefer.checked = settingsValues[advItem.default];
+                prefer.type = 'checkbox';
+                prefer.id = advItem.id;
+
+                preferLabel.append(preferText, prefer, checkSpan);
+            }
+            advancedMenu.append(preferLabel);
 
             switch (advItem.id) {
                 case 'nahida-preference':
@@ -4330,15 +4348,17 @@ function settingsBox(type,eleId) {
                         settingsValues.leftHandMode = prefer.checked;
                     });
                     break;
+                case 'font-size-level':
+                    prefer.addEventListener('change', () => {
+                        document.documentElement.style.fontSize = `calc(${0.2 + prefer.value * 0.16}vw + ${0.2 + prefer.value * 0.16}vh)`
+                    });
+                    break;
                 default:
                     prefer.addEventListener('change', () => {
                         settingsValues[advItem.default] = prefer.checked;
                     });
                     break;
             }
-            
-            preferLabel.append(preferText, prefer, checkSpan)
-            advancedMenu.append(preferLabel);
 
             if (beta) {
                 setTimeout(() => {
@@ -11992,11 +12012,11 @@ function autoClickNahida(type = 'use') {
 
             let delay;
             if (persistentValues.blackMarketDict['materialCollector'].level === 3) {
-                delay = 750;
+                delay = 800;
             } else if (persistentValues.blackMarketDict['materialCollector'].level === 2) {
-                delay = 1000;
+                delay = 1200;
             } else if (persistentValues.blackMarketDict['materialCollector'].level === 1) {
-                delay = 1250;
+                delay = 1500;
             }
 
             let demoButton = document.getElementById('demo-main-img');
@@ -12187,7 +12207,7 @@ function addNutStore() {
     const bodyText = document.createElement("div");
     bodyText.classList.add("flex-row")
     const bodyTextLeft = document.createElement("p");
-    bodyTextLeft.innerText = `You lose: \n\n All Nuts, \n All Items, \n Energy, \n Primogems`;
+    bodyTextLeft.innerText = `You lose: \n All Nuts, \n All Items, \n Energy, \n Primogems`;
     bodyTextLeft.classList.add("flex-column");
     const bodyTextRight = document.createElement("p");
     bodyTextRight.id = "transcend-display";

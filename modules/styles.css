@@ -11,9 +11,9 @@ html, body {
 }
 
 html {
-    font-size: calc(0.75vw + 0.75vh);
     height: 100%;
     width: 100%;
+    font-size: calc(1vw + 1vh);
     display: flex;
     justify-content: center;
     flex-direction: row;
@@ -56,7 +56,7 @@ button {
     position: absolute;
     bottom: 2%;
     font: inherit;
-    font-size: 0.7em;
+    font-size: 0.7rem;
     color: white;
     text-align: center;
     filter: drop-shadow(0 0 0.15em rgba(0, 0, 0, 0.795)) drop-shadow(0 0 0.1em rgba(0, 0, 0, 0.604));
@@ -68,7 +68,7 @@ button {
     bottom: 0;
     right: 0.2%;
     z-index: 10;
-    font-size: 0.75em;
+    font-size: 0.75rem;
     text-shadow: 0.1em 0.1em 0.15em black;
 }
 
@@ -78,7 +78,7 @@ button {
     bottom: 0;
     left: 0.1%;
     z-index: 10;
-    font-size: 0.45em;
+    font-size: 0.75rem;
     text-shadow: 0.05em 0.05em 0.07em black;
 }
 
@@ -186,13 +186,11 @@ button {
 }
 
 /* <-- STRETCHING HORIZONTALLY---> */
-
 @media (min-aspect-ratio: 28/9) {
     body {
         width: 50%;
         height: 100%;
         margin: 0;
-        font-size: 0.7vw;
         border-left: 0.2em groove  #465E2B;
         border-right: 0.2em groove  #465E2B;
     }
@@ -203,7 +201,6 @@ button {
         width: 68%;
         height: 100%;
         margin: 0;
-        font-size: 0.952vw;
         border-left: 0.2em groove  #465E2B;
         border-right: 0.2em groove  #465E2B;
     }
@@ -214,7 +211,6 @@ button {
         width: 80%;
         height: 100%;
         margin: 0;
-        font-size: 1.12vw;
         border-left: 0.2em groove  #465E2B;
         border-right: 0.2em groove  #465E2B;
     }
@@ -225,7 +221,6 @@ button {
         width: 90%;
         height: 100%;
         margin: 0;
-        font-size: 1.26vw;
         border-left: 0.2em groove  #465E2B;
         border-right: 0.2em groove  #465E2B;
     }
@@ -233,122 +228,12 @@ button {
 
 @media (max-aspect-ratio: 19/9) {
     body {
-        font-size: 1.5vw;
         width: 100%;
         height: 100%;
         margin: 0;
         border: 0;
     }
 }
-
-@media (max-aspect-ratio: 14/9) {
-    body {
-        font-size: 1.4vw;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        border: 0;
-    }
-}
-
-@media (max-aspect-ratio: 12.5/9) {
-    body {
-        font-size: 1.7vw;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        border: 0;
-    }
-}
-
-@media (max-aspect-ratio: 11.5/9) {
-    body {
-        touch-action: manipulation;
-        font-size: 1.9vw;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        border: 0;
-    }
-}
-
-@media (max-aspect-ratio: 9.5/9) {
-    body {
-        touch-action: manipulation;
-        font-size: 2.2vw;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        border: 0;
-    }
-}
-
- @media (max-aspect-ratio: 8/9){
-    body {
-        font-size: 2.6vw;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        border: 0;
-    }
-} 
-
-@media (max-aspect-ratio: 6/9){
-    body {
-        font-size: 3.2vw;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        border: 0;
-    }
-} 
-
-@media (max-aspect-ratio: 3.9/9){
-    .unsupported {
-        opacity: 1 !important;
-        z-index: 999999999 !important;
-    }
-} 
-
-.unsupported {
-    position: absolute;
-    z-index: -1;
-    height: 100%;
-    width: 100%;
-    row-gap: 2%;
-    opacity: 0;
-}
-
-.unsupported::before {
-    content: "";
-    position: absolute;
-    top:0;
-    left:0;
-    width: 100%;
-    height: 100%;
-    background-color: black;
-}
-
-.unsupported > img {
-    z-index: 9999999;
-    width: 30%;
-    max-height: 60%;
-    object-fit: cover;
-    aspect-ratio: 1;
-    box-sizing: border-box;
-    border: 0.5em solid #59BD8C;
-    border-radius: 1em;
-}
-
-.unsupported > p {
-    z-index: 9999999;
-    width: 85%;
-    text-align: center;
-    font: inherit;
-    font-size: 2em;
-    color: white;
-}
-
 
 /*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
@@ -602,7 +487,7 @@ table, button, label {
     bottom: 2%;
     z-index: 1010;
     font-family: 'gi-font';
-    font-size: 1.4em;
+    font-size: 1.4rem;
     text-shadow: var(--text-shadow-075);
     color:white;
     width: 30%;
@@ -622,7 +507,7 @@ table, button, label {
 #loading > p {
     position: absolute;
     bottom: 66.5%;
-    font-size: 2em;
+    font-size: 1.6rem;
     color: #ACDE7E;
     text-shadow: 0 0 0.2em black, 0 0 0.15em black, 0 0 0.1em black;
 }
@@ -634,11 +519,11 @@ table, button, label {
 }
 
 #score {
-    font-size: 1.5em;
+    font-size: 1.3rem;
 }
 
 #dps {
-    font-size: 0.9em;
+    font-size: 0.8rem;
 }
 
 .energy-primo-container {
@@ -661,7 +546,7 @@ table, button, label {
     width: 140%;
     height: 40%;
     z-index: 13;
-    font-size: 0.8em;
+    font-size: 0.65rem;
     background-color: #000000d8;
     border-radius: 1em;
 }
@@ -815,7 +700,7 @@ table, button, label {
 }
 
 .floatingText {
-    font-size: 1em;
+    font-size: 1rem;
     color: #022107;
     text-shadow: 0 0 0.25em white, 0 0 0.25em white, 0 0 0.15em white;
     position: absolute;
@@ -825,7 +710,7 @@ table, button, label {
 }
 
 .floatingTextLow {
-    font-size: 1.5em;
+    font-size: 1.5rem;
     color: #022107;
     text-shadow: 0 0 0.25em white, 0 0 0.25em white, 0 0 0.15em white;
     position: absolute;
@@ -835,7 +720,7 @@ table, button, label {
 }
 
 .floatingCritText {
-    font-size: 2em;
+    font-size: 2rem;
     color: #032509;
     text-shadow: 0 0 0.25em whitea2, 0 0 0.35em white9a, 0 0 0.15em white8e, 0 0 0.15em white8e;
     position: absolute;
@@ -856,7 +741,7 @@ table, button, label {
     position: absolute;
     z-index: 3;
     padding: 1%;
-    font-size: 0.65em;
+    font-size: 0.55rem;
     text-align: center;
     justify-content: flex-start;
     background-color: #00000096;
@@ -935,7 +820,7 @@ table, button, label {
     border-radius: 1rem;
     border: 0.20em solid var(--bright-dark-green);
     z-index: 150;
-    font-size: 1.3rem;
+    font-size: 1rem;
     animation: slidedown-pop 0.8s ease-in-out both;
     pointer-events: none;
 }
@@ -1017,7 +902,7 @@ table, button, label {
     top: -8%;
     font: inherit;
     width: auto;
-    font-size: 2.5em;
+    font-size: 1.6rem;
     color: #425d38;
     filter: drop-shadow(0 0 0.05em #98c887);
 }
@@ -1057,7 +942,7 @@ table, button, label {
     height: auto;
     max-height: 13%;
     aspect-ratio: 6.25;
-    font-size: 0.85em;
+    font-size: 0.8rem;
     position: relative;
     transition: 0.4s ease;
     text-align: center;
@@ -1281,10 +1166,8 @@ table, button, label {
 .filter-row div:nth-child(4) {
     position: relative;
     left: 2%;
-    top: -2%;
-    font-size: 1.1em;
+    font-size: 1rem;
     color: #3d311c;
-
 }
 
 .filter-row form:nth-child(3) {
@@ -1316,7 +1199,7 @@ table, button, label {
     height: 12%;
     aspect-ratio: 3.61;
     background-image: url(../assets/tutorial/exped-button.webp);
-    font-size: 1.4em;
+    font-size: 1.2rem;
     color: #E1D8CB;
     text-shadow: #40312b 0.05em 0.05em 0.05em;
     display: flex;
@@ -1342,7 +1225,7 @@ table, button, label {
     padding: 2%;
     width: auto;
     height: auto;
-    font-size: 1.2em;
+    font-size: 1rem;
     text-align: center;
     display: none;
     justify-content: center;
@@ -1351,7 +1234,7 @@ table, button, label {
     border-radius: 1em;
     border: 0.3em solid #876547;
     color: #f9d0bd;
-    filter: drop-shadow(0.3em 0.5em 0.15em #291504d4);
+    filter: drop-shadow(0.3rem 0.5rem 0.15rem #291504d4);
 }
 
 #expedDiv {
@@ -1498,7 +1381,7 @@ table, button, label {
 
 .exped-text {
     position: relative;
-    font-size: 1.4em;
+    font-size: 1.2rem;
     height: 22%;
     align-items: flex-end;
     column-gap: 1%;
@@ -1526,7 +1409,7 @@ table, button, label {
 }
 
 .exped-lore {
-    font-size: 1.1em;
+    font-size: 1rem;
     flex-grow: 1;
     align-items: flex-start;
     overflow-y: auto;
@@ -1618,7 +1501,7 @@ table, button, label {
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    font-size: 0.8em;
+    font-size: 0.6rem;
     pointer-events: none;
     color: #cfc0ac;
     white-space: nowrap;
@@ -1718,10 +1601,7 @@ table, button, label {
 .bounty-button > :first-child {
     height: 20%;
     width: 100%;
-    color: #F4D9A9;
     background-color: #95412d;
-    text-align: center;
-    font-size: 0.9em;
 }
 
 .bounty-button > :first-child > img {
@@ -1806,7 +1686,7 @@ table, button, label {
 .rank-button > p {
     position: absolute;
     color: white;
-    font-size: 2.3em;
+    font-size: 1.6rem;
     filter: drop-shadow(0 0 0.4em #3556B0) drop-shadow(0 0 0.4em #3556B0);
 }
 
@@ -1818,7 +1698,7 @@ table, button, label {
     width: 100%;
     overflow-y: auto;
     text-align: center;
-    font-size: 1.4em;
+    font-size: 1.1rem;
     padding: 2%;
     box-sizing: border-box;
     justify-content: flex-start;
@@ -1980,7 +1860,7 @@ table, button, label {
 }
 
 .commision-setting > p {
-    font-size: 0.8em;
+    font-size: 0.8rem;
     text-align: center;
     width: 7em;
     min-width: 7em;
@@ -2054,7 +1934,7 @@ table, button, label {
 }
 
 .comm-heroes > p:last-child {
-    font-size: 0.8em;
+    font-size: 0.8rem;
     padding: 0 2%;
 }
 
@@ -2132,7 +2012,7 @@ table, button, label {
     height: 100%;
     position: absolute;
     column-gap: 1%;
-    font-size: 1.4em;
+    font-size: 1.15rem;
 }
 
 .wish-button-primo {
@@ -2204,7 +2084,7 @@ table, button, label {
     border-radius: 0.3em 0.3em 0 0;
     border-bottom: 0;
     color: #e5ddda;
-    font-size: 1.25em;
+    font-size: 1rem;
 }
 
 #wish-counter-display > img {
@@ -2229,13 +2109,12 @@ table, button, label {
 
 /*/////////////////////////////// ACHIEVEMENT (TABLE5) CSS ///////////////////////////////*/
 #table5-container {
-    font-size: 10;
     background: url(../assets/bg/achievementBG.webp);
     background-size:cover;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: inherit;
+    font-size: 0.85rem;
 }
 
 .achieve {                                         
@@ -2254,11 +2133,11 @@ table, button, label {
 }
 
 .achieveH1 {
-    font-size: 0.9em;
+    font-size: 0.9rem;
 }
 
 .achieveH2 {
-    font-size: 0.8em;
+    font-size: 0.8rem;
 }
 
 .achieve:hover {
@@ -2352,13 +2231,13 @@ table, button, label {
 }
 
 .achieveStoredH1 {
-    font-size: 0.85em;
+    font-size: 0.7rem;
     color: #343030;
     margin: 0;
 }
 
 .achieveStoredH2 {
-    font-size: 0.75em;
+    font-size: 0.65rem;
     margin: 0;
 }
 
@@ -2368,7 +2247,7 @@ table, button, label {
     height: 80%;
     top: 12%;
     color: #D9BD85;
-    font-size: 1em;
+    font-size: 0.9rem;
     overflow-y: auto;
     justify-content: flex-start;
     gap: 2%;
@@ -2413,7 +2292,7 @@ table, button, label {
 }
 
 .challenge-button {
-    font-size: 0.8em;
+    font-size: 0.75rem;
     width: 25%;
     padding: 1%;
     background-color: #314151;
@@ -2477,9 +2356,9 @@ table, button, label {
 
 /*/////////////////////////////// TOOLTIP UI (TABLE6) CSS ///////////////////////////////*/
 #table6 {
-    padding: 1%;
+    padding: 0.2rem;
     font: inherit;
-    font-size: 1.08em;
+    font-size: 1.1rem;
     position: relative;
     width: 30%;
     height: 87.5%;
@@ -2495,7 +2374,7 @@ table, button, label {
 }
 
 #table6 > form {
-    font-size: 0.8em;
+    font-size: 0.75rem;
     width: 100%;
 }
 
@@ -2516,7 +2395,7 @@ table, button, label {
 
 .hero-breakdown > div > #notif-list {
     color: var(--very-dark-brown);
-    font-size: 1em !important;
+    font-size: 1rem !important;
     margin: 0.5em;
     padding-left: unset;
 }
@@ -2634,13 +2513,13 @@ table, button, label {
 }
 
 .tool-tip-text {
-    font-size:  0.8em;
+    font-size: 0.8rem;
     text-align: center;
     height: fit-content;
 }
 
 .tool-tip-lore {
-    font-size: 0.9em;
+    font-size: 0.9rem;
     overflow-y: auto;
     flex-grow: 1;
 }
@@ -2675,7 +2554,7 @@ table, button, label {
     width: 100%;
     z-index: 5;
     font-family: gi-font;
-    font-size: 1.4em;
+    font-size: 1.2rem;
     color: white;
     text-shadow: var(--very-dark-brown) 0.08em 0.08em 0.1em;
 }
@@ -2705,7 +2584,7 @@ table, button, label {
 
 #tree-table > p {
     color: white;
-    font-size: 1.5em;
+    font-size: 1.4rem;
     text-shadow: var(--text-shadow-075);
 }
 
@@ -2744,7 +2623,7 @@ table, button, label {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    font-size: 1.2em;
+    font-size: 1.2rem;
 }
 
 #seed-container {
@@ -2773,7 +2652,7 @@ table, button, label {
 .seed-column > button {
     width: 20%;
     margin-right: 2.5%;
-    font-size: 1.2em;
+    font-size: 1.2rem;
     margin-top: 0.2em;
     background-color: #B1A79A;
     color: #48392b;
@@ -2817,7 +2696,7 @@ table, button, label {
     right: 6%;
     top: 7%;
     color: white;
-    font-size: 1.3em;
+    font-size: 1rem;
     text-shadow: var(--text-shadow-050);
 }
 
@@ -2971,13 +2850,13 @@ table, button, label {
 }
 
 #tree-offer-container > p {
-    font-size: 1.2em;
+    font-size: 1rem;
     margin: 0.4em;
     text-align: center;
 }
 
 #tree-offer-container > p:last-of-type {
-    font-size: 1em;
+    font-size: 1rem;
     line-height: unset;
 }
 
@@ -3058,7 +2937,7 @@ table, button, label {
 #tree-offer-container > container > button, #leyline-container > div:last-of-type > button {
     width: 33%;
     aspect-ratio: 4.61;
-    font-size: 1em;
+    font-size: 1rem;
     color: white;
     text-shadow: var(--text-shadow-075);
     background: transparent url(../assets/tutorial/nutPill.webp) center/contain no-repeat;
@@ -3089,7 +2968,7 @@ table, button, label {
 }
 
 .tree-enemy > p:first-of-type {
-    font-size: 1.4em;
+    font-size: 1.4rem;
 }
 
 .tree-enemy > p:last-of-type {
@@ -3099,7 +2978,7 @@ table, button, label {
 
 .tree-enemy > button {
     margin: 2%;
-    font-size: 1.1em;
+    font-size: 1.1rem;
     padding: 1%;
     background-color: #557a36;
     border-radius: 0.5em;
@@ -3123,7 +3002,7 @@ table, button, label {
 }
 
 #leyline-container > p:first-of-type {
-    font-size: 1.4em;
+    font-size: 1.2rem;
     color: #e39f2b;
 }
 
@@ -3203,7 +3082,7 @@ table, button, label {
 }
 
 #notif-list, #transcend-helpbox {
-    font-size: 1.2em;
+    font-size: 1.2rem;
     margin: 1em;
     width: 100%;
     color: #233d10;
@@ -3213,7 +3092,7 @@ table, button, label {
 }
 
 #transcend-helpbox {
-    font-size: 1em;
+    font-size: 1rem;
     margin: 0.5em;
     padding-left: 0;
 }
@@ -3249,7 +3128,7 @@ table, button, label {
 }
 
 .choice-ele > div > p, .notif-ele > div > p {
-    font-size: 1.4em;
+    font-size: 1.2rem;
     text-shadow: var(--text-shadow-075);
     text-align: center;
 }
@@ -3260,7 +3139,7 @@ table, button, label {
 }
 
 .choice-ele > div > div > button, .notif-ele > div > div > button {
-    font-size: 1.1em;
+    font-size: 1.2rem;
     padding: 5%;
     background-color: #557a36;
     border-radius: 0.5em;
