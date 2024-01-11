@@ -94,15 +94,6 @@
     scrollbar-color: var(--light-green) var(--very-dark-green);
 }
 
-.settings-tab::-webkit-scrollbar {
-    background-color: var(--light-green)
-}
-
-.settings-tab::-webkit-scrollbar-thumb {
-    background-color: var(--bright-dark-green);
-    border-radius: 1rem;
-}
-
 .patch-button {
     position: unset;
     width: fit-content;
@@ -154,8 +145,33 @@ input:checked + .slider {
 #font-size-level {
     opacity: 1;
     font: inherit;
-    width: 2rem;
-    height: 1.6rem;
+    width: auto;
+    height: 70%;
+    aspect-ratio: 1.3;
+    color: var(--very-dark-green);
+    background-color: var(--light-green);
+    border: 0.1rem solid var(--dark-green);
+}
+
+.font-add {
+    font-size: 1.15rem;
+    height: 75%;
+    width: auto;
+    aspect-ratio: 1;
+    border: 0.1rem solid var(--dark-green);
+}
+
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.adv-reset {
+    width: auto;
+    height: 80%;
+    aspect-ratio: 2.3;
+    background-color: var(--light-green);
+    border: 0.1rem solid var(--dark-green);
 }
 
 .slider {
@@ -164,7 +180,7 @@ input:checked + .slider {
 
 .advanced-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 50%);
     grid-auto-rows: 3em;
     gap: 1em 0.5em;
 }
@@ -345,3 +361,28 @@ input:checked + .slider {
     background-color: var(--pale-medium-green);
     border: var(--dark-green) 0.15em solid;
 }
+
+.green-scrollbar {
+    scrollbar-color: var(--bright-dark-green) var(--light-green);
+}
+
+.green-scrollbar::-webkit-scrollbar {
+    background-color: var(--light-green);
+}
+
+.green-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--bright-dark-green);
+}
+
+.blue-scrollbar {
+    scrollbar-color: var(--medium-blue) var(--dark-blue);
+}
+
+.blue-scrollbar::-webkit-scrollbar {
+    background-color: var(--dark-blue);
+}
+
+.blue-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--medium-blue);
+}
+

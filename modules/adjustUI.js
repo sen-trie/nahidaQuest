@@ -1,5 +1,3 @@
-import { randomInteger } from "./functions.js";
-
 // ADD TO INVENTORY BUTTON ADJUST
 function inventoryAddButton(buttonInv, Item) {
     let buttonInvFrame = document.createElement("img");
@@ -127,12 +125,6 @@ function dimMultiplierButton(int,currentDimMultiplier) {
         currentDimMultiplier = int;
     }
     return currentDimMultiplier;
-}
-
-// ADJUST SETTINGS VOLUME 
-function volumeScrollerAdjust(volumeScroller) {
-    volumeScroller.x = "100";
-    return volumeScroller;
 }
 
 // CREATES A FRAME OF AN INVENTORY ITEM
@@ -431,4 +423,4 @@ function createMedal(num, choiceBox, mainBody, stopSpawnEvents) {
     return nutMedal;
 }
 
-export { createButton,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal };
+export { createButton,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal };

@@ -1,11 +1,11 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,volumeScrollerAdjust,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal } from "./modules/adjustUI.js"
+import * as Settings from "./modules/features/settings.js"
 import * as Shop from "./modules/features/shop.js";
 import * as Expedition from "./modules/features/expedition.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
-// import * as drawUI from "./modules/drawUI.js"
 
 const VERSIONNUMBER = "V.1-02-002";
 const COPYRIGHT = "DISCLAIMER © HoYoverse.  \n All rights reserved. This site is not affiliated \n with Hoyoverse, nor Genshin Impact.";
@@ -45,7 +45,7 @@ if (localStorage.getItem("settingsValues") !== null) {
         
             setTimeout(function() {
                 let deleteBox = document.getElementById("confirm-box");
-                if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
+                if (deleteBox.style.zIndex !== -1) {deleteBox.style.zIndex = -1}
                 startText.remove();
             },200)
         }
@@ -91,7 +91,7 @@ function deleteConfirmMenu(type,location) {
     let deleteBox = document.getElementById("confirm-box");
     deleteType = location;
     if (type == "toggle") {
-        universalStyleCheck(deleteBox,"zIndex",1000,-1)
+        universalStyleCheck(deleteBox,"zIndex", 1100, -1)
     } else if (type === "close") {
         if (deleteBox.style.zIndex !== -1) {
             deleteBox.style.zIndex = -1;
@@ -152,7 +152,7 @@ function deleteConfirmButton(confirmed) {
     }
         
     let deleteBox = document.getElementById("confirm-box");
-    if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1}
+    if (deleteBox.style.zIndex !== -1) {deleteBox.style.zIndex = -1}
     return;
 }
 
@@ -584,6 +584,7 @@ function loadSaveData() {
         }
 
         advDict = advDictDefault;
+        advDict.rankDict = rankTemp;
     } else {
         let advDictTemp = localStorage.getItem("advDictSave");
         advDict = JSON.parse(advDictTemp);
@@ -712,6 +713,7 @@ function loadSaveData() {
 
     const leftHandCSS = document.getElementById('toggle-css');
     leftHandCSS.disabled = (settingsValues.leftHandMode ? undefined : 'disabled');
+    document.documentElement.style.fontSize = `calc(${0.2 + settingsValues.fontSizeLevel * 0.16}vw + ${0.2 + settingsValues.fontSizeLevel * 0.16}vh)`;
 }
 
 // BIG BUTTON FUNCTIONS
@@ -3156,12 +3158,12 @@ function tutorial(idleAmount) {
         playButton.addEventListener("click",()=>{
             overlay.style.zIndex = -1;
             // CHECK IF ITS PLAYER'S FIRST LOAD FOR THE DAY (ONLY WORKS ON DEPLOYMENT)
-            const lastVisit = document.cookie.replace(/(?:(?:^|.*;\s*)lastVisit\s*\=\s*([^;]*).*$)|^.*$/, '$1');
-            const today = new Date().toDateString();
-            if (lastVisit === '' || lastVisit !== today) {
-                settingsBox("toggle", "patch");
-                document.cookie = 'lastVisit=' + today + '; expires=' + new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toUTCString() + '; path=/';
-            }
+            // const lastVisit = document.cookie.replace(/(?:(?:^|.*;\s*)lastVisit\s*\=\s*([^;]*).*$)|^.*$/, '$1');
+            // const today = new Date().toDateString();
+            // if (lastVisit === '' || lastVisit !== today) {
+            //     settingsBox("toggle", "patch");
+            //     document.cookie = 'lastVisit=' + today + '; expires=' + new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toUTCString() + '; path=/';
+            // }
 
             clearInterval(timerLoad);
             timer = setInterval(timerEvents,timeRatio);
@@ -3378,12 +3380,7 @@ function tabChange(x) {
         let treeSide = document.getElementById("tree-side");
         if (treeSide.style.display === "flex") {treeSide.style.display = "none";}
     }
-
-    // if (document.getElementById("pet-table")) {
-    //     let petTemp = document.getElementById("pet-table");
-    //     if (petTemp.style.display === "flex") {petTemp.style.display = "none"}
-    // }
-
+    
     if (x == 0) {
         if (filterDiv.style.display !== "flex") {filterDiv.style.display = "flex"};
         if (table6.style.display !== "flex") {table6.style.display = "flex"};
@@ -3438,7 +3435,7 @@ document.addEventListener("keydown", function(event) {
         toggleSettings();
         if (document.getElementById("confirm-box")) {
             let deleteBox = document.getElementById("confirm-box");
-            if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
+            if (deleteBox.style.zIndex !== -1) {deleteBox.style.zIndex = -1};
         }
     }
 
@@ -3477,136 +3474,81 @@ document.addEventListener("keydown", function(event) {
 function settings() {
     settingsBox("create");
     // JUST THE BUTTON FOR SETTING MENU
-    let settingButton = document.createElement("button");
-    settingButton.classList.add("settings-button");
-    settingButton.id = 'setting-button'
-
-    let settingButtonImg = document.createElement("img");
-    settingButtonImg.src = "./assets/settings/settings-logo.webp";
-    settingButtonImg.classList.add("settings-button-img");
-    settingButtonImg.id = 'setting-button-img';
-    settingButton.appendChild(settingButtonImg);
+    const settingButton = Settings.settingButton();
 
     // RELATED TO SETTINGS MENU
-    const settingsMenu = createDom('div', {
-        class:["flex-column","settings-menu"],
-        id: 'settings-menu'
-    });
-
-    const settingsNameObject = {'General': 'block', 'Advanced':'block', 'Saves':'flex', 'Console':'flex'};
+    const settingsNameObject = {'General': 'block', 'Advanced': 'block', 'Saves': 'flex', 'Console': 'flex'};
     const settingsTabArray = [];
     const settingsButtonArray = [];
-    if (beta) {
-        const settingsHeader = createDom('div', {
-            classList: ['flex-row', 'settings-header']
+    const settingsHeader = createDom('div', {
+        classList: ['flex-row', 'settings-header']
+    })
+
+    const settingsMenu = createDom('div', {
+        class:["flex-column","settings-menu"],
+        id: 'settings-menu',
+        child: [settingsHeader]
+    });
+
+    for (const [tabKey, styleValue] of Object.entries(settingsNameObject)) {
+        const tabMenu = createDom('div', {
+            class:['settings-tab', 'green-scrollbar', (styleValue === 'flex' ? 'flex-column' : null), (styleValue === 'flex' ? 'settings-tab-box' : null)],
+            id: `settings-tab-${tabKey.toLowerCase()}`,
+            defaultStyle: styleValue,
+            style: {
+                display: tabKey === 'General' ? 'block' : 'none'
+            }
+        });
+
+        const tabButton = createDom('button', {
+            class:["settings-tab-button", (tabKey === 'General' ? null : 'inactive-tab')],
+            id: `settings-button-${tabKey.toLowerCase()}`,
+            innerText: tabKey,
+        });
+
+        tabButton.addEventListener('click', () => {
+            settingsTabArray.forEach((tab) => { tab.style.display = 'none' });
+            settingsButtonArray.forEach((item) => { item.classList.add('inactive-tab')});
+            if (tabButton.classList.contains('inactive-tab')) { tabButton.classList.remove('inactive-tab')}
+            if (tabKey === 'Advanced') {
+                const advancedStats = document.getElementById('settings-stats');
+                advancedStats.generateStats(persistentValues);
+            }
+
+            tabMenu.style.display = styleValue;
         })
 
-        settingsMenu.append(settingsHeader);
-
-        for (const [tabKey, styleValue] of Object.entries(settingsNameObject)) {
-            const tabMenu = createDom('div', {
-                class:['settings-tab', (styleValue === 'flex' ? 'flex-column' : null), (styleValue === 'flex' ? 'settings-tab-box' : null)],
-                id: `settings-tab-${tabKey.toLowerCase()}`,
-                defaultStyle: styleValue,
-                style: {
-                    display: tabKey === 'General' ? 'block' : 'none'
-                }
-            });
-
-            const tabButton = createDom('button', {
-                class:["settings-tab-button", (tabKey === 'General' ? null : 'inactive-tab')],
-                id: `settings-button-${tabKey.toLowerCase()}`,
-                innerText: tabKey,
-            });
-
-            tabButton.addEventListener('click', () => {
-                settingsTabArray.forEach((tab) => {
-                    tab.style.display = 'none';
-                })
-
-                settingsButtonArray.forEach((item) => {
-                    item.classList.add('inactive-tab');
-                });
-
-                if (tabButton.classList.contains('inactive-tab')) {
-                    tabButton.classList.remove('inactive-tab')
-                }
-
-                if (tabKey === 'Advanced') {
-                    const advancedStats = document.getElementById('settings-stats');
-                    advancedStats.innerHTML = '';
-
-                    const statsArray = {
-                        'timeSpentValue': 'Time Spent:', 
-                        'lifetimeClicksValue': 'Big Nahida Clicks:',  
-                        'itemsUsedValue': 'Items Used:', 
-                        'lifetimeLevelsValue': 'Character Levels Purchased:', 
-                        'lifetimeEnergyValue': 'Cumulative Energy:', 
-                        'lifetimePrimoValue': 'Cumulative Primogems:', 
-                        'aranaraEventValue': 'Aranara Events Witnessed:', 
-                        'aranaraLostValue': 'Aranara Events Lost:', 
-                        'enemiesDefeatedValue': 'Enemies Defeated:', 
-                        'commissionsCompletedValue': 'Commisions Completed:', 
-                        'transcendValue': 'Times Transcended:',
-                        'harvestCount': 'Mature Trees Harvested:'
-                    };
-    
-                    for (const [key, value] of Object.entries(statsArray)) {
-                        advancedStats.innerHTML += `${value} ${key === 'timeSpentValue' ? convertTo24HourFormat(persistentValues[key] / 60) + ' hrs' : persistentValues[key]}<br>`;
-                    }
-                }
-
-                tabMenu.style.display = styleValue;
-            })
-
-            settingsButtonArray.push(tabButton)
-            settingsTabArray.push(tabMenu);
-
-            settingsHeader.append(tabButton);
-            settingsMenu.append(tabMenu);
-        }
+        settingsButtonArray.push(tabButton)
+        settingsTabArray.push(tabMenu);
+        settingsHeader.append(tabButton);
+        settingsMenu.append(tabMenu);
     }
 
-    let settingsText = document.createElement("img");
-    settingsText.classList.add("settings-text");
-    settingsText.src = "./assets/settings/SettingsText.webp"
+    mainBody.appendChild(settingsMenu);
+
+    generalSettings(settingsMenu);
+    advancedSettings();
+
+    settingButton.addEventListener("click", () => {
+        toggleSettings();
+        let deleteBox = document.getElementById("confirm-box");
+        if (deleteBox.style.zIndex !== -1) {deleteBox.style.zIndex = -1};
+        if (settingButton.classList.contains('settings-button-img-glow')) {
+            settingButton.classList.remove('settings-button-img-glow')
+        }
+    })
+    multiplierButtonContainer.prepend(settingButton);
+}
+
+function generalSettings(settingsMenu) {
+    let generalSettingsMenu = document.getElementById('settings-tab-general');
+    // TOP OF GENERAL
+    const volumeScrollerContainer = Settings.volumeScrollerCreate(settingsValues);
     
-    let volumeScrollerContainer = document.createElement("div")
-    volumeScrollerContainer.classList.add("volume-scroller-container");
-
-    let volumeScrollerBGMContainer = document.createElement("div");
-    volumeScrollerBGMContainer.classList.add("volume-scroller-container-children");
-    let volumeScrollerBGM = document.createElement("input");
-    volumeScrollerBGM = volumeScrollerAdjust(volumeScrollerBGM);
-    volumeScrollerBGM.id = "volume-scroller-bgm";
-    volumeScrollerBGM.setAttribute("type", "range");
-    volumeScrollerBGM.value = settingsValues.bgmVolume * 100;
-
-    let volumeScrollerBGMText = document.createElement("div");
-    let volumeScrollerBGMTextImage = document.createElement("img");
-    volumeScrollerBGMTextImage.src = "./assets/settings/BGM.webp"
-    volumeScrollerBGMText.appendChild(volumeScrollerBGMTextImage)
-    volumeScrollerBGMContainer.append(volumeScrollerBGMText,volumeScrollerBGM);
-
-    let volumeScrollerSFXContainer = document.createElement("div");
-    volumeScrollerSFXContainer.classList.add("volume-scroller-container-children");
-    let volumeScrollerSFX = document.createElement("input");
-    volumeScrollerSFX = volumeScrollerAdjust(volumeScrollerSFX);
-    volumeScrollerSFX.setAttribute("type", "range");
-    volumeScrollerSFX.id = "volume-scroller-sfx";
-    volumeScrollerSFX.value = settingsValues.sfxVolume * 100;
-
-    let volumeScrollerSFXText = document.createElement("div");
-    let volumeScrollerSFXTextImage = document.createElement("img");
-    volumeScrollerSFXTextImage.src = "./assets/settings/SFX.webp"
-    volumeScrollerSFXText.appendChild(volumeScrollerSFXTextImage)
-    volumeScrollerSFXContainer.append(volumeScrollerSFXText,volumeScrollerSFX);
-    volumeScrollerContainer.append(volumeScrollerBGMContainer,volumeScrollerSFXContainer)
-    
+    // MIDDLE OF GENERAL
     let settingsMiddle = document.createElement("div");
     settingsMiddle.classList.add("flex-row","settings-bottom");
 
-    // BOTTOM RIGHT OF SETTINGS
     let settingsMiddleRight = document.createElement("div");
     settingsMiddleRight.classList.add("settings-bottom-right");
 
@@ -3630,68 +3572,6 @@ function settings() {
     clearSetting.classList.add("setting-clear");
     clearSetting.addEventListener("click",() => {deleteConfirmMenu("toggle","loaded")})
 
-    // BOTTOM LEFT OF SETTINGS
-    let settingsMiddleLeft = document.createElement("div");
-    settingsMiddleLeft.classList.add("settings-bottom-left");
-
-    let label = document.createElement("label");
-    label.innerText = "Combine Click Counts";
-    label.classList.add("switch");
-    
-    let input = document.createElement("input");
-    input.type = "checkbox";
-    input.name = "color";
-    input.value = "red";
-
-    let slider = document.createElement("span");
-    slider.classList.add("slider")
-    if (settingsValues.combineFloatText === true) {
-        input.checked = true;
-    }
-
-    input.addEventListener("change", function() {
-        if (input.checked) {
-            settingsValues.combineFloatText = true;
-        } else {
-            settingsValues.combineFloatText = false;
-        }
-    });
-
-    label.append(input,slider);
-
-    const advancedSettingButton = document.createElement("button");
-    advancedSettingButton.innerText = "Advanced Settings";
-    advancedSettingButton.addEventListener("click",()=>{settingsBox("toggle", "advanced")});
-
-    const errorButton = document.createElement("button");
-    errorButton.innerText = "Error Log";
-    errorButton.addEventListener("click",()=>{settingsBox("toggle","error")});
-
-    const extraButton = document.createElement("button");
-    extraButton.innerText = "Command Console";
-    extraButton.addEventListener("click",()=>{settingsBox("toggle","command")});
-
-    const reportButton = document.createElement("button");
-    reportButton.innerText = "Report a Bug!";
-    reportButton.addEventListener("click",()=>{window.open('https://nahidaquest.com/feedback',"_blank")})
-
-    const creditsButton = document.createElement("button");
-    creditsButton.innerText = "Credits";
-    creditsButton.addEventListener("click",()=>{window.open('https://nahidaquest.com/credits',"_blank")})
-
-    settingsMiddleLeft.append(label);
-    settingsMiddleLeft.append(errorButton, reportButton, extraButton, creditsButton);
-
-    const exportSaveSetting = document.createElement("div");
-    exportSaveSetting.innerText = "Export Save";
-    exportSaveSetting.classList.add("flex-row");
-    exportSaveSetting.addEventListener("click",()=>{settingsBox("toggle","export")})
-
-    const importSaveSetting = document.createElement("div");
-    importSaveSetting.innerText = "Import Data";
-    importSaveSetting.classList.add("flex-row");
-    importSaveSetting.addEventListener("click",()=>{settingsBox("toggle","import")})
-
     const cancelButton = document.createElement("button");
     cancelButton.classList.add("cancel-button");
     cancelButton.addEventListener("click",()=>{
@@ -3700,113 +3580,195 @@ function settings() {
         deleteConfirmMenu("close","loaded");
     })
 
-    const patchNotesButton = document.createElement("button");
-    patchNotesButton.classList.add("patch-button", 'clickable');
-    
-    if (beta) {
-        const patchNotesDiv = document.getElementById('patch-container');
-        patchNotesDiv.style.display = 'none';
+    const patchNotesDiv = document.getElementById('patch-container');
+    patchNotesDiv.style.display = 'none';
 
-        const patchBack = createDom('button', {
-            innerText: 'Back'
-        });
+    const patchBack = createDom('button', {
+        innerText: 'Back',
+        event: ['click', () => {patchNotesDiv.style.display = patchNotesDiv.style.display === 'none' ? 'flex' : 'none'}]
+    });
 
-        patchBack.addEventListener('click', () => {
+    patchNotesDiv.prepend(patchBack);
+    generalSettingsMenu.append(patchNotesDiv);
+
+    const patchNotesButton = createDom("button", {
+        classList: ["patch-button", 'clickable', "flex-row"],
+        event: ["click", () => {
             patchNotesDiv.style.display = patchNotesDiv.style.display === 'none' ? 'flex' : 'none';
-        })
+        }],
+        child: [
+            createDom('img', {
+                src: './assets/icon/patch.webp'
+            }), 
+            createDom('p', {
+                innerText: 'Patch Notes',
+            })
+        ]
+    });
 
-        patchNotesDiv.prepend(patchBack)
-        settingsTabArray[0].append(patchNotesDiv);
+    settingsMiddleRight.append(infoSetting, saveSetting, clearSetting);
+    settingsMiddle.append(patchNotesButton, settingsMiddleRight);
 
-        patchNotesButton.addEventListener("click", () => {
-            patchNotesDiv.style.display = patchNotesDiv.style.display === 'none' ? 'flex' : 'none';
-        })
-        patchNotesButton.classList.add("flex-row");
+    // BOTTOM OF GENERAL
+    const settingsBottom = createDom('div', {
+        class: ["flex-row", "settings-bottom"],
+    });
 
-        const patchNoteImg = createDom('img', {
-            src: './assets/icon/patch.webp'
-        })
+    const settingsBottomBadge = createDom('div', {
+        class: ['settings-badges'],
+        id: 'badges-div'
+    });
 
-        const patchNoteText = createDom('p', {
-            innerText: 'Patch Notes',
-        })
+    if (saveValues.goldenTutorial) { settingsBottomBadge.append(createMedal(1, choiceBox, mainBody, stopSpawnEvents))}
+    if (persistentValues.finaleBossDefeat) { settingsBottomBadge.append(createMedal(2, choiceBox, mainBody, stopSpawnEvents))}
+    if (persistentValues.allChallenges) { settingsBottomBadge.append(createMedal(3, choiceBox, mainBody, stopSpawnEvents))}
 
-        patchNotesButton.append(patchNoteImg, patchNoteText)
+    const settingsBottomButtons = Settings.settingsBottomLinks();
+    const settingsCredits = createDom('div', {
+        class: ['flex-column', 'settings-bottom'],
+        child: [document.getElementById('copyright-number'), document.getElementById('vers-number')]
+    });
 
-        settingsMiddleRight.append(infoSetting, saveSetting, clearSetting);
-        settingsMiddle.append(patchNotesButton, settingsMiddleRight);
+    settingsBottom.append(settingsBottomBadge, settingsBottomButtons);
+    generalSettingsMenu.append(volumeScrollerContainer, settingsMiddle, settingsBottom, settingsCredits);
+    settingsMenu.append(cancelButton);
+}
 
-        const settingsBottom = createDom('div', {
-            class: ["flex-row", "settings-bottom"],
-        });
+function advancedSettings() {
+    // ADVANCED SETTINGS
+    const advSettingsDict = [
+        {id: 'nahida-preference',  default: 'preferOldPic', text: "Prefer Old 'Big Nahida'"},
+        {id: 'falling-preference',  default: 'showFallingNuts', text: "No Falling Nuts on Click"},
+        {id: 'clicking-preference',  default: 'combineFloatText', text: "Combine Click Counts"},
+        {id: 'wish-preference',  default: 'showWishAnimation', text: "No Wish Animation"},
+        {id: 'auto-preference',  default: 'autoClickBig', text: "Hold to Click 'Big Nahida'"},
+        {id: 'wide-combat-preference',  default: 'wideCombatScreen', text: "Wide Battle Screen"},
+        {id: 'left-hand-mode',  default: 'leftHandMode', text: "Left Handed Mode"},
+        {id: 'font-size-level',  default: 'fontSizeLevel', text: "Font Size (1-10)"},
+        {id: 'reset-level',  default: 'resetLevel', text: "Reset Adv. Settings"},
+    ]
 
-        const settingsBottomBadge = createDom('div', {
-            class: ['settings-badges'],
-            id: 'badges-div'
-        })
+    let advancedSettingsMenu = document.getElementById('settings-tab-advanced');
+    let advancedSettingsGrid = createDom('div', { class: ['advanced-grid']});
 
-        if (saveValues.goldenTutorial) {
-            settingsBottomBadge.append(createMedal(1, choiceBox, mainBody, stopSpawnEvents))
+    advSettingsDict.forEach(advItem => {
+        const preferLabel = document.createElement('label');
+        preferLabel.classList.add('switch', 'flex-row');
+        preferLabel.setAttribute('for', advItem.id);
+
+        const preferText = document.createElement('p');
+        preferText.innerText = advItem.text;
+
+        const prefer = document.createElement('input');
+        if (advItem.id === 'reset-level') {
+            const addButton = createDom('button', { classList:['flex-row', 'adv-reset'], innerText: 'Reset'});
+            addButton.addEventListener('click', () => {
+                advSettingsDict.forEach(key => {
+                    const keyInput = document.getElementById(key.id);
+                    if (key.id === 'font-size-level') {
+                        keyInput.value = SettingsDefault[key.default];
+                        keyInput.dispatchEvent(new Event('change'));
+                    } else if (key.id !== 'reset-level') {
+                        keyInput.checked = SettingsDefault[key.default];
+                        keyInput.dispatchEvent(new Event('change'));
+                    }
+                })
+            });
+            preferLabel.append(preferText, addButton);
+        } else if (advItem.id === 'font-size-level') {
+            prefer.classList.add('font-setting-input', 'flex-row');
+            prefer.changeValue = (newValue) => {
+                if (isNaN(newValue)) {
+                    prefer.value = 5;
+                } else {
+                    if (newValue < 1) {
+                        prefer.value = 1;
+                    } else if (newValue > 10) {
+                        prefer.value = 10;
+                    }
+
+                    prefer.value = Math.round(newValue * 10) / 10;
+                }
+
+                document.documentElement.style.fontSize = `calc(${0.2 + newValue * 0.16}vw + ${0.2 + newValue * 0.16}vh)`;
+                settingsValues[advItem.default] = Number(newValue);
+            }
+
+            prefer.value = settingsValues[advItem.default];
+            prefer.type = 'text';
+            prefer.id = advItem.id;
+
+            const addButton = createDom('button', { classList:['flex-row', 'font-add'], innerText: '+'});
+            const minusButton = createDom('button', { classList:['flex-row', 'font-add'], innerText: '-'});
+            addButton.addEventListener('click', () => {prefer.changeValue(Number(prefer.value) + 1)});
+            minusButton.addEventListener('click', () => {prefer.changeValue(Number(prefer.value) - 1)});
+
+            preferLabel.append(preferText, addButton, prefer, minusButton);
+        } else {
+            const checkSpan = document.createElement('span');
+            checkSpan.classList.add('slider');
+
+            prefer.checked = settingsValues[advItem.default];
+            prefer.type = 'checkbox';
+            prefer.id = advItem.id;
+
+            preferLabel.append(preferText, prefer, checkSpan);
         }
 
-        if (persistentValues.finaleBossDefeat || beta) {
-            settingsBottomBadge.append(createMedal(2, choiceBox, mainBody, stopSpawnEvents))
+        switch (advItem.id) {
+            case 'nahida-preference':
+                prefer.addEventListener('change', () => {
+                    settingsValues.preferOldPic = prefer.checked;
+                    let demoImg = document.getElementById('demo-main-img');
+                    demoImg.skin = prefer.checked ? 'Old' : 'New';
+                    persistentValues.nahidaSkin = demoImg.skin;
+
+                    if (demoImg.src != "./assets/event/scara.webp") {
+                        demoImg.revertPicture();
+                    }
+                });
+                break;
+            case 'wide-combat-preference':
+                prefer.addEventListener('change', () => {
+                    const adventureVideo = document.getElementById('adventure-video');
+                    if (adventureVideo) {
+                        adventureVideo.style.width = prefer.checked ? '95%' : '60%';
+                    }
+                    settingsValues.wideCombatScreen = prefer.checked;
+                });
+                break;
+            case 'left-hand-mode':
+                prefer.addEventListener('change', () => {
+                    const leftHandCSS = document.getElementById('toggle-css');
+                    if (prefer.checked) {
+                        leftHandCSS.disabled = undefined;
+                    } else {
+                        leftHandCSS.disabled = 'disabled';
+                    }
+                    settingsValues.leftHandMode = prefer.checked;
+                });
+                break;
+            case 'font-size-level':
+                prefer.addEventListener('change', () => {
+                    prefer.changeValue(prefer.value);
+                })
+                break;
+            case 'reset-level':
+                break;
+            default:
+                prefer.addEventListener('change', () => {
+                    settingsValues[advItem.default] = prefer.checked;
+                });
+                break;
         }
 
-        if (persistentValues.allChallenges) {
-            settingsBottomBadge.append(createMedal(3, choiceBox, mainBody, stopSpawnEvents))
-        }
+        setTimeout(() => {
+            advancedSettingsGrid.append(preferLabel);
+        }, 1000)
+    });
 
-        const settingsBottomButtons = createDom('div', {
-            class: ['flex-column', 'settings-bottom-buttons']
-        })
-
-        const settingsCredit = createDom('button', {
-            innerText: 'Credits',
-            class: ['clickable'],
-            event: ['click', () => {window.open('https://nahidaquest.com/credits',"_blank")}]
-        })
-
-        const settingsHelp = createDom('button', {
-            innerText: 'Wiki',
-            class: ['clickable'],
-            event: ['click', () => {window.open('https://nahidaquest.com/wiki',"_blank")}]
-        })
-    
-        settingsBottomButtons.append(settingsHelp, settingsCredit);
-
-        const settingsCredits = createDom('div', {
-            class: ['flex-column', 'settings-bottom']
-        })
-
-        const copyrightText = document.getElementById('copyright-number');
-        const versNumber = document.getElementById('vers-number');
-
-        settingsCredits.append(copyrightText, versNumber)
-        settingsBottom.append(settingsBottomBadge, settingsBottomButtons);
-        settingsTabArray[0].append(settingsText, volumeScrollerContainer, settingsMiddle, settingsBottom, settingsCredits);
-        settingsMenu.append(cancelButton);
-    } else {
-        patchNotesButton.addEventListener("click", () => {settingsBox("toggle","patch")})
-
-        settingsMiddleRight.append(importSaveSetting, exportSaveSetting, infoSetting, saveSetting, clearSetting);
-        settingsMiddle.append(settingsMiddleLeft, settingsMiddleRight);
-        settingsMenu.append(settingsText, volumeScrollerContainer, settingsMiddle, cancelButton, patchNotesButton);
-    }
-
-
-
-    mainBody.appendChild(settingsMenu);
-
-    settingButton.addEventListener("click", () => {
-        toggleSettings();
-        let deleteBox = document.getElementById("confirm-box");
-        if (deleteBox.style.zIndex == 1000) {deleteBox.style.zIndex = -1};
-        if (settingButton.classList.contains('settings-button-img-glow')) {
-            settingButton.classList.remove('settings-button-img-glow')
-        }
-    })
-    multiplierButtonContainer.prepend(settingButton);
+    const advancedStats = Settings.advancedStats();
+    advancedSettingsMenu.append(advancedSettingsGrid, advancedStats);
 }
 
 let settingsOpen = false;
@@ -3815,7 +3777,6 @@ function toggleSettings(closeOnly) {
     if (settingsOpen == true) {
         settingsMenu.style.zIndex = -1;
         settingsOpen = false;
-        settingsBox("close");
     } else {
         if (closeOnly !== true) {
             settingsMenu.style.zIndex = 1000;
@@ -3841,25 +3802,54 @@ function settingsVolume() {
     });
 }
 
-const settingsID = ["export", "import", "error", "command", "patch", "advanced"];
-function settingsBox(type,eleId) {
-    if (type === "create") {
-        // EXPORT SAVE
-        const exportBoxDiv = document.createElement("div");
-        exportBoxDiv.classList.add("text-box");
-        exportBoxDiv.id = "export-box";
-        exportBoxDiv.style.zIndex = -1;
+function settingsBox() {
+    // PATCH NOTES
+    const patchDiv = document.createElement("div");
+    patchDiv.classList.add("text-box","patch-notes-div","flex-column");
+    patchDiv.id = "patch-box";
+    patchDiv.style.zIndex = -1;
 
-        const exportBox = document.createElement("textarea");
-        exportBox.value = "Save your game to export it!"
-        const cancelExportButton = document.createElement("button");
-        cancelExportButton.addEventListener("click",() => {
-            exportBoxDiv.style.zIndex = -1;
+    drawUI.patchNotes(patchDiv);
+
+    const patchCmdButton = document.createElement("button");
+    patchCmdButton.addEventListener("click",() => {
+        patchDiv.style.zIndex = -1;
+    })
+
+    patchDiv.append(patchCmdButton);
+    mainBody.appendChild(patchDiv);
+
+    setTimeout(() => {
+        const saveSettingsMenu = document.getElementById('settings-tab-saves');
+        const settingsHeader = createDom('div', { class: ['flex-row', 'settings-inner-tab', 'settings-header']});
+        const exportHeaderButton = createDom('button', { 
+            class: ['settings-header-button', 'settings-tab-button', 'inactive-tab'],
+            innerText: 'Export'
+        });
+
+        const importHeaderButton = createDom('button', { 
+            class: ['settings-header-button', 'settings-tab-button'],
+            innerText: 'Import'
+        });
+
+        const exportBox = createDom('div', {
+            class: ['settings-box'],
+            style: {
+                display: 'none'
+            }
+        });
+
+        const exportBoxText = createDom('textarea', {
+            class: ['settings-textarea'],
+            placeholder: "Save your game to export it!",
         })
 
-        const copyExportButton = document.createElement("button");
-        copyExportButton.innerText = "Download Save";
-        copyExportButton.addEventListener("click",() => {
+        const exportBoxButton = createDom('button', {
+            class: ['settings-inner-button'],
+            innerText: 'Download Save'
+        })
+        
+        exportBoxButton.addEventListener("click",() => {
             let text = JSON.stringify(localStorage);
             text = JSON.stringify(JSON.parse(text), null, 2)
 
@@ -3869,27 +3859,28 @@ function settingsBox(type,eleId) {
             link.href = URL.createObjectURL(blob);
             link.click();
         })
-        
-        exportBoxDiv.append(exportBox,cancelExportButton,copyExportButton);
-        mainBody.appendChild(exportBoxDiv);
 
-        // IMPORT SAVE
-        const importBoxDiv = document.createElement("div");
-        importBoxDiv.classList.add("text-box");
-        importBoxDiv.id = "import-box";
-        importBoxDiv.style.zIndex = -1;
+        exportBox.append(exportBoxText, exportBoxButton);
 
-        const textBox = document.createElement("textarea");
-        textBox.placeholder = "Paste save data here.";
-        const cancelButton = document.createElement("button");
-        cancelButton.addEventListener("click",() => {
-            importBoxDiv.style.zIndex = -1;
+        const importBox = createDom('div', {
+            class: ['settings-box'],
+            style: {
+                display: 'block'
+            }
+        });
+
+        const importBoxText = createDom('textarea', {
+            class: ['settings-textarea'],
+            placeholder: "Paste save data here.",
         })
 
-        const copyButton = document.createElement("button");
-        copyButton.innerText = "Import Data";
-        copyButton.addEventListener("click",()=>{
-            let promptSave = textBox.value;
+        const importBoxButton = createDom('button', {
+            class: ['settings-inner-button'],
+            innerText: 'Import Save'
+        })
+
+        importBoxButton.addEventListener("click", () => {
+            let promptSave = importBoxText.value;
             if (promptSave != null) {
                 let localStorageTemp = tryParseJSONObject(promptSave);
                 preventSave = true;
@@ -3909,7 +3900,7 @@ function settingsBox(type,eleId) {
                     clearPromise.then(
                         function(value) {
                             for (let key in localStorageTemp) {
-                                 localStorage.setItem(key, localStorageTemp[key]);
+                                    localStorage.setItem(key, localStorageTemp[key]);
                             }
                             location.reload();
                         },
@@ -3918,515 +3909,169 @@ function settingsBox(type,eleId) {
                 }
                 preventSave = false;
             }
-        })
-        importBoxDiv.append(textBox,cancelButton,copyButton);
-        mainBody.appendChild(importBoxDiv);
-
-        // ERROR LOG
-        const errorBoxDiv = document.createElement("div");
-        errorBoxDiv.classList.add("text-box");
-        errorBoxDiv.id = "error-box";
-        errorBoxDiv.style.zIndex = -1;
-
-        const errorBox = document.createElement("textarea");
-        errorBox.value = "Any errors or bugs will appear below this line! \nPlease report such errors to the developer through 'Report a Bug'. Thank you! :) \n------------------------------------------------------------------------------------------\n"
-        errorBox.readOnly = true;
-
-        window.onerror = function(message, url, line, col, error) {
-            errorBox.value += `${error}\nLine:${line}, Column:${col}\n\n`;
-        };
-
-        const cancelErrorButton = document.createElement("button");
-        cancelErrorButton.addEventListener("click",() => {
-            errorBoxDiv.style.zIndex = -1;
-        })
+        });
         
-        errorBoxDiv.append(errorBox,cancelErrorButton);
-        mainBody.appendChild(errorBoxDiv);
+        importBox.append(importBoxText, importBoxButton)
+        
+        exportHeaderButton.addEventListener('click', () => {
+            if (exportHeaderButton.classList.contains('inactive-tab')) {
+                exportHeaderButton.classList.remove('inactive-tab');
+                importHeaderButton.classList.add('inactive-tab')
+            }
 
-        // COMMAND BOX
-        const commandDiv = document.createElement("div");
-        commandDiv.classList.add("text-box");
-        commandDiv.id = "command-box";
-        commandDiv.style.zIndex = -1;
-
-        const commandBox = document.createElement("textarea");
-        commandBox.value = "Type your command here!";
-        const cancelCmdButton = document.createElement("button");
-        cancelCmdButton.addEventListener("click",() => {
-            commandDiv.style.zIndex = -1;
+            importBox.style.display = 'none';
+            exportBox.style.display = 'block';
+            setTimeout(()=> {
+                exportBoxText.value = `I AM NOT RESPONSIBLE FOR ANY DAMAGES CAUSED BY EDITING SAVES. Beware! Directly changing 'realScore','rowCount' or adding non-integer values may result in the save file being corrupted!
+                                        \n---------------------------------
+                                        \n${JSON.stringify(localStorage)}\n\n`;
+            }, 300);
         })
 
-        const commandButton = document.createElement("button");
-        commandButton.innerText = "Execute Command";
-        commandButton.addEventListener("click",()=>{
-            let commandText = commandBox.value.toLowerCase();
+        importHeaderButton.addEventListener('click', () => {
+            if (importHeaderButton.classList.contains('inactive-tab')) {
+                importHeaderButton.classList.remove('inactive-tab');
+                exportHeaderButton.classList.add('inactive-tab')
+            }
+
+            importBox.style.display = 'block';
+            exportBox.style.display = 'none';
+        })
+
+        settingsHeader.append(importHeaderButton, exportHeaderButton);
+        saveSettingsMenu.append(settingsHeader, exportBox, importBox);
+
+        /////////////////// CONSOLE TAB ////////////////////////////////////////
+        const consoleSettingsMenu = document.getElementById('settings-tab-console');
+        const consoleHeader = createDom('div', { class: ['flex-row', 'settings-inner-tab', 'settings-header']});
+        const errorHeaderButton = createDom('button', { 
+            class: ['settings-header-button', 'settings-tab-button'],
+            innerText: 'Error Log'
+        });
+
+        const consoleHeaderButton = createDom('button', { 
+            class: ['settings-header-button', 'settings-tab-button','inactive-tab'],
+            innerText: 'Commands'
+        });
+
+        const errorBox = createDom('div', {
+            class: ['settings-box'],
+            style: {
+                display: 'block'
+            }
+        });
+
+        const errorBoxText = createDom('textarea', {
+            class: ['settings-textarea'],
+            value: `Any errors logged will appear below the line! Please report such errors through 'Report a Bug' at the bottom right. Thank you! :) 
+                    \n---------------------------------\n`,
+            readOnly: true,
+        })
+
+        const errorBoxButton = createDom('button', {
+            class: ['settings-inner-button'],
+            innerText: 'Report a Bug!',
+            event: ['click', () => {window.open('https://nahidaquest.com/feedback',"_blank")}]
+        })
+
+        window.onerror = (line, col, error) => {
+            errorBoxText.value += `${error}\nLine:${line}, Column:${col}\n\n`;
+            };
+
+        errorBox.append(errorBoxText, errorBoxButton);
+
+        const consoleBox = createDom('div', {
+            class: ['settings-box'],
+            style: {
+                display: 'none'
+            }
+        });
+
+        const consoleBoxText = createDom('textarea', {
+            class: ['settings-textarea'],
+            placeholder: "Type your command here!",
+            style: {
+                fontSize: '1rem'
+            }
+        })
+
+        const consoleBoxButton = createDom('button', {
+            class: ['settings-inner-button'],
+            innerText: 'Execute Command'
+        })
+
+        consoleBoxButton.addEventListener("click",() => {
+            let commandText = consoleBoxText.value.toLowerCase();
             if (commandText === "transcend") {
                 nutPopUp();
                 toggleSettings(true);
             } else if (commandText === "ascend skip") {
                 persistentValues.tutorialAscend = true;
                 saveData();
-            } else if (commandText === "beta tools activate") {
+                location.reload();
+            } else if (commandText === "tester on") {
+                localStorage.setItem('tester', true);
+                location.reload();
+            } else if (commandText === "tester off") {
+                localStorage.setItem('tester', false);
+                location.reload();
+            } else if (commandText === "beta on") {
                 localStorage.setItem('beta', true);
                 location.reload();
-            } else if (commandText === "beta tools off") {
+            } else if (commandText === "beta off") {
                 localStorage.setItem('beta', false);
                 location.reload();
-            } else {
-                alert("Invalid command.");
-            }
-        })
-        commandDiv.append(commandBox,cancelCmdButton,commandButton);
-        mainBody.appendChild(commandDiv);
-
-        // PATCH NOTES
-        const patchDiv = document.createElement("div");
-        patchDiv.classList.add("text-box","patch-notes-div","flex-column");
-        patchDiv.id = "patch-box";
-        patchDiv.style.zIndex = -1;
-
-        drawUI.patchNotes(patchDiv);
-
-        const patchCmdButton = document.createElement("button");
-        patchCmdButton.addEventListener("click",() => {
-            patchDiv.style.zIndex = -1;
-        })
-
-        patchDiv.append(patchCmdButton);
-        mainBody.appendChild(patchDiv);
-
-        if (beta) {
-            setTimeout(() => {
-                const saveSettingsMenu = document.getElementById('settings-tab-saves');
-                const settingsHeader = createDom('div', { class: ['flex-row', 'settings-inner-tab', 'settings-header']});
-                const exportHeaderButton = createDom('button', { 
-                    class: ['settings-header-button', 'settings-tab-button', 'inactive-tab'],
-                    innerText: 'Export'
-                });
-
-                const importHeaderButton = createDom('button', { 
-                    class: ['settings-header-button', 'settings-tab-button'],
-                    innerText: 'Import'
-                });
-
-                const exportBox = createDom('div', {
-                    class: ['settings-box'],
-                    style: {
-                        display: 'none'
-                    }
-                });
-
-                const exportBoxText = createDom('textarea', {
-                    class: ['settings-textarea'],
-                    placeholder: "Save your game to export it!",
-                })
-
-                const exportBoxButton = createDom('button', {
-                    class: ['settings-inner-button'],
-                    innerText: 'Download Save'
-                })
-                
-                exportBoxButton.addEventListener("click",() => {
-                    let text = JSON.stringify(localStorage);
-                    text = JSON.stringify(JSON.parse(text), null, 2)
-        
-                    let blob = new Blob([text], {type: "text/plain"});
-                    let link = document.createElement("a");
-                    link.download = `NQ Save ${DBNUBMER}.txt`;
-                    link.href = URL.createObjectURL(blob);
-                    link.click();
-                })
-
-                exportBox.append(exportBoxText, exportBoxButton);
-
-                const importBox = createDom('div', {
-                    class: ['settings-box'],
-                    style: {
-                        display: 'block'
-                    }
-                });
-
-                const importBoxText = createDom('textarea', {
-                    class: ['settings-textarea'],
-                    placeholder: "Paste save data here.",
-                })
-
-                const importBoxButton = createDom('button', {
-                    class: ['settings-inner-button'],
-                    innerText: 'Import Save'
-                })
-        
-                importBoxButton.addEventListener("click", () => {
-                    let promptSave = importBoxText.value;
-                    if (promptSave != null) {
-                        let localStorageTemp = tryParseJSONObject(promptSave);
-                        preventSave = true;
-                        if (localStorageTemp === false) {
-                            alert("Invalid save data.")
-                            console.error("Invalid save data.");
-                        } else {
-                            let clearPromise = new Promise(function(myResolve, myReject) {
-                                localStorage.clear();
-                                if (localStorage.length === 0) {
-                                    myResolve(); 
-                                } else {
-                                    myReject();
-                                }
-                            });
-                            
-                            clearPromise.then(
-                                function(value) {
-                                    for (let key in localStorageTemp) {
-                                         localStorage.setItem(key, localStorageTemp[key]);
-                                    }
-                                    location.reload();
-                                },
-                                function(err) {console.error("Error clearing local data")}
-                            ); 
-                        }
-                        preventSave = false;
-                    }
-                });
-                
-                importBox.append(importBoxText, importBoxButton)
-                
-                exportHeaderButton.addEventListener('click', () => {
-                    if (exportHeaderButton.classList.contains('inactive-tab')) {
-                        exportHeaderButton.classList.remove('inactive-tab');
-                        importHeaderButton.classList.add('inactive-tab')
-                    }
-
-                    importBox.style.display = 'none';
-                    exportBox.style.display = 'block';
-                    setTimeout(()=> {
-                        exportBoxText.value = `I AM NOT RESPONSIBLE FOR ANY DAMAGES CAUSED BY EDITING SAVES. Beware! Directly changing 'realScore','rowCount' or adding non-integer values may result in the save file being corrupted!
-                                              \n---------------------------------
-                                              \n${JSON.stringify(localStorage)}\n\n`;
-                    }, 300);
-                })
-
-                importHeaderButton.addEventListener('click', () => {
-                    if (importHeaderButton.classList.contains('inactive-tab')) {
-                        importHeaderButton.classList.remove('inactive-tab');
-                        exportHeaderButton.classList.add('inactive-tab')
-                    }
-
-                    importBox.style.display = 'block';
-                    exportBox.style.display = 'none';
-                })
-
-                settingsHeader.append(importHeaderButton, exportHeaderButton);
-                saveSettingsMenu.append(settingsHeader, exportBox, importBox);
-
-                /////////////////// CONSOLE TAB ////////////////////////////////////////
-                const consoleSettingsMenu = document.getElementById('settings-tab-console');
-                const consoleHeader = createDom('div', { class: ['flex-row', 'settings-inner-tab', 'settings-header']});
-                const errorHeaderButton = createDom('button', { 
-                    class: ['settings-header-button', 'settings-tab-button'],
-                    innerText: 'Error Log'
-                });
-
-                const consoleHeaderButton = createDom('button', { 
-                    class: ['settings-header-button', 'settings-tab-button','inactive-tab'],
-                    innerText: 'Commands'
-                });
-
-                const errorBox = createDom('div', {
-                    class: ['settings-box'],
-                    style: {
-                        display: 'block'
-                    }
-                });
-
-                const errorBoxText = createDom('textarea', {
-                    class: ['settings-textarea'],
-                    value: `Any errors logged will appear below the line! Please report such errors through 'Report a Bug' at the bottom right. Thank you! :) 
-                            \n---------------------------------\n`,
-                    readOnly: true,
-                })
-
-                const errorBoxButton = createDom('button', {
-                    class: ['settings-inner-button'],
-                    innerText: 'Report a Bug!',
-                    event: ['click', () => {window.open('https://nahidaquest.com/feedback',"_blank")}]
-                })
-
-                window.onerror = (line, col, error) => {
-                    errorBoxText.value += `${error}\nLine:${line}, Column:${col}\n\n`;
-                  };
-        
-
-                errorBox.append(errorBoxText, errorBoxButton);
-
-                const consoleBox = createDom('div', {
-                    class: ['settings-box'],
-                    style: {
-                        display: 'none'
-                    }
-                });
-
-                const consoleBoxText = createDom('textarea', {
-                    class: ['settings-textarea'],
-                    placeholder: "Type your command here!",
-                    style: {
-                        fontSize: '1em'
-                    }
-                })
-
-                const consoleBoxButton = createDom('button', {
-                    class: ['settings-inner-button'],
-                    innerText: 'Execute Command'
-                })
-        
-                consoleBoxButton.addEventListener("click",() => {
-                    let commandText = consoleBoxText.value.toLowerCase();
-                    if (commandText === "transcend") {
-                        nutPopUp();
-                        toggleSettings(true);
-                    } else if (commandText === "ascend skip") {
-                        persistentValues.tutorialAscend = true;
-                        saveData();
-                        location.reload();
-                    } else if (commandText === "tester on") {
-                        localStorage.setItem('tester', true);
-                        location.reload();
-                    } else if (commandText === "tester off") {
-                        localStorage.setItem('tester', false);
-                        location.reload();
-                    } else if (commandText === "beta on") {
-                        localStorage.setItem('beta', true);
-                        location.reload();
-                    } else if (commandText === "beta off") {
-                        localStorage.setItem('beta', false);
-                        location.reload();
-                    } else if (commandText === "max level") {
-                        document.getElementById('tab-2').click();
-                        gainXP(99999);
-                        consoleBoxText.value = '';
-                    } else if (commandText.startsWith("spawn boss") && !isNaN(commandText.slice(-1))) {
-                        let bossNumber = Math.round(commandText.slice(-1));
-                        if (bossNumber > 0 && bossNumber < 5) {
-                            document.getElementById('tab-2').click();
-                            spawnBossQuest(bossNumber);
-                            consoleBoxText.value = '';
-                        } else {
-                            invalidCommand();
-                        }
-                    } else if (commandText === "skip nuts") {
-                        saveValues.realScore += 1e40;
-                        consoleBoxText.value = '';
-                    } else {
-                        invalidCommand();
-                    }
-                });
-
-                const invalidCommand = () => {
-                    alert("Invalid command.");
-                    console.warn(`Invalid command: ${consoleBoxText.value}.`);
+            } else if (commandText === "max level") {
+                document.getElementById('tab-2').click();
+                gainXP(99999);
+                consoleBoxText.value = '';
+            } else if (commandText.startsWith("spawn boss") && !isNaN(commandText.slice(-1))) {
+                let bossNumber = Math.round(commandText.slice(-1));
+                if (bossNumber > 0 && bossNumber < 5) {
+                    document.getElementById('tab-2').click();
+                    spawnBossQuest(bossNumber);
+                    consoleBoxText.value = '';
+                } else {
+                    invalidCommand();
                 }
-                
-                consoleBox.append(consoleBoxText, consoleBoxButton)
-                
-                errorHeaderButton.addEventListener('click', () => {
-                    if (errorHeaderButton.classList.contains('inactive-tab')) {
-                        errorHeaderButton.classList.remove('inactive-tab');
-                        consoleHeaderButton.classList.add('inactive-tab')
-                    }
-
-                    consoleBox.style.display = 'none';
-                    errorBox.style.display = 'block';
-                })
-
-                consoleHeaderButton.addEventListener('click', () => {
-                    if (consoleHeaderButton.classList.contains('inactive-tab')) {
-                        consoleHeaderButton.classList.remove('inactive-tab');
-                        errorHeaderButton.classList.add('inactive-tab')
-                    }
-
-                    consoleBox.style.display = 'block';
-                    errorBox.style.display = 'none';
-                })
-
-                consoleHeader.append(errorHeaderButton, consoleHeaderButton);
-                consoleSettingsMenu.append(consoleHeader, errorBox, consoleBox);
-            }, 500)
-        }
-
-        // ADVANCED SETTINGS
-        const advancedSettings = document.createElement("div");
-        advancedSettings.classList.add("advanced-settings-box", "patch-notes-div", "flex-column", "text-box");
-        advancedSettings.id = "advanced-box";
-        advancedSettings.style.zIndex = -1;
-
-        const advancedMenu = document.createElement("form");
-        advancedMenu.classList.add('advanced-menu-form')
-        const advancedMenuText = new Image();
-        advancedMenuText.src = './assets/settings/adv-settings.webp';
-        advancedMenu.append(advancedMenuText)
-
-        const advSettingsDict = [
-            {id: 'nahida-preference',  default: 'preferOldPic', text: "Prefer Old 'Big Nahida'"},
-            {id: 'falling-preference',  default: 'showFallingNuts', text: "No Falling Nuts on Click"},
-            {id: 'clicking-preference',  default: 'combineFloatText', text: "Combine Click Counts"},
-            {id: 'wish-preference',  default: 'showWishAnimation', text: "No Wish Animation"},
-            {id: 'auto-preference',  default: 'autoClickBig', text: "Hold to Click 'Big Nahida'"},
-            {id: 'wide-combat-preference',  default: 'wideCombatScreen', text: "Wide Battle Screen"},
-            {id: 'left-hand-mode',  default: 'leftHandMode', text: "Left Handed Mode"},
-            {id: 'font-size-level',  default: 'fontSizeLevel', text: "Font Size"},
-        ]
-
-        let advancedSettingsMenu;
-        let advancedSettingsGrid;
-        if (beta) {
-            setTimeout(() => {
-                advancedSettingsMenu = document.getElementById('settings-tab-advanced');
-                advancedSettingsGrid = createDom('div', { class: ['advanced-grid']});
-            }, 400)
-        }
-
-        advSettingsDict.forEach(advItem => {
-            const preferLabel = document.createElement('label');
-            preferLabel.classList.add('switch', 'flex-row');
-            preferLabel.setAttribute('for', advItem.id);
-    
-            const preferText = document.createElement('p');
-            preferText.innerText = advItem.text;
-
-            const prefer = document.createElement('input');
-            if (advItem.id === 'font-size-level') {
-                prefer.classList.add('font-setting-input', 'flex-row');
-                prefer.value = settingsValues[advItem.default];
-                prefer.type = 'number';
-                prefer.min = 1;
-                prefer.max = 10;
-                prefer.id = advItem.id;
-
-                preferLabel.append(preferText, prefer);
+            } else if (commandText === "skip nuts") {
+                saveValues.realScore += 1e40;
+                consoleBoxText.value = '';
             } else {
-                const checkSpan = document.createElement('span');
-                checkSpan.classList.add('slider');
-
-                prefer.checked = settingsValues[advItem.default];
-                prefer.type = 'checkbox';
-                prefer.id = advItem.id;
-
-                preferLabel.append(preferText, prefer, checkSpan);
-            }
-            advancedMenu.append(preferLabel);
-
-            switch (advItem.id) {
-                case 'nahida-preference':
-                    prefer.addEventListener('change', () => {
-                        settingsValues.preferOldPic = prefer.checked;
-                        let demoImg = document.getElementById('demo-main-img');
-                        demoImg.skin = prefer.checked ? 'Old' : 'New';
-                        persistentValues.nahidaSkin = demoImg.skin;
-
-                        if (demoImg.src != "./assets/event/scara.webp") {
-                            demoImg.revertPicture();
-                        }
-                    });
-                    break;
-                case 'wide-combat-preference':
-                    prefer.addEventListener('change', () => {
-                        const adventureVideo = document.getElementById('adventure-video');
-                        if (adventureVideo) {
-                            adventureVideo.style.width = prefer.checked ? '95%' : '60%';
-                        }
-                        settingsValues.wideCombatScreen = prefer.checked;
-                    });
-                    break;
-                case 'left-hand-mode':
-                    prefer.addEventListener('change', () => {
-                        const leftHandCSS = document.getElementById('toggle-css');
-                        if (prefer.checked) {
-                            leftHandCSS.disabled = undefined;
-                        } else {
-                            leftHandCSS.disabled = 'disabled';
-                        }
-                        settingsValues.leftHandMode = prefer.checked;
-                    });
-                    break;
-                case 'font-size-level':
-                    prefer.addEventListener('change', () => {
-                        document.documentElement.style.fontSize = `calc(${0.2 + prefer.value * 0.16}vw + ${0.2 + prefer.value * 0.16}vh)`
-                    });
-                    break;
-                default:
-                    prefer.addEventListener('change', () => {
-                        settingsValues[advItem.default] = prefer.checked;
-                    });
-                    break;
-            }
-
-            if (beta) {
-                setTimeout(() => {
-                    advancedSettingsGrid.append(preferLabel);
-                }, 500)
+                invalidCommand();
             }
         });
 
-        if (beta) {
-            setTimeout(() => {
-                const advancedStats = createDom('p', {
-                    id: 'settings-stats',
-                    class: ['settings-stats'],
-                });
-
-                const statsArray = {
-                    'timeSpentValue': 'Time Spent:', 
-                    'lifetimeClicksValue': 'Big Nahida Clicks:',  
-                    'itemsUsedValue': 'Items Used:', 
-                    'lifetimeLevelsValue': 'Character Levels Purchased:',
-                    'lifetimeEnergyValue': 'Cumulative Energy:', 
-                    'lifetimePrimoValue': 'Cumulative Primogems:', 
-                    'aranaraEventValue': 'Aranara Events Witnessed:', 
-                    'aranaraLostValue': 'Aranara Events Lost:', 
-                    'enemiesDefeatedValue': 'Enemies Defeated:', 
-                    'commissionsCompletedValue': 'Commisions Completed:', 
-                    'transcendValue': 'Times Transcended:',
-                    'harvestCount': 'Mature Trees Harvested:'
-                };
-
-                for (const [key, value] of Object.entries(statsArray)) {
-                    advancedStats.innerHTML += `${value} ${key === 'timeSpentValue' ? convertTo24HourFormat(persistentValues[key] / 60) : persistentValues[key]}<br>`;
-                }
-
-                advancedSettingsMenu.append(advancedSettingsGrid, advancedStats);
-            }, 550)
+        const invalidCommand = () => {
+            alert("Invalid command.");
+            console.warn(`Invalid command: ${consoleBoxText.value}.`);
         }
+        
+        consoleBox.append(consoleBoxText, consoleBoxButton)
+        
+        errorHeaderButton.addEventListener('click', () => {
+            if (errorHeaderButton.classList.contains('inactive-tab')) {
+                errorHeaderButton.classList.remove('inactive-tab');
+                consoleHeaderButton.classList.add('inactive-tab')
+            }
 
-        const closeAdvancedSettings = document.createElement("button");
-        closeAdvancedSettings.addEventListener("click", () => {
-            advancedSettings.style.zIndex = -1;
+            consoleBox.style.display = 'none';
+            errorBox.style.display = 'block';
         })
 
-        advancedSettings.append(advancedMenu, closeAdvancedSettings);
-        mainBody.appendChild(advancedSettings);
-    } else if (type === "toggle") {
-        let textBox = document.getElementById(`${eleId}-box`);
-        if (textBox.style.zIndex == -1) {
-            if (eleId === "export") {
-                saveData(true);
-                setTimeout(()=>{
-                    textBox.children[0].value = `Please use a JSON reader like JSONHERO if you like to manipulate the save values. Beware! Directly changing 'realScore','rowCount' or adding non-integer values may result in the save file being corrupted!\n---------------------------------\n\n${JSON.stringify(localStorage)}`;
-                },300)
+        consoleHeaderButton.addEventListener('click', () => {
+            if (consoleHeaderButton.classList.contains('inactive-tab')) {
+                consoleHeaderButton.classList.remove('inactive-tab');
+                errorHeaderButton.classList.add('inactive-tab')
             }
-            settingsBox("close");
-            textBox.style.zIndex = 10000;
-        } else {
-            textBox.style.zIndex = -1;
-        }
-    } else if (type === "close") {
-        for (let i = 0; i < settingsID.length; i++) {
-            let eleId = settingsID[i];
-            let textBox = document.getElementById(`${eleId}-box`);
-            if (textBox.style.zIndex != -1) {
-                textBox.style.zIndex = -1;
-            }
-        }
-    }
+
+            consoleBox.style.display = 'block';
+            errorBox.style.display = 'none';
+        })
+
+        consoleHeader.append(errorHeaderButton, consoleHeaderButton);
+        consoleSettingsMenu.append(consoleHeader, errorBox, consoleBox);
+    }, 1000)
 }
 
 function tryParseJSONObject(jsonString) {
@@ -5923,7 +5568,7 @@ function createGuild() {
     const rankMenu = document.createElement("div");
     rankMenu.classList.add("flex-column","rank-menu");
     const rankDiv = document.createElement("div");
-    rankDiv.classList.add("flex-row","rank-div");
+    rankDiv.classList.add("flex-row","rank-div","blue-scrollbar");
     rankDiv.activeLevel;
     const rankLore = document.createElement("div");
     rankLore.classList.add("rank-lore");

@@ -134,6 +134,7 @@ const advDictDefault = {
     bounty:[],
     bountyTime: 0,
     morale:50,
+    rankDict:{},
 }
 
 const permUpgrades = {

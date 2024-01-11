@@ -90,6 +90,8 @@ button {
     --dark-purple: #31185f;
     --medium-purple: #b79de6;
     --bright-pink: #EEC0CA;
+    --medium-blue: #7F858D;
+    --dark-blue: #303B44;
     --light-green: #DEE3BA;
     --bright-light-green: #ABD5A7;
     --pale-light-green: #AAD4A5;
@@ -543,10 +545,10 @@ table, button, label {
     align-items: center;
     text-align: right;
     color:white;
-    width: 140%;
+    width: 160%;
     height: 40%;
     z-index: 13;
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     background-color: #000000d8;
     border-radius: 1em;
 }
@@ -1648,7 +1650,7 @@ table, button, label {
     color: white;
 }
 
-.rank-menu > :first-child {
+.rank-div {
     justify-content: flex-start;
     gap: 1%;
     height: 30%;
@@ -2231,13 +2233,13 @@ table, button, label {
 }
 
 .achieveStoredH1 {
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     color: #343030;
     margin: 0;
 }
 
 .achieveStoredH2 {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     margin: 0;
 }
 
@@ -2519,6 +2521,7 @@ table, button, label {
 }
 
 .tool-tip-lore {
+    padding: 0.2rem;
     font-size: 0.9rem;
     overflow-y: auto;
     flex-grow: 1;
@@ -3636,7 +3639,7 @@ body {
     transform: translate(-50%, -50%);
 }
 
-#testerScreen {
+/* #testerScreen {
     position: absolute;
     top: 0;
     left: 0;
@@ -3658,4 +3661,4 @@ body {
     transform: translate(-50%, -60%);
     
     background: url(../assets/title/construction.webp) center center/contain no-repeat
-}
+} */
