@@ -1,59 +1,66 @@
+.char-select, .char-menu, .currency-pop, .middle-area, .left-area, .weasel-back, .weasel-timer-div, .side-pop-container {
+    left: unset;
+}
+
+.notif-select, .nut-store-access, .tree-access, .right-area {
+    right: unset;
+}
+
+.minesweeper-backdrop, .weasel-backdrop, .battleship-div, .snake-description, .side-pop, .main-table {
+    flex-direction: row-reverse;
+}
+
 
 .left-area {
-    left: unset;
-    right: 0.2%;
+    right: 0%;
 }
 
 .right-area {
-    right: unset;
     left: 0;
 }
 
 .middle-area {
-    left: unset;
     right: 35.2%;
     z-index: 11;
 }
 
-.main-table {
-    flex-direction: row-reverse;
-}
-
 .char-select {
-    left: unset;
     right: 1%;
 }
 
 .char-menu {
-    left: unset;
     right: 2%;
 }
 
 .notif-select {
-    right: unset;
     left: 3%;
 }
 
 .currency-pop {
-    left: unset;
     right: 32%;
 }
 
-.minesweeper-backdrop, .weasel-backdrop, .battleship-div, .snake-description {
-    flex-direction: row-reverse;
-}
-
 .weasel-back, .weasel-timer-div {
-    left: unset;
     right: 4%;
 }
 
 .nut-store-access {
     left: 1%;
-    right: unset;
 }
 
 .tree-access {
-    left: 24%;
-    right: unset;
+    left: 1%;
+}
+
+.side-pop-container {
+    right: 0;
+}
+
+.side-pop > img {
+    margin-left: unset;
+    margin-right: 0.25rem;
+}
+
+.side-pop-animation {
+    animation: slide-in-right 0.8s ease-in-out;
 }

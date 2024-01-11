@@ -32,6 +32,12 @@ const changeStoreDialog = (typeText) => {
     let newText;
 
     switch (typeText) {
+        case ('normWelcome'):
+            newText = "Welcome! Feel free to have a look. I'll even help package up your purchase, free of charge.";
+            break;
+        case ('ascendWelcome'):
+            newText = "Welcome back! I'm sure you'll be delighted to see my expanded catalogue! Hehehe.";
+            break;
         case ('clear'):
         case ('normalLoad'):
             newText = "Any questions or troubles? I'm here to personally assist you!";
@@ -249,7 +255,7 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
     const elementCurrency = drawTopBlackMarket(persistentValues)
     const shopBlackDiv = createDom("div", {
         id: "shop-black-div",
-        class: ['shop-black-div']
+        class: ['shop-black-div', 'light-brown-scrollbar']
     });
     
     const shopBlackContainer = createDom("div", {

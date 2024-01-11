@@ -922,11 +922,11 @@
     text-align: center;
     aspect-ratio: 3.12;
     width: auto;
-    height: 8%;
+    height: 2.5rem;
     right: 3%;
     top: 1%;
     box-sizing: border-box;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
 }
 
 .notif-select > div {
@@ -2312,8 +2312,9 @@ input[type="range"]:focus::-moz-range-thumb {
 #currently-saving {
     z-index: 5000;
     position: absolute;
-    height: 10%;
-    bottom: 2%;
+    height: 7%;
+    aspect-ratio: 3;
+    bottom: 1%;
     left: 1%;
     object-fit: contain;
     animation: blink 2s linear 2 forwards;
@@ -2450,8 +2451,10 @@ input:checked + .slider:before {
 }
 
 .store-timer {
-    width: 50%;
-    height: 12%;
+    width: auto;
+    height: 3.5rem;
+    font-size: 1rem;
+    aspect-ratio: 57 / 10;
     background-image: url(../assets/frames/dori-deals.webp);
     color: #4e363c;
 }
@@ -2490,6 +2493,7 @@ input:checked + .slider:before {
     border: 0.2rem solid var(--very-dark-brown);
     box-sizing: border-box;
     transition: 0.5s ease;
+    margin-bottom: 1%;
 }
 
 .black-card-top {
@@ -2551,11 +2555,11 @@ input:checked + .slider:before {
 }
 
 .shop-black-div {
-    padding: 0.75rem;
+    padding: 2%;
     overflow-y: auto;
     max-height: calc(100% - 2rem);
     justify-content: flex-start;
-    gap: 1rem 1.5rem;
+    gap: 1% 3%;
 }
 
 .black-currency-container {
@@ -2652,15 +2656,17 @@ input:checked + .slider:before {
     left: 5%;
     width: 75%;
     height: 16%;
-    border-radius:0.5em;
+    box-sizing: border-box;
+    padding: 0.5% 1%;
+    border-radius: 0.5em;
     border: 0.35em solid var(--dark-brown);
     background-color: var(--medium-brown);
-    column-gap: 1.5%;
+    gap: 1%;
 }
 
 #table7-text {
     box-sizing: border-box;
-    padding: 1.5%;
+    flex-grow: 1;
     width: 70%;
     height: 100%;
     font-size: 0.9rem;
@@ -2696,8 +2702,10 @@ input:checked + .slider:before {
 
 .store-buy {
     text-align: center;
-    width: 20%;
-    height: 50%;
+    width: 6rem;
+    max-height: 100%;
+    height: 3rem;
+    font-size: 1rem;
     background-color: var(--dark-brown);
     color: white;
     border: 0.15em solid var(--very-dark-brown);
@@ -2895,15 +2903,10 @@ input:checked + .slider:before {
     filter: unset;
 }
 
-.transcend-bottom {
-    width: 100%;
-    height: fit-content;
-}
-
 .transcend-bottom > button {
     transition: 0.15s ease;
-    height: auto;
-    width: 40%;
+    max-width: 50%;
+    height: 2.75rem;
     aspect-ratio: 4.61;
     font-size: 0.9rem;
     color: white;
@@ -3086,6 +3089,10 @@ img[src=""] {
     justify-content: space-evenly;
 }
 
+.transcend-body > p {
+    padding: 0.5rem 0;
+}
+
 .transcend-dark::before, .chain-lock::before {
     content: "";
     position: absolute;
@@ -3100,8 +3107,13 @@ img[src=""] {
 
 .nut-transcend > div {
     width: 90%;
-    height: 50%;
+    height: fit-content;
     justify-content: space-evenly;
+}
+
+.nut-transcend > .transcend-bottom {
+    width: 100%;
+    height: fit-content;
 }
 
 .nut-transcend > p {
@@ -3560,4 +3572,17 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
 .blue-scrollbar::-webkit-scrollbar-thumb {
     background-color: var(--medium-blue);
 }
+
+.light-brown-scrollbar {
+    scrollbar-color: var(--light-brown) var(--bright-brown);
+}
+
+.light-brown-scrollbar::-webkit-scrollbar {
+    background-color: var(--bright-brown);
+}
+
+.light-brown-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--light-brown);
+}
+
 

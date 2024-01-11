@@ -123,11 +123,11 @@ function buildGame(mainBody) {
 function drawMainBody() {
     // LEFT DIV/AREA
     let leftDiv = document.getElementById("left-div");
-    let leftImg = document.createElement("img");
-    leftImg.src = "./assets/bg/bg.webp";
-    leftImg.id = "left-bg";
-    leftImg.classList.add("cover-all","div-img");
-    leftDiv.appendChild(leftImg);
+    // let leftImg = document.createElement("img");
+    // leftImg.src = "./assets/bg/bg.webp";
+    // leftImg.id = "left-bg";
+    // leftImg.classList.add("cover-all","div-img");
+    // leftDiv.appendChild(leftImg);
 
     // RIGHT DIV/AREA
     let rightDiv = document.getElementById("right-div");

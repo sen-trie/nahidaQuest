@@ -423,4 +423,26 @@ function createMedal(num, choiceBox, mainBody, stopSpawnEvents) {
     return nutMedal;
 }
 
-export { createButton,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal };
+const sidePop = (imgSrc, text) => {
+    const sidePopContainer = document.getElementById('side-pop-container');
+    const sidePop = createDom('div', {
+        class: ['flex-row', 'side-pop', 'side-pop-animation'],
+        child: [
+            createDom('img', { src: imgSrc }),
+            createDom('p', { innerText: text, class: ['flex-row'] }),
+        ]
+    });
+
+    setTimeout(() => {
+        sidePop.style.animation = '';
+        void sidePop.offsetWidth;
+        sidePop.style.animation = 'fadeOut 2s ease-out';
+        sidePop.addEventListener('animationend', () => {
+            sidePop.remove();
+        }, { once: true });
+    }, 4000)
+
+    sidePopContainer.append(sidePop);
+}
+
+export { createButton,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal,sidePop };

@@ -1,7 +1,7 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop } from "./modules/adjustUI.js"
 import * as Settings from "./modules/features/settings.js"
 import * as Shop from "./modules/features/shop.js";
 import * as Expedition from "./modules/features/expedition.js"
@@ -367,6 +367,7 @@ var achievementMap;
 let advDict;
 let storeInventory;
 loadSaveData();
+postSaveData();
 loadingAnimation();
 var upgradeDict;
 var expeditionDict;
@@ -694,15 +695,12 @@ function loadSaveData() {
         createTreeMenu();
     }
 
-    if (beta) {
-        if (persistentValues.challengeCheck === undefined) {
-            persistentValues.challengeCheck = challengeCheck('populate', challengeInfo);
-        } else {
-            persistentValues.challengeCheck = challengeCheck('checkKeys', persistentValues.challengeCheck, challengeInfo);
-        }
-
-        updateObjectKeys(saveValues.treeObj, saveValuesDefault.treeObj);
+    if (persistentValues.challengeCheck === undefined) {
+        persistentValues.challengeCheck = challengeCheck('populate', challengeInfo);
+    } else {
+        persistentValues.challengeCheck = challengeCheck('checkKeys', persistentValues.challengeCheck, challengeInfo);
     }
+    updateObjectKeys(saveValues.treeObj, saveValuesDefault.treeObj);
 
     achievementListload();
 
@@ -710,10 +708,6 @@ function loadSaveData() {
     if (saveValues.goldenTutorial === true) {
         addNutStore();
     }
-
-    const leftHandCSS = document.getElementById('toggle-css');
-    leftHandCSS.disabled = (settingsValues.leftHandMode ? undefined : 'disabled');
-    document.documentElement.style.fontSize = `calc(${0.2 + settingsValues.fontSizeLevel * 0.16}vw + ${0.2 + settingsValues.fontSizeLevel * 0.16}vh)`;
 }
 
 // BIG BUTTON FUNCTIONS
@@ -740,8 +734,8 @@ demoContainer.addEventListener('mousedown', () => {
     }
 })
 
-demoContainer.addEventListener("mouseup", () => {
-    touchDemo();
+demoContainer.addEventListener("mouseup", (e) => {
+    touchDemo(e.detail);
 });
 
 document.addEventListener("mouseup", () => {
@@ -751,7 +745,7 @@ document.addEventListener("mouseup", () => {
     }
 });
 
-function touchDemo() {
+function touchDemo(autoClicked = false) {
     let clickEarn;
     let crit = false;
     saveValues.clickCount++;
@@ -785,7 +779,7 @@ function touchDemo() {
     if (clickEarn > 1e9) {
         challengeNotification(({category: 'specific', value: [3, 1]}))
     }
-    energyRoll();
+    energyRoll(autoClicked);
 
     if (clickAudioDelay === null) {
         if (timerSeconds !== 0) {
@@ -827,12 +821,17 @@ function spawnFallingNut() {
 }
 
 // ROLL FOR ENERGY
-function energyRoll() {
+function energyRoll(autoClicked = false) {
     let randInt = Math.floor(Math.random() * 1000);
-    clickDelay--;
+    if (autoClicked) {
+        clickDelay -= 0.4;
+    } else {
+        clickDelay--;
+    }
+    
     if (clickDelay < 1){
         if (randInt < ENERGYCHANCE) {
-            const energyGain =  randomInteger(lowerEnergyRate, upperEnergyRate)
+            const energyGain = randomInteger(lowerEnergyRate, upperEnergyRate)
             saveValues.energy += energyGain;
             persistentValues.lifetimeEnergyValue += energyGain;
 
@@ -948,6 +947,19 @@ function idleCheck(idleAmount) {
         idleAmount = timePassed * saveValues.dps * 60 * idleRate;
     }
     return idleAmount;
+}
+
+function postSaveData() {
+    const leftHandCSS = document.getElementById('toggle-css');
+    leftHandCSS.disabled = (settingsValues.leftHandMode ? undefined : 'disabled');
+    document.documentElement.style.fontSize = `calc(${0.2 + settingsValues.fontSizeLevel * 0.16}vw + ${0.2 + settingsValues.fontSizeLevel * 0.16}vh)`;
+
+    const sidePopContainer = createDom('div', {
+        id: 'side-pop-container',
+        class: ['side-pop-container']
+    });
+
+    mainBody.append(sidePopContainer)
 }
 
 //--------------------------------------------------------------------------RANDOM EVENTS----------------------------------------------------------------------//
@@ -1107,8 +1119,8 @@ function clickEvent(wandererMode) {
         setTimeout(()=>{
             button.style.animation = "rotation 3.5s infinite linear forwards";
             if (!leftDiv.classList.contains("vignette-blue")) {leftDiv.classList.add("vignette-blue")};
-            let leftBG = document.getElementById("left-bg");
-            leftBG.src = "./assets/bg/scara-bg.webp";
+            // let leftBG = document.getElementById("left-bg");
+            // leftBG.src = "./assets/bg/scara-bg.webp";
             button.src = "./assets/event/scara.webp";
         },150);
         challengeNotification(({category: 'specific', value: [2,4]}))
@@ -1134,10 +1146,8 @@ function stopClickEvent() {
         void leftDiv.offsetWidth;
         leftDiv.style.animation = "darkness-transition 0.3s linear";
 
-        let leftBG = document.getElementById("left-bg");
         setTimeout(()=>{
             button.revertPicture();
-            leftBG.src = "./assets/bg/bg.webp";
         },150)
     } else {
         if (leftDiv.classList.contains("vignette")) {leftDiv.classList.remove("vignette")};
@@ -3238,7 +3248,7 @@ function customTutorial(tutorialFile,maxSlide,exitFunction) {
     mainBody.appendChild(customTutorialDiv);
 }
 
-function saveData(skip) {
+function saveData(skip = false) {
     if (preventSave) {return};
     const currentTime = getTime();
 
@@ -3278,7 +3288,7 @@ function saveData(skip) {
 // TAB UI
 function createTabs() {
     let tabFlex = document.getElementById("flex-container-TAB");
-    for (let i=0, len=(TABS.length - 1); i < len; i++){
+    for (let i=0, len = (TABS.length - 1); i < len; i++){
         let tabButton = document.createElement("div");
         tabButton.classList += " tab-button-div";
 
@@ -3312,9 +3322,7 @@ function tabChange(x) {
     while (i--) {
         if (document.getElementById("tab-" + (i))) {
             tabButton = document.getElementById("tab-" + (i));
-            if (!tabButton.firstChild.classList.contains("darken")) {
-                tabButton.firstChild.classList.add("darken");
-            }
+            if (!tabButton.firstChild.classList.contains("darken")) { tabButton.firstChild.classList.add("darken");}
             if (i === x - 1) {
                 if (tabButton.firstChild.classList.contains("darken")) {
                     tabButton.firstChild.classList.remove("darken");
@@ -3395,10 +3403,10 @@ function tabChange(x) {
         if (document.getElementById('upgrade-menu-button')) {
             document.getElementById('upgrade-menu-button').style.display = "block";
         }
-    } else if (x == 1){
-        if (filterDiv.style.display !== "flex") {filterDiv.style.display = "flex"};
-        if (table6.style.display !== "flex") {table6.style.display = "flex"};
-        table6.style.display = "flex";  
+    } else if (x == 1) {
+        universalStyleCheck(filterDiv, 'display', 'none', 'flex', true);
+        universalStyleCheck(table6, 'display', 'none', 'flex', true);
+
         tooltipTable = 2;
         updateFilter(filteredInv);
         if (document.getElementById("tool-tip-button")) {
@@ -3406,12 +3414,7 @@ function tabChange(x) {
             tooltipButtonText.innerText = "Use";
         }
     } else if (x == 5) {
-        let dialog = document.getElementById("table7-text");
-        if (persistentValues.tutorialAscend) {
-            dialog.innerText = "Welcome back! I'm sure you'll be delighted to see my expanded catalogue! Hehehe."
-        } else {
-            dialog.innerText = "Welcome! Feel free to have a look. I'll even help package up your purchase, free of charge."
-        }
+        Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'ascendWelcome' : 'normWelcome')
     }
 
     if (x != 3 && wishCounter != saveValues["wishCounterSaved"]) {
@@ -3439,7 +3442,7 @@ document.addEventListener("keydown", function(event) {
         }
     }
 
-    if (!stopSpawnEvents) {
+    if (!stopSpawnEvents && !settingsOpen) {
         if (event.key === "1") {
             tabChange(1);
         } else if (event.key === "2") {
@@ -3672,7 +3675,8 @@ function advancedSettings() {
                         keyInput.checked = SettingsDefault[key.default];
                         keyInput.dispatchEvent(new Event('change'));
                     }
-                })
+                });
+                saveData(true);
             });
             preferLabel.append(preferText, addButton);
         } else if (advItem.id === 'font-size-level') {
@@ -4071,7 +4075,7 @@ function settingsBox() {
 
         consoleHeader.append(errorHeaderButton, consoleHeaderButton);
         consoleSettingsMenu.append(consoleHeader, errorBox, consoleBox);
-    }, 1000)
+    }, 400)
 }
 
 function tryParseJSONObject(jsonString) {
@@ -7140,6 +7144,7 @@ function spawnWorldQuest() {
     let mapImage = document.getElementById('sumeru-map');
     spawnKey(mapImage, imgKey, rollQuest, true);
     notifPop("add", "quest", 1);
+    sidePop('./assets/expedbg/adv-12.webp', 'New World Quest');
 }
 
 function spawnBossQuest(num) {
@@ -11490,6 +11495,7 @@ function refreshShop() {
     Shop.changeStoreDialog('clear');
     Shop.regenBlackPrice(persistentValues.blackMarketDict);
     storeInventory.storedTime = getTime();
+    sidePop('./assets/icon/tab7.webp', 'Shop has Refreshed!');
 }
 
 function successPurchase(mainButton) {
@@ -11630,13 +11636,15 @@ function loadShopItems(shopDiv, i, inventoryArray) {
 }
 
 //------------------------------------------------------------------------ BLACK MARKET ITEMS ------------------------------------------------------------------------//
-const mousedownEvent = new Event('mousedown', {
+const mousedownAutoEvent = new CustomEvent('mousedown', {
+    'detail': true,
     bubbles: true,
     cancelable: true,
     button: 0, 
 });
 
-const mouseupEvent = new Event('mouseup', {
+const mouseupAutoEvent = new CustomEvent('mouseup', {
+    'detail': true,
     bubbles: true,
     cancelable: true,
     button: 0,
@@ -11665,9 +11673,9 @@ function autoClickNahida(type = 'use') {
             }
 
             let demoButton = document.getElementById('demo-main-img');
-            demoButton.dispatchEvent(mousedownEvent);
+            demoButton.dispatchEvent(mousedownAutoEvent);
             setTimeout(() => {
-                demoButton.dispatchEvent(mouseupEvent);
+                demoButton.dispatchEvent(mouseupAutoEvent);
                 autoClickTimer = setTimeout(() => {autoClickNahida('use')}, delay);
             }, 100)
         }
@@ -11850,7 +11858,7 @@ function addNutStore() {
     titleText.innerText = "Do you wish to turn \n back time and transcend?";
 
     const bodyText = document.createElement("div");
-    bodyText.classList.add("flex-row")
+    bodyText.classList.add("flex-row", 'transcend-body')
     const bodyTextLeft = document.createElement("p");
     bodyTextLeft.innerText = `You lose: \n All Nuts, \n All Items, \n Energy, \n Primogems`;
     bodyTextLeft.classList.add("flex-column");
@@ -12294,6 +12302,12 @@ function createTreeMenu() {
     sandImg.src = './assets/tree/sand.webp';
     sandImg.classList.add('tree-sand');
 
+    const backButton = createDom('button', {
+        class: ['tree-back'],
+        innerText: 'Back',
+        event: ['click', () => {tabChange(1)}]
+    })
+
     const treeContainer = document.createElement('div');
     treeContainer.classList.add('tree-container');
     treeContainer.id = 'tree-container';
@@ -12340,7 +12354,7 @@ function createTreeMenu() {
     treeProgressValue.rate;
 
     treeContainer.appendChild(treeImg);
-    treeSide.append(treeProgressBar,sandImg,treeContainer,treeHealthContainer,treeProgressValue);
+    treeSide.append(treeProgressBar,sandImg,backButton,treeContainer,treeHealthContainer,treeProgressValue);
 
     const palmText = document.createElement('p');
     palmText.id = 'palm-text';
@@ -13349,10 +13363,12 @@ function newPop(type) {
     }    
 }
 
-if (beta) {
+if (beta || testing) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
             Shop.regenBlackPrice(persistentValues.blackMarketDict);
+        } else if (e.key === 'g') {
+            sidePop('./assets/icon/tab7.webp', 'Shop has Refreshed!');
         }
     })    
 }

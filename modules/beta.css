@@ -361,28 +361,3 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
     background-color: var(--pale-medium-green);
     border: var(--dark-green) 0.15em solid;
 }
-
-.green-scrollbar {
-    scrollbar-color: var(--bright-dark-green) var(--light-green);
-}
-
-.green-scrollbar::-webkit-scrollbar {
-    background-color: var(--light-green);
-}
-
-.green-scrollbar::-webkit-scrollbar-thumb {
-    background-color: var(--bright-dark-green);
-}
-
-.blue-scrollbar {
-    scrollbar-color: var(--medium-blue) var(--dark-blue);
-}
-
-.blue-scrollbar::-webkit-scrollbar {
-    background-color: var(--dark-blue);
-}
-
-.blue-scrollbar::-webkit-scrollbar-thumb {
-    background-color: var(--medium-blue);
-}
-
