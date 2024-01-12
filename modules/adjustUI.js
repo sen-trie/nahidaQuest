@@ -428,7 +428,7 @@ const sidePop = (imgSrc, text) => {
     const sidePop = createDom('div', {
         class: ['flex-row', 'side-pop', 'side-pop-animation'],
         child: [
-            createDom('img', { src: imgSrc }),
+            createDom('img', { src: `../assets${imgSrc}` }),
             createDom('p', { innerText: text, class: ['flex-row'] }),
         ]
     });

@@ -138,18 +138,18 @@ const advDictDefault = {
 }
 
 const permUpgrades = {
-    1:{Name:"Blessing of Vitality",        Effect:5,  Max:50,   Cap:false,   Description:"Increases Energy gained by clicking Big Nahida."},
+    1:{Name:"Blessing of Vitality",        Effect:2.5,  Max:50,   Cap:false,   Description:"Increases Energy gained by clicking Big Nahida."},
     2:{Name:"Blessing of Technique",       Effect:2,  Max:50,    Cap:true,   Description:"Increase clicking DMG during Combat Expeditions."},
     3:{Name:"Blessing of Wanderlust",      Effect:0.5, Max:50,   Cap:true,   Description:"Decreases base price of Wish characters."},
     4:{Name:"Blessing of Concession",      Effect:2,   Max:25,   Cap:true,   Description:"Decreases price of Dori's Shop items and random trades."},
     5:{Name:"Blessing of Might",           Effect:1,   Max:50,   Cap:true,   Description:"Increases critical rate amount for clicking Big Nahida.",   zeroDescription:"Enables critical hits for clicking Big Nahida."},
     6:{Name:"Blessing of Tranquillity",    Effect:1,   Max:50,   Cap:false,   Description:"Increases offline Nut accumulation rate.",    zeroDescription:"Enables accumulation of Nuts while offline."},
     7:{Name:"Blessing of Fortuity",        Effect:0.5, Max:50,   Cap:true,   Description:"Increases chances of lucky outcomes.",          zeroDescription:"Enables additional lucky outcomes for certain events."},
-    8:{Name:"Blessing of Enlightenment",   Effect:2,   Max:25,   Cap:true,   Description:"Decreases cooldown between Event spawns."},
-    9:{Name:"Blessing of Riches",          Effect:10,  Max:25,   Cap:true,   Description:"Increases Primogems gained from Events/Achievements."},
-    10:{Name:"Blessing of Strength",       Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
-    11:{Name:"Blessing of Fortification",  Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
-    12:{Name:"Blessing of Determination",  Effect:2,  Max:50,   Cap:false,   Description:"Increase XP gain from Expeditions attempts."},
+    8:{Name:"Blessing of Enlightenment",   Effect:1,   Max:25,   Cap:true,   Description:"Decreases cooldown between Event spawns."},
+    9:{Name:"Blessing of Riches",          Effect:5,  Max:25,   Cap:true,   Description:"Increases Primogems gained from Events/Achievements."},
+    10:{Name:"Blessing of Strength",       Effect:5,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
+    11:{Name:"Blessing of Fortification",  Effect:5,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
+    12:{Name:"Blessing of Determination",  Effect:5,  Max:50,   Cap:false,   Description:"Increase XP and Nuts gain in Expeditions."},
 }
 
 const expeditionDictDefault = {

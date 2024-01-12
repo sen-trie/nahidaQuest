@@ -54,6 +54,7 @@
 
 .side-pop-container {
     right: 0;
+    align-items: flex-end;
 }
 
 .side-pop > img {

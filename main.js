@@ -467,12 +467,10 @@ function timerEvents() {
     shopCheck();
     shopTimerFunction();
     checkTimerBounty();
-    if (beta) {
-        if (persistentValues.tutorialAscend) {
-            growTree('add');
-        }
-        checkCommisions();
-    };
+    if (persistentValues.tutorialAscend) {
+        growTree('add');
+    }
+    checkCommisions();
 }
 
 // TEMPORARY TIMER
@@ -641,7 +639,7 @@ function loadSaveData() {
             }
 
             // FOR SAVE DATA BELOW 2.0.001 TO ADD NEW VALUES
-            // ALSO TO REMOVE PURCHASED
+            // ALSO TO SIMPLIFY TREE UPGRADES
             if (parseInt(saveValues.versNumber) < 200001) {
                 if (persistentValues.lifetimeClicksValue === 0) {
                     persistentValues.lifetimeClicksValue = saveValues.clickCount;
@@ -659,15 +657,17 @@ function loadSaveData() {
                     persistentValues.lifetimePrimoValue = saveValues.primogem;
                 }
 
-                let tempArray = persistentValues.upgrade;
-                if (tempArray === undefined) {
-                    tempArray = [null];
-                    for (let i = 1; i < 13; i++) {
-                        let tempItem = persistentValues[`upgrade${i}`].Purchased;
-                        if (tempItem) tempArray.push(tempItem);
+                let tempArray = [null];
+                for (let i = 1; i < 13; i++) {
+                    let tempItem;
+                    if (persistentValues[`upgrade${i}`].Purchased === undefined) {
+                        tempItem = persistentValues[`upgrade${i}`]
+                    } else {
+                        tempItem = persistentValues[`upgrade${i}`].Purchased
                     }
-                    persistentValues.upgrade = tempArray;
+                    if (tempItem) tempArray.push(tempItem);
                 }
+                persistentValues.upgrade = tempArray;
             }  
         }
     }
@@ -762,8 +762,15 @@ function touchDemo(autoClicked = false) {
             clickEarn = Math.ceil(saveValues["clickFactor"] * clickCritDmg);
         }
 
+        if (randomInteger(0, 100) < 5 && autoClicked !== true) {
+            addTreeCore(randomInteger(1, 3), 0);
+        }
+
         demoImg.critInARow++;
-        challengeNotification(({category: 'nahidaCrit', value: demoImg.critInARow}))
+        if (demoImg.critInARow > 2) {
+            challengeNotification(({category: 'specific', value: [0, 4]}));
+        } 
+        
     } else {
         if (clickerEvent !== "none") {
             clickDelay -= 2;
@@ -773,6 +780,10 @@ function touchDemo(autoClicked = false) {
         }
 
         if (demoImg.critInARow > 0) {demoImg.critInARow = 0}
+    }
+
+    if (randomInteger(0, 1000) < 5 && autoClicked !== true) {
+        addTreeCore(randomInteger(1, 3), 0);
     }
 
     saveValues["realScore"] += clickEarn;
@@ -823,7 +834,7 @@ function spawnFallingNut() {
 // ROLL FOR ENERGY
 function energyRoll(autoClicked = false) {
     let randInt = Math.floor(Math.random() * 1000);
-    if (autoClicked) {
+    if (autoClicked === true) {
         clickDelay -= 0.4;
     } else {
         clickDelay--;
@@ -956,10 +967,10 @@ function postSaveData() {
 
     const sidePopContainer = createDom('div', {
         id: 'side-pop-container',
-        class: ['side-pop-container']
+        class: ['side-pop-container', 'flex-column']
     });
 
-    mainBody.append(sidePopContainer)
+    mainBody.append(sidePopContainer);
 }
 
 //--------------------------------------------------------------------------RANDOM EVENTS----------------------------------------------------------------------//
@@ -991,11 +1002,14 @@ function startRandomEvent() {
     if (stopSpawnEvents === true) {return};
     let eventPicture = document.createElement("div");
     let aranaraNumber;
-    // HARD EVENTS ARE LOCKED TO 4TH EXPEDITION UNLOCK
-    if (expeditionDict[4] != '1') {
-        aranaraNumber = randomInteger(1,7);
+    // 2ND SET ARE LOCKED TO 4TH EXPEDITION UNLOCK
+    // 3RD SET ARE LOCKED TO FELL BOSS
+    if (persistentValues.fellBossDefeat) {
+        aranaraNumber = randomInteger(1, 10);
+    } else if (expeditionDict[4] != '1') {
+        aranaraNumber = randomInteger(1, 7);
     } else {
-        aranaraNumber = randomInteger(1,4);
+        aranaraNumber = randomInteger(1, 4);
     }
      
     eventPicture.classList.add("random-event");
@@ -4465,6 +4479,10 @@ function upgrade(clicked_id) {
             saveValues["dps"] += heroIncrease;
         }
 
+        if (randomInteger(0, 1000) < 0.5 * currentMultiplierLocal) {
+            addTreeCore(randomInteger(1, 3));
+        }
+
         upgradeDictTemp.Contribution += heroIncrease;
         upgradeDictTemp.Purchased += 1 * currentMultiplierLocal;
         saveValues.heroesPurchased += 1 * currentMultiplierLocal;
@@ -5466,7 +5484,7 @@ function createExpedition() {
 
     let charMorale = document.createElement("div");
     charMorale.id = "char-morale";
-    charMorale.classList.add("char-morale");
+    charMorale.classList.add("char-morale", 'clickable');
     let moraleLore = document.createElement("p");
     moraleLore.style.display = "none";
 
@@ -5478,7 +5496,7 @@ function createExpedition() {
     let guildTable = createGuild();
     let advButton = createDom("div", {
         id: "adventure-button",
-        class: ["background-image-cover"],
+        class: ["background-image-cover", 'clickable'],
         innerText: 'Adventure!'
     });
 
@@ -5495,6 +5513,7 @@ function createExpedition() {
     })
 
     let advTutorial = createDom("img", {
+        classList: ['clickable'],
         src: './assets/icon/help.webp',
         id: 'adventure-tutorial'
     });
@@ -5583,7 +5602,7 @@ function createGuild() {
     rankMenu.append(rankDiv,rankLore,rankClaim)
     for (let i = 1; i < 21; i++) {
         let rankButton = document.createElement("div");
-        rankButton.classList.add("rank-button","flex-column");
+        rankButton.classList.add("rank-button","flex-column", 'clickable');
         rankButton.id = `rank-button-${i}`;
         let rankText = document.createElement("p");
         let rankImg = new Image();
@@ -5685,299 +5704,296 @@ function createGuild() {
 
     const commisionMenu = document.createElement("div");
     commisionMenu.id = 'commision-menu';
-    if (!beta) commisionMenu.innerText = '??? \n In Development. Stay Tuned!';
-    if (beta) {
-        commisionMenu.classList.add('commision-menu', 'flex-column');
+    commisionMenu.classList.add('commision-menu', 'flex-column');
 
-        const commisionList = document.createElement('div');
-        commisionList.id = 'commision-list'
-        commisionList.classList.add('commision-list');
+    const commisionList = document.createElement('div');
+    commisionList.id = 'commision-list'
+    commisionList.classList.add('commision-list');
 
-        if (saveValues.baseCommisions.length === 0) {
-            generateCommisions();
-        }
-
-        const selectComission = document.createElement('div');
-        selectComission.classList.add('flex-column');
-        selectComission.style.display = 'none';
-        selectComission.id = 'select-comission';
-        const commissionSetting = document.createElement('div');
-        commissionSetting.classList.add('commision-setting', 'flex-row');
-
-        const commTitle = document.createElement('p');
-        const commItems = createDom('div', {
-            classList: ['select-commision-items', 'flex-column'],
-            id: 'select-comm-items'
-        })
-        const commRewards = document.createElement('div');
-        const commStars = document.createElement('img');
-        commItems.append(commRewards, commStars)
-
-        const commHeroes = document.createElement('div');
-        commHeroes.classList.add('comm-heroes');
-        const textArray = ['Leader', 'Support', 'Boon'];
-        textArray.forEach((text) => {
-            let barText = document.createElement('p');
-            barText.innerText = text
-            commHeroes.append(barText);
-        })
-
-        const heroContainer = createDom('div', {
-            hero: null,
-            id: 'select-hero-leader',
-            style:{ background: 'url(./assets/icon/charPlus.webp) no-repeat center center/contain' }
-        });
-
-        const suppContainer = createDom('div', {
-            hero: null,
-            id: 'select-hero-support',
-            style:{ background: 'url(./assets/icon/charPlus.webp) no-repeat center center/contain' }
-        });
-
-        heroContainer.addEventListener('click',() => {
-            selectHeroType = 'leader';
-            heroContainer.style.animation = 'tallyCount 0.5s ease-in-out infinite both';
-            suppContainer.style.animation = 'unset';
-            suppContainer.offsetWidth;
-        });
-
-        suppContainer.addEventListener('click',() => {
-            selectHeroType = 'support';
-            suppContainer.style.animation = 'tallyCount 0.5s ease-in-out infinite both';
-            heroContainer.style.animation = 'unset';
-            heroContainer.offsetWidth;
-        });
-        
-        const perkText = document.createElement('p');
-        perkText.id = 'comm-perk-test';
-        perkText.innerText = 'None Curently';
-        
-        commHeroes.append(heroContainer, suppContainer, perkText);
-        commissionSetting.append(commTitle, commItems, commHeroes);
-
-        const commissionChar = document.createElement('div');
-        commissionChar.id = 'commission-char';
-        commissionChar.classList.add('commision-char');
-        selectComission.append(commissionSetting, commissionChar);
-
-        const currentCommisions = document.createElement('div');
-        currentCommisions.classList.add('current-commision', 'flex-row');
-
-        for (let i = 0; i < 3; i++) {
-            const currentCommisionsCell = createDom('div', {
-                id: `commision-cell-${i}`,
-                class: ['current-commision-cell', 'flex-row'],
-                style: { display: 'flex' },
-            });
-
-            const currentCommisionsLeader = document.createElement('img');
-            const currentCommisionsSupport = document.createElement('img');
-            const currentCommisionsTime = createDom('button', { class:['current-commision-button'] });
-
-            currentCommisionsTime.ready = false;
-            currentCommisionsTime.addEventListener('click', () => {
-                if (currentCommisionsTime.ready === true) {
-                    currentCommisionsTime.ready = false;
-                    currentCommisionsLeader.style.display = 'none';
-                    currentCommisionsSupport.style.display = 'none';
-                    currentCommisionsTime.innerText = 'Available';
-                    if (currentCommisionsTime.classList.contains('rank-button-available')) currentCommisionsTime.classList.remove('rank-button-available');
-
-                    const commId = currentCommisionsTime.commId.split('/');
-                    let commInfo;
-                    
-                    if (commId[1].includes('base')) {
-                        saveValues.currentCommisions.splice(saveValues.currentCommisions.indexOf(commId[1]), 1)
-                        commInfo = saveValues.baseCommisions[commId[1].split('-')[1]]
-                    }
-
-                    for (let key in saveValues.commisionDict) {
-                        if (saveValues.commisionDict[key].currentComm === commId[1]) {
-                            saveValues.commisionDict[key].currentComm = '';
-                        }
-                    }
-
-                    const lootContainer = createDom('div', { class:['notif-item'] });
-                    let lootArray = [];
-                    let markedItems = [];
-                    let extraInfo = [];
-
-                    let upgradeItem = null;
-                    if (commInfo.perk === 'Keen-Eyed') {
-                        upgradeItem = rollArray(commInfo.possibleItems);
-                    }
-
-                    commInfo.possibleItems.forEach((item) => {
-                        let itemType;
-                        let minLevel = commInfo.rating - 2;
-                        let maxLevel = commInfo.rating;
-                        let specialType = null;
-
-                        if (Object.keys(constNation).includes(item)) {
-                            itemType = 'talent';
-                            minLevel = Math.min(minLevel, 2);
-                            maxLevel = Math.max(minLevel, 4);
-                        } else if (item === "PyroHydro" || item === "DendroGeoAnemo" || item === "ElectroCryo") {
-                            itemType = 'gem';
-                            minLevel = Math.min(minLevel, 3);
-                        } else if (['bow', 'catalyst', 'claymore', 'polearm', 'sword'].includes(item.toLowerCase())) {
-                            itemType = 'weapon';
-                            specialType = item.charAt(0).toUpperCase() + item.slice(1);
-                        } else {
-                            itemType = item;
-                        }
-
-                        let itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                        const itemId2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-
-                        let lossRoll = randomInteger(1, 15);
-                        // SYNC AND ANTI-SYNC
-                        if ((commInfo.char[0] === 'Nahida' || commInfo.char[1] === 'Nahida') && randomInteger(1, 5) === 1) {
-                            const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                            lootArray.push(itemId1);
-                            markedItems.push(itemId1);
-                            extraInfo.push('Sync');
-                        } else if (commInfo.char[1] === 'Wanderer' || commInfo.char[0] === 'Wanderer') {
-                            lossRoll -= 5;
-                            extraInfo.push('Anti-Sync');
-                        } else if (commisionInfo[commInfo.char[0]].charLikes.includes(commInfo.char[1]) && randomInteger(1, 5) === 1) {
-                            const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                            lootArray.push(itemId1);
-                            markedItems.push(itemId1);
-                            extraInfo.push('Sync');
-                        } else if (commisionInfo[commInfo.char[0]].charDislikes.includes(commInfo.char[1])) {
-                            lossRoll -= 5;
-                            extraInfo.push('Anti-Sync');
-                        }
-
-                        if (lossRoll < 3) {
-                            if (commInfo.perk === 'Toughness') {
-                                lossRoll = false;
-                                extraInfo.push('Toughness');
-                            } else {
-                                lossRoll = true;
-                                extraInfo.push('Loss');
-                            }
-                        } else {
-                            lossRoll = false;
-                        }
-
-                        
-                        if (!lossRoll) {
-                            lootArray.push(itemId2);
-                        }
-
-                        // LOSS ROLL
-                        if (randomInteger(1,3) === 1 && !lossRoll) {
-                            const itemId3 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                            lootArray.push(itemId3);
-                        }
-
-                        // KEEN-EYED PERK
-                        if (upgradeItem !== null && upgradeItem == item) {
-                            itemId1 = specialType ? inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'shop');
-                            markedItems.push(itemId1);
-                            extraInfo.push('Keen-Eyed');
-                        }
-                        
-                        if (commInfo.perk === 'Proficient') {
-                            if (commInfo.priority === item) {
-                                const itemIdPro1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                                const itemIdPro2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                                
-                                markedItems.push(itemIdPro1);
-                                markedItems.push(itemIdPro2);
-                                lootArray.push(itemIdPro1);
-                                lootArray.push(itemIdPro2);
-                                lootArray.push(itemId1);
-
-                                extraInfo.push('Proficient');
-                            }
-                        } else {
-                            lootArray.push(itemId1);
-                        }
-
-                        // SCAVENGER PERK
-                        if (commInfo.perk === 'Scavenger' && randomInteger(1,4) === 1) {
-                            const itemId4 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                            lootArray.push(itemId4);
-                            markedItems.push(itemId4);
-                            extraInfo.push('Scavenger');
-                        }
-                    });
-
-                    const postTreeItems = compareTreeItems(lootArray);
-                    lootArray = [];
-                    for (let key in postTreeItems) {
-                        const itemFrame = inventoryFrame(document.createElement("div"), Inventory[postTreeItems[key][0]],itemFrameColors);
-
-                        if (postTreeItems[key][1]) {
-                            itemFrame.classList.add('extra-item-tree');
-                        } else if (markedItems.includes(postTreeItems[key][0])) {
-                            markedItems.splice(markedItems.indexOf(postTreeItems[key][0]), 1);
-                            itemFrame.classList.add('extra-item');
-                        }
-                        
-                        lootArray.push(postTreeItems[key][0])
-                        lootContainer.append(itemFrame);
-                    }
-
-                    const lootText = createDom('p', {
-                        style: {
-                            color: 'var(--dull-green)',
-                            marginBottom: '1em'
-                        }
-                    });
-
-                    for (let text in extraInfoDict) {
-                        if (extraInfo.includes(text)) {
-                            lootText.innerText = `${extraInfoDict[text]}\n`
-                        }
-                    }
-
-                    const lootDiv = createDom('div', {
-                        class: ['flex-column'],
-                        children: [lootContainer, lootText],
-                        style: {
-                            width: '100%'
-                        }
-                    })
-
-
-                    const addLoot = (lootArray) => {
-                        lootArray.forEach((item) => {
-                            inventoryAdd(item);
-                        });
-
-                        newPop(1);
-                        sortList("table2");
-                        saveValues.baseCommisions[commId[1].split('-')[1]].progress = true;
-                        notifPop("clear","comm",commId[1]);
-                    }
-
-                    persistentValues.commissionsCompletedValue++;
-                    choiceBox(mainBody, {text: 'Loot obtained:'}, stopSpawnEvents, () => {addLoot(lootArray)}, null, lootDiv, ['notif-ele']);
-                    document.getElementById('guild-button-comm').click();
-                }
-            })
-
-            currentCommisionsCell.leader = currentCommisionsLeader;
-            currentCommisionsCell.support = currentCommisionsSupport;
-            currentCommisionsCell.time = currentCommisionsTime;
-            
-            currentCommisionsCell.append(currentCommisionsLeader, currentCommisionsSupport, currentCommisionsTime);
-            currentCommisions.appendChild(currentCommisionsCell);
-        }
-
-        const currentCommisionsBack = createDom('button', { class:['commision-footer', 'flex-column'], innerText: 'Back', style: { display:'none' }})
-        currentCommisionsBack.addEventListener('click', () => {focusNewComm(true, null)});
-        const enterCommision = createDom('button', { class:['commision-footer', 'flex-column'], innerText: 'Confirm!', style: { display:'none' }})
-        enterCommision.addEventListener('click', () => {enterNewComm()});
-        const commFeedback = createDom('p', {class:['commision-footer', 'flex-column'], style: { display:'none' }, id:'comm-feedback', chosenComm: null})
-
-        currentCommisions.append(currentCommisionsBack, commFeedback, enterCommision);
-        commisionMenu.append(commisionList, selectComission, currentCommisions);
+    if (saveValues.baseCommisions.length === 0) {
+        generateCommisions();
     }
+
+    const selectComission = document.createElement('div');
+    selectComission.classList.add('flex-column');
+    selectComission.style.display = 'none';
+    selectComission.id = 'select-comission';
+    const commissionSetting = document.createElement('div');
+    commissionSetting.classList.add('commision-setting', 'flex-row');
+
+    const commTitle = document.createElement('p');
+    const commItems = createDom('div', {
+        classList: ['select-commision-items', 'flex-column'],
+        id: 'select-comm-items'
+    })
+    const commRewards = document.createElement('div');
+    const commStars = document.createElement('img');
+    commItems.append(commRewards, commStars)
+
+    const commHeroes = document.createElement('div');
+    commHeroes.classList.add('comm-heroes');
+    const textArray = ['Leader', 'Support', 'Boon'];
+    textArray.forEach((text) => {
+        let barText = document.createElement('p');
+        barText.innerText = text
+        commHeroes.append(barText);
+    })
+
+    const heroContainer = createDom('div', {
+        hero: null,
+        id: 'select-hero-leader',
+        style:{ background: 'url(./assets/icon/charPlus.webp) no-repeat center center/contain' }
+    });
+
+    const suppContainer = createDom('div', {
+        hero: null,
+        id: 'select-hero-support',
+        style:{ background: 'url(./assets/icon/charPlus.webp) no-repeat center center/contain' }
+    });
+
+    heroContainer.addEventListener('click',() => {
+        selectHeroType = 'leader';
+        heroContainer.style.animation = 'tallyCount 0.5s ease-in-out infinite both';
+        suppContainer.style.animation = 'unset';
+        suppContainer.offsetWidth;
+    });
+
+    suppContainer.addEventListener('click',() => {
+        selectHeroType = 'support';
+        suppContainer.style.animation = 'tallyCount 0.5s ease-in-out infinite both';
+        heroContainer.style.animation = 'unset';
+        heroContainer.offsetWidth;
+    });
+    
+    const perkText = document.createElement('p');
+    perkText.id = 'comm-perk-test';
+    perkText.innerText = 'None Curently';
+    
+    commHeroes.append(heroContainer, suppContainer, perkText);
+    commissionSetting.append(commTitle, commItems, commHeroes);
+
+    const commissionChar = document.createElement('div');
+    commissionChar.id = 'commission-char';
+    commissionChar.classList.add('commision-char');
+    selectComission.append(commissionSetting, commissionChar);
+
+    const currentCommisions = document.createElement('div');
+    currentCommisions.classList.add('current-commision', 'flex-row');
+
+    for (let i = 0; i < 3; i++) {
+        const currentCommisionsCell = createDom('div', {
+            id: `commision-cell-${i}`,
+            class: ['current-commision-cell', 'flex-row'],
+            style: { display: 'flex' },
+        });
+
+        const currentCommisionsLeader = document.createElement('img');
+        const currentCommisionsSupport = document.createElement('img');
+        const currentCommisionsTime = createDom('button', { class:['current-commision-button'] });
+
+        currentCommisionsTime.ready = false;
+        currentCommisionsTime.addEventListener('click', () => {
+            if (currentCommisionsTime.ready === true) {
+                currentCommisionsTime.ready = false;
+                currentCommisionsLeader.style.display = 'none';
+                currentCommisionsSupport.style.display = 'none';
+                currentCommisionsTime.innerText = 'Available';
+                if (currentCommisionsTime.classList.contains('rank-button-available')) currentCommisionsTime.classList.remove('rank-button-available');
+
+                const commId = currentCommisionsTime.commId.split('/');
+                let commInfo;
+                
+                if (commId[1].includes('base')) {
+                    saveValues.currentCommisions.splice(saveValues.currentCommisions.indexOf(commId[1]), 1)
+                    commInfo = saveValues.baseCommisions[commId[1].split('-')[1]]
+                }
+
+                for (let key in saveValues.commisionDict) {
+                    if (saveValues.commisionDict[key].currentComm === commId[1]) {
+                        saveValues.commisionDict[key].currentComm = '';
+                    }
+                }
+
+                const lootContainer = createDom('div', { class:['notif-item'] });
+                let lootArray = [];
+                let markedItems = [];
+                let extraInfo = [];
+
+                let upgradeItem = null;
+                if (commInfo.perk === 'Keen-Eyed') {
+                    upgradeItem = rollArray(commInfo.possibleItems);
+                }
+
+                commInfo.possibleItems.forEach((item) => {
+                    let itemType;
+                    let minLevel = commInfo.rating - 2;
+                    let maxLevel = commInfo.rating;
+                    let specialType = null;
+
+                    if (Object.keys(constNation).includes(item)) {
+                        itemType = 'talent';
+                        minLevel = Math.min(minLevel, 2);
+                        maxLevel = Math.max(minLevel, 4);
+                    } else if (item === "PyroHydro" || item === "DendroGeoAnemo" || item === "ElectroCryo") {
+                        itemType = 'gem';
+                        minLevel = Math.min(minLevel, 3);
+                    } else if (['bow', 'catalyst', 'claymore', 'polearm', 'sword'].includes(item.toLowerCase())) {
+                        itemType = 'weapon';
+                        specialType = item.charAt(0).toUpperCase() + item.slice(1);
+                    } else {
+                        itemType = item;
+                    }
+
+                    let itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                    const itemId2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+
+                    let lossRoll = randomInteger(1, 15);
+                    // SYNC AND ANTI-SYNC
+                    if ((commInfo.char[0] === 'Nahida' || commInfo.char[1] === 'Nahida') && randomInteger(1, 5) === 1) {
+                        const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                        lootArray.push(itemId1);
+                        markedItems.push(itemId1);
+                        extraInfo.push('Sync');
+                    } else if (commInfo.char[1] === 'Wanderer' || commInfo.char[0] === 'Wanderer') {
+                        lossRoll -= 5;
+                        extraInfo.push('Anti-Sync');
+                    } else if (commisionInfo[commInfo.char[0]].charLikes.includes(commInfo.char[1]) && randomInteger(1, 5) === 1) {
+                        const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                        lootArray.push(itemId1);
+                        markedItems.push(itemId1);
+                        extraInfo.push('Sync');
+                    } else if (commisionInfo[commInfo.char[0]].charDislikes.includes(commInfo.char[1])) {
+                        lossRoll -= 5;
+                        extraInfo.push('Anti-Sync');
+                    }
+
+                    if (lossRoll < 3) {
+                        if (commInfo.perk === 'Toughness') {
+                            lossRoll = false;
+                            extraInfo.push('Toughness');
+                        } else {
+                            lossRoll = true;
+                            extraInfo.push('Loss');
+                        }
+                    } else {
+                        lossRoll = false;
+                    }
+
+                    
+                    if (!lossRoll) {
+                        lootArray.push(itemId2);
+                    }
+
+                    // LOSS ROLL
+                    if (randomInteger(1,3) === 1 && !lossRoll) {
+                        const itemId3 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                        lootArray.push(itemId3);
+                    }
+
+                    // KEEN-EYED PERK
+                    if (upgradeItem !== null && upgradeItem == item) {
+                        itemId1 = specialType ? inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'shop');
+                        markedItems.push(itemId1);
+                        extraInfo.push('Keen-Eyed');
+                    }
+                    
+                    if (commInfo.perk === 'Proficient') {
+                        if (commInfo.priority === item) {
+                            const itemIdPro1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                            const itemIdPro2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                            
+                            markedItems.push(itemIdPro1);
+                            markedItems.push(itemIdPro2);
+                            lootArray.push(itemIdPro1);
+                            lootArray.push(itemIdPro2);
+                            lootArray.push(itemId1);
+
+                            extraInfo.push('Proficient');
+                        }
+                    } else {
+                        lootArray.push(itemId1);
+                    }
+
+                    // SCAVENGER PERK
+                    if (commInfo.perk === 'Scavenger' && randomInteger(1,4) === 1) {
+                        const itemId4 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                        lootArray.push(itemId4);
+                        markedItems.push(itemId4);
+                        extraInfo.push('Scavenger');
+                    }
+                });
+
+                const postTreeItems = compareTreeItems(lootArray);
+                lootArray = [];
+                for (let key in postTreeItems) {
+                    const itemFrame = inventoryFrame(document.createElement("div"), Inventory[postTreeItems[key][0]],itemFrameColors);
+
+                    if (postTreeItems[key][1]) {
+                        itemFrame.classList.add('extra-item-tree');
+                    } else if (markedItems.includes(postTreeItems[key][0])) {
+                        markedItems.splice(markedItems.indexOf(postTreeItems[key][0]), 1);
+                        itemFrame.classList.add('extra-item');
+                    }
+                    
+                    lootArray.push(postTreeItems[key][0])
+                    lootContainer.append(itemFrame);
+                }
+
+                const lootText = createDom('p', {
+                    style: {
+                        color: 'var(--dull-green)',
+                        marginBottom: '1em'
+                    }
+                });
+
+                for (let text in extraInfoDict) {
+                    if (extraInfo.includes(text)) {
+                        lootText.innerText = `${extraInfoDict[text]}\n`
+                    }
+                }
+
+                const lootDiv = createDom('div', {
+                    class: ['flex-column'],
+                    children: [lootContainer, lootText],
+                    style: {
+                        width: '100%'
+                    }
+                })
+
+
+                const addLoot = (lootArray) => {
+                    lootArray.forEach((item) => {
+                        inventoryAdd(item);
+                    });
+
+                    newPop(1);
+                    sortList("table2");
+                    saveValues.baseCommisions[commId[1].split('-')[1]].progress = true;
+                    notifPop("clear","comm",commId[1]);
+                }
+
+                persistentValues.commissionsCompletedValue++;
+                choiceBox(mainBody, {text: 'Loot obtained:'}, stopSpawnEvents, () => {addLoot(lootArray)}, null, lootDiv, ['notif-ele']);
+                document.getElementById('guild-button-comm').click();
+            }
+        })
+
+        currentCommisionsCell.leader = currentCommisionsLeader;
+        currentCommisionsCell.support = currentCommisionsSupport;
+        currentCommisionsCell.time = currentCommisionsTime;
+        
+        currentCommisionsCell.append(currentCommisionsLeader, currentCommisionsSupport, currentCommisionsTime);
+        currentCommisions.appendChild(currentCommisionsCell);
+    }
+
+    const currentCommisionsBack = createDom('button', { class:['commision-footer', 'flex-column'], innerText: 'Back', style: { display:'none' }})
+    currentCommisionsBack.addEventListener('click', () => {focusNewComm(true, null)});
+    const enterCommision = createDom('button', { class:['commision-footer', 'flex-column'], innerText: 'Confirm!', style: { display:'none' }})
+    enterCommision.addEventListener('click', () => {enterNewComm()});
+    const commFeedback = createDom('p', {class:['commision-footer', 'flex-column'], style: { display:'none' }, id:'comm-feedback', chosenComm: null})
+
+    currentCommisions.append(currentCommisionsBack, commFeedback, enterCommision);
+    commisionMenu.append(commisionList, selectComission, currentCommisions);
 
     const guildArray = [rankMenu, bountyMenu, commisionMenu];
     const buttonArray = ["Adventure Rank", "Bounties", "Commisions"];
@@ -6669,7 +6685,7 @@ function createExpMap() {
     }
 
     for (let key in imgKey) {
-        // if (key > 17) {break}
+        if (key > 17) {break}
         spawnKey(advImage,imgKey,key);
     }
 
@@ -7144,7 +7160,7 @@ function spawnWorldQuest() {
     let mapImage = document.getElementById('sumeru-map');
     spawnKey(mapImage, imgKey, rollQuest, true);
     notifPop("add", "quest", 1);
-    sidePop('./assets/expedbg/adv-12.webp', 'New World Quest');
+    sidePop('/expedbg/adv-12.webp', 'New World Quest');
 }
 
 function spawnBossQuest(num) {
@@ -10258,7 +10274,7 @@ function winAdventure() {
     const adventureVideo = document.getElementById('adventure-video');
     const nutReward = document.createElement('p');
     nutReward.classList.add("adventure-currency");
-    nutReward.value = saveValues["dps"] * 60 * 3 * (1.5**(imgKey[keyNumber].Level)) * randomInteger(90,100) / 100;
+    nutReward.value = saveValues["dps"] * 60 * 3 * (1.5**(imgKey[keyNumber].Level)) * randomInteger(90,100) / 100 * additionalXP;
 
     if (imgKey[keyNumber].Level === 5) {
         nutReward.gValue = randomInteger(3,10)*3 + advDict.adventureRank;
@@ -11379,10 +11395,8 @@ function setShop(type) {
     } else if (type === "add" || storeInventory.storedTime === 0) {
         storeInventory.storedTime = getTime();
         let i = 10;
-        let upgradedShop = persistentValues.tutorialAscend;
-
         while (i--) {
-            createShopItems(shopDiv, i, Shop.drawShopItem(i, upgradedShop, inventoryDraw, saveValues));
+            createShopItems(shopDiv, i, Shop.drawShopItem(i, persistentValues, inventoryDraw, saveValues));
         }
         saveData(true);
     }
@@ -11489,13 +11503,13 @@ function refreshShop() {
 
     let i = 10;
     while (i--) {
-        createShopItems(shopContainer, i, Shop.drawShopItem(i, persistentValues.tutorialAscend, inventoryDraw, saveValues));
+        createShopItems(shopContainer, i, Shop.drawShopItem(i, persistentValues, inventoryDraw, saveValues));
     }
 
     Shop.changeStoreDialog('clear');
     Shop.regenBlackPrice(persistentValues.blackMarketDict);
     storeInventory.storedTime = getTime();
-    sidePop('./assets/icon/tab7.webp', 'Shop has Refreshed!');
+    sidePop('/icon/tab7.webp', 'Shop Refreshed!');
 }
 
 function successPurchase(mainButton) {
@@ -11516,7 +11530,6 @@ function successPurchase(mainButton) {
 
 function confirmPurchase(shopCost, id, blackDict) {
     let mainButton = document.getElementById(id);
-    saveValues.primogem += shopCost * 2
     if (saveValues.primogem >= shopCost) {
         let typeShop = id.split("-")[0];
         let saveId = id.split("-")[1];
@@ -11540,15 +11553,31 @@ function confirmPurchase(shopCost, id, blackDict) {
                 }
 
                 successPurchase(mainButton);
+                let allItemsPurchased = true;
+                for (let key in blackShopDict) {
+                    if (blackShopDict[key].maxLevel !== persistentValues.blackMarketDict[key].level) {
+                        allItemsPurchased = false;
+                        break;
+                    }
+                }
+
+                if (allItemsPurchased) {
+                    challengeNotification(({category: 'specific', value: [3, 4]}));
+                }
             } else {
                 Shop.changeStoreDialog(persistentValues.tutorialAscend ? 'purchaseFailAscend' : 'purchaseFailRegular');
                 return;
             }
         } else if (typeShop === 'shop') {
             shopId = null;
-            newPop(1);
-            inventoryAdd(itemId);
-            sortList("table2");
+
+            if (id < 4019 && id > 4021) {
+                newPop(1);
+                inventoryAdd(itemId);
+                sortList("table2");
+            } else {
+                addTreeCore(randomInteger(3, 6), id - 4018, true);
+            }
             
             mainButton.classList.add("purchased");
             saveValues.primogem -= shopCost;
@@ -11780,6 +11809,7 @@ function addNutStore() {
     const nutArray = [nutShopDiv,nutTranscend,nutAscend];
     for (let i = 0; i < 3; i++) {
         let nutButton = document.createElement("button");
+        nutButton.classList.add('clickable');
         nutButton.innerText = buttonText[i];
         nutButton.addEventListener("click",()=>{
             for (let j = 0; j < 3; j++) {
@@ -12303,7 +12333,7 @@ function createTreeMenu() {
     sandImg.classList.add('tree-sand');
 
     const backButton = createDom('button', {
-        class: ['tree-back'],
+        class: ['tree-back', 'clickable'],
         innerText: 'Back',
         event: ['click', () => {tabChange(1)}]
     })
@@ -12725,6 +12755,33 @@ function updateTreeValues(turnZero = false) {
     }
 }
 
+function addTreeCore(number = 1, increaseOdds = 0, override = false) {
+    if (!persistentValues.tutorialAscend) {return}
+    let maxCore = 1;
+    let rolledCore;
+    if (!override) {
+        if (persistentValues.fellBossDefeat) {
+            maxCore = 2;
+        } else if (persistentValues.unusualBossDefeat) {
+            maxCore = 3;
+        } else if (persistentValues.workshopBossDefeat) {
+            increaseOdds += 20;
+        }
+    
+        if ((randomInteger(0, 100) + increaseOdds) > 50) {
+            rolledCore = maxCore;
+        } else {
+            rolledCore = Math.max(maxCore - 1, 1)
+        }
+    } else {
+        increaseOdds = rolledCore;
+    }
+
+    persistentValues.treeSeeds[rolledCore - 1] += number;
+    updateSeedContainer(true);
+    sidePop(`/tooltips/inventory/seed-${rolledCore}.webp`, `${number}x Lvl. ${rolledCore} Seed`);
+}
+
 function enemyBlock(remove, damage, maxHP) {
     if (remove === true) {
         let enemyContainer = document.getElementById('tree-block').firstChild;
@@ -12805,11 +12862,14 @@ function pickTree() {
     // growTree('level');
 }
 
-function updateSeedContainer(updateValueOnly) {
+function updateSeedContainer(updateValueOnly = false) {
     if (document.getElementById('seed-container')) {
         const seedContainer = document.getElementById('seed-container');
         if (updateValueOnly) {
-
+            const containerChildren = Array.from(seedContainer.children);
+            for (let index = 0; index < 3; index++) {
+                containerChildren[index].updateValue();
+            }
         } else {
             let seedAdded = [0,0,0];
             for (let i = 0; i < 3; i++) {
@@ -12817,7 +12877,7 @@ function updateSeedContainer(updateValueOnly) {
                 seedColumnContainer.classList.add('seed-column')
                 
                 let seedImg = new Image();
-                seedImg.src = `./assets/tree/seed-${i+1}.webp`
+                seedImg.src = `./assets//tooltips/inventory/seed-${i + 1}.webp`;
 
                 let seedNumber = document.createElement('p');
                 seedNumber.amount = 0;
@@ -12862,10 +12922,15 @@ function updateSeedContainer(updateValueOnly) {
                     incrementValue(10);
                 });
 
-                seedColumnContainer.append(seedImg, seedNumber, seedMegaDecrement, seedDecrement, seedIncrement, seedMegaIncrement);
-                seedContainer.append(seedColumnContainer)
-            }
+                seedColumnContainer.updateValue = () => {
+                    seedNumber.innerText = `0 / ${persistentValues.treeSeeds[i]}`;
+                }
 
+                seedColumnContainer.append(seedImg, seedNumber, seedMegaDecrement, seedDecrement, seedIncrement, seedMegaIncrement);
+                seedContainer.append(seedColumnContainer);
+
+                
+            }
             const backButton = createDom('button', {
                 innerText: 'Back',
                 style: {
@@ -12885,6 +12950,7 @@ function updateSeedContainer(updateValueOnly) {
                     transform: 'translateX(5%)',
                 }
             });
+
             plantButton.addEventListener('click', () => {
                 let seedValue = 0;
                 let seedNum = 1;
@@ -12930,6 +12996,7 @@ function growTree(type, amount) {
                     }
                     saveValues.treeObj.level = 5;
                     treeOptions(true, document.getElementById('options-container'), true);
+                    sidePop('/tree/harvest.webp', 'Tree has Matured!');
                 } else {
                     treeProgress.progress = 0;
                     growTree('level');
@@ -13368,7 +13435,7 @@ if (beta || testing) {
         if (e.key === 'f') {
             Shop.regenBlackPrice(persistentValues.blackMarketDict);
         } else if (e.key === 'g') {
-            sidePop('./assets/icon/tab7.webp', 'Shop has Refreshed!');
+            sidePop('/icon/tab7.webp', 'Shop has Refreshed!');
         }
     })    
 }

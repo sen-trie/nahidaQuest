@@ -1889,22 +1889,6 @@
     filter: drop-shadow(0 0 0.4em white);
 }
 
-.settings-menu {
-    position: absolute;
-    left: 26%;
-    top: 20.5%;
-    width: 48%;
-    height: 65%;
-    row-gap: 1%;
-    border: 0.3em outset var(--medium-green);
-    border-radius: 1em;
-    background-color: var(--light-green);
-    color: #1d2e18;
-    z-index: -1;
-    justify-content: space-around;
-    filter: drop-shadow(0.1em 0.1em 0.2em #474d45);
-}
-
 .cancel-button {
     position: absolute;
     bottom: 97%;
@@ -2488,7 +2472,7 @@ input:checked + .slider:before {
 }
 
 .shop-black-card {
-    width: 30%;
+    width: 31%;
     background-color: wheat;
     border: 0.2rem solid var(--very-dark-brown);
     box-sizing: border-box;
@@ -2538,7 +2522,7 @@ input:checked + .slider:before {
     bottom: 0.5rem;
     width: auto;
     max-width: 100%;
-    height: 85%;
+    height: 75%;
     aspect-ratio: 1;
     object-fit: contain;
     box-sizing: border-box;
@@ -2655,7 +2639,7 @@ input:checked + .slider:before {
     position: relative;
     left: 5%;
     width: 75%;
-    height: 16%;
+    height: 20%;
     box-sizing: border-box;
     padding: 0.5% 1%;
     border-radius: 0.5em;
@@ -3186,6 +3170,7 @@ img[src=""] {
 }
 
 .settings-menu {
+    position: absolute;
     left: 50%;
     top: 50%;
     height: 80%;
@@ -3193,6 +3178,12 @@ img[src=""] {
     row-gap: unset;
     width: auto;
     aspect-ratio: 1.35;
+    z-index: -1;
+    justify-content: space-around;
+    border: 0.3em outset var(--medium-green);
+    border-radius: 1em;
+    background-color: var(--light-green);
+    color: #1d2e18;
 }
 
 .settings-menu button {

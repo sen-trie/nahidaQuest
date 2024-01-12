@@ -99,40 +99,83 @@ const calculateShopCost = (star, costDiscount = 1) => {
     return shopCost;
 }
 
-const drawShopItem = (i, upgradedShop = false, inventoryDraw, saveValues) => {
+const drawShopItem = (i, persistentValues, inventoryDraw, saveValues) => {
     let inventoryNumber;
-    if (i >= 7 && i <= 9) {
-        if (upgradedShop) {
-            if (i === 9) {
-                inventoryNumber = 4015;
+    switch (i) {
+        case 9:
+            if (persistentValues.workshopBossDefeat) {
+                inventoryNumber = randomInteger(4020, 4022);
+            } else if (persistentValues.fellBossDefeat) {
+                inventoryNumber = randomInteger(4019, 4021);
+            } else if (persistentValues.tutorialAscend) {
+                inventoryNumber = 4019;
             } else {
-                inventoryNumber = 4014;
+                inventoryNumber = inventoryDraw("gem", 5, 6, "shop");
             }
-        } else {
-            inventoryNumber = inventoryDraw("talent", 2, 4, "shop");
-        }
-    } else if (i === 6) {
-        inventoryNumber = randomInteger(4011,4014);
-    } else if (i === 5) {
-        if (upgradedShop) {
-            inventoryNumber = 4018;
-        } else if (saveValues["wishUnlocked"] === true) {
-            inventoryNumber = 4010;
-        } else {
-            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
-        }
-    } else if (i >= 3 && i <= 4) {
-        if (upgradedShop) {
-            if (i === 3) {
+            break;
+        case 8:
+            if (persistentValues.workshopBossDefeat) {
+                inventoryNumber = randomInteger(4020, 4022);
+            } else if (persistentValues.fellBossDefeat) {
+                inventoryNumber = randomInteger(4019, 4021);
+            } else if (persistentValues.tutorialAscend) {
+                inventoryNumber = 4019;
+            } else {
+                inventoryNumber = inventoryDraw("gem", 5, 6, "shop");
+            }
+            break;
+        case 7:
+            inventoryNumber = inventoryDraw("weapon", 5, 6, "shop");
+            break;
+        case 6:
+            inventoryNumber = inventoryDraw("weapon", 5, 6, "shop");
+            break;
+        case 5:
+            if (persistentValues.tutorialAscend) {
+                inventoryNumber = randomInteger(4012, 4014);
+            } else {
+                inventoryNumber = randomInteger(4011, 4014);
+            }
+            break;
+        case 4:
+            if (persistentValues.tutorialAscend) {
+                inventoryNumber = 4018;
+            } else if (saveValues["wishUnlocked"] === true) {
+                inventoryNumber = 4010;
+            } else {
+                inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
+            }
+            break;
+        case 3:
+            if (persistentValues.tutorialAscend) {
+                inventoryNumber = 4016;
+            } else {
+                inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
+            }
+            break;
+        case 2:
+            if (persistentValues.tutorialAscend) {
                 inventoryNumber = 4017;
             } else {
-                inventoryNumber = 4016;
+                inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
             }
-        } else {
-            inventoryNumber = inventoryDraw("gem", 3, 6, "shop");
-        }
-    } else {
-        inventoryNumber = inventoryDraw("weapon", 5, 6, "shop");
+            break;
+        case 1:
+            if (persistentValues.tutorialAscend) {
+                inventoryNumber = 4014;
+            } else {
+                inventoryNumber = inventoryDraw("talent", 2, 4, "shop");
+            }
+            break;
+        case 0:
+            if (persistentValues.tutorialAscend) {
+                inventoryNumber = 4015;
+            } else {
+                inventoryNumber = inventoryDraw("talent", 2, 4, "shop");
+            }
+            break;
+        default:
+            break;
     }
 
     return inventoryNumber;

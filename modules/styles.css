@@ -858,6 +858,8 @@ table, button, label {
     bottom: 15%;
     width: fit-content;
     height: fit-content;
+    align-items: flex-start;
+    pointer-events: none;
 }
 
 .side-pop-animation {
@@ -868,6 +870,7 @@ table, button, label {
     background-color: rgba(0, 0, 0, 0.705);
     height: 2rem;
     width: fit-content;
+    padding: 0.1rem;
 }
 
 .side-pop > img {
@@ -875,6 +878,7 @@ table, button, label {
     height: 80%;
     width: auto;
     object-fit: contain;
+    filter: drop-shadow(0 0 0.1em white);
 }
 
 .side-pop > p {
@@ -1160,6 +1164,7 @@ table, button, label {
     text-shadow: var(--text-shadow-075);
     border: 0.15em solid var(--dark-brown);
     border-radius: 0.3em;
+    transition: 0.2s ease;
 }
 
 #upgrade-menu-button {
@@ -1170,10 +1175,15 @@ table, button, label {
     right: 1.5%;
     background-color: #AEC378;
     border: 0.15em solid #4d693b;
+    transition: 0.2s ease;
+}
+
+#upgrade-menu-button:hover {
+    background-color: #4d693b;
 }
 
 .filter-row > button:hover {
-    filter: brightness(110%);
+    background-color: var(--dark-brown);
 }
 
 .filter-row div:nth-child(2) > button,.filter-row div:nth-child(3) > button {
@@ -1584,7 +1594,11 @@ table, button, label {
     background-color: #5B656D;
     border: 0.2em solid #2C3742;
     color: rgb(255, 255, 255);
-    transition: background-color 0.3s ease;
+    transition: 0.3s ease;
+}
+
+.guild-button:hover {
+    border: 0.2em solid #5B656D;
 }
 
 .guild-selected {
@@ -2153,9 +2167,9 @@ table, button, label {
 }
 
 .achieve {                                         
-    z-index:2;
+    z-index:10;
     position: absolute;
-    bottom: 18%;
+    bottom: 4%;
     width:90%;
     height:10%;
     text-align: center;
@@ -2733,7 +2747,7 @@ table, button, label {
     right: 6%;
     top: 7%;
     color: white;
-    font-size: 1rem;
+    font-size: 1.1rem;
     text-shadow: var(--text-shadow-050);
 }
 

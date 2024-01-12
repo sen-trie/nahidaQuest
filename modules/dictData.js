@@ -1062,6 +1062,9 @@ const InventoryDefault = {
         4016: {File:"gemBundle1",               Name:"Gem Share Bundle",                 Lore:"A bundle of gems that the Guild routinely gives out, and which contain elemental power.", Star:4,  Type:"Level" },
         4017: {File:"gemBundle2",               Name:"Gem Mega Bundle",                 Lore:"A big bundle of gems that the Guild routinely gives out, and which contain elemental power.", Star:5,  Type:"Level" },
         4018: {File:"letterBundle",            Name:"Supply Share Bundle",                 Lore:"Supplies the Guild has prepared for those who harbor great ambition. They will certainly come into play.", Star:5,  Type:"Level" },
+        4019: {File:"seed-1",               Name:"Special Wisdom Seed",                 Lore:"A seed that is likely to be older than the Akademiya.", Star:4,  Type:"Level" },
+        4020: {File:"seed-2",               Name:"Ancient Wisdom Seed",                 Lore:"A seed that is likely to be older than the Akademiya.", Star:5,  Type:"Level" },
+        4021: {File:"seed-3",               Name:"Primoridal Wisdom Seed",                 Lore:"A seed that is likely to be older than the Akademiya.", Star:6,  Type:"Level" },
         // SHOP ITEMS vvv
         5001: {File:"any5",          Name:"Brilliant Diamond Gemstone",                  Lore:"A shiny spectral gem that increases power of [s]all[/s] characters by [s][eBuff][/s] of their [s]base power[/s]. \n\n (Only characters currently purchased count.)",                       Star:6,       Type:"Gemstone",           element:"Any"          },
         5002: {File:"any4",          Name:"Brilliant Diamond Chunck",                    Lore:"A shiny mystical gem that increases power of [s]all[/s] characters by [s][4eBuff][/s] of their [s]base power[/s]. \n\n (Only characters currently purchased count.)",                        Star:5,        Type:"Gemstone",         element:"Any"          },
@@ -1280,7 +1283,7 @@ const challengeInfo = [
         {'title': 'At the Click of a Button', 'desc': 'Click for over one billion Nuts'},  // CH DONE
         {'title': 'House of Haravatat', 'desc': 'Possess 200 discounted levels'}, // CH DONE
         {'title': 'Song of Songs', 'desc': "Reach 15,000 energy in one run"}, // CH DONE
-        {'title': 'Greater Vision', 'desc': 'Get a Crit on Big Nahida seven times in a row'},  // CH DONE
+        {'title': "Grand Bazaar's Conquerer", 'desc': "Clear out Dori's black market shop"},   // CH DONE
         {'title': 'Follow Me!', 'desc': 'Collect 1400 points while leading the Aranara'}, // CH DONE
         {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},   // CH DONE
         {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 30 fully-grown trees'},  // CH DONE

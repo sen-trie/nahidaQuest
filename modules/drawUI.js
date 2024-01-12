@@ -354,7 +354,7 @@ const patchDict = {
         </indent>
 
         <br><br> 6. New Aranara events <br>
-        Added 'Aranara Reveals', 'Aranara Says' and 'Aranara Snake'. These events randomly spawn as a (¿).
+        Added 'Aranara Reveals', 'Aranara Says' and 'Aranara Snake'. Unlocked after defeating the first boss. These events randomly spawn as a (¿).
         </indent>
 
         <br><br> 7. Dori's Black Market <br>

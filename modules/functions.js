@@ -234,10 +234,6 @@ const challengeThreshold = {
         50:[0,3],
         200:[3,2],
     },
-    'nahidaCrit':{
-        3:[0,4],
-        7:[3,4]
-    },
     'harvest': {
         1:[0,9],
         15:[2,8],
