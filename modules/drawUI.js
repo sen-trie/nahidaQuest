@@ -1,3 +1,6 @@
+import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js';
+import { createDom } from './adjustUI.js';
+
 function textReplacerCopy(dictReplace, originalText) {
     for (let key in dictReplace) {
         originalText = originalText.replaceAll(key,dictReplace[key]);
@@ -521,4 +524,84 @@ function patchNotes(parent, showImgTitle = true, onlyOneOpen = false) {
     return parent.append(patchContainer);
 }
 
-export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadMinimumArray,preloadImage,patchNotes }
+// CUSTOM TUTORIALS
+const preloadTutorial = Preload();
+function customTutorial(tutorialFile, maxSlide, title, exitFunction) {
+    const mainBody = document.getElementById("game");  
+    let currentSlide = 1;
+    let customTutorialDiv = document.createElement("div");
+    customTutorialDiv.classList.add("cover-all","flex-column","tutorial-dark");
+
+    let slideArray = [];
+    for (let i = 0; i < maxSlide; i++) {
+        slideArray.push(`./assets/tutorial/${tutorialFile}-${i+1}.webp`);
+    }
+    preloadTutorial.fetch(slideArray);
+
+    let tutorialImage = document.createElement("img");
+    tutorialImage.classList.add("tutorial-img");
+    tutorialImage.src = `./assets/tutorial/${tutorialFile}-1.webp`;
+
+    const nextButton = createDom('button', { 
+        class: ['tutorial-direction-next', 'clickable'],
+        event: ['click', () => {changeSlide(1)}],
+        innerText: 'Next',
+    });
+    
+    const prevButton = createDom('button', { 
+        class: ['tutorial-direction-prev'],
+        style: { 
+            opacity: 0.2,
+            pointerEvents: 'none',
+         },
+        event: ['click', () => {changeSlide(-1)}],
+        innerText: 'Back',
+    });
+
+    const changeSlide = (change) => {
+        currentSlide = Math.max((currentSlide += change), 1);
+        if (currentSlide === maxSlide) {
+            customTutorialDiv.remove();
+
+            if (exitFunction) {exitFunction()};
+            return;
+        }
+
+        if (currentSlide === 1) {
+            if (prevButton.style.pointerEvents !== 'none') { 
+                if (prevButton.classList.contains('clickable')) {prevButton.classList.remove('clickable');}
+                prevButton.style.pointerEvents = 'none';
+                prevButton.style.opacity = 0.2;
+            }
+        } else {
+            if (prevButton.style.pointerEvents === 'none') {
+                prevButton.classList.add('clickable');
+                prevButton.style.pointerEvents = 'unset';
+                prevButton.style.opacity = 1;
+            }
+        }
+
+        if (currentSlide === (maxSlide - 1)) {
+            nextButton.innerText = 'Finish';
+        } else {
+            nextButton.innerText = 'Next';
+        }
+
+        tutorialImage.src = `./assets/tutorial/${tutorialFile}-${currentSlide}.webp`;
+    }
+
+    let buttonContainer = createDom('div', { 
+        class: ['flex-row', 'tutorial-button-container'],
+        child: [prevButton, nextButton],
+    });
+    
+    let tutorialScreen = createDom('div', {
+        class: ["flex-column","tutorial-screen"],
+        child: [createDom('p', { innerText: title, class: ['flex-row', 'tutorial-title'] }), tutorialImage, buttonContainer]
+    });
+
+    customTutorialDiv.appendChild(tutorialScreen);
+    mainBody.appendChild(customTutorialDiv);
+}
+
+export { drawMainBody,demoFunction,createHeroButtonContainer,createExpedTable,createAchievement,storeAchievement,drawMailTable,buildGame,preloadMinimumArray,preloadImage,patchNotes,customTutorial }

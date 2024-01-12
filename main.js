@@ -2,10 +2,10 @@ import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,save
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop } from "./modules/adjustUI.js"
-import * as Settings from "./modules/features/settings.js"
+import * as Settings from "./modules/features/settings.js";
 import * as Shop from "./modules/features/shop.js";
-import * as Expedition from "./modules/features/expedition.js"
-import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js'
+import * as Expedition from "./modules/features/expedition.js";
+import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js';
 
 const VERSIONNUMBER = "V.1-02-002";
 const COPYRIGHT = "DISCLAIMER © HoYoverse.  \n All rights reserved. This site is not affiliated \n with Hoyoverse, nor Genshin Impact.";
@@ -665,7 +665,11 @@ function loadSaveData() {
                     } else {
                         tempItem = persistentValues[`upgrade${i}`].Purchased
                     }
-                    if (tempItem) tempArray.push(tempItem);
+                    if (tempItem) {
+                        tempArray.push(tempItem);
+                    } else {
+                        tempArray.push(0);
+                    }
                 }
                 persistentValues.upgrade = tempArray;
             }  
@@ -701,9 +705,7 @@ function loadSaveData() {
         persistentValues.challengeCheck = challengeCheck('checkKeys', persistentValues.challengeCheck, challengeInfo);
     }
     updateObjectKeys(saveValues.treeObj, saveValuesDefault.treeObj);
-
     achievementListload();
-
     specialValuesUpgrade(true);
     if (saveValues.goldenTutorial === true) {
         addNutStore();
@@ -757,12 +759,12 @@ function touchDemo(autoClicked = false) {
         clickDelay -= 3;
         if (clickerEvent !== "none") {
             clickDelay -= 2;
-            clickEarn = Math.ceil(currentClick * clickCritDmg);
+            clickEarn = Math.ceil((currentClick * 5) * clickCritDmg);
         } else {
-            clickEarn = Math.ceil(saveValues["clickFactor"] * clickCritDmg);
+            clickEarn = Math.ceil((saveValues.dps + saveValues["clickFactor"]) * 5 * clickCritDmg);
         }
 
-        if (randomInteger(0, 100) < 5 && autoClicked !== true) {
+        if (randomInteger(0, 100) < 3 && autoClicked !== true) {
             addTreeCore(randomInteger(1, 3), 0);
         }
 
@@ -782,7 +784,7 @@ function touchDemo(autoClicked = false) {
         if (demoImg.critInARow > 0) {demoImg.critInARow = 0}
     }
 
-    if (randomInteger(0, 1000) < 5 && autoClicked !== true) {
+    if (randomInteger(0, 1000) < 3 && autoClicked !== true) {
         addTreeCore(randomInteger(1, 3), 0);
     }
 
@@ -792,7 +794,7 @@ function touchDemo(autoClicked = false) {
     }
     energyRoll(autoClicked);
 
-    if (clickAudioDelay === null) {
+    if (clickAudioDelay === null && autoClicked !== true) {
         if (timerSeconds !== 0) {
             audioPlay(demoElement);
 
@@ -953,17 +955,24 @@ function idleCheck(idleAmount) {
     let timePassed = timeLoaded - saveValues.currentTime;
     if (timePassed > 1400) {
         timePassed = 1400;
-    }
-    if (timePassed >= 60) {
+    } else if (timePassed >= 60) {
         idleAmount = timePassed * saveValues.dps * 60 * idleRate;
     }
     return idleAmount;
 }
 
+// POST-SETUP GAME CONFIG
 function postSaveData() {
     const leftHandCSS = document.getElementById('toggle-css');
     leftHandCSS.disabled = (settingsValues.leftHandMode ? undefined : 'disabled');
     document.documentElement.style.fontSize = `calc(${0.2 + settingsValues.fontSizeLevel * 0.16}vw + ${0.2 + settingsValues.fontSizeLevel * 0.16}vh)`;
+    
+    if (persistentValues.autoFood) {
+        autoConsumeFood('check');
+    }
+    if (persistentValues.autoClickNahida) {
+        autoClickNahida('use');
+    }
 
     const sidePopContainer = createDom('div', {
         id: 'side-pop-container',
@@ -977,6 +986,8 @@ function postSaveData() {
 // RANDOM EVENTS TIMER
 let eventTimes = 1;
 let eventChance = 0;
+let worldQuestCooldown = null;
+let skrimishCooldown = null;
 function randomEventTimer(timerSeconds) {
     let eventTimeMin = EVENTCOOLDOWN * eventTimes * eventCooldownDecrease;
     if (eventChance !== 0) {
@@ -990,6 +1001,28 @@ function randomEventTimer(timerSeconds) {
             const currentTime = getTime();
             persistentValues.timeSpentValue += currentTime - persistentValues.lastRecordedTime;
             persistentValues.lastRecordedTime = currentTime;
+        } else {
+            if (worldQuestCooldown === null) {
+                let worldQuestRoll = randomInteger(1, 101) - luckRate;
+                worldQuestCooldown = true;
+                if (worldQuestRoll < 30) {
+                    console.log('World Quest Spawned!');
+                    spawnWorldQuest();
+                    setTimeout(() => {worldQuestCooldown = null}, 7 * 60 * 1000)
+                } else {
+                    setTimeout(() => {worldQuestCooldown = null}, 1 * 60 * 1000)
+                }
+            } else if (!document.getElementById('world-quest-button') && skrimishCooldown === null) {
+                let skirmishRoll = randomInteger(1, 101) - luckRate;
+                skrimishCooldown = true;
+                if (skirmishRoll < 30) {
+                    console.log('Skirmish Spawned!');
+                    spawnSkirmish();
+                    setTimeout(() => {worldQuestCooldown = null}, 15 * 60 * 1000)
+                } else {
+                    setTimeout(() => {worldQuestCooldown = null}, 0.5 * 60 * 1000)
+                }
+            }
         }
         return;
     }
@@ -3129,34 +3162,12 @@ function playAudio() {
 function tutorial(idleAmount) {
     let overlay = document.getElementById("loading");
     if (firstGame === true) {
-        let currentSlide = 1;
-        let tutorialDark = document.createElement("div");
-        tutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
-
-        let tutorialImage = document.createElement("img");
-        tutorialImage.classList.add("tutorial-img");
-        tutorialImage.id = "tutorialImg";
-        tutorialImage.src = "./assets/tutorial/tut-1.webp"
-        
-        let tutorialScreen = document.createElement("div");
-        tutorialScreen.classList.add("flex-column","tutorial-screen");
-        tutorialScreen.addEventListener("click", () => {
-            if (currentSlide == 4) {
-                overlay.style.zIndex = -1;
-                clearInterval(timerLoad);
-                timer = setInterval(timerEvents,timeRatio);
-                currentBGM = playAudio();
-                settingsVolume();
-                return;
-            }
-
-            currentSlide++;
-            tutorialImage.src = "./assets/tutorial/tut-"+currentSlide+".webp";
-        })
-
-        tutorialScreen.append(tutorialImage);
-        tutorialDark.appendChild(tutorialScreen);
-        overlay.appendChild(tutorialDark);
+        drawUI.customTutorial("tut", 5, 'Introduction', () => { 
+            clearInterval(timerLoad);
+            timer = setInterval(timerEvents,timeRatio);
+            currentBGM = playAudio();
+            settingsVolume(); 
+        });
     } else if (firstGame === false) {
         let tutorialDark = document.createElement("div");
         tutorialDark.classList.add("cover-all","flex-column","tutorial-dark");
@@ -3181,13 +3192,6 @@ function tutorial(idleAmount) {
         playButton.classList.add("play-button");
         playButton.addEventListener("click",()=>{
             overlay.style.zIndex = -1;
-            // CHECK IF ITS PLAYER'S FIRST LOAD FOR THE DAY (ONLY WORKS ON DEPLOYMENT)
-            // const lastVisit = document.cookie.replace(/(?:(?:^|.*;\s*)lastVisit\s*\=\s*([^;]*).*$)|^.*$/, '$1');
-            // const today = new Date().toDateString();
-            // if (lastVisit === '' || lastVisit !== today) {
-            //     settingsBox("toggle", "patch");
-            //     document.cookie = 'lastVisit=' + today + '; expires=' + new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toUTCString() + '; path=/';
-            // }
 
             clearInterval(timerLoad);
             timer = setInterval(timerEvents,timeRatio);
@@ -3215,51 +3219,7 @@ function tutorial(idleAmount) {
 
         tutorialDark.appendChild(playButton);
         overlay.append(tutorialDark);
-
-        // POST-SETUP GAME CONFIG
-        if (persistentValues.autoFood) {
-            autoConsumeFood('check');
-        }
-        if (persistentValues.autoClickNahida) {
-            autoClickNahida('use');
-        }
     }
-}
-
-// CUSTOM TUTORIALS
-const preloadTutorial = Preload();
-function customTutorial(tutorialFile,maxSlide,exitFunction) {
-    let currentSlide = 1;
-    let customTutorialDiv = document.createElement("div");
-    customTutorialDiv.classList.add("cover-all","flex-column","tutorial-dark");
-
-    let slideArray = [];
-    for (let i = 0; i < maxSlide; i++) {
-        slideArray.push(`./assets/tutorial/${tutorialFile}-${i+1}.webp`);
-    }
-    preloadTutorial.fetch(slideArray);
-
-    let tutorialImage = document.createElement("img");
-    tutorialImage.classList.add("tutorial-img");
-    tutorialImage.src = `./assets/tutorial/${tutorialFile}-1.webp`;
-    
-    let tutorialScreen = document.createElement("div");
-    tutorialScreen.classList.add("flex-column","tutorial-screen");
-    tutorialScreen.addEventListener("click",()=>{
-        if (currentSlide === maxSlide) {
-            customTutorialDiv.remove();
-            stopSpawnEvents = false;
-
-            if (exitFunction) {exitFunction()};
-            return;
-        }
-        currentSlide++;
-        tutorialImage.src = `./assets/tutorial/${tutorialFile}-${currentSlide}.webp`;
-    })
-
-    tutorialScreen.append(tutorialImage);
-    customTutorialDiv.appendChild(tutorialScreen);
-    mainBody.appendChild(customTutorialDiv);
 }
 
 function saveData(skip = false) {
@@ -5198,11 +5158,11 @@ function adventure(advType) {
 
             if (activeLeader == "Paimon" && type <= 5 && type > 1) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.15)}
 
-            if (!persistentValues.tutorialBasic) {
-                customTutorial("advTut", 6, () => { drawAdventure(type, wave) });
+            if (!persistentValues.tutorialBasic || testing) {
+                drawUI.customTutorial("advTut", 6, 'Expedition Tutorial', () => { drawAdventure(type, wave) });
                 persistentValues.tutorialBasic = true;
             } else if (type >= 3 && type < 6 && persistentValues.tutorialRanged != true) {
-                customTutorial("rangTut", 2, () => { drawAdventure(type, wave) });
+                drawUI.customTutorial("rangTut", 2, 'Expedition Tutorial', () => { drawAdventure(type, wave) });
                 persistentValues.tutorialRanged = true;
             } else {
                 drawAdventure(type, wave);
@@ -5519,7 +5479,7 @@ function createExpedition() {
     });
 
     advTutorial.addEventListener("click", () => {
-        customTutorial("advTut", 6);
+        drawUI.customTutorial("advTut", 6, 'Expedition Tutorial');
     })
 
     table3.append(charMorale,advButton,advTutorial);
@@ -6604,6 +6564,7 @@ function createExpMap() {
     notifSelect.questArray = [];
     notifSelect.commArray = [];
     notifSelect.bossArray = [];
+    notifSelect.skirmishArray = [];
     notifSelect.classList.add("flex-column","notif-select");
     
     let charMenu = document.createElement("div");
@@ -6847,11 +6808,15 @@ function notifPop(type,icon,count) {
         } else if (icon === "comm") {
             notifImg.src = "./assets/icon/comm.webp";
             notifText.innerText = "Commision \n Complete";
-            notifSelect.questArray.push(count);
+            notifSelect.commArray.push(count);
         } else if (icon === "boss") {
             notifImg.src = "./assets/expedbg/adv-14.webp";
             notifText.innerText = "Boss \n Battle";
-            notifSelect.questArray.push(count);
+            notifSelect.bossArray.push(count);
+        } else if (icon === "skirmish") {
+            notifImg.src = "./assets/expedbg/adv-13.webp";
+            notifText.innerText = "Skirmish \n Battle";
+            notifSelect.skirmishArray.push(count);
         }
 
         if (guildButton.includes(icon)) {
@@ -7094,7 +7059,7 @@ function drawAdventure(advType, wave) {
     }
 }
 
-function spawnKey(advImage,imgKey,key,worldQuest) {
+function spawnKey(advImage, imgKey, key, type = 'normal') {
     let button = createDom('button', {
         class: ['adv-image-btn'],
         style: {
@@ -7107,8 +7072,11 @@ function spawnKey(advImage,imgKey,key,worldQuest) {
     });
 
     button.wave = imgKey[key].Wave;
-    if (worldQuest) {
+    if (type === 'worldQuest') {
         button.id = "world-quest-button";
+        button.style.transform = `scale(${1 / (0.2 + (2/100) * settingsValues.defaultZoom) * (MOBILE ? 1.5 : 1)})`;
+    } else if (type === 'skirmish') {
+        button.id = "skirmish-button";
         button.style.transform = `scale(${1 / (0.2 + (2/100) * settingsValues.defaultZoom) * (MOBILE ? 1.5 : 1)})`;
     };
 
@@ -7158,9 +7126,22 @@ function spawnWorldQuest() {
 
     let rollQuest = randomInteger(18, 26);
     let mapImage = document.getElementById('sumeru-map');
-    spawnKey(mapImage, imgKey, rollQuest, true);
+    spawnKey(mapImage, imgKey, rollQuest, 'worldQuest');
     notifPop("add", "quest", 1);
     sidePop('/expedbg/adv-12.webp', 'New World Quest');
+}
+
+function spawnSkirmish() {
+    if (document.getElementById("skirmish-button")) {
+        document.getElementById("skirmish-button").remove();
+        notifPop("clearAll","skirmish");
+    }
+
+    let rollQuest = 26;
+    let mapImage = document.getElementById('sumeru-map');
+    spawnKey(mapImage, imgKey, rollQuest, 'skirmish');
+    notifPop("add", "skirmish", 1);
+    sidePop('/expedbg/adv-13.webp', 'Skirmish Quest');
 }
 
 function spawnBossQuest(num) {
@@ -7422,7 +7403,10 @@ function finishQuest(advType) {
 
         if (document.getElementById("world-quest-button")) {
             document.getElementById("world-quest-button").remove();
-            notifPop("clear","quest",1);
+            notifPop("clearAll","quest");
+        } else if (document.getElementById("skirmish-button")) {
+            document.getElementById("skirmish-button").remove();
+            notifPop("clearAll","skirmish");
         }
 
         if (res) {
@@ -10274,7 +10258,7 @@ function winAdventure() {
     const adventureVideo = document.getElementById('adventure-video');
     const nutReward = document.createElement('p');
     nutReward.classList.add("adventure-currency");
-    nutReward.value = saveValues["dps"] * 60 * 3 * (1.5**(imgKey[keyNumber].Level)) * randomInteger(90,100) / 100 * additionalXP;
+    nutReward.value = saveValues["dps"] * 60 * 3 * (1.5**(imgKey[keyNumber].Level > 5 ? imgKey[keyNumber].Level : 7)) * randomInteger(90,100) / 100 * additionalXP;
 
     if (imgKey[keyNumber].Level === 5) {
         nutReward.gValue = randomInteger(3,10)*3 + advDict.adventureRank;
@@ -10324,11 +10308,6 @@ function winAdventure() {
 }
 
 function quitAdventure(wonBattle) {
-    let worldQuestRoll = randomInteger(1,101) - luckRate;
-    if (worldQuestRoll < 30) {
-        spawnWorldQuest();
-    }
-
     const comboNumber = document.getElementById("combo-number");
     comboNumber.remove();
     challengeNotification(({category: 'combo', value: comboNumber.maxCombo}));
@@ -12298,7 +12277,7 @@ function nutPopUp() {
 
         setTimeout(()=>{
             addNutStore();
-            customTutorial("goldenNut", 4);
+            drawUI.customTutorial("goldenNut", 4, 'Golden Nut Obtained!!');
             const settingsBottomBadge = document.getElementById('badges-div');
             if (!settingsBottomBadge.querySelector('medal-img-1')) {
                 settingsBottomBadge.append(createMedal(1, choiceBox, mainBody, stopSpawnEvents))
@@ -13435,7 +13414,7 @@ if (beta || testing) {
         if (e.key === 'f') {
             Shop.regenBlackPrice(persistentValues.blackMarketDict);
         } else if (e.key === 'g') {
-            sidePop('/icon/tab7.webp', 'Shop has Refreshed!');
+            spawnSkirmish()
         }
     })    
 }

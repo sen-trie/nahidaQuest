@@ -76,7 +76,7 @@ const imgKey = {
     23:{Left:"30",  Top:"37",   Level:12,   Wave:[11,13,14]},
     24:{Left:"55",  Top:"24",   Level:12,   Wave:[15,20]},
     25:{Left:"66",  Top:"41",   Level:12,   Wave:[16,19]},
-    26:{Left:"78",  Top:"48",   Level:13,   Wave:[1],  Heads:[18,19]        ,Loot:{}},
+    26:{Left:"78",  Top:"48",   Level:13,   Wave:[1],  Heads:[18,19]        ,Loot:{Seed:[5,"Tree \n Seeds"],}},
     27:{Left:"20",  Top:"57",   Level:14,   Wave:[1],  Heads:[26]           ,Loot:{}},
     28:{Left:"80",  Top:"35",   Level:14,   Wave:[2],  Heads:[26]           ,Loot:{}},
     29:{Left:"72",  Top:"28",   Level:14,   Wave:[3],  Heads:[25]           ,Loot:{}},

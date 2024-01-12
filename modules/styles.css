@@ -725,10 +725,10 @@ table, button, label {
 .floatingCritText {
     font-size: 2rem;
     color: #032509;
-    text-shadow: 0 0 0.25em whitea2, 0 0 0.35em white9a, 0 0 0.15em white8e, 0 0 0.15em white8e;
+    text-shadow: 0 0 0.25em white, 0 0 0.25em white, 0 0 0.15em white;
     position: absolute;
     animation: fadeOutCritOpacity 2.0s ease-out forwards;
-    z-index: 11;
+    z-index: 10;
     pointer-events: none;
 }
 
@@ -916,16 +916,44 @@ table, button, label {
 }
 
 .tutorial-screen {
-    width: 72%;
+    padding: 1.5% 0.75%;
+    box-sizing: border-box;
+    width: auto;
+    aspect-ratio: 10 / 7;
     height: 80%; 
     z-index: 200;
-    row-gap: 1%;
+    row-gap: 3%;
+    background: url(../assets/tutorial/tutorialScreen.webp) center center/cover no-repeat;
+}
+
+.tutorial-title {
+    width: fit-content;
+    height: fit-content;
+    font-size: 1.4rem;
+    color: var(--very-dark-green);
 }
 
 .tutorial-img {
+    width: 95%;
+    flex-grow: 1;
+    object-fit: cover;
+    border: 0.15rem solid var(--dark-green);
+}
+
+.tutorial-button-container {
+    height: fit-content;
     width: 100%;
-    height: 100%;
-    object-fit: contain;
+    justify-content: space-evenly;
+}
+
+.tutorial-button-container > button {
+    font-size: 1.1rem;
+    max-width: 50%;
+    height: 2.5rem;
+    aspect-ratio: 5;
+    color: white;
+    text-shadow: var(--text-shadow-050);
+    background: url(../assets/tutorial/tutorial-button.webp) center center/contain no-repeat;
 }
 
 .idle-dark {
@@ -2424,6 +2452,7 @@ table, button, label {
 #table6 > form {
     font-size: 0.75rem;
     width: 100%;
+    padding: 0.2rem 0;
 }
 
 #hero-breakdown {
@@ -2596,7 +2625,7 @@ table, button, label {
 
 #tool-tip-button {
     position: absolute;
-    top: 99%;
+    top: 99.5%;
     background-color: var(--dark-brown);
     border-top: 0.15em solid var(--very-dark-brown);
     border-bottom: 0.15em solid var(--very-dark-brown);
