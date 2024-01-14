@@ -1,4 +1,4 @@
-.char-select, .char-menu, .currency-pop, .middle-area, .left-area, .weasel-back, .weasel-timer-div, .side-pop-container {
+.char-select, .char-menu, .currency-pop, .middle-area, .left-area, .weasel-back, .weasel-timer-div, .side-pop-container, .tree-health {
     left: unset;
 }
 
@@ -10,6 +10,14 @@
     flex-direction: row-reverse;
 }
 
+
+.tree-health {
+    right: 2%;
+}
+
+.tree-back {
+    left: 2%;
+}
 
 .left-area {
     right: 0%;

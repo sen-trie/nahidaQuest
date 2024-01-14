@@ -1,4 +1,5 @@
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js';
+import { advancedStats } from './features/settings.js';
 import { createDom } from './adjustUI.js';
 
 function textReplacerCopy(dictReplace, originalText) {
@@ -559,14 +560,55 @@ function customTutorial(tutorialFile, maxSlide, title, exitFunction) {
     });
 
     const changeSlide = (change) => {
-        currentSlide = Math.max((currentSlide += change), 1);
-        if (currentSlide === maxSlide) {
-            customTutorialDiv.remove();
+        if (currentSlide === maxSlide && change !== -1) {
+            if (tutorialFile === 'finale') {
+                prevButton.style.opacity = 0;
+                prevButton.style.pointerEvents = 'none';
 
-            if (exitFunction) {exitFunction()};
+                let statsText = advancedStats();
+                statsText.id = 'finale-stats';
+                statsText.classList.add('green-scrollbar');
+                let imgDiv = createDom('div', {
+                    class: ['tutorial-img', 'final-img'],
+                    children: [statsText]
+                });
+
+                statsText.generateStats(exitFunction);
+                statsText.innerHTML = `<span class='finale-title flex-row'>Game Details</span><br>` + statsText.innerHTML;
+
+                let count = 0;
+                const challengeDict = exitFunction.challengeCheck;
+                for (let tier in challengeDict) {
+                    for (let challenge in challengeDict[tier]) {
+                        if (challengeDict[tier][challenge] === true) {
+                            count++;
+                        }
+                    }
+                }
+
+                let text = `${count}/50 Challenges Complete`;
+                if (count < 50) {
+                    text += '<br>Try to complete all of them!';
+                } else {
+                    text += '<br>Congratulations!';
+                }
+
+                statsText.innerHTML += `<br><span class='finale-end flex-row'>${text}</span>`;
+
+                let nextButtonNew = nextButton.cloneNode(true);
+                nextButton.parentNode.replaceChild(nextButtonNew, nextButton);
+                tutorialScreen.replaceChild(imgDiv, tutorialImage);
+                nextButtonNew.addEventListener('click', () => {
+                    customTutorialDiv.remove();
+                })
+            } else {
+                if (exitFunction) {exitFunction()};
+                customTutorialDiv.remove();
+            }
             return;
         }
 
+        currentSlide = Math.max((currentSlide += change), 1);
         if (currentSlide === 1) {
             if (prevButton.style.pointerEvents !== 'none') { 
                 if (prevButton.classList.contains('clickable')) {prevButton.classList.remove('clickable');}
@@ -581,7 +623,7 @@ function customTutorial(tutorialFile, maxSlide, title, exitFunction) {
             }
         }
 
-        if (currentSlide === (maxSlide - 1)) {
+        if (currentSlide === maxSlide) {
             nextButton.innerText = 'Finish';
         } else {
             nextButton.innerText = 'Next';

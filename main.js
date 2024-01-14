@@ -45,7 +45,7 @@ if (localStorage.getItem("settingsValues") !== null) {
         
             setTimeout(function() {
                 let deleteBox = document.getElementById("confirm-box");
-                if (deleteBox.style.zIndex !== -1) {deleteBox.style.zIndex = -1}
+                if (deleteBox.style.display !== 'none') {deleteBox.style.display = 'none'};
                 startText.remove();
             },200)
         }
@@ -67,7 +67,7 @@ deleteButton.addEventListener("click",()=> {
 
 let confirmationBox = document.createElement("div");
 confirmationBox.classList.add("confirm-box");
-confirmationBox.style.zIndex = -1;
+confirmationBox.style.display = 'none';
 confirmationBox.id = "confirm-box";
 
 let textBox = document.createElement('p');
@@ -91,11 +91,9 @@ function deleteConfirmMenu(type,location) {
     let deleteBox = document.getElementById("confirm-box");
     deleteType = location;
     if (type == "toggle") {
-        universalStyleCheck(deleteBox,"zIndex", 1100, -1)
+        universalStyleCheck(deleteBox,"display", "flex", "none")
     } else if (type === "close") {
-        if (deleteBox.style.zIndex !== -1) {
-            deleteBox.style.zIndex = -1;
-        } 
+        if (deleteBox.style.display !== 'none') {deleteBox.style.display = 'none'}; 
     }
 }
 
@@ -152,7 +150,7 @@ function deleteConfirmButton(confirmed) {
     }
         
     let deleteBox = document.getElementById("confirm-box");
-    if (deleteBox.style.zIndex !== -1) {deleteBox.style.zIndex = -1}
+    if (deleteBox.style.display !== 'none') {deleteBox.style.display = 'none'};
     return;
 }
 
@@ -302,11 +300,14 @@ let bountyObject = {};
 let lootArray = {};
 let selectHeroType = null;
 const upgradeThreshold = [0,0,50,101,150,200];
+const MORALE_THRESHOLD_1 = 80;
+const MORALE_THRESHOLD_2 = 60;
+const MORALE_THRESHOLD_3 = 30;
 const moraleLore = [
-    "Nahida is feeling [s]Really Happy[/s]! [mor]<br><br> XP gains are increased by 10% and party <br> deals 10% additional DMG in combat.",
-    "Nahida is feeling [s]Happy[/s]! [mor]<br><br> XP gains are increased by 5%.",
+    "Nahida is feeling [s]Really Happy[/s]! [mor]<br><br> XP gains are increased by 10% and party <br> deals 20% additional DMG in combat.",
+    "Nahida is feeling [s]Happy[/s]! [mor]<br><br> Party <br> deals 10% additional DMG in comba.",
     "Nahida feels [s]Neutral[/s] [mor]<br><br> No additional buffs to the party, <br> increase morale by eating food.",
-    "Nahida feels [s]Sad[/s]... [mor]<br><br> XP gains are reduced by 15%, recover party morale <br> by resting or completing expeditions successfully.",
+    "Nahida feels [s]Sad[/s]... [mor]<br><br> Party deals 50% less DMG; recover party morale <br> by resting or eating food.",
 ]
 
 const extraInfoDict = {
@@ -486,7 +487,7 @@ function timerSave(timerSeconds) {
     // SAVES DATA EVERY 3 MINUTES
     if (timerSeconds > saveTimeMin) {
         saveData();
-        if (!beta) console.log("Saved!");
+        console.log("Saved!");
 
         savedTimes++;
         saveTimeMin = 180 * savedTimes;
@@ -559,6 +560,10 @@ function loadSaveData() {
     } else {
         let InventoryTemp = localStorage.getItem("InventorySave");
         InventoryMap = new Map(JSON.parse(InventoryTemp));
+        for (let [key, value] of InventoryMap.entries()) {
+            if (value === null || value < 0) { InventoryMap.delete(key) }
+        }
+
         inventoryload();
     }
     // LOAD EXPEDITION DATA
@@ -996,7 +1001,7 @@ function randomEventTimer(timerSeconds) {
             eventChance = 0;
             eventTimes++;
             startRandomEvent();
-            updateMorale("recover", 3);
+            updateMorale("recover", 5);
 
             const currentTime = getTime();
             persistentValues.timeSpentValue += currentTime - persistentValues.lastRecordedTime;
@@ -1006,8 +1011,14 @@ function randomEventTimer(timerSeconds) {
                 let worldQuestRoll = randomInteger(1, 101) - luckRate;
                 worldQuestCooldown = true;
                 if (worldQuestRoll < 30) {
-                    console.log('World Quest Spawned!');
-                    spawnWorldQuest();
+                    if (document.getElementById('world-quest-button')) {
+                        document.getElementById('world-quest-button').remove();
+                        notifPop("clearAll","quest");
+                    } else {
+                        console.log('World Quest Spawned!');
+                        spawnWorldQuest();
+                    }
+
                     setTimeout(() => {worldQuestCooldown = null}, 7 * 60 * 1000)
                 } else {
                     setTimeout(() => {worldQuestCooldown = null}, 1 * 60 * 1000)
@@ -1016,8 +1027,14 @@ function randomEventTimer(timerSeconds) {
                 let skirmishRoll = randomInteger(1, 101) - luckRate;
                 skrimishCooldown = true;
                 if (skirmishRoll < 30) {
-                    console.log('Skirmish Spawned!');
+                    if (document.getElementById('skirmish-button')) {
+                        document.getElementById('skirmish-button').remove();
+                        notifPop("clearAll","skirmish");
+                    } else {
+                        console.log('Skirmish Spawned!');
                     spawnSkirmish();
+                    }
+                    
                     setTimeout(() => {worldQuestCooldown = null}, 15 * 60 * 1000)
                 } else {
                     setTimeout(() => {worldQuestCooldown = null}, 0.5 * 60 * 1000)
@@ -1656,7 +1673,7 @@ function addWeasel(weaselBack,delay,specialWeasel) {
     let weaselDiv = weaselBack.children;
     let realWeasel = randomInteger(0,18);
     let specialWeaselSpawns = false;
-    if (specialWeasel) {specialWeaselSpawns = randomIntegerWrapper(luckRate*6, 200)}
+    if (specialWeasel) {specialWeaselSpawns = randomIntegerWrapper(luckRate + 45, 100)}
 
     for (let i = 0, len = weaselDiv.length; i < len; i++) {
         let weaselImage = weaselDiv[i].querySelector('img');
@@ -3191,7 +3208,7 @@ function tutorial(idleAmount) {
         playButton.id = 'play-button';
         playButton.classList.add("play-button");
         playButton.addEventListener("click",()=>{
-            overlay.style.zIndex = -1;
+            overlay.style.display = 'none';
 
             clearInterval(timerLoad);
             timer = setInterval(timerEvents,timeRatio);
@@ -3412,7 +3429,7 @@ document.addEventListener("keydown", function(event) {
         toggleSettings();
         if (document.getElementById("confirm-box")) {
             let deleteBox = document.getElementById("confirm-box");
-            if (deleteBox.style.zIndex !== -1) {deleteBox.style.zIndex = -1};
+            if (deleteBox.style.display !== 'none') {deleteBox.style.display = 'none'};
         }
     }
 
@@ -3464,7 +3481,10 @@ function settings() {
     const settingsMenu = createDom('div', {
         class:["flex-column","settings-menu"],
         id: 'settings-menu',
-        child: [settingsHeader]
+        child: [settingsHeader],
+        style: {
+            display: 'none',
+        }
     });
 
     for (const [tabKey, styleValue] of Object.entries(settingsNameObject)) {
@@ -3509,7 +3529,7 @@ function settings() {
     settingButton.addEventListener("click", () => {
         toggleSettings();
         let deleteBox = document.getElementById("confirm-box");
-        if (deleteBox.style.zIndex !== -1) {deleteBox.style.zIndex = -1};
+        if (deleteBox.style.display !== 'none') {deleteBox.style.display = 'none'};
         if (settingButton.classList.contains('settings-button-img-glow')) {
             settingButton.classList.remove('settings-button-img-glow')
         }
@@ -3552,7 +3572,7 @@ function generalSettings(settingsMenu) {
     const cancelButton = document.createElement("button");
     cancelButton.classList.add("cancel-button");
     cancelButton.addEventListener("click",()=>{
-        settingsMenu.style.zIndex = -1;
+        settingsMenu.style.display = 'none';
         settingsOpen = false;
         deleteConfirmMenu("close","loaded");
     })
@@ -3753,11 +3773,11 @@ let settingsOpen = false;
 function toggleSettings(closeOnly) {
     let settingsMenu = document.getElementById("settings-menu");
     if (settingsOpen == true) {
-        settingsMenu.style.zIndex = -1;
+        settingsMenu.style.display = 'none';
         settingsOpen = false;
     } else {
         if (closeOnly !== true) {
-            settingsMenu.style.zIndex = 1000;
+            settingsMenu.style.display = 'flex';
             settingsOpen = true;
         }
     }
@@ -3785,13 +3805,13 @@ function settingsBox() {
     const patchDiv = document.createElement("div");
     patchDiv.classList.add("text-box","patch-notes-div","flex-column");
     patchDiv.id = "patch-box";
-    patchDiv.style.zIndex = -1;
+    patchDiv.style.display = 'none';
 
     drawUI.patchNotes(patchDiv);
 
     const patchCmdButton = document.createElement("button");
     patchCmdButton.addEventListener("click",() => {
-        patchDiv.style.zIndex = -1;
+        patchDiv.style.display = 'none';
     })
 
     patchDiv.append(patchCmdButton);
@@ -4880,21 +4900,27 @@ function inventoryAdd(idNum, type) {
     }
 
     itemUniqueID = idNum;
-    let buttonInv = document.createElement("button");
-    buttonInv.classList.add("button-container");
-    buttonInv.id = itemUniqueID;
-    buttonInv.addEventListener('click', function() {
-        changeTooltip(Inventory[idNum], "item", idNum);
-        if (itemTooltip === -1) {
-            buttonInv.classList.add("inventory-selected");
-        } else if (idNum !== itemTooltip) {
-            let buttonDocument = document.getElementById(itemTooltip);
-            buttonDocument.classList.remove("inventory-selected");
-            buttonInv.classList.add("inventory-selected");
-        }
-        
-        itemTooltip = idNum;
-    });
+    let buttonInv;
+    // SEED CHECKER (SKIRMISH ONLY)
+    if (itemUniqueID >= 4019 && itemUniqueID < 4021) {
+        addTreeCore(randomInteger(8, 15), itemUniqueID - 4018, true);
+    } else {
+        buttonInv = document.createElement("button");
+        buttonInv.classList.add("button-container");
+        buttonInv.id = itemUniqueID;
+        buttonInv.addEventListener('click', function() {
+            changeTooltip(Inventory[idNum], "item", idNum);
+            if (itemTooltip === -1) {
+                buttonInv.classList.add("inventory-selected");
+            } else if (idNum !== itemTooltip) {
+                let buttonDocument = document.getElementById(itemTooltip);
+                buttonDocument.classList.remove("inventory-selected");
+                buttonInv.classList.add("inventory-selected");
+            }
+            
+            itemTooltip = idNum;
+        });
+    }
 
     if (type != "load") {
         let newIcon = document.createElement("img");
@@ -5158,7 +5184,7 @@ function adventure(advType) {
 
             if (activeLeader == "Paimon" && type <= 5 && type > 1) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.15)}
 
-            if (!persistentValues.tutorialBasic || testing) {
+            if (!persistentValues.tutorialBasic) {
                 drawUI.customTutorial("advTut", 6, 'Expedition Tutorial', () => { drawAdventure(type, wave) });
                 persistentValues.tutorialBasic = true;
             } else if (type >= 3 && type < 6 && persistentValues.tutorialRanged != true) {
@@ -5327,7 +5353,7 @@ function createAdventure() {
         createDom('div', {
             id: "adventure-area",
             class: ["adventure-area", "flex-column"],
-            style: { zIndex: -1 },
+            style: { display: 'none' },
             child: [adventureVideo, adventureTextBox]
         })
     );
@@ -5380,7 +5406,7 @@ function inventoryDraw(itemType, min, max, type, itemClass){
                         }
 
                         if (Array.isArray(itemClass)) {
-                            let randomEle = rollArray(itemClass,0);
+                            let randomEle = rollArray(itemClass, 0);
                             if (Inventory[drawnItem][checkedProperty] != randomEle) {
                                 continue;
                             }
@@ -5486,6 +5512,18 @@ function createExpedition() {
     updateMorale("load");
 }
 
+function moraleCheck(currentATK) {
+    if (advDict.morale > MORALE_THRESHOLD_1) { 
+        currentATK *= 1.2;
+    } else if (advDict.morale > MORALE_THRESHOLD_2) { 
+        currentATK *= 1.1;
+    } else if (advDict.morale > MORALE_THRESHOLD_3) { 
+        currentATK *= 0.5;
+    }
+
+    return currentATK;
+}
+
 function updateMorale(type,amount) {
     let moraleEle = document.getElementById("char-morale");
     if (type == "add") {
@@ -5503,14 +5541,9 @@ function updateMorale(type,amount) {
 
     let happinessNumber = 4;
     let morale = advDict.morale;
-
-    if (morale > 80) {
-        happinessNumber = 1;
-    } else if (morale > 60) {
-        happinessNumber = 2;
-    } else if (morale > 30) {
-        happinessNumber = 3;
-    }
+    if (morale > MORALE_THRESHOLD_1) { happinessNumber = 1 } 
+    else if (morale > MORALE_THRESHOLD_2) { happinessNumber = 2 } 
+    else if (morale > MORALE_THRESHOLD_3) { happinessNumber = 3 }
 
     moraleEle.style.backgroundImage = `url(./assets/expedbg/morale-${happinessNumber}.webp)`;
     let text = moraleLore[happinessNumber-1];
@@ -5990,7 +6023,7 @@ function createGuild() {
     }
     table3.appendChild(guildTable);
 
-    if (beta) {showCommisions()};
+    showCommisions();
     return guildTable;
 }
 
@@ -6703,19 +6736,11 @@ function gainXP(xpAmount, multiplier) {
     }
 
     xpAmount = (xpAmount * randomInteger(98,103) / 100);
+    xpAmount = moraleCheck(xpAmount);
+    xpAmount = Math.round(xpAmount);
+
     let xpBar = document.getElementById('exped-xp-bar');
     xpBar.maxXP = advDict.adventureRank * 100;
-    let morale = advDict.morale;
-
-    if (morale > 80) {
-        xpAmount *= 1.10;
-    } else if (morale > 60) {
-        xpAmount *= 1.05;
-    } else if (morale <= 30) {
-        xpAmount *= 0.85;
-    }
-
-    xpAmount = Math.round(xpAmount)
     xpBar.currentXP = parseInt(xpBar.currentXP);
     xpBar.currentXP += xpAmount;
     expedPop("xp",xpAmount);
@@ -7007,7 +7032,7 @@ function drawAdventure(advType, wave) {
     const preloadedImage = new Image();
     preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${bgRoll}.webp`;
     preloadedImage.onload = () => {
-        adventureArea.style.zIndex = 500;
+        adventureArea.style.display = 'flex';
         adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
         adventureTextBox.addEventListener("animationend",textFadeIn,true);
         bgmElement.pause();
@@ -7078,7 +7103,9 @@ function spawnKey(advImage, imgKey, key, type = 'normal') {
     } else if (type === 'skirmish') {
         button.id = "skirmish-button";
         button.style.transform = `scale(${1 / (0.2 + (2/100) * settingsValues.defaultZoom) * (MOBILE ? 1.5 : 1)})`;
-    };
+    } else if (type === 'boss') {
+        button.style.transform = `scale(${1 / (0.2 + (2/100) * settingsValues.defaultZoom) * (MOBILE ? 1.5 : 1)})`;
+    }
 
     let level = imgKey[key].Level;
     let wave = imgKey[key].Wave;
@@ -7150,8 +7177,9 @@ function spawnBossQuest(num) {
         return;
     } else {
         let mapImage = document.getElementById('sumeru-map');
-        spawnKey(mapImage, imgKey, val, true);
+        spawnKey(mapImage, imgKey, val, "boss");
         notifPop("add", "boss", val);
+        sidePop('/expedbg/adv-14.webp', 'Boss Quest');
     }
 }
 
@@ -7180,7 +7208,7 @@ function drawWorldQuest(advType) {
     let preloadedImage = new Image();
     preloadedImage.src = `./assets/expedbg/choice/${questId}-1.webp`;
     preloadedImage.onload = ()=> {
-        adventureArea.style.zIndex = 500;
+        adventureArea.style.display = 'flex';
         adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
         adventureTextBox.addEventListener("animationend",textFadeIn,true);
     }
@@ -7396,7 +7424,7 @@ function finishQuest(advType) {
 
     function quitQuest(res) {
         let adventureArea = document.getElementById("adventure-area");
-        adventureArea.style.zIndex = -1;
+        adventureArea.style.display = 'none';
         let adventureHeading = document.getElementById("adventure-header");
         adventureHeading.innerHTML = "";
         adventureHeading.style.animation = "";
@@ -7404,10 +7432,7 @@ function finishQuest(advType) {
         if (document.getElementById("world-quest-button")) {
             document.getElementById("world-quest-button").remove();
             notifPop("clearAll","quest");
-        } else if (document.getElementById("skirmish-button")) {
-            document.getElementById("skirmish-button").remove();
-            notifPop("clearAll","skirmish");
-        }
+        } 
 
         if (res) {
             res();
@@ -7789,7 +7814,6 @@ function triggerFight() {
 
     // FOR SCREEN TRAPS
     function floatTimeCheck() {
-        if (!beta) {return}
         if (battleVariables.floatTime > 1 && !document.getElementById('warning-quicktime')) {
             battleVariables.floatTime = 0;
             if (adventureVariables.specialty === 'FellBoss') {
@@ -8776,7 +8800,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             updateMobHealth();
         }
 
-        mobDiv.children[0].addEventListener("mouseup", () => {
+        mobDiv.children[0].addEventListener("click", () => {
             clickMob();
         })
 
@@ -8972,7 +8996,7 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
             if (popImage.rotationNumber > 360) {
                 popImage.rotationNumber = 0;
                 loseHP(0.5, 'normal', false);
-                sapEnergy(1, 25);
+                Expedition.sapEnergy(1, 25);
             } else {
                 popImage.style.transform = `rotateZ(${popImage.rotationNumber}deg)`;
                 popImage.rotationNumber += 1 * initialFactor * speedUpFactor;
@@ -9983,7 +10007,7 @@ function attackAll() {
 
     let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
     if (activeLeader == "Zhongli") {currentATK *= 1.50};
-    if (advDict.morale > 80) {currentATK *= 1.10};
+    currentATK = moraleCheck(currentATK);
 
     let attackMultiplier = Expedition.comboHandler("check", 1);
     currentATK *= attackMultiplier;
@@ -10230,22 +10254,40 @@ function winAdventure() {
         lootCounter++;
     }
 
+    let tempArray = compareTreeItems(Object.values(lootArray));
+    lootArray = {};
+
+    // SKIRMISH
+    if (imgKey[keyNumber].Level === 13) {
+        let treeSeedID;
+        if (persistentValues.workshopBossDefeat) {
+            treeSeedID = 4021;
+        } else if (persistentValues.fellBossDefeat) {
+            treeSeedID = 4020;
+        } else {
+            treeSeedID = 4019;
+        }
+
+        tempArray[getHighestKey(tempArray) + 1] = [treeSeedID, false];
+    }
+
     const adventureRewards = document.getElementById("adventure-rewards");
-    for (let key in lootArray) {
-        let itemInfo = Inventory[lootArray[key]];
-        inventoryAdd(lootArray[key]);
+    for (let key in tempArray) {
+        let itemInfo = Inventory[tempArray[key][0]];
+        inventoryAdd(tempArray[key][0]);
 
         let lootDiv = document.createElement("div");
         lootDiv = inventoryFrame(lootDiv, itemInfo, itemFrameColors);
 
-        if (key === "Bonus" || key === "Bonus2") {
+        if (tempArray[key][1] === true) {
             let bonus = new Image();
-            bonus.src = "./assets/expedbg/bonus.webp";
-            lootDiv.append(bonus)
+            bonus.classList.add('tree-bonus')
+            bonus.src = "./assets/expedbg/tree-item.webp";
+            lootDiv.append(bonus);
         }
+        
         adventureRewards.appendChild(lootDiv);
-        delete lootArray[key];
-    }
+    };
 
     if (adventureRewards.children.length === 0) {
         adventureRewards.style.opacity = "0";
@@ -10261,7 +10303,7 @@ function winAdventure() {
     nutReward.value = saveValues["dps"] * 60 * 3 * (1.5**(imgKey[keyNumber].Level > 5 ? imgKey[keyNumber].Level : 7)) * randomInteger(90,100) / 100 * additionalXP;
 
     if (imgKey[keyNumber].Level === 5) {
-        nutReward.gValue = randomInteger(3,10)*3 + advDict.adventureRank;
+        nutReward.gValue = randomInteger(3, 10) * 3 + advDict.adventureRank;
         nutReward.innerHTML = `Gained:<br> ${abbrNum(nutReward.value)} [s]Nuts[/s]<br> ${nutReward.gValue} [s]Golden Nuts[/s]`;
     } else {
         nutReward.innerHTML = `Gained:<br> ${abbrNum(nutReward.value)} [s]Nuts[/s]`;
@@ -10280,11 +10322,7 @@ function winAdventure() {
     }, nutReward.innerHTML);
     adventureVideo.append(nutReward);
 
-    const adventureChoiceOne = document.getElementById("adv-button-one");
-    adventureChoiceOne.addEventListener("click", () => {
-        saveValues["realScore"] += nutReward.value;
-        nutReward.remove();
-
+    const exitAdventure = () => {
         quitAdventure(true);
         charScan();
         updateMorale("recover",randomInteger(2,6));
@@ -10301,6 +10339,31 @@ function winAdventure() {
         let rewardChildren = adventureRewards.children;
         while (rewardChildren.length > 0) {
             rewardChildren[0].remove();
+        }
+    }
+
+    const adventureChoiceOne = document.getElementById("adv-button-one");
+    adventureChoiceOne.addEventListener("click", () => {
+        saveValues["realScore"] += nutReward.value;
+        nutReward.remove();
+
+        let tempSpecialty = adventureVariables.specialty;
+        exitAdventure();
+        switch (tempSpecialty) {
+            case 'FellBoss':
+                drawUI.customTutorial("flower", 2, 'Scene');
+                break;
+            case 'Unusual':
+                drawUI.customTutorial("unusual", 4, 'Scene');
+                break;
+            case 'Workshop':
+                drawUI.customTutorial("workshop", 3, 'Scene');
+                break;
+            case 'Finale':
+                drawUI.customTutorial("finale", 8, 'Scene');
+                break;
+            default:
+                break;
         }
     }, { once: true });
 
@@ -10324,11 +10387,16 @@ function quitAdventure(wonBattle) {
             }
         }
     }
+
+    if (document.getElementById("skirmish-button")) {
+        document.getElementById("skirmish-button").remove();
+        notifPop("clearAll","skirmish");
+    }
     
     adventureVariables = {};
     battleVariables = {};
     let adventureArea = document.getElementById("adventure-area");
-    adventureArea.style.zIndex = -1;
+    adventureArea.style.display = 'none';
     adventureScene = false;
 
     let adventureHeading = document.getElementById("adventure-header");
@@ -11255,20 +11323,20 @@ function clearTooltip() {
     }, 100)
 }
 
-function reduceItem(itemTooltip, usingTooltip = false) {
-    let itemButton = document.getElementById(itemTooltip);
-    let inventoryCount = InventoryMap.get(itemTooltip);
+function reduceItem(localItemTooltip, usingTooltip = false) {
+    let itemButton = document.getElementById(localItemTooltip);
+    let inventoryCount = InventoryMap.get(localItemTooltip);
     inventoryCount--;
-    InventoryMap.set(itemTooltip,inventoryCount);
+    InventoryMap.set(localItemTooltip, inventoryCount);
 
     persistentValues.itemsUsedValue++;
+    
 
     if (usingTooltip) {
         if (inventoryCount > 0) {
-            changeTooltip(Inventory[itemTooltip],"item",itemTooltip);
+            changeTooltip(Inventory[localItemTooltip],"item", localItemTooltip);
         } else if (inventoryCount <= 0) {
             let nextButton = itemButton.nextSibling;
-            itemButton.remove();
             if (nextButton) {
                 let idNum = parseInt(nextButton.id);
                 itemTooltip = idNum;
@@ -11278,6 +11346,7 @@ function reduceItem(itemTooltip, usingTooltip = false) {
                 itemTooltip = -1;
                 clearTooltip();
             }
+            itemButton.remove();
         }
     } else {
         if (inventoryCount <= 0) {
@@ -11549,13 +11618,14 @@ function confirmPurchase(shopCost, id, blackDict) {
             }
         } else if (typeShop === 'shop') {
             shopId = null;
+            itemId = parseInt(itemId);
 
-            if (id < 4019 && id > 4021) {
+            if (itemId >= 4019 && itemId < 4022) {
+                addTreeCore(randomInteger(3, 6), itemId - 4018, true);
+            } else {
                 newPop(1);
                 inventoryAdd(itemId);
                 sortList("table2");
-            } else {
-                addTreeCore(randomInteger(3, 6), id - 4018, true);
             }
             
             mainButton.classList.add("purchased");
@@ -12143,7 +12213,7 @@ function createTranscendMenu() {
         transcendFunction();
     })
     transcendMenu.children[1].children[1].addEventListener("click",()=>{
-        transcendMenu.style.zIndex = -1;
+        transcendMenu.style.display = 'none';
     })
 
     mainBody.appendChild(transcendMenu);
@@ -12154,13 +12224,13 @@ function toggleTranscendMenu(forceClose) {
     toggleSettings(true);
     deleteConfirmMenu("close","loaded");
     let transcendMenu = document.getElementById("transcend-menu");
-    if (transcendMenu.style.zIndex == -1) {
-        transcendMenu.style.zIndex = 200;
+    if (transcendMenu.style.display === 'none') {
+        transcendMenu.style.display = 'flex';
 
         if(transcendDelay != null) {clearTimeout(transcendDelay)};
         transcendDelay = setTimeout(()=>{
             transcendDelay = null;
-            if (transcendMenu.style.zIndex != -1) transcendMenu.style.zIndex = -1;
+            if (transcendMenu.style.display !== 'none') { transcendMenu.style.display = 'none' }
         },6000);
     } else {
         transcendMenu.style.zIndex = -1;
@@ -12190,7 +12260,8 @@ function transcendFunction() {
             clearPromise.then(
                 () => {
                     let overlay = document.getElementById("loading");
-                    overlay.style.zIndex = 100000;
+                    overlay.style.display = 'flex';
+                    overlay.style.zIndex = 10000;
                     overlay.children[0].style.backgroundImage = "url(./assets/bg/wood.webp)";
 
                     let oldGif = overlay.children[0].children[0];
@@ -12535,16 +12606,14 @@ function offerItemFunction() {
     }
 
     treeMissingText.innerText = treeInnerValue;
-    if (!beta) {
-        if (treeInnerValue !== '') {return}
-        saveValues.treeObj.offer[0] -= persistentValues.goldenCore;
-        for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
-            let itemNumber = saveValues.treeObj.offer[i];
-            let newAmount = InventoryMap.get(itemNumber) - 1;
-    
-            InventoryMap.set(itemNumber, newAmount);
-            if (newAmount === 0) {(document.getElementById(itemNumber)).remove();}
-        }
+    if (treeInnerValue !== '' && !testing) {return}
+    saveValues.treeObj.offer[0] -= persistentValues.goldenCore;
+    for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
+        let itemNumber = saveValues.treeObj.offer[i];
+        let newAmount = InventoryMap.get(itemNumber) - 1;
+
+        InventoryMap.set(itemNumber, newAmount);
+        if (newAmount === 0) {(document.getElementById(itemNumber)).remove();}
     }
 
     const treeImg = document.getElementById('tree-img');
@@ -12555,6 +12624,7 @@ function offerItemFunction() {
 
     saveValues.treeObj.growthRate = Math.round(saveValues.treeObj.growthRate * 1.05 * 100) / 100;
     updateTreeValues(false);
+    growTree('add', 10)
 
     saveValues.treeObj.offerAmount++;
     challengeNotification(({category: 'offer', value: saveValues.treeObj.offerAmount}))
@@ -12580,8 +12650,8 @@ function treeOptions(planted, optionsContainer, lastPhase) {
 
         treeButton.addEventListener('click',() => {
             persistentValues.harvestCount++;
-            challengeNotification(({category: 'harvest', value: persistentValues.harvestCount}))
-            destroyTree();
+            challengeNotification(({category: 'harvest', value: persistentValues.harvestCount}));
+            destroyTree(true);
         })
         treeButton.append(optionImg,optionText);
         optionsContainer.appendChild(treeButton);
@@ -12641,14 +12711,43 @@ function treeOptions(planted, optionsContainer, lastPhase) {
     }
 }
 
-function destroyTree() {
+function destroyTree(finalPhase = false) {
     const treeProgress = document.getElementById('tree-progress');
     const treeImg = document.getElementById('tree-img');
     const treeContainer = document.getElementById('tree-container');
     const optionsContainer = document.getElementById('options-container');
     const treeMissingText = document.getElementById('tree-missing-text');
+
+    const generateImage = () => {
+        const randomAngle = Math.random() * 2 * Math.PI;
+        const rotationAxis = randomInteger(0, 360);
+        const explodeImg = createDom('img', { 
+            src: `./assets/tooltips/inventory/solid${rollArray(boxElement, 1)}.webp`,
+            classList: ['tree-explode-img'],
+            style: {
+                transform: `rotate(${rotationAxis}deg)`
+            }
+        });
+
+        treeContainer.append(explodeImg);
+        setTimeout(() => {
+            explodeImg.style.transform  = `rotate(${rotationAxis}deg) translate(${randomInteger(100, 225) * Math.cos(randomAngle)}%, ${randomInteger(100, 225) * Math.sin(randomAngle)}%)`;
+            setTimeout(() => {
+                explodeImg.style.opacity = 0.1;
+                setTimeout(() => {
+                    explodeImg.remove();
+                }, 1000)
+            }, 4500)
+        }, 10)
+    }
+
+    if (finalPhase) {
+        for (let i = 0; i < 15; i++) {
+            generateImage();
+        }
+    }
     
-    treeMissingText.innerText = ''
+    treeMissingText.innerText = '';
     treeOptions(false, optionsContainer);
     updateTreeValues(true);
     treeImg.src = `./assets/tooltips/Empty.webp`;
@@ -12710,9 +12809,7 @@ function destroyTree() {
         }
 
         choiceBox(mainBody, {text: 'Materials harvested:'}, stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
-        if (!beta) {
-            saveData(true);
-        }
+        // saveData(true);
     },100);
 }
 
@@ -12753,7 +12850,7 @@ function addTreeCore(number = 1, increaseOdds = 0, override = false) {
             rolledCore = Math.max(maxCore - 1, 1)
         }
     } else {
-        increaseOdds = rolledCore;
+        rolledCore = increaseOdds;
     }
 
     persistentValues.treeSeeds[rolledCore - 1] += number;
@@ -12938,8 +13035,6 @@ function updateSeedContainer(updateValueOnly = false) {
                     seedNum *= Math.max(Math.log(((seedAdded[i] * (i + 1)) + 1)), 1);
                 }
 
-                if (beta) {seedValue = 99}
-
                 if (seedValue > 0) {
                     saveValues.treeObj.growthRate = Math.round(seedNum * 100) / 100;
                     seedContainer.remove();
@@ -12957,13 +13052,13 @@ function updateSeedContainer(updateValueOnly = false) {
     }
 }
 
-function growTree(type, amount) {
+function growTree(type, amount = 0) {
     const treeProgress = document.getElementById('tree-progress');
     const treeProgressValue = document.getElementById('tree-progress-value');
     if (type === 'add') {
         if (saveValues.treeObj.level === 5) {return}
         if (saveValues.treeObj.defense !== 'block') {
-            treeProgress.progress += treeProgressValue.rate;
+            treeProgress.progress += treeProgressValue.rate + amount;
             saveValues.treeObj.growth = treeProgress.progress;
             treeProgress.style.width = treeProgress.progress + '%';
             if (treeProgress.progress > 100) {
@@ -12982,8 +13077,8 @@ function growTree(type, amount) {
                 }
             }
         }
-    } else if (type === 'rate') {
-        treeProgressValue.rate += (amount / 25);
+    // } else if (type === 'rate') {
+    //     treeProgressValue.rate += (amount / 25);
     } else if (type === 'level') {
         const treeImg = document.getElementById('tree-img');
         const treeContainer = document.getElementById('tree-container');
@@ -13018,6 +13113,8 @@ function growTree(type, amount) {
                 enemyBlock();
             }
         }
+    } else {
+        console.errror(`growTree: Missing Type ${type}`)
     }
 }
 
@@ -13050,7 +13147,7 @@ function compareTreeItems(itemArray) {
     const sameTypeAndStar = (itemType, itemStar, i, itemArrayCopyItem) => {
         for (let itemKey in treeOffer) {
             if (treeOffer[itemKey].Type === itemType && treeOffer[itemKey].Star === itemStar) {
-                let replaceWithTreeItem = randomIntegerWrapper(35 + luckRate * 1.5, 100);
+                let replaceWithTreeItem = randomIntegerWrapper(65 + luckRate, 100);
                 if (replaceWithTreeItem || parseInt(itemKey) === parseInt(itemArrayCopyItem)) {
                     replacedTreeItems[i] = [parseInt(itemKey), true];
                     return;
@@ -13412,9 +13509,10 @@ function newPop(type) {
 if (beta || testing) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            Shop.regenBlackPrice(persistentValues.blackMarketDict);
+            // Shop.regenBlackPrice(persistentValues.blackMarketDict);
+            drawAranaraWish();
         } else if (e.key === 'g') {
-            spawnSkirmish()
+            drawUI.customTutorial("finale", 9, 'Scene', persistentValues);
         }
     })    
 }

@@ -67,7 +67,7 @@ const imgKey = {
     14:{Left:"20",  Top:"32",   Level:4,    Wave:[2,3,5],           Heads:[8,12,19]         ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Polearm:[4,"4-Star \n Polearm"],      PyroHydro:        [5,"5-Star \n Hydro / Pyro \n Gem"],            Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
     15:{Left:"51",  Top:"18",   Level:4,    Wave:[1],               Heads:[11,13]           ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Catalyst:[4,"4-Star \n Catalyst"],    ElectroCryo:      [5,"5-Star \n Electro / Cryo \n Gem"],           Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
     16:{Left:"88",  Top:"45",   Level:4,    Wave:[4,5],             Heads:[18,19]           ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Claymore:[4,"4-Star \n Claymore"],    DendroGeoAnemo:   [5,"5-Star \n Dendro / Geo / Anemo \n Gem"],    Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
-    17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,4,5,6,7,8],   Heads:[15,16,17,18,20]  ,Loot:{Artifact:[5,"5-Star \n Artifacts"],  Weapon:[5,"5-Star \n Weapon"],        Talent:           [4,"4-Star \n Talent"],                         Gemstone: [5,"5-Star \n Gem"],                   Level: [4,"4-Star \n Level \n Books"],   Food: [5,"5-Star \n Food \n Item"]}},
+    17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,3,4,5,6,7],   Heads:[15,16,17,18,20]  ,Loot:{Artifact:[5,"5-Star \n Artifacts"],  Weapon:[5,"5-Star \n Weapon"],        Talent:           [4,"4-Star \n Talent"],                         Gemstone: [5,"5-Star \n Gem"],                   Level: [4,"4-Star \n Level \n Books"],   Food: [5,"5-Star \n Food \n Item"]}},
     18:{Left:"53",  Top:"38",   Level:12,   Wave:[1,2,17]},
     19:{Left:"80",  Top:"18",   Level:12,   Wave:[6,3,4]},
     20:{Left:"81",  Top:"27",   Level:12,   Wave:[7,18,21]},
@@ -76,11 +76,11 @@ const imgKey = {
     23:{Left:"30",  Top:"37",   Level:12,   Wave:[11,13,14]},
     24:{Left:"55",  Top:"24",   Level:12,   Wave:[15,20]},
     25:{Left:"66",  Top:"41",   Level:12,   Wave:[16,19]},
-    26:{Left:"78",  Top:"48",   Level:13,   Wave:[1],  Heads:[18,19]        ,Loot:{Seed:[5,"Tree \n Seeds"],}},
-    27:{Left:"20",  Top:"57",   Level:14,   Wave:[1],  Heads:[26]           ,Loot:{}},
-    28:{Left:"80",  Top:"35",   Level:14,   Wave:[2],  Heads:[26]           ,Loot:{}},
-    29:{Left:"72",  Top:"28",   Level:14,   Wave:[3],  Heads:[25]           ,Loot:{}},
-    30:{Left:"50",  Top:"29",   Level:14,   Wave:[4],  Heads:[26]           ,Loot:{}},
+    26:{Left:"78",  Top:"48",   Level:13,   Wave:[1,2],             Heads:[18,19]        ,Loot:{Seed:[5,"Tree \n Seeds"], Weapon:[5,"5-Star \n Weapon"],  Talent: [4,"4-Star \n Talent"],   Gemstone: [5,"5-Star \n Gem"], Food: [5,"5-Star \n Food \n Item"]}},
+    27:{Left:"20",  Top:"57",   Level:14,   Wave:[1],               Heads:[26]           ,Loot:{}},
+    28:{Left:"80",  Top:"35",   Level:14,   Wave:[2],               Heads:[26]           ,Loot:{}},
+    29:{Left:"72",  Top:"28",   Level:14,   Wave:[3],               Heads:[25]           ,Loot:{}},
+    30:{Left:"50",  Top:"29",   Level:14,   Wave:[4],               Heads:[26]           ,Loot:{}},
 }
 
 const sceneInfo = { 
@@ -196,7 +196,7 @@ const sceneInfo = {
         Scenes: 3,
         Type: 'Meeting',
         Lore: ["As Nahida was walking the streets of Sumeru City, she heard rumours of a 'flying man' cruising around the city's perimeter.",
-               "A recent newspaper article shows a picture of this flying person. His figure seems familiar to Nahida.",
+               "A recent newspaper article shows a picture of this flying person. His figure seems familiar...",
                "The next day, Nahida managed to catch the Wanderer by surprise. She lectures him on the dangers of flying recklessly."
         ]
     },
@@ -1132,7 +1132,12 @@ const adventureLoot = {
         Food:       ["food", 4, 5, "adventure", "Any"],
         Talent:     ["talent", 4,4, "adventure", "Any"],
     },
-    "Level-13":{},
+    "Level-13":{
+        Weapon:     ["weapon", 4, 6, "adventure", "Any"],
+        Weapon2:    ["weapon", 4, 6, "adventure", "Any"],
+        Gem:        ["gem",4,5,"adventure", "Any"],
+        Food:       ["food", 4, 5, "adventure", "Any"],
+    },
     "Level-14":{},
     2:{
         Weapon: ["weapon", 1, 2, "adventure", "Catalyst"],
@@ -1228,7 +1233,10 @@ const adventureLoot = {
         Bonus:  ["xp", 4, 4, "Bonus", "Any"],
         Bonus2: ["weapon", 6, 6, "Bonus2", "Any"],
     },
-    26:{}
+    26:{
+        Bonus:  ["xp", 4, 4, "Bonus", "Any"],
+        Bonus2: ["weapon", 6, 6, "Bonus2", "Any"],
+    }
 }
 
 const eventText = {
@@ -1283,7 +1291,7 @@ const challengeInfo = [
         {'title': 'At the Click of a Button', 'desc': 'Click for over one billion Nuts'},  // CH DONE
         {'title': 'House of Haravatat', 'desc': 'Possess 200 discounted levels'}, // CH DONE
         {'title': 'Song of Songs', 'desc': "Reach 15,000 energy in one run"}, // CH DONE
-        {'title': "Grand Bazaar's Conquerer", 'desc': "Clear out Dori's black market shop"},   // CH DONE
+        {'title': "Grand Bazaar's Conquerer", 'desc': "Clear out Dori's special shop"},   // CH DONE
         {'title': 'Follow Me!', 'desc': 'Collect 1400 points while leading the Aranara'}, // CH DONE
         {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},   // CH DONE
         {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 30 fully-grown trees'},  // CH DONE

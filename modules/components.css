@@ -1091,6 +1091,7 @@
     background-size: cover;
     background-position: center;
     gap: 1%;
+    z-index: 500;
 }
 
 .adventure-video {
@@ -1445,11 +1446,11 @@
     filter: drop-shadow(0 0 0.1em black);
 }
 
-.item-frame > :nth-child(3) {
+.item-frame > .tree-bonus {
     position: absolute;
     top: 0;
     right: 0;
-    height: 20%;
+    height: 40%;
     object-fit: contain;
     width: auto;
     max-width: 100%;
@@ -1457,9 +1458,12 @@
 }
 
 .item-frame-text {
-    color: white !important;
-    right: 5% !important;
+    position: absolute;
+    color: white;
+    right: 5%;
     font-size: 1.6rem;
+    z-index: 10;
+    text-shadow: var(--text-shadow-050);
 }
 
 .extra-item-tree::after, .extra-item::after {
@@ -2071,7 +2075,7 @@
     width: 40%;
     max-height: 18%;
     left: 30%;
-    z-index: -1;
+    z-index: 1100;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -3178,7 +3182,7 @@ img[src=""] {
     row-gap: unset;
     width: auto;
     aspect-ratio: 1.35;
-    z-index: -1;
+    z-index: 1000;
     justify-content: space-around;
     border: 0.3em outset var(--medium-green);
     border-radius: 1em;
@@ -3384,6 +3388,26 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
     padding: 2%;
     border-top: var(--medium-green) 0.3rem solid;
     overflow-y: auto;
+}
+
+#finale-stats {
+    font-size: 1.2rem;
+    color: var(--very-dark-green);
+    border: 0;
+    margin: 0;
+    padding: 3%;
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.39);
+}
+
+.finale-title {
+    font-size: 1.4rem;
+    color: white;
+    text-shadow: var(--text-shadow-050);
+}
+
+.finale-end {
+    font-size: 1.3rem;
 }
 
 .settings-inner-tab {
