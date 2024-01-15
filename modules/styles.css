@@ -3170,13 +3170,15 @@ table, button, label {
 
 .medal-backing {
     width: 100%;
+    height: 80%;
     object-fit: contain;
     filter: drop-shadow(0 0 0.2em black);
-    margin-top: 0.5em;
-    margin-bottom: -1em;
+    margin-top: 0.5rem;
+    margin-bottom: -1rem;
 }
 
 .smaller-choice-ele > div {
+    height: 80%;
     padding: 1%;
 }
 
@@ -3205,9 +3207,11 @@ table, button, label {
     width: 95%;
     height: fit-content;
     margin-top: 0em;
-    padding: 1% 0;
+    gap: 6% 2%;
+    padding: 2% 0;
+    box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(5, 20%);
+    grid-template-columns: repeat(5, 18%);
     grid-auto-rows: auto;
     overflow: hidden;
 }

@@ -5,6 +5,7 @@ import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust
 import * as Settings from "./modules/features/settings.js";
 import * as Shop from "./modules/features/shop.js";
 import * as Expedition from "./modules/features/expedition.js";
+import * as Battle from "./modules/features/battle.js";
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js';
 
 const VERSIONNUMBER = "V.1-02-002";
@@ -4900,12 +4901,16 @@ function inventoryAdd(idNum, type) {
     }
 
     itemUniqueID = idNum;
-    let buttonInv;
+    let buttonInv = document.createElement("button");
     // SEED CHECKER (SKIRMISH ONLY)
     if (itemUniqueID >= 4019 && itemUniqueID < 4021) {
+        if (type === "load") {
+            InventoryMap.delete(itemUniqueID);
+            return;
+        }
         addTreeCore(randomInteger(8, 15), itemUniqueID - 4018, true);
+        return;
     } else {
-        buttonInv = document.createElement("button");
         buttonInv.classList.add("button-container");
         buttonInv.id = itemUniqueID;
         buttonInv.addEventListener('click', function() {
@@ -6513,8 +6518,9 @@ function checkCommisions() {
             if (item.split('-')[0] === 'base') {
                 const baseId = item.split('-')[1];
                 const timeLeft = saveValues.baseCommisions[baseId].endTime - getTime();
-                if (timeLeft <= 0) {
+                if (timeLeft <= 0 && !document.getElementById('notif-comm-div')) {
                     notifPop("add","comm", item);
+                    sidePop('/icon/comm.webp', 'Commission Complete');
                 }
             }
         })
@@ -6811,6 +6817,7 @@ function notifPop(type,icon,count) {
 
         let notifContainer = document.createElement("div");
         notifContainer.classList.add("flex-row","notif-div");
+        notifContainer.id = `notif-${icon}-div`
         let notifImg = new Image();
         let notifText = document.createElement("p");
 
@@ -6832,7 +6839,7 @@ function notifPop(type,icon,count) {
             notifSelect.questArray.push(count);
         } else if (icon === "comm") {
             notifImg.src = "./assets/icon/comm.webp";
-            notifText.innerText = "Commision \n Complete";
+            notifText.innerText = "Commission \n Complete";
             notifSelect.commArray.push(count);
         } else if (icon === "boss") {
             notifImg.src = "./assets/expedbg/adv-14.webp";
@@ -6926,160 +6933,6 @@ function unlockExpedition(i,expeditionDict) {
                     }  
                 })
             }
-        }
-    }
-}
-
-// ADVENTURE PROCESS
-const adventurePreload = new Preload();
-const adventureWorker = new Worker('./modules/workers.js');
-function drawAdventure(advType, wave) {
-    if (adventureScene) {return}
-    adventureScaraText = (advType === 5 || (advType === 14 && wave === 3)) ? "-scara" : "";
-    lootArray = {};
-
-    adventureScene = true;
-    stopSpawnEvents = true;
-
-    let removeEle = document.querySelectorAll('.adventure-atk-cooldown, .adventure-atk-cooldown-scara');
-    removeEle.forEach((element) => {
-        element.remove();
-    });
-
-    let quickType;
-    if ((advType >= 3 && advType < 6) || advType >= 13) {
-        quickType = enemyInfo.quicktimeDict[advType];
-    } else {
-        quickType = advType;
-    }
-    
-    const waveType = enemyInfo[`${advType}-Wave-${wave}`];
-    const quicktimeEnabled = ((advType >= 3 && advType < 6) || advType >= 13);
-    let specialty = null;
-    if (advType === 14) {
-        switch (wave) {
-            case 1:
-                specialty = 'FellBoss';
-                break;
-            case 2:
-                specialty = 'Unusual';
-                quickType = enemyInfo.quicktimeDict['Unusual'];
-                break;
-            case 3:
-                specialty = 'Workshop';
-                break;
-            case 4:
-                specialty = 'Finale';
-                break;
-            default:
-                break;
-        }
-    }
-
-    adventureVariables = {
-        quicktimeEnabled: quicktimeEnabled,  // BOOL
-        quickType: quicktimeEnabled ? quickType : null, // ARRAY
-        advType: advType, // INTEGER
-        specialty: specialty,
-        waveType: waveType, // TWO ARRAYS
-        currentEnemyAmount: waveType.Wave.length,
-        maxEnemyAmount: waveType.Wave.length,
-        // lootArray: {},
-        fightSceneOn: false,
-        pheonixMode: false,
-    }
-
-    // NAHIDA UPGRADE CHECKER
-    let nahidaMultiplier = 0;
-    for (let key in upgradeDict[0]["milestone"]) {
-        if (upgradeDict[0]["milestone"][key]) {nahidaMultiplier += 3}
-    }
-    adventureVariables.nahidaMultiplier = nahidaMultiplier;
-
-    let adventureVideo = document.getElementById("adventure-video");
-    if (settingsValues.wideCombatScreen) {adventureVideo.style.width = '95%'}
-    const adventureFightImg = document.getElementById("adventure-fight").children;
-
-    // SCARA MODE
-    const imageGif = document.getElementById("adventure-gif");
-    imageGif.src = `./assets/expedbg/exped${adventureScaraText ? '-scara' : '-Nahida'}.webp`;
-    adventureVideo.style.border = `0.2em ridge ${adventureScaraText === '-scara' ? '#C0C5ED' : '#AEDF7D'}`;
-
-    for (let i = 0; i < adventureFightImg.length; i++) {
-        if (adventureFightImg[i].classList.contains(`fight-button${!adventureScaraText}`)) {adventureFightImg[i].classList.remove(`fight-button${!adventureScaraText}`)};
-        adventureFightImg[i].classList.add(`fight-button${adventureScaraText}`);
-    }
-    
-    const adventureChoiceOne = document.getElementById("adv-button-one");
-    adventureChoiceOne.style.display = "block";
-    adventureChoiceOne.pressAllowed = false;
-    adventureChoiceOne.innerText = "Fight!";
-    adventureChoiceOne.advType = advType;
-
-    const adventureRewards = document.getElementById("adventure-rewards");
-    adventureRewards.style.opacity = "0";
-    adventureRewards.style.flexGrow = "1";
-    const adventureHeading = document.getElementById("adventure-header");
-    adventureHeading.style.flexGrow = "0";
- 
-    const adventureArea = document.getElementById("adventure-area");
-    const adventureTextBox = document.getElementById("adventure-text");
-    
-    const bgRoll = randomInteger(waveType.BG[0],waveType.BG[1] + 1);
-    adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${bgRoll}.webp)`;
-    spawnMob(adventureVideo, waveType.Wave, false);
-
-    const preloadedImage = new Image();
-    preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${bgRoll}.webp`;
-    preloadedImage.onload = () => {
-        adventureArea.style.display = 'flex';
-        adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
-        adventureTextBox.addEventListener("animationend",textFadeIn,true);
-        bgmElement.pause();
-        fightEncounter.load();
-        fightEncounter.play();
-    }
-
-    function textFadeIn() {
-        adventureHeading.style.top = "10%";
-        adventureHeading.style.overflowY = "hidden";
-        adventureHeading.style.animation = "fadeOut 1s ease-out reverse";
-
-        // TODO: DIFFERENT TEXT BASED ON ADV TYPE
-        if (adventureVariables.maxEnemyAmount > 1) {
-            adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
-        } else {
-            adventureHeading.innerText = "You encounter a hostile mob.";
-            switch (specialty) {
-                case 'FellBoss':
-                    adventureHeading.innerText = "The excess energy from the Leyline Outbreak has caused this Whoppperflower to grow uncontrollably..."
-                    break;
-                case 'Unusual':
-                    adventureHeading.style.animation = "fadeOut 0.4s ease-out reverse";
-                    adventureHeading.innerText = "After stepping into the domain, you...Watch out! Something is being launched towards you!!"
-                    break;
-                case 'Workshop':
-                    adventureHeading.innerText = "Before you stands the re-animated machine of the Prodigal, Everlasting Lord of Arcane Wisdom."
-                    break;
-                case 'Finale':
-                    adventureHeading.innerText = "You stand before the Doctor, Second of the Fatui Harbingers, mastermind behind the Leyline Outbreak."
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        const fightTextbox = document.getElementById('fight-text');
-        fightTextbox.innerText = "Prepare for a fight!";
-
-        adventureTextBox.style.animation = "";
-        adventureChoiceOne.pressAllowed = true;
-        adventureTextBox.removeEventListener("animationend", textFadeIn, true);
-
-        if (specialty === 'Unusual') {
-            setTimeout(() => {
-                adventureChoiceOne.click();
-            }, 1500)
         }
     }
 }
@@ -7528,6 +7381,164 @@ function spawnMob(adventureVideo, waveInfo, adjacentSibling) {
     }
 }
 
+// ADVENTURE PROCESS
+const adventurePreload = new Preload();
+const adventureWorker = new Worker('./modules/workers.js');
+function drawAdventure(advType, wave) {
+    if (adventureScene) {return}
+    adventureScaraText = (advType === 5 || (advType === 14 && wave === 3)) ? "-scara" : "";
+    lootArray = {};
+
+    adventureScene = true;
+    stopSpawnEvents = true;
+
+    let removeEle = document.querySelectorAll('.adventure-atk-cooldown, .adventure-atk-cooldown-scara');
+    removeEle.forEach((element) => {
+        element.remove();
+    });
+
+    let quickType;
+    if ((advType >= 3 && advType < 6) || advType >= 13) {
+        quickType = enemyInfo.quicktimeDict[advType];
+    } else {
+        quickType = advType;
+    }
+    
+    const waveType = enemyInfo[`${advType}-Wave-${wave}`];
+    const quicktimeEnabled = ((advType >= 3 && advType < 6) || advType >= 13);
+    let specialty = null;
+    if (advType === 14) {
+        switch (wave) {
+            case 1:
+                specialty = 'FellBoss';
+                break;
+            case 2:
+                specialty = 'Unusual';
+                quickType = enemyInfo.quicktimeDict['Unusual'];
+                break;
+            case 3:
+                specialty = 'Workshop';
+                break;
+            case 4:
+                specialty = 'Finale';
+                break;
+            default:
+                break;
+        }
+    }
+
+    adventureVariables = {
+        quicktimeEnabled: quicktimeEnabled,  // BOOL
+        quickType: quicktimeEnabled ? quickType : null, // ARRAY
+        advType: advType, // INTEGER
+        specialty: specialty,
+        waveType: waveType, // TWO ARRAYS
+        currentEnemyAmount: waveType.Wave.length,
+        maxEnemyAmount: waveType.Wave.length,
+        fightSceneOn: false,
+        pheonixMode: false,
+    }
+
+    // NAHIDA UPGRADE CHECKER
+    let nahidaMultiplier = 0;
+    for (let key in upgradeDict[0]["milestone"]) {
+        if (upgradeDict[0]["milestone"][key]) {nahidaMultiplier += 3}
+    }
+    adventureVariables.nahidaMultiplier = nahidaMultiplier;
+
+    let adventureVideo = document.getElementById("adventure-video");
+    if (settingsValues.wideCombatScreen) {adventureVideo.style.width = '95%'}
+    const adventureFightImg = document.getElementById("adventure-fight").children;
+
+    // SCARA MODE
+    const imageGif = document.getElementById("adventure-gif");
+    imageGif.src = `./assets/expedbg/exped${adventureScaraText ? '-scara' : '-Nahida'}.webp`;
+    adventureVideo.style.border = `0.2em ridge ${adventureScaraText === '-scara' ? '#C0C5ED' : '#AEDF7D'}`;
+
+    for (let i = 0; i < adventureFightImg.length; i++) {
+        if (adventureFightImg[i].classList.contains(`fight-button${!adventureScaraText}`)) {adventureFightImg[i].classList.remove(`fight-button${!adventureScaraText}`)};
+        adventureFightImg[i].classList.add(`fight-button${adventureScaraText}`);
+    }
+    
+    const adventureChoiceOne = document.getElementById("adv-button-one");
+    adventureChoiceOne.style.display = "block";
+    adventureChoiceOne.pressAllowed = false;
+    adventureChoiceOne.innerText = "Fight!";
+    adventureChoiceOne.advType = advType;
+
+    const adventureRewards = document.getElementById("adventure-rewards");
+    adventureRewards.style.opacity = "0";
+    adventureRewards.style.flexGrow = "1";
+    const adventureHeading = document.getElementById("adventure-header");
+    adventureHeading.style.flexGrow = "0";
+ 
+    const adventureArea = document.getElementById("adventure-area");
+    const adventureTextBox = document.getElementById("adventure-text");
+    
+    const bgRoll = randomInteger(waveType.BG[0],waveType.BG[1] + 1);
+    adventureVideo.style.backgroundImage = `url(./assets/expedbg/scene/${advType}-B-${bgRoll}.webp)`;
+    spawnMob(adventureVideo, waveType.Wave, false);
+
+    const preloadedImage = new Image();
+    preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${bgRoll}.webp`;
+    preloadedImage.onload = () => {
+        adventureArea.style.display = 'flex';
+        adventureTextBox.style.animation = "flipIn 1s ease-in-out forwards";
+        adventureTextBox.addEventListener("animationend",textFadeIn,true);
+        bgmElement.pause();
+        fightEncounter.load();
+        fightEncounter.play();
+    }
+
+    function textFadeIn() {
+        adventureHeading.style.top = "10%";
+        adventureHeading.style.overflowY = "hidden";
+        adventureHeading.style.animation = "fadeOut 1s ease-out reverse";
+
+        const fightTextbox = document.getElementById('fight-text');
+        // TODO: DIFFERENT TEXT BASED ON ADV TYPE
+        if (adventureVariables.maxEnemyAmount > 1) {
+            adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
+            fightTextbox.innerText = "Prepare for a fight!";
+        } else {
+            adventureHeading.innerText = "You encounter a hostile mob.";
+            fightTextbox.innerText = "Prepare for a fight!";
+            switch (specialty) {
+                case 'FellBoss':
+                    fightTextbox.innerText = "Watch out for its magic circles!";
+                    adventureHeading.innerText = "The excess energy from the Leyline Outbreak has caused this Whoppperflower to grow uncontrollably..."
+                    break;
+                case 'Unusual':
+                    fightTextbox.innerText = "Beware of its decoys!";
+                    adventureHeading.style.animation = "fadeOut 0.4s ease-out reverse";
+                    adventureHeading.innerText = "After stepping into the domain, you...Watch out! Something is being launched towards you!!"
+                    break;
+                case 'Workshop':
+                    fightTextbox.innerText = "Be prepared for anything!";
+                    adventureHeading.innerText = "Before you stands the re-animated machine of the Prodigal, Everlasting Lord of Arcane Wisdom."
+                    break;
+                case 'Finale':
+                    fightTextbox.innerText = "Do not give up!";
+                    adventureHeading.innerText = "You stand before the Doctor, Second of the Fatui Harbingers, mastermind behind the Leyline Outbreak."
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        adventureTextBox.style.animation = "";
+        adventureChoiceOne.pressAllowed = true;
+        adventureTextBox.removeEventListener("animationend", textFadeIn, true);
+
+        if (specialty === 'Unusual') {
+            setTimeout(() => {
+                adventureChoiceOne.click();
+            }, 1500)
+        }
+    }
+}
+
+
 function triggerFight() {
     if (!adventureScene) {return}
     adventureVariables.fightSceneOn = true;
@@ -7547,19 +7558,19 @@ function triggerFight() {
     }
 
     let adventureVideo = document.getElementById("adventure-video");
-    adventureVideo = Expedition.comboHandler("create",adventureVideo);
+    adventureVideo = Battle.comboHandler("create",adventureVideo);
     let adventureVideoChildren = adventureVideo.children;
 
     battleVariables = {
         defenseMob: null,
-        guardtime: adventureVariables.advType === 13 || adventureVariables.specialty === 'Finale' ? 0 : null,
-        doubleAtkCooldown: adventureVariables.advType === 13 || adventureVariables.specialty === 'FellBoss' || adventureVariables.specialty === 'Finale' ? 1 : null,
+        guardtime: null,
+        doubleAtkCooldown: null,
         healthLost: 0,
-        maxHealth: Math.ceil((5 + Math.floor(advDict.adventureRank / 4)) * (activeLeader == "Nahida" ? 1.2 : 1)),
+        maxHealth: Math.ceil((5 + Math.floor(advDict.adventureRank / 4)) * (activeLeader === "Nahida" ? 1.2 : 1)),
         artificalSpeedUp: 0,
-        quicktime: adventureVariables.specialty === 'Unusual' ? 100 : 0,
+        quicktime: 0,
         quicktimeAttack: false,
-        summonTime: adventureVariables.specialty === 'Finale' ? 0 : null,
+        summonTime: null,
         rainTime: null,
         floatTime: null,
         floatNumber: 0,
@@ -7567,14 +7578,40 @@ function triggerFight() {
         decoyNumber: null,
         chargeTime: null,
         currentDeflect: null,
-        deflectTime: adventureVariables.specialty === 'Workshop' ? 0 : null,
+        deflectTime: null,
         burstAttack: null,
-        burstTime: adventureVariables.specialty === 'Workshop' ? 0.25 : null,
+        burstTime: null,
         eatTime: null,
         currentEaten: null,
         bossHealth: adventureVariables.advType === 14 ? 100 : null,
         lastStand: false,
         triggerConstants: {quicktimeCheck, summonMob, rainTimeCheck, floatTimeCheck, burstTimeCheck, burstTimeEnd, eatTimeCheck},
+    }
+
+    // SPECIALTY CHCKER
+    if (adventureVariables.advType === 13) {
+        battleVariables.doubleAtkCooldown = 1;
+        battleVariables.guardtime = 0;
+        if (persistentValues.workshopBossDefeat) {
+            battleVariables.deflectTime = 0;
+        }
+        if (persistentValues.fellBossDefeat) {
+            battleVariables.floatTime = 0.5;
+        }
+    } else if (adventureVariables.advType === 14) {
+        if (adventureVariables.specialty === 'FellBoss') {
+            battleVariables.floatTime = 0.5;
+            battleVariables.doubleAtkCooldown = 1;
+        } else if (adventureVariables.specialty === 'Unusual') {
+            battleVariables.quicktime = 100;
+        } else if (adventureVariables.specialty === 'Workshop') {
+            battleVariables.deflectTime = 0;
+            battleVariables.burstTime = 0.25;
+        } else if (adventureVariables.specialty === 'Finale') {
+            battleVariables.guardtime = 0;
+            battleVariables.summonTime = 0;
+            battleVariables.doubleAtkCooldown = 1;
+        }
     }
     
     let currentSong = randomInteger(1, 4); 
@@ -7591,32 +7628,7 @@ function triggerFight() {
     fightBgmElement.load();
     fightBgmElement.addEventListener('canplaythrough', () => {fightBgmElement.play();})
 
-    let healthDiv = document.getElementById("adventure-health");
-    healthDiv.style.opacity = 1;
-
-    let healthBar = document.getElementById("health-bar");
-    healthBar.currentWidth = 100;
-    healthBar.classList.add("adventure-health");
-    healthBar.style.width = "100%";
-
-    if (adventureScaraText) {
-        healthDiv.classList.add("adventure-scara-health");
-        healthBar.classList.add("adventure-scara-barHealth");
-    } else {
-        if (healthDiv.classList.contains("adventure-scara-health")) {healthDiv.classList.remove("adventure-scara-health")}
-        if (healthBar.classList.contains("adventure-scara-barHealth")) {healthBar.classList.remove("adventure-scara-barHealth")}
-    };
-
-    for (let i = 0; i < battleVariables.maxHealth; i++) {
-        let health = document.createElement("div");
-        health.classList.add("heart-bit","flex-column");
-        if (adventureScaraText) {health.style.borderRight = "0.1em solid #333553"};
-
-        let healthImg = new Image();
-        healthImg.src = `./assets/icon/health${adventureScaraText}.webp`;
-        health.appendChild(healthImg)
-        healthDiv.append(health);
-    }
+    Battle.drawBattleHealth(adventureScaraText, battleVariables);
 
     const adventureFightImg = document.getElementById("adventure-fight").children;
     for (let i = 1; i < 4; i++) {
@@ -7736,6 +7748,12 @@ function triggerFight() {
                 } else if (battleVariables.bossHealth <= FINALE_THRESHOLD) {
                     variant = '-osu';
                 }
+            } else if (adventureVariables.advType === 13) {
+                if (persistentValues.workshopBossDefeat) {
+                    variant = rollArray(['', '-osu', '-cytus']);
+                } else if (persistentValues.fellBossDefeat) {
+                    variant = rollArray(['', '-osu']);
+                }
             }
 
             let warningImg = new Image();
@@ -7756,7 +7774,7 @@ function triggerFight() {
                     }
                 })
             }
-        }
+        } 
     }
 
     // SUMMONS NEW MOBS 
@@ -8034,10 +8052,7 @@ function triggerFight() {
             summonMob('decoy');
             battleVariables.decoyNumber = 3;
         }, 5000)
-    } else if (adventureVariables.specialty === 'FellBoss') {
-        battleVariables.floatTime = 0;
     }
-
 }
 
 // STARTS COMBAT FOR MOB
@@ -8293,14 +8308,14 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                             battleVariables.triggerConstants.burstTimeEnd();
                         } else {
                             if (evadeRoll <= evadeMax && !decoy) {
-                                Expedition.createBattleText("dodge", animationTime * 150 * 2, mobDiv);
+                                Battle.createBattleText("dodge", animationTime * 150 * 2, mobDiv);
                             } else {
                                 if (canvas.burstMode) {
                                     const energyBurst = document.getElementById('energy-ball');
                                     energyBurst.startingValue++;
                                     energyBurst.changeValue();
 
-                                    Expedition.createBattleText("chargedMiss", animationTime * 150 * 2, mobDiv);
+                                    Battle.createBattleText("chargedMiss", animationTime * 150 * 2, mobDiv);
                                 } else {
                                     loseHP(mobHealth.atk, "normal");
                                 }
@@ -8554,13 +8569,13 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
                 switch (type) {
                     case 'strong':
-                        Expedition.createBattleText("strongCounter", animationTime * 150 * 2, mobDiv);
+                        Battle.createBattleText("strongCounter", animationTime * 150 * 2, mobDiv);
                         break;
                     case 'weak':
-                        Expedition.createBattleText("weakCounter", animationTime * 150 * 2, mobDiv);
+                        Battle.createBattleText("weakCounter", animationTime * 150 * 2, mobDiv);
                         break;
                     default:
-                        Expedition.createBattleText("counter", animationTime * 150 * 2, mobDiv);
+                        Battle.createBattleText("counter", animationTime * 150 * 2, mobDiv);
                         break;
                 }
 
@@ -8569,7 +8584,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 }
             } else {
                 mobHealth.health -= (battleVariables.currentATK * attackMultiplier * 0.25);
-                Expedition.createBattleText("guard", animationTime * 150 * 2, mobDiv);
+                Battle.createBattleText("guard", animationTime * 150 * 2, mobDiv);
             }
 
             if (!advDict.rankDict[10]) {
@@ -8599,7 +8614,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             
             parrySuccess.load();
             parrySuccess.play();
-            Expedition.comboHandler("add");
+            Battle.comboHandler("add");
         }
 
         const clickMob = () => {
@@ -8733,12 +8748,12 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                         parriedCorrectly(attackMultiplier, guardCheckBool);
                     }
                 } else if (canvas.classList.contains("decoy-ready")) {
-                    Expedition.createBattleText("deflect", animationTime * 150 * 2, mobDiv);
+                    Battle.createBattleText("deflect", animationTime * 150 * 2, mobDiv);
                     loseHP(mobHealth.atk, "normal");
 
                     parryFailure.load();
                     parryFailure.play();
-                    Expedition.comboHandler("reset");
+                    Battle.comboHandler("reset");
 
                     if (!advDict.rankDict[10]) {
                         const cooldown = document.getElementById('adventure-cooldown-3');
@@ -8750,7 +8765,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
                     parryFailure.load();
                     parryFailure.play();
-                    Expedition.comboHandler("reset");
+                    Battle.comboHandler("reset");
                     if (!advDict.rankDict[10]) {
                         const cooldown = document.getElementById('adventure-cooldown-3');
                         cooldown.amount += 10;
@@ -8764,7 +8779,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                     }
                 } else {
                     mobHealth.health -= (battleVariables.currentATK * 0.25);
-                    Expedition.createBattleText("guard", animationTime * 150 * 2, mobDiv);
+                    Battle.createBattleText("guard", animationTime * 150 * 2, mobDiv);
                     doubleAttack();
                     if (!advDict.rankDict[10]) {
                         const cooldown = document.getElementById('adventure-cooldown-3');
@@ -8777,7 +8792,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 dodgeOn("close");
             } else {
                 // NO PARRY IS BEING USED
-                attackMultiplier = Expedition.comboHandler("check", attackMultiplier);
+                attackMultiplier = Battle.comboHandler("check", attackMultiplier);
 
                 if (mobDiv.classList.contains('megaboss')) {
                     if (adventureVariables.specialty === 'Unusual') {
@@ -9015,7 +9030,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
     if (disableQuicktime && beta) {return}
     battleVariables.quicktimeAttack = true;
 
-    const quicktimeBar = document.createElement("div");
+    let quicktimeBar = document.createElement("div");
 
     const videoOverlay = document.createElement("div");
     videoOverlay.id = "quicktime-overlay";
@@ -9023,269 +9038,18 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
 
     const adventureText = document.getElementById('adventure-text');
     const textOverlay = document.createElement("div");
+    textOverlay.id = 'text-overlay';
     textOverlay.classList.add("text-overlay","cover-all","flex-row");
 
     const adventureVideo = document.getElementById('adventure-video');
     if (variant === '-cytus') {
-        textOverlay.classList.add("flex-column");
-        textOverlay.style.justifyContent = 'space-around';
-        textOverlay.style.padding = '0 15%';
-        textOverlay.style.boxSizing = 'border-box';
-
-        const textBox = document.createElement('p');
-        textBox.classList.add('flex-column')
-        textBox.innerText = "Avoid being hit by the attacks!";
-        textBox.style.width = '50%'
-        textBox.style.height = '100%';
-        textOverlay.appendChild(textBox);
-
-        quicktimeBar.id = "quicktime-bar";
-        quicktimeBar.state = null;
-        quicktimeBar.classList.add("flex-row","quicktime-block");
-
-        const quickImg = new Image();
-        quickImg.src = "./assets/expedbg/quicktime-block.webp";
-        quickImg.classList.add("cover-all");
-        quickImg.style.zIndex = 1;
-
-        const quicktimeCytus = createDom('div', { class: ['quicktime-osu'] });
-        for (let i = 0; i < 3; i++) {
-            const cytusLine = createDom('b', {
-                class: ['cytus-line'],
-                style: {
-                    top: ((i + 1) * 25) + '%',
-                }
-            })
-            quicktimeCytus.append(cytusLine);
-        }
-
-        const adventureGif = document.getElementById('adventure-gif');
-        const cytusHead = adventureGif.cloneNode(false);
-        adventureGif.style.display = 'none';
-
-        cytusHead.classList.add('cytus-head');
-        cytusHead.style.top = '50%';
-        quicktimeCytus.appendChild(cytusHead);
-
-        let activeRow = 1;
-        let finalSequence = false;
-        let hitCount = 0;
-        let invincibleFrame = false;
-        const controlledRows = [[], [], []];
-
-        const arrowArray = ['down','up'];
-        for (let i = 1; i > -1; i--) {
-            const img = createDom('img', {
-                src: `./assets/expedbg/battle-${arrowArray[i]}${adventureScaraText}.webp`,
-                style: {
-                    height: '49%',
-                    position: 'unset',
-                }
-            });
-
-            img.addEventListener("click",() => {
-                if (i === 1) {
-                    activeRow = Math.max(--activeRow, 0);
-                } else {
-                    activeRow = Math.min(++activeRow, 2);
-                }
-
-                cytusHead.style.top = ((activeRow + 1) * 25) + '%';
-            })
-            textOverlay.appendChild(img);
-        }
-
-
-        const checkCollision = () => {
-            if (controlledRows[activeRow].length > 0) {
-                if (invincibleFrame) {
-                    return;
-                } else {
-                    invincibleFrame = true;
-                    cytusHead.classList.add("damaged");
-                    cytusHead.damagedState = setTimeout(() => {
-                        cytusHead.classList.remove("damaged");
-                        invincibleFrame = false;
-                        hitCount++;
-                    }, 300);
-                }
-            }
-        }
-
-        let usedDict;
+        let usedDict = enemyInfo.skirmishCytusDict;
         if (adventureVariables.specialty === 'Workshop') {
             usedDict = battleVariables.bossHealth <= WORKSHOP_THRESHOLD ? enemyInfo.hardCytusDict : enemyInfo.easyCytusDict;
         } else if (adventureVariables.specialty === 'Finale') {
-            if (battleVariables.lastStand) {
-                usedDict = enemyInfo.veryHardCytusDict;
-            } else {
-                usedDict = enemyInfo.hardCytusDict;
-            }
+            usedDict = battleVariables.lastStand ? enemyInfo.veryHardCytusDict : enemyInfo.finaleCytusDict;
         }
-
-        let beatArray = deepCopy(rollArray(usedDict, 0));
-        const maxBeat = beatArray.length;
-        let mirrorAll = randomInteger(1, 3) === 1 ? true : false;
-        let beatCount = 10;
-
-        const spawnBeat = (counter) => {
-            const currentBeat = beatArray[0];
-            beatArray.shift();   
-
-            const re = new RegExp('X', 'g');
-            const XCount = currentBeat[2].match(re).length;
-
-            const activeBeats = [];
-            let progress = 0;
-            let spawnNextBeat = 0;
-            let spawnedAlready = false;
-
-            const modifier = currentBeat[3] === null ? '' : currentBeat[3];
-            let mirrorSequence = currentBeat[4] === undefined ? false : true;
-            mirrorSequence = mirrorAll === true ? !(mirrorSequence) : mirrorSequence;
-
-            for (let i = 0; i < currentBeat[2].length; i++) {
-                if (currentBeat[2][i] === 'X') {
-                    const rowBeat = createDom('img', {
-                        src: `./assets/expedbg/${modifier}Purple.webp`,
-                        row: i,
-                        class: ['cytus-beat'],
-                        style: {
-                            zIndex: beatCount,
-                            left: mirrorSequence ? 'unset' : 0,
-                            right: mirrorSequence ? 0 : 'unset',
-                            top: ((i + 1) * 25) + '%',
-                            transform: mirrorSequence ? `translate(50%, -55%) scaleX(-1)` : `translate(-50%, -55%)`,
-                        }
-                    });
-
-                    beatCount++;
-
-                    if (modifier === 'Bullet-') {
-                        rowBeat.style.transform = mirrorSequence ? 'translate(50%, -55%)' : `translate(-50%, -55%) scaleX(-1)`; 
-                        let warnImage = createDom('img', { 
-                            src: `./assets/expedbg/Warning-Purple.webp`,
-                            class: ["cytus-warn", 'cytus-beat'],
-                            style: {
-                                left: mirrorSequence ? 'unset' : 0,
-                                right: mirrorSequence ? 0 : 'unset',
-                                top: ((i + 1) * 25) + '%',
-                                transform: mirrorSequence ? `translate(50%, -55%) scaleX(-1)` : `translate(-50%, -55%)` ,
-                            }
-                        });
-
-                        warnImage.addEventListener('animationend', () => {
-                            quicktimeCytus.appendChild(rowBeat);
-                            activeBeats.push(rowBeat)
-                            warnImage.remove();
-                        })
-                        
-                        quicktimeCytus.append(warnImage);
-                    } else {
-                        rowBeat.onload = () => {
-                            activeBeats.push(rowBeat)
-                            quicktimeCytus.appendChild(rowBeat);
-                            
-                        }
-                    }
-                }
-            }
-
-            const interval = Math.floor(1000 / FRAMES_PER_SECOND);
-            let previousTime = performance.now();
-            let currentTime = 0;
-            let deltaTime = 0;
-            let thresholdReached = false;
-    
-            function animateMovement(timestamp) {
-                currentTime = timestamp;
-                deltaTime = currentTime - previousTime;
-                
-                if (deltaTime > interval) {
-                    activeBeats.forEach((beat) => {
-                        const progressIncrement = currentBeat[0] / 1000 / XCount;
-                        if (modifier === 'Boomer-') {
-                            if (thresholdReached) {
-                                beat.style.transform = `${mirrorSequence ? 'translate(50%, -55%)' : 'translate(-50%, -55%) scaleX(-1)'} rotate(${progress / 95 * 360 * 2}deg)`;
-                                progress -= progressIncrement * 1.7;
-                                spawnNextBeat += progressIncrement;
-                            } else if (progress < 95) {
-                                beat.style.transform = `${mirrorSequence ? 'translate(50%, -55%)' : 'translate(-50%, -55%) scaleX(-1)'} rotate(${progress / 95 * 360 * 2}deg)`;
-                                progress += progressIncrement * 1.4;
-                                spawnNextBeat += progressIncrement;
-                            } else {
-                                thresholdReached = true;
-                            }
-                        // ACCELERATIING AND DECELERATING MOTION
-                        } else if (modifier === 'Bullet-') {
-                            progress += progressIncrement * (3 - 0.8 * (progress / 100));
-                            spawnNextBeat += progressIncrement;
-                        } else if (modifier === 'Circle-') {
-                            progress += progressIncrement * (0.3 + 2 * (progress / 100));
-                            spawnNextBeat += progressIncrement;
-                        // STANDARD MOTION
-                        } else {
-                            progress += progressIncrement;
-                            spawnNextBeat += progressIncrement;
-                        }
-
-                        mirrorSequence === true ? (beat.style.right = progress + '%') : (beat.style.left = progress + '%');
-    
-                        if (progress > 41 && progress < 53) {
-                            if (!controlledRows[beat.row].includes(beat)) {
-                                controlledRows[beat.row].push(beat);
-                            }
-                        } else {
-                            if (controlledRows[beat.row].includes(beat)) {
-                                controlledRows[beat.row].splice(controlledRows[beat.row].indexOf(beat), 1);
-                            }
-
-                            if (progress > 100 || progress < 0) {
-                                beat.style.display = 'none';
-                                if (spawnedAlready) {
-                                    beat.remove();
-                                    return;
-                                } else if (maxBeat === counter && !finalSequence) {
-                                    beat.remove();
-                                    finalSequence = true;
-
-                                    textBox.innerHTML = `You were hit ${hitCount}</span> times!`;
-                                    setTimeout(() => {
-                                        quitQuicktime(advLevel, null, hitCount / 2, videoOverlay, textOverlay);
-                                        if (battleVariables.lastStand) {
-                                            const bossEleHealth = adventureVideo.querySelector('.megaboss > .health-bar');
-                                            if (bossEleHealth) {
-                                                bossEleHealth.style.width = `0%`;
-                                            }
-                                            bossUpdate(0);
-                                        }
-                                        adventureGif.style.display = 'block';
-                                    }, 2000);
-                                    return;
-                                }
-                            }
-                        }
-                    })
-
-                    if (beatArray.length > 0 && !spawnedAlready && spawnNextBeat >= beatArray[0][1]) {
-                        counter++;
-                        spawnBeat(counter);
-                        spawnedAlready = true;
-                    }
-                }
-            
-                checkCollision();
-                window.requestAnimationFrame(animateMovement);
-            }
-
-            window.requestAnimationFrame(animateMovement);
-        }
-
-        setTimeout(() => {
-            spawnBeat(1);
-        }, 500)
-
-        quicktimeBar.append(quickImg, quicktimeCytus);
+        quicktimeBar = Battle.cytusQuicktime(quicktimeBar, textOverlay, usedDict, quitQuicktime, advLevel, adventureScaraText, battleVariables, bossUpdate);
     } else if (variant === '-rain') {
         const textBox = document.getElementById('fight-text');
         textBox.innerText = 'The Fellflower is dazed! Avoid all the spikes while catching all the falling spores!';
@@ -9571,7 +9335,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                 } else {
                     setTimeout(() => {
                         textBox.innerHTML = `You successfully countered <span style='color:#A97803'>${correctBeat}</span> out of <span style='color:#A97803'>${maxBeat}</span> ranged attacks!`;
-                        setTimeout(() => {quitQuicktime(advLevel, maxBeat, correctBeat, videoOverlay, textOverlay)}, 2000);
+                        setTimeout(() => {quitQuicktime(advLevel, maxBeat, correctBeat)}, 2000);
                     }, 1250);
                 }
             }
@@ -9617,7 +9381,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                     if (quicktimeBar.state === colorArray[i]) {
                         correctBeat++;
                     } else {
-                        Expedition.createBattleText("miss", 2000, videoOverlay);
+                        Battle.createBattleText("miss", 2000, videoOverlay);
                     }
 
                     quicktimeBar.state = null;
@@ -9755,7 +9519,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                         } else if (leftPos < -15 || leftPos > 115) {
                             currentBeat++;
                             quicktimeBar.state = null;
-                            Expedition.createBattleText("miss", 2000, videoOverlay);
+                            Battle.createBattleText("miss", 2000, videoOverlay);
                             outcomeCheck(advLevel, currentBeat, maxBeat);
                             return;
                         } else {
@@ -9774,46 +9538,11 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                 textBox.innerHTML = `You successfully countered <span style='color:#A97803'>${correctBeat}</span> out of <span style='color:#A97803'>${maxBeat}</span> ranged attacks!`;
                 setTimeout(() => {
                     // LOSE HALF HP FOR OSU QUICKTIMES
-                    quitQuicktime(advLevel, maxBeat, (maxBeat + correctBeat) / 2, videoOverlay, textOverlay);
+                    quitQuicktime(advLevel, maxBeat, (maxBeat + correctBeat) / 2);
                 },2000)
             } else if (currentBeat < maxBeat) {
                 createBeat(advLevel);
             }
-        }
-    }
-
-    function quitQuicktime(advLevel, maxBeat, correctBeat, videoOverlay, textOverlay) {
-        videoOverlay.remove();
-        textOverlay.remove();
-        setTimeout(() => {battleVariables.quicktimeAttack = false}, 300);
-
-        let atkNumber;
-        switch (advLevel) {
-            case 13:
-                atkNumber = 2.5;
-                break;
-            case 5:
-                atkNumber = 2;
-                break;
-            case 4:
-                atkNumber = 1.5;
-                break;
-            case 3:
-                atkNumber = 1;
-                break;
-            default:
-                atkNumber = 1;
-                break;
-        }
-
-        if (maxBeat !== null) {
-            atkNumber = atkNumber * (maxBeat - correctBeat);
-        } else {
-            atkNumber *= correctBeat;
-        }
-        
-        if (atkNumber > 0) {
-            loseHP(Math.round(atkNumber * 10) / 10, "normal");
         }
     }
 
@@ -9824,6 +9553,42 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
 
     adventureVideo.appendChild(videoOverlay);
 }
+
+function quitQuicktime(advLevel, maxBeat, correctBeat) {
+    document.getElementById('quicktime-overlay').remove();
+    document.getElementById('text-overlay').remove();
+    setTimeout(() => {battleVariables.quicktimeAttack = false}, 300);
+
+    let atkNumber;
+    switch (advLevel) {
+        case 13:
+            atkNumber = 2.5;
+            break;
+        case 5:
+            atkNumber = 2;
+            break;
+        case 4:
+            atkNumber = 1.5;
+            break;
+        case 3:
+            atkNumber = 1;
+            break;
+        default:
+            atkNumber = 1;
+            break;
+    }
+
+    if (maxBeat !== null) {
+        atkNumber = atkNumber * (maxBeat - correctBeat);
+    } else {
+        atkNumber *= correctBeat;
+    }
+    
+    if (atkNumber > 0) {
+        loseHP(Math.round(atkNumber * 10) / 10, "normal");
+    }
+}
+
 
 function loseHP(ATK, type='normal', resetCombo=true) {
     if (!adventureVariables.fightSceneOn) {return}
@@ -9839,7 +9604,7 @@ function loseHP(ATK, type='normal', resetCombo=true) {
         battleVariables.healthLost += ATK;
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
-        if (resetCombo && type !== 'inverse') {Expedition.comboHandler("reset");}
+        if (resetCombo && type !== 'inverse') {Battle.comboHandler("reset");}
 
         adventureHealth.style.animation = 'shake 1s infinite linear';
         setTimeout(()=>{
@@ -9855,7 +9620,7 @@ function loseHP(ATK, type='normal', resetCombo=true) {
 
             healthBar.currentWidth += (hpInterval * 3);
             healthBar.style.width = `${healthBar.currentWidth}%`;
-            Expedition.createBattleText("endure",2000,document.getElementById('adventure-video'));
+            Battle.createBattleText("endure",2000,document.getElementById('adventure-video'));
         } else {
             loseAdventure();
         }
@@ -10009,7 +9774,7 @@ function attackAll() {
     if (activeLeader == "Zhongli") {currentATK *= 1.50};
     currentATK = moraleCheck(currentATK);
 
-    let attackMultiplier = Expedition.comboHandler("check", 1);
+    let attackMultiplier = Battle.comboHandler("check", 1);
     currentATK *= attackMultiplier;
 
     let cooldownTime;
@@ -10038,14 +9803,14 @@ function attackAll() {
         if (battleVariables.defenseMob != null) {
             currentATK *= 0.5;
             critThreshold = -1;
-            Expedition.createBattleText("guard", 2000, mobDiv);
+            Battle.createBattleText("guard", 2000, mobDiv);
         } else if (battleVariables.burstAttack !== null) {
             currentATK *= 0.3;
         }
 
         const mobHealth = mobDiv.children[1];
         if (critRoll <= critThreshold && !decoy) {
-            Expedition.createBattleText("crit", 2000, mobDiv);
+            Battle.createBattleText("crit", 2000, mobDiv);
             mobHealth.health -= (currentATK * 4 * 1.5);
         } else {
             mobHealth.health -= (currentATK * 4);
@@ -10186,22 +9951,23 @@ function winAdventure() {
         case 'FellBoss':
             adventureHeading.innerText = "You have stopped the rampaging Whopperflower!";
             persistentValuesDefault.fellBossDefeat = true;
-            challengeNotification(({category: 'specific', value: [1, 8]}))
+            challengeNotification(({category: 'specific', value: [1, 8]}));
             break;
         case 'Unusual':
             adventureHeading.innerText = "You have survived the Unusual Hilichurl's onslaught!";
             persistentValuesDefault.unusualBossDefeat = true;
-            challengeNotification(({category: 'specific', value: [2, 5]}))
+            challengeNotification(({category: 'specific', value: [2, 5]}));
+            document.getElementById('shop-backdoor').style.display = 'block';
             break;
         case 'Workshop':
             adventureHeading.innerText = "You successfully put down the Shouki no Kami!";
             persistentValuesDefault.workshopBossDefeat = true;
-            challengeNotification(({category: 'specific', value: [3, 6]}))
+            challengeNotification(({category: 'specific', value: [3, 6]}));
             break;
         case 'Finale':
             adventureHeading.innerText = "You have ended the Leyline Outbreak Experiment, once and for all.";
             persistentValuesDefault.finaleBossDefeat = true;
-            challengeNotification(({category: 'specific', value: [4, 3]}))
+            challengeNotification(({category: 'specific', value: [4, 3]}));
             drawAranaraWish();
 
             const settingsBottomBadge = document.getElementById('badges-div');
@@ -10360,7 +10126,7 @@ function winAdventure() {
                 drawUI.customTutorial("workshop", 3, 'Scene');
                 break;
             case 'Finale':
-                drawUI.customTutorial("finale", 8, 'Scene');
+                drawUI.customTutorial("finale", 9, 'Scene', persistentValues);
                 break;
             default:
                 break;
@@ -11462,7 +11228,11 @@ function setShop(type) {
     shopDialogueText.id = "table7-text";
 
     const shopBackdoor = createButton('dim-button', {
-        class: ['shop-backdoor']
+        id: 'shop-backdoor',
+        class: ['shop-backdoor'],
+        style: {
+            display: 'none'
+        }
     });
 
     const shopBlackContainer = Shop.drawBlackMarket(persistentValues, blackMarketFunctions, choiceBox);
@@ -13512,7 +13282,7 @@ if (beta || testing) {
             // Shop.regenBlackPrice(persistentValues.blackMarketDict);
             drawAranaraWish();
         } else if (e.key === 'g') {
-            drawUI.customTutorial("finale", 9, 'Scene', persistentValues);
+            spawnBossQuest(4);
         }
     })    
 }

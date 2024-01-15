@@ -193,7 +193,7 @@ const enemyInfo = {
         5:["Automaton-Boss.1","SAutomaton-Boss.2","Eremite-Boss.3"],
     },
 
-    // 1ST POSITION IS FOR TIMING, 2ND IS FOR DELAY, X IS FOR OCCUPIED LANE, O IS FOR EMPTY LANE
+    // [TIMING, DELAY, X: OCCUPIED, O: EMPTY, TYPE, REVERSE DIRECTION] 
     easyCytusDict: [
         [
             [300, 20, 'OXO', 'Circle-', true],
@@ -295,6 +295,155 @@ const enemyInfo = {
         ]
     ],
 
+    skirmishCytusDict: [
+        [
+            [350, 20, 'XXO', null, true],
+            [300, 20, 'OOX', 'Circle-'],
+            [300, 25, 'OXX', 'Circle-'],
+            [300, 25, 'XOX', 'Circle-'],
+            [300, 25, 'OXX', 'Circle-'],
+            [300, 25, 'XOX', 'Circle-'],
+            [300, 25, 'XXO', 'Circle-'],
+            [300, 85, 'OXO', 'Boomer-', true],
+            [300, 35, 'XOX', 'Boomer-'],
+            [500, 35, 'OXO', 'Bullet-'],
+        ],[
+            [400, 0, 'OXO', 'Bullet-'], 
+            [300, 20, 'XOX', 'Circle-'],
+            [350, 0, 'OXO', null],
+            [300, 30, 'XOX', 'Bullet-', true],
+            [250, 30, 'OXX', 'Bullet-'],
+            [300, 15, 'XXO', null, true],
+            [300, 30, 'XOX', null, true],
+            [300, 55, 'OXX', 'Boomer-'],
+            [300, 10, 'XOO', 'Bullet-', true],
+        ],[  
+            [300, 25, 'XXO', 'Circle-', true],
+            [300, 35, 'OXX', 'Circle-'],
+            [300, 35, 'XXO', 'Circle-'],
+            [200, 45, 'XOX', 'Circle-', true],
+            [400, 25, 'XXO', null],
+            [200, 65, 'OXX', 'Boomer-'],
+            [350, 45, 'XOX', null],
+            [300, 75, 'XXO', 'Bullet-', true],
+            [300, 5, 'OXX', 'Bullet-'],
+            [300, 5, 'XOX', 'Bullet-', true],
+            [400, 15, 'OXX', null],
+            
+        ],[
+            [300, 20, 'OXX', null],
+            [300, 17, 'OOX', null],
+            [300, 17, 'XOX', null],
+            [300, 17, 'XOO', null],
+            [300, 0, 'OOX', 'Boomer-', true],
+            [300, 17, 'XXO', null],
+            [300, 17, 'XOO', null],
+            [300, 17, 'XOX', null],
+            [300, 17, 'OOX', null],
+            [300, 17, 'OXX', null],
+            [300, 17, 'OOX', null],
+            [300, 17, 'XOX', null],
+            [300, 0, 'XOO', 'Boomer-', true],
+            [300, 17, 'XOO', null],
+            [300, 17, 'XXO', null],
+            [300, 60, 'OXX', 'Bullet-', true],
+            [300, 10, 'XOX', 'Bullet-'],
+            [350, 10, 'OXX', 'Boomer-'],
+        ], [
+            [340, 20, 'XOX', 'Bullet-', true],
+            [340, 0, 'XOX', 'Bullet-'],
+            [320, 20, 'OXX', 'Boomer-', true],
+            [320, 0, 'OXX', 'Boomer-'],
+            [320, 35, 'XOX', 'Bullet-', true],
+            [320, 0, 'XOX', 'Bullet-'],
+            [320, 40, 'XXO', 'Boomer-', true],
+            [320, 0, 'XXO', 'Boomer-'],
+            [320, 20, 'XOX', 'Bullet-', true],
+            [320, 0, 'XOX', 'Bullet-'],
+            [300, 20, 'OXX', 'Circle-', true],
+            [300, 0, 'OXX', 'Circle-'],
+        ]
+    ],
+
+    finaleCytusDict: [
+        [
+            [350, 20, 'XXO', null, true],
+            [300, 20, 'OOX', 'Circle-'],
+            [300, 25, 'OXX', 'Circle-'],
+            [300, 25, 'XOX', 'Circle-'],
+            [300, 25, 'OXX', 'Circle-'],
+            [300, 25, 'XOX', 'Circle-'],
+            [300, 25, 'XXO', 'Circle-'],
+            [300, 85, 'OXO', 'Boomer-', true],
+            [300, 35, 'XOX', 'Boomer-'],
+            [500, 35, 'OXO', 'Bullet-'],
+        ],[
+            [400, 0, 'OXO', 'Bullet-'], 
+            [300, 20, 'XOX', 'Circle-'],
+            [350, 0, 'OXO', null],
+            [300, 30, 'XOX', 'Bullet-', true],
+            [250, 30, 'OXX', 'Bullet-'],
+            [300, 15, 'XXO', null, true],
+            [300, 30, 'XOX', null, true],
+            [300, 55, 'OXX', 'Boomer-'],
+            [300, 10, 'XOO', 'Bullet-', true],
+        ],[  
+            [300, 25, 'XXO', 'Circle-', true],
+            [300, 35, 'OXX', 'Circle-'],
+            [300, 35, 'XXO', 'Circle-'],
+            [200, 45, 'XOX', 'Circle-', true],
+            [400, 25, 'XXO', null],
+            [200, 65, 'OXX', 'Boomer-'],
+            [350, 45, 'XOX', null],
+            [300, 75, 'XXO', 'Bullet-', true],
+            [300, 5, 'OXX', 'Bullet-'],
+            [300, 5, 'XOX', 'Bullet-', true],
+            [400, 15, 'OXX', null],
+            
+        ],[
+            [300, 20, 'OXX', 'Circle-'],
+            [300, 17, 'OOX', 'Circle-', true],
+            [300, 17, 'XOX', 'Circle-'],
+            [300, 17, 'XOO', 'Circle-'],
+            [420, 0, 'OOX', null],
+            [420, 0, 'OOX', null, true],
+            [300, 17, 'XXO', 'Circle-'],
+            [300, 17, 'XOO', 'Circle-'],
+            [300, 17, 'XOX', 'Circle-', true],
+            [300, 17, 'OOX', 'Circle-'],
+            [300, 17, 'OXX', 'Circle-'],
+            [300, 17, 'OOX', 'Circle-'],
+            [300, 17, 'XOX', 'Circle-'],
+            [420, 0, 'OXO', 'Bullet-', true],
+            [100, 0, 'XOX', 'Bullet-'],
+            [300, 20, 'OOX', null, true],
+            [300, 0, 'OOX', null],
+            [300, 0, 'OXO', 'Bullet-'],
+            [300, 40, 'OXX', 'Bullet-', true],
+            [350, 10, 'XOO', 'Boomer-'],
+            [350, 20, 'OXO', 'Boomer-'],
+            [300, 35, 'XOO', 'Bullet-'],
+        ], [
+            [540, 0, 'XOO', 'Bullet-'],
+            [540, 10, 'XOO', 'Boomer-'],
+            [420, 20, 'OXO', 'Boomer-'],
+            [340, 30, 'OOX', 'Boomer-'],
+            [540, 0, 'XOO', 'Boomer-'],
+            [300, 100, 'XOX', 'Bullet-', true],
+            [340, 0, 'XOX', 'Bullet-'],
+            [320, 20, 'OXX', 'Boomer-', true],
+            [320, 0, 'OXX', 'Boomer-'],
+            [320, 35, 'XOX', 'Bullet-', true],
+            [320, 0, 'XOX', 'Bullet-'],
+            [320, 40, 'XXO', 'Boomer-', true],
+            [320, 0, 'XXO', 'Boomer-'],
+            [320, 20, 'XOX', 'Bullet-', true],
+            [320, 0, 'XOX', 'Bullet-'],
+            [300, 20, 'OXX', 'Circle-', true],
+            [300, 0, 'OXX', 'Circle-'],
+        ]
+    ],
+
     veryHardCytusDict: [[
         [300, 20, 'XOX', null],
         [300, 17, 'XOX', null],
@@ -327,7 +476,7 @@ const enemyInfo = {
         [320, 1, 'XXO', 'Bullet-'],
     ]],
 
-    // HIGHER 3RD NUMBER MEANS SLOWER
+    // [X POS, Y POS, TIMING]
     hardOsuArray: [
         [
             [50, 30, 450], [45, 35, 450], [40, 40, 450], [35, 50, 450],
@@ -504,7 +653,7 @@ const enemyInfo = {
     1412:{Class:"Minion",          Variation:3,   Type:"Unusual",      HP:850,   ATK:2,     AtkCooldown:45},
     1421:{Class:"Megaboss",       Variation:1,   Type:"Workshop",      HP:2000,   ATK:4,     AtkCooldown:35},
     1422:{Class:"Arm",           Variation:1,   Type:"Workshop",      HP:3000,   ATK:3,     AtkCooldown:70},
-    1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:9000,   ATK:3,     AtkCooldown:32.5},
+    1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:10,   ATK:3,     AtkCooldown:32.5},
     1432:{Class:"Minion",          Variation:1,   Type:"Finale",      HP:1850,   ATK:1.5,     AtkCooldown:30},
 }
 

@@ -525,6 +525,41 @@ function patchNotes(parent, showImgTitle = true, onlyOneOpen = false) {
     return parent.append(patchContainer);
 }
 
+function finaleTutorial(persistentValues) {
+    let statsText = advancedStats();
+    statsText.id = 'finale-stats';
+    statsText.classList.add('green-scrollbar');
+    let imgDiv = createDom('div', {
+        class: ['tutorial-img', 'final-img'],
+        children: [statsText]
+    });
+
+    statsText.generateStats(persistentValues);
+
+    let count = 0;
+    const challengeDict = persistentValues.challengeCheck;
+    for (let tier in challengeDict) {
+        for (let challenge in challengeDict[tier]) {
+            if (challengeDict[tier][challenge] === true) {
+                count++;
+            }
+        }
+    }
+
+    let text = `${count}/50 Challenges Complete`;
+    if (count < 50) {
+        text += '<br>Try to complete all of them!';
+    } else {
+        text += '<br>Congratulations!';
+    }
+
+    statsText.innerHTML = `<span class='finale-title flex-row'>Game Details</span><br>` 
+                        + `<span class='finale-end flex-row'>${text}</span><br>` 
+                        + statsText.innerHTML;
+
+    return imgDiv;
+}
+
 // CUSTOM TUTORIALS
 const preloadTutorial = Preload();
 function customTutorial(tutorialFile, maxSlide, title, exitFunction) {
@@ -565,35 +600,7 @@ function customTutorial(tutorialFile, maxSlide, title, exitFunction) {
                 prevButton.style.opacity = 0;
                 prevButton.style.pointerEvents = 'none';
 
-                let statsText = advancedStats();
-                statsText.id = 'finale-stats';
-                statsText.classList.add('green-scrollbar');
-                let imgDiv = createDom('div', {
-                    class: ['tutorial-img', 'final-img'],
-                    children: [statsText]
-                });
-
-                statsText.generateStats(exitFunction);
-                statsText.innerHTML = `<span class='finale-title flex-row'>Game Details</span><br>` + statsText.innerHTML;
-
-                let count = 0;
-                const challengeDict = exitFunction.challengeCheck;
-                for (let tier in challengeDict) {
-                    for (let challenge in challengeDict[tier]) {
-                        if (challengeDict[tier][challenge] === true) {
-                            count++;
-                        }
-                    }
-                }
-
-                let text = `${count}/50 Challenges Complete`;
-                if (count < 50) {
-                    text += '<br>Try to complete all of them!';
-                } else {
-                    text += '<br>Congratulations!';
-                }
-
-                statsText.innerHTML += `<br><span class='finale-end flex-row'>${text}</span>`;
+                const imgDiv = finaleTutorial(exitFunction);
 
                 let nextButtonNew = nextButton.cloneNode(true);
                 nextButton.parentNode.replaceChild(nextButtonNew, nextButton);

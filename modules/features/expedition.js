@@ -181,48 +181,6 @@ const sapEnergy = (quantityAmount, energyAmount) => {
     }
 }
 
-const createBattleText = (text, timer, container) => {
-    let textBox = document.createElement("img");
-    textBox.classList.add("flex-column","battle-text")
-    textBox.src = `./assets/expedbg/${text}.webp`;
-    setTimeout(()=>{textBox.remove()}, timer);
-    container.append(textBox);
-    return container;
-}
-
-const comboHandler = (type, ele) => {
-    if (type === "create") {
-        let comboNumber = document.createElement("p");
-        comboNumber.id = "combo-number";
-        comboNumber.combo = 0;
-        comboNumber.maxCombo = 0;
-        comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
-        ele.appendChild(comboNumber);
-        return ele;
-    } else if (type === "add") {
-        let comboNumber = document.getElementById("combo-number");
-        comboNumber.combo++;
-        comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
-        if (comboNumber.maxCombo < comboNumber.combo) {comboNumber.maxCombo = comboNumber.combo}
-
-        comboNumber.style.animation = "";
-        void comboNumber.offsetWidth;
-        comboNumber.style.animation = "tallyCount 1s ease";
-    } else if (type === "reset") {
-        let comboNumber = document.getElementById("combo-number");
-        comboNumber.combo = 0;
-        comboNumber.innerText = `Combo: \n ${comboNumber.combo}`;
-
-        comboNumber.style.animation = "";
-        void comboNumber.offsetWidth;
-        comboNumber.style.animation = "tallyCount 1s ease";
-    } else if (type === "check") {
-        let comboNumber = document.getElementById("combo-number");
-        let multiplierThreshold = Math.floor(comboNumber.combo / 3) * 0.25;
-        return (ele + multiplierThreshold);
-    }
-}
-
 // SINGLE USE
 const createTopHalf = () => {
     const adventureHealth = createDom('div', {
@@ -316,4 +274,5 @@ const createBattleHalf = (MOBILE) => {
     return [adventureFight, adventureFightDodge, adventureFightSkill, adventureFightBurst];
 }
 
-export { expedInfo, createTopHalf, createEncounterHalf, createBattleHalf, resetAdventure, sapEnergy, createBattleText, comboHandler }
+
+export { expedInfo, createTopHalf, createEncounterHalf, createBattleHalf, resetAdventure, sapEnergy }
