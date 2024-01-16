@@ -72,7 +72,7 @@ const drawBattleHealth = (adventureScaraText, battleVariables) => {
     }
 }
 
-const cytusQuicktime = (quicktimeBar, textOverlay, usedDict, quitQuicktime, advLevel, adventureScaraText, battleVariables, bossUpdate) => {
+const cytusQuicktime = (quicktimeBar, textOverlay, usedDict, quitQuicktime, adventureScaraText, battleVariables, adventureVariables, bossUpdate) => {
     textOverlay.classList.add("flex-column");
     textOverlay.style.justifyContent = 'space-around';
     textOverlay.style.padding = '0 15%';
@@ -287,7 +287,12 @@ const cytusQuicktime = (quicktimeBar, textOverlay, usedDict, quitQuicktime, advL
                                 setTimeout(() => {
                                     textBox.innerHTML = `You were hit ${hitCount}</span> times!`;
                                     setTimeout(() => {
-                                        quitQuicktime(advLevel, null, hitCount);
+                                        let atkLevel = 2;
+                                        if (adventureVariables.specialty === 'Finale' || adventureVariables.specialty === 'Workshop') {
+                                            atkLevel = 2.5;
+                                        }
+
+                                        quitQuicktime(atkLevel, null, hitCount);
                                         if (battleVariables.lastStand) {
                                             const bossEleHealth = document.getElementById('adventure-video').querySelector('.megaboss > .health-bar');
                                             if (bossEleHealth) { bossEleHealth.style.width = `0%` }

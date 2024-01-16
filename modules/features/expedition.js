@@ -125,7 +125,7 @@ const expedInfo = (butId, expeditionDict, saveValues, persistentValues) => {
     enemyInfo.currentWave = id;
 }
 
-const resetAdventure = (dodgeOn, fightBgmElement, fightWinElement, adventureVariables, bgmElement) => {
+const resetAdventure = (dodgeOn, fightBgmElement, fightSFXElement, adventureVariables, bgmElement) => {
     const adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
     adventureChoiceOne.innerText = "Leave";
@@ -154,14 +154,14 @@ const resetAdventure = (dodgeOn, fightBgmElement, fightWinElement, adventureVari
     setTimeout(()=>{
         dodgeOn("close");
         fightBgmElement.pause();
-        fightWinElement.load();
-        fightWinElement.play();
-        fightWinElement.addEventListener('ended', () => {
+        fightSFXElement.load();
+        fightSFXElement.play();
+        fightSFXElement.addEventListener('ended', () => {
             setTimeout(()=>{
                 if (!adventureVariables.fightSceneOn) {
                     bgmElement.play()
                 }
-            }, 300);
+            }, 1000);
         })
     },300);
 }
