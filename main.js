@@ -6,6 +6,7 @@ import * as Settings from "./modules/features/settings.js";
 import * as Shop from "./modules/features/shop.js";
 import * as Expedition from "./modules/features/expedition.js";
 import * as Battle from "./modules/features/battle.js";
+import * as Tree from "./modules/features/tree.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js';
 
 const VERSIONNUMBER = "V.1-02-002";
@@ -12225,7 +12226,7 @@ function createTreeMenu() {
     container.style.background = `url(./assets/tooltips/elements/nut-${element.toLowerCase()}.webp) no-repeat center center/contain`;
     
     treeTable.append(palmText, optionsContainer);
-    offerBox(treeTable, optionsContainer);
+    Tree.offerBox(treeTable, optionsContainer, offerItemFunction);
     leylineCreate(treeTable, optionsContainer);
 
     leftDiv.appendChild(treeSide);
@@ -12240,9 +12241,9 @@ function createTreeMenu() {
     })
     leftDiv.appendChild(nutStoreButton);
 
-    updateTreeValues(treeLevel === 0 ? true : false);
+    Tree.updateTreeValues(treeLevel === 0 ? true : false, saveValues.treeObj);
     if (saveValues.treeObj.defense === 'block') {
-        enemyBlock();
+        enemyBlock(false);
     } else if (treeLevel === 5) {
         treeOptions(true, document.getElementById('options-container'), true);
     }
@@ -12309,59 +12310,10 @@ function populateTreeItems() {
             });
         })
         
-        itemContainer.append(itemAmount)
-        itemOfferArray.push(itemContainer)
+        itemContainer.append(itemAmount);
+        itemOfferArray.push(itemContainer);
         treeItem.append(itemContainer);
     }
-}
-
-function offerBox(treeTable, optionsContainer) {
-    const treeOffer = document.createElement('div');
-    treeOffer.id = 'tree-offer-container';
-    treeOffer.classList.add('flex-column');
-    treeOffer.style.display = 'none';
-
-    const nutStoreCurrency = document.createElement("div");
-    nutStoreCurrency.id = "tree-store-currency";
-    nutStoreCurrency.classList.add("flex-row");
-    nutStoreCurrency.innerText = abbrNum(persistentValues["goldenCore"],2,true);
-    const nutStoreCurrencyImage = document.createElement("img");
-    nutStoreCurrencyImage.src = "./assets/icon/core.webp";
-    nutStoreCurrency.appendChild(nutStoreCurrencyImage);
-
-    const treeOfferText = document.createElement('p');
-    treeOfferText.innerHTML = `The Tree wishes for power, pick one item to sacrifice.
-                               <br><span style='font-size: 0.6em'>Note: Anytime you receive new loot, you have a higher chance to <br>get these items, which can increased through
-                                your <span style='color:#b39300'>luck rate</span>!</span>
-                                `;
-    const treeItem = document.createElement('div');
-    treeItem.id = 'tree-offer-items';
-    treeItem.classList.add('flex-row');
-
-    const treeMissingText = document.createElement('p');
-    treeMissingText.id = 'tree-missing-text';
-
-    const buttonContainer = document.createElement('container');
-    buttonContainer.classList.add('flex-row')
-
-    const backButton = createDom('button', {
-        innerText: 'Back',
-        id: 'tree-offer-button'
-    });
-    backButton.addEventListener('click', () => {
-        universalStyleCheck(optionsContainer,"display","flex","none");
-        universalStyleCheck(treeOffer,"display","none","flex");
-    });
-
-    const offerButton = document.createElement('button');
-    offerButton.innerText = 'Offer';
-    offerButton.addEventListener('click', () => {
-        offerItemFunction();
-    });
-
-    buttonContainer.append(backButton, offerButton);
-    treeOffer.append(treeOfferText, treeItem, treeMissingText, buttonContainer, nutStoreCurrency);
-    treeTable.append(treeOffer);
 }
 
 function offerItemFunction() {
@@ -12399,8 +12351,8 @@ function offerItemFunction() {
     }, { once: true });
 
     saveValues.treeObj.growthRate = Math.round(saveValues.treeObj.growthRate * 1.05 * 100) / 100;
-    updateTreeValues(false);
-    growTree('add', 10)
+    Tree.updateTreeValues(false, saveValues.treeObj);
+    growTree('add', 10);
 
     saveValues.treeObj.offerAmount++;
     challengeNotification(({category: 'offer', value: saveValues.treeObj.offerAmount}))
@@ -12412,10 +12364,8 @@ function offerItemFunction() {
 }
 
 function treeOptions(planted, optionsContainer, lastPhase) {
-    while (optionsContainer.firstChild) {
-        optionsContainer.firstChild.remove();
-    }
-
+    while (optionsContainer.firstChild) { optionsContainer.firstChild.remove() }
+    
     if (lastPhase) {
         optionsContainer.classList.add('flex-row','options-container');
         let treeButton = document.createElement('div');
@@ -12460,11 +12410,16 @@ function treeOptions(planted, optionsContainer, lastPhase) {
                     })
                     break;
                 case 2:
+                    /// MOVE THIS TO ANOTHER BUTTON
                     treeButton.addEventListener('click',() => {
-                        choiceBox(mainBody,{
-                            text: 'Are you sure you want to destroy the tree? This cannot be undone.'
-                        }, stopSpawnEvents, destroyTree, undefined, null, ['choice-ele']);
+                        universalStyleCheck(optionsContainer,"display","flex","none");
+                        universalStyleCheck(document.getElementById('bless-container'),"display","none","flex");
                     })
+                    // treeButton.addEventListener('click',() => {
+                    //     choiceBox(mainBody,{
+                    //         text: 'Are you sure you want to destroy the tree? This cannot be undone.'
+                    //     }, stopSpawnEvents, destroyTree, undefined, null, ['choice-ele']);
+                    // })
                     break;
                 default:
                     break;
@@ -12525,7 +12480,7 @@ function destroyTree(finalPhase = false) {
     
     treeMissingText.innerText = '';
     treeOptions(false, optionsContainer);
-    updateTreeValues(true);
+    Tree.updateTreeValues(true, saveValues.treeObj);
     treeImg.src = `./assets/tooltips/Empty.webp`;
 
     setTimeout(()=>{
@@ -12589,24 +12544,6 @@ function destroyTree(finalPhase = false) {
     },100);
 }
 
-function updateTreeValues(turnZero = false) {
-    const treeProgress = document.getElementById('tree-progress');
-    const treeProgressValue = document.getElementById('tree-progress-value');
-    const palmEnergy = document.getElementById('palm-text');
-
-    if (turnZero) {
-        treeProgress.progress = 0;
-        treeProgress.style.width = 0;
-        treeProgressValue.rate = 0;
-        treeProgressValue.innerText = 'Growth: 0x';
-        palmEnergy.innerText = 'Palm Energy: 0';
-    } else {
-        treeProgressValue.rate = saveValues.treeObj.growthRate / 25;
-        treeProgressValue.innerText = 'Growth: ' + saveValues.treeObj.growthRate + 'x';
-        palmEnergy.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
-    }
-}
-
 function addTreeCore(number = 1, increaseOdds = 0, override = false) {
     if (!persistentValues.tutorialAscend) {return}
     let maxCore = 1;
@@ -12634,8 +12571,8 @@ function addTreeCore(number = 1, increaseOdds = 0, override = false) {
     sidePop(`/tooltips/inventory/seed-${rolledCore}.webp`, `${number}x Lvl. ${rolledCore} Seed`);
 }
 
-function enemyBlock(remove, damage, maxHP) {
-    if (remove === true) {
+function enemyBlock(removeBlocker = false, damage, maxHP) {
+    if (removeBlocker === true) {
         let enemyContainer = document.getElementById('tree-block').firstChild;
         let enemyContainerChildren = enemyContainer.children;
         let lostHP = Math.min(50,(50 * (damage / maxHP)));
@@ -12652,7 +12589,10 @@ function enemyBlock(remove, damage, maxHP) {
         let enemyButtonNew = enemyContainerChildren[3].cloneNode(true);
         enemyContainer.replaceChild(enemyButtonNew, enemyContainerChildren[3]);
         enemyButtonNew.addEventListener('click', () => {
-            enemyBlock('confirm');
+            document.getElementById('tree-block').remove();
+            universalStyleCheck(document.getElementById('tree-offer-container'),"display","flex","none", true);
+            saveValues.treeObj.defense = false;
+
             let treeHealthText = document.getElementById('tree-health-text');
             saveValues.treeObj.health = Math.max(saveValues.treeObj.health - lostHP, 1); ;
             treeHealthText.health = saveValues.treeObj.health;
@@ -12660,11 +12600,7 @@ function enemyBlock(remove, damage, maxHP) {
         })
 
         enemyContainerChildren[1].remove();
-    } else if (remove === 'confirm') {
-        document.getElementById('tree-block').remove();
-        universalStyleCheck(document.getElementById('tree-offer-container'),"display","flex","none", true);
-        saveValues.treeObj.defense = false;
-    } else {
+    } else if (removeBlocker === false) {
         universalStyleCheck(document.getElementById('tree-offer-container'),"display","flex","none", true);
         const treeTable = document.getElementById('tree-table');
 
@@ -12791,7 +12727,7 @@ function updateSeedContainer(updateValueOnly = false) {
             });
 
             backButton.addEventListener('click', () => {
-                updateTreeValues(true);
+                Tree.updateTreeValues(true, saveValues.treeObj);
                 seedContainer.remove();
                 treeOptions(false, document.getElementById('options-container'));
             })
@@ -12870,7 +12806,7 @@ function growTree(type, amount = 0) {
             const leylineText = document.getElementById('leyline-text');
             leylineText.innerText = '';
 
-            updateTreeValues(false);
+            Tree.updateTreeValues(false, saveValues.treeObj);
             saveValues.treeObj.defense = randomIntegerWrapper(0);
             rollTreeItems();
             weaselBurrow.load();
@@ -12886,7 +12822,7 @@ function growTree(type, amount = 0) {
         if (saveValues.treeObj.level === 3) {
             if (saveValues.treeObj.defense) {
                 saveValues.treeObj.defense = 'block';
-                enemyBlock();
+                enemyBlock(false);
             }
         }
     } else {
@@ -12938,7 +12874,6 @@ function compareTreeItems(itemArray) {
     for (let i = 0; i < itemArrayCopy.length; i++) {
         let itemType = Inventory[itemArrayCopy[i]].Type;
         let itemStar = Inventory[itemArrayCopy[i]].Star;
-
         sameTypeAndStar(itemType, itemStar, i, itemArrayCopy[i]);
     }
 
@@ -12949,22 +12884,21 @@ function leylineCreate(treeTable, optionsContainer) {
     const leylineDisplay = createDom('div', {class:['flex-column'], id:'leyline-container', style:{ display:'none' }});
     const leylineTitle = createDom('p', { innerHTML: 'Leyline Outbreak Energy Level' });
     const leylineBar = createProgressBar(
-        { class: ['leyline-progress', 'healthbar-container'] },
-        { id: 'leyline-progress',
-          progress: parseFloat(persistentValues.leylinePower),
-          style: { width: (parseFloat(persistentValues.leylinePower) + '%'), background: 'linear-gradient(90deg, rgba(204,12,12,1) 0%, rgba(235,225,15,1) 100%)' }},
-        { style: { borderRight: '0.2em solid #C17D6D' }},
-        4,
-        { src: './assets/tree/skull.webp'}
+            { class: ['leyline-progress', 'healthbar-container'] },
+            { id: 'leyline-progress', progress: parseFloat(persistentValues.leylinePower),
+            style: { width: (parseFloat(persistentValues.leylinePower) + '%'), background: 'linear-gradient(90deg, rgba(204,12,12,1) 0%, rgba(235,225,15,1) 100%)' }},
+            { style: { borderRight: '0.2em solid #C17D6D' }},
+            4,
+            { src: './assets/tree/skull.webp'}
     );
      
     let text = `Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
                 <br> cost of your tree's HP`
     const leylineText = createDom('p', { innerHTML: text, id:'leyline-text' });
     const leylineEnergy = createDom('p', { innerHTML: `
-        Current Energy Levels: ${Math.round(persistentValues.leylinePower * 10) / 10}%
-        <br><span style='font-size: 0.6em'>Note: Energy levels correspond to the amount of rewards after harvesting. 
-        <br>Trees have the highest energy absorption rate when mature.</span>
+            Current Energy Levels: ${Math.round(persistentValues.leylinePower * 10) / 10}%
+            <br><span style='font-size: 0.6em'>Note: Energy levels correspond to the amount of rewards after harvesting. 
+            <br>Trees have the highest energy absorption rate when mature.</span>
     `, progress: persistentValues.leylinePower });
 
     checkAbsorbThreshold();
