@@ -105,6 +105,7 @@ button {
     --dark-green: #4D613D;
     --bright-dark-green: #3D7250;
     --very-dark-green: #1c2f0e;
+    --light-red: #d47269;
     --medium-red: #a2443b;
     --very-dark-red: #651418;
     --light-brown: #E9D5C1;
@@ -2808,7 +2809,7 @@ table, button, label {
 .tree-health {
     position: absolute;
     left: 2%;
-    bottom: 1%;
+    top: 7%;
     height: 15%;
     aspect-ratio: 1;
 }
@@ -2920,6 +2921,13 @@ table, button, label {
     background: #E7D97B;
 }
 
+.tree-destroy {
+    left: 2%;
+    background-color: var(--very-dark-red);
+    color: var(--light-red);
+    border-color: var(--light-red);
+}
+
 .affinity-container {
     width: auto;
     height: 10%;
@@ -2943,7 +2951,7 @@ table, button, label {
     transform: translateY(90%);
 }
 
-#tree-offer-container, #leyline-container {
+#tree-offer-container, #leyline-container, #bless-container {
     margin-top: 1em;
     position: relative;
     width: 100%;
@@ -3033,12 +3041,14 @@ table, button, label {
     filter: drop-shadow(0 0 0.1em black);
 }
 
-#tree-offer-container > container, #leyline-container > div:last-of-type {
+#tree-offer-container > .tree-button-container, 
+#leyline-container > .tree-button-container,
+#bless-container > .tree-button-container {
     width: 100%;
-    gap: 2%
+    gap: 2%;
 }
 
-#tree-offer-container > container > button, #leyline-container > div:last-of-type > button {
+.fancy-button {
     width: 33%;
     aspect-ratio: 4.61;
     font-size: 1rem;

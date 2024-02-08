@@ -358,11 +358,11 @@ const patchDict = {
         </indent>
 
         <br><br> 6. New Aranara events <br>
-        Added 'Aranara Reveals', 'Aranara Says' and 'Aranara Snake'. Unlocked after defeating the first boss. These events randomly spawn as a (¿).
+        Added 'Aranara Reveals', 'Aranara Says' and 'Aranara Snake'. Event spawn are indicated by a (¿).
         </indent>
 
         <br><br> 7. Dori's Black Market <br>
-        After unlocking it, palyers can buy exclusive items from Dori using drops from Trees. These items can be either visual or functional.
+        After unlocking it, palyers can buy exclusive one-time purchases from Dori. These items can either be visual or functional.
         </indent>
 
         <br><br> 8. New Characters <br>

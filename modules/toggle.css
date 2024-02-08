@@ -1,15 +1,24 @@
-.char-select, .char-menu, .currency-pop, .middle-area, .left-area, .weasel-back, .weasel-timer-div, .side-pop-container, .tree-health {
-    left: unset;
+.char-select, .char-menu, .currency-pop, .middle-area, .left-area, 
+.weasel-back, .weasel-timer-div, .side-pop-container, .tree-health,
+.tree-destroy {
+    left: unset !important;
 }
 
-.notif-select, .nut-store-access, .tree-access, .right-area {
-    right: unset;
+.notif-select, .nut-store-access, .tree-access, .right-area, .tree-progress-value {
+    right: unset !important;
 }
 
 .minesweeper-backdrop, .weasel-backdrop, .battleship-div, .snake-description, .side-pop, .main-table {
     flex-direction: row-reverse;
 }
 
+.tree-progress-value {
+    left: 6%;
+}
+
+.tree-destroy {
+    right: 2%;
+}
 
 .tree-health {
     right: 2%;

@@ -144,6 +144,16 @@ input[type="file"] {
     color: white;
 }
 
+.github-link {
+    background-color: var(--bright-green);
+    padding: 0.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    height: fit-content;
+    margin-bottom: 0.5rem;
+    font: inherit;
+}
+
 @media (min-width: 1200px) {
     main {
         width: 75%;
@@ -173,6 +183,11 @@ input[type="file"] {
     .question-div > label {
         width: 25%;
         height: 5rem;
+    }
+
+    .github-link {
+        padding: 0.25rem;
+        margin-bottom: 0.25rem;
     }
 }
 

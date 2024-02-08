@@ -12226,8 +12226,9 @@ function createTreeMenu() {
     container.style.background = `url(./assets/tooltips/elements/nut-${element.toLowerCase()}.webp) no-repeat center center/contain`;
     
     treeTable.append(palmText, optionsContainer);
-    Tree.offerBox(treeTable, optionsContainer, offerItemFunction);
+    Tree.offerBox(treeTable, optionsContainer, offerItemFunction, persistentValues);
     leylineCreate(treeTable, optionsContainer);
+    blessCreate(treeTable, optionsContainer);
 
     leftDiv.appendChild(treeSide);
     mainTable.appendChild(treeTable);
@@ -12248,6 +12249,7 @@ function createTreeMenu() {
         treeOptions(true, document.getElementById('options-container'), true);
     }
 
+    toggleDestroyButton();
     populateTreeItems();
 }
 
@@ -12300,7 +12302,6 @@ function populateTreeItems() {
                 itemAmount.innerText = InventoryMap.get(saveValues.treeObj.offer[i]);
             }
 
-
             itemOfferArray.forEach((item) => {
                 if (itemContainer === item) {
                     item.classList.remove('dim-filter');
@@ -12352,7 +12353,7 @@ function offerItemFunction() {
 
     saveValues.treeObj.growthRate = Math.round(saveValues.treeObj.growthRate * 1.05 * 100) / 100;
     Tree.updateTreeValues(false, saveValues.treeObj);
-    growTree('add', 10);
+    growTree('add', randomInteger(7, 10) + saveValues.treeObj.offerAmount);
 
     saveValues.treeObj.offerAmount++;
     challengeNotification(({category: 'offer', value: saveValues.treeObj.offerAmount}))
@@ -12384,7 +12385,7 @@ function treeOptions(planted, optionsContainer, lastPhase) {
     } else if (planted) {
         optionsContainer.classList.add('flex-row','options-container');
         optionsContainer.style.display = 'flex';
-        const optionsTextArray = ['Offer','Absorb','Destroy'];
+        const optionsTextArray = ['Offer', 'Absorb', 'Bless'];
         for (let i = 0; i < 3; i++) {
             let treeButton = document.createElement('div');
             let optionImg = new Image();
@@ -12415,11 +12416,6 @@ function treeOptions(planted, optionsContainer, lastPhase) {
                         universalStyleCheck(optionsContainer,"display","flex","none");
                         universalStyleCheck(document.getElementById('bless-container'),"display","none","flex");
                     })
-                    // treeButton.addEventListener('click',() => {
-                    //     choiceBox(mainBody,{
-                    //         text: 'Are you sure you want to destroy the tree? This cannot be undone.'
-                    //     }, stopSpawnEvents, destroyTree, undefined, null, ['choice-ele']);
-                    // })
                     break;
                 default:
                     break;
@@ -12430,18 +12426,37 @@ function treeOptions(planted, optionsContainer, lastPhase) {
         }
     } else {
         optionsContainer.classList.add('flex-row','options-container');
-        let treeButton = document.createElement('div');
-        let optionImg = new Image();
-        optionImg.src = `./assets/tree/plant.webp`;
-        let optionText = document.createElement('p');
-        optionText.innerText = 'Plant';
+        let treeButton = createDom('div', {
+            child: [createDom('img', { src: `./assets/tree/plant.webp` }),
+                createDom('p', { innerText: 'Plant' })
+            ]
+        });
 
         treeButton.addEventListener('click',() => {
             Tree.pickTree();
-            Tree.updateSeedContainer(false, persistentValues, saveValues, growTree, treeOptions);
-        })
-        treeButton.append(optionImg,optionText);
+            Tree.updateSeedContainer(false, persistentValues, saveValues, growTree, treeOptions, toggleDestroyButton);
+        });
         optionsContainer.appendChild(treeButton);
+    }
+}
+
+function toggleDestroyButton() {
+    if (saveValues.treeObj.level === 0) {
+        if (document.getElementById('tree-destroy-button')) document.getElementById('tree-destroy-button').remove();
+    } else if (!document.getElementById('tree-destroy-button')) {
+        const treeSide = document.getElementById('tree-side');
+        const destroyButton = createDom('button', {
+            class: ['tree-back', 'clickable', 'tree-destroy'],
+            id: 'tree-destroy-button',
+            innerText: 'Destroy',
+            event: ['click', () => {
+                choiceBox(mainBody, {
+                    text: 'Are you sure you want to destroy the tree? This cannot be undone.'
+                }, stopSpawnEvents, destroyTree, undefined, null, ['choice-ele']);
+            }]
+        });
+
+        treeSide.appendChild(destroyButton);
     }
 }
 
@@ -12452,34 +12467,7 @@ function destroyTree(finalPhase = false) {
     const optionsContainer = document.getElementById('options-container');
     const treeMissingText = document.getElementById('tree-missing-text');
 
-    const generateImage = () => {
-        const randomAngle = Math.random() * 2 * Math.PI;
-        const rotationAxis = randomInteger(0, 360);
-        const explodeImg = createDom('img', { 
-            src: `./assets/tooltips/inventory/solid${rollArray(boxElement, 1)}.webp`,
-            classList: ['tree-explode-img'],
-            style: {
-                transform: `rotate(${rotationAxis}deg)`
-            }
-        });
-
-        treeContainer.append(explodeImg);
-        setTimeout(() => {
-            explodeImg.style.transform  = `rotate(${rotationAxis}deg) translate(${randomInteger(100, 225) * Math.cos(randomAngle)}%, ${randomInteger(100, 225) * Math.sin(randomAngle)}%)`;
-            setTimeout(() => {
-                explodeImg.style.opacity = 0.1;
-                setTimeout(() => {
-                    explodeImg.remove();
-                }, 1000)
-            }, 4500)
-        }, 10)
-    }
-
-    if (finalPhase) {
-        for (let i = 0; i < 15; i++) {
-            generateImage();
-        }
-    }
+    if (finalPhase) { Tree.generateTreeExplosion(15) }
     
     treeMissingText.innerText = '';
     treeOptions(false, optionsContainer);
@@ -12528,8 +12516,8 @@ function destroyTree(finalPhase = false) {
                 let rankInventoryRewardsImg = document.createElement('div');
                 rankInventoryRewardsImg = inventoryFrame(rankInventoryRewardsImg, { Star: 5, File: `solid${boxElement[i + 1]}` }, itemFrameColors);
                 let rankInventoryRewardsText = createDom('p', { innerText: lootArray[i] });
-                rankInventoryReward.append(rankInventoryRewardsImg, rankInventoryRewardsText);
 
+                rankInventoryReward.append(rankInventoryRewardsImg, rankInventoryRewardsText);
                 lootContainer.append(rankInventoryReward);
             }
         }
@@ -12544,7 +12532,8 @@ function destroyTree(finalPhase = false) {
 
         choiceBox(mainBody, {text: 'Materials harvested:'}, stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
         // saveData(true);
-    },100);
+        toggleDestroyButton();
+    }, 100);
 }
 
 function addTreeCore(number = 1, increaseOdds = 0, override = false) {
@@ -12681,9 +12670,9 @@ function growTree(type, amount = 0) {
             weaselBurrow.play();
         };
 
-        treeContainer.classList.remove(`tree-${saveValues.treeObj.level}`);
         saveValues.treeObj.level++;
         treeImg.src = `./assets/tree/tree-${saveValues.treeObj.level}.webp`;
+        treeContainer.classList.remove(`tree-${saveValues.treeObj.level - 1}`);  
         treeContainer.classList.add(`tree-${saveValues.treeObj.level}`);
 
         // INTIATE TREE DEFENSE 
@@ -12743,16 +12732,36 @@ function compareTreeItems(itemArray) {
     return replacedTreeItems;
 }
 
+function blessCreate(treeTable, optionsContainer) {
+    const blessDisplay = createDom('div', { class:['flex-column'], id: 'bless-container', style: { display:'none' }});
+    const blessContainer = createDom('p', { innerText:'Under Construction!'})
+
+    blessDisplay.append(blessContainer);
+
+    const backButton = document.createElement('button');
+    backButton.innerText = 'Back';
+    backButton.classList.add('fancy-button', 'clickable');
+    backButton.addEventListener('click', () => {
+        universalStyleCheck(optionsContainer, "display", "flex", "none");
+        universalStyleCheck(blessDisplay, "display", "none", "flex");
+    });
+
+    const buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [backButton] });
+    
+    blessDisplay.append(buttonContainer);
+    treeTable.append(blessDisplay);
+}
+
 function leylineCreate(treeTable, optionsContainer) {
     const leylineDisplay = createDom('div', {class:['flex-column'], id:'leyline-container', style:{ display:'none' }});
     const leylineTitle = createDom('p', { innerHTML: 'Leyline Outbreak Energy Level' });
     const leylineBar = createProgressBar(
-        { class: ['leyline-progress', 'healthbar-container'] },
-        { id: 'leyline-progress', progress: parseFloat(persistentValues.leylinePower),
-        style: { width: (parseFloat(persistentValues.leylinePower) + '%'), background: 'linear-gradient(90deg, rgba(204,12,12,1) 0%, rgba(235,225,15,1) 100%)' }},
-        { style: { borderRight: '0.2em solid #C17D6D' }},
-        4,
-        { src: './assets/tree/skull.webp'}
+            { class: ['leyline-progress', 'healthbar-container'] },
+            { id: 'leyline-progress', progress: parseFloat(persistentValues.leylinePower),
+            style: { width: (parseFloat(persistentValues.leylinePower) + '%'), background: 'linear-gradient(90deg, rgba(204,12,12,1) 0%, rgba(235,225,15,1) 100%)' }},
+            { style: { borderRight: '0.2em solid #C17D6D' }},
+            4,
+            { src: './assets/tree/skull.webp'}
     );
      
     let text = `Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
@@ -12760,14 +12769,15 @@ function leylineCreate(treeTable, optionsContainer) {
     const leylineText = createDom('p', { innerHTML: text, id:'leyline-text' });
     const leylineEnergy = createDom('p', { innerHTML: `
             Current Energy Levels: ${Math.round(persistentValues.leylinePower * 10) / 10}%
-            <br><span style='font-size: 0.6em'>Note: Energy levels correspond to the amount of rewards after harvesting. 
-            <br>Trees have the highest energy absorption rate when mature.</span>
     `, progress: persistentValues.leylinePower });
 
+    // <br><span style='font-size: 0.6em'>Note: Energy levels correspond to the amount of rewards after harvesting. 
+    // <br>Trees have the highest energy absorption rate when mature.</span>
     checkAbsorbThreshold();
 
     const absorbButton = document.createElement('button');
     absorbButton.innerText = 'Absorb';
+    absorbButton.classList.add('fancy-button', 'clickable');
     absorbButton.addEventListener('click', () => {
         if (saveValues.treeObj.health <= 15) {
             leylineText.innerText = 'This tree is too weak to absorb excess energy!'
@@ -12817,12 +12827,13 @@ function leylineCreate(treeTable, optionsContainer) {
 
     const backButton = document.createElement('button');
     backButton.innerText = 'Back';
+    backButton.classList.add('fancy-button', 'clickable');
     backButton.addEventListener('click', () => {
         universalStyleCheck(optionsContainer,"display","flex","none");
         universalStyleCheck(leylineDisplay,"display","none","flex");
     });
 
-    const buttonContainer = createDom('div', { class:['flex-row'] });
+    const buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'] });
     buttonContainer.append(backButton, absorbButton);
     
     leylineDisplay.append(leylineTitle, leylineBar, leylineEnergy, leylineText, buttonContainer);

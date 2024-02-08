@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>nahidaQuest! - Feedback</title>
+        <link rel="stylesheet" type="text/css" href="./components/shared.css?v=4fea0934d22e5c4f77f22896a2e0b229">
+        <link rel="stylesheet" type="text/css" href="./components/feedback.css?v=4fea0934d22e5c4f77f22896a2e0b229">
+        <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+        <meta http-equiv='cache-control' content='no-cache'> 
+        <meta http-equiv='expires' content='0'> 
+        <meta http-equiv='pragma' content='no-cache'>
+        <script src="./components/header.js?v=4fea0934d22e5c4f77f22896a2e0b229" type="text/javascript" defer></script>
+        <script src="./components/feedback.js?v=4fea0934d22e5c4f77f22896a2e0b229" type="text/javascript" defer></script>
+        <!-- REMEMBER TO SWITCH -->
+    </head>
+    <body>
+        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="iframeFunction()"></iframe>
+        <header-component></header-component>
+        <main>
+            <form id='feedbackForm' method="post" action="https://docs.google.com/forms/d/e/1FAIpQLSc-BiFNhC0crA_rBYafrapiA9tMlOdGHGNlJGHFGHNJ5BmQkw/formResponse" target="hidden_iframe" onsubmit="return validate()">
+                <label class="flex-row">Familiar with Github?</label>
+                <a class='github-link' href="https://github.com/bobbaID/nahidaQuest/issues">Open a ticket on the repository</a>
+                <label class="flex-row">Type of Feedback</label>
+                <input type="text" name="entry.147690499" placeholder="Bug / Balancing / UI / Idea"/>
+                <label class="flex-row">Feedback / Suggestions</label>
+                <textarea id="feedbackText" name="entry.1683911296" placeholder="If this is a bug report, please indicate your device specs and browser version."></textarea>
+                <label class="flex-row">Save File</label>
+                <textarea id="fileText" name="entry.466934428" style="display: none;"></textarea>
+                <div class="flex-row file-submit">
+                    <input id="saveInput" accept=".txt" type="file" id="myFile" name="filename" onchange="readFile()">
+                    <textarea id="saveText" placeholder="Copy save text here!"></textarea>
+                </div>
+                <button id='clickSummit' type="submit" value="Submit" style="display: none;"></button>
+                <button type="button" onClick="submitVerify()">Submit</button>
+            </form>
+            <form id="questionForm" class="flex-column" style="display: none;">
+                <p class="title">Spam Filter</p>
+                <label id="question-1"></label>
+                <input type="text" id='question-text-1'/>
+                <label id="question-2">Select the character "Nahida"</label>
+                <div class="flex-row question-div">
+                    <label>
+                        <input type="radio" value="1" name="character" onchange="changeImage(1)">
+                        <img src="https://via.placeholder.com/40x60/0bf/fff&text=A" id='select-image-1' alt="Option 1">
+                    </label>
+                    <label>
+                        <input type="radio" value="2" name="character" onchange="changeImage(2)">
+                        <img src="https://via.placeholder.com/40x60/b0f/fff&text=B" id='select-image-2' alt="Option 2">
+                    </label>
+                    <label>
+                        <input type="radio" value="3" name="character" onchange="changeImage(3)">
+                        <img src="https://via.placeholder.com/40x60/b0f/fff&text=B" id='select-image-3' alt="Option 2">
+                    </label>
+                    <label>
+                        <input type="radio" value="4" name="character" onchange="changeImage(4)">
+                        <img src="https://via.placeholder.com/40x60/b0f/fff&text=B" id='select-image-4' alt="Option 4">
+                    </label>
+                </div>
+                <button type="button" onClick="submitForm()">Confirm</button>
+            </form>
+        </main>
+    </body>
+</html>
+

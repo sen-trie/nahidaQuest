@@ -1,7 +1,8 @@
-import { universalStyleCheck } from "../functions.js";
+import { universalStyleCheck, abbrNum, rollArray, randomInteger } from "../functions.js";
 import { createDom } from "../adjustUI.js";
 
-const offerBox = (treeTable, optionsContainer, offerItemFunction) => {
+const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
+const offerBox = (treeTable, optionsContainer, offerItemFunction, persistentValues) => {
     const treeOffer = createDom('div', {
         id: 'tree-offer-container',
         class: ['flex-column'],
@@ -11,10 +12,8 @@ const offerBox = (treeTable, optionsContainer, offerItemFunction) => {
     const nutStoreCurrency = document.createElement("div");
     nutStoreCurrency.id = "tree-store-currency";
     nutStoreCurrency.classList.add("flex-row");
-    nutStoreCurrency.innerText = abbrNum(persistentValues["goldenCore"],2,true);
-    const nutStoreCurrencyImage = document.createElement("img");
-    nutStoreCurrencyImage.src = "./assets/icon/core.webp";
-    nutStoreCurrency.appendChild(nutStoreCurrencyImage);
+    nutStoreCurrency.innerText = abbrNum(persistentValues["goldenCore"], 2, true);
+    nutStoreCurrency.appendChild(createDom('img', { src: './assets/icon/core.webp' }));
 
     const treeOfferText = document.createElement('p');
     treeOfferText.innerHTML = `The Tree wishes for power, pick one item to sacrifice.
@@ -22,28 +21,19 @@ const offerBox = (treeTable, optionsContainer, offerItemFunction) => {
             <br>get these items, which can increased through your 
             <span style='color:#b39300'>luck rate</span>!</span>`;
     
-    const treeItem = document.createElement('div');
-    treeItem.id = 'tree-offer-items';
-    treeItem.classList.add('flex-row');
-
-    const treeMissingText = document.createElement('p');
-    treeMissingText.id = 'tree-missing-text';
-
-    const buttonContainer = document.createElement('container');
-    buttonContainer.classList.add('flex-row');
-
-    const backButton = createDom('button', {
-        innerText: 'Back',
-        id: 'tree-offer-button'
-    });
+    const treeItem = createDom('div', { id: 'tree-offer-items', class:['flex-row'] });
+    const treeMissingText = createDom('p', { id: 'tree-missing-text' });
+    const buttonContainer = createDom('div', { class: ['flex-row', 'tree-button-container'] });
+    const backButton = createDom('button', { innerText: 'Back', id: 'tree-offer-button', class:['fancy-button', 'clickable'] });
 
     backButton.addEventListener('click', () => {
-        universalStyleCheck(optionsContainer,"display","flex","none");
-        universalStyleCheck(treeOffer,"display","none","flex");
+        universalStyleCheck(optionsContainer, "display", "flex", "none");
+        universalStyleCheck(treeOffer, "display", "none", "flex");
     });
 
     const offerButton = document.createElement('button');
     offerButton.innerText = 'Offer';
+    offerButton.classList.add('fancy-button', 'clickable');
     offerButton.addEventListener('click', () => {
         offerItemFunction();
     })
@@ -66,7 +56,7 @@ const updateTreeValues = (turnZero = false, treeObj) => {
         palmEnergy.innerText = 'Palm Energy: 0';
     } else {
         treeProgressValue.rate = treeObj.growthRate / 25;
-        treeProgressValue.innerText = `Growth: ${treeObj.growthRate} x`;
+        treeProgressValue.innerText = `Growth: ${treeObj.growthRate}x`;
         palmEnergy.innerText = `Palm Energy: ${treeObj.energy}`;
     }
 }
@@ -85,17 +75,11 @@ const createTreeSeedContainer = (index, persistentValues, seedAdded) => {
     const seedColumnContainer = document.createElement('div');
     seedColumnContainer.classList.add('seed-column')
     
-    let seedImg = new Image();
+    const seedImg = new Image();
     seedImg.src = `./assets/tooltips/inventory/seed-${index + 1}.webp`;
 
-    let seedNumber = document.createElement('p');
+    const seedNumber = createDom('p', { innerText: `0 / ${persistentValues.treeSeeds[index]}` });
     seedNumber.amount = 0;
-    seedNumber.innerText = `0 / ${persistentValues.treeSeeds[index]}`;
-
-    let seedDecrement = document.createElement('button');
-    let seedIncrement = document.createElement('button');
-    let seedMegaDecrement = document.createElement('button');
-    let seedMegaIncrement = document.createElement('button');
 
     const incrementValue = (change) => {
         if (seedNumber.amount + change >= 0 && seedNumber.amount + change <= persistentValues.treeSeeds[index]) {
@@ -110,26 +94,18 @@ const createTreeSeedContainer = (index, persistentValues, seedAdded) => {
         seedAdded[index] = seedNumber.amount;
     }
 
-    seedDecrement.innerText = '-';
-    seedDecrement.addEventListener('click', () => {
-        incrementValue(-1);
-    });
-    
-    seedIncrement.innerText = '+';
-    seedIncrement.addEventListener('click', () => {
-        incrementValue(1);
-    });
+    const seedDecrement = createDom('button', { innerText: '-' });
+    seedDecrement.addEventListener('click', () => { incrementValue(-1) });
 
-    seedMegaDecrement.innerText = '--';
-    seedMegaDecrement.addEventListener('click', () => {
-        incrementValue(-10);
-    });
+    const seedIncrement = createDom('button', { innerText: '+' });
+    seedIncrement.addEventListener('click', () => { incrementValue(1) });
 
-    seedMegaIncrement.innerText = '++';
-    seedMegaIncrement.addEventListener('click', () => {
-        incrementValue(10);
-    });
+    const seedMegaDecrement = createDom('button', { innerText: '--' });
+    seedMegaDecrement.addEventListener('click', () => { incrementValue(-10) });
 
+    const seedMegaIncrement = createDom('button', { innerText: '++' });
+    seedMegaIncrement.addEventListener('click', () => { incrementValue(10) });
+   
     seedColumnContainer.updateValue = () => {
         seedNumber.innerText = `0 / ${persistentValues.treeSeeds[index]}`;
     }
@@ -138,19 +114,19 @@ const createTreeSeedContainer = (index, persistentValues, seedAdded) => {
     seedContainer.append(seedColumnContainer);
 }
 
-const updateSeedContainer = (updateValueOnly = false, persistentValues, saveValues, growTree, treeOptions) => {
-    if (document.getElementById('seed-container')) { return }
+const updateSeedContainer = (updateValueOnly = false, persistentValues, saveValues, growTree, treeOptions, toggleDestroyButton) => {
+    if (!document.getElementById('seed-container')) { return }
     const seedContainer = document.getElementById('seed-container');
 
     if (updateValueOnly) {
         const containerChildren = Array.from(seedContainer.children);
-        for (let index = 0; index < 3; index++) {
-            containerChildren[index].updateValue();
+        for (let i = 0; i < 3; i++) {
+            containerChildren[i].updateValue();
         }
     } else {
         let seedAdded = [0, 0, 0];
         for (let i = 0; i < 3; i++) {
-            createTreeSeedContainer(index, persistentValues, seedAdded);
+            createTreeSeedContainer(i, persistentValues, seedAdded);
         }
 
         const backButton = createDom('button', {
@@ -159,7 +135,7 @@ const updateSeedContainer = (updateValueOnly = false, persistentValues, saveValu
         });
 
         backButton.addEventListener('click', () => {
-            Tree.updateTreeValues(true, saveValues.treeObj);
+            updateTreeValues(true, saveValues.treeObj);
             seedContainer.remove();
             treeOptions(false, document.getElementById('options-container'));
         });
@@ -183,6 +159,7 @@ const updateSeedContainer = (updateValueOnly = false, persistentValues, saveValu
 
                 saveValues.treeObj.energy = 100 * seedValue;
                 growTree('level');
+                toggleDestroyButton();
 
                 for (let i = 0; i < 3; i++) {
                     persistentValues.treeSeeds[i] -= seedAdded[i];
@@ -193,4 +170,28 @@ const updateSeedContainer = (updateValueOnly = false, persistentValues, saveValu
     }
 }
 
-export { offerBox, updateTreeValues, pickTree, updateSeedContainer }
+const generateTreeExplosion = (amount = 1) => {
+    const treeContainer = document.getElementById('tree-container');
+    for (let index = 0; index < amount; index++) {
+        const randomAngle = Math.random() * 2 * Math.PI;
+        const rotationAxis = randomInteger(0, 360);
+        const explodeImg = createDom('img', { 
+            src: `./assets/tooltips/inventory/solid${rollArray(boxElement, 1)}.webp`,
+            classList: ['tree-explode-img'],
+            style: { transform: `rotate(${rotationAxis}deg)` }
+        });
+
+        treeContainer.append(explodeImg);
+        setTimeout(() => {
+            explodeImg.style.transform  = `rotate(${rotationAxis}deg) translate(${randomInteger(100, 225) * Math.cos(randomAngle)}%, ${randomInteger(100, 225) * Math.sin(randomAngle)}%)`;
+            setTimeout(() => {
+                explodeImg.style.opacity = 0.1;
+                setTimeout(() => {
+                    explodeImg.remove();
+                }, 1000);
+            }, 4500);
+        }, 10);
+    }
+}
+
+export { offerBox, updateTreeValues, pickTree, updateSeedContainer, generateTreeExplosion }
