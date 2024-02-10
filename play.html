@@ -49,11 +49,11 @@
 ⠀⠀⠠⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡈⠻⣷⣶⣿⣿⣿⣿⣿⣿⠋⠀⠀⠀⢸⣿⣿⣿⡟⠛⣿⣿⡟⠁⠀⠠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀ -->
     <div id="game-wrapper" >
         <div id="start-screen" class="cover-all flex-column">
-            <img alt="Start Screen Background" src="./assets/start.webp" importance="high">
-            <img id="start-image" alt="Nahida Quest Title" src="./assets/title/logo.webp" importance="high">
+            <img id="start-bg" alt="Start Screen Background" src="./assets/start.webp" importance="high" fetchPriority="high">
+            <img id="start-image" alt="Nahida Quest Title" src="./assets/title/logo.webp" importance="high" fetchPriority="high">
             <button id="start-button" class="dim-filter">Continue</button>
             <button id="start-delete">New Game</button>
-            <p id="vers-number-start"></p>
+            <p id="vers-number-start" class="version-text-start"></p>
             <a class="link clickable" href="https://nahidaquest.com/feedback">Feedback</a>
             <a class="link second-link clickable" href="https://nahidaquest.com/credits">Credits</a>
         </div>
@@ -62,13 +62,14 @@
                 <img src="./assets/loading.webp" alt="Nahida Quest Loading Screen" class="overlay-tutorial" importance="high">
                 <p id="loading-number" loadingValue="0">0%</p>
             </div>
-            <p id="vers-number"></p>
-            <p id="copyright-number"></p>
+            <p id="vers-number" class="version-text"></p>
+            <p id="copyright-number" class="copyright-text"></p>
         </div>
         <div id='testerScreen' class="hide-tester"></div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js" async></script>
-    <script type="module" src="main.js?v=7ac9eb8ea5f9ea4f83b970e302ede916"></script>
+    <script type="module" src="./modules/startPage.js?v=7ac9eb8ea5f9ea4f83b970e302ede916"></script>
+    <script type="module" src="main.js?v=7ac9eb8ea5f9ea4f83b970e302ede916" defer></script>
     <noscript style="height: 100%; width: 100%; z-index: 9999999999; position: absolute;">
         <div style="text-align: center; padding: 20px; background-color: #ffcccc; height: 100%; width: 100%;">
           <p>This website requires JavaScript to be enabled. Please enable JavaScript in your browser settings.</p>

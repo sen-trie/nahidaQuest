@@ -446,7 +446,7 @@ table, button, label {
     color: #cee0d4;
 }
 
-#start-screen :first-child {
+#start-bg {
     position: absolute;
     object-fit: cover;
     height: 100%;

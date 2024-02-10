@@ -43,6 +43,18 @@ const offerBox = (treeTable, optionsContainer, offerItemFunction, persistentValu
     treeTable.append(treeOffer);
 }
 
+const treeBackButton = (backContainer) => {
+    const backButton = document.createElement('button');
+    backButton.innerText = 'Back';
+    backButton.classList.add('fancy-button', 'clickable');
+    backButton.addEventListener('click', () => {
+        universalStyleCheck(document.getElementById('options-container'),"display","flex","none");
+        universalStyleCheck(backContainer,"display","none","flex");
+    });
+
+    return backButton;
+}
+
 const updateTreeValues = (turnZero = false, treeObj) => {
     const treeProgress = document.getElementById('tree-progress');
     const treeProgressValue = document.getElementById('tree-progress-value');
@@ -194,4 +206,4 @@ const generateTreeExplosion = (amount = 1) => {
     }
 }
 
-export { offerBox, updateTreeValues, pickTree, updateSeedContainer, generateTreeExplosion }
+export { offerBox, updateTreeValues, pickTree, updateSeedContainer, generateTreeExplosion, treeBackButton }

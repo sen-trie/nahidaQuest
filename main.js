@@ -15,169 +15,89 @@ const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
 let mainBody = document.getElementById("game");   
-let startText = document.getElementById("start-screen"); 
-let startAlready = true;
-setTimeout(()=>{startAlready = false},500);
-
-if (localStorage.getItem("settingsValues") !== null) {
-    let startChance = randomInteger(1,11);
-    if (startChance === 1) {
-        let startIdle = document.createElement("img");
-        startIdle.src = "./assets/icon/nahida-start.webp";
-        startIdle.id = "start-idle-nahida";
-        startText.append(startIdle);
-    } else if (startChance === 2) {
-        let startIdle = document.createElement("img");
-        startIdle.src = "./assets/icon/shop-start.webp";
-        startIdle.id = "start-idle-dori";
-        startText.append(startIdle);
-    } else if (startChance === 3) {
-        let startIdle = document.createElement("img");
-        startIdle.src = "./assets/icon/scara-start.webp";
-        startIdle.id = "start-idle-scara";
-        startText.append(startIdle);
-    }
-
-    let startButton = document.getElementById("start-button");
-    startButton.classList.remove("dim-filter");
-    startButton.addEventListener("click",()=> {
-        if (!startAlready) {
-            startAlready = true;
-            startGame(false);
-        
-            setTimeout(function() {
-                let deleteBox = document.getElementById("confirm-box");
-                if (deleteBox.style.display !== 'none') {deleteBox.style.display = 'none'};
-                startText.remove();
-            },200)
-        }
-    });
-}
-
-let deleteButton = document.getElementById("start-delete");
-deleteButton.addEventListener("click",()=> {
-    if (localStorage.getItem("settingsValues") !== null) {
-        deleteConfirmMenu("toggle","intro");
-    } else {
-        if (!startAlready) {
-            startAlready = true;
-            startGame(true);
-            setTimeout(()=>startText.remove(),100);
-        }
-    }
-});
-
-let confirmationBox = document.createElement("div");
-confirmationBox.classList.add("confirm-box");
-confirmationBox.style.display = 'none';
-confirmationBox.id = "confirm-box";
-
-let textBox = document.createElement('p');
-textBox.innerText = "Are you sure? Deleting your save cannot be undone.";
-
-let confirmationBoxButton = document.createElement("div");
-confirmationBoxButton.classList.add("confirm-button-div");
-let confirmDeleteButton = document.createElement("button");
-confirmDeleteButton.innerText = "Confirm";
-confirmDeleteButton.addEventListener("click",()=>deleteConfirmButton(true));
-let cancelDeleteButton = document.createElement("button");
-cancelDeleteButton.innerText = "Cancel";
-cancelDeleteButton.addEventListener("click",()=>deleteConfirmButton(false));
-
-confirmationBoxButton.append(confirmDeleteButton,cancelDeleteButton);
-confirmationBox.append(textBox,confirmationBoxButton);
-mainBody.appendChild(confirmationBox);
-
-let deleteType;
-function deleteConfirmMenu(type,location) {
-    let deleteBox = document.getElementById("confirm-box");
-    deleteType = location;
-    if (type == "toggle") {
-        universalStyleCheck(deleteBox,"display", "flex", "none")
-    } else if (type === "close") {
-        if (deleteBox.style.display !== 'none') {deleteBox.style.display = 'none'}; 
-    }
-}
-
-let currentlyClearing = false;
-function clearLocalStorage(forceReload) {
-    if (currentlyClearing != true) {
-        currentlyClearing = true;
-        let clearPromise = new Promise(function(myResolve, myReject) {
-            localStorage.clear();
-            if(localStorage.length === 0) {
-                myResolve(); 
-            } else {
-                myReject();
-            }
-        });
-        
-        clearPromise.then(
-            function(value) {
-                if (forceReload) {
-                    setTimeout(location.reload(),200)
-                }
-            },
-            function(error) {console.error("Error clearing local data")}
-        ); 
-    } 
-}
-
-function deleteConfirmButton(confirmed) {
-    if (confirmed == true) {
-        if (deleteType === "intro") {
-            if (!startAlready) {
-                startAlready = true;
-                let clearPromise = new Promise(function(myResolve, myReject) {
-                    localStorage.clear();
-        
-                    if(localStorage.length === 0) {
-                        myResolve(); 
-                    } else {
-                        myReject();
-                    }
-                });
-                
-                clearPromise.then(
-                    function(value) {
-                        startGame(true);
-                        setTimeout(()=>startText.remove(),200);
-                    },
-                    function(error) {console.error("Error clearing local data")}
-                ); 
-            }
-        } else if (deleteType === "loaded") {
-            clearLocalStorage(true);
-        } 
-    }
-        
-    let deleteBox = document.getElementById("confirm-box");
-    if (deleteBox.style.display !== 'none') {deleteBox.style.display = 'none'};
-    return;
-}
-
 let drawUI;
 (async () => {
     drawUI = await import('./modules/drawUI.js');
-    mainBody = drawUI.buildGame(mainBody);
-    mainBody.style.display = "block";
 })();
+// let continueButton = document.getElementById("start-button");
+// let newGameButton = document.getElementById("start-delete");
 
-let copyrightText = document.getElementById("copyright-number"); 
-copyrightText.innerText = COPYRIGHT;
-copyrightText.classList.add("copyright-text");
+// let isNewGame = (localStorage.getItem("settingsValues") === null) ? true : false; 
+// let startAlreadyDelay = true;
+// setTimeout(() => { startAlreadyDelay = false }, 500);
 
-let versionText = document.getElementById("vers-number");
-versionText.innerText = VERSIONNUMBER;
-versionText.classList.add("version-text");
+// if (!isNewGame) {
+//     let startChance = randomInteger(1, 14);
+//     if (startChance === 1) {
+//         startScreen.append(createDom('img', { src: './assets/icon/nahida-start.webp', id: 'start-idle-nahida' }));
+//     } else if (startChance === 2) {
+//         startScreen.append(createDom('img', { src: './assets/icon/shop-start.webp', id: 'start-idle-dori' }));
+//     } else if (startChance === 3) {
+//         startScreen.append(createDom('img', { src: './assets/icon/scara-start.webp', id: 'start-idle-scara' }));
+//     }
 
-let versionTextStart = document.getElementById("vers-number-start");
-versionTextStart.innerText = `[${VERSIONNUMBER}] \n ${COPYRIGHT}`;
-versionText.classList.add("version-text-start");
+//     continueButton.classList.remove("dim-filter");
+// }
+
+// const launchGame = () => {
+//     if (startAlreadyDelay === true) return;
+//     startAlreadyDelay = true;
+//     startGame(isNewGame);
+//     setTimeout(() => (startScreen.remove(), 100));
+// }
+
+// continueButton.addEventListener("click", () => {
+//     if (!isNewGame) launchGame();
+// });
+
+// newGameButton.addEventListener("click", () => {
+//     if (!isNewGame) {
+//         newGameButton.addEventListener("click", () => {
+//             choiceBox(startScreen, {text: 'Are you sure? Deleting your save cannot be undone!'}, null, 
+//                       () => {clearLocalStorage()}, undefined, null, ['choice-ele']);
+//         });
+//     } else if (isNewGame) {
+//         launchGame();
+//     }
+// });
+
+// let currentlyClearing = false;
+// function clearLocalStorage() {
+//     if (currentlyClearing === true) return;
+//     currentlyClearing = true;
+
+//     let clearPromise = new Promise(function(myResolve, myReject) {
+//         localStorage.clear();
+//         localStorage.length === 0 ? myResolve() : myReject();
+//     });
+    
+//     clearPromise.then(
+//         (value) => {
+//             setTimeout(location.reload(), 200);
+//         },
+//         function(error) {console.error("Error clearing local data")}
+//     ); 
+// }
+
+// let drawUI;
+// (async () => {
+//     drawUI = await import('./modules/drawUI.js');
+//     mainBody = drawUI.buildGame(mainBody);
+//     mainBody.style.display = "block";
+// })();
+
+// let copyrightText = document.getElementById("copyright-number"); 
+// copyrightText.innerText = COPYRIGHT;
+
+// let versionText = document.getElementById("vers-number");
+// versionText.innerText = VERSIONNUMBER;
+
+// let versionTextStart = document.getElementById("vers-number-start");
+// versionTextStart.innerText = `[${VERSIONNUMBER}] \n ${COPYRIGHT}`;
 
 let preloadStart = Preload();
 //------------------------------------------------------------------------POST SETUP------------------------------------------------------------------------//
-function startGame(firstGame) {
+const startGame = (firstGame) => {
 
 // GLOBAL VARIABLES
 var saveValues;
@@ -780,7 +700,6 @@ function touchDemo(autoClicked = false) {
         if (demoImg.critInARow > 2) {
             challengeNotification(({category: 'specific', value: [0, 4]}));
         } 
-        
     } else {
         if (clickerEvent !== "none") {
             clickDelay -= 2;
@@ -1070,7 +989,6 @@ function startRandomEvent() {
         clickedEvent(aranaraNumber);
         eventPicture.remove();
         toggleSettings(true);
-        deleteConfirmMenu("close","loaded");
     });
 
     setTimeout(() => {eventPicture.remove()}, 8000);
@@ -3532,8 +3450,6 @@ function settings() {
 
     settingButton.addEventListener("click", () => {
         toggleSettings();
-        let deleteBox = document.getElementById("confirm-box");
-        if (deleteBox.style.display !== 'none') {deleteBox.style.display = 'none'};
         if (settingButton.classList.contains('settings-button-img-glow')) {
             settingButton.classList.remove('settings-button-img-glow')
         }
@@ -3571,14 +3487,15 @@ function generalSettings(settingsMenu) {
 
     let clearSetting = document.createElement("button");
     clearSetting.classList.add("setting-clear");
-    clearSetting.addEventListener("click",() => {deleteConfirmMenu("toggle","loaded")})
+    clearSetting.addEventListener("click",() => {choiceBox(mainBody, {text: 'Are you sure? Deleting your save cannot be undone!'}, null, 
+                                                () => {clearLocalStorage()}, undefined, null, ['choice-ele'])
+    });
 
     const cancelButton = document.createElement("button");
     cancelButton.classList.add("cancel-button");
-    cancelButton.addEventListener("click",()=>{
+    cancelButton.addEventListener("click",() => {
         settingsMenu.style.display = 'none';
         settingsOpen = false;
-        deleteConfirmMenu("close","loaded");
     })
 
     const patchNotesDiv = document.getElementById('patch-container');
@@ -3852,12 +3769,13 @@ function settingsBox() {
         })
         
         exportBoxButton.addEventListener("click",() => {
+            const date = new Date();
             let text = JSON.stringify(localStorage);
             text = JSON.stringify(JSON.parse(text), null, 2)
 
             let blob = new Blob([text], {type: "text/plain"});
             let link = document.createElement("a");
-            link.download = `NQ Save ${DBNUBMER}.txt`;
+            link.download = `nq_save_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate()}_v${DBNUBMER}.txt`;
             link.href = URL.createObjectURL(blob);
             link.click();
         })
@@ -11597,7 +11515,6 @@ function nutCost(id) {
 
 // ADDS ACCESS BUTTON AFTER 1 NUT
 function addNutStore() {
-    createTranscendMenu();
     let preloadArray = [];
     for (let i=1; i < 8; i++) {
         preloadArray.push(`./assets/tooltips/nut-shop-${1}.webp`);
@@ -11763,9 +11680,10 @@ function addNutStore() {
 
     const trascendButton = document.createElement("button");
     trascendButton.innerText = "Transcend!";
-    trascendButton.addEventListener("click",()=>{
+    trascendButton.addEventListener("click",() => {
         calculateGoldenCore();
-        toggleTranscendMenu();
+        choiceBox(mainBody, {text: 'Are you sure? Transcending cannot be undone!'}, null, 
+        () => {transcendFunction()}, undefined, null, ['choice-ele']);
     })
 
     const transcendBottom = createDom('div', {
@@ -11977,40 +11895,6 @@ function calculateGoldenCore(type) {
         transcendValue.innerHTML = `You gain:<br><br> ${abbrNum(goldenNutValue)} 
                                              <br><img class="transcendLogo" src="./assets/icon/core.webp">`;
         return goldenNutValue;
-    }
-}
-
-function createTranscendMenu() {
-    let deleteMenu = document.getElementById("confirm-box")
-    let transcendMenu = deleteMenu.cloneNode(true);
-    transcendMenu.firstChild.innerText = "Are you sure? Transcending cannot be undone.";
-    transcendMenu.id = "transcend-menu";
-
-    transcendMenu.children[1].children[0].addEventListener("click",()=>{
-        transcendFunction();
-    })
-    transcendMenu.children[1].children[1].addEventListener("click",()=>{
-        transcendMenu.style.display = 'none';
-    })
-
-    mainBody.appendChild(transcendMenu);
-}
-
-let transcendDelay = null;
-function toggleTranscendMenu(forceClose) {
-    toggleSettings(true);
-    deleteConfirmMenu("close","loaded");
-    let transcendMenu = document.getElementById("transcend-menu");
-    if (transcendMenu.style.display === 'none') {
-        transcendMenu.style.display = 'flex';
-
-        if(transcendDelay != null) {clearTimeout(transcendDelay)};
-        transcendDelay = setTimeout(()=>{
-            transcendDelay = null;
-            if (transcendMenu.style.display !== 'none') { transcendMenu.style.display = 'none' }
-        },6000);
-    } else {
-        transcendMenu.style.zIndex = -1;
     }
 }
 
@@ -12236,8 +12120,8 @@ function createTreeMenu() {
     let nutStoreButton = document.createElement("button");
     nutStoreButton.classList.add("tree-access","nut-store-access");
     nutStoreButton.addEventListener("click", () => {
-        universalStyleCheck(treeTable,"display","none","flex",true);
-        universalStyleCheck(treeSide,"display","none","flex",true);
+        universalStyleCheck(treeTable, "display", "none", "flex", true);
+        universalStyleCheck(treeSide, "display", "none", "flex", true);
         universalStyleCheck(document.getElementById('nut-store-table'),"display","flex","none",true);
     })
     leftDiv.appendChild(nutStoreButton);
@@ -12253,7 +12137,7 @@ function createTreeMenu() {
     populateTreeItems();
 }
 
-function rollTreeItems() {  
+function rollTreeItems() {
     saveValues.treeObj.offer = createTreeItems(saveValues, randomInteger, inventoryDraw, rollArray);
 
     const treeItem = document.getElementById('tree-offer-items');
@@ -12720,7 +12604,7 @@ function compareTreeItems(itemArray) {
         }
 
         replacedTreeItems[i] = [itemArrayCopyItem, false];
-        return
+        return;
     }
 
     for (let i = 0; i < itemArrayCopy.length; i++) {
@@ -12732,27 +12616,18 @@ function compareTreeItems(itemArray) {
     return replacedTreeItems;
 }
 
-function blessCreate(treeTable, optionsContainer) {
+function blessCreate(treeTable) {
     const blessDisplay = createDom('div', { class:['flex-column'], id: 'bless-container', style: { display:'none' }});
     const blessContainer = createDom('p', { innerText:'Under Construction!'})
-
     blessDisplay.append(blessContainer);
 
-    const backButton = document.createElement('button');
-    backButton.innerText = 'Back';
-    backButton.classList.add('fancy-button', 'clickable');
-    backButton.addEventListener('click', () => {
-        universalStyleCheck(optionsContainer, "display", "flex", "none");
-        universalStyleCheck(blessDisplay, "display", "none", "flex");
-    });
-
-    const buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [backButton] });
+    const buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [Tree.treeBackButton(blessDisplay)] });
     
     blessDisplay.append(buttonContainer);
     treeTable.append(blessDisplay);
 }
 
-function leylineCreate(treeTable, optionsContainer) {
+function leylineCreate(treeTable) {
     const leylineDisplay = createDom('div', {class:['flex-column'], id:'leyline-container', style:{ display:'none' }});
     const leylineTitle = createDom('p', { innerHTML: 'Leyline Outbreak Energy Level' });
     const leylineBar = createProgressBar(
@@ -12825,16 +12700,8 @@ function leylineCreate(treeTable, optionsContainer) {
         leylineEnergy.innerText = `Current Energy Levels: ${(Math.round(persistentValues.leylinePower * 10)/10)}%`
     });
 
-    const backButton = document.createElement('button');
-    backButton.innerText = 'Back';
-    backButton.classList.add('fancy-button', 'clickable');
-    backButton.addEventListener('click', () => {
-        universalStyleCheck(optionsContainer,"display","flex","none");
-        universalStyleCheck(leylineDisplay,"display","none","flex");
-    });
-
     const buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'] });
-    buttonContainer.append(backButton, absorbButton);
+    buttonContainer.append(Tree.treeBackButton(leylineDisplay), absorbButton);
     
     leylineDisplay.append(leylineTitle, leylineBar, leylineEnergy, leylineText, buttonContainer);
     treeTable.append(leylineDisplay);
@@ -13113,7 +12980,7 @@ if (localStorage.getItem('tester') === 'true') {
 }
 
 if (testing || beta) {
-    document.getElementById('testerScreen').remove();
+    if (document.getElementById('testerScreen')) document.getElementById('testerScreen').remove();
 } 
 
 if (testing) {
@@ -13155,3 +13022,5 @@ if (beta) {
         // BETA FUNCTIONS
     }
 }
+
+export { startGame }
