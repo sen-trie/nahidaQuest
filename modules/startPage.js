@@ -1,5 +1,5 @@
 import { randomInteger } from './functions.js';
-import { createDom } from './adjustUI.js';
+import { createDom, choiceBox } from './adjustUI.js';
 import { startGame } from '../main.js'
 
 const VERSIONNUMBER = "V.1-02-002b";
