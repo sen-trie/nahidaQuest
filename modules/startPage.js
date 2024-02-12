@@ -2,7 +2,7 @@ import { randomInteger } from './functions.js';
 import { createDom } from './adjustUI.js';
 import { startGame } from '../main.js'
 
-const VERSIONNUMBER = "V.1-02-002";
+const VERSIONNUMBER = "V.1-02-002b";
 const COPYRIGHT = "DISCLAIMER © HoYoverse.  \n All rights reserved. This site is not affiliated \n with Hoyoverse, nor Genshin Impact.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//

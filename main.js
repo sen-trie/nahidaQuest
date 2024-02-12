@@ -9,7 +9,7 @@ import * as Battle from "./modules/features/battle.js";
 import * as Tree from "./modules/features/tree.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js';
 
-const VERSIONNUMBER = "V.1-02-002";
+const VERSIONNUMBER = "V.1-02-002b";
 const COPYRIGHT = "DISCLAIMER © HoYoverse.  \n All rights reserved. This site is not affiliated \n with Hoyoverse, nor Genshin Impact.";
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
@@ -61,23 +61,23 @@ let drawUI;
 //     }
 // });
 
-// let currentlyClearing = false;
-// function clearLocalStorage() {
-//     if (currentlyClearing === true) return;
-//     currentlyClearing = true;
+let currentlyClearing = false;
+function clearLocalStorage() {
+    if (currentlyClearing === true) return;
+    currentlyClearing = true;
 
-//     let clearPromise = new Promise(function(myResolve, myReject) {
-//         localStorage.clear();
-//         localStorage.length === 0 ? myResolve() : myReject();
-//     });
+    let clearPromise = new Promise(function(myResolve, myReject) {
+        localStorage.clear();
+        localStorage.length === 0 ? myResolve() : myReject();
+    });
     
-//     clearPromise.then(
-//         (value) => {
-//             setTimeout(location.reload(), 200);
-//         },
-//         function(error) {console.error("Error clearing local data")}
-//     ); 
-// }
+    clearPromise.then(
+        (value) => {
+            setTimeout(location.reload(), 200);
+        },
+        function(error) {console.error("Error clearing local data")}
+    ); 
+}
 
 // let drawUI;
 // (async () => {
@@ -585,13 +585,16 @@ function loadSaveData() {
                     persistentValues.lifetimePrimoValue = saveValues.primogem;
                 }
 
+                
+
                 let tempArray = [null];
                 for (let i = 1; i < 13; i++) {
                     let tempItem;
-                    if (persistentValues[`upgrade${i}`].Purchased === undefined) {
-                        tempItem = persistentValues[`upgrade${i}`]
-                    } else {
-                        tempItem = persistentValues[`upgrade${i}`].Purchased
+
+                    if (persistentValues[`upgrade${i}`] && persistentValues[`upgrade${i}`].Purchased === undefined) {
+                        tempItem = persistentValues[`upgrade${i}`];
+                    } else if (persistentValues[`upgrade${i}`]) {
+                        tempItem = persistentValues[`upgrade${i}`].Purchased;
                     }
                     if (tempItem) {
                         tempArray.push(tempItem);
