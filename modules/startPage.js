@@ -1,10 +1,8 @@
 import { randomInteger } from './functions.js';
-import { createDom, choiceBox } from './adjustUI.js';
+import { createDom,choiceBox } from './adjustUI.js';
 import { startGame } from '../main.js'
+import { CONSTANTS } from './constants.js';
 
-const VERSIONNUMBER = "V.1-02-002b";
-const COPYRIGHT = "DISCLAIMER © HoYoverse.  \n All rights reserved. This site is not affiliated \n with Hoyoverse, nor Genshin Impact.";
-const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
 let mainBody = document.getElementById("game");   
@@ -32,7 +30,14 @@ if (!isNewGame) {
 const launchGame = () => {
     if (startAlreadyDelay === true) return;
     startAlreadyDelay = true;
-    startGame(isNewGame);
+
+    try {
+        startGame(isNewGame);
+    } catch (err) {
+        // TODO: ERROR POPUP
+        console.error(`Error detected`);
+    }
+    
     setTimeout(() => (startScreen.remove(), 100));
 }
 
@@ -77,10 +82,10 @@ let drawUI;
 })();
 
 let copyrightText = document.getElementById("copyright-number"); 
-copyrightText.innerText = COPYRIGHT;
+copyrightText.innerText = CONSTANTS.COPYRIGHT;
 
 let versionText = document.getElementById("vers-number");
-versionText.innerText = VERSIONNUMBER;
+versionText.innerText = CONSTANTS.VERSIONNUMBER;
 
 let versionTextStart = document.getElementById("vers-number-start");
-versionTextStart.innerText = `[${VERSIONNUMBER}] \n ${COPYRIGHT}`;
+versionTextStart.innerText = `[${CONSTANTS.VERSIONNUMBER}] \n ${CONSTANTS.COPYRIGHT}`;

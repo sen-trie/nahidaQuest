@@ -2,6 +2,7 @@ import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,save
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop } from "./modules/adjustUI.js"
+import { CONSTANTS } from "./modules/constants.js";
 import * as Settings from "./modules/features/settings.js";
 import * as Shop from "./modules/features/shop.js";
 import * as Expedition from "./modules/features/expedition.js";
@@ -9,9 +10,6 @@ import * as Battle from "./modules/features/battle.js";
 import * as Tree from "./modules/features/tree.js"
 import Preload from 'https://unpkg.com/preload-it@latest/dist/preload-it.esm.min.js';
 
-const VERSIONNUMBER = "V.1-02-002b";
-const COPYRIGHT = "DISCLAIMER © HoYoverse.  \n All rights reserved. This site is not affiliated \n with Hoyoverse, nor Genshin Impact.";
-const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
 let mainBody = document.getElementById("game");   
@@ -19,47 +17,6 @@ let drawUI;
 (async () => {
     drawUI = await import('./modules/drawUI.js');
 })();
-// let continueButton = document.getElementById("start-button");
-// let newGameButton = document.getElementById("start-delete");
-
-// let isNewGame = (localStorage.getItem("settingsValues") === null) ? true : false; 
-// let startAlreadyDelay = true;
-// setTimeout(() => { startAlreadyDelay = false }, 500);
-
-// if (!isNewGame) {
-//     let startChance = randomInteger(1, 14);
-//     if (startChance === 1) {
-//         startScreen.append(createDom('img', { src: './assets/icon/nahida-start.webp', id: 'start-idle-nahida' }));
-//     } else if (startChance === 2) {
-//         startScreen.append(createDom('img', { src: './assets/icon/shop-start.webp', id: 'start-idle-dori' }));
-//     } else if (startChance === 3) {
-//         startScreen.append(createDom('img', { src: './assets/icon/scara-start.webp', id: 'start-idle-scara' }));
-//     }
-
-//     continueButton.classList.remove("dim-filter");
-// }
-
-// const launchGame = () => {
-//     if (startAlreadyDelay === true) return;
-//     startAlreadyDelay = true;
-//     startGame(isNewGame);
-//     setTimeout(() => (startScreen.remove(), 100));
-// }
-
-// continueButton.addEventListener("click", () => {
-//     if (!isNewGame) launchGame();
-// });
-
-// newGameButton.addEventListener("click", () => {
-//     if (!isNewGame) {
-//         newGameButton.addEventListener("click", () => {
-//             choiceBox(startScreen, {text: 'Are you sure? Deleting your save cannot be undone!'}, null, 
-//                       () => {clearLocalStorage()}, undefined, null, ['choice-ele']);
-//         });
-//     } else if (isNewGame) {
-//         launchGame();
-//     }
-// });
 
 let currentlyClearing = false;
 function clearLocalStorage() {
@@ -78,22 +35,6 @@ function clearLocalStorage() {
         function(error) {console.error("Error clearing local data")}
     ); 
 }
-
-// let drawUI;
-// (async () => {
-//     drawUI = await import('./modules/drawUI.js');
-//     mainBody = drawUI.buildGame(mainBody);
-//     mainBody.style.display = "block";
-// })();
-
-// let copyrightText = document.getElementById("copyright-number"); 
-// copyrightText.innerText = COPYRIGHT;
-
-// let versionText = document.getElementById("vers-number");
-// versionText.innerText = VERSIONNUMBER;
-
-// let versionTextStart = document.getElementById("vers-number-start");
-// versionTextStart.innerText = `[${VERSIONNUMBER}] \n ${COPYRIGHT}`;
 
 let preloadStart = Preload();
 //------------------------------------------------------------------------POST SETUP------------------------------------------------------------------------//
@@ -130,10 +71,8 @@ const SHOPCOOLDOWN = 15;
 const SHOP_THRESHOLD = 600;
 
 let MOBILE = false;
-if (navigator.userAgentData) {
-    if (navigator.userAgentData.mobile) {
-        MOBILE = true;
-    }
+if (navigator.userAgentData && navigator.userAgentData.mobile) {
+    MOBILE = true;
 } else {
     MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
@@ -3169,7 +3108,7 @@ function saveData(skip = false) {
     const currentTime = getTime();
 
     saveValues.currentTime = currentTime;
-    saveValues.versNumber = DBNUBMER;
+    saveValues.versNumber = CONSTANTS.DBNUBMER;
     persistentValues.timeSpentValue += currentTime - persistentValues.lastRecordedTime;
     persistentValues.lastRecordedTime = getTime();
 
@@ -3778,7 +3717,7 @@ function settingsBox() {
 
             let blob = new Blob([text], {type: "text/plain"});
             let link = document.createElement("a");
-            link.download = `nq_save_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate()}_v${DBNUBMER}.txt`;
+            link.download = `nq_save_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate()}_v${CONSTANTS.DBNUBMER}.txt`;
             link.href = URL.createObjectURL(blob);
             link.click();
         })
@@ -11945,7 +11884,7 @@ function transcendFunction() {
                     let newSaveValues = saveValuesDefault;
                     newSaveValues.goldenTutorial = true;
                     newSaveValues.wishUnlocked = true;
-                    newSaveValues.versNumber = DBNUBMER;
+                    newSaveValues.versNumber = CONSTANTS.DBNUBMER;
                     localStorage.setItem("saveValuesSave", JSON.stringify(newSaveValues));
 
                     let newlocalStore = storeInventoryDefault;
