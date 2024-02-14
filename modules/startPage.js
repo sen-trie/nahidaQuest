@@ -1,5 +1,5 @@
 import { randomInteger } from './functions.js';
-import { createDom,choiceBox } from './adjustUI.js';
+import { createDom,choiceBox,errorMesg } from './adjustUI.js';
 import { startGame } from '../main.js'
 import { CONSTANTS } from './constants.js';
 
@@ -10,11 +10,17 @@ let startScreen = document.getElementById("start-screen");
 let continueButton = document.getElementById("start-button");
 let newGameButton = document.getElementById("start-delete");
 
+window.onerror = (message, source, lineno, colno, error) => {
+    errorMesg(error);
+}
+
 let isNewGame = (localStorage.getItem("settingsValues") === null) ? true : false; 
 let startAlreadyDelay = true;
 setTimeout(() => { startAlreadyDelay = false }, 500);
 
 if (!isNewGame) {
+    continueButton.classList.remove("dim-filter");
+    
     let startChance = randomInteger(1, 14);
     if (startChance === 1) {
         startScreen.append(createDom('img', { src: './assets/icon/nahida-start.webp', id: 'start-idle-nahida' }));
@@ -24,21 +30,23 @@ if (!isNewGame) {
         startScreen.append(createDom('img', { src: './assets/icon/scara-start.webp', id: 'start-idle-scara' }));
     }
 
-    continueButton.classList.remove("dim-filter");
+    try {
+        let settingsTemp = localStorage.getItem("settingsValues");
+        let settingsValues = JSON.parse(settingsTemp);
+        CONSTANTS.CHANGEFONTSIZE(settingsValues.fontSizeLevel);
+    } catch (err) {
+        console.error('Error checking LocalStorage');
+    }
 }
 
 const launchGame = () => {
     if (startAlreadyDelay === true) return;
     startAlreadyDelay = true;
 
-    try {
-        startGame(isNewGame);
-    } catch (err) {
-        // TODO: ERROR POPUP
-        console.error(`Error detected`);
-    }
+    startGame(isNewGame);
+    console.log(`======== NAHIDAQUEST! ${CONSTANTS.VERSIONNUMBER} loaded ========`);
     
-    setTimeout(() => (startScreen.remove(), 100));
+    setTimeout(() => startScreen.remove(), 100);
 }
 
 continueButton.addEventListener("click", () => {

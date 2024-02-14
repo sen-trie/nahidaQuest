@@ -372,7 +372,7 @@ function loadSaveData() {
     } else {
         let settingsTemp = localStorage.getItem("settingsValues");
         settingsValues = JSON.parse(settingsTemp);
-        updateObjectKeys(settingsValues,SettingsDefault);
+        updateObjectKeys(settingsValues, SettingsDefault);
     }
     // LOAD VALUES DATA
     if (localStorage.getItem("saveValuesSave") == null) {
@@ -834,7 +834,7 @@ function idleCheck(idleAmount) {
 function postSaveData() {
     const leftHandCSS = document.getElementById('toggle-css');
     leftHandCSS.disabled = (settingsValues.leftHandMode ? undefined : 'disabled');
-    document.documentElement.style.fontSize = `calc(${0.2 + settingsValues.fontSizeLevel * 0.16}vw + ${0.2 + settingsValues.fontSizeLevel * 0.16}vh)`;
+    CONSTANTS.CHANGEFONTSIZE(settingsValues.fontSizeLevel);
     
     if (persistentValues.autoFood) {
         autoConsumeFood('check');
@@ -3542,17 +3542,12 @@ function advancedSettings() {
                 if (isNaN(newValue)) {
                     prefer.value = 5;
                 } else {
-                    if (newValue < 1) {
-                        prefer.value = 1;
-                    } else if (newValue > 10) {
-                        prefer.value = 10;
-                    }
-
+                    newValue = Math.min(Math.max(newValue, 1), 10);
                     prefer.value = Math.round(newValue * 10) / 10;
                 }
 
-                document.documentElement.style.fontSize = `calc(${0.2 + newValue * 0.16}vw + ${0.2 + newValue * 0.16}vh)`;
-                settingsValues[advItem.default] = Number(newValue);
+                settingsValues.fontSizeLevel = Number(newValue);
+                CONSTANTS.CHANGEFONTSIZE(Number(newValue));
             }
 
             prefer.value = settingsValues[advItem.default];
@@ -3909,7 +3904,7 @@ function settingsBox() {
             console.warn(`Invalid command: ${consoleBoxText.value}.`);
         }
         
-        consoleBox.append(consoleBoxText, consoleBoxButton)
+        consoleBox.append(consoleBoxText, consoleBoxButton);
         
         errorHeaderButton.addEventListener('click', () => {
             if (errorHeaderButton.classList.contains('inactive-tab')) {
@@ -3933,7 +3928,8 @@ function settingsBox() {
 
         consoleHeader.append(errorHeaderButton, consoleHeaderButton);
         consoleSettingsMenu.append(consoleHeader, errorBox, consoleBox);
-    }, 400)
+        patchDiv.remove();
+    }, 400);
 }
 
 function tryParseJSONObject(jsonString) {
@@ -10146,8 +10142,8 @@ function drawWish() {
 function drawAranaraWish() {
     const mailImageDiv = document.getElementById('mail-image-div');
     const wishButton = document.getElementById('wishButton');
-
     const wishButtonText = document.getElementById('wishButtonText');
+
     if (wishButtonText.innerText === '???') {
         return;
     }
@@ -12904,6 +12900,8 @@ if (beta || testing) {
             drawAranaraWish();
         } else if (e.key === 'g') {
             spawnSkirmish();
+        } else if (e.key === 'h') {
+            throw new Error('Test Error');
         }
     })    
 }

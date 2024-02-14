@@ -13,7 +13,7 @@ html, body {
 html {
     height: 100%;
     width: 100%;
-    font-size: calc(1vw + 1vh);
+    font-size: clamp(0.5rem, 1rem + 0.6vw, 2rem);
     display: flex;
     justify-content: center;
     flex-direction: row;
@@ -887,6 +887,16 @@ table, button, label {
     color: white;
     text-shadow: var(--text-shadow-075);
     flex-grow: 1;
+}
+
+.error-pop-up {
+    position: absolute;
+    font-size: 0.7rem;
+    left: 0.5%;
+    bottom: 0.5%;
+    z-index: 99999999;
+    color: var(--light-red);
+    text-shadow: var(--text-shadow-075);
 }
 
 /*/////////////////////////////// TUTORIAL CSS ///////////////////////////////*/
