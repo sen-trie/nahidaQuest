@@ -8888,6 +8888,42 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
     adventureVideo.appendChild(popImage);
 }
 
+function rollBeatModifier() {
+    let modifier = '';
+    if ((adventureVariables.specialty === 'Finale')) {
+        let roll = randomInteger(1, 101);
+        if (roll < 25) {
+            modifier = 'Boomer-';
+        } else if (roll < 55) {
+            modifier = 'Bullet-';
+        } else if (roll < 85) {
+            modifier = 'Circle-';
+        }
+    } else if (adventureVariables.specialty === 'Unusual') {
+        let roll = randomInteger(1, 101);
+        if (battleVariables.bossHealth && battleVariables.bossHealth <= UNUSUAL_THRESHOLD && roll < 60) {
+            modifier = 'Boomer-';
+        } else if (battleVariables.bossHealth && battleVariables.bossHealth > UNUSUAL_THRESHOLD && roll < 40) {
+            modifier = 'Bullet-';
+        } else if (roll < 85) {
+            modifier = 'Circle-';
+        }
+    } else if (persistentValues.unusualBossDefeat && adventureVariables.advType === 13) {
+        let roll = randomInteger(1, 101);
+        if (roll < 30) {
+            modifier = 'Boomer-';
+        } else if (roll < 60) {
+            modifier = 'Bullet-';
+        } else if (roll < 85) {
+            modifier = 'Circle-';
+        }
+    } else {
+        modifier = '';
+    }
+
+    return modifier;
+}
+
 function quicktimeEvent(waveQuicktime, advLevel, variant) {
     if (!adventureVariables.fightSceneOn) {return}
     if (disableQuicktime && beta) {return}
@@ -9215,17 +9251,20 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
             const quicktimeArray = enemyInfo.quicktimeDict['Finale'];
             waveQuicktime = quicktimeArray[randomInteger(1, Object.keys(quicktimeArray).length + 1)];
         }
-    
-        let maxBeat = waveQuicktime.length;
-        let currentBeat = 0;
-        let correctBeat = 0;
-        let removeBeat = false;
+
+        let quicktimeDict = {
+            maxBeat: waveQuicktime.length,
+            currentBeat: 0,
+            correctBeat: 0,
+            removeBeat: false,
+            advLevel: advLevel,
+        }
         
         quicktimeBar.id = "quicktime-bar";
         quicktimeBar.state = null;
-        quicktimeBar.classList.add("flex-row","quicktime-bar");
+        quicktimeBar.classList.add("flex-row", "quicktime-bar");
     
-        let colorArray = ["Red","Green","Blue"];
+        const colorArray = ["Red", "Green", "Blue"];
         if (adventureVariables.specialty === 'Unusual') {
             for (let i = colorArray.length - 1; i > 0; i--) {
                 const j = randomInteger(0, i);
@@ -9234,7 +9273,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
 
             if (battleVariables.bossHealth < UNUSUAL_THRESHOLD) {
                 waveQuicktime = waveQuicktime.slice(0, (randomInteger(1, 3) * -1));
-                maxBeat = waveQuicktime.length;
+                quicktimeDict.maxBeat = waveQuicktime.length;
             }
         } 
     
@@ -9242,17 +9281,16 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
             let img = new Image();
             img.src = `./assets/expedbg/${colorArray[i]}.webp`;
             img.addEventListener("click",() => {
-                if (quicktimeBar.state !== null) {
-                    if (quicktimeBar.state === colorArray[i]) {
-                        correctBeat++;
-                    } else {
-                        Battle.createBattleText("miss", 2000, videoOverlay);
-                    }
+                if (quicktimeBar.state === null) return;
+                if (quicktimeBar.state === colorArray[i]) {
+                    quicktimeDict.correctBeat++;
+                } else {
+                    Battle.createBattleText("miss", 2000, videoOverlay);
+                }
 
-                    quicktimeBar.state = null;
-                    currentBeat++;
-                    removeBeat = true;
-                }   
+                quicktimeBar.state = null;
+                quicktimeDict.currentBeat++;
+                quicktimeDict.removeBeat = true; 
             })
             textOverlay.appendChild(img);
         }
@@ -9261,55 +9299,25 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
         quickImg.src = "./assets/expedbg/quicktime.webp";
         quickImg.classList.add("cover-all");
         quickImg.style.zIndex = 1;
-        createBeat(advLevel);
+        createBeat();
         
-        function createBeat(advLevel) {
-            let modifier = '';
-            if ((adventureVariables.specialty === 'Finale')) {
-                let roll = randomInteger(1, 101);
-                if (roll < 25) {
-                    modifier = 'Boomer-';
-                } else if (roll < 55) {
-                    modifier = 'Bullet-';
-                } else if (roll < 85) {
-                    modifier = 'Circle-';
-                }
-            } else if (adventureVariables.specialty === 'Unusual') {
-                let roll = randomInteger(1, 101);
-                if (battleVariables.bossHealth && battleVariables.bossHealth <= UNUSUAL_THRESHOLD && roll < 60) {
-                    modifier = 'Boomer-';
-                } else if (battleVariables.bossHealth && battleVariables.bossHealth > UNUSUAL_THRESHOLD && roll < 40) {
-                    modifier = 'Bullet-';
-                } else if (roll < 85) {
-                    modifier = 'Circle-';
-                }
-            } else if (persistentValues.unusualBossDefeat && adventureVariables.advType === 13) {
-                let roll = randomInteger(1, 101);
-                if (roll < 30) {
-                    modifier = 'Boomer-';
-                } else if (roll < 60) {
-                    modifier = 'Bullet-';
-                } else if (roll < 85) {
-                    modifier = 'Circle-';
-                }
-            } else {
-                modifier = '';
-            }
+        function createBeat() {
+            const modifier = rollBeatModifier();
     
-            let beatImage = new Image();
+            let beatImage = createDom('img');
             beatImage.classList.add("quicktime-img");
             beatImage.color = rollArray(colorArray, 0);
             beatImage.src = `./assets/expedbg/${modifier}${beatImage.color}.webp`;
             beatImage.position = 0;
             beatImage.style.left = "100%";
     
-            let brightnessIncrement = waveQuicktime[currentBeat] * randomInteger(90,110) / 100;
+            let brightnessIncrement = waveQuicktime[quicktimeDict.currentBeat] * randomInteger(90,110) / 100;
             let thresholdReached = false;
     
             // ALLOWS BEAT TO GO IN REVERSE DIRECTION
             let inverseDirection = false;
             let inverseRoll = randomInteger(1,101);
-            if ((advLevel >= 13 && inverseRoll > 50) || (advLevel == 5 && inverseRoll > 75)) {
+            if ((quicktimeDict.advLevel >= 13 && inverseRoll > 50) || (quicktimeDict.advLevel == 5 && inverseRoll > 75)) {
                 inverseDirection = true;
                 beatImage.style.transform = `scaleX(-1)`;
                 beatImage.style.left = '-10%';
@@ -9344,19 +9352,17 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
     
                 function increaseGlow(timestamp) {
                     if (!adventureVariables.fightSceneOn) {return}
-                    if (removeBeat) {
-                        removeBeat = false;
+                    if (quicktimeDict.removeBeat) {
+                        quicktimeDict.removeBeat = false;
                     
-                        if (beatImage.style.transform === `scaleX(-1)`) {
-                            beatImage.style.animation = "puffOutMirror 0.25s linear";
-                        } else {
-                            beatImage.style.animation = "puffOut 0.25s linear";
-                        }
-    
+                        beatImage.style.animation = `${beatImage.style.transform === `scaleX(-1)` 
+                                                    ? 'puffOutMirror' : 'puffOut' } 0.25s linear`;
+
                         beatImage.addEventListener("animationend",() => {
                             beatImage.remove();
-                            outcomeCheck(advLevel, currentBeat, maxBeat);
-                        })
+                            outcomeCheck();
+                        });
+                        
                         return;
                     }
                     
@@ -9391,10 +9397,10 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                         if (leftPos <= 60 && leftPos > 35) {
                             quicktimeBar.state = beatImage.color;
                         } else if (leftPos < -15 || leftPos > 115) {
-                            currentBeat++;
+                            quicktimeDict.currentBeat++;
                             quicktimeBar.state = null;
                             Battle.createBattleText("miss", 2000, videoOverlay);
-                            outcomeCheck(advLevel, currentBeat, maxBeat);
+                            outcomeCheck();
                             return;
                         } else {
                             quicktimeBar.state = "ready";
@@ -9407,9 +9413,10 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
             quicktimeBar.append(quickImg, beatImage);
         }
     
-        function outcomeCheck(advLevel, currentBeat, maxBeat) {
-            if (currentBeat === maxBeat) {
-                textBox.innerHTML = `You successfully countered <span style='color:#A97803'>${correctBeat}</span> out of <span style='color:#A97803'>${maxBeat}</span> ranged attacks!`;
+        function outcomeCheck() {
+            if (quicktimeDict.currentBeat === quicktimeDict.maxBeat) {
+                textBox.innerHTML = `You successfully countered <span style='color:#A97803'>${quicktimeDict.correctBeat}
+                                    </span> out of <span style='color:#A97803'>${quicktimeDict.maxBeat}</span> ranged attacks!`;
                 setTimeout(() => {
                     let atkLevel = 1.5;
                     if (adventureVariables.specialty === 'Finale' || adventureVariables.specialty === 'Unusual') {
@@ -9417,10 +9424,10 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                     } else if (adventureVariables.advType >= 4) {
                         atkLevel = 2;
                     }
-                    quitQuicktime(atkLevel, maxBeat, (maxBeat + correctBeat) / 2);
+                    quitQuicktime(atkLevel, quicktimeDict.maxBeat, (quicktimeDict.maxBeat + quicktimeDict.correctBeat) / 2);
                 },2000)
-            } else if (currentBeat < maxBeat) {
-                createBeat(advLevel);
+            } else if (quicktimeDict.currentBeat < quicktimeDict.maxBeat) {
+                createBeat();
             }
         }
     }
@@ -9556,18 +9563,18 @@ function skillUse() {
     }
 
     if (resetChance <= resetRoll && skillCooldownReset === false) {
-        let resetButton = document.getElementById('battle-skill');
-        let img = new Image();
-        img.classList.add("cover-all");
-        img.id = "refresh-icon";
-        img.src = "./assets/expedbg/refresh.webp";
-        img.onload = ()=>{
-            resetButton.appendChild(img);
-            img.addEventListener("animationend",()=>{
-                img.remove();
-            })
-        }
         skillCooldownReset = true;
+        let resetButton = document.getElementById('battle-skill');
+        const img = createDom('img', {
+            classList: ['cover-all'],
+            id: 'refresh-icon',
+            src: './assets/expedbg/refresh.webp'
+        });
+
+        img.onload = () => {
+            resetButton.appendChild(img);
+            img.addEventListener("animationend", () => { img.remove() });
+        }
     } else {
         cooldown.amount -= 100;
         skillCooldownReset = false;
@@ -9576,52 +9583,52 @@ function skillUse() {
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         const mobDiv = adventureVideoChildren[i];
         if (!mobDiv.classList.contains('enemy') || mobDiv.children[1] == undefined) {continue};
-
-        if (mobDiv.querySelector('.skill-mark')) {
-            mobDiv.querySelector('.skill-mark').remove();
-        };
+        if (mobDiv.querySelector('.skill-mark')) { mobDiv.querySelector('.skill-mark').remove() };
 
         let skillMark = new Image();
         skillMark.src = `./assets/icon/mark${adventureScaraText}.webp`;
 
         let canvas = document.createElement("canvas");
         canvas.classList.add("skill-mark");
-        canvas.brightness = 1;
+        canvas.style.filter = "drop-shadow(0 0 0.2em #ADDE7D)";
+        canvas = Battle.canvasHandler(canvas, skillMark, adventureVariables, {
+            postCalc
+        });
 
         mobDiv.children[0].appendChild(canvas);
 
-        skillMark.onload = ()=> {
-            canvas.width = skillMark.naturalWidth;
-            canvas.height = skillMark.naturalHeight;
+        // skillMark.onload = () => {
+        //     canvas.width = skillMark.naturalWidth;
+        //     canvas.height = skillMark.naturalHeight;
 
-            let ctx = canvas.getContext("2d");
-            ctx.drawImage(skillMark, 0, 0);
-            let brightnessIncrement = 0.001;
-            canvas.style.filter = "drop-shadow(0 0 0.2em #ADDE7D)";
+        //     let ctx = canvas.getContext("2d");
+        //     ctx.drawImage(skillMark, 0, 0);
+        //     let brightnessIncrement = 0.001;
+        //     canvas.style.filter = "drop-shadow(0 0 0.2em #ADDE7D)";
 
-            const FRAMES_PER_SECOND = 60;
-            const interval = Math.floor(1000 / FRAMES_PER_SECOND);
-            let previousTime = performance.now();
+        //     const FRAMES_PER_SECOND = 60;
+        //     const interval = Math.floor(1000 / FRAMES_PER_SECOND);
+        //     let previousTime = performance.now();
 
-            let currentTime = 0;
-            let deltaTime = 0;
+        //     let currentTime = 0;
+        //     let deltaTime = 0;
 
-            window.requestAnimationFrame(increaseGlow);
-            function increaseGlow(timestamp) {
-                if (!adventureVariables.fightSceneOn) {return}
-                currentTime = timestamp;
-                deltaTime = currentTime - previousTime;
+        //     window.requestAnimationFrame(increaseGlow);
+        //     function increaseGlow(timestamp) {
+        //         if (!adventureVariables.fightSceneOn) {return}
+        //         currentTime = timestamp;
+        //         deltaTime = currentTime - previousTime;
                 
-                if (deltaTime > interval) {
-                    canvas.brightness += brightnessIncrement;
-                    if (canvas.brightness > 3) {
-                        canvas.remove();
-                        return;
-                    }
-                }
-                window.requestAnimationFrame(increaseGlow);
-            }
-        }
+        //         if (deltaTime > interval) {
+        //             canvas.brightness += brightnessIncrement;
+        //             if (canvas.brightness > 3) {
+        //                 canvas.remove();
+        //                 return;
+        //             }
+        //         }
+        //         window.requestAnimationFrame(increaseGlow);
+        //     }
+        // }
     }
 }
 

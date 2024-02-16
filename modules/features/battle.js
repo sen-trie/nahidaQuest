@@ -1,6 +1,9 @@
 import { createDom } from "../adjustUI.js";
 import { deepCopy, rollArray, randomInteger } from "../functions.js";
 
+const FRAMES_PER_SECOND = 60;
+const interval = Math.floor(1000 / FRAMES_PER_SECOND);
+
 const createBattleText = (text, timer, container) => {
     let textBox = document.createElement("img");
     textBox.classList.add("flex-column","battle-text")
@@ -8,6 +11,48 @@ const createBattleText = (text, timer, container) => {
     setTimeout(()=>{textBox.remove()}, timer);
     container.append(textBox);
     return container;
+}
+
+const canvasHandler = (canvasEle, canvasImg, adventureVariables, addFunc = {}) => {
+    canvasEle.brightness = 1;
+
+    canvasImg.onload = () => {
+        canvasEle.width = canvasImg.naturalWidth;
+        canvasEle.height = canvasImg.naturalHeight;
+
+        let ctx = canvasEle.getContext("2d");
+        ctx.drawImage(canvasImg, 0, 0);
+        let brightnessIncrement = 0.001;
+
+        let previousTime = performance.now();
+        let variables = {
+            currentTime: 0,
+        }
+        let currentTime = 0;
+        let deltaTime = 0;
+        let exitCanvas = false;
+
+        window.requestAnimationFrame(increaseGlow);
+        function increaseGlow(timestamp) {
+            if (!adventureVariables.fightSceneOn || exitCanvas) {return}
+            if (addFunc.preCalc) { addFunc.preCalc() }
+            
+            currentTime = timestamp;
+            deltaTime = currentTime - previousTime;
+            
+            if (deltaTime > interval) {
+                canvasEle.brightness += brightnessIncrement;
+                if (addFunc.postCalc) { addFunc.postCalc() }
+                if (canvasEle.brightness > 3) {
+                    canvasEle.remove();
+                    return;
+                }
+            }
+            window.requestAnimationFrame(increaseGlow);
+        }
+    }
+
+    return canvasEle;
 }
 
 const comboHandler = (type, ele) => {
@@ -329,4 +374,4 @@ const cytusQuicktime = (quicktimeBar, textOverlay, usedDict, quitQuicktime, adve
     return quicktimeBar;
 }
 
-export { drawBattleHealth, comboHandler, createBattleText, cytusQuicktime }
+export { canvasHandler, drawBattleHealth, comboHandler, createBattleText, cytusQuicktime }
