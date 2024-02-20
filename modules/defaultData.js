@@ -166,6 +166,7 @@ const expeditionDictDefault = {
     12:"0",
     13:"0",
     14:"0",
+    15:"0",
 }
 
 const storeInventoryDefault = {
@@ -560,7 +561,13 @@ const enemyInfo = {
             2:[0.45,0.55,0.45,0.55,0.45,0.55],
             3:[0.54,0.54,0.50,0.54,0.50,0.54,0.50,0.54],
             4:[0.40,0.43,0.46,0.49,0.52,0.54,0.57],
-        }
+        },
+        15:{
+            1:[0.50,0.46,0.50],
+            2:[0.52,0.54,0.52,0.49],
+            3:[0.50,0.53,0.47,0.51],
+            4:[0.50,0.47,0.50,0.53,0.47],
+        },
     },
 
     // LVL 1, INCLUSIVE BG
@@ -662,6 +669,13 @@ const enemyInfo = {
     1422:{Class:"Arm",           Variation:1,   Type:"Workshop",      HP:3000,   ATK:2.5,     AtkCooldown:70},
     1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:12000,   ATK:3,     AtkCooldown:32.5},
     1432:{Class:"Minion",          Variation:2,   Type:"Finale",      HP:1850,   ATK:1,     AtkCooldown:30},
+    // LVL 15
+    "15-Wave-1":{Wave:[1501,1501],         BG:[1,2]},
+    "15-Wave-2":{Wave:[1502,1502],         BG:[1,2]},
+    "15-Wave-3":{Wave:[1503,1503],         BG:[1,2]},
+    1501:{Class:"Leader",       Variation:2,   Type:"Skirmish",            HP:1200,   ATK:1.5,     AtkCooldown:30},
+    1502:{Class:"Leader",        Variation:2,   Type:"WAbyss",              HP:1100,   ATK:2,     AtkCooldown:32.5},
+    1503:{Class:"Leader",       Variation:2,   Type:"SkirmishBeast",       HP:2000,   ATK:3,     AtkCooldown:40},
 }
 
 const upgradeDictDefault = {

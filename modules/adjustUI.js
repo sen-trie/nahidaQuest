@@ -448,6 +448,8 @@ const sidePop = (imgSrc, text) => {
 // ERROR POPUP
 const MAX_ERROR_LENGTH = 30;
 const errorMesg = (errMesg) => {
+    console.log(111)
+
     let innerText = errMesg.message;
     if (innerText.length > MAX_ERROR_LENGTH) {
         innerText = innerText.slice(0, MAX_ERROR_LENGTH - 3);

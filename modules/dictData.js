@@ -85,6 +85,7 @@ const imgKey = {
     32:{Left:"80",  Top:"35",   Level:14,   Wave:[2],               Heads:[26]           ,Loot:{}},
     33:{Left:"72",  Top:"28",   Level:14,   Wave:[3],               Heads:[27]           ,Loot:{}},
     34:{Left:"50",  Top:"29",   Level:14,   Wave:[4],               Heads:[28]           ,Loot:{}},
+    35:{Left:"0",  Top:"0",     Level:15,   Wave:[1],               Heads:[28]           ,Loot:{}},
 }
 
 const sceneInfo = { 
@@ -1143,6 +1144,9 @@ const adventureLoot = {
         Food:       ["food", 4, 5, "adventure", "Any"],
     },
     "Level-14":{},
+    "Level-15":{
+        Food:       ["food", 4, 5, "adventure", "Any"],
+    },
     2:{
         Weapon: ["weapon", 1, 2, "adventure", "Catalyst"],
         Talent: ["talent", 2, 2,"adventure",  "Sumeru"],

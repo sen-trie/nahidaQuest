@@ -10,8 +10,9 @@ let startScreen = document.getElementById("start-screen");
 let continueButton = document.getElementById("start-button");
 let newGameButton = document.getElementById("start-delete");
 
-window.onerror = (message, source, lineno, colno, error) => {
+window.onerror = function(message, source, lineno, colno, error) {
     errorMesg(error);
+    return false;
 }
 
 let isNewGame = (localStorage.getItem("settingsValues") === null) ? true : false; 

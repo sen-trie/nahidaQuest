@@ -10,5 +10,10 @@ export const CONSTANTS = Object.freeze({
                 All rights reserved. This site is not affiliated 
                 with Hoyoverse, nor Genshin Impact.`,
     DBNUBMER: (VERSIONNUMBER.split(".")[1]).replaceAll("-",""),
-    CHANGEFONTSIZE: changeFontSize
+    CHANGEFONTSIZE: changeFontSize,
+    FELLBOSS_THRESHOLD: 65,
+    UNUSUAL_THRESHOLD: 65,
+    WORKSHOP_THRESHOLD: 75,
+    FINALE_THRESHOLD: 65,
+    FINALE_THRESHOLD_TWO : 0,
 });

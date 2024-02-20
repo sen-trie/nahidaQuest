@@ -87,12 +87,6 @@ let skillCooldownReset;
 let adventureTreeDefense = false;
 let worldQuestDict = {};
 
-const FELLBOSS_THRESHOLD = 65;
-const UNUSUAL_THRESHOLD = 65;
-const WORKSHOP_THRESHOLD = 75;
-const FINALE_THRESHOLD = 65;
-const FINALE_THRESHOLD_TWO = 30;
-
 const suffixPreload = ['Blue', 'Red', 'Green', 'Purple'];
 const prefixPreload = ['', 'Boomer-', 'Bullet-', 'Circle-', 'Warning-'];
 let quicktimeAssetArray = [];
@@ -1744,11 +1738,11 @@ function rainEvent() {
                 stopSpawnEvents = false;
                 saveValues.realScore += tempScore * dpsMultiplier;
                 if (tempPrimogem != 0 && tempGolden != 0) {
-                    currencyPopUp("primogem", tempPrimogem, "nuts", tempGolden);
+                    currencyPopUp([["primogem", tempPrimogem],["nuts", tempGolden]]);
                 } else if (tempPrimogem != 0) {
-                    currencyPopUp("primogem", tempPrimogem);
+                    currencyPopUp([["primogem", tempPrimogem]]);
                 } else if (tempGolden != 0) {
-                    currencyPopUp("nuts", tempGolden);
+                    currencyPopUp([["nuts", tempGolden]]);
                 }
 
                 rainText.remove();
@@ -2881,30 +2875,30 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
 
             boxText.addEventListener("animationend",() => {
                 if (type === "primogem") {
-                    currencyPopUp("primogem",amount);
+                    currencyPopUp([["primogem",amount]]);
                 } else if (type === "weasel") {
                     if (amount == 0 && amount2 == 0) {
                         void(0);
                     } else if (amount == 0 && amount2 > 0) {
-                        currencyPopUp("nuts",amount2);
+                        currencyPopUp([["nuts",amount2]]);
                     } else if (amount < 60 && amount2 > 0) {
-                        currencyPopUp("primogem",amount,"nuts",amount2);
+                        currencyPopUp([["primogem",amount],["nuts",amount2]]);
                     }  else if (amount < 100 && amount2 > 0) {
-                        currencyPopUp("items",0,"nuts",amount2);
+                        currencyPopUp([["items",0],["nuts",amount2]]);
                     }  else if (amount < 140 && amount2 > 0) {
-                        currencyPopUp("items",0,"nuts",amount2);
+                        currencyPopUp([["items",0],["nuts",amount2]]);
                     } else if (amount < 60) {
-                        currencyPopUp("primogem",amount);
+                        currencyPopUp([["primogem",amount]]);
                     }  else if (amount < 100) {
-                        currencyPopUp("primogem",amount,"items",0);
+                        currencyPopUp([["primogem",amount],["items",0]]);
                     }  else if (amount < 140) {
-                        currencyPopUp("primogem",amount,"items",0);
+                        currencyPopUp([["primogem",amount],["items",0]]);
                     } 
                 } else if (type === "box") {
                     if (amount < 40 && amount > 0) {
-                        currencyPopUp("nuts",amount);
+                        currencyPopUp([["nuts",amount]]);
                     } else if (amount >= 40 && amount <= 60) {
-                        currencyPopUp("primogem",amount);
+                        currencyPopUp([["primogem",amount]]);
                     } else if (amount > 60 && amount <= 100) {
                         saveValues.energy = Math.floor(saveValues.energy * amount / 100);
                     } else if (amount > 100) {
@@ -2912,18 +2906,18 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
                     }
                 } else if (type === "reaction") {
                     if (amount != 0) {
-                        currencyPopUp("items",0,"primogem",amount);
+                        currencyPopUp([["items",0],["primogem",amount]]);
                     }
                 } else if (type === "simon") {
                     if (amount != 0) {
-                        currencyPopUp("primogem",amount,"items",0);
+                        currencyPopUp([["primogem",amount],["items",0]]);
                         genericItemLoot();
                         newPop(1);
                         sortList("table2");
                     }
                 } else if (type === "battleship") {
                     if (amount != 0) {
-                        currencyPopUp("items",0);
+                        currencyPopUp([["items",0]]);
                         genericItemLoot();
                         genericItemLoot();
                         genericItemLoot();
@@ -2932,19 +2926,19 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
                     }
                 } else if (type === "snake") {
                     if (amount < 80 && amount > 0) {
-                        currencyPopUp("primogem",amount);
+                        currencyPopUp([["primogem",amount]]);
                     }  else if (amount < 140) {
-                        currencyPopUp("primogem",amount,"items",0);
+                        currencyPopUp([["primogem",amount],["items",0]]);
                         genericItemLoot();
                         newPop(1);
                         sortList("table2");
                     }  else if (amount < 220) {
-                        currencyPopUp("primogem",amount,"items",0);
+                        currencyPopUp([["primogem",amount],["items",0]]);
                         genericItemLoot();
                         newPop(1);
                         sortList("table2");
                     } else if (amount < 305) {
-                        currencyPopUp("primogem",amount,"items",0);
+                        currencyPopUp([["primogem",amount],["items",0]]);
                         genericItemLoot();
                         genericItemLoot();
                         newPop(1);
@@ -4913,7 +4907,7 @@ function itemUse(itemUniqueId) {
         }
 
         newPop(1);
-        currencyPopUp("items", 0);
+        currencyPopUp([["items", 0]]);
         sortList("table2");
     } else if (itemID === 4018) {
         inventoryDraw("xp", 2, 3);
@@ -4923,7 +4917,7 @@ function itemUse(itemUniqueId) {
         inventoryAdd(4010);
 
         newPop(1);
-        currencyPopUp("items", 0);
+        currencyPopUp([["items", 0]]);
         sortList("table2");
     // ELEMENT GEMS
     } else if (itemID === 5001 || itemID === 5002){
@@ -5047,7 +5041,6 @@ function adventure(advType) {
             updateMorale("add", (randomInteger(7, 15) * -1));
 
             if (activeLeader == "Paimon" && type <= 5 && type > 1) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.15)}
-
             if (!persistentValues.tutorialBasic) {
                 drawUI.customTutorial("advTut", 6, 'Expedition Tutorial', () => { drawAdventure(type, wave) });
                 persistentValues.tutorialBasic = true;
@@ -5546,7 +5539,7 @@ function createGuild() {
                     inventoryAdd(itemArray[i]);
                 }
                 newPop(1);
-                currencyPopUp("items");
+                currencyPopUp([["items"]]);
             }
             sortList("table2");
 
@@ -6049,7 +6042,7 @@ function completeBounty(bountyID,type,ele) {
 
     claim.addEventListener("click",()=>{
         notifPop("clear","bounty",bountyID);
-        currencyPopUp("primogem",Math.round(claim.primoReward));
+        currencyPopUp([["primogem",Math.round(claim.primoReward)]]);
         gainXP(Math.round(claim.xpReward));
         bountyObject[bountyID].Completed = "claimed";
         claim.remove();
@@ -7010,21 +7003,21 @@ function finishQuest(advType) {
             persistentValues.lifetimeEnergyValue += energyRoll;
 
             challengeNotification(({category: 'energy', value: saveValues.energy}))
-            currencyPopUp("energy",energyRoll);
+            currencyPopUp([["energy",energyRoll]]);
         }
     } else if (infoDict.Type === "Treasure") {
         quitQuest();
         if (advType === 10) {
             genericItemLoot();
 
-            currencyPopUp("items",0);
+            currencyPopUp([["items",0]]);
             newPop(1);
             sortList("table2");
         } else if (advType === 7 || advType === 9) {
             inventoryDraw("food", 2, 4);
             inventoryDraw("food", 2, 4);
 
-            currencyPopUp("items",0);
+            currencyPopUp([["items",0]]);
             newPop(1);
             sortList("table2");
         }
@@ -7116,7 +7109,7 @@ function finishQuest(advType) {
 
                 saveValues.primogem -= document.getElementById("offer-amount").value;
                 newPop(1);
-                currencyPopUp("items",0)
+                currencyPopUp([["items", 0]])
                 sortList("table2");
             }
 
@@ -7359,6 +7352,11 @@ function drawAdventure(advType, wave) {
         if (adventureVariables.maxEnemyAmount > 1) {
             adventureHeading.innerText = "You encounter a bunch of hostile enemies.";
             fightTextbox.innerText = "Prepare for a fight!";
+            if (adventureVariables.advType === 15) {
+                adventureHeading.innerText = "Protect the trees at all costs!";
+            } else if (adventureVariables.advType === 13) {
+                adventureHeading.innerText = "Prepare for a tough fight!";
+            }
         } else {
             adventureHeading.innerText = "You encounter a hostile mob.";
             fightTextbox.innerText = "Prepare for a fight!";
@@ -7444,11 +7442,12 @@ function triggerFight() {
         currentEaten: null,
         bossHealth: adventureVariables.advType === 14 ? 100 : null,
         lastStand: false,
+        skirmish: adventureVariables.advType === 13 || adventureVariables.advType === 15,
         triggerConstants: {quicktimeCheck, summonMob, rainTimeCheck, floatTimeCheck, burstTimeCheck, burstTimeEnd, eatTimeCheck},
     }
 
     // SPECIALTY CHCKER
-    if (adventureVariables.advType === 13) {
+    if (adventureVariables.skirmish) {
         battleVariables.doubleAtkCooldown = 1;
         battleVariables.guardtime = 0;
         if (persistentValues.workshopBossDefeat) {
@@ -7601,13 +7600,13 @@ function triggerFight() {
                 variant = '-osu';
             } else if (adventureVariables.specialty === 'Workshop') {
                 variant = '-cytus';
-            }  else if (adventureVariables.specialty === 'Finale') {
-                if (battleVariables.bossHealth <= FINALE_THRESHOLD_TWO) {
+            } else if (adventureVariables.specialty === 'Finale') {
+                if (battleVariables.bossHealth <= CONSTANTS.FINALE_THRESHOLD_TWO) {
                     variant = '-cytus';
-                } else if (battleVariables.bossHealth <= FINALE_THRESHOLD) {
+                } else if (battleVariables.bossHealth <= CONSTANTS.FINALE_THRESHOLD) {
                     variant = '-osu';
                 }
-            } else if (adventureVariables.advType === 13) {
+            } else if (adventureVariables.skirmish) {
                 if (persistentValues.workshopBossDefeat || testing) {
                     variant = rollArray(['', '-osu', '-cytus']);
                 } else if (persistentValues.fellBossDefeat) {
@@ -7622,16 +7621,27 @@ function triggerFight() {
             adventureVideo.appendChild(warningImg);
 
             adventurePreload.fetch(quicktimeAssetArray);
-            warningImg.onload = () => {
-                warningImg.addEventListener("animationend", () => {
-                    battleVariables.quicktime = 0;
-                    quicktimeEvent(quicktimeArray[randomInteger(1, Object.keys(quicktimeArray).length + 1)], battleVariables.currentATK, variant);
-                    warningImg.remove();
 
-                    if (battleVariables.rainTime > 0.8) {
-                        battleVariables.rainTime -= 0.25;
-                    }
-                })
+            const startQuicktime = () => {
+                battleVariables.quicktime = 0;
+                quicktimeEvent(quicktimeArray[randomInteger(1, Object.keys(quicktimeArray).length + 1)], battleVariables.currentATK, variant);
+                warningImg.remove();
+
+                if (battleVariables.rainTime > 0.8) {
+                    battleVariables.rainTime -= 0.25;
+                }
+            }
+
+
+            warningImg.onload = () => {
+                if ((adventureVariables.specialty === 'Unusual')) {
+                    setTimeout(() => {startQuicktime()}, 1000);
+                } else {
+                    warningImg.addEventListener("animationend", () => {
+                        startQuicktime();
+                    })
+                }
+                
             }
         } 
     }
@@ -7695,14 +7705,14 @@ function triggerFight() {
             battleVariables.floatTime = 0;
             if (adventureVariables.specialty === 'FellBoss') {
                 summonBattleFloat(5, 1);
-                if (battleVariables.bossHealth <= FELLBOSS_THRESHOLD && randomInteger(1, 3) === 1) {
+                if (battleVariables.bossHealth <= CONSTANTS.FELLBOSS_THRESHOLD && randomInteger(1, 3) === 1) {
                     summonBattleFloat(4, 1.5);
                 } else if (randomInteger(1, 4) === 1) {
                     summonBattleFloat(6, 1);
                 }
             } else {
-                if (battleVariables.bossHealth <= FINALE_THRESHOLD) {
-                    if (battleVariables.bossHealth <= FINALE_THRESHOLD_TWO) {
+                if (battleVariables.bossHealth <= CONSTANTS.FINALE_THRESHOLD) {
+                    if (battleVariables.bossHealth <= CONSTANTS.FINALE_THRESHOLD_TWO) {
                         battleVariables.floatTime = -0.5;
                     } else {
                         randomInteger(1, 3) === 1 ? summonBattleFloat(5, 0.75, true) : null;
@@ -7711,9 +7721,7 @@ function triggerFight() {
                     summonBattleFloat(4, 1.5, true);
                     summonBattleFloat(3, 1, true);
                 }
-            }
-
-            
+            }  
         }
     }
 
@@ -7843,7 +7851,7 @@ function triggerFight() {
 
                     const bossEle = document.querySelector('.megaboss > .health-bar');
                     bossEle.health += 0.10 * bossEle.maxHP;
-                    bossEle.health = Math.min(bossEle.health, FINALE_THRESHOLD_TWO)
+                    bossEle.health = Math.min(bossEle.health, CONSTANTS.FINALE_THRESHOLD_TWO)
                     bossEle.style.width = `${bossEle.health / bossEle.maxHP * 100}%`
                     bossUpdate(bossEle.health);
                 } else if (battleVariables.eatTime > 0.95) {
@@ -7988,7 +7996,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
         switch (adventureVariables.specialty) {
             case 'Unusual':
-                canvas.brightness = 0.65;
+                canvas.brightness = 0.15;
                 break;
             case 'Workshop':
                 canvas.brightness = 0.15;
@@ -8075,15 +8083,16 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                             }
                             
                             if (adventureVariables.specialty === 'Unusual') {
-                                if (battleVariables.bossHealth > UNUSUAL_THRESHOLD) {
+                                if (battleVariables.bossHealth > CONSTANTS.UNUSUAL_THRESHOLD) {
                                     battleVariables.summonTime += (brightnessIncrement * speedUpFactor * 0.5);
-                                    battleVariables.quicktime += brightnessIncrement * 0.3;
+                                    battleVariables.quicktime -= brightnessIncrement * 0.1;
+                                    canvas.brightness += brightnessIncrement * 0.5;
                                     battleVariables.decoyTime = canvas.brightness;
                                 } else {
                                     canvas.brightness += (brightnessIncrement * speedUpFactor * 0.2);
                                 }
                             } else if (adventureVariables.specialty === 'FellBoss') {
-                                if (battleVariables.bossHealth <= FELLBOSS_THRESHOLD) {
+                                if (battleVariables.bossHealth <= CONSTANTS.FELLBOSS_THRESHOLD) {
                                     canvas.brightness -= brightnessIncrement * 0.15;
                                     battleVariables.rainTime += brightnessIncrement * 0.4;
                                     battleVariables.triggerConstants.rainTimeCheck();
@@ -8098,7 +8107,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                                     canvas.brightness -= (brightnessIncrement * (speedUpFactor - 1) + brightnessIncrement * 0.75);
                                 } else {
                                     battleVariables.deflectTime += brightnessIncrement * 2 * speedUpFactor;
-                                    if (battleVariables.bossHealth <= WORKSHOP_THRESHOLD) {
+                                    if (battleVariables.bossHealth <= CONSTANTS.WORKSHOP_THRESHOLD) {
                                         canvas.brightness -= brightnessIncrement * 0.25;
     
                                         battleVariables.burstTime += brightnessIncrement * 0.2;
@@ -8450,7 +8459,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 if (adventureVariables.specialty === 'Unusual') {
                     cooldown.amount += 15;
                 } else {
-                    cooldown.amount += 20 + (adventureVariables.advType === 13 ? 5 : 0);
+                    cooldown.amount += 20 + (adventureVariables.skirmish ? 5 : 0);
                 }
             }
 
@@ -8500,7 +8509,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                         canvas.style.display = 'none';
 
                         let barWidth = 75 - Math.floor((mobHealth.health / mobHealth.maxHP) / 0.20) * 10;
-                        if (battleVariables.bossHealth <= WORKSHOP_THRESHOLD) {
+                        if (battleVariables.bossHealth <= CONSTANTS.WORKSHOP_THRESHOLD) {
                             barWidth = Math.max(barWidth, 40);
                         }
                         const leftRoll = randomInteger(5, 95 - barWidth);
@@ -8654,7 +8663,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
                 if (mobDiv.classList.contains('megaboss')) {
                     if (adventureVariables.specialty === 'Unusual') {
-                        attackMultiplier *= (battleVariables.bossHealth > UNUSUAL_THRESHOLD) ? 2.25 : 1.75;
+                        attackMultiplier *= (battleVariables.bossHealth > CONSTANTS.UNUSUAL_THRESHOLD) ? 2.25 : 1.75;
                     } else if (mobDiv.querySelector('.health-shield') !== null) {
                         attackMultiplier *= 0.15;
                     }
@@ -8752,27 +8761,27 @@ function bossUpdate(updatedHealth) {
         }
     }
 
-    if (adventureVariables.specialty === 'Unusual' && updatedHealth <= UNUSUAL_THRESHOLD) {
+    if (adventureVariables.specialty === 'Unusual' && updatedHealth <= CONSTANTS.UNUSUAL_THRESHOLD) {
         if (battleVariables.summonTime === null) {
             battleVariables.summonTime = 0;
             battleVariables.decoyTime = null;
             battleVariables.decoyNumber = null;
             changeAnimation(2);
         }
-    } else if (adventureVariables.specialty === 'FellBoss' && updatedHealth <= FELLBOSS_THRESHOLD) {
+    } else if (adventureVariables.specialty === 'FellBoss' && updatedHealth <= CONSTANTS.FELLBOSS_THRESHOLD) {
         if (battleVariables.rainTime === null) {
             battleVariables.rainTime = 0;
             changeAnimation(2);
         }
-    } else if (adventureVariables.specialty === 'Workshop' && updatedHealth <= WORKSHOP_THRESHOLD) {
+    } else if (adventureVariables.specialty === 'Workshop' && updatedHealth <= CONSTANTS.WORKSHOP_THRESHOLD) {
         if (battleVariables.chargeTime === null) {
             battleVariables.chargeTime = 0;
             changeAnimation(2);
         } else if (updatedHealth <= 0) {
             winAdventure();
         }
-    } else if (adventureVariables.specialty === 'Finale' && updatedHealth <= FINALE_THRESHOLD) {
-        if (updatedHealth <= FINALE_THRESHOLD_TWO) {
+    } else if (adventureVariables.specialty === 'Finale' && updatedHealth <= CONSTANTS.FINALE_THRESHOLD) {
+        if (updatedHealth <= CONSTANTS.FINALE_THRESHOLD_TWO) {
             if (updatedHealth <= 0) {
                 winAdventure();
             } else if (battleVariables.summonTime === null) {
@@ -8815,7 +8824,7 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
     let sizeVariable = 27.5;
     if (battleVariables.floatNumber > 10) {
         return;
-    } else if (adventureVariables.specialty === 'Finale' && battleVariables.bossHealth <= FINALE_THRESHOLD_TWO) {
+    } else if (adventureVariables.specialty === 'Finale' && battleVariables.bossHealth <= CONSTANTS.FINALE_THRESHOLD_TWO) {
         sizeVariable *= 1.1;
     }
 
@@ -8888,42 +8897,6 @@ function summonBattleFloat(HP, initialFactor, ignoreSpace=false) {
     adventureVideo.appendChild(popImage);
 }
 
-function rollBeatModifier() {
-    let modifier = '';
-    if ((adventureVariables.specialty === 'Finale')) {
-        let roll = randomInteger(1, 101);
-        if (roll < 25) {
-            modifier = 'Boomer-';
-        } else if (roll < 55) {
-            modifier = 'Bullet-';
-        } else if (roll < 85) {
-            modifier = 'Circle-';
-        }
-    } else if (adventureVariables.specialty === 'Unusual') {
-        let roll = randomInteger(1, 101);
-        if (battleVariables.bossHealth && battleVariables.bossHealth <= UNUSUAL_THRESHOLD && roll < 60) {
-            modifier = 'Boomer-';
-        } else if (battleVariables.bossHealth && battleVariables.bossHealth > UNUSUAL_THRESHOLD && roll < 40) {
-            modifier = 'Bullet-';
-        } else if (roll < 85) {
-            modifier = 'Circle-';
-        }
-    } else if (persistentValues.unusualBossDefeat && adventureVariables.advType === 13) {
-        let roll = randomInteger(1, 101);
-        if (roll < 30) {
-            modifier = 'Boomer-';
-        } else if (roll < 60) {
-            modifier = 'Bullet-';
-        } else if (roll < 85) {
-            modifier = 'Circle-';
-        }
-    } else {
-        modifier = '';
-    }
-
-    return modifier;
-}
-
 function quicktimeEvent(waveQuicktime, advLevel, variant) {
     if (!adventureVariables.fightSceneOn) {return}
     if (disableQuicktime && beta) {return}
@@ -8943,7 +8916,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
     if (variant === '-cytus') {
         let usedDict = enemyInfo.skirmishCytusDict;
         if (adventureVariables.specialty === 'Workshop') {
-            usedDict = battleVariables.bossHealth <= WORKSHOP_THRESHOLD ? enemyInfo.hardCytusDict : enemyInfo.easyCytusDict;
+            usedDict = battleVariables.bossHealth <= CONSTANTS.WORKSHOP_THRESHOLD ? enemyInfo.hardCytusDict : enemyInfo.easyCytusDict;
         } else if (adventureVariables.specialty === 'Finale') {
             usedDict = battleVariables.lastStand ? enemyInfo.veryHardCytusDict : enemyInfo.finaleCytusDict;
         }
@@ -9073,7 +9046,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
         let speedUpFactor = 1;
         if (adventureVariables.specialty === 'Finale') {
             speedUpFactor += 0.125;
-        } else if (adventureVariables.advType === 13) {
+        } else if (adventureVariables.skirmish) {
             speedUpFactor += 0.075;
         } 
 
@@ -9232,7 +9205,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
                         let atkLevel = 1.5;
                         if (adventureVariables.specialty === 'Finale') {
                             atkLevel = 2.5;
-                        } else if (adventureVariables.advType === 13) {
+                        } else if (adventureVariables.skirmish) {
                             atkLevel = 2;
                         }
  
@@ -9258,178 +9231,14 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
             correctBeat: 0,
             removeBeat: false,
             advLevel: advLevel,
+            waveQuicktime: waveQuicktime,
         }
-        
-        quicktimeBar.id = "quicktime-bar";
-        quicktimeBar.state = null;
-        quicktimeBar.classList.add("flex-row", "quicktime-bar");
-    
-        const colorArray = ["Red", "Green", "Blue"];
-        if (adventureVariables.specialty === 'Unusual') {
-            for (let i = colorArray.length - 1; i > 0; i--) {
-                const j = randomInteger(0, i);
-                [colorArray[i], colorArray[j]] = [colorArray[j], colorArray[i]];
-            }
 
-            if (battleVariables.bossHealth < UNUSUAL_THRESHOLD) {
-                waveQuicktime = waveQuicktime.slice(0, (randomInteger(1, 3) * -1));
-                quicktimeDict.maxBeat = waveQuicktime.length;
-            }
-        } 
-    
-        for (let i = 0; i < 3; i++) {
-            let img = new Image();
-            img.src = `./assets/expedbg/${colorArray[i]}.webp`;
-            img.addEventListener("click",() => {
-                if (quicktimeBar.state === null) return;
-                if (quicktimeBar.state === colorArray[i]) {
-                    quicktimeDict.correctBeat++;
-                } else {
-                    Battle.createBattleText("miss", 2000, videoOverlay);
-                }
-
-                quicktimeBar.state = null;
-                quicktimeDict.currentBeat++;
-                quicktimeDict.removeBeat = true; 
-            })
-            textOverlay.appendChild(img);
-        }
-    
-        let quickImg = new Image();
-        quickImg.src = "./assets/expedbg/quicktime.webp";
-        quickImg.classList.add("cover-all");
-        quickImg.style.zIndex = 1;
-        createBeat();
-        
-        function createBeat() {
-            const modifier = rollBeatModifier();
-    
-            let beatImage = createDom('img');
-            beatImage.classList.add("quicktime-img");
-            beatImage.color = rollArray(colorArray, 0);
-            beatImage.src = `./assets/expedbg/${modifier}${beatImage.color}.webp`;
-            beatImage.position = 0;
-            beatImage.style.left = "100%";
-    
-            let brightnessIncrement = waveQuicktime[quicktimeDict.currentBeat] * randomInteger(90,110) / 100;
-            let thresholdReached = false;
-    
-            // ALLOWS BEAT TO GO IN REVERSE DIRECTION
-            let inverseDirection = false;
-            let inverseRoll = randomInteger(1,101);
-            if ((quicktimeDict.advLevel >= 13 && inverseRoll > 50) || (quicktimeDict.advLevel == 5 && inverseRoll > 75)) {
-                inverseDirection = true;
-                beatImage.style.transform = `scaleX(-1)`;
-                beatImage.style.left = '-10%';
-            }
-            
-            // ADDS WARNING FOR BULLET QUICKTIME
-            if (modifier === 'Bullet-') {
-                brightnessIncrement = Math.max(brightnessIncrement, 0.54);
-                let warnImage = createDom('img', { src: `./assets/expedbg/Warning-${beatImage.color}.webp` });
-                warnImage.classList.add("quicktime-warn");
-                inverseDirection ? (warnImage.style.left = '0') : (warnImage.style.right = '0');
-    
-                warnImage.addEventListener('animationend', () => {
-                    startQuicktime();
-                    warnImage.remove();
-                })
-                quicktimeBar.append(warnImage);
-            } else {
-                beatImage.onload = () => {
-                    startQuicktime();
-                }
-            }
-    
-            function startQuicktime() {
-                const FRAMES_PER_SECOND = 60;
-                const interval = Math.floor(1000 / FRAMES_PER_SECOND);
-                let previousTime = performance.now();
-    
-                let currentTime = 0;
-                let deltaTime = 0;
-                window.requestAnimationFrame(increaseGlow);
-    
-                function increaseGlow(timestamp) {
-                    if (!adventureVariables.fightSceneOn) {return}
-                    if (quicktimeDict.removeBeat) {
-                        quicktimeDict.removeBeat = false;
-                    
-                        beatImage.style.animation = `${beatImage.style.transform === `scaleX(-1)` 
-                                                    ? 'puffOutMirror' : 'puffOut' } 0.25s linear`;
-
-                        beatImage.addEventListener("animationend",() => {
-                            beatImage.remove();
-                            outcomeCheck();
-                        });
-                        
-                        return;
-                    }
-                    
-                    currentTime = timestamp;
-                    deltaTime = currentTime - previousTime;
-                    
-                    if (deltaTime > interval) {
-                        // BOOMERANG MOTION
-                        if (modifier === 'Boomer-') {
-                            if (thresholdReached) {
-                                beatImage.style.transform = `scaleX(-1) rotate(${beatImage.position / 95 * 360 * 2}deg)`;
-                                beatImage.position -= brightnessIncrement * 1.25;
-                            } else if (beatImage.position < 95) {
-                                beatImage.style.transform = `scaleX(-1) rotate(${beatImage.position / 95 * 360 * 2}deg)`;
-                                beatImage.position += brightnessIncrement * 2;
-                            } else {
-                                thresholdReached = true;
-                            }
-                        // ACCELERATIING AND DECELERATING MOTION
-                        } else if (modifier === 'Bullet-') {
-                            beatImage.position += brightnessIncrement * (1.7 - 1 * (beatImage.position / 100));
-                        } else if (modifier === 'Circle-') {
-                            beatImage.position += brightnessIncrement * (0.3 + 2 * (beatImage.position / 100));
-                        // STANDARD MOTION
-                        } else {
-                            beatImage.position += brightnessIncrement;
-                        }
-    
-                        beatImage.style.left = inverseDirection ? `${beatImage.position}%` : `${100 - beatImage.position}%`;
-                        let leftPos = parseFloat(beatImage.style.left);
-    
-                        if (leftPos <= 60 && leftPos > 35) {
-                            quicktimeBar.state = beatImage.color;
-                        } else if (leftPos < -15 || leftPos > 115) {
-                            quicktimeDict.currentBeat++;
-                            quicktimeBar.state = null;
-                            Battle.createBattleText("miss", 2000, videoOverlay);
-                            outcomeCheck();
-                            return;
-                        } else {
-                            quicktimeBar.state = "ready";
-                        }
-                    }
-                    window.requestAnimationFrame(increaseGlow);
-                }
-            }
-    
-            quicktimeBar.append(quickImg, beatImage);
-        }
-    
-        function outcomeCheck() {
-            if (quicktimeDict.currentBeat === quicktimeDict.maxBeat) {
-                textBox.innerHTML = `You successfully countered <span style='color:#A97803'>${quicktimeDict.correctBeat}
-                                    </span> out of <span style='color:#A97803'>${quicktimeDict.maxBeat}</span> ranged attacks!`;
-                setTimeout(() => {
-                    let atkLevel = 1.5;
-                    if (adventureVariables.specialty === 'Finale' || adventureVariables.specialty === 'Unusual') {
-                        atkLevel = 3;
-                    } else if (adventureVariables.advType >= 4) {
-                        atkLevel = 2;
-                    }
-                    quitQuicktime(atkLevel, quicktimeDict.maxBeat, (quicktimeDict.maxBeat + quicktimeDict.correctBeat) / 2);
-                },2000)
-            } else if (quicktimeDict.currentBeat < quicktimeDict.maxBeat) {
-                createBeat();
-            }
-        }
+        quicktimeBar = Battle.regularQuicktime({quicktimeBar: quicktimeBar, quicktimeDict: quicktimeDict, 
+                                                quitQuicktime: quitQuicktime, textBox:textBox, 
+                                                battleVariables:battleVariables, adventureVariables:adventureVariables, 
+                                                bossUpdate: bossUpdate, textOverlay: textOverlay, persistentValues:persistentValues
+        });
     }
 
     if (variant !== '-rain') {
@@ -9582,53 +9391,23 @@ function skillUse() {
 
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         const mobDiv = adventureVideoChildren[i];
-        if (!mobDiv.classList.contains('enemy') || mobDiv.children[1] == undefined) {continue};
+        if (!mobDiv.classList.contains('enemy') || mobDiv.children[1] == undefined) continue;
         if (mobDiv.querySelector('.skill-mark')) { mobDiv.querySelector('.skill-mark').remove() };
 
         let skillMark = new Image();
         skillMark.src = `./assets/icon/mark${adventureScaraText}.webp`;
 
-        let canvas = document.createElement("canvas");
-        canvas.classList.add("skill-mark");
+        let canvas = Battle.createCanvas(["skill-mark"]);
         canvas.style.filter = "drop-shadow(0 0 0.2em #ADDE7D)";
+
         canvas = Battle.canvasHandler(canvas, skillMark, adventureVariables, {
-            postCalc
+            postCalc: () => {
+                if (canvas.brightness > 3) {
+                    canvas.exitCanvas = true;
+                }
+            }
         });
-
         mobDiv.children[0].appendChild(canvas);
-
-        // skillMark.onload = () => {
-        //     canvas.width = skillMark.naturalWidth;
-        //     canvas.height = skillMark.naturalHeight;
-
-        //     let ctx = canvas.getContext("2d");
-        //     ctx.drawImage(skillMark, 0, 0);
-        //     let brightnessIncrement = 0.001;
-        //     canvas.style.filter = "drop-shadow(0 0 0.2em #ADDE7D)";
-
-        //     const FRAMES_PER_SECOND = 60;
-        //     const interval = Math.floor(1000 / FRAMES_PER_SECOND);
-        //     let previousTime = performance.now();
-
-        //     let currentTime = 0;
-        //     let deltaTime = 0;
-
-        //     window.requestAnimationFrame(increaseGlow);
-        //     function increaseGlow(timestamp) {
-        //         if (!adventureVariables.fightSceneOn) {return}
-        //         currentTime = timestamp;
-        //         deltaTime = currentTime - previousTime;
-                
-        //         if (deltaTime > interval) {
-        //             canvas.brightness += brightnessIncrement;
-        //             if (canvas.brightness > 3) {
-        //                 canvas.remove();
-        //                 return;
-        //             }
-        //         }
-        //         window.requestAnimationFrame(increaseGlow);
-        //     }
-        // }
     }
 }
 
@@ -9969,7 +9748,7 @@ function winAdventure() {
         if (adventureRewards.children.length >= 0) {
             newPop(1);
             sortList("table2");
-            nutReward.gValue === 0 ? currencyPopUp("items") : currencyPopUp("items", 0, "nuts", nutReward.gValue);
+            nutReward.gValue === 0 ? currencyPopUp([["items"]]) : currencyPopUp([["items", 0], ["nuts", nutReward.gValue]]);
         }
 
         let rewardChildren = adventureRewards.children;
@@ -12434,15 +12213,15 @@ function enemyBlock(removeBlocker = false, damage, maxHP) {
         let treeEnemyHeader = createDom('p', { innerText: 'Tree Defense'});
         let treeEnemyImg = createDom('img', { src: './assets/tree/treeDefense.webp' });
         let treeEnemyText = createDom('p', { innerHTML: 
-                `Recommended Rank: 16 <br><br> 
-                Stop the monsters from destroying your leyline tree! <br>
-                <span style='color:#dd5548'>Any damage inflicted upon you is inflicted on the tree as well! </span>`});
+                `Recommended Rank: 17 <br><br> 
+                Stop the monsters from destroying the leyline trees! <br>
+                <span style='color:#dd5548'>Any damage inflicted upon you is inflicted on the trees as well! </span>`});
                 
         let treeEnemyButton = createDom('button', { innerText: 'Defend!' });
         treeEnemyButton.addEventListener('click', () => {
             let advButton = document.getElementById("adventure-button");
-            advButton.key = 26;
-            adventure('13-[2]');
+            advButton.key = 35;
+            adventure('15-[1]');
             adventureTreeDefense = true;
         })
     
@@ -12565,6 +12344,15 @@ function blessCreate(treeTable) {
     const blessDisplay = createDom('div', { class:['flex-column'], id: 'bless-container', style: { display:'none' }});
     const blessContainer = createDom('p', { innerText:'Under Construction!'})
     blessDisplay.append(blessContainer);
+
+    if (testing) {
+        blessContainer.remove();
+        const blessButton = createButton('button', { class:['flex-column'], innerText:'Bless' });
+        blessButton.addEventListener('click', () => {
+            enemyBlock(false);
+        })
+        blessDisplay.append(blessButton)
+    }
 
     const buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [Tree.treeBackButton(blessDisplay)] });
     
@@ -12761,7 +12549,7 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
                 } else {
                     newPop(3);
                     itemUse(4010);
-                    currencyPopUp("mail",1);
+                    currencyPopUp([["mail", 1]]);
                     saveValues.mailCore--;
                     wishUnlock();
                     saveValues["wishUnlocked"] = true;
@@ -12820,7 +12608,7 @@ const createPopEle = (type, amount) => {
     return currencyPop;
 }
 
-function currencyPopUp(type1, amount1=0, type2=undefined, amount2=0, type3=undefined, amount3=0, type4=undefined, amount4=0) {
+function currencyPopUp(currenyNestedList) {
     const currencyPop = createDom('div', {
         class: ["currency-pop"],
         child: [createDom('p', { classList: ['flex-row'], innerText: 'Obtained: '})]
@@ -12831,12 +12619,14 @@ function currencyPopUp(type1, amount1=0, type2=undefined, amount2=0, type3=undef
         currencyPop.append(createPopEle(type, amount));
     };
 
-    processCurrencyItem(type1, amount1);
-    if (type2 !== undefined) processCurrencyItem(type2, amount2);
-    if (type3 !== undefined) processCurrencyItem(type3, amount3);
-    if (type4 !== undefined) processCurrencyItem(type4, amount4);
+    for (currencyList in currenyNestedList) {
+        if (currencyList[1] === undefined) {
+            currencyList[1] = 0;
+        }
+        processCurrencyItem(currencyList[0], currencyList[1]);
+    }
 
-    setTimeout(()=> {
+    setTimeout(() => {
         currencyPop.style.animation = "fadeOut 2s cubic-bezier(.93,-0.24,.93,.81) forwards";
         currencyPop.addEventListener("animationend", () => {
             currencyPop.remove();
@@ -12908,11 +12698,12 @@ if (beta || testing) {
         } else if (e.key === 'g') {
             spawnSkirmish();
         } else if (e.key === 'h') {
-            throw new Error('Test Error');
+            let advButton = document.getElementById("adventure-button");
+            advButton.key = 32;
+            adventure("14-[2]");
         }
     })    
 }
-
 }
 
 // FOR TESTING PURPOSES ONLY
@@ -12955,7 +12746,7 @@ if (beta) {
         setTimeout(()=>{
             let startButton = document.getElementById("play-button");
             if (startButton) startButton.click();
-            setTimeout(()=>{startingFunction();},500)
+            setTimeout(()=>{ startingFunction() },500);
         }, 3500);
     }, 800);
 

@@ -1763,7 +1763,7 @@ table, button, label {
 }
 
 .active-rank {
-    transform:scale(1.1) translateY(-0.1em);
+    transform:scale(1.1) translateY(-0.1em) !important;
 }
 
 .rank-button > :first-child {
