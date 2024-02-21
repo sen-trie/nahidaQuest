@@ -125,7 +125,7 @@ const expedInfo = (butId, expeditionDict, saveValues, persistentValues) => {
     enemyInfo.currentWave = id;
 }
 
-const resetAdventure = (dodgeOn, fightBgmElement, fightSFXElement, adventureVariables, bgmElement) => {
+const resetAdventure = (dodgeOn, fightBgmElement, fightSFXElement, adventureVariables, bgmElement, winBattle = false) => {
     const adventureChoiceOne = document.getElementById("adv-button-one");
     adventureChoiceOne.style.display = "block";
     adventureChoiceOne.innerText = "Leave";
@@ -136,30 +136,33 @@ const resetAdventure = (dodgeOn, fightBgmElement, fightSFXElement, adventureVari
     adventureEncounter.style.display = "flex";
 
     const adventureVideo = document.getElementById('adventure-video');
-    const targetElements = adventureVideo.querySelectorAll('.atk-indicator, .select-indicator, .raining-image, .health-bar, .health-bar-scara, .skill-mark, .counter-button, .energy-burst');
+    const targetElements = adventureVideo.querySelectorAll(`.atk-indicator, .select-indicator, .raining-image, .health-bar, 
+                                                            .health-bar-scara, .skill-mark, .counter-button, .energy-burst, .defense-timer`);
     targetElements.forEach((item) => {
         item.remove();
     });
 
-    const leftOverEnemy = adventureVideo.querySelectorAll('.enemy');
-    leftOverEnemy.forEach((ele) => {
-        ele.style.filter = 'grayscale(100%) brightness(20%)';
-    })
+    if (winBattle) {
+        const leftOverEnemy = adventureVideo.querySelectorAll('.enemy');
+        leftOverEnemy.forEach((ele) => {
+            ele.style.filter = 'grayscale(100%) brightness(20%)';
+        })
+    
+        const leftOverImg = adventureVideo.querySelectorAll('.enemyImg');
+        leftOverImg.forEach((ele) => {
+            ele.style.animation = '';
+        })
+    }
 
-    const leftOverImg = adventureVideo.querySelectorAll('.enemyImg');
-    leftOverImg.forEach((ele) => {
-        ele.style.animation = '';
-    })
-
-    setTimeout(()=>{
+    setTimeout(() => {
         dodgeOn("close");
         fightBgmElement.pause();
         fightSFXElement.load();
         fightSFXElement.play();
         fightSFXElement.addEventListener('ended', () => {
-            setTimeout(()=>{
+            setTimeout(() => {
                 if (!adventureVariables.fightSceneOn) {
-                    bgmElement.play()
+                    bgmElement.play();
                 }
             }, 1000);
         })

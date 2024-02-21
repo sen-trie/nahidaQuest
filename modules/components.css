@@ -1132,7 +1132,7 @@
     border-right: 0.1em solid #333553 !important;
 }
 
-#adventure-health {
+#adventure-health, .defense-timer {
     position: absolute;
     height: 9%;
     width: 75%;
@@ -1860,6 +1860,21 @@
     transform: translate(-50%, 0%);
     filter: brightness(0);
     pointer-events: none;
+}
+
+.defense-timer {
+    top: 12%;
+    height: 1.5%;
+    background-color: var(--dark-brown);
+    border: 0.1em solid var(--pale-brown);
+    transition: opacity 0.4s ease;
+}
+
+.defense-width {
+    width: 100%;
+    height: 100%;
+    background-color: var(--dull-yellow);
+    
 }
 
 /*/////////////////////////////// SETTINGS CSS ///////////////////////////////*/

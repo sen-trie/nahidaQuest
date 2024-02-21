@@ -670,12 +670,18 @@ const enemyInfo = {
     1431:{Class:"Megaboss",       Variation:1,   Type:"Finale",      HP:12000,   ATK:3,     AtkCooldown:32.5},
     1432:{Class:"Minion",          Variation:2,   Type:"Finale",      HP:1850,   ATK:1,     AtkCooldown:30},
     // LVL 15
-    "15-Wave-1":{Wave:[1501,1501],         BG:[1,2]},
-    "15-Wave-2":{Wave:[1502,1502],         BG:[1,2]},
-    "15-Wave-3":{Wave:[1503,1503],         BG:[1,2]},
-    1501:{Class:"Leader",       Variation:2,   Type:"Skirmish",            HP:1200,   ATK:1.5,     AtkCooldown:30},
-    1502:{Class:"Leader",        Variation:2,   Type:"WAbyss",              HP:1100,   ATK:2,     AtkCooldown:32.5},
-    1503:{Class:"Leader",       Variation:2,   Type:"SkirmishBeast",       HP:2000,   ATK:3,     AtkCooldown:40},
+    "15-Wave-1":{Wave:[1501,1502,1502,1501],         BG:[1,2]},
+    "15-Wave-2":{Wave:[1503,1505,1503,1503],         BG:[1,2]},
+    "15-Wave-3":{Wave:[1504,1506,1504,1504],         BG:[1,2]},
+    "15-Wave-4":{Wave:[1507,1508,1507,1507],         BG:[1,2]},
+    1501:{Class:"Mob",         Variation:4,   Type:"Fungi",              HP:400,   ATK:1.5,     AtkCooldown:35},
+    1502:{Class:"Leader",       Variation:2,   Type:"Fungi",              HP:650,   ATK:2,     AtkCooldown:32.5},
+    1503:{Class:"Mob",        Variation:5,   Type:"Specter",              HP:600,   ATK:2,     AtkCooldown:37.5},
+    1504:{Class:"Mob",       Variation:4,   Type:"Hilichurl",          HP:350,   ATK:1,     AtkCooldown:32},
+    1505:{Class:"Leader",       Variation:3,   Type:"Hilichurl",       HP:600,   ATK:2,     AtkCooldown:37},
+    1506:{Class:"Boss",       Variation:2,   Type:"Hilichurl",       HP:900,   ATK:3,     AtkCooldown:40},
+    1507:{Class:"Mob",       Variation:3,   Type:"Automaton",          HP:450,   ATK:1,     AtkCooldown:34},
+    1508:{Class:"Leader",       Variation:3,   Type:"Automaton",       HP:700,   ATK:2,     AtkCooldown:34},
 }
 
 const upgradeDictDefault = {

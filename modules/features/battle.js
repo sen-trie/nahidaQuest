@@ -621,4 +621,63 @@ const cytusQuicktime = (quicktimeBar, textOverlay, usedDict, quitQuicktime, adve
     return quicktimeBar;
 }
 
-export { beatHandle, createCanvas, canvasHandler, drawBattleHealth, comboHandler, createBattleText, cytusQuicktime, regularQuicktime }
+const enemyCanvas = (enemyCanvasObj) => {
+    const canvas = createDom("canvas", {
+        class: ["atk-indicator"],
+        brightness: enemyCanvasObj.brightness,
+        paused: false,
+        eaten: false,
+        deflecting: false,
+        burstMode: false,
+        changeSrc: enemyCanvasObj.changeSrc,
+    });
+    
+    switch (enemyCanvasObj.specialty) {
+        case 'Unusual':
+        case 'Workshop':
+            canvas.brightness = 0.15;
+            break;
+        default:
+            break;
+    }
+
+    if (enemyCanvasObj.arm) {
+        canvas.brightness -= 0.05 * randomInteger(1, enemyCanvasObj.position * 10);
+    }
+
+    return canvas;
+}
+
+const animateMob = (mobDiv, enemyImg, adventureVariables) => {
+    const slitIn = () => {
+        enemyImg.style.animation = 'slit-in-horizontal 0.6s ease-out both';
+        enemyImg.addEventListener('animationend', () => {
+            enemyImg.style.animation = '';
+            void enemyImg.offsetWidth;
+            enemyImg.style.animation = `vibrate ${randomInteger(600, 900) / 100}s linear infinite both`;
+        }, {once: true})
+    }
+
+    enemyImg.style.animation = `vibrate ${randomInteger(600,1200) / 100}s linear infinite both`;
+    if (mobDiv.classList.contains('wide-enemy')) {
+        enemyImg.style.animation = `vibrate ${randomInteger(2000,2400) / 100}s linear infinite both`;
+    } else if (adventureVariables.specialty === 'Unusual') {
+        if (mobDiv.classList.contains('minion')) {
+            slitIn();
+        } else if (mobDiv.classList.contains('decoy')) {
+            enemyImg.style.animation = 'slit-in-horizontal 0.6s ease-out both';
+            mobDiv.style.animation = `sway ${randomInteger(26, 46) / 10}s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite`;
+        } else {
+            enemyImg.style.animation = 'unset';
+            mobDiv.style.animation = 'sway 3s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite';
+        }
+    } else if (adventureVariables.specialty === 'Finale') {
+        if (mobDiv.classList.contains('minion')) {
+            slitIn();
+        }
+    } else if (adventureVariables.treeDefense && mobDiv.classList.contains('new-spawn')) {
+        slitIn();
+    }
+}
+
+export { beatHandle, createCanvas, canvasHandler, drawBattleHealth, comboHandler, createBattleText, cytusQuicktime, regularQuicktime, enemyCanvas, animateMob }
