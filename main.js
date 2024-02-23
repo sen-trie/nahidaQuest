@@ -1,7 +1,7 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop,errorMesg } from "./modules/adjustUI.js"
 import { CONSTANTS } from "./modules/constants.js";
 import * as Settings from "./modules/features/settings.js";
 import * as Shop from "./modules/features/shop.js";
@@ -84,7 +84,6 @@ let battleVariables = {};
 let adventureScene = false;
 let adventureScaraText = "";
 let skillCooldownReset;
-let adventureTreeDefense = false;
 let worldQuestDict = {};
 
 const suffixPreload = ['Blue', 'Red', 'Green', 'Purple'];
@@ -1424,7 +1423,7 @@ function minesweeperEvent() {
                     eventOutcome(`All whopperflowers have been revealed!`,eventBackdrop);
                     const endTimestamp = performance.now();
                     setTimeout(()=> {
-                        currencyPopUp("items", 0, "primogem", randomPrimo);
+                        currencyPopUp([["items", 0], ["primogem", randomPrimo]]);
                         if (endTimestamp - startTimestamp < 15 * 1000) {
                             challengeNotification(({category: 'specific', value: [2, 7]}));
                         }
@@ -2967,7 +2966,9 @@ function loadingAnimation() {
     let value = parseInt(loadingNumber.loadingValue);
     let preloadArray = drawUI.preloadMinimumArray(upgradeInfo);
     preloadStart.fetch(preloadArray).then(() => {
-        setTimeout(() => {removeLoading(loadingNumber)}, 2000);
+        setTimeout(() => {
+            removeLoading(loadingNumber);
+        }, 2000);
     });
 
     preloadStart.onprogress = event => {
@@ -3000,6 +3001,7 @@ function removeLoading(loadingNumber) {
         }
 
         tutorial(idleAmount);
+        if (testing) document.getElementById('play-button').click(); 
     }, 200);
 }
 
@@ -3825,9 +3827,11 @@ function settingsBox() {
             event: ['click', () => {window.open('https://nahidaquest.com/feedback',"_blank")}]
         })
 
-        window.onerror = (line, col, error) => {
-            errorBoxText.value += `${error}\nLine:${line}, Column:${col}\n\n`;
-            };
+        window.onerror = (message, source, lineno, colno, error) => {
+            errorBoxText.value += `${error}\nLine:${lineno}, Column:${colno}\n\n`;
+            errorMesg(error);
+            return false;
+        };
 
         errorBox.append(errorBoxText, errorBoxButton);
 
@@ -4490,11 +4494,7 @@ function milestoneBuy(heroTooltip) {
                 }
 
                 let tempID = rollArray(itemArray, 0);
-                let inventoryCount = InventoryMap.get(tempID);
-                inventoryCount--;
-                InventoryMap.set(tempID, inventoryCount)
-
-                if (inventoryCount <= 0) { (document.getElementById(tempID)).remove()}
+                reduceItem(tempID);
                 milestoneSuccess(true);
             }
         } else {
@@ -4531,11 +4531,7 @@ function milestoneBuy(heroTooltip) {
                 weaselDecoy.play();
                 return;
             } else if (itemArray.length >= 0 && saveValues.realScore >= cost) {
-                let inventoryCount = InventoryMap.get(itemArray[0]);
-                inventoryCount--;
-                InventoryMap.set(itemArray[0], inventoryCount);
-
-                if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
+                reduceItem(itemArray[0]);
                 milestoneSuccess(true);
             }
         }
@@ -6042,7 +6038,7 @@ function completeBounty(bountyID,type,ele) {
 
     claim.addEventListener("click",()=>{
         notifPop("clear","bounty",bountyID);
-        currencyPopUp([["primogem",Math.round(claim.primoReward)]]);
+        currencyPopUp([["primogem", Math.round(claim.primoReward)]]);
         gainXP(Math.round(claim.xpReward));
         bountyObject[bountyID].Completed = "claimed";
         claim.remove();
@@ -7003,21 +6999,21 @@ function finishQuest(advType) {
             persistentValues.lifetimeEnergyValue += energyRoll;
 
             challengeNotification(({category: 'energy', value: saveValues.energy}))
-            currencyPopUp([["energy",energyRoll]]);
+            currencyPopUp([["energy", energyRoll]]);
         }
     } else if (infoDict.Type === "Treasure") {
         quitQuest();
         if (advType === 10) {
             genericItemLoot();
 
-            currencyPopUp([["items",0]]);
+            currencyPopUp([["items", 0]]);
             newPop(1);
             sortList("table2");
         } else if (advType === 7 || advType === 9) {
             inventoryDraw("food", 2, 4);
             inventoryDraw("food", 2, 4);
 
-            currencyPopUp([["items",0]]);
+            currencyPopUp([["items", 0]]);
             newPop(1);
             sortList("table2");
         }
@@ -7297,6 +7293,7 @@ function drawAdventure(advType, wave) {
         fightSceneOn: false,
         pheonixMode: false,
         nahidaMultiplier: nahidaMultiplier,
+        skirmish: advType === 13 || advType === 15,
     }
 
     let adventureVideo = document.getElementById("adventure-video");
@@ -7359,19 +7356,26 @@ function drawAdventure(advType, wave) {
             if (!adventureVariables.fightSceneOn) {return}
             currentTime = timestamp;
             deltaTime = currentTime - previousTime;
-          
+
             if (deltaTime > interval) {
                 previousTime = currentTime - (deltaTime % interval);
+                if (battleVariables.quicktimeAttack) {
+                    window.requestAnimationFrame(decreaseTime);
+                    return;
+                }
+              
                 timerWidth.brightness -= 0.005;
+                if (testing) {timerWidth.brightness -= 0.5}
                 timerWidth.style.width = `${timerWidth.brightness}%`;
-            }
 
-            if (timerWidth.brightness < 0) {
-                winAdventure();
-                return;
+                if (timerWidth.brightness < 0) {
+                    winAdventure();
+                    return;
+                }
             }
             window.requestAnimationFrame(decreaseTime);
         }
+
         adventureVideo.append(timerDefense);
     }
 
@@ -7485,7 +7489,6 @@ function triggerFight() {
         currentEaten: null,
         bossHealth: adventureVariables.advType === 14 ? 100 : null,
         lastStand: false,
-        skirmish: adventureVariables.advType === 13 || adventureVariables.advType === 15,
         triggerConstants: {quicktimeCheck, summonMob, rainTimeCheck, floatTimeCheck, burstTimeCheck, burstTimeEnd, eatTimeCheck},
     }
 
@@ -7498,6 +7501,9 @@ function triggerFight() {
         }
         if (persistentValues.fellBossDefeat) {
             battleVariables.floatTime = 0.5;
+        }
+        if (adventureVariables.treeDefense) {
+            document.getElementById('timer-defense').activate();
         }
     } else if (adventureVariables.advType === 14) {
         if (adventureVariables.specialty === 'FellBoss') {
@@ -7513,9 +7519,6 @@ function triggerFight() {
             battleVariables.summonTime = 0;
             battleVariables.doubleAtkCooldown = 1;
         }
-    } else if (adventureVariables.treeDefense) {
-        let treeDefense = document.getElementById('timer-defense');
-        treeDefense.activate();
     }
     
     let currentSong = randomInteger(1, 4); 
@@ -8270,11 +8273,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                         }
                     }
 
-                    if (battleVariables.decoyTime != null) {
-                        canvas.style.filter = `brightness(${canvas.brightness * 0.65})`;
-                    } else {
-                        canvas.style.filter = `brightness(${canvas.brightness})`;
-                    }
+                    canvas.style.filter = `brightness(${canvas.brightness})`;
                 }
             }
             window.requestAnimationFrame(increaseBrightness);
@@ -8376,6 +8375,10 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
         if (battleVariables.decoyNumber != null) {
             canvas.brightness = 0 - (randomInteger(0,10) / 10);
+            const allCanvas = document.getElementById('adventure-video').querySelectorAll('atk-indicator');
+            allCanvas.forEach((canvas) => {
+                canvas.brightness = 0;
+            })
         } else {
             switch (type) {
                 case 'strong':
@@ -9262,7 +9265,7 @@ function quitQuicktime(atkNumber = 1, maxBeat = null, correctBeat) {
 
 
 function loseHP(ATK, type = 'normal', resetCombo = true, src = null) {
-    if (!adventureVariables.fightSceneOn) {return}
+    if (!adventureVariables.fightSceneOn || testing) {return}
 
     const healthBar = document.getElementById('health-bar');
     let hpInterval = (100 / battleVariables.maxHealth);
@@ -9276,8 +9279,6 @@ function loseHP(ATK, type = 'normal', resetCombo = true, src = null) {
         healthBar.currentWidth -= (hpInterval * ATK);
         if (healthBar.currentWidth < 1) {healthBar.currentWidth = 0}
         if (resetCombo && type !== 'inverse') {Battle.comboHandler("reset");}
-
-        console.log(`Being attacked for ${ATK} HP from ${src}`);
 
         adventureHealth.style.animation = 'shake 1s infinite linear';
         setTimeout(()=>{
@@ -9755,7 +9756,7 @@ function winAdventure() {
         if (adventureRewards.children.length >= 0) {
             newPop(1);
             sortList("table2");
-            nutReward.gValue === 0 ? currencyPopUp([["items"]]) : currencyPopUp([["items", 0], ["nuts", nutReward.gValue]]);
+            nutReward.gValue === 0 ? currencyPopUp([["items", 0]]) : currencyPopUp([["items", 0], ["nuts", nutReward.gValue]]);
         }
 
         let rewardChildren = adventureRewards.children;
@@ -9815,8 +9816,6 @@ function quitAdventure(wonBattle) {
         notifPop("clearAll","skirmish");
     }
     
-    adventureVariables = {};
-    battleVariables = {};
     let adventureArea = document.getElementById("adventure-area");
     adventureArea.style.display = 'none';
     adventureScene = false;
@@ -9845,10 +9844,12 @@ function quitAdventure(wonBattle) {
     adventureScaraText = "";
     if (document.getElementById('refresh-icon')) {document.getElementById('refresh-icon').remove()};
 
-    if (adventureTreeDefense) {
-        adventureTreeDefense = false;
+    if (adventureVariables.treeDefense) {
         enemyBlock(true, battleVariables.healthLost, battleVariables.maxHealth);
     }
+
+    adventureVariables = {};
+    battleVariables = {};
 }
 
 //------------------------------------------------------------------------TABLE 4 (WISH)------------------------------------------------------------------------//
@@ -10749,12 +10750,11 @@ function reduceItem(localItemTooltip, usingTooltip = false) {
     let itemButton = document.getElementById(localItemTooltip);
     let inventoryCount = InventoryMap.get(localItemTooltip);
     inventoryCount--;
-    InventoryMap.set(localItemTooltip, inventoryCount);
+    InventoryMap.set(localItemTooltip, Math.max(inventoryCount, 0));
 
     persistentValues.itemsUsedValue++;
-    
 
-    if (usingTooltip) {
+    if (usingTooltip && itemButton) {
         if (inventoryCount > 0) {
             changeTooltip(Inventory[localItemTooltip],"item", localItemTooltip);
         } else if (inventoryCount <= 0) {
@@ -10771,7 +10771,7 @@ function reduceItem(localItemTooltip, usingTooltip = false) {
             itemButton.remove();
         }
     } else {
-        if (inventoryCount <= 0) {
+        if (inventoryCount <= 0 && itemButton) {
             itemButton.remove();
         }
     }
@@ -11954,10 +11954,7 @@ function offerItemFunction() {
     saveValues.treeObj.offer[0] -= persistentValues.goldenCore;
     for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
         let itemNumber = saveValues.treeObj.offer[i];
-        let newAmount = InventoryMap.get(itemNumber) - 1;
-
-        InventoryMap.set(itemNumber, newAmount);
-        if (newAmount === 0) {(document.getElementById(itemNumber)).remove();}
+        reduceItem(itemNumber);
     }
 
     const treeImg = document.getElementById('tree-img');
@@ -11966,9 +11963,10 @@ function offerItemFunction() {
         treeImg.style.animation = 'unset';
     }, { once: true });
 
+    const treeGrowth = (randomInteger(7, 10) + saveValues.treeObj.offerAmount) / Math.log(saveValues.treeObj.energy);
     saveValues.treeObj.growthRate = Math.round(saveValues.treeObj.growthRate * 1.05 * 100) / 100;
     Tree.updateTreeValues(false, saveValues.treeObj);
-    growTree('add', randomInteger(7, 10) + saveValues.treeObj.offerAmount);
+    growTree('add', Math.round(treeGrowth));
 
     saveValues.treeObj.offerAmount++;
     challengeNotification(({category: 'offer', value: saveValues.treeObj.offerAmount}))
@@ -12026,7 +12024,6 @@ function treeOptions(planted, optionsContainer, lastPhase) {
                     })
                     break;
                 case 2:
-                    /// MOVE THIS TO ANOTHER BUTTON
                     treeButton.addEventListener('click',() => {
                         universalStyleCheck(optionsContainer,"display","flex","none");
                         universalStyleCheck(document.getElementById('bless-container'),"display","none","flex");
@@ -12089,6 +12086,11 @@ function destroyTree(finalPhase = false) {
     Tree.updateTreeValues(true, saveValues.treeObj);
     treeImg.src = `./assets/tooltips/Empty.webp`;
 
+    if (saveValues.treeObj.defense) {
+        enemyBlock(true);
+    }
+
+    Tree.toggleOptionsContainer(true);
     setTimeout(()=>{
         mailElement.load();
         mailElement.play();
@@ -12178,44 +12180,50 @@ function addTreeCore(number = 1, increaseOdds = 0, override = false) {
     sidePop(`/tooltips/inventory/seed-${rolledCore}.webp`, `${number}x Lvl. ${rolledCore} Seed`);
 }
 
-function enemyBlock(removeBlocker = false, damage, maxHP) {
+function enemyBlock(removeBlocker = false, damage = null, maxHP) {
     if (removeBlocker === true) {
-        let enemyContainer = document.getElementById('tree-block').firstChild;
-        let enemyContainerChildren = enemyContainer.children;
-        let lostHP = Math.min(50,(50 * (damage / maxHP)));
-
-        // TODO: add a funny picture or smth depending on amount of lost HP
-        let endText = `You took ${damage} cumulative damage <br> The tree lost ` + (lostHP == 0 ? '0' : `<span style='color:#dd5548'>${lostHP}%</span>`) + ' of its HP.'
-        enemyContainerChildren[2].innerHTML = endText;
-        enemyContainerChildren[2].style.textAlign = 'center';
-        enemyContainerChildren[2].style.margin = '2% 0';
-        enemyContainerChildren[2].style.width = '100%';
-        enemyContainer.style.width = 'fit-content';
-
-        enemyContainerChildren[3].innerText = 'Okay';
-        let enemyButtonNew = enemyContainerChildren[3].cloneNode(true);
-        enemyContainer.replaceChild(enemyButtonNew, enemyContainerChildren[3]);
-        enemyButtonNew.addEventListener('click', () => {
+        if (damage === null) {
             document.getElementById('tree-block').remove();
-            universalStyleCheck(document.getElementById('tree-offer-container'),"display","flex","none", true);
             saveValues.treeObj.defense = false;
-
-            let treeHealthText = document.getElementById('tree-health-text');
-            saveValues.treeObj.health = Math.max(saveValues.treeObj.health - lostHP, 1); ;
-            treeHealthText.health = saveValues.treeObj.health;
-            treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
-        })
-
-        enemyContainerChildren[1].remove();
+        } else {
+            let enemyContainer = document.getElementById('tree-block').firstChild;
+            let enemyContainerChildren = enemyContainer.children;
+            let lostHP = Math.min(50,(50 * Math.round(damage / maxHP / 1.5)));
+    
+            // TODO: add a funny picture or smth depending on amount of lost HP
+            let endText = `You took ${damage} cumulative damage <br> The tree lost ` + (lostHP == 0 ? '0' : `<span style='color:#dd5548'>${lostHP}%</span>`) + ' of its HP.'
+            enemyContainerChildren[2].innerHTML = endText;
+            enemyContainerChildren[2].style.textAlign = 'center';
+            enemyContainerChildren[2].style.margin = '2% 0';
+            enemyContainerChildren[2].style.width = '100%';
+            enemyContainer.style.width = 'fit-content';
+    
+            enemyContainerChildren[3].innerText = 'Okay';
+            let enemyButtonNew = enemyContainerChildren[3].cloneNode(true);
+            enemyContainer.replaceChild(enemyButtonNew, enemyContainerChildren[3]);
+            enemyButtonNew.addEventListener('click', () => {
+                document.getElementById('tree-block').remove();
+                saveValues.treeObj.defense = false;
+                Tree.toggleOptionsContainer(false, 'bless-container');
+    
+                let treeHealthText = document.getElementById('tree-health-text');
+                saveValues.treeObj.health = Math.max(saveValues.treeObj.health - lostHP, 1); ;
+                treeHealthText.health = saveValues.treeObj.health;
+                treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
+            })
+    
+            enemyContainerChildren[1].remove();
+        }
     } else if (removeBlocker === false) {
-        universalStyleCheck(document.getElementById('tree-offer-container'),"display","flex","none", true);
+        Tree.toggleOptionsContainer(true);
+        saveValues.treeObj.defense = true;
 
         let eventBackdrop = document.createElement('div');
         eventBackdrop.classList.add('event-dark', 'cover-all');
         eventBackdrop.id = 'tree-block';
 
         let enemyContainer = document.createElement('div');
-        enemyContainer.classList.add('tree-enemy','flex-column')
+        enemyContainer.classList.add('tree-enemy','flex-column');
     
         let treeEnemyHeader = createDom('p', { innerText: 'Tree Defense'});
         let treeEnemyImg = createDom('img', { src: './assets/tree/treeDefense.webp' });
@@ -12229,7 +12237,6 @@ function enemyBlock(removeBlocker = false, damage, maxHP) {
             let advButton = document.getElementById("adventure-button");
             advButton.key = 35;
             adventure('15-[1,2,3,4]');
-            adventureTreeDefense = true;
         })
     
         enemyContainer.append(treeEnemyHeader, treeEnemyImg, treeEnemyText, treeEnemyButton);
@@ -12277,7 +12284,8 @@ function growTree(type, amount = 0) {
             treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
 
             const leylineText = document.getElementById('leyline-text');
-            leylineText.innerText = '';
+            leylineText.innerHTML = `Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
+            <br> cost of your tree's HP`;
 
             Tree.updateTreeValues(false, saveValues.treeObj);
             rollTreeItems();
@@ -12293,7 +12301,7 @@ function growTree(type, amount = 0) {
         // INTIATE TREE DEFENSE 
         if (saveValues.treeObj.defense) { enemyBlock(false) }
     } else {
-        console.errror(`growTree: Missing Type ${type}`)
+        console.error(`growTree: Missing Type ${type}`)
     }
 }
 
@@ -12352,16 +12360,46 @@ function blessCreate(treeTable) {
     const blessContainer = createDom('p', { innerText:'Under Construction!'})
     blessDisplay.append(blessContainer);
 
+    let buttonContainer;
     if (testing) {
+        const leylineTitle = createDom('p', { innerHTML: 'Blessing of Dendro' });
         blessContainer.remove();
-        const blessButton = createButton('button', { class:['flex-column'], innerText:'Bless' });
+
+        const chargePic = createDom('img', { classList:['bless-icon'], src: './assets/tree/bless.webp' });
+        const blessBar = createProgressBar(
+            { class: ['leyline-progress', 'healthbar-container'] },
+            { id: 'bless-progress', progress: parseFloat(persistentValues.blessPower),
+            style: { width: (parseFloat(persistentValues.blessPower) + '%'), background: '#25818E' }},
+            { style: { borderRight: '0.2em solid #ADB3F6' }},
+            4,
+        );
+
+        const chargeContainer = createDom('div', { classList:['flex-row', 'charge-container'], children:[chargePic, blessBar] });
+        const leylineText = createDom('p', { id:'blessing-text' });
+        leylineText.innerHTML = `Using Nahida's power, bless the trees' growth. 
+                            <br> Recharge rate is based on Nahida's morale.
+                            <br><span style='font-size: 0.6em'>Note: Dendro accumulation may attract nearby 
+                            <span style='color: var(--light-red)'>enemies</span>!</span></span>`;
+
+
+        blessDisplay.append(leylineTitle, chargeContainer, leylineText);
+
+        const blessButton = document.createElement('button');
+        blessButton.innerText = 'Bless';
+        blessButton.classList.add('fancy-button', 'clickable');
         blessButton.addEventListener('click', () => {
-            enemyBlock(false);
-        })
-        blessDisplay.append(blessButton)
+            growTree('add', randomInteger(20, 30));
+            const enemyRoll = randomInteger(0, 100);
+            if (enemyRoll < (25 - luckRate / 3)) {
+                enemyBlock(false);
+            }
+        });
+
+        buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [Tree.treeBackButton(blessDisplay), blessButton] });
+    } else {
+        buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [Tree.treeBackButton(blessDisplay)] });
     }
 
-    const buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [Tree.treeBackButton(blessDisplay)] });
     
     blessDisplay.append(buttonContainer);
     treeTable.append(blessDisplay);
@@ -12371,14 +12409,14 @@ function leylineCreate(treeTable) {
     const leylineDisplay = createDom('div', {class:['flex-column'], id:'leyline-container', style:{ display:'none' }});
     const leylineTitle = createDom('p', { innerHTML: 'Leyline Outbreak Energy Level' });
     const leylineBar = createProgressBar(
-            { class: ['leyline-progress', 'healthbar-container'] },
+            { id: 'leyline-bar', class: ['leyline-progress', 'healthbar-container'] },
             { id: 'leyline-progress', progress: parseFloat(persistentValues.leylinePower),
             style: { width: (parseFloat(persistentValues.leylinePower) + '%'), background: 'linear-gradient(90deg, rgba(204,12,12,1) 0%, rgba(235,225,15,1) 100%)' }},
             { style: { borderRight: '0.2em solid #C17D6D' }},
             4,
             { src: './assets/tree/skull.webp'}
     );
-     
+    
     let text = `Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
             <br> cost of your tree's HP`;
     const leylineText = createDom('p', { innerHTML: text, id:'leyline-text' });
@@ -12395,7 +12433,7 @@ function leylineCreate(treeTable) {
     absorbButton.classList.add('fancy-button', 'clickable');
     absorbButton.addEventListener('click', () => {
         if (saveValues.treeObj.health <= 15) {
-            leylineText.innerText = 'This tree is too weak to absorb excess energy!'
+            leylineText.innerHTML = 'This tree is too weak to absorb excess energy!'
             weaselDecoy.load();
             weaselDecoy.play();
             return;
@@ -12424,13 +12462,9 @@ function leylineCreate(treeTable) {
                 break;
         }
 
-        let leylineProgress = document.getElementById('leyline-progress');
         persistentValues.leylinePower -= treeAbsorbPower;
-
         checkAbsorbThreshold();
-
-        leylineProgress.progress = parseFloat(persistentValues.leylinePower);
-        leylineProgress.style.width = leylineProgress.progress + '%';
+        leylineBar.updateHealth(parseFloat(persistentValues.leylinePower), 'progress')
 
         let treeHealthText = document.getElementById('tree-health-text');
         saveValues.treeObj.health = Math.max(saveValues.treeObj.health - randomInteger(20, 40), 1);
@@ -12615,7 +12649,12 @@ const createPopEle = (type, amount) => {
     return currencyPop;
 }
 
-function currencyPopUp(currenyNestedList) {
+function currencyPopUp(currencyNestList) {
+    const currencyNestedList = deepCopy(currencyNestList);
+    if (currencyNestedList.length === 0) {
+        return;
+    }
+
     const currencyPop = createDom('div', {
         class: ["currency-pop"],
         child: [createDom('p', { classList: ['flex-row'], innerText: 'Obtained: '})]
@@ -12626,19 +12665,20 @@ function currencyPopUp(currenyNestedList) {
         currencyPop.append(createPopEle(type, amount));
     };
 
-    for (currencyList in currenyNestedList) {
-        if (currencyList[1] === undefined) {
-            currencyList[1] = 0;
+    for (let i = 0; i < currencyNestedList.length; i++) {
+        if (currencyNestedList[i][1] === undefined) {
+            currencyNestedList[i][1] = 0;
         }
-        processCurrencyItem(currencyList[0], currencyList[1]);
+
+        processCurrencyItem(currencyNestedList[i][0], currencyNestedList[i][1]);
     }
 
     setTimeout(() => {
-        currencyPop.style.animation = "fadeOut 2s cubic-bezier(.93,-0.24,.93,.81) forwards";
+        currencyPop.style.animation = "fadeOut 3s cubic-bezier(.93,-0.24,.93,.81) forwards";
         currencyPop.addEventListener("animationend", () => {
             currencyPop.remove();
         })
-    },1000)
+    },1000);
     mainBody.appendChild(currencyPop);
 }
 
@@ -12709,7 +12749,7 @@ if (beta || testing) {
             advButton.key = 32;
             adventure("14-[2]");
         }
-    })    
+    });
 }
 }
 
@@ -12733,6 +12773,11 @@ if (testing) {
     tester.innerText = 'TESTER';
     tester.classList.add('test-warning');
     mainBody.append(tester); 
+    
+    setTimeout(()=>{
+    let startButton = document.getElementById("start-button");
+    startButton.click();
+    }, 1200);
 }
 
 if (beta) {
@@ -12753,7 +12798,9 @@ if (beta) {
         setTimeout(()=>{
             let startButton = document.getElementById("play-button");
             if (startButton) startButton.click();
-            setTimeout(()=>{ startingFunction() },500);
+            setTimeout(()=>{ 
+                startingFunction();
+            },500);
         }, 3500);
     }, 800);
 

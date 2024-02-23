@@ -365,6 +365,11 @@ function createProgressBar(parentProps, childProps, dividerProps, dividerNumber,
         }
     }
 
+    parentEle.updateHealth = (newProgress, prop) => {
+        parentEle[prop] = parseFloat(newProgress);
+        childEle.style.width = newProgress + '%';
+    }
+
     barEle.appendChild(childEle)
     parentEle.appendChild(barEle);
     return parentEle;
@@ -448,18 +453,16 @@ const sidePop = (imgSrc, text) => {
 // ERROR POPUP
 const MAX_ERROR_LENGTH = 30;
 const errorMesg = (errMesg) => {
-    console.log(111)
-
     let innerText = errMesg.message;
     if (innerText.length > MAX_ERROR_LENGTH) {
         innerText = innerText.slice(0, MAX_ERROR_LENGTH - 3);
         innerText += "...";
     }
 
-    const errorDiv = createDom('p', { classList: ['flex-row', 'error-pop-up'], innerText: `Error: ${innerText} \n Check log for details`});
+    const errorDiv = createDom('p', { classList: ['flex-row', 'error-pop-up'], innerText: `Error: ${innerText} \n Check error log for details`});
     document.body.appendChild(errorDiv);
     errorDiv.addEventListener('click', () => { errorDiv.remove() }, { once: true })
-    setTimeout(() => {errorDiv.remove()}, 10000);
+    setTimeout(() => {errorDiv.remove()}, 60 * 1000);
 }
 
 export { errorMesg,createButton,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal,sidePop };

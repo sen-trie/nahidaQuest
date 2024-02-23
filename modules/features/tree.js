@@ -15,6 +15,7 @@ const offerBox = (treeTable, optionsContainer, offerItemFunction, persistentValu
     nutStoreCurrency.innerText = abbrNum(persistentValues["goldenCore"], 2, true);
     nutStoreCurrency.appendChild(createDom('img', { src: './assets/icon/core.webp' }));
 
+    const offerTitle = createDom('p', { innerHTML: 'Tree Offering' });
     const treeOfferText = document.createElement('p');
     treeOfferText.innerHTML = `The Tree wishes for power, pick one item to sacrifice.
             <br><span style='font-size: 0.6em'>Note: Anytime you receive new loot, you have a higher chance to 
@@ -39,7 +40,7 @@ const offerBox = (treeTable, optionsContainer, offerItemFunction, persistentValu
     })
 
     buttonContainer.append(backButton, offerButton);
-    treeOffer.append(treeOfferText, treeItem, treeMissingText, buttonContainer, nutStoreCurrency);
+    treeOffer.append(offerTitle, treeOfferText, treeItem, treeMissingText, buttonContainer, nutStoreCurrency);
     treeTable.append(treeOffer);
 }
 
@@ -126,6 +127,21 @@ const createTreeSeedContainer = (index, persistentValues, seedAdded) => {
     seedContainer.append(seedColumnContainer);
 }
 
+const toggleOptionsContainer = (showOptions = true, showContainer = 'tree-offer-container') => {
+    if (showOptions) {
+        document.getElementById('options-container').style.display = 'flex';
+        document.getElementById('tree-offer-container').style.display = 'none';
+        document.getElementById('leyline-container').style.display = 'none';
+        document.getElementById('bless-container').style.display = 'none';
+    } else {
+        document.getElementById('options-container').style.display = 'none';
+        document.getElementById('tree-offer-container').style.display = 'none';
+        document.getElementById('leyline-container').style.display = 'none';
+        document.getElementById('bless-container').style.display = 'none';
+        document.getElementById(showContainer).style.display = 'flex';
+    }
+}
+
 const updateSeedContainer = (updateValueOnly = false, persistentValues, saveValues, growTree, treeOptions, toggleDestroyButton) => {
     if (!document.getElementById('seed-container')) { return }
     const seedContainer = document.getElementById('seed-container');
@@ -206,4 +222,4 @@ const generateTreeExplosion = (amount = 1) => {
     }
 }
 
-export { offerBox, updateTreeValues, pickTree, updateSeedContainer, generateTreeExplosion, treeBackButton }
+export { offerBox, updateTreeValues, pickTree, updateSeedContainer, generateTreeExplosion, treeBackButton, toggleOptionsContainer }

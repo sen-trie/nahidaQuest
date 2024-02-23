@@ -332,11 +332,11 @@ function audioPlay(audioElement) {
 
 // ROLLS FOR TREE ITEMS, BOUNDARIES EVERY 3.5 LEVELS
 function createTreeItems(saveValues, randomInteger, inventoryDraw, rollArray) {
-    const offer = saveValues.treeObj.offerAmount + 1;
+    const offer = 1.25 * (saveValues.treeObj.offerAmount + 1);
     let boundary = Math.floor(saveValues.treeObj.offerAmount / 3.5);
     const maxItem = Math.min(Math.max(boundary, 2), 5);
 
-    const goldCore = Math.log(saveValues.treeObj.energy / 100) / 10 * (randomInteger(85, 116) / 100) * (1 + 0.25 * offer) * 1.8**(boundary / 2);
+    const goldCore = Math.log(saveValues.treeObj.energy) * (randomInteger(85, 116) / 100) * offer * 1.8**(boundary / 2);
     let itemArray = [Math.round(goldCore)];
 
     for (let i = 0; i < maxItem; i++) {
