@@ -349,18 +349,20 @@ function createProgressBar(parentProps, childProps, dividerProps, dividerNumber,
     const childEle = createDom('div', childProps);
 
     barEle.style.gridTemplateColumns = `repeat(${dividerNumber}, 1fr)`;
-    for (let i = 0; i < dividerNumber; i++) {
-        const bar = createDom('b', dividerProps);
-        if (i === (dividerNumber - 1)) {
-            bar.style.borderRight = 0;
-        }
-        barEle.appendChild(bar);
-
-        if (imgProps) {
-            const dividerImg = createDom('img', imgProps);
-            dividerImg.style.left = `${(100 / dividerNumber) * (i)}%`
-            if (i !== (dividerNumber)) {
-                parentEle.appendChild(dividerImg);
+    parentEle.addBar = (newDividerNumber) => {
+        for (let i = 0; i < newDividerNumber; i++) {
+            const bar = createDom('b', dividerProps);
+            if (i === (newDividerNumber - 1)) {
+                bar.style.borderRight = 0;
+            }
+            barEle.appendChild(bar);
+    
+            if (imgProps) {
+                const dividerImg = createDom('img', imgProps);
+                dividerImg.style.left = `${(100 / newDividerNumber) * (i)}%`
+                if (i !== (newDividerNumber)) {
+                    parentEle.appendChild(dividerImg);
+                }
             }
         }
     }
@@ -370,6 +372,18 @@ function createProgressBar(parentProps, childProps, dividerProps, dividerNumber,
         childEle.style.width = newProgress + '%';
     }
 
+    parentEle.updateBar = (barNumber) => {
+        barEle.style.gridTemplateColumns = `repeat(${barNumber}, 1fr)`;
+        barEle.querySelectorAll('b').forEach((bar) => {
+            bar.remove();
+        });
+        barEle.querySelectorAll('img').forEach((img) => {
+            img.remove();
+        });
+        parentEle.addBar(barNumber);
+    }
+
+    parentEle.addBar(dividerNumber);
     barEle.appendChild(childEle)
     parentEle.appendChild(barEle);
     return parentEle;

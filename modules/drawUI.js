@@ -342,7 +342,7 @@ const patchDict = {
         </indent>
 
         <br><br> 2. Bosses (Extended Endgame) <br>
-        At certain thresholds, bosses will spawn in the world map. These bosses introduce unique combat mechanics and are needed to be defeated to be progress.
+        At certain thresholds, bosses will spawn on the world map. These bosses introduce unique combat mechanics and are needed to be defeated to progress.
         </indent>
 
         <br><br> 3. Ascension <br>
@@ -354,15 +354,15 @@ const patchDict = {
         </indent>
 
         <br><br> 5. Challenges <br>
-        Added 5 sets of 10 Challenges, with increasing difficulty per set. Completing challenges give a small boost to global NpS. Unlike Achievements, Challenges do not reset and are persistent. Complete all of them for a final reward!
+        Added 5 sets of 10 Challenges, with increasing difficulty per set. Completing challenges gives a small boost to global NpS. Unlike Achievements, Challenges do not reset and are persistent. Complete all of them for a final reward!
         </indent>
 
         <br><br> 6. New Aranara events <br>
-        Added 'Aranara Reveals', 'Aranara Says' and 'Aranara Snake'. Event spawn are indicated by a (¿).
+        Added 'Aranara Reveals', 'Aranara Says' and 'Aranara Snake'. Event spawns are indicated by a (¿).
         </indent>
 
         <br><br> 7. Dori's Black Market <br>
-        After unlocking it, palyers can buy exclusive one-time purchases from Dori. These items can either be visual or functional.
+        After unlocking it, players can buy exclusive one-time purchases from Dori. These items can either be visual or functional.
         </indent>
 
         <br><br> 8. New Characters <br>
@@ -372,18 +372,18 @@ const patchDict = {
     <br><br><line>Systems Rework 🌰: </line><br><br>
         </indent>
         1. Removed portrait mode <br>
-        I am sorry to any mobile users who make use of potrait mode. Some of the content in this update heavily relies on a wide-aspect ratio (specifically combat) which would not work in a portrait mode. The overhead of maintaining two orientations was also becoming increasingly unmanageable, I hope you can understand. 
+        I am sorry to any mobile users who make use of portait mode. Some of the content in this update heavily relies on a wide-aspect ratio (specifically combat) which would not work in a portrait mode. The overhead of maintaining two orientations was also becoming increasingly unmanageable, I hope you can understand. 
 
         <br><br> 2. Settings menu rework <br>
-        Cleaned up the settings UI to accomodate additional options and to make it easier to navigate. Be sure to look through the 'Advanced' tab!
+        Cleaned up the settings UI to accommodate additional options and to make it easier to navigate. Be sure to look through the 'Advanced' tab!
         </indent>
 
         <br><br> 3. Upgrades rework <br>
-        You now have a choice between using gems or (nuts + talent materials) when choosing to upgrades above Lvl 50, with the exception of the Traveller who can only use gems.
+        You now have a choice between using gems or (nuts + talent materials) when choosing to upgrade above Lvl 50, except the Traveller who can only use gems.
         </indent>
 
         <br><br> 4. Information breakdown for characters and golden cores <br>
-        When selecting a character, there is an additional button in the tooltips, which gives detailed stats. Similarly, at the transcend menu, the amount of golden cores now have a breakdown for the top 7 sources.
+        When selecting a character, there is an additional button in the tooltips, which gives detailed stats. Similarly, at the transcend menu, the amount of golden cores now has a breakdown for the top 7 sources.
         </indent>
 
     <br><br>Please report any bugs and I hope you enjoy this dump of content! Many thanks. [img]

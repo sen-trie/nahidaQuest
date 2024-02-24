@@ -1146,6 +1146,10 @@ const adventureLoot = {
     "Level-14":{},
     "Level-15":{
         Food:       ["food", 4, 5, "adventure", "Any"],
+        Food2:      ["food", 4, 5, "adventure", "Any"],
+        Food3:      ["food", 4, 5, "adventure", "Any"],
+        Bonus:      ["xp", 4, 4, "Bonus", "Any"],
+        Bonus2:     ["weapon", 6, 6, "Bonus2", "Any"],
     },
     2:{
         Weapon: ["weapon", 1, 2, "adventure", "Catalyst"],
@@ -1240,10 +1244,6 @@ const adventureLoot = {
     17:{
         Bonus:  ["xp", 4, 4, "Bonus", "Any"],
         Bonus2: ["weapon", 6, 6, "Bonus2", "Any"],
-    },
-    26:{
-        Bonus:  ["xp", 4, 4, "Bonus", "Any"],
-        Bonus2: ["weapon", 6, 6, "Bonus2", "Any"],
     }
 }
 
@@ -1304,7 +1304,7 @@ const challengeInfo = [
         {'title': "The Balladeer's Finale", 'desc': 'Defeat the Prodigal'},   // CH DONE
         {'title': 'Honorary Forest Ranger', 'desc': 'Harvest 30 fully-grown trees'},  // CH DONE
         {'title': 'Rooted Philanthropist', 'desc': 'Offer 25 times to a tree in a single cycle'}, // CH DONE
-        {'title': 'Defender of Nature', 'desc': 'During a tree defense, do not let the tree get attacked once'}, //CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        {'title': 'Defender of Nature', 'desc': 'During tree defense, do not let the tree get attacked once'}, // CH DONE
     ], [
         {'title': 'Live and Let Live', 'desc': 'Transcend for over 250,000 Cores'}, // CH DONE
         {'title': 'Perspective of A God', 'desc': 'Level up Nahida 700 times'},  // CH DONE

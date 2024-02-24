@@ -325,6 +325,7 @@ function timerEvents() {
     checkTimerBounty();
     if (persistentValues.tutorialAscend) {
         growTree('add');
+        document.getElementById('bless-bar').updateCharge();
     }
     checkCommisions();
 }
@@ -516,8 +517,6 @@ function loadSaveData() {
                 if (persistentValues.lifetimePrimoValue === 0) {
                     persistentValues.lifetimePrimoValue = saveValues.primogem;
                 }
-
-                
 
                 let tempArray = [null];
                 for (let i = 1; i < 13; i++) {
@@ -7339,6 +7338,10 @@ function drawAdventure(advType, wave) {
             window.requestAnimationFrame(decreaseTime);
         }
 
+        timerDefense.readProgress = () => {
+            return timerWidth.brightness;
+        }
+
         timerDefense.killMob = () => {
             timerWidth.brightness -= 5;
             timerWidth.style.width = `${timerWidth.brightness}%`;
@@ -7365,7 +7368,6 @@ function drawAdventure(advType, wave) {
                 }
               
                 timerWidth.brightness -= 0.005;
-                if (testing) {timerWidth.brightness -= 0.5}
                 timerWidth.style.width = `${timerWidth.brightness}%`;
 
                 if (timerWidth.brightness < 0) {
@@ -7980,6 +7982,19 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
     let mobHealth = createDom('div', { classList: [`health-bar${adventureScaraText}`] });
     let singleEnemyInfo = mobDiv.enemyID;
+
+    if (adventureVariables.treeDefense) {
+        let timerLeft = document.getElementById('timer-defense').readProgress();
+        if (timerLeft < 10) {
+            singleEnemyInfo.HP *= 1.25;
+            singleEnemyInfo.AtkCooldown *= 0.9;
+        } else if (timerLeft < 25) {
+            singleEnemyInfo.HP *= 1.2;
+            singleEnemyInfo.AtkCooldown *= 0.95;
+        } else if (timerLeft < 50) {
+            singleEnemyInfo.HP *= 1.1;
+        }
+    }
     
     mobHealth.maxHP = singleEnemyInfo.HP;
     if (decoy) mobHealth.maxHP = 1e10;
@@ -9265,7 +9280,7 @@ function quitQuicktime(atkNumber = 1, maxBeat = null, correctBeat) {
 
 
 function loseHP(ATK, type = 'normal', resetCombo = true, src = null) {
-    if (!adventureVariables.fightSceneOn || testing) {return}
+    if (!adventureVariables.fightSceneOn) {return}
 
     const healthBar = document.getElementById('health-bar');
     let hpInterval = (100 / battleVariables.maxHealth);
@@ -9680,8 +9695,7 @@ function winAdventure() {
     lootArray = {};
 
     // SKIRMISH
-    if (imgKey[keyNumber].Level === 13) {
-        console.log(persistentValues)
+    if (adventureVariables.advLevel === 13) {
         let treeSeedID;
         if (persistentValues.workshopBossDefeat) {
             treeSeedID = 4021;
@@ -9702,7 +9716,7 @@ function winAdventure() {
         let lootDiv = document.createElement("div");
         lootDiv = inventoryFrame(lootDiv, itemInfo, itemFrameColors);
 
-        if (tempArray[key][1] === true) {
+        if (tempArray[key][1] === true && (saveValues.treeObj.level > 0 && saveValues.treeObj.level < 5)) {
             let bonus = new Image();
             bonus.classList.add('tree-bonus')
             bonus.src = "./assets/expedbg/tree-item.webp";
@@ -9808,6 +9822,8 @@ function quitAdventure(wonBattle) {
             if (healthBar.currentWidth <= hpInterval) {
                 challengeNotification(({category: 'specific', value: [1, 5]}));
             }
+        } else if (adventureVariables.treeDefense && battleVariables.healthLost === 0) {
+            challengeNotification(({category: 'specific', value: [3, 9]}));
         }
     }
 
@@ -12263,14 +12279,13 @@ function growTree(type, amount = 0) {
                 }
                 saveValues.treeObj.level = 5;
                 treeOptions(true, document.getElementById('options-container'), true);
+                Tree.toggleOptionsContainer(true);
                 sidePop('/tree/harvest.webp', 'Tree has Matured!');
             } else {
                 treeProgress.progress = 0;
                 growTree('level');
             }
         }
-    // } else if (type === 'rate') {
-    //     treeProgressValue.rate += (amount / 25);
     } else if (type === 'level') {
         const treeImg = document.getElementById('tree-img');
         const treeContainer = document.getElementById('tree-container');
@@ -12283,9 +12298,8 @@ function growTree(type, amount = 0) {
             treeHealthText.health = saveValues.treeObj.health;
             treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
 
-            const leylineText = document.getElementById('leyline-text');
-            leylineText.innerHTML = `Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
-            <br> cost of your tree's HP`;
+            const leylineMissingText = document.getElementById('leyline-missing-text');
+            leylineMissingText.innerText = '';
 
             Tree.updateTreeValues(false, saveValues.treeObj);
             rollTreeItems();
@@ -12300,6 +12314,8 @@ function growTree(type, amount = 0) {
 
         // INTIATE TREE DEFENSE 
         if (saveValues.treeObj.defense) { enemyBlock(false) }
+            // } else if (type === 'rate') {
+    //     treeProgressValue.rate += (amount / 25);
     } else {
         console.error(`growTree: Missing Type ${type}`)
     }
@@ -12363,35 +12379,55 @@ function blessCreate(treeTable) {
     let buttonContainer;
     if (testing) {
         const leylineTitle = createDom('p', { innerHTML: 'Blessing of Dendro' });
+        const blessMissingText = createDom('p', { id: 'bless-missing-text', innerText: '' });
         blessContainer.remove();
 
         const chargePic = createDom('img', { classList:['bless-icon'], src: './assets/tree/bless.webp' });
         const blessBar = createProgressBar(
-            { class: ['leyline-progress', 'healthbar-container'] },
+            { id:'bless-bar', class: ['leyline-progress', 'healthbar-container'] },
             { id: 'bless-progress', progress: parseFloat(persistentValues.blessPower),
-            style: { width: (parseFloat(persistentValues.blessPower) + '%'), background: '#25818E' }},
+            style: { width: (100 + '%'), background: '#25818E' }},
             { style: { borderRight: '0.2em solid #ADB3F6' }},
-            4,
+            persistentValues.maxBlessPower,
         );
+
+        blessBar.useCharge = () => {
+            if (persistentValues.blessPower >= 100) {
+                persistentValues.blessPower -= 100;
+                blessBar.updateCharge();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        blessBar.updateCharge = () => {
+            persistentValues.blessPower += 0.25 * (persistentValues.maxBlessPower / 2);
+            persistentValues.blessPower = Math.min(persistentValues.blessPower, persistentValues.maxBlessPower * 100);
+            const newWidth = persistentValues.blessPower / (persistentValues.maxBlessPower * 100);
+            document.getElementById('bless-progress').style.width = (newWidth * 100) + "%";
+        }
 
         const chargeContainer = createDom('div', { classList:['flex-row', 'charge-container'], children:[chargePic, blessBar] });
         const leylineText = createDom('p', { id:'blessing-text' });
         leylineText.innerHTML = `Using Nahida's power, bless the trees' growth. 
-                            <br> Recharge rate is based on Nahida's morale.
-                            <br><span style='font-size: 0.6em'>Note: Dendro accumulation may attract nearby 
-                            <span style='color: var(--light-red)'>enemies</span>!</span></span>`;
-
-
-        blessDisplay.append(leylineTitle, chargeContainer, leylineText);
+                            <br> Dendro accumulation may attract nearby <span style='color: var(--light-red)'>enemies</span>!
+                            <br> <span style='font-size: 0.6em'>Note: Recharge rate is based on Nahida's morale.</span>`;
+        blessDisplay.append(leylineTitle, leylineText, chargeContainer, blessMissingText);
 
         const blessButton = document.createElement('button');
         blessButton.innerText = 'Bless';
         blessButton.classList.add('fancy-button', 'clickable');
         blessButton.addEventListener('click', () => {
-            growTree('add', randomInteger(20, 30));
-            const enemyRoll = randomInteger(0, 100);
-            if (enemyRoll < (25 - luckRate / 3)) {
-                enemyBlock(false);
+            if (blessBar.useCharge()) {
+                blessMissingText.innerText = '';
+                growTree('add', randomInteger(20, 30));
+                const enemyRoll = randomInteger(0, 100);
+                if (enemyRoll < (25 - luckRate / 3)) {
+                    enemyBlock(false);
+                }
+            } else {
+                blessMissingText.innerText = 'Not enough charges!';
             }
         });
 
@@ -12417,15 +12453,14 @@ function leylineCreate(treeTable) {
             { src: './assets/tree/skull.webp'}
     );
     
-    let text = `Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> at the
-            <br> cost of your tree's HP`;
+    let text = `Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> 
+                <br> at the cost of your tree's HP
+                <br> <span style='font-size: 0.6em'>Note: Older trees have better absorption.</span>`;
     const leylineText = createDom('p', { innerHTML: text, id:'leyline-text' });
+    const leylineMissingText = createDom('p', { innerText: '', id:'leyline-missing-text' });
     const leylineEnergy = createDom('p', { innerHTML: `
-            Current Energy Levels: ${Math.round(persistentValues.leylinePower * 10) / 10}%
+            Current Energy Levels: ${Math.round(persistentValues.leylinePower * 100) / 100}%
     `, progress: persistentValues.leylinePower });
-
-    // <br><span style='font-size: 0.6em'>Note: Energy levels correspond to the amount of rewards after harvesting. 
-    // <br>Trees have the highest energy absorption rate when mature.</span>
     checkAbsorbThreshold();
 
     const absorbButton = document.createElement('button');
@@ -12433,7 +12468,7 @@ function leylineCreate(treeTable) {
     absorbButton.classList.add('fancy-button', 'clickable');
     absorbButton.addEventListener('click', () => {
         if (saveValues.treeObj.health <= 15) {
-            leylineText.innerHTML = 'This tree is too weak to absorb excess energy!'
+            leylineMissingText.innerText = 'This tree is too weak to absorb excess energy!'
             weaselDecoy.load();
             weaselDecoy.play();
             return;
@@ -12455,11 +12490,15 @@ function leylineCreate(treeTable) {
                 break;
             case 1:
                 treeAbsorbPower *= 0;
-                leylineText.innerText = 'A seed is too weak to absorb anything!'
+                leylineMissingText.innerText = 'A seed is too weak to absorb anything!'
                 return;
             default:
                 treeAbsorbPower *= 0;
                 break;
+        }
+
+        if (treeAbsorbPower > 0) {
+            leylineMissingText.innerText = '';
         }
 
         persistentValues.leylinePower -= treeAbsorbPower;
@@ -12477,12 +12516,12 @@ function leylineCreate(treeTable) {
     const buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'] });
     buttonContainer.append(Tree.treeBackButton(leylineDisplay), absorbButton);
     
-    leylineDisplay.append(leylineTitle, leylineBar, leylineEnergy, leylineText, buttonContainer);
+    leylineDisplay.append(leylineTitle, leylineText, leylineBar, leylineEnergy, leylineMissingText, buttonContainer);
     treeTable.append(leylineDisplay);
 }
 
 function checkAbsorbThreshold() {
-    const leylineText = document.getElementById('leyline-text');
+    const leylineText = document.getElementById('leyline-missing-text');
     if (persistentValues.leylinePower < 75 && persistentValues.fellBossDefeat === false) {
         spawnBossQuest(1);
         persistentValues.leylinePower = 75.0;

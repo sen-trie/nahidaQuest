@@ -90,6 +90,7 @@ const persistentValuesDefault = {
     leylinePower: 100,
     harvestCount: 0,
     blessPower: 100,
+    maxBlessPower: 4,
     ascendEle:{"Pyro": 0, "Hydro": 0, "Dendro": 0, "Electro": 0, "Anemo": 0, "Cryo": 0, "Geo": 0},
     ascendDict:{},
     nahidaSkin: 'New',
