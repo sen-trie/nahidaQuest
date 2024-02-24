@@ -2613,6 +2613,11 @@ input:checked + .slider:before {
     background-color: var(--very-dark-brown);
 }
 
+.black-prop {
+    background-color: white;
+    color: var(--very-dark-brown);
+}
+
 .black-currency {
     height: 1.8rem;
     width: auto;
@@ -2766,7 +2771,7 @@ input:checked + .slider:before {
 }
 
 #table7 .black-info {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     text-shadow: none;
 }
 
@@ -3018,7 +3023,7 @@ img[src=""] {
 
 .nut-shop-button {
     flex: none;
-    height: 6.5rem;
+    height: 8rem;
     width: 97%;
     box-sizing: border-box;
     padding: 1% 2% 1% 2%;

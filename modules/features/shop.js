@@ -233,7 +233,19 @@ const useItem = (key, buttonFunctions) => {
         
         const equipButton = document.getElementById(`black-card-${key}`);
         equipButton.innerText = equipState ? 'Equipped' : 'Equip';
+    } else if (blackShopDict[key].type === 'prop') {
+        return;
     }
+}
+
+const createPurcButton = (key) => {
+    const equipButton = createDom('p', {
+        class: ['flex-row', 'black-button', 'black-equip', 'black-prop'],
+        id: `black-purc-${key}`,
+        innerText: 'Purchased',
+    });
+
+    return equipButton;
 }
 
 const createEquipButton = (key, buttonFunctions, persistentValues = null) => {
@@ -346,7 +358,7 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
             });
 
             event.stopPropagation();
-            choiceBox(document.getElementById('table7'), {text: `'${blackShopDict[key].title}'`}, null, ()=>{}, null, info, ['notif-ele']);
+            choiceBox(document.getElementById('table7'), {text: `${blackShopDict[key].title}`}, null, ()=>{}, null, info, ['notif-ele']);
         })
 
         let eleCost = createDom('p', { innerText: itemDict.cost });
@@ -399,15 +411,22 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
                 );
             }
         });
-
         
         let childrenArray;
         if (itemDict.level === 0) {
             childrenArray = [elePrice];
         } else if (itemDict.level === itemDict.maxLevel) {
-            childrenArray = [createEquipButton(key, buttonFunctions, persistentValues)];
+            if (blackShopDict[key].type === 'prop') {
+                childrenArray = [createPurcButton(key)];
+            } else {
+                childrenArray = [createEquipButton(key, buttonFunctions, persistentValues)];
+            }
         } else {
-            childrenArray =  [elePrice, createEquipButton(key, buttonFunctions, persistentValues)];
+            if (blackShopDict[key].type === 'prop') {
+                childrenArray = [elePrice, createPurcButton(key)];
+            } else {
+                childrenArray =  [elePrice, createEquipButton(key, buttonFunctions, persistentValues)];
+            }
         }
         
         let blackCardTop = createDom('div', {

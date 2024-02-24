@@ -636,6 +636,7 @@ table, button, label {
     height: 100%;
     z-index: 1;
     border-radius: 0.2em;
+    transition: 0.2s ease;
 }
 
 .clickable {
@@ -2856,6 +2857,20 @@ table, button, label {
     position: relative;
 }
 
+@keyframes blessTree {
+    0% {
+        filter: none;
+    }
+    50% {
+        transform: scale(1.03);
+        transform-origin: bottom;
+        filter: hue-rotate(60deg) contrast(150%);
+    }
+    100% {
+        filter: none;
+    }
+}
+
 .tree-2::before, .tree-3::before, .tree-4::before {
     content: "";
     position: absolute;
@@ -2933,6 +2948,12 @@ table, button, label {
     background-color: var(--very-dark-red);
     color: var(--light-red);
     border-color: var(--light-red);
+}
+
+.tree-harvest {
+    background-color: var(--pale-light-green);
+    color: var(--bright-dark-green);
+    border-color: var(--bright-dark-green);
 }
 
 .affinity-container {

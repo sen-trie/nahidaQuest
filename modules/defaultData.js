@@ -141,17 +141,24 @@ const advDictDefault = {
 
 const permUpgrades = {
     1:{Name:"Blessing of Vitality",        Effect:2.5,  Max:50,   Cap:false,   Description:"Increases Energy gained by clicking Big Nahida."},
-    2:{Name:"Blessing of Technique",       Effect:2,  Max:50,    Cap:true,   Description:"Increase clicking DMG during Combat Expeditions."},
+    2:{Name:"Blessing of Technique",       Effect:2.5,  Max:50,    Cap:true,   Description:"Increase clicking DMG during Combat Expeditions."},
     3:{Name:"Blessing of Wanderlust",      Effect:0.5, Max:50,   Cap:true,   Description:"Decreases base price of Wish characters."},
     4:{Name:"Blessing of Concession",      Effect:2,   Max:25,   Cap:true,   Description:"Decreases price of Dori's Shop items and random trades."},
-    5:{Name:"Blessing of Might",           Effect:1,   Max:50,   Cap:true,   Description:"Increases critical rate amount for clicking Big Nahida.",   zeroDescription:"Enables critical hits for clicking Big Nahida."},
-    6:{Name:"Blessing of Tranquillity",    Effect:1,   Max:50,   Cap:false,   Description:"Increases offline Nut accumulation rate.",    zeroDescription:"Enables accumulation of Nuts while offline."},
+    5:{Name:"Blessing of Might",           Effect:1,   Max:50,   Cap:true,   Description:"Increases critical rate for clicking Big Nahida.",   zeroDescription:"Enables critical hits for clicking Big Nahida."},
+    6:{Name:"Blessing of Tranquillity",    Effect:2,   Max:50,   Cap:false,   Description:"Increases offline Nut accumulation rate.",    zeroDescription:"Enables accumulation of Nuts while offline."},
     7:{Name:"Blessing of Fortuity",        Effect:0.5, Max:50,   Cap:true,   Description:"Increases chances of lucky outcomes.",          zeroDescription:"Enables additional lucky outcomes for certain events."},
     8:{Name:"Blessing of Enlightenment",   Effect:1,   Max:25,   Cap:true,   Description:"Decreases cooldown between Event spawns."},
     9:{Name:"Blessing of Riches",          Effect:5,  Max:25,   Cap:true,   Description:"Increases Primogems gained from Events/Achievements."},
-    10:{Name:"Blessing of Strength",       Effect:5,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
-    11:{Name:"Blessing of Fortification",  Effect:5,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
+    10:{Name:"Blessing of Strength",       Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Weapons and Talents."},
+    11:{Name:"Blessing of Fortification",  Effect:10,  Max:25,   Cap:false,   Description:"Increases effectiveness of Artifacts, Gems and Food."},
     12:{Name:"Blessing of Determination",  Effect:5,  Max:50,   Cap:false,   Description:"Increase XP and Nuts gain in Expeditions."},
+    13:{Name:"Blessing of Collection",     Effect:6,  Max:25,   Cap:false,   Description:"Increases amount of lucky additional Tree Nuts.",    zeroDescription:"Enables lucky chance to get more Tree Nuts."},
+    14:{Name:"Blessing of Perception",     Effect:2.5,  Max:50,   Cap:false,   Description:"Increases palm energy gained after offering Tree Items."},
+    15:{Name:"Blessing of Tenacity",       Effect:0.8,  Max:50,   Cap:true,   Description:"Decreases energy used by Nahida when blessing Trees."},
+    16:{Name:"Blessing of Balance",        Effect:2,  Max:50,   Cap:false,   Description:"Increases harvest amount for Pyro & Hydro ascension materials."},
+    17:{Name:"Blessing of Creation",       Effect:2,  Max:50,   Cap:false,   Description:"Increases harvest amount for Dendro, Geo & Anemo ascension materials."},
+    18:{Name:"Blessing of Duality",        Effect:2,  Max:50,   Cap:false,   Description:"Increases harvest amount for Electro & Cryo ascension materials."},
+    19:{Name:"Blessing of Fortune",        Effect:4,  Max:25,   Cap:true,   Description:"If Nahida is at Expedition Rank 20, excess XP is converted into primogems."},
 }
 
 const expeditionDictDefault = {

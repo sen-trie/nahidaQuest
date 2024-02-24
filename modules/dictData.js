@@ -1353,6 +1353,17 @@ const blackShopDict = {
         level: 0,
         maxLevel: 1,
     },
+    'springWater': {
+        cost: 1250,
+        primoCost: 600,
+        type: 'prop',
+        subtype: 'water',
+        title: 'Spring Water',
+        desc: 'Imported Fontaine spring water. Increases effectiveness when Nahida blesses trees by 20% per level.',
+        file: 'tooltips/inventory/springWater.webp',
+        level: 0,
+        maxLevel: 5,
+    },
     'nre': {
         cost: 1500,
         primoCost: 800,

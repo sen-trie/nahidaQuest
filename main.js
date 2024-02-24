@@ -111,6 +111,13 @@ let additionalPrimo = 1;
 let additionalStrength = 1;
 let additionalDefense = 1;
 let additionalXP = 1;
+let additionalTreeNut = 1;
+let additionalTreeEnergy = 1;
+let decreaseEnergyBless = 1;
+let additionalPyroHydro = 1;
+let additionalDendroGeoAnemo = 1;
+let additionalCryoElectro = 1;
+let convertXPPrimo = 0;
 
 // ITEM VARIABLES
 const weaponBuffPercent =   [0, 1.1, 1.3, 1.7, 2.1, 2.7, 4.6];
@@ -519,15 +526,15 @@ function loadSaveData() {
                 }
 
                 let tempArray = [null];
-                for (let i = 1; i < 13; i++) {
+                for (let i = 1; i < getHighestKey(permUpgrades) + 1; i++) {
                     let tempItem;
-
                     if (persistentValues[`upgrade${i}`] && persistentValues[`upgrade${i}`].Purchased === undefined) {
                         tempItem = persistentValues[`upgrade${i}`];
                     } else if (persistentValues[`upgrade${i}`]) {
                         tempItem = persistentValues[`upgrade${i}`].Purchased;
                     }
-                    if (tempItem) {
+                    
+                    if (tempItem !== undefined) {
                         tempArray.push(tempItem);
                     } else {
                         tempArray.push(0);
@@ -748,23 +755,16 @@ function resetAnimationListener(elem) {
     }
 }
 
+function calcPermEffect(id) {
+    return (persistentValues.upgrade[id]*permUpgrades[id].Effect / 100);
+}
+
 // UPDATES VALUES WITH PERSISTENT VALUES
 function specialValuesUpgrade(loading = false, valueUpdate) {
     if (loading === true) {
-        upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade[1]) / 10);
-        lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
-        specialClick = (1 + (persistentValues.upgrade[2])/10).toFixed(3);
-        wishPower = (1 - (persistentValues.upgrade[3])/200).toFixed(3);
-        costDiscount = (1 - (persistentValues.upgrade[4])/50).toFixed(3);
-        clickCritRate = persistentValues.upgrade[5];
-        clickCritDmg = Math.round((Math.log(persistentValues.upgrade[5] + 1) * 18));
-        idleRate = (persistentValues.upgrade[6]/100).toFixed(2);
-        luckRate = persistentValues.upgrade[7]/2;
-        eventCooldownDecrease = (1 - persistentValues.upgrade[8]/50).toFixed(1);
-        additionalPrimo = (1 + persistentValues.upgrade[9]/10).toFixed(3);
-        additionalStrength = (1 + persistentValues.upgrade[10]/10).toFixed(3);
-        additionalDefense = (1 + persistentValues.upgrade[11]/10).toFixed(3);
-        additionalXP = (1 + persistentValues.upgrade[12]/50).toFixed(3);
+        for (let i = 1; i < getHighestKey(permUpgrades + 1); i++) {
+            specialValuesUpgrade(false, i);
+        }
     } else if (loading == false) {
         switch (valueUpdate) {
             case 1:
@@ -772,39 +772,60 @@ function specialValuesUpgrade(loading = false, valueUpdate) {
                 lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
                 break;
             case 2:
-                specialClick = (1 + (persistentValues.upgrade[2])/10).toFixed(3);
+                specialClick = (1 + calcPermEffect(valueUpdate)).toFixed(3);
                 break;
             case 3:
-                wishPower = (1 - (persistentValues.upgrade[3])/200).toFixed(3);
+                wishPower = (1 - calcPermEffect(valueUpdate)).toFixed(3);
                 break;
             case 4:
-                costDiscount = (1 - (persistentValues.upgrade[4])/50).toFixed(3);
+                costDiscount = (1 - calcPermEffect(valueUpdate)).toFixed(3);
                 break;
             case 5:
                 clickCritRate = persistentValues.upgrade[5];
                 clickCritDmg = Math.round((Math.log(persistentValues.upgrade[5] + 1) * 18));
                 break;
             case 6:
-                idleRate = (persistentValues.upgrade[6]/100).toFixed(2);
+                idleRate = calcPermEffect(valueUpdate).toFixed(2); // 0-1
                 break;
             case 7:
-                luckRate = (persistentValues.upgrade[7]/2).toFixed(3);
+                luckRate = (calcPermEffect(valueUpdate) * 100).toFixed(3); // 0-100
                 break;
             case 8:
-                eventCooldownDecrease = (1 - persistentValues.upgrade[8]/50).toFixed(1);
+                eventCooldownDecrease = (1 - calcPermEffect(valueUpdate)).toFixed(1);
                 break;
             case 9:
-                additionalPrimo = (1 + persistentValues.upgrade[9]/10).toFixed(3);
+                additionalPrimo = (1 + calcPermEffect(valueUpdate)).toFixed(3);
                 break;
             case 10:
-                additionalStrength = (1 + persistentValues.upgrade[10]/10).toFixed(3);
+                additionalStrength = (1 + calcPermEffect(valueUpdate)).toFixed(3);
                 break;
             case 11:
-                additionalDefense = (1 + persistentValues.upgrade[11]/10).toFixed(3);
+                additionalDefense = (1 + calcPermEffect(valueUpdate)).toFixed(3);
                 break;
             case 12:
-                additionalXP = (1 + persistentValues.upgrade[12]/50).toFixed(3);
+                additionalXP = (1 + calcPermEffect(valueUpdate)).toFixed(3);
                 break;
+            case 13:
+                additionalTreeNut = (1 + calcPermEffect(valueUpdate)).toFixed(3);
+                break;
+            case 14:
+                additionalTreeEnergy = (1 + calcPermEffect(valueUpdate)).toFixed(3);
+                break;
+            case 15:
+                decreaseEnergyBless = (1 - calcPermEffect(valueUpdate)).toFixed(3);
+                break;
+            case 16:
+                additionalPyroHydro = (1 + calcPermEffect(valueUpdate)).toFixed(3);
+                break;
+            case 17:
+                additionalDendroGeoAnemo = (1 + calcPermEffect(valueUpdate)).toFixed(3);
+                break;    
+            case 18:
+                additionalCryoElectro = (1 + calcPermEffect(valueUpdate)).toFixed(3);
+                break;
+            case 19:
+                convertXPPrimo = (calcPermEffect(valueUpdate)).toFixed(3);
+                break;    
             default:
                 console.error('Upgrade error: Invalid value to update');
                 break;
@@ -812,11 +833,9 @@ function specialValuesUpgrade(loading = false, valueUpdate) {
     }
 }
 
-function idleCheck(idleAmount) {
-    let timePassed = timeLoaded - saveValues.currentTime;
-    if (timePassed > 1400) {
-        timePassed = 1400;
-    } else if (timePassed >= 60) {
+function idleCheck(idleAmount = 0) {
+    let timePassed = Math.min(timeLoaded - saveValues.currentTime, 1400);
+    if (timePassed >= 60) {
         idleAmount = timePassed * saveValues.dps * 60 * idleRate;
     }
     return idleAmount;
@@ -6596,7 +6615,7 @@ function gainXP(xpAmount, multiplier) {
     xpBar.maxXP = advDict.adventureRank * 100;
     xpBar.currentXP = parseInt(xpBar.currentXP);
     xpBar.currentXP += xpAmount;
-    expedPop("xp",xpAmount);
+    expedPop("xp", xpAmount);
 
     while (xpBar.currentXP >= xpBar.maxXP) {
         xpBar.currentXP -= xpBar.maxXP;
@@ -6631,6 +6650,10 @@ function gainXP(xpAmount, multiplier) {
         xpBar.style.width = "100%";
         xpBar.currentXP = 0;
         advDict.advXP = xpBar.currentXP;
+
+        if (convertXPPrimo > 0 && xpAmount * convertXPPrimo > 1) {
+            currencyPopUp([["primogem", Math.round(xpAmount * convertXPPrimo)]]);
+        }
     }
 }
 
@@ -9633,6 +9656,7 @@ function winAdventure() {
         case 'Workshop':
             adventureHeading.innerText = "You successfully put down the Shouki no Kami!";
             persistentValuesDefault.workshopBossDefeat = true;
+            document.getElementById("nut-shop-div").activateWorkshopCell();
             challengeNotification(({category: 'specific', value: [3, 6]}));
             break;
         case 'Finale':
@@ -10903,7 +10927,7 @@ function setShop(type) {
         id: 'shop-backdoor',
         class: ['shop-backdoor'],
         style: {
-            display: 'none'
+            display: persistentValues.unusualBossDefeat || testing ? 'block' : 'none',
         }
     });
 
@@ -11247,7 +11271,7 @@ function autoConsumeFood(type = 'check', foodID = null) {
 //------------------------------------------------------------------------ GOLDEN NUT STORE ------------------------------------------------------------------------//
 // COSTS OF NUT PURCHASE
 function nutCost(id) {
-    let amount = persistentValues["upgrade"+id];
+    let amount = persistentValues.upgrade[id];
     let scaleCeiling = permUpgrades[id].Max;
     let cost;
 
@@ -11322,53 +11346,62 @@ function addNutStore() {
 
     leftDiv.append(nutStoreButton);
 
-    let len = (getHighestKey(permUpgrades) + 1);
-    for (let i = 1; i < len; i++) {
+    nutShopDiv.createCell = (i) => {
         let nutShopItem = document.createElement("div");
         nutShopItem.classList.add("nut-shop-button","flex-row");
         nutShopItem.id = "nut-shop-" + i;
 
-        let nutShopTitle = document.createElement("p");
-        nutShopTitle.innerText = permUpgrades[i]["Name"];
-        let nutShopButton = document.createElement("div");
-        nutShopButton.classList.add("flex-column");
+        let nutShopTitle = createDom("p", { innerText: permUpgrades[i]["Name"] });
+        let nutShopButton = createDom("div", { classList:["flex-column"] });
+        let nutShopButtonBottom = createDom('div', {
+            innerText: `${abbrNum(nutCost(i),2,true)}`,
+            child: [createDom('img', { src:"./assets/icon/core.webp" })]
+        });
 
-        let nutShopButtonTop = document.createElement("p");
-        nutShopButtonTop.innerText = `Upgrade`;
-        let nutShopButtonBottom = document.createElement("div");
-        nutShopButtonBottom.innerText = `${abbrNum(nutCost(i),2,true)}`;
-        let nutShopMail = new Image();
-        nutShopMail.src = "./assets/icon/core.webp";
-        nutShopButtonBottom.appendChild(nutShopMail);
-
-        let nutShopLevel = document.createElement("p");
+        let nutShopLevel = createDom("p");
         if (permUpgrades[i].Cap === true) {
-            if (persistentValues["upgrade"+i] >= permUpgrades[i].Max) {
+            if (persistentValues.upgrade[i] >= permUpgrades[i].Max) {
                 nutShopLevel.innerText = `Level MAX`;
                 nutShopButtonBottom.innerText = "MAXED";
             } else {
-                nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i]}`;
+                nutShopLevel.innerText = `Level ${persistentValues.upgrade[i]}`;
                 nutShopButton.addEventListener("click",()=>{nutPurchase(nutShopItem.id)});
             }
         } else {
-            nutShopLevel.innerText = `Level ${persistentValues["upgrade"+i]}`;
+            nutShopLevel.innerText = `Level ${persistentValues.upgrade[i]}`;
             nutShopButton.addEventListener("click",()=>{nutPurchase(nutShopItem.id)})
         }
         
-        let nutShopImg = new Image();
-        nutShopImg.src = "./assets/tooltips/nut-shop-" +i+ ".webp";
-        let nutShopDesc = document.createElement("p");
-        if (permUpgrades[i]["zeroDescription"] !== undefined && persistentValues["upgrade"+i] <= 0) {
-            nutShopDesc.innerText = `${permUpgrades[i]["zeroDescription"]}
-                                    (Effect: ${permUpgrades[i].Effect*persistentValues["upgrade"+i]}%)`;
-        } else {
-            nutShopDesc.innerText = `${permUpgrades[i]["Description"]}
-                                    (Effect: ${permUpgrades[i].Effect*persistentValues["upgrade"+i]}%)`;
+        let nutShopImg = createDom('img', { src: `./assets/tooltips/nut-shop-${i}.webp` });
+        let nutShopDesc = createDom("p");
+        nutShopDesc.updateText = (index) => {
+            if (permUpgrades[index]["zeroDescription"] !== undefined && persistentValues.upgrade[index] <= 0) {
+                nutShopDesc.innerText = `${permUpgrades[index]["zeroDescription"]}
+                                        (Effect: ${Math.round(10 * permUpgrades[index].Effect * persistentValues.upgrade[index]) / 10}%)`;
+            } else {
+                nutShopDesc.innerText = `${permUpgrades[index]["Description"]}
+                                        (Effect: ${Math.round(10 * permUpgrades[index].Effect * persistentValues.upgrade[index]) / 10}%)`;
+            }
         }
+        nutShopDesc.updateText(i);
         
-        nutShopButton.append(nutShopButtonTop,nutShopButtonBottom);
+        nutShopButton.append(createDom("p", { innerText: `Upgrade` }), nutShopButtonBottom);
         nutShopItem.append(nutShopTitle,nutShopLevel,nutShopImg,nutShopDesc,nutShopButton);
         nutShopDiv.appendChild(nutShopItem);
+    }
+
+    for (let i = 1; i < 13; i++) {
+        nutShopDiv.createCell(i);
+    }
+
+    nutShopDiv.activateWorkshopCell = () => {
+        for (let i = 14; i < getHighestKey(permUpgrades) + 1; i++) {
+            nutShopDiv.createCell(i);
+        }
+    }
+
+    if (persistentValues.workshopBossDefeat) {
+        nutShopDiv.activateWorkshopCell();
     }
 
     nutShopDiv.style.display = "flex";
@@ -11444,14 +11477,11 @@ function addNutStore() {
     mainTable.appendChild(nutStoreTable);
     calculateGoldenCore();
 
-    if (persistentValues.tutorialAscend) {
-        createAscend();
-    }
+    if (persistentValues.tutorialAscend) createAscend();
 }
 
 function createAscend() {
     if (document.getElementById('ascend-text')) {return};
-
     let ascend = document.getElementById('nut-shop-ascend');
     ascend.innerText = '';
 
@@ -11720,28 +11750,27 @@ function nutPurchase(fullId) {
     if (persistentValues.goldenCore >= cost) {
         upgradeElement.load();
         upgradeElement.play();
-        persistentValues["upgrade"+id]++;
+        persistentValues.upgrade[id]++;
         persistentValues.goldenCore -= cost;
 
         let childArray = document.getElementById(fullId).children;
-        childArray[1].innerText = `Level ${persistentValues["upgrade"+id]}`;
-        childArray[3].innerText = `${permUpgrades[id]["Description"]}
-                                    (Effect: ${permUpgrades[id]["Effect"] * persistentValues["upgrade"+id]}%)`;
+        childArray[1].innerText = `Level ${persistentValues.upgrade[id]}`;
+        childArray[3].updateText(id);
         childArray[4].children[1].innerHTML = childArray[4].children[1].innerHTML.replace(/[^<]+</g, `${abbrNum(nutCost(id),2,true)}<`);
         updateCoreCounter();
-        specialValuesUpgrade(false,parseInt(id));
+        specialValuesUpgrade(false, parseInt(id));
 
         if (permUpgrades[id].Cap === true) {
-            if (persistentValues["upgrade"+id] >= permUpgrades[id].Max) {
+            if (persistentValues.upgrade[id] >= permUpgrades[id].Max) {
                 childArray[1].innerText = `Level MAX`;
                 let buttonNew = childArray[4].cloneNode(true);
                 childArray[4].parentNode.replaceChild(buttonNew, childArray[4]);
                 childArray[4].children[1].innerText = "MAXED";
             } else {
-                childArray[1].innerText = `Level ${persistentValues["upgrade"+id]}`;
+                childArray[1].innerText = `Level ${persistentValues.upgrade[id]}`;
             }
         } else {
-            childArray[1].innerText = `Level ${persistentValues["upgrade"+id]}`;
+            childArray[1].innerText = `Level ${persistentValues.upgrade[id]}`;
         }
         
     }
@@ -11877,11 +11906,14 @@ function createTreeMenu() {
     if (saveValues.treeObj.defense === true) {
         enemyBlock(false);
     } else if (treeLevel === 5) {
-        treeOptions(true, document.getElementById('options-container'), true);
+        treeOptions(true, document.getElementById('options-container'));
     }
 
     toggleDestroyButton();
     populateTreeItems();
+    if (saveValues.treeObj.level === 5) {
+        changeHarvestButton();
+    }
 }
 
 function rollTreeItems() {
@@ -11984,34 +12016,23 @@ function offerItemFunction() {
     Tree.updateTreeValues(false, saveValues.treeObj);
     growTree('add', Math.round(treeGrowth));
 
+    let treeHealthText = document.getElementById('tree-health-text');
+    saveValues.treeObj.health = Math.min(saveValues.treeObj.health + Math.round(randomInteger(7, 10) + saveValues.treeObj.offerAmount / 3), 100); ;
+    treeHealthText.health = saveValues.treeObj.health;
+    treeHealthText.innerText = 'HP:\n' + treeHealthText.health + '%';
+
     saveValues.treeObj.offerAmount++;
     challengeNotification(({category: 'offer', value: saveValues.treeObj.offerAmount}))
-    saveValues.treeObj.energy = Math.round(saveValues.treeObj.energy * randomInteger(105, 110) / 100);
+    saveValues.treeObj.energy = Math.round(saveValues.treeObj.energy * additionalTreeEnergy * randomInteger(105, 115) / 100);
 
     const palmText = document.getElementById('palm-text');
     palmText.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
     rollTreeItems();
 }
 
-function treeOptions(planted, optionsContainer, lastPhase) {
+function treeOptions(planted, optionsContainer) {
     while (optionsContainer.firstChild) { optionsContainer.firstChild.remove() }
-    
-    if (lastPhase) {
-        optionsContainer.classList.add('flex-row','options-container');
-        let treeButton = document.createElement('div');
-        let optionImg = new Image();
-        optionImg.src = `./assets/tree/harvest.webp`;
-        let optionText = document.createElement('p');
-        optionText.innerText = 'Harvest';
-
-        treeButton.addEventListener('click',() => {
-            persistentValues.harvestCount++;
-            challengeNotification(({category: 'harvest', value: persistentValues.harvestCount}));
-            destroyTree(true);
-        })
-        treeButton.append(optionImg,optionText);
-        optionsContainer.appendChild(treeButton);
-    } else if (planted) {
+    if (planted) {
         optionsContainer.classList.add('flex-row','options-container');
         optionsContainer.style.display = 'flex';
         const optionsTextArray = ['Offer', 'Absorb', 'Bless'];
@@ -12067,6 +12088,21 @@ function treeOptions(planted, optionsContainer, lastPhase) {
         optionsContainer.appendChild(treeButton);
     }
 }
+
+function changeHarvestButton() {
+    let destroyButton = document.getElementById('tree-destroy-button');
+    if (destroyButton) {
+        let destroyButtonNew = destroyButton.cloneNode(true);
+        destroyButton.parentNode.replaceChild(destroyButtonNew, destroyButton);
+        destroyButtonNew.innerText = 'Harvest';
+        destroyButtonNew.classList.add('tree-harvest');
+        destroyButtonNew.addEventListener('click', () => {
+            persistentValues.harvestCount++;
+            challengeNotification(({category: 'harvest', value: persistentValues.harvestCount}));
+            destroyTree(true);
+        })
+    }
+} 
 
 function toggleDestroyButton() {
     if (saveValues.treeObj.level === 0) {
@@ -12148,8 +12184,25 @@ function destroyTree(finalPhase = false) {
                 const rankInventoryReward = createDom('div', { class:['notif-item-number', 'flex-column']});
                 let rankInventoryRewardsImg = document.createElement('div');
                 rankInventoryRewardsImg = inventoryFrame(rankInventoryRewardsImg, { Star: 5, File: `solid${boxElement[i + 1]}` }, itemFrameColors);
-                let rankInventoryRewardsText = createDom('p', { innerText: lootArray[i] });
+                if (additionalPyroHydro > 1) {
+                    if (boxElement[i + 1] === 'Hydro' || boxElement[i + 1] === 'Pyro') {
+                        lootArray[i] = Math.round(lootArray[i] * additionalPyroHydro);
+                    } 
+                }
 
+                if (additionalDendroGeoAnemo > 1) {
+                    if (boxElement[i + 1] === 'Dendro' || boxElement[i + 1] === 'Geo' || boxElement[i + 1] === 'Anemo') {
+                        lootArray[i] = Math.round(lootArray[i] * additionalDendroGeoAnemo);
+                    } 
+                }
+
+                if (additionalCryoElectro > 1) {
+                    if (boxElement[i + 1] === 'Cryo' || boxElement[i + 1] === 'Hydro') {
+                        lootArray[i] = Math.round(lootArray[i] * additionalCryoElectro);
+                    } 
+                }
+
+                let rankInventoryRewardsText = createDom('p', { innerText: lootArray[i] });
                 rankInventoryReward.append(rankInventoryRewardsImg, rankInventoryRewardsText);
                 lootContainer.append(rankInventoryReward);
             }
@@ -12189,6 +12242,12 @@ function addTreeCore(number = 1, increaseOdds = 0, override = false) {
         }
     } else {
         rolledCore = increaseOdds;
+    }
+
+    if (additionalTreeNut > 1) {
+        if (luckRate + 100 * (additionalTreeNut - 1) / 6 + randomInteger(0, 100) > 50) {
+            number = Math.round(number * additionalTreeNut);
+        }
     }
 
     persistentValues.treeSeeds[rolledCore - 1] += number;
@@ -12273,12 +12332,13 @@ function growTree(type, amount = 0) {
         if (treeProgress.progress > 100) {
             // REMOVE MAXED TREE
             if (saveValues.treeObj.level === 4) {
-                let treeOfferContainer = document.getElementById('tree-offer-container')
+                let treeOfferContainer = document.getElementById('tree-offer-container');
                 if (treeOfferContainer.style.display !== 'none') {
                     document.getElementById('tree-offer-button').click();
                 }
                 saveValues.treeObj.level = 5;
-                treeOptions(true, document.getElementById('options-container'), true);
+                treeOptions(true, document.getElementById('options-container'));
+                changeHarvestButton();
                 Tree.toggleOptionsContainer(true);
                 sidePop('/tree/harvest.webp', 'Tree has Matured!');
             } else {
@@ -12392,8 +12452,9 @@ function blessCreate(treeTable) {
         );
 
         blessBar.useCharge = () => {
-            if (persistentValues.blessPower >= 100) {
-                persistentValues.blessPower -= 100;
+            const requiredCharge = 100 * decreaseEnergyBless;
+            if (persistentValues.blessPower >= requiredCharge) {
+                persistentValues.blessPower -= requiredCharge;
                 blessBar.updateCharge();
                 return true;
             } else {
@@ -12401,8 +12462,28 @@ function blessCreate(treeTable) {
             }
         }
 
+        const blessTree = () => {
+            let additionalBless = 1;
+            if (persistentValues.blackMarketDict && persistentValues.blackMarketDict.springWater) {
+                additionalBless += (persistentValues.blackMarketDict.springWater.level + 0.2);
+            }
+
+            growTree('add', randomInteger(15, 20) * additionalBless);
+            const enemyRoll = randomInteger(0, 100);
+            if (enemyRoll < (20 - luckRate / 4) && !testing) {
+                enemyBlock(false);
+            }
+
+            const treeImg = document.getElementById('tree-img');
+            treeImg.style.animation = 'blessTree 1s linear forwards';
+            treeImg.addEventListener('animationend', () => {
+                treeImg.style.animation = 'unset';
+            }, { once: true });
+        }
+
         blessBar.updateCharge = () => {
-            persistentValues.blessPower += 0.25 * (persistentValues.maxBlessPower / 2);
+            const rate = moraleCheck(0.2);
+            persistentValues.blessPower += rate * (persistentValues.maxBlessPower / 1.5);
             persistentValues.blessPower = Math.min(persistentValues.blessPower, persistentValues.maxBlessPower * 100);
             const newWidth = persistentValues.blessPower / (persistentValues.maxBlessPower * 100);
             document.getElementById('bless-progress').style.width = (newWidth * 100) + "%";
@@ -12420,12 +12501,8 @@ function blessCreate(treeTable) {
         blessButton.classList.add('fancy-button', 'clickable');
         blessButton.addEventListener('click', () => {
             if (blessBar.useCharge()) {
+                blessTree();
                 blessMissingText.innerText = '';
-                growTree('add', randomInteger(20, 30));
-                const enemyRoll = randomInteger(0, 100);
-                if (enemyRoll < (25 - luckRate / 3)) {
-                    enemyBlock(false);
-                }
             } else {
                 blessMissingText.innerText = 'Not enough charges!';
             }
@@ -12779,14 +12856,12 @@ function newPop(type) {
 if (beta || testing) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            // Shop.regenBlackPrice(persistentValues.blackMarketDict);
-            drawAranaraWish();
+            // Shop.regenBlackPrice(persistentValues.blackMarketDict);h
+            spawnWorldQuest();
         } else if (e.key === 'g') {
             spawnSkirmish();
         } else if (e.key === 'h') {
-            let advButton = document.getElementById("adventure-button");
-            advButton.key = 32;
-            adventure("14-[2]");
+            document.getElementById("nut-shop-div").activateWorkshopCell();
         }
     });
 }
@@ -12815,7 +12890,7 @@ if (testing) {
     
     setTimeout(()=>{
     let startButton = document.getElementById("start-button");
-    startButton.click();
+    if (startButton) startButton.click();
     }, 1200);
 }
 
@@ -12833,7 +12908,7 @@ if (beta) {
 
     setTimeout(()=>{
         let startButton = document.getElementById("start-button");
-        startButton.click();
+        if (startButton) startButton.click();
         setTimeout(()=>{
             let startButton = document.getElementById("play-button");
             if (startButton) startButton.click();
