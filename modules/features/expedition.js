@@ -1,5 +1,7 @@
 import { expeditionDictInfo, imgKey } from "../dictData.js";
 import { createDom } from "../adjustUI.js";
+import { universalStyleCheck } from "../functions.js";
+import { customTutorial } from "../drawUI.js";
 
 const recommendedLevel = [0,1,4,7,10,13,16,20];
 
@@ -185,6 +187,57 @@ const sapEnergy = (quantityAmount, energyAmount) => {
 }
 
 // SINGLE USE
+const createExpedition = (advButtonFunction) => {
+    let expedTable = createDom("div", { classList: ["flex-column","tooltipTABLEEXPED"] });
+    let expedBottom = createDom("div", { id: "exped-bottom", classList: ["flex-row","exped-bottom"] });
+    let expedContainer = createDom("div", { id: "exped-container", classList: ["exped-container","flex-row"] });
+
+    let expedLoot = createDom("div", { id: "exped-loot", classList: ["exped-loot","flex-column"] });
+    let expedLore = createDom("div", { id: "exped-lore", classList: ["exped-lore","flex-column"] });
+    let expedImg = createDom('img', { id: 'exped-img' });
+
+    let expedText = createDom("div", { id: "exped-text", classList: ["flex-row"] });
+    let expedImgDiv = createDom("div", { classList: ["flex-row","exped-text"], child:[expedImg, expedText] });
+
+    expedBottom.append(expedContainer,expedLoot);
+    expedTable.append(expedImgDiv,expedLore,expedBottom);
+
+    document.getElementById("expedTooltip").append(expedTable);
+    let table3 = document.getElementById("table3")
+    table3.appendChild(expedTooltip);
+    document.getElementById("expedDiv").remove();
+    
+    let moraleLore = createDom("p", { style: { display: 'none' }});
+    let charMorale = createDom("div", { id: "char-morale", classList: ["char-morale", 'clickable'], child: [moraleLore] });
+    charMorale.addEventListener("click",() => {
+        universalStyleCheck(moraleLore,"display","block","none");
+    });
+
+    table3.appendChild(charMorale);
+
+    let advButton = createDom("div", {
+        id: "adventure-button",
+        class: ["background-image-cover", 'clickable'],
+        innerText: 'Adventure!'
+    });
+
+    advButton.addEventListener("click",() => {
+        advButtonFunction();
+    });
+
+    let advTutorial = createDom("img", {
+        classList: ['clickable'],
+        src: './assets/icon/help.webp',
+        id: 'adventure-tutorial'
+    });
+
+    advTutorial.addEventListener("click", () => {
+        customTutorial("advTut", 6, 'Expedition Tutorial');
+    })
+
+    table3.append(advButton,advTutorial);
+}
+
 const createTopHalf = () => {
     const adventureHealth = createDom('div', {
         id: "adventure-health",
@@ -278,4 +331,4 @@ const createBattleHalf = (MOBILE) => {
 }
 
 
-export { expedInfo, createTopHalf, createEncounterHalf, createBattleHalf, resetAdventure, sapEnergy }
+export { expedInfo, createTopHalf, createEncounterHalf, createBattleHalf, resetAdventure, sapEnergy, createExpedition }

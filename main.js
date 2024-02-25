@@ -51,6 +51,8 @@ const WEAPONMAX = 1500;
 const ARTIFACTMAX = 2150;
 const FOODMAX = 3150;
 const XPMAX = 4004;
+const GEMMAX = 5025;
+const NATIONMAX = 6200;
 
 const NONWISHHEROMAX = 250;
 const WISHHEROMIN = 800;
@@ -188,7 +190,7 @@ const blackMarketFunctions = {
     autoClickNahida: autoClickNahida,
 };
 
-const possibleItems = ['Bow', 'Catalyst', 'Claymore', 'Polearm', 'Sword', 'Artifact', 'Food', 'DendroGeoAnemo', 'ElectroCryo', 'PyroHydro', 'Inazuma', 'Liyue', 'Mondstadt', 'Sumeru'];
+const possibleItems = ['Bow', 'Catalyst', 'Claymore', 'Polearm', 'Sword', 'Artifact', 'Food', 'DendroGeoAnemo', 'ElectroCryo', 'PyroHydro', 'Inazuma', 'Liyue', 'Mondstadt', 'Sumeru', 'Fontaine'];
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
 const specialText = ["Ah! It's Bongo-Head!","'Thank you for releasing Arapacati!'","Woah, a treasure-seeking Seelie!","Woah, a shikigami was trapped inside!"];
 const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
@@ -213,8 +215,6 @@ let table1 = document.getElementById("table1");
 let table2 = document.getElementById("table2");
 let filterDiv = document.getElementById("filter-button");
 let table3 = document.getElementById("table3");
-let expedTooltip = document.getElementById("expedTooltip");
-let expedDiv = document.getElementById("expedDiv");
 let table4 = document.getElementById("table4");
 let table5 = document.getElementById("table5");
 let table5Container = document.getElementById("table5-container");
@@ -4034,7 +4034,7 @@ function createFilter() {
         clearTooltip();
     })
 
-    const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','Sword','Claymore','Catalyst','Polearm','Bow','Sumeru','Mondstadt','Liyue','Inazuma'];
+    const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','Sword','Claymore','Catalyst','Polearm','Bow','Sumeru','Mondstadt','Liyue','Inazuma', 'Fontaine'];
     const invOptions = ['Artifact','Food','Level','Gemstone','Talent','Sword','Claymore','Catalyst','Polearm','Bow'];
     for (let i = 0, len = heroOptions.length; i < len; i++) {
         let filterPicture = document.createElement("button");
@@ -4457,6 +4457,7 @@ const constNation = {
     Mondstadt: 2,
     Sumeru: 3,
     Inazuma: 4,
+    Fontaine: 5,
 }
 
 function milestoneBuy(heroTooltip) {
@@ -4539,9 +4540,10 @@ function milestoneBuy(heroTooltip) {
             }
 
             itemArray = [];
-            let tempBook = InventoryMap.get(nationItemID + constNation[heroNation] + 4 * (4 - itemStar));
+            const nationItem = nationItemID + constNation[heroNation] + 50 * (4 - itemStar);
+            let tempBook = InventoryMap.get(nationItem);
             if (tempBook && tempBook > 0) {
-                itemArray.push(nationItemID + constNation[heroNation] + 4 * (4 - itemStar));
+                itemArray.push(nationItem);
             }
 
             if (itemArray.length === 0 || saveValues.realScore < cost) {
@@ -4952,7 +4954,7 @@ function itemUse(itemUniqueId) {
         heroSkipper(gemFunction, itemID);
         clearTooltip();
     // ELEMENT GEMS
-    } else if (itemID >= 5001 && itemID < 5050){
+    } else if (itemID >= 5001 && itemID < GEMMAX){
         const gemFunction = (i, upgradeDictTemp, itemID) => {
             let power = elementBuffPercent[Inventory[itemID].Star];
             let elem = Inventory[itemID].element;
@@ -4975,7 +4977,7 @@ function itemUse(itemUniqueId) {
         heroSkipper(gemFunction, itemID);
         clearTooltip();
     // NATION BOOKS
-    } else if (itemID >= 6001 && itemID < 6050){
+    } else if (itemID >= 6001 && itemID < NATIONMAX){
         const bookFunction = (i, upgradeDictTemp, itemID) => {
             let power = nationBuffPercent[Inventory[itemID].Star];
             let nation = Inventory[itemID].nation;
@@ -5240,8 +5242,8 @@ function inventoryDraw(itemType, min, max, type, itemClass){
         "artifact": ARTIFACTMAX, 
         "food": FOODMAX, 
         "xp": XPMAX,
-        "gem": 5025,
-        "talent": 6013,
+        "gem": GEMMAX,
+        "talent": NATIONMAX,
     }
     let lowerInventoryType = {
         "weapon": 1001, 
@@ -5254,7 +5256,7 @@ function inventoryDraw(itemType, min, max, type, itemClass){
     let drawnItem = 0;
     while (true){
         attempts++;
-        if (attempts >= 2000) {
+        if (attempts >= 10000) {
             console.error(`Error drawing item with properties [${itemType},${type}${itemClass ? `,${itemClass}` : ','}]. Please submit this bug in the feedback form`);
             return;
         }
@@ -5308,78 +5310,19 @@ function inventoryDraw(itemType, min, max, type, itemClass){
 
 // CREATING EXPEDITION UI
 function createExpedition() {
-    let expedTable = document.createElement("div");
-    expedTable.classList.add("flex-column","tooltipTABLEEXPED");
-    let expedBottom = document.createElement("div");
-    expedBottom.id = "exped-bottom";
-    expedBottom.classList.add("flex-row","exped-bottom");
-    let expedContainer = document.createElement("div");
-    expedContainer.id = "exped-container";
-    expedContainer.classList.add("exped-container","flex-row");
-
-    let expedLoot = document.createElement("div");
-    expedLoot.id = "exped-loot";
-    expedLoot.classList.add("exped-loot","flex-column");
-    let expedLore = document.createElement("div");
-    expedLore.classList.add("exped-lore","flex-column");
-    expedLore.id = "exped-lore";
-
-    let expedImgDiv = document.createElement("div");
-    let expedImg = new Image();
-    expedImg.id = "exped-img";
-    let expedText = document.createElement("div");
-    expedText.id = "exped-text";
-    expedText.classList.add("flex-row");
-    expedImgDiv.classList.add("flex-row","exped-text");
-    expedImgDiv.append(expedImg,expedText);
-
-    expedBottom.append(expedContainer,expedLoot);
-    expedTable.append(expedImgDiv,expedLore,expedBottom);
-    expedTooltip.append(expedTable);
-    table3.appendChild(expedTooltip);
-    expedDiv.remove();
-
-    let charMorale = document.createElement("div");
-    charMorale.id = "char-morale";
-    charMorale.classList.add("char-morale", 'clickable');
-    let moraleLore = document.createElement("p");
-    moraleLore.style.display = "none";
-
-    charMorale.append(moraleLore);
-    charMorale.addEventListener("click",()=>{
-        universalStyleCheck(moraleLore,"display","block","none");
-    })
-
-    let guildTable = createGuild();
-    let advButton = createDom("div", {
-        id: "adventure-button",
-        class: ["background-image-cover", 'clickable'],
-        innerText: 'Adventure!'
-    });
-
-    advButton.addEventListener("click",() => {
-        if (adventureType != 0) {
-            if (adventureType == "10-[]") {
-                guildTable.toggle();
-            } else if (adventureType.split("-")[0] === "12") {
-                drawWorldQuest(adventureType);
-            } else {
-                adventure(adventureType);
-            }
+    const advButtonFunction = () => {
+        if (adventureType == 0) return;
+        if (adventureType == "10-[]") {
+            guildTable.toggle();
+        } else if (adventureType.split("-")[0] === "12") {
+            drawWorldQuest(adventureType);
+        } else {
+            adventure(adventureType);
         }
-    })
+    }
 
-    let advTutorial = createDom("img", {
-        classList: ['clickable'],
-        src: './assets/icon/help.webp',
-        id: 'adventure-tutorial'
-    });
-
-    advTutorial.addEventListener("click", () => {
-        drawUI.customTutorial("advTut", 6, 'Expedition Tutorial');
-    })
-
-    table3.append(charMorale,advButton,advTutorial);
+    Expedition.createExpedition(advButtonFunction);
+    let guildTable = createGuild();
     updateMorale("load");
 }
 
@@ -9818,7 +9761,7 @@ function winAdventure() {
                 drawUI.customTutorial("unusual", 4, 'Scene');
                 break;
             case 'Workshop':
-                drawUI.customTutorial("workshop", 3, 'Scene');
+                drawUI.customTutorial("workshop", 4, 'Scene');
                 break;
             case 'Finale':
                 drawUI.customTutorial("finale", 9, 'Scene', persistentValues);
@@ -12857,7 +12800,8 @@ if (beta || testing) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
             // Shop.regenBlackPrice(persistentValues.blackMarketDict);h
-            spawnWorldQuest();
+            // spawnWorldQuest();
+            drawUI.customTutorial("workshop", 4, 'Scene');
         } else if (e.key === 'g') {
             spawnSkirmish();
         } else if (e.key === 'h') {
