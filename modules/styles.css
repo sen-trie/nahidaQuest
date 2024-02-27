@@ -88,7 +88,21 @@ button {
     --dropshadow:0 0 0 black;
     --grayscale:0%;
     --dark-purple: #31185f;
-    --medium-purple: #b79de6;
+    --dull-purple: #6D5893;
+    --bright-purple: #402c64;
+    --medium-purple: #b79de6;;
+    --dark-cyan: #1D474A;
+    --dull-cyan: #79b6b9;
+    --bright-cyan: #348f96;
+    --medium-cyan: #509599;
+    --dark-orange: #503111;
+    --dull-orange: #dfbe72;
+    --bright-orange: #be922c;
+    --medium-orange: #A86245;
+    --dark-ocean: #0a2d46;
+    --dull-ocean: #79b6b9;
+    --bright-ocean: #1b537a;
+    --medium-ocean: #509599;
     --bright-pink: #EEC0CA;
     --medium-blue: #7F858D;
     --dark-blue: #303B44;
@@ -291,6 +305,8 @@ button {
 body {
     background-image: url(../assets/borderNew.webp);
     background-repeat: repeat;
+    background-size: cover;
+    background-position: center center;
     position: relative;
     overflow: hidden;
     font-family: 'gi-font';
@@ -332,11 +348,11 @@ table, button, label {
     left: 0;
   }
 
-.vignette {
+.vignette, .vignette-blue {
     position: absolute;
 }
   
-.vignette::after {
+.vignette::after, .vignette-blue::after {
     content: "";
     position: absolute;
     top: 0;
@@ -346,20 +362,9 @@ table, button, label {
     background: radial-gradient(ellipse at center, #ecd59100 0%,#c8a94e4a 40%,#c8a94e5b 60%,#c8a94e8d 80%, #cfa10ce2 100%);
     animation: vignette-animation 2s linear infinite;
 }
-
-.vignette-blue {
-    position: absolute;
-}
   
 .vignette-blue::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     background: radial-gradient(ellipse at center, #88effb00 0%,#88effb33 40%,#88effb56 60%,#88effb99 80%, #3bd4e6 100%);
-    animation: vignette-animation 2s linear infinite;
 }
 
 .middle-area {
@@ -705,34 +710,31 @@ table, button, label {
     align-items: center;
 }
 
+.floatingText, .floatingTextLow, .floatingCritText {
+    color: var(--very-dark-green);
+    position: absolute;
+    z-index: 10;
+    text-shadow: 0 0 0.15em white, 0 0 0.15em white, 0 0 0.15em white;
+    pointer-events: none;
+}
+
+.scara-floatingCritText {
+    color: #0c1327 !important;
+}
+
 .floatingText {
     font-size: 1rem;
-    color: #022107;
-    text-shadow: 0 0 0.25em white, 0 0 0.25em white, 0 0 0.15em white;
-    position: absolute;
     animation: fadeOutOpacity 2.0s cubic-bezier(.02,.97,.91,.14) forwards;
-    z-index: 10;
-    pointer-events: none;
 }
 
 .floatingTextLow {
     font-size: 1.5rem;
-    color: #022107;
-    text-shadow: 0 0 0.25em white, 0 0 0.25em white, 0 0 0.15em white;
-    position: absolute;
     animation: fadeOutCritOpacity 2.0s ease-out forwards;
-    z-index: 10;
-    pointer-events: none;
 }
 
 .floatingCritText {
     font-size: 2rem;
-    color: #032509;
-    text-shadow: 0 0 0.25em white, 0 0 0.25em white, 0 0 0.15em white;
-    position: absolute;
     animation: fadeOutCritOpacity 2.0s ease-out forwards;
-    z-index: 10;
-    pointer-events: none;
 }
 
 .falling-image {
@@ -812,46 +814,6 @@ table, button, label {
     width:100%;
     height:100%;
     object-fit: contain;
-}
-
-.currency-pop {
-    display: grid;
-    text-align: center;
-    position: absolute;
-    top: 11%;
-    left: 31%;
-    width: 12%;
-    color: var(--dull-green);
-    background-color: var(--bright-medium-green);
-    border-radius: 1rem;
-    border: 0.20em solid var(--bright-dark-green);
-    z-index: 150;
-    font-size: 1rem;
-    animation: slidedown-pop 0.8s ease-in-out both;
-    pointer-events: none;
-}
-
-.currency-pop > * {
-    height: 2.2rem;
-    width: 100%;
-    border-top: 0.15rem solid var(--bright-dark-green);
-}
-
-.currency-pop > p {
-    color: var(--bright-medium-green);
-    background-color: var(--bright-dark-green);
-    border-radius: 0.25rem 0.25rem 0 0;
-}
-
-.currency-pop-first > img {
-    height: 1.5rem;
-    aspect-ratio: 1;
-    filter: drop-shadow(0 0 0.1em rgba(0, 0, 0, 0.795));
-    margin-left: 0.35rem;
-}
-
-.currency-pop > :last-child {
-    margin-bottom: 0.2rem;
 }
 
 .side-pop-container {

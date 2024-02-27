@@ -1,4 +1,4 @@
-.char-select, .char-menu, .currency-pop, .middle-area, .left-area, 
+.char-select, .char-menu, .middle-area, .left-area, 
 .weasel-back, .weasel-timer-div, .side-pop-container, .tree-health,
 .tree-destroy {
     left: unset !important;
@@ -37,7 +37,7 @@
 }
 
 .middle-area {
-    right: 35.2%;
+    right: 35%;
     z-index: 11;
 }
 
@@ -51,10 +51,6 @@
 
 .notif-select {
     left: 3%;
-}
-
-.currency-pop {
-    right: 32%;
 }
 
 .weasel-back, .weasel-timer-div {

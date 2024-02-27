@@ -223,6 +223,8 @@ const regenBlackPrice = (persistentBlackMarket, particularKey = null) => {
 const useItem = (key, buttonFunctions) => {
     if (blackShopDict[key].subtype === 'bigNahida') {
         buttonFunctions.changeBigNahida(key);
+    } else if (blackShopDict[key].subtype === 'skinCollection') {
+        buttonFunctions.changeSkinCollection(key);
     } else if (blackShopDict[key].type === 'functional') {
         let equipState;
         if (blackShopDict[key].subtype === 'autoFood') {

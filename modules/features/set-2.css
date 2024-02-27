@@ -1,0 +1,94 @@
+.middle-area {
+    background-image: url(../../assets/frames/bar-2.webp);
+    border-color: var(--dull-orange);
+}
+
+.top-bar {
+    content: url(../../assets/frames/top-bar-2.webp);
+}
+
+#adventure-tutorial {
+    content: url(../../assets/icon/help-2.webp);
+}
+
+#table5-container {
+    background-image: url(../../assets/bg/achievementBG-2.webp);
+}
+
+#left-div {
+    background-image: url(../../assets/bg/bg-2.webp);
+}
+
+.adventure-map {
+    background-image: url(../../assets/bg/advBg-2.webp);
+}
+
+body {
+    background-image: url(../../assets/borderNew-2.webp);
+}
+
+#multiplierButton-1 > .multiplier-button-img {
+    content: url(../../assets/settings/multi-1-2.webp);
+}
+
+#multiplierButton-2 > .multiplier-button-img {
+    content: url(../../assets/settings/multi-2-2.webp);
+}
+
+#multiplierButton-3 > .multiplier-button-img {
+    content: url(../../assets/settings/multi-3-2.webp);
+}
+
+.tooltipEXPED {
+    background-color: var(--bright-orange);
+}
+
+.char-select {
+    color: var(--dark-orange);
+    background-color: var(--medium-orange);
+    border-color: var(--dark-orange);
+}
+
+.tier-button {
+    color: var(--medium-orange);
+}
+
+.tier-container > div {
+    background-color: var(--medium-orange);
+    border-color: var(--dull-orange);
+    outline-color: var(--medium-orange);
+}
+
+.challenge-button-claimed {
+    background-color: var(--bright-orange);
+    border-color: var(--dark-orange);
+}
+
+.char-menu, #adventure-encounter > button {
+    border-color: var(--dark-orange);
+    background-color: var(--dull-orange);
+}
+
+.char-menu > div {
+    border-color: var(--dark-orange);
+}
+
+.char-selected, #adventure-encounter > button {
+    background-color: var(--bright-orange);
+}
+
+.char-menu > div:hover, #adventure-encounter > button:hover {
+    background-color: var(--dark-orange);
+}
+
+.nut-store-access:hover {
+    filter: drop-shadow(0 0 0.8em var(--medium-orange));
+}
+
+.floatingText, .floatingTextLow, .floatingCritText {
+    color: var(--dark-orange);
+}
+
+#game, #start-screen {
+    border-color: var(--dull-orange);
+}

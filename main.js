@@ -185,6 +185,7 @@ const extraInfoDict = {
 
 const blackMarketFunctions = {
     changeBigNahida: changeBigNahida,
+    changeSkinCollection: changeSkinCollection,
     buyShop: buyShop,
     autoConsumeFood: autoConsumeFood,
     autoClickNahida: autoClickNahida,
@@ -673,7 +674,7 @@ function touchDemo(autoClicked = false) {
 
     if (document.visibilityState === 'visible') {
         if (crit) {
-            floatText("crit",true,leftDiv,clickEarn,randomInteger(40,55),60,abbrNum,clickerEvent);
+            floatText("crit",true,leftDiv,clickEarn,randomInteger(20,45),60,abbrNum,clickerEvent);
         } else {
             if (settingsValues.combineFloatText) {
                 floatText("normal",true,leftDiv,clickEarn,43,43,abbrNum,clickerEvent);
@@ -705,7 +706,7 @@ function spawnFallingNut() {
 function energyRoll(autoClicked = false) {
     let randInt = Math.floor(Math.random() * 1000);
     if (autoClicked === true) {
-        clickDelay -= 0.4;
+        clickDelay -= 0.05;
     } else {
         clickDelay--;
     }
@@ -850,8 +851,13 @@ function postSaveData() {
     if (persistentValues.autoFood) {
         autoConsumeFood('check');
     }
+
     if (persistentValues.autoClickNahida) {
         autoClickNahida('use');
+    }
+
+    if (persistentValues.collectionSkin !== 0) {
+        changeSkinCollection('S' + persistentValues.collectionSkin);
     }
 
     const sidePopContainer = createDom('div', {
@@ -1050,20 +1056,12 @@ function clickEvent(wandererMode) {
     clickerEvent = wandererMode === true ? "scara" : "event";
     currentClick = 15 * (saveValues["dps"] + 1);
 
+    button.style.animation = "rotation 3.5s infinite linear forwards";
     if (wandererMode === true) {
-        leftDiv.style.animation = "none";
-        void leftDiv.offsetWidth;
-        leftDiv.style.animation = "darkness-transition 0.3s linear";
-        setTimeout(()=>{
-            button.style.animation = "rotation 3.5s infinite linear forwards";
-            if (!leftDiv.classList.contains("vignette-blue")) {leftDiv.classList.add("vignette-blue")};
-            // let leftBG = document.getElementById("left-bg");
-            // leftBG.src = "./assets/bg/scara-bg.webp";
-            button.src = "./assets/event/scara.webp";
-        },150);
+        button.src = "./assets/event/scara.webp";
+        if (!leftDiv.classList.contains("vignette-blue")) {leftDiv.classList.add("vignette-blue")};
         challengeNotification(({category: 'specific', value: [2,4]}))
     } else {
-        button.style.animation = "rotation 3.5s infinite linear forwards";
         if (!leftDiv.classList.contains("vignette")) {leftDiv.classList.add("vignette")};
     }
     foodButton(2);
@@ -10082,7 +10080,7 @@ function wish() {
 function wishAnimation(randomWishHero) {
     stopSpawnEvents = true;
     let nameTemp = upgradeInfo[randomWishHero].Name;
-    preloadStart.fetch([`./assets/tooltips/letter-${nameTemp}.webp`])
+    preloadStart.fetch([`./assets/tooltips/letter-${nameTemp}.webp`]);
     setTimeout(()=>{
         let wishBackdropDark = document.createElement("div");
         wishBackdropDark.classList.add("cover-all","flex-column","tutorial-dark");
@@ -10812,6 +10810,39 @@ function shopTimerFunction() {
     }
 }
 
+function changeSkinCollection(key) {
+    const keyNumber = key.charAt(key.length - 1);
+    const currentKey = document.body.skinCollection;
+
+    if (!document.getElementById(`skin-collection-${keyNumber}`)) {
+        let link = createDom("link", {
+            href: `./modules/features/set-${keyNumber}.css`,
+            type: 'text/css',
+            rel: 'stylesheet',
+            id: `skin-collection-${keyNumber}`,
+            disabled: false,
+        });
+        document.head.appendChild(link);
+        document.body.skinCollection = keyNumber;
+    } else {
+        const skinCollection = document.getElementById(`skin-collection-${keyNumber}`);
+        if (keyNumber === currentKey) {
+            skinCollection.disabled = true;
+            document.body.skinCollection = 0;
+        } else {
+            skinCollection.disabled = false;
+            document.body.skinCollection = keyNumber;
+        }
+    }
+
+    if (currentKey !== undefined && currentKey !== 0) {
+        const oldSkinCollection = document.getElementById(`skin-collection-${currentKey}`);
+        oldSkinCollection.disabled = true;
+    }
+
+    persistentValues.collectionSkin = document.body.skinCollection;
+}
+
 function changeBigNahida(key) {
     let demoButton = document.getElementById('demo-main-img');
     if (demoButton.skin === key) {
@@ -11160,11 +11191,15 @@ function autoClickNahida(type = 'use') {
             }
 
             let demoButton = document.getElementById('demo-main-img');
-            demoButton.dispatchEvent(mousedownAutoEvent);
-            setTimeout(() => {
-                demoButton.dispatchEvent(mouseupAutoEvent);
-                autoClickTimer = setTimeout(() => {autoClickNahida('use')}, delay);
-            }, 100)
+            if (demoButton) {
+                demoButton.dispatchEvent(mousedownAutoEvent);
+                setTimeout(() => {
+                    demoButton.dispatchEvent(mouseupAutoEvent);
+                    autoClickTimer = setTimeout(() => {autoClickNahida('use')}, delay);
+                }, 100);
+            } else {
+                setTimeout(() => { autoClickNahida('use')}, 1000);
+            }
         }
     }
 }
@@ -11233,7 +11268,7 @@ function addNutStore() {
     for (let i=1; i < 8; i++) {
         preloadArray.push(`./assets/tooltips/nut-shop-${1}.webp`);
     }
-    preloadStart.fetch(preloadArray)
+    preloadStart.fetch(preloadArray);
 
     const mainTable = rightDiv.childNodes[1];
     const nutStoreTable = document.createElement("div");
@@ -11626,7 +11661,7 @@ function transcendFunction() {
 
         persistentValues.transcendValue++;
         saveData(true);
-        drawUI.preloadImage(1,"transcend",true);
+        drawUI.preloadImage(1, "transcend", true);
 
         setTimeout(()=>{
             let clearPromise = new Promise(function(myResolve, myReject) {
@@ -12665,47 +12700,46 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
 
 // POP UPS FOR SPECIAL CURRENCY
 const createPopEle = (type, amount) => {
-    let currencyPop = createDom('div', {
-        classList: ["currency-pop-first", "flex-row"],
-        innerHTML: `${amount}   `
-    });
-
-    let currencyPopImg = createDom('img');
+    let currencyPopImg;
+    let text;
     switch (type) {
         case 'energy':
-            currencyPopImg.src = "./assets/icon/energyIcon.webp";
+            currencyPopImg = "/icon/energyIcon.webp";
             saveValues.energy += amount;
             persistentValues.lifetimeEnergyValue += amount;
             challengeNotification(({category: 'energy', value: saveValues.energy}));
+            text = `${amount} Energy Gained`;
             break;
         case 'primogem':
-            currencyPopImg.src = "./assets/icon/primogemIcon.webp";
+            currencyPopImg = "/icon/primogemIcon.webp";
             saveValues.primogem += amount;
             persistentValues.lifetimePrimoValue += amount;
             challengeNotification(({category: 'primogem', value: saveValues.primogem}));
+            text = `${amount} Primogems Obtained`;
             break;
         case 'nuts':
-            currencyPopImg.src = "./assets/icon/goldenIcon.webp";
+            currencyPopImg = "/icon/goldenIcon.webp";
             saveValues.goldenNut += amount;
             persistentValues.goldenCore += amount;
+            text = `${amount} Golden Nuts Obtained`;
             updateCoreCounter();
             nutPopUp();
             break;
         case 'mail':
-            currencyPopImg.src = "./assets/icon/mailLogo.webp";
+            currencyPopImg = "/icon/mailLogo.webp";
             saveValues.mailCore += amount;
+            text = `${amount} Wish Mail Obtained`;
             break;
         case 'items':
-            currencyPop.innerHTML = "Items";
-            currencyPopImg.src = "./assets/icon/item.webp";
+            text = "Items Obtained";
+            currencyPopImg = "/icon/item.webp";
             break;
         default:
             console.error(`currencyPopUp Error: ${type} ${amount} ${additionalClass}`);
             break;
     }
 
-    currencyPop.append(currencyPopImg);
-    return currencyPop;
+    sidePop(currencyPopImg, text);
 }
 
 function currencyPopUp(currencyNestList) {
@@ -12714,31 +12748,13 @@ function currencyPopUp(currencyNestList) {
         return;
     }
 
-    const currencyPop = createDom('div', {
-        class: ["currency-pop"],
-        child: [createDom('p', { classList: ['flex-row'], innerText: 'Obtained: '})]
-    });
-
-    const processCurrencyItem = (type, amount) => {
-        if (type === 'primogem') amount = Math.round(amount * additionalPrimo);
-        currencyPop.append(createPopEle(type, amount));
-    };
-
     for (let i = 0; i < currencyNestedList.length; i++) {
-        if (currencyNestedList[i][1] === undefined) {
-            currencyNestedList[i][1] = 0;
-        }
-
-        processCurrencyItem(currencyNestedList[i][0], currencyNestedList[i][1]);
+        if (currencyNestedList[i][1] === undefined) currencyNestedList[i][1] = 0;
+        let type = currencyNestedList[i][0];
+        let amount = currencyNestedList[i][1];
+        if (type === 'primogem') amount = Math.round(amount * additionalPrimo);
+        createPopEle(type, amount);
     }
-
-    setTimeout(() => {
-        currencyPop.style.animation = "fadeOut 3s cubic-bezier(.93,-0.24,.93,.81) forwards";
-        currencyPop.addEventListener("animationend", () => {
-            currencyPop.remove();
-        })
-    },1000);
-    mainBody.appendChild(currencyPop);
 }
 
 // POP UPS FOR NEW HEROES(WISH), INVENTORY AND EXPEDITION
@@ -12801,11 +12817,13 @@ if (beta || testing) {
         if (e.key === 'f') {
             // Shop.regenBlackPrice(persistentValues.blackMarketDict);h
             // spawnWorldQuest();
-            drawUI.customTutorial("workshop", 4, 'Scene');
+            changeSkinCollection('S' + 4);
         } else if (e.key === 'g') {
             spawnSkirmish();
         } else if (e.key === 'h') {
             document.getElementById("nut-shop-div").activateWorkshopCell();
+        } else if (e.key === 'j') {
+            clickEvent(true);
         }
     });
 }

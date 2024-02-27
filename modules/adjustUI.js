@@ -22,24 +22,26 @@ function inventoryAddButton(buttonInv, Item) {
 // ADDS FLOATING TEXT UPON CLICKING ON DEMO BUTTON
 function floatText(clickType,combineText,leftDiv,clickFactor,Xlocation,Ylocation,abbrNum,clickerEvent) {
     let clickCountAppear = document.createElement("div");
+    let addDiv = true;
     if (clickType === "crit") {
         if (document.getElementById("crit-text")) {
             let oldNumberText = document.getElementById("crit-text");
             let oldValue = oldNumberText.nutValue + clickFactor;
             oldNumberText.innerText = `+${abbrNum(oldValue,2,true)}`;
+            addDiv = false;
 
-            if (clickerEvent === "scara") {
-                oldNumberText.style.color = "#0c1327";
-            } else {
-                oldNumberText.style.color = "#022107"
-            }
+            if (clickerEvent === "scara") { clickCountAppear.classList.add("scara-floatingCritText") }
 
             let newNumberText = oldNumberText.cloneNode(true);
             oldNumberText.parentNode.replaceChild(newNumberText, oldNumberText);
             newNumberText.nutValue = oldValue;
-            newNumberText.addEventListener('animationend', ()=>{newNumberText.remove()});
+            newNumberText.addEventListener('animationend', () => {
+                oldNumberText.remove();
+                newNumberText.remove();
+            });
         } else {
             clickCountAppear.classList.add("floatingCritText");
+            if (clickerEvent === "scara") { clickCountAppear.classList.add("scara-floatingCritText") }
             clickCountAppear.id = "crit-text";
             clickCountAppear.nutValue = clickFactor;
             clickCountAppear.innerText = "+" + abbrNum(clickFactor,2,true);
@@ -51,18 +53,15 @@ function floatText(clickType,combineText,leftDiv,clickFactor,Xlocation,Ylocation
                 let oldValue = oldNumberText.nutValue + clickFactor;
                 oldNumberText.innerText = `+${abbrNum(oldValue,2,true)}`;
 
-                if (clickerEvent === "scara") {
-                    oldNumberText.style.color = "#0c1327";
-                } else {
-                    oldNumberText.style.color = "#022107"
-                }
-
+                if (clickerEvent === "scara") { clickCountAppear.classList.add("scara-floatingCritText") }
+                
                 let newNumberText = oldNumberText.cloneNode(true);
                 oldNumberText.parentNode.replaceChild(newNumberText, oldNumberText);
                 newNumberText.nutValue = oldValue;
                 newNumberText.addEventListener('animationend', ()=>{newNumberText.remove()});
             } else {
                 clickCountAppear.classList.add("floatingTextLow");
+                if (clickerEvent === "scara") { clickCountAppear.classList.add("scara-floatingCritText") }
                 clickCountAppear.id = "float-text";
                 clickCountAppear.nutValue = clickFactor;
                 clickCountAppear.innerText = "+" + abbrNum(clickFactor,2,true);
@@ -81,7 +80,9 @@ function floatText(clickType,combineText,leftDiv,clickFactor,Xlocation,Ylocation
     clickCountAppear.style.left = Xlocation + "%";
     clickCountAppear.style.top = Ylocation + "%";
     clickCountAppear.addEventListener('animationend', ()=>{clickCountAppear.remove()});
-    if (!document.getElementById("float-text")) leftDiv.appendChild(clickCountAppear);
+    if (!document.getElementById("float-text") && addDiv) {
+        leftDiv.appendChild(clickCountAppear);
+    };
     return leftDiv;
 }
 
