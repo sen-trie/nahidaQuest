@@ -98,6 +98,7 @@ suffixPreload.forEach((color) => {
 })
 
 // SPECIAL UPGRADE VARIABLES
+const PERM_UPGRADES_CUTOFF = 14;
 let wishPower = 0;
 let upperEnergyRate = 35;
 let lowerEnergyRate = 15;
@@ -1268,6 +1269,10 @@ function boxOpen(eventBackdrop,specialBox) {
 
 // EVENT 4 (MINESWEEPER)
 function minesweeperEvent() {
+
+    console.log(persistentValues.blackMarketDict && persistentValues.blackMarketDict.kusava)
+
+
     let ROWS = 8;
     let COLS = 8;
     let mines = randomInteger(6,10);
@@ -3326,6 +3331,7 @@ document.addEventListener("keydown", function(event) {
             }
         } else if (event.key === "Enter") {
             event.preventDefault();
+            // if (event.repeat) { return }
             if (table4.style.display === "flex") {
                 let wishButton = document.getElementById("wishButton");
                 if (!wishButton.locked) {
@@ -5684,7 +5690,6 @@ function createGuild() {
                         lossRoll = false;
                     }
 
-                    
                     if (!lossRoll) {
                         lootArray.push(itemId2);
                     }
@@ -5720,12 +5725,18 @@ function createGuild() {
                     }
 
                     // SCAVENGER PERK
-                    if (commInfo.perk === 'Scavenger' && randomInteger(1,4) === 1) {
+                    if (commInfo.perk === 'Scavenger' && randomInteger(1, 4) === 1) {
                         const itemId4 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                        lootArray.push(itemId4);
-                        markedItems.push(itemId4);
+                        const itemId5 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                        const itemId6 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                        lootArray.push(itemId4, itemId5, itemId6);
+                        markedItems.push(itemId4, itemId5, itemId6);
                         extraInfo.push('Scavenger');
                     }
+
+                    let itemIdBase1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                    let itemIdBase2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
+                    lootArray.push(itemIdBase1, itemIdBase2);
                 });
 
                 const postTreeItems = compareTreeItems(lootArray);
@@ -5778,7 +5789,7 @@ function createGuild() {
                 }
 
                 persistentValues.commissionsCompletedValue++;
-                choiceBox(mainBody, {text: 'Loot obtained:'}, stopSpawnEvents, () => {addLoot(lootArray)}, null, lootDiv, ['notif-ele']);
+                choiceBox(mainBody, {text: 'Loot obtained:'}, stopSpawnEvents, () => {addLoot(lootArray)}, null, lootDiv, ['notif-ele', 'commision-ele']);
                 document.getElementById('guild-button-comm').click();
             }
         })
@@ -5988,11 +5999,11 @@ function completeBounty(bountyID,type,ele) {
     claim.xpReward = bountyObject[bountyID].xpReward;
 
     if (!advDict.rankDict[11]) {
-        claim.xpReward *= 1.15;
-        claim.primoReward *= 1.15;
+        claim.xpReward *= 1.50;
+        claim.primoReward *= 1.50;
     } else if (!advDict.rankDict[3]) {
-        claim.xpReward *= 1.05;
-        claim.primoReward *= 1.05;
+        claim.xpReward *= 1.25;
+        claim.primoReward *= 1.25;
     }
 
     claim.addEventListener("click",()=>{
@@ -6417,7 +6428,7 @@ function createExpMap() {
     let activeChar;
     charMenu.classList.add("flex-column","char-menu");
     charMenu.style.display = "none";
-    for (let k = 0; k < 5; k++) {
+    for (let k = 0; k < (CONSTANTS.MAX_LEADER + 1); k++) {
         let charImg = new Image();
         charImg.src = `./assets/expedbg/leader-${k}.webp`;
         let charLore = document.createElement("p");
@@ -6704,7 +6715,7 @@ function notifPop(type,icon,count) {
 }
 
 function charScan() {
-    for (let i = 2; i < 5; i++) {
+    for (let i = 2; i < (CONSTANTS.MAX_LEADER + 1); i++) {
         let charDiv = document.getElementById(`char-select-${i}`);
         if (charDiv.locked) {
             if (upgradeDict[upgradeThreshold[i]].Purchased > 0) {
@@ -7490,6 +7501,8 @@ function triggerFight() {
     let currentSong = randomInteger(1, 4); 
     if (adventureScaraText) {
         currentSong = 4;
+    } else if (adventureVariables.advType === 15) {
+        currentSong = randomInteger(1, 7);
     } else if (adventureVariables.advType >= 13) {
         currentSong = randomInteger(5, 7);
     }
@@ -8468,7 +8481,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
         // CHECK IF PARRY IS BEING USED
         if (document.getElementById('select-indicator')) {
-            if (activeLeader == "Ei") {attackMultiplier = 1.35}
+            if (activeLeader == "Ei") {attackMultiplier = 2.00}
             // IF TIMING WAS CORRECT
             if (canvas.classList.contains("attack-ready")) {
                 // FOR WHEN DEFLECTION IS AVAILABLE (OVERRIDES EATEN)
@@ -9251,6 +9264,7 @@ function loseHP(ATK, type = 'normal', resetCombo = true, src = null) {
     let adventureHealth = document.getElementById('adventure-health');
 
     if (type === "inverse") {
+        if (activeLeader === 'Furina') ATK = Math.round(ATK * 1.5);
         healthBar.currentWidth += (hpInterval * ATK);
         if (healthBar.currentWidth > 100) {healthBar.currentWidth = 100}
     } else {
@@ -9390,7 +9404,7 @@ function attackAll() {
     cooldown.amount -= 100;
 
     let currentATK = 10 + 6 * Math.floor(advDict.adventureRank / 4);
-    if (activeLeader == "Zhongli") {currentATK *= 1.50};
+    if (activeLeader == "Zhongli") {currentATK *= 1.75};
     currentATK = moraleCheck(currentATK);
 
     let attackMultiplier = Battle.comboHandler("check", 1);
@@ -10572,7 +10586,29 @@ function createTooltip() {
     tooltipButton.id = "tool-tip-button";
     tooltipButton.classList.add("background-image-cover");
     tooltipButton.innerText = "Purchase";
-    tooltipButton.addEventListener("click",() => { tooltipFunction() })
+    let isMouseDown = false;
+    let holdInterval;
+
+    tooltipButton.addEventListener("click", () => {
+        tooltipFunction();
+    });
+
+    tooltipButton.addEventListener("mousedown", () => { 
+        isMouseDown = true;
+        holdInterval = setInterval(function() {
+            if (isMouseDown) tooltipFunction();
+        }, 175);
+    });
+
+    tooltipButton.addEventListener("mouseup", () => { 
+        isMouseDown = false;
+        clearInterval(holdInterval);
+    });
+
+    tooltipButton.addEventListener("mouseleave", () => { 
+        isMouseDown = false;
+        clearInterval(holdInterval);
+    });
 
     table6Background = document.createElement("img");
     table6Background.src = "./assets/tooltips/background.webp"
@@ -11251,14 +11287,23 @@ function autoConsumeFood(type = 'check', foodID = null) {
 function nutCost(id) {
     let amount = persistentValues.upgrade[id];
     let scaleCeiling = permUpgrades[id].Max;
-    let cost;
-
+    let cost = 1;
     if (scaleCeiling === 50) {
-        cost = Math.ceil((amount)**2.6) + 1;
+        cost = Math.ceil((amount)**2.6);
     } else if (scaleCeiling === 25) {
-        cost = Math.ceil((amount)**3.3) + 1;
+        cost = Math.ceil((amount)**3.3);
     }
 
+    if (id >= PERM_UPGRADES_CUTOFF) {
+        cost += 100 * (amount + 1);
+        if (scaleCeiling === 50) {
+            cost = Math.ceil(cost*(amount + 1)**0.3);
+        } else if (scaleCeiling === 25) {
+            cost = Math.ceil(cost*(amount + 1)**0.5);
+        }
+    }
+
+    cost = Math.max(cost, 1);
     return cost;
 }
 
@@ -11373,7 +11418,8 @@ function addNutStore() {
     }
 
     nutShopDiv.activateWorkshopCell = () => {
-        for (let i = 14; i < getHighestKey(permUpgrades) + 1; i++) {
+        for (let i = PERM_UPGRADES_CUTOFF; i < getHighestKey(permUpgrades) + 1; i++) {
+            if (document.getElementById("nut-shop-" + i)) { continue }
             nutShopDiv.createCell(i);
         }
     }
@@ -12815,9 +12861,7 @@ function newPop(type) {
 if (beta || testing) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            // Shop.regenBlackPrice(persistentValues.blackMarketDict);h
-            // spawnWorldQuest();
-            changeSkinCollection('S' + 4);
+            spawnBossQuest(3);
         } else if (e.key === 'g') {
             spawnSkirmish();
         } else if (e.key === 'h') {

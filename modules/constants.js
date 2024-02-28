@@ -16,4 +16,6 @@ export const CONSTANTS = Object.freeze({
     WORKSHOP_THRESHOLD: 75,
     FINALE_THRESHOLD: 65,
     FINALE_THRESHOLD_TWO : 0,
+    MAX_LEADER: 5,
+    COLOR_ARRAY: ["Red", "Green", "Blue"], // MUST BE USE WITH SPREAD (PREVENT PASS BY REFERENCE)
 });

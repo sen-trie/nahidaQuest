@@ -46,8 +46,9 @@ const charLoreObj = {
     0:{Name:"Nahida",     Desc:"20%+ HP in Combat"},
     1:{Name:"Paimon",     Desc:"15%+ Energy Refund"},
     2:{Name:"Venti",      Desc:"10%+ Counter Recharge Rate"},
-    3:{Name:"Zhongli",    Desc:"50%+ Burst DMG"},
-    4:{Name:"Ei",         Desc:"35%+ Counter DMG"},
+    3:{Name:"Zhongli",    Desc:"75%+ Burst DMG"},
+    4:{Name:"Ei",         Desc:"100%+ Counter DMG"},
+    5:{Name:"Furina",     Desc:"50%+ Healing from Skills"}
 }
 
 const imgKey = {
@@ -865,7 +866,7 @@ const expeditionDictInfo = {
 const advInfo = {
     1:{Item:[], Desc:"Unlock [s]Parry Attack[/s]. <br><br><br><br>"},
     2:{Item:[1303,2056,4011], Desc:"Begin fights with [s]Parry Attack[/s] charged."},
-    3:{Item:[1316,2052,5017,5018], Desc:"Bounty rewards provide 5% more [s]XP[/s] and [s]Primogems[/s]."},
+    3:{Item:[1316,2052,5017,5018], Desc:"Bounty rewards provide 25% more [s]XP[/s] and [s]Primogems[/s]."},
     4:{Item:[1312,2059,5020,5022], Desc:"Successful expeditions have a chance to reward [s]an additional item[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
     5:{Item:[1306,5023,5019,5021], Desc:"Unlock [s]Skill Attack[/s]. <br><br> Enemies can be marked with [s]`Seeds of Skandha`[/s], dealing additional DMG and provides healing upon [s]Parry Attack[/s]."},
     6:{Item:[1220,6005,6006,6007,6008], Desc:"Party has a 5% chance to [s]evade[/s] enemy attacks."},
@@ -873,7 +874,7 @@ const advInfo = {
     8:{Item:[1210,2038,5013,5015], Desc:"Defeating enemies immediately [s]regenerates[/s] some [s]HP[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
     9:{Item:[1202,2039,5016,5012,5014], Desc:"An additional [s]Parry Attack[/s] can be stored."},
     10:{Item:[1206,2031,4012,4001], Desc:"Unlock [s]Burst Attack[/s]. <br><br> Reset all enemies' attacks while dealing immense damage."},
-    11:{Item:[1104,2001,5002,4010], Desc:"Bounty rewards provide 15% more [s]XP[/s] and [s]Primogems[/s]."},
+    11:{Item:[1104,2001,5002,4010], Desc:"Bounty rewards provide an additional 50% more [s]XP[/s] and [s]Primogems[/s]"},
     12:{Item:[1107,2004,5003,5004], Desc:"Successful expeditions have a higher chance to reward [s]an additional item[/s]. <br><br> Battle Stats are also increased <br> [hp]"},
     13:{Item:[1114,2005,5006,5008], Desc:"[s]Evasion rate[/s] is increased to 10%."},
     14:{Item:[1109,2008,5009,5005,5007], Desc:"[s]Skill Attack[/s] has a 50% chance to reset its cooldown (Cannot occur twice in a row)."},
@@ -1276,7 +1277,7 @@ const eventText = {
     1.5: `"Are you sure it has to be me? \n ...Fine, let's get this over with."`,
     2: "Let's play a game! When the clock stops ticking, we'll see who can press the button first!",
     3: "We found some mysterious boxes in the wild! Shall we open them?",
-    4: "A whopperflower infestation has occured in the area - please help to identify them!",
+    4: "A whopperflower infestation has occured in the area - please help us find them!",
     5: "Weasel thieves has been hoarding the Ajilenakh Nuts for themselves, we need to catch them!",
     6: "Oh no! A strong wind current has swept through the desert and caused things to fall from the sky!",
     7: "Let's play a game! Follow Arachatora's rhythm to win a prize!",
@@ -1440,6 +1441,17 @@ const blackShopDict = {
         title: 'Justice Theme Set',
         desc: 'Unlocks a new theme for the UI!',
         file: 'tooltips/inventory/skinCollection4.webp',
+        level: 0,
+        maxLevel: 1,
+    },
+    'kusava': {
+        cost: 4000,
+        primoCost: 900,
+        type: 'prop',
+        subtype: 'aranara',
+        title: 'Kusava',
+        desc: 'For certain Aranara events, Hard Mode becomes available which increases the possible rewards.',
+        file: 'tooltips/inventory/kusava.webp',
         level: 0,
         maxLevel: 1,
     },

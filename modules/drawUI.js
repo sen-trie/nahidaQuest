@@ -17,11 +17,14 @@ const uniqueFileArray = {
     "tooltips/elements/":["Anemo","Any","Artifact","Bow","Catalyst","Claymore","Cryo","Dendro","Electro","Food","Gemstone","Geo","Hydro","Level","Polearm","Pyro","Sword","Talent"],
     "event/":["clock-arrow","clock-back","clock-top","mineEventBG","mine-flag","mine-info","mine-unclicked","mine-wrong","timer-sand","mine-empty","weasel-back","timer-bar"],
     "icon/":["food1","food2","goldenNut","nut","primogemLarge","scarab","shop-start","event-easy","event-hard"],
-    "expedbg/":["counter","crit","dodge","Red","Blue","Green","quicktime","guard"]
+    "expedbg/":["counter","crit","dodge","Red","Blue","Green","quicktime","guard"],
+    "tree/":["treeDefense", "bless", "plant", "option-0", "option-1", "option-2"]
 }
 
 const numberedFileArray = {
     "achievement/":20,
+    "bg/achievementBG-": 4,
+    "bg/bg-": 4,
     "event/box-":7,
     "event/good-":7,
     "frames/background-":6,

@@ -175,7 +175,7 @@ const rollBeatModifier = (adventureVariables, battleVariables, persistentValues)
 }
 
 const regularQuicktime = (regularQuicktimeObject) => {
-    const colorArray = ["Red", "Green", "Blue"];
+    const colorArray = [...CONSTANTS.COLOR_ARRAY];
     let quicktimeDict = regularQuicktimeObject.quicktimeDict;
     let waveQuicktime = quicktimeDict.waveQuicktime;
     let adventureVariables = regularQuicktimeObject.adventureVariables;
@@ -436,7 +436,6 @@ const cytusQuicktime = (quicktimeBar, textOverlay, usedDict, quitQuicktime, adve
         textOverlay.appendChild(img);
     }
 
-
     const checkCollision = () => {
         if (controlledRows[activeRow].length > 0) {
             if (invincibleFrame) {
@@ -457,6 +456,10 @@ const cytusQuicktime = (quicktimeBar, textOverlay, usedDict, quitQuicktime, adve
     const maxBeat = beatArray.length;
     let mirrorAll = randomInteger(1, 3) === 1 ? true : false;
     let beatCount = 10;
+    let beatColor = 'Purple';
+    if (adventureVariables.specialty !== 'Workshop') {
+        beatColor = rollArray([...CONSTANTS.COLOR_ARRAY]);
+    }
 
     const spawnBeat = (counter) => {
         const currentBeat = beatArray[0];
@@ -477,7 +480,7 @@ const cytusQuicktime = (quicktimeBar, textOverlay, usedDict, quitQuicktime, adve
         for (let i = 0; i < currentBeat[2].length; i++) {
             if (currentBeat[2][i] === 'X') {
                 const rowBeat = createDom('img', {
-                    src: `./assets/expedbg/${modifier}Purple.webp`,
+                    src: `./assets/expedbg/${modifier}${beatColor}.webp`,
                     row: i,
                     class: ['cytus-beat'],
                     style: {
@@ -494,7 +497,7 @@ const cytusQuicktime = (quicktimeBar, textOverlay, usedDict, quitQuicktime, adve
                 if (modifier === 'Bullet-') {
                     rowBeat.style.transform = mirrorSequence ? 'translate(50%, -55%)' : `translate(-50%, -55%) scaleX(-1)`; 
                     let warnImage = createDom('img', { 
-                        src: `./assets/expedbg/Warning-Purple.webp`,
+                        src: `./assets/expedbg/Warning-${beatColor}.webp`,
                         class: ["cytus-warn", 'cytus-beat'],
                         style: {
                             left: mirrorSequence ? 'unset' : 0,

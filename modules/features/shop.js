@@ -397,7 +397,12 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
 
         shopBlackCard.increaseLevel = (persistentBlackMarket, keyId, updateCost = true) => {
             levelCount.innerText = `${persistentBlackMarket[keyId].level} / ${persistentBlackMarket[keyId].maxLevel}`;
-            if (updateCost) {
+            if (blackShopDict[keyId].type === 'prop') {
+                while (blackCardBottom.firstChild) {
+                    blackCardBottom.removeChild(blackCardBottom.lastChild);
+                }
+                blackCardBottom.append(createPurcButton(keyId));
+            } else if (updateCost) {
                 regenBlackPrice(persistentBlackMarket, keyId);
             } else {
                 shopBlackCard.removeCost();

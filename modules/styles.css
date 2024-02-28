@@ -94,11 +94,11 @@ button {
     --dark-cyan: #1D474A;
     --dull-cyan: #79b6b9;
     --bright-cyan: #348f96;
-    --medium-cyan: #509599;
+    --medium-cyan: #73c1c5;
     --dark-orange: #503111;
     --dull-orange: #dfbe72;
     --bright-orange: #be922c;
-    --medium-orange: #A86245;
+    --medium-orange: #be7859;
     --dark-ocean: #0a2d46;
     --dull-ocean: #79b6b9;
     --bright-ocean: #1b537a;
@@ -415,7 +415,7 @@ table, button, label {
 .table-with-tooltip {
     flex-grow: 2;
     width: 70%;
-    height: 92%;
+    height: 92.5%;
     box-sizing: border-box;
     padding: 1.5%;
     overflow-y: auto;
@@ -983,9 +983,8 @@ table, button, label {
     justify-content: center;
     align-items: center;
     flex: none;
-
     color: white;
-    width: 98%;
+    width: 100%;
     height: auto;
     max-height: 13%;
     aspect-ratio: 6.25;
@@ -3230,6 +3229,11 @@ table, button, label {
     font-size: 1rem;
     margin: 0.5em;
     padding-left: 0;
+}
+
+.commision-ele > div > div:first-of-type > .notif-item {
+    grid-template-columns: repeat(7, calc(100% / 8));
+    max-height: 100%;
 }
 
 .notif-item {

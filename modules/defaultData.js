@@ -97,6 +97,7 @@ const persistentValuesDefault = {
     collectionSkin: 0,
     autoFood: false,
     autoClickNahida: false,
+    hardAranara: false,
     blackMarketDict:{},
     lastRecordedTime: null,
     timeSpentValue: 0,

@@ -98,7 +98,7 @@
 
 .event-description {
     font: inherit;
-    font-size: 2rem;
+    font-size: 1.6rem;
     text-align: center;
     color: white;
     z-index: 10001;
@@ -509,7 +509,7 @@
 }
   
 .event-mine-bg {
-    height: 85%;
+    height: calc(100% - 5rem);
     aspect-ratio: 1;
     z-index: 101;
     background-repeat: no-repeat;
@@ -2807,7 +2807,7 @@ input:checked + .slider:before {
 #nut-store-currency, #tree-store-currency {
     position: absolute;
     left: 8%;
-    bottom: 83%;
+    bottom: 84%;
     width: 20%;
     height: fit-content;
     border-radius: 0.3em 0.3em 0 0;
@@ -2843,9 +2843,9 @@ input:checked + .slider:before {
     position: absolute;
     box-sizing: border-box;
     padding: 1%;
-    top: 17%;
-    height: 70%;
-    width: 90%;
+    top: 16%;
+    height: 75%;
+    width: 98%;
     gap: 1%;
     overflow-x: hidden;
     overflow-y: auto;
@@ -2874,15 +2874,13 @@ input:checked + .slider:before {
     color: white;
     text-align: center;
     text-shadow: var(--text-shadow-075);
-    margin-bottom: 1%;
 }
 
 #nut-shop-ascend > div:first-of-type {
     width: 100%;
     height: auto;
     justify-content: space-evenly;
-    margin-bottom: 1%;
-    max-height: 30%;
+    max-height: 15%;
 }
 
 #nut-shop-ascend > div:last-of-type {
@@ -3010,8 +3008,8 @@ img[src=""] {
 
 .nut-button-container {
     position: absolute;
-    bottom: 1%;
-    height: 11%;
+    bottom: 0%;
+    height: 10%;
     width: auto;
     max-width: 90%;
     gap: 1%;
