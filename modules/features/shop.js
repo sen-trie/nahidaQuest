@@ -1,6 +1,6 @@
 import { randomInteger, rollArray, abbrNum } from "../functions.js";
 import { blackShopDict } from "../dictData.js";
-import { createDom, choiceBox } from "../adjustUI.js";
+import { createDom, choiceBox, popUpBox } from "../adjustUI.js";
 
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
 // REUSED FUNCTIONS
@@ -354,13 +354,20 @@ const drawBlackMarket = (persistentValues, buttonFunctions) => {
         });
 
         infoButton.addEventListener('click', (event) => {
-            let info = createDom('p', {
+            const info = createDom('p', {
                 innerText: blackShopDict[key].desc,
-                class: ['black-info']
+                class: ['black-info'],
+            });
+
+            const buttonContainer = createDom('div', {
+                classList: ['flex-row', 'menu-container-black-shop'],
+                child: [
+                    createDom('button', { innerText: 'Okay' }),
+                ]
             });
 
             event.stopPropagation();
-            choiceBox(document.getElementById('table7'), {text: `${blackShopDict[key].title}`}, null, ()=>{}, null, info, ['notif-ele']);
+            popUpBox(document.getElementById('table7'), blackShopDict[key].title, info, buttonContainer, ['menu-small', 'menu-black-market']);
         })
 
         let eleCost = createDom('p', { innerText: itemDict.cost });

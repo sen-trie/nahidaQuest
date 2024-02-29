@@ -144,6 +144,21 @@ function inventoryFrame(ele, itemInfo, itemFrameColors) {
     return ele;
 }
 
+function popUpBox(mainBody, containerText, additionalContainer = null, buttonContainer, additionalClass = [], type = 'Close') {
+    const containerTitle = createDom('p', { id:'pop-up-text', innerText: containerText });    
+    const containerEle = createDom('div', { class: ['flex-column', ...additionalClass], child: [containerTitle, additionalContainer, buttonContainer] })
+    const parentEle = createDom('div', { class: ['flex-column', 'menu-ele'], child: [containerEle] });
+    mainBody.append(parentEle);
+
+    const buttonArray = Array.from(buttonContainer.children);
+    buttonArray.forEach((button) => {
+        if (type === 'Pick2' || type === 'Close') {
+            button.addEventListener('click', () => { parentEle.remove() });
+        }
+    });
+    
+}
+
 // CHOICE BOX (FOR ITEMS, PARENT CONTAINER MUST HAVE 'NOTIF-ITEM' CLASS)
 function choiceBox(mainBody, dialogObg, stopSpawnEvents = undefined, yesFunc, noFunc, extraEle, classes, returnEle = false) {
     if (stopSpawnEvents) {stopSpawnEvents = false}
@@ -480,4 +495,4 @@ const errorMesg = (errMesg) => {
     setTimeout(() => {errorDiv.remove()}, 60 * 1000);
 }
 
-export { errorMesg,createButton,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal,sidePop };
+export { errorMesg,createButton,popUpBox,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal,sidePop };

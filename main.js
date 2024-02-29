@@ -1,7 +1,7 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop,errorMesg } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,popUpBox,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop,errorMesg } from "./modules/adjustUI.js"
 import { CONSTANTS } from "./modules/constants.js";
 import * as Settings from "./modules/features/settings.js";
 import * as Shop from "./modules/features/shop.js";
@@ -933,15 +933,11 @@ function randomEventTimer(timerSeconds) {
 function startRandomEvent() {
     if (stopSpawnEvents === true) {return};
     let eventPicture = document.createElement("div");
-    let aranaraNumber;
-    // 2ND SET ARE LOCKED TO 4TH EXPEDITION UNLOCK
-    // 3RD SET ARE LOCKED TO FELL BOSS
+    let aranaraNumber = randomInteger(1, 4);
     if (persistentValues.fellBossDefeat) {
-        aranaraNumber = randomInteger(1, 10);
+        aranaraNumber = randomInteger(1, 10); // 3RD SET ARE LOCKED TO FELL BOSS
     } else if (expeditionDict[4] != '1') {
-        aranaraNumber = randomInteger(1, 7);
-    } else {
-        aranaraNumber = randomInteger(1, 4);
+        aranaraNumber = randomInteger(1, 7); // 2ND SET ARE LOCKED TO 4TH EXPEDITION UNLOCK
     }
      
     eventPicture.classList.add("random-event");
@@ -1010,8 +1006,7 @@ function clickedEvent(aranaraNumber) {
     mainBody.appendChild(eventDropdown);
 }
 
-function chooseEvent(type,specialMode) {
-    if (stopSpawnEvents === true) {return};
+function startEvent(type, specialMode, hardMode = false) {
     switch (type) {
         case 1:
         case 1.5:
@@ -1022,29 +1017,46 @@ function chooseEvent(type,specialMode) {
             break;
         case 3:
             boxFunction(specialMode);
-            break
+            break;
         case 4:
-            minesweeperEvent();
+            minesweeperEvent(hardMode);
             break;
         case 5:
-            weaselEvent(specialMode);
+            weaselEvent(specialMode, hardMode);
             break;
         case 6:
             rainEvent();
             break;
         case 7:
-            simonEvent(randomInteger(1,3) === 2 ? true : false);
+            simonEvent(hardMode);
             break;
         case 8:
             battleshipEvent();
             break;
         case 9:
-            snakeEvent();
+            snakeEvent(hardMode);
             break;
         default:
             console.error(`Event error: Invalid event ${type}`);
             break;
     }
+}
+
+function chooseEvent(type, specialMode) {
+    if (stopSpawnEvents === true) {return};
+    if (persistentValues.blackMarketDict && persistentValues.blackMarketDict.kusava.level === 1 && [4, 5, 7, 9].includes(type)) {
+        const aranaraImg = createDom('img', { src: `./assets/tutorial/aranara-${type}.webp`});
+        const buttonContainer = createDom('div', {
+            classList: ['flex-row', 'menu-container-two'],
+            child: [
+                createDom('button', { innerText: 'Normal', event: ['click', () => {startEvent(type, specialMode, false)}] }),
+                createDom('button', { innerText: 'Hard', event: ['click', () => {startEvent(type, specialMode, true)} ]})
+            ]
+        });
+        popUpBox(mainBody, 'Select Aranara Difficulty', aranaraImg, buttonContainer, ['menu-small'], 'Pick2');
+    } else {
+        startEvent(type, specialMode);
+    }    
 }
 
 // EVENT 1 (ENERGY OVERLOAD)
@@ -1268,14 +1280,10 @@ function boxOpen(eventBackdrop,specialBox) {
 }
 
 // EVENT 4 (MINESWEEPER)
-function minesweeperEvent() {
-
-    console.log(persistentValues.blackMarketDict && persistentValues.blackMarketDict.kusava)
-
-
-    let ROWS = 8;
-    let COLS = 8;
-    let mines = randomInteger(6,10);
+function minesweeperEvent(hardMode = false) {
+    const ROWS = hardMode === true ? 9 : 8;
+    const COLS = hardMode === true ? 18 : 8;
+    const mines = hardMode === true ? randomInteger(28, 30) : randomInteger(6, 10);
 
     stopSpawnEvents = true;
     const startTimestamp = performance.now();
@@ -1290,25 +1298,19 @@ function minesweeperEvent() {
 
     let mineInfo = document.createElement("div");
     mineInfo.id = "mine-info";
-    mineInfo.classList.add("flex-column")
+    mineInfo.classList.add("flex-column");
     let mineInfoTop = new Image();
     mineInfoTop.src = "./assets/event/minesweeper-top.webp";
     let mineInfoBot = new Image();
     mineInfoBot.src = "./assets/event/minesweeper-bot.webp";
-    mineInfo.append(mineInfoTop,mineInfoBot)
+    mineInfo.append(mineInfoTop,mineInfoBot);
     
-    let mineBackground = document.createElement("table");
-    // if (beta) {
-    //     ROWS = 8;
-    //     COLS = 12;
-    //     mines = randomInteger(10,14);
-    //     mineBackground.style.aspectRatio = '1.5';
-    // }
-
+    let mineBackground = document.createElement("table");    
     let board;
     let firstClick = true;
     let cellsLeft = ROWS * COLS - mines;
     mineBackground.classList.add("event-mine-bg");
+    mineBackground.style.aspectRatio = hardMode ? '2' : '1';
     initializeBoard();
 
     // INITIALIZE BOARD
@@ -1466,7 +1468,8 @@ function minesweeperEvent() {
         }
     })
 
-    eventBackdrop.append(eventDescription,mineBackground,mineInfo,cancelBox);
+    eventBackdrop.append(eventDescription,mineBackground,cancelBox);
+    hardMode ? null : eventBackdrop.append(mineInfo);
     mainBody.append(eventBackdrop);
 }
 
@@ -1474,8 +1477,14 @@ let weaselCount = 0;
 let goldWeaselCount = 0;
 // EVENT 5 (WHACK-A-MOLE)
 function weaselEvent(specialWeasel) {
+    let hardMode = false;
+    if (persistentValues.blackMarketDict && persistentValues.blackMarketDict.kusava.level === 1) {
+        hardMode = true;
+    }
+
     stopSpawnEvents = true;
-    let weaselElement = 18;
+    const weaselElementMax = hardMode ? 27 : 18;
+    let weaselElement = weaselElementMax;
     weaselCount = 0;
     goldWeaselCount = 0;
 
@@ -1490,10 +1499,12 @@ function weaselEvent(specialWeasel) {
     eventDescription.style.top = "5%";
     let weaselBack = document.createElement("div");
     weaselBack.classList.add("flex-row","weasel-back");
+    weaselBack.style.width = hardMode ? '80%' : '60%';
 
     while (weaselElement--) {
             let weaselContainer = document.createElement("div");
             weaselContainer.classList.add("weasel");
+            weaselContainer.style.width = `${(100 * 3 / weaselElementMax)}%`;
 
             let weaselBackImage = document.createElement("img");
             weaselBackImage.src = './assets/event/weasel-10.webp';
@@ -1503,7 +1514,7 @@ function weaselEvent(specialWeasel) {
 
     let delay = 2000;
     setTimeout(() => {
-        addWeasel(weaselBack,delay,specialWeasel);
+        addWeasel(weaselBack,delay,specialWeasel,hardMode);
         weaselBurrow.load();
         weaselBurrow.play();
     },2000)
@@ -1525,6 +1536,7 @@ function weaselEvent(specialWeasel) {
     let weaselTimerImage = document.createElement("img");
     weaselTimerImage.src = "./assets/event/timer-sand.webp";
     weaselTimerImage.classList.add("weasel-sand");
+    weaselTimerImage.style.animationDuration = hardMode ? '40s' : '25s';
     weaselTimerImage.addEventListener("animationend",() => {
         let eventText = `You caught ${weaselCount} weasel thieves!`;
         if (goldWeaselCount > 0) {
@@ -1546,9 +1558,10 @@ function weaselEvent(specialWeasel) {
     mainBody.append(eventBackdrop);
 }
 
-function addWeasel(weaselBack,delay,specialWeasel) {
+function addWeasel(weaselBack,delay,specialWeasel,hardMode) {
     let weaselDiv = weaselBack.children;
     let realWeasel = randomInteger(0,18);
+    let currentWeaselSrc = 0;
     let specialWeaselSpawns = false;
     if (specialWeasel) {specialWeaselSpawns = randomIntegerWrapper(luckRate + 45, 100)}
 
@@ -1559,22 +1572,24 @@ function addWeasel(weaselBack,delay,specialWeasel) {
             if (specialWeaselSpawns) {
                 weaselImage.src = "./assets/event/weasel-1.webp";
             } else {
-                let realWeasel = randomInteger(2,4);
-                weaselImage.src = "./assets/event/weasel-"+realWeasel+".webp";
+                currentWeaselSrc = randomInteger(2,4);
+                weaselImage.src = "./assets/event/weasel-"+currentWeaselSrc+".webp";
             }
 
             let springInterval = (randomInteger(20,25) / 100);
             weaselImage.classList.add("spring");
             weaselImage.style["animation-duration"] = springInterval + "s";
+            const brightness = hardMode ? randomInteger(85, 95) : 100;
+            weaselImage.style.filter = `brightness(${brightness / 100})`;
             weaselImage.addEventListener("click",() => {
                 mailElement.load();
                 mailElement.playbackRate = 1.35;
                 mailElement.play();
 
                 delay *= 0.65;
-                if (delay <= 450) {delay = 450}
+                delay = Math.max(delay, 450);
 
-                clearWeasel(weaselBack, delay, specialWeasel);
+                clearWeasel(weaselBack, delay, specialWeasel,hardMode);
                 weaselCount++;
                 if (specialWeaselSpawns) {goldWeaselCount++}
 
@@ -1582,44 +1597,61 @@ function addWeasel(weaselBack,delay,specialWeasel) {
                 weaselCountText.innerText = weaselCount;
             })
         } else {
-            let emptyWeasel = randomInteger(7,11);
+            let emptyWeasel = randomInteger(7, 11);
+            if (hardMode) {
+                emptyWeasel = randomInteger(7, 9);
+            }
+            
             if (emptyWeasel != 10 & emptyWeasel != 9) {
                 let springInterval = (randomInteger(15, 20) / 100);
                 weaselImage.classList.add("spring");
                 weaselImage.style["animation-duration"] = springInterval + "s";
-                weaselImage.style.filter = `brightness(${randomInteger(65, 90) / 100})`;
+                const brightness = hardMode ? randomInteger(75, 100) : randomInteger(65, 90);
+                weaselImage.style.filter = `brightness(${brightness / 100})`;
             }
-            weaselImage.src = "./assets/event/weasel-"+emptyWeasel+".webp"
+            weaselImage.src = "./assets/event/weasel-"+emptyWeasel+".webp";
         }
     }
 
-    let fakeAmount = Math.floor(2000/delay + 0.3);
-    if (fakeAmount > 10) {fakeAmount = 10}
+    let fakeAmount = Math.floor(2000/(delay / (hardMode ? 3 : 1)) + 0.3);
+    if (fakeAmount > 10) {
+        fakeAmount = 10;
+        if (hardMode) {
+            fakeAmount = Math.min(20, fakeAmount);
+        }
+    }
     let combination = generateCombination(fakeAmount);
     for (let j = 0, len = combination.length; j < len; j++) {
         if ((combination[j] - 1) === realWeasel) {continue}
         let weaselImage = weaselDiv[combination[j] - 1].querySelector('img');
         let fakeWeasel = randomInteger(5, 7);
         if (specialWeasel) {fakeWeasel = randomInteger(4, 7)}
+        if (hardMode) {
+            if (specialWeasel) {
+                fakeWeasel = 4;
+            } else {
+                fakeWeasel = currentWeaselSrc + 3;
+            }
+        }
 
         weaselImage.src = "./assets/event/weasel-"+fakeWeasel+".webp";
         weaselImage.style.filter = 'unset';
 
-        let springInterval = (randomInteger(15,35) / 100)
+        let springInterval = (randomInteger(15,35) / 100);
         weaselImage.classList.add("spring");
         weaselImage.style["animation-duration"] = springInterval + "s";
         weaselImage.addEventListener("click",()=> {
             let fakeWeaselAlert = document.getElementById("fake-weasel-alert");
             fakeWeaselAlert.style.animation = "none";
-            setTimeout(() => { fakeWeaselAlert.style.animation = "fadeOutWeasel 3s linear forwards"}, 10)
+            setTimeout(() => { fakeWeaselAlert.style.animation = "fadeOutWeasel 3s linear forwards"}, 10);
             weaselDecoy.load();
             weaselDecoy.play();
-            clearWeasel(weaselBack, delay, specialWeasel);
+            clearWeasel(weaselBack, delay, specialWeasel,hardMode);
         })
     }
 }
 
-function clearWeasel(weaselBack,delay,specialWeasel) {
+function clearWeasel(weaselBack,delay,specialWeasel,hardMode) {
     let weaselDiv = weaselBack.children;
     for (let i=0, len=weaselDiv.length; i < len; i++) {
         let weaselImage = weaselDiv[i].querySelector('img');
@@ -1632,7 +1664,7 @@ function clearWeasel(weaselBack,delay,specialWeasel) {
     }
 
     setTimeout(()=>{
-        addWeasel(weaselBack, delay, specialWeasel);
+        addWeasel(weaselBack, delay, specialWeasel,hardMode);
         weaselBurrow.load();
         weaselBurrow.play();
     },delay)
@@ -1773,7 +1805,9 @@ function rainEvent() {
 }
 
 // EVENT 7 (SIMON SAYS)
-function simonEvent(hexMode) {
+function simonEvent(hardMode) {
+    const hexMode = randomInteger(1,3) === 2 ? true : false;
+
     stopSpawnEvents = true;
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","flex-column","event-dark");
@@ -1800,10 +1834,8 @@ function simonEvent(hexMode) {
     let firstTime = true;
 
     if (hexMode) {
-        requiredAmount = 7;
-        if (beta) {
-            requiredAmount = 11;
-        }
+        requiredAmount = 6;
+        if (hardMode) { requiredAmount = 9 }
 
         saysContainer.classList.add('hex-container');
         const hexArray = {
@@ -1822,10 +1854,8 @@ function simonEvent(hexMode) {
             saysContainer.appendChild(saysImg);
         }
     } else {
-        requiredAmount = 8;
-        if (beta) {
-            requiredAmount = 12;
-        }
+        requiredAmount = 7;
+        if (hardMode) { requiredAmount = 10 }
 
         saysContainer.classList.add('say-container');
         for (let i = 1; i < 5; i++) {
@@ -1870,10 +1900,10 @@ function simonEvent(hexMode) {
                 if (array.length === 0) {
                     saysContainer.ready = true;
                 } else {
-                    setTimeout(() => {showSequence(array);}, 550);   
+                    setTimeout(() => {showSequence(array)}, hardMode ? 350 : 550);   
                 }
             }
-        }, 750);
+        },  hardMode ? 550 : 750);
     }
 
     function addSequence() {
@@ -1920,7 +1950,7 @@ function simonEvent(hexMode) {
                         scoreCounter.innerText = `[${currentScore}]`;
                         addSequence();
                     }
-                }, 300)
+                }, 300);
             } else {
                 saysContainer.ready = true;
             }
@@ -2390,7 +2420,7 @@ function battleshipEvent() {
 }
 
 // EVENT 9
-function snakeEvent() {
+function snakeEvent(hardMode) {
     stopSpawnEvents = true;
     let eventBackdrop = createDom('div', {
         classList: ["cover-all","flex-column","event-dark","minesweeper-backdrop"],
@@ -2560,11 +2590,26 @@ function snakeEvent() {
     
     // random food position
     function generateRandomFood() {
-        const randomX = randomInteger(0, width / cellLength);
-        const randomY = randomInteger(0, height / cellLength);
+        let randomX = randomInteger(0, width / cellLength);
+        let randomY = randomInteger(0, height / cellLength);
 
-        if ((randomX === 0 || randomX === Math.ceil(width / cellLength - 1)) || (randomY === 0 || randomY === Math.ceil(height / cellLength - 1))) {
+        if (!hardMode && 
+            (randomX === 0 || randomX === Math.ceil(width / cellLength - 1) || 
+             randomY === 0 || randomY === Math.ceil(height / cellLength - 1))) {
             return generateRandomFood();
+        }
+
+        if (hardMode) {
+            let wallRoll = randomInteger(0, 80);
+            if (wallRoll < 5) {
+                randomX = 0;
+            } else if (wallRoll < 10) {
+                randomY = 0;
+            } else if (wallRoll < 15) {
+                randomX = Math.ceil(width / cellLength - 1);
+            } else if (wallRoll < 20) {
+                randomY = Math.ceil(height / cellLength - 1);
+            }
         }
 
         for (let i = 0; i < snake.length; i++) {
@@ -2674,7 +2719,10 @@ function snakeEvent() {
                     return;
                 }
 
-                let scoreMultiplier = Math.min(MOBILE ? 10 : 12, scoreCounter.score * (MOBILE ? 0.3 : 0.4))
+                let scoreMultiplier = Math.min(MOBILE ? 10 : 12, scoreCounter.score * (MOBILE ? 0.3 : 0.4));
+                if (hardMode) {
+                    scoreMultiplier = Math.min(MOBILE ? 10 : 12, scoreCounter.score * (MOBILE ? 0.45 : 0.6));
+                }
                 canvas.brightness += 0.03 + 0.005 * (scoreMultiplier);
 
                 if (canvas.brightness > 1) {
@@ -3448,7 +3496,7 @@ function generalSettings(settingsMenu) {
     let clearSetting = document.createElement("button");
     clearSetting.classList.add("setting-clear");
     clearSetting.addEventListener("click",() => {choiceBox(mainBody, {text: 'Are you sure? Deleting your save cannot be undone!'}, null, 
-                                                () => {clearLocalStorage()}, undefined, null, ['choice-ele'])
+                                                () => {clearLocalStorage()}, undefined, null, ['choice-ele']);
     });
 
     const cancelButton = document.createElement("button");
@@ -12861,7 +12909,7 @@ function newPop(type) {
 if (beta || testing) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            spawnBossQuest(3);
+            startRandomEvent();
         } else if (e.key === 'g') {
             spawnSkirmish();
         } else if (e.key === 'h') {

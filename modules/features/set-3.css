@@ -92,3 +92,8 @@ body {
 #game, #start-screen {
     border-color: var(--dull-purple);
 }
+
+.menu-small {
+    background-color: var(--bright-pink);
+    border-color: var(--bright-purple);
+}

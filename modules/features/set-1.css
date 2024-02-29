@@ -92,3 +92,16 @@ body {
 #game, #start-screen {
     border-color: var(--dull-cyan);
 }
+
+.menu-small {
+    background-color: var(--dim-cyan);
+    border-color: var(--bright-cyan);
+}
+
+.tab-button-div {
+    filter: invert(1) contrast(0.75);
+}
+
+.tab-button-div > .pop-new {
+    filter: invert(1) ;
+}

@@ -92,3 +92,8 @@ body {
 #game, #start-screen {
     border-color: var(--dull-ocean);
 }
+
+.menu-small {
+    background-color: var(--dull-ocean);
+    border-color: var(--bright-ocean);
+}
