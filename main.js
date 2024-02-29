@@ -5469,12 +5469,12 @@ function createGuild() {
         rankText.innerText = i;
         rankButton.append(rankImg,rankText);
 
-        if (advDict.adventureRank < i && advDict.rankDict[i] == true) {
+        if (advDict.adventureRank < i && advDict.rankDict[i] === false) {
             let rankIco = new Image();
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/lock.webp";
             rankButton.append(rankIco);
-        } else if (advDict.rankDict[i] == false) {
+        } else if (advDict.rankDict[i] === true) {
             let rankIco = new Image();
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/tick.webp";
@@ -5507,12 +5507,12 @@ function createGuild() {
 
             if (rankDiv.activeLevel != undefined) {rankDiv.activeLevel.classList.remove("active-rank")}
             rankClaim.buttonLevel = i;
-            if (advDict.rankDict[i] == true) {
+            if (advDict.rankDict[i] === false) {
                 rankClaim.innerText = "Locked";
                 rankClaim.available = false;
                 rankClaim.classList.add("rank-button-claimed");
                 if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
-            } else if (advDict.rankDict[i] == false) {
+            } else if (advDict.rankDict[i] === true) {
                 rankClaim.innerText = "Rank Claimed";
                 rankClaim.available = false;
                 rankClaim.classList.add("rank-button-claimed");
@@ -5541,7 +5541,6 @@ function createGuild() {
             if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
             advDict.rankDict[level] = false;
 
-            
             let itemArray = advInfo[level].Item;
             if (itemArray.length > 0) {
                 for (let i = 0; i < itemArray.length; i++) {
@@ -6046,10 +6045,10 @@ function completeBounty(bountyID,type,ele) {
     claim.primoReward = bountyObject[bountyID].primoReward;
     claim.xpReward = bountyObject[bountyID].xpReward;
 
-    if (!advDict.rankDict[11]) {
+    if (advDict.rankDict[11] === true) {
         claim.xpReward *= 1.50;
         claim.primoReward *= 1.50;
-    } else if (!advDict.rankDict[3]) {
+    } else if (advDict.rankDict[3] === true) {
         claim.xpReward *= 1.25;
         claim.primoReward *= 1.25;
     }
@@ -6361,10 +6360,12 @@ function generateCommisions() {
         let extraItem = randomInteger(0,2);
         if (extraItem === 1) {possibleCommItems.push(shuffledItems[2])}
 
+        const minLevel = 5 + rating * 2 + extraItem * 2 + randomInteger(0,2);
+        if (advDict.adventureRank < minLevel) { continue }
         baseCommisions.push({
             title: text,
             rating: Math.min(rating, 5),
-            rank: 5 + rating * 2 + extraItem * 2 + randomInteger(0,2),
+            rank: minLevel,
             duration: (Math.round(randomInteger(2, 6) / 2 * 10) / 10),
             possibleItems: possibleCommItems,
             priority: null,
@@ -6372,7 +6373,7 @@ function generateCommisions() {
             id: `base-${i}`,
             progress: false,
             endTime: null,
-        })
+        });
     }
 
     saveValues.baseCommisions = baseCommisions;
@@ -7471,7 +7472,7 @@ function drawAdventure(advType, wave) {
 function triggerFight() {
     if (!adventureScene) {return}
     adventureVariables.fightSceneOn = true;
-    adventureVariables.pheonixMode = advDict.rankDict[20] ? false : true;
+    adventureVariables.pheonixMode = advDict.rankDict[20] === true ? true : false;
 
     skillCooldownReset = false;
 
@@ -7586,15 +7587,15 @@ function triggerFight() {
         if (i == 1) {
             amountInterval *= 4;
             normalAtkCooldown.maxAmount = 2;
-            if (!advDict.rankDict[16]) {
+            if (advDict.rankDict[16] === true) {
                 amountInterval *= 1.1;
             }
 
-            if (!advDict.rankDict[9]) {
+            if (advDict.rankDict[9] === true) {
                 normalAtkCooldown.maxAmount = 3;
             }
 
-            if (!advDict.rankDict[2]) {
+            if (advDict.rankDict[2] === true) {
                 normalAtkCooldown.amount = 100 * normalAtkCooldown.maxAmount;
             }
 
@@ -7603,12 +7604,12 @@ function triggerFight() {
             }
         } else if (i == 2) {
             amountInterval *= 0.65;
-            if (advDict.rankDict[5]) {
+            if (advDict.rankDict[5] !== true) {
                 advImage.classList.add('dim-filter');
                 continue;
             }
         } else if (i == 3) {
-            if (advDict.rankDict[10]) {
+            if (advDict.rankDict[10] !== true) {
                 advImage.classList.add('dim-filter');
                 continue;
             } else {
@@ -8203,11 +8204,11 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
 
                     const evadeRoll = randomInteger(1,101);
                     let evadeMax = -1;
-                    if (!advDict.rankDict[19]) {
+                    if (advDict.rankDict[19] === true) {
                         evadeMax = 15;
-                    } else if (!advDict.rankDict[13]) {
+                    } else if (advDict.rankDict[13] === true) {
                         evadeMax = 10;
-                    } else if (!advDict.rankDict[6]) {
+                    } else if (advDict.rankDict[6] === true) {
                         evadeMax = 5;
                     }
 
@@ -8491,7 +8492,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
             Battle.createBattleText("guard", animationTime * 150 * 2, mobDiv);
         }
 
-        if (!advDict.rankDict[10]) {
+        if (advDict.rankDict[10] === true) {
             const cooldown = document.getElementById('adventure-cooldown-3');
             if (adventureVariables.specialty === 'Unusual') {
                 cooldown.amount += 15;
@@ -8659,7 +8660,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 parryFailure.play();
                 Battle.comboHandler("reset");
 
-                if (!advDict.rankDict[10]) {
+                if (advDict.rankDict[10] === true) {
                     const cooldown = document.getElementById('adventure-cooldown-3');
                     cooldown.amount += 15;
                 }
@@ -8670,7 +8671,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 parryFailure.load();
                 parryFailure.play();
                 Battle.comboHandler("reset");
-                if (!advDict.rankDict[10]) {
+                if (advDict.rankDict[10] === true) {
                     const cooldown = document.getElementById('adventure-cooldown-3');
                     cooldown.amount += 10;
                 }
@@ -8685,7 +8686,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                 mobHealth.health -= (battleVariables.currentATK * 0.25);
                 Battle.createBattleText("guard", animationTime * 150 * 2, mobDiv);
                 mobDiv.doubleAttack();
-                if (!advDict.rankDict[10]) {
+                if (advDict.rankDict[10] === true) {
                     const cooldown = document.getElementById('adventure-cooldown-3');
                     cooldown.amount += 10;
                 }
@@ -9392,7 +9393,7 @@ function dodgeOn(type) {
 }
 
 function skillUse() {
-    if (!adventureVariables.fightSceneOn || advDict.rankDict[5] || battleVariables.quicktimeAttack) {return}
+    if (!adventureVariables.fightSceneOn || advDict.rankDict[5] !== true || battleVariables.quicktimeAttack) {return}
     
     const adventureVideoChildren = document.getElementById("adventure-video").querySelectorAll('.enemy');
     const cooldown = document.getElementById('adventure-cooldown-2');
@@ -9402,9 +9403,9 @@ function skillUse() {
     let resetRoll = -1;
     if (skillCooldownReset) {
         resetRoll = -1;
-    } else if (!advDict.rankDict[14]) {
+    } else if (advDict.rankDict[14] === true) {
         resetRoll = 50;
-    } else if (!advDict.rankDict[7]) {
+    } else if (advDict.rankDict[7] === true) {
         resetRoll = 20;
     }
 
@@ -9446,7 +9447,7 @@ function skillUse() {
 }
 
 function attackAll() {
-    if (!adventureVariables.fightSceneOn || advDict.rankDict[10] || battleVariables.quicktimeAttack) {return}
+    if (!adventureVariables.fightSceneOn || advDict.rankDict[10] !== true || battleVariables.quicktimeAttack) {return}
     const cooldown = document.getElementById('adventure-cooldown-3');
     if (cooldown.amount < 100) {return}
     cooldown.amount -= 100;
@@ -9476,9 +9477,9 @@ function attackAll() {
 
         let critRoll = randomInteger(1,101);
         let critThreshold = -1;
-        if (!advDict.rankDict[18]) {
+        if (advDict.rankDict[18] === true) {
             critThreshold = 20;
-        } else if (!advDict.rankDict[15]) {
+        } else if (advDict.rankDict[15] === true) {
             critThreshold = 10;
         }
 
@@ -9586,7 +9587,7 @@ function killMob(mobDiv, mobHealth) {
         battleVariables.guardtime = 0;
     }
 
-    if (!advDict.rankDict[8]) {
+    if (advDict.rankDict[8] === true) {
         loseHP((mobDiv.classList.contains('minion') ? 0.5 : 1), "inverse");
     }
 
@@ -9688,12 +9689,12 @@ function winAdventure() {
     let itemSecondRoll = randomInteger(1,101);
     let itemSecondThreshold = 101;
 
-    if (!advDict.rankDict[17]) {
+    if (advDict.rankDict[17] === true) {
         itemSecondThreshold = 70;
         itemFirstThreshold = 65;
-    } else if (!advDict.rankDict[12]) {
+    } else if (advDict.rankDict[12] === true) {
         itemFirstThreshold = 70;
-    } else if (!advDict.rankDict[4]) {
+    } else if (advDict.rankDict[4] === true) {
         itemFirstThreshold = 90;
     }
 
@@ -10580,8 +10581,8 @@ function createTooltip() {
             let listText = createDom('p', { 
                 id:'notif-list', 
                 innerText: 
-                `${heroTooltip === 0 ? 'Base Nuts/Click' : "Base NpS"}: ${abbrNum(upgradeDict[heroTooltip].BaseFactor, 2)} (No Item Buffs)\n
-                ${heroTooltip === 0 ? 'Buffed Nuts/Click' : 'Buffed NpS'}: ${abbrNum(upgradeDict[heroTooltip].Factor, 2)} (With Item Buffs)\n
+                `${heroTooltip === 0 ? 'Base Nuts/Click' : "Base NpS"}: ${abbrNum(upgradeDict[heroTooltip].BaseFactor, 2)}/lvl (No Item Buffs)\n
+                ${heroTooltip === 0 ? 'Buffed Nuts/Click' : 'Buffed NpS'}: ${abbrNum(upgradeDict[heroTooltip].Factor, 2)}/lvl (With Item Buffs)\n
                 Upgrades: ${upgradeCount} (Built into ${heroTooltip === 0 ? 'Base Nuts/Click' : 'Base NpS'})\n
                 Overall: ${abbrNum(upgradeDict[heroTooltip].Contribution, 2)} (${overallText}% of total NpS before global buffs)`
             });
@@ -12942,10 +12943,10 @@ if (testing) {
     tester.classList.add('test-warning');
     mainBody.append(tester); 
     
-    setTimeout(()=>{
-    let startButton = document.getElementById("start-button");
-    if (startButton) startButton.click();
-    }, 1200);
+    // setTimeout(()=>{
+    // let startButton = document.getElementById("start-button");
+    // if (startButton) startButton.click();
+    // }, 1200);
 }
 
 if (beta) {
