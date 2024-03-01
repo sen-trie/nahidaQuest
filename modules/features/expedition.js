@@ -112,7 +112,7 @@ const expedInfo = (butId, expeditionDict, saveValues, persistentValues) => {
 
         lootHTML = lootHTML.replace('[container]','');
         lootInfo.innerHTML = `${lootHTML}`;
-        lootInfo.appendChild(invDiv)
+        lootInfo.appendChild(invDiv);
 
         expedImg.src = `./assets/expedbg/header/${id}.webp`;
         expedRow2.style.borderBottom = "0.2em solid #8B857C";

@@ -12932,7 +12932,10 @@ if (beta || testing) {
         } else if (e.key === 'h') {
             document.getElementById("nut-shop-div").activateWorkshopCell();
         } else if (e.key === 'j') {
-            clickEvent(true);
+            spawnBossQuest(1);
+            spawnBossQuest(2);
+            spawnBossQuest(3);
+            spawnBossQuest(4);
         }
     });
 }

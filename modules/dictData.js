@@ -82,11 +82,10 @@ const imgKey = {
     28:{Left:"15",  Top:"47",   Level:13,   Wave:[3],             Heads:[22]        ,Loot:{Seed:[5,"Tree \n Seeds"], Weapon:[5,"5-Star \n Weapon"],  Talent: [4,"4-Star \n Talent"],   Gemstone: [5,"5-Star \n Gem"], Food: [5,"5-Star \n Food \n Item"]}},
     29:{Left:"28",  Top:"67",   Level:13,   Wave:[4],             Heads:[23]        ,Loot:{Seed:[6,"Tree \n Seeds"], Weapon:[5,"5-Star \n Weapon"],  Talent: [4,"4-Star \n Talent"],   Gemstone: [5,"5-Star \n Gem"], Food: [5,"5-Star \n Food \n Item"]}},
     30:{Left:"30",  Top:"57",   Level:13,   Wave:[5],             Heads:[24]        ,Loot:{Seed:[6,"Tree \n Seeds"], Weapon:[5,"5-Star \n Weapon"],  Talent: [4,"4-Star \n Talent"],   Gemstone: [5,"5-Star \n Gem"], Food: [5,"5-Star \n Food \n Item"]}},
-    31:{Left:"20",  Top:"57",   Level:14,   Wave:[1],               Heads:[25]           ,Loot:{}},
-    32:{Left:"80",  Top:"35",   Level:14,   Wave:[2],               Heads:[26]           ,Loot:{}},
-    33:{Left:"72",  Top:"28",   Level:14,   Wave:[3],               Heads:[27]           ,Loot:{}},
-    34:{Left:"50",  Top:"29",   Level:14,   Wave:[4],               Heads:[28]           ,Loot:{}},
-    35:{Left:"0",  Top:"0",     Level:15,   Wave:[1],               Heads:[28]           ,Loot:{}},
+    31:{Left:"20",  Top:"57",   Level:14,   Wave:[1],               Heads:[25]           ,Loot:{Fell:[6, "Aranara \n Unlock"]}},
+    32:{Left:"80",  Top:"35",   Level:14,   Wave:[2],               Heads:[26]           ,Loot:{Unusual:[6, "Shop \n Unlock"]}},
+    33:{Left:"72",  Top:"28",   Level:14,   Wave:[3],               Heads:[27]           ,Loot:{Workshop:[6, "Blessings \n Unlock"]}},
+    34:{Left:"50",  Top:"29",   Level:14,   Wave:[4],               Heads:[28]           ,Loot:{Finale:[6, "Mail \n Unlock"]}},
 }
 
 const sceneInfo = { 
