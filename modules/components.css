@@ -3470,6 +3470,14 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
     background-color: var(--bright-light-green);
 }
 
+.import-file {
+    max-width: 50%;
+    font: inherit;
+    font-size: 0.9rem;
+    right: unset;
+    left: 0;
+}
+
 .settings-textarea {
     width: 100%;
     height: 100%;

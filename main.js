@@ -61,7 +61,6 @@ const WISHCOST = 1;
 let STARTINGWISHFACTOR = 25;
 let wishMultiplier = 0;
 let adventureType = 0;
-let goldenNutUnlocked = false;
 let stopSpawnEvents = false;
 let preventSave = false;
 let timePassedSinceLast = null;
@@ -1241,7 +1240,7 @@ function boxOpen(eventBackdrop,specialBox) {
         outcomeText = specialText[randomSpecial-2];
     } else {
         let boxChance = randomInteger(1,101);
-        if (goldenNutUnlocked === true && boxChance >= 90) {
+        if (saveValues.goldenTutorial && boxChance >= 90) {
             outcomeNumber = randomInteger(5,15);
             boxOutcome.src = "./assets/icon/goldenNut.webp";
             outcomeText = `Oh! It had Golden Nuts!`;
@@ -1718,7 +1717,7 @@ function rainEvent() {
         let animation = `rain ${(randomInteger(8,12)/2)}s linear forwards`
         let type = randomInteger(1,101);
         var img = document.createElement("img");
-        if (type >= 95 && goldenNutUnlocked === true && tempGolden <= 5) {
+        if (type >= 95 && saveValues.goldenTutorial) {
             img.src = "./assets/icon/goldenIcon.webp";
             animation = `rain-rotate ${(randomInteger(6,10)/2)}s linear forwards`
             img.addEventListener('click', () => {
@@ -3070,7 +3069,7 @@ function removeLoading(loadingNumber) {
         }
 
         tutorial(idleAmount);
-        if (testing) document.getElementById('play-button').click(); 
+        if (testing && document.getElementById('play-button')) document.getElementById('play-button').click(); 
     }, 200);
 }
 
@@ -3795,12 +3794,38 @@ function settingsBox() {
         const importBoxText = createDom('textarea', {
             class: ['settings-textarea'],
             placeholder: "Paste save data here.",
-        })
+        });
 
         const importBoxButton = createDom('button', {
             class: ['settings-inner-button'],
             innerText: 'Import Save'
-        })
+        });
+
+        const importFileButton = createDom('input', {
+            class: ['settings-inner-button', 'import-file'],
+            innerText: 'Upload File',
+            type: 'file',
+            accept: '.txt'
+        });
+
+        importFileButton.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file && file.type === "text/plain") {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const fileContent = event.target.result;
+                        importBoxText.value = fileContent;
+                    } catch {
+                        importBoxText.value = 'Invalid save data loaded.';
+                    }
+                };
+    
+                reader.readAsText(file);
+            } else {
+                importBoxText.value = 'Invalid save data loaded.';
+            }
+        });
 
         importBoxButton.addEventListener("click", () => {
             let promptSave = importBoxText.value;
@@ -3834,7 +3859,7 @@ function settingsBox() {
             }
         });
         
-        importBox.append(importBoxText, importBoxButton)
+        importBox.append(importBoxText, importBoxButton, importFileButton);
         
         exportHeaderButton.addEventListener('click', () => {
             if (exportHeaderButton.classList.contains('inactive-tab')) {
@@ -5108,7 +5133,7 @@ function adventure(advType) {
             saveValues["energy"] -= ADVENTURECOSTS[type <= 5 && type > 1  ? type : 0];
             updateMorale("add", (randomInteger(7, 15) * -1));
 
-            if (activeLeader == "Paimon" && type <= 5 && type > 1) {saveValues["energy"] += (ADVENTURECOSTS[type] * 0.15)}
+            if (activeLeader == "Paimon" && type <= 5 && type > 1) {saveValues["energy"] += Math.round(ADVENTURECOSTS[type] * 0.15)}
             if (!persistentValues.tutorialBasic) {
                 drawUI.customTutorial("advTut", 6, 'Expedition Tutorial', () => { drawAdventure(type, wave) });
                 persistentValues.tutorialBasic = true;
@@ -5306,56 +5331,52 @@ function inventoryDraw(itemType, min, max, type, itemClass){
         "talent": 6001,
     }
     let drawnItem = 0;
-    while (true){
+    while (true) {
         attempts++;
         if (attempts >= 10000) {
-            console.error(`Error drawing item with properties [${itemType},${type}${itemClass ? `,${itemClass}` : ','}]. Please submit this bug in the feedback form`);
-            return;
+            throw new Error(`Error drawing item with properties [${itemType},${type}${itemClass ? `,${itemClass}` : ','}]. Please submit this bug in the feedback form`);
         }
 
         drawnItem = randomInteger(lowerInventoryType[itemType], upperInventoryType[itemType]);
         if (Inventory[drawnItem] == undefined) {continue}
-        if (Inventory[drawnItem].Star >= min && Inventory[drawnItem].Star < (max + 1)) {
-            if (type === "shop") {
-                return drawnItem;
-            } else if (typeof type === 'string') {
-                if (type.split("-")[0] === "adventure" || type === "Bonus" || type === "Bonus2"){
-                    if (itemClass === "Any") {
+        if (Inventory[drawnItem].Star < min || Inventory[drawnItem].Star > max) {continue}
+        if (type === "shop") {
+            return drawnItem;
+        } else if (typeof type === 'string') {
+            if (type.split("-")[0] === "adventure" || type === "Bonus" || type === "Bonus2") {
+                if (itemClass === "Any") {
+                    lootArray[type] = drawnItem;
+                } else {
+                    let checkedProperty = "Type";
+                    if (itemType === "talent") {
+                        checkedProperty = "nation";
+                    } else if (itemType === "gem") {
+                        checkedProperty = "element";
+                    }
+
+                    if (Array.isArray(itemClass)) {
+                        let randomEle = rollArray(itemClass, 0);
+                        if (Inventory[drawnItem][checkedProperty] != randomEle) {
+                            continue;
+                        }
                         lootArray[type] = drawnItem;
                     } else {
-                        let checkedProperty = "Type";
-                        if (itemType === "talent") {
-                            checkedProperty = "nation";
-                        } else if (itemType === "gem") {
-                            checkedProperty = "element";
+                        if (Inventory[drawnItem][checkedProperty] != itemClass) {
+                            continue;
                         }
-
-                        if (Array.isArray(itemClass)) {
-                            let randomEle = rollArray(itemClass, 0);
-                            if (Inventory[drawnItem][checkedProperty] != randomEle) {
-                                continue;
-                            }
-                            lootArray[type] = drawnItem;
-                        } else {
-                            if (Inventory[drawnItem][checkedProperty] != itemClass) {
-                                continue;
-                            }
-                            lootArray[type] = drawnItem;
-                        }
+                        lootArray[type] = drawnItem;
                     }
-                } else if (type === "itemLoot") {
-                    let checkedProperty = "Type";
-                    if (Inventory[drawnItem][checkedProperty] != itemClass) {
-                        continue;
-                    }
-                    return drawnItem;
-                } 
-            } else {
-                inventoryAdd(drawnItem);
-            }
-            break;
+                }
+                return;
+            } else if (type === "itemLoot") {
+                let checkedProperty = "Type";
+                if (Inventory[drawnItem][checkedProperty] != itemClass) {
+                    continue;
+                }
+                return drawnItem;
+            } 
         } else {
-            continue;
+            return inventoryAdd(drawnItem);
         }
     }
 }
@@ -5821,8 +5842,7 @@ function createGuild() {
                     style: {
                         width: '100%'
                     }
-                })
-
+                });
 
                 const addLoot = (lootArray) => {
                     lootArray.forEach((item) => {
@@ -6012,7 +6032,7 @@ function resetBounty(bountyMenu,type) {
                 bountyObject.hasOwnProperty(bountyPath)
             );
     
-            bountyObject[bountyPath] = {primoReward: (5 * (2**i)), xpReward: (10 * (i**2)), Completed: false, Level: i};
+            bountyObject[bountyPath] = {primoReward: (25 * (2**i)), xpReward: (10 * (i**2)), Completed: false, Level: i};
             bountyImg.src = `./assets/expedbg/enemy/${bountyPath}.webp`;
             bountyButton.id = `bounty-${bountyPath}`;
             bountyButton.append(bountyStar,bountyImg);
@@ -6344,7 +6364,7 @@ function generateCommisions() {
 
     for (let i = 0; i < 10; i++) {
         if (currentCommisionsDict[i] !== undefined) {
-            baseCommisions.push(saveValues.baseCommisions[i])
+            baseCommisions.push(saveValues.baseCommisions[i]);
             continue;
         }
 
@@ -7017,7 +7037,7 @@ function finishQuest(advType) {
         quitQuest();
         gainXP("variable");
         if (advType === 17 || advType === 3) {
-            let energyRoll = Math.round(randomInteger(150,250) / 5) * 5;
+            let energyRoll = randomInteger(150, 250);
             saveValues.energy += energyRoll;
             persistentValues.lifetimeEnergyValue += energyRoll;
 
@@ -9719,6 +9739,7 @@ function winAdventure() {
         lootCounter++;
     }
 
+
     let tempArray = compareTreeItems(Object.values(lootArray));
     lootArray = {};
 
@@ -9944,7 +9965,6 @@ function wishUnlock() {
 
 // DRAWS/WISH FOR SPECIAL HEROS
 function drawWish() {
-    goldenNutUnlocked = true;
     var wishButton = document.createElement("div");
     wishButton.classList += " wish-button";
     wishButton.id = "wishButton";
@@ -9960,7 +9980,7 @@ function drawWish() {
     let wishButtonImg = document.createElement("img");
     wishButtonImg.src = "./assets/frames/wishButton.webp";
     wishButtonImg.classList += " wish-button-img cover-all";
-    wishButton.append(wishButtonImg, wishButtonText)
+    wishButton.append(wishButtonImg, wishButtonText);
     mailImageDiv.append(wishButton);
 
     if (saveValues["wishCounterSaved"] === wishCounter) {
@@ -10015,11 +10035,11 @@ function drawAranaraWish() {
             }
         })
         if (i < 4) {
-            aranaraText.innerText = '?'
+            aranaraText.innerText = '?';
         } else if (i < 7) {
-            aranaraText.innerText = '!'
+            aranaraText.innerText = '!';
         } else {
-            aranaraText.innerText = '¿'
+            aranaraText.innerText = '¿';
         }
 
         const aranaraDiv = createDom('div', {
@@ -12475,7 +12495,9 @@ function getTreeItems() {
 
 function compareTreeItems(itemArray) {
     const treeOffer = getTreeItems();
-    if (treeOffer === null) {return};
+    if (treeOffer === null) {
+        return itemArray.map(itemId => [itemId, false]);
+    };
 
     const itemArrayCopy = [...itemArray];
     let replacedTreeItems = {};
@@ -12510,82 +12532,77 @@ function blessCreate(treeTable) {
     blessDisplay.append(blessContainer);
 
     let buttonContainer;
-    if (testing) {
-        const leylineTitle = createDom('p', { innerHTML: 'Blessing of Dendro' });
-        const blessMissingText = createDom('p', { id: 'bless-missing-text', innerText: '' });
-        blessContainer.remove();
+    const leylineTitle = createDom('p', { innerHTML: 'Blessing of Dendro' });
+    const blessMissingText = createDom('p', { id: 'bless-missing-text', innerText: '' });
+    blessContainer.remove();
 
-        const chargePic = createDom('img', { classList:['bless-icon'], src: './assets/tree/bless.webp' });
-        const blessBar = createProgressBar(
-            { id:'bless-bar', class: ['leyline-progress', 'healthbar-container'] },
-            { id: 'bless-progress', progress: parseFloat(persistentValues.blessPower),
-            style: { width: (100 + '%'), background: '#25818E' }},
-            { style: { borderRight: '0.2em solid #ADB3F6' }},
-            persistentValues.maxBlessPower,
-        );
+    const chargePic = createDom('img', { classList:['bless-icon'], src: './assets/tree/bless.webp' });
+    const blessBar = createProgressBar(
+        { id:'bless-bar', class: ['leyline-progress', 'healthbar-container'] },
+        { id: 'bless-progress', progress: parseFloat(persistentValues.blessPower),
+        style: { width: (100 + '%'), background: '#25818E' }},
+        { style: { borderRight: '0.2em solid #ADB3F6' }},
+        persistentValues.maxBlessPower,
+    );
 
-        blessBar.useCharge = () => {
-            const requiredCharge = 100 * decreaseEnergyBless;
-            if (persistentValues.blessPower >= requiredCharge) {
-                persistentValues.blessPower -= requiredCharge;
-                blessBar.updateCharge();
-                return true;
-            } else {
-                return false;
-            }
+    blessBar.useCharge = () => {
+        const requiredCharge = 100 * decreaseEnergyBless;
+        if (persistentValues.blessPower >= requiredCharge) {
+            persistentValues.blessPower -= requiredCharge;
+            blessBar.updateCharge();
+            return true;
+        } else {
+            return false;
         }
-
-        const blessTree = () => {
-            let additionalBless = 1;
-            if (persistentValues.blackMarketDict && persistentValues.blackMarketDict.springWater) {
-                additionalBless += (persistentValues.blackMarketDict.springWater.level + 0.2);
-            }
-
-            growTree('add', randomInteger(15, 20) * additionalBless);
-            const enemyRoll = randomInteger(0, 100);
-            if (enemyRoll < (20 - luckRate / 4) && !testing) {
-                enemyBlock(false);
-            }
-
-            const treeImg = document.getElementById('tree-img');
-            treeImg.style.animation = 'blessTree 1s linear forwards';
-            treeImg.addEventListener('animationend', () => {
-                treeImg.style.animation = 'unset';
-            }, { once: true });
-        }
-
-        blessBar.updateCharge = () => {
-            const rate = moraleCheck(0.2);
-            persistentValues.blessPower += rate * (persistentValues.maxBlessPower / 1.5);
-            persistentValues.blessPower = Math.min(persistentValues.blessPower, persistentValues.maxBlessPower * 100);
-            const newWidth = persistentValues.blessPower / (persistentValues.maxBlessPower * 100);
-            document.getElementById('bless-progress').style.width = (newWidth * 100) + "%";
-        }
-
-        const chargeContainer = createDom('div', { classList:['flex-row', 'charge-container'], children:[chargePic, blessBar] });
-        const leylineText = createDom('p', { id:'blessing-text' });
-        leylineText.innerHTML = `Using Nahida's power, bless the trees' growth. 
-                            <br> Dendro accumulation may attract nearby <span style='color: var(--light-red)'>enemies</span>!
-                            <br> <span style='font-size: 0.6em'>Note: Recharge rate is based on Nahida's morale.</span>`;
-        blessDisplay.append(leylineTitle, leylineText, chargeContainer, blessMissingText);
-
-        const blessButton = document.createElement('button');
-        blessButton.innerText = 'Bless';
-        blessButton.classList.add('fancy-button', 'clickable');
-        blessButton.addEventListener('click', () => {
-            if (blessBar.useCharge()) {
-                blessTree();
-                blessMissingText.innerText = '';
-            } else {
-                blessMissingText.innerText = 'Not enough charges!';
-            }
-        });
-
-        buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [Tree.treeBackButton(blessDisplay), blessButton] });
-    } else {
-        buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [Tree.treeBackButton(blessDisplay)] });
     }
 
+    const blessTree = () => {
+        let additionalBless = 1;
+        if (persistentValues.blackMarketDict && persistentValues.blackMarketDict.springWater) {
+            additionalBless += (persistentValues.blackMarketDict.springWater.level + 0.2);
+        }
+
+        growTree('add', randomInteger(15, 20) * additionalBless);
+        const enemyRoll = randomInteger(0, 100);
+        if (enemyRoll < (20 - luckRate / 4) && !testing) {
+            enemyBlock(false);
+        }
+
+        const treeImg = document.getElementById('tree-img');
+        treeImg.style.animation = 'blessTree 1s linear forwards';
+        treeImg.addEventListener('animationend', () => {
+            treeImg.style.animation = 'unset';
+        }, { once: true });
+    }
+
+    blessBar.updateCharge = () => {
+        const rate = moraleCheck(0.2);
+        persistentValues.blessPower += rate * (persistentValues.maxBlessPower / 1.5);
+        persistentValues.blessPower = Math.min(persistentValues.blessPower, persistentValues.maxBlessPower * 100);
+        const newWidth = persistentValues.blessPower / (persistentValues.maxBlessPower * 100);
+        document.getElementById('bless-progress').style.width = (newWidth * 100) + "%";
+    }
+
+    const chargeContainer = createDom('div', { classList:['flex-row', 'charge-container'], children:[chargePic, blessBar] });
+    const leylineText = createDom('p', { id:'blessing-text' });
+    leylineText.innerHTML = `Using Nahida's power, bless the trees' growth. 
+                        <br> Dendro accumulation may attract nearby <span style='color: var(--light-red)'>enemies</span>!
+                        <br> <span style='font-size: 0.6em'>Note: Recharge rate is based on Nahida's morale.</span>`;
+    blessDisplay.append(leylineTitle, leylineText, chargeContainer, blessMissingText);
+
+    const blessButton = document.createElement('button');
+    blessButton.innerText = 'Bless';
+    blessButton.classList.add('fancy-button', 'clickable');
+    blessButton.addEventListener('click', () => {
+        if (blessBar.useCharge()) {
+            blessTree();
+            blessMissingText.innerText = '';
+        } else {
+            blessMissingText.innerText = 'Not enough charges!';
+        }
+    });
+
+    buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [Tree.treeBackButton(blessDisplay), blessButton] });
     
     blessDisplay.append(buttonContainer);
     treeTable.append(blessDisplay);
@@ -12783,7 +12800,6 @@ function checkExpeditionUnlock(heroesPurchasedNumber) {
                     saveValues.mailCore--;
                     wishUnlock();
                     saveValues["wishUnlocked"] = true;
-                    goldenNutUnlocked = true;
                 }
             }
             newPop(expeditionCounter + 10);
