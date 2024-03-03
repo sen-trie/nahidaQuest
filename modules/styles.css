@@ -3155,9 +3155,15 @@ table, button, label {
 }
 
 /*//////////// OTHER CSS  /////////////*/
+#iframe-warn {
+    text-shadow: unset;
+    margin: 0.5rem;
+    color: var(--dark-green);
+    font-size: 1rem;
+}
 .beta-warning {
     position: absolute;
-    left: 50%;
+    left: 45%;
     z-index: 99999999;
     background-color: yellow;
     color: purple;

@@ -10,12 +10,6 @@ let startScreen = document.getElementById("start-screen");
 let continueButton = document.getElementById("start-button");
 let newGameButton = document.getElementById("start-delete");
 
-console.log(`======== NAHIDAQUEST! ${CONSTANTS.VERSIONNUMBER} loaded ========`);
-if (window.location !== window.parent.location) {
-    console.log("======== iFrame version loaded ========");
-} 
-
-
 window.onerror = function(message, source, lineno, colno, error) {
     errorMesg(error);
     return false;
@@ -30,6 +24,16 @@ window.addEventListener("message", e => {
 let isNewGame = (localStorage.getItem("settingsValues") === null) ? true : false; 
 let startAlreadyDelay = true;
 setTimeout(() => { startAlreadyDelay = false }, 500);
+
+console.log(`======== NAHIDAQUEST! ${CONSTANTS.VERSIONNUMBER} loaded ========`);
+console.log(isNewGame ? `Save File Not Found` : `Save File Found`);
+if (window.location !== window.parent.location) {
+    console.log("======== iFrame Version loaded ========");
+    if (isNewGame) {
+        console.log(`Warning: ${CONSTANTS.IFRAME_TEXT}`);
+        choiceBox(startScreen, {text: "Warning"}, null, null, null, createDom('p', { id:'iframe-warn', innerText: CONSTANTS.IFRAME_TEXT }), ['notif-ele']);
+    }
+} 
 
 if (!isNewGame) {
     continueButton.classList.remove("dim-filter");

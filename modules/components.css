@@ -2872,7 +2872,7 @@ input:checked + .slider:before {
     box-sizing: border-box;
     padding: 1%;
     top: 16%;
-    height: 75%;
+    height: 74%;
     width: 98%;
     gap: 1%;
     overflow-x: hidden;
