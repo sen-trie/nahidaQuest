@@ -1449,7 +1449,7 @@ const blackShopDict = {
         type: 'prop',
         subtype: 'aranara',
         title: 'Kusava',
-        desc: 'For certain Aranara events, Hard Mode becomes available which increases the possible rewards.',
+        desc: 'Harnesses the power of the Aranara. \n For certain Aranara events, Hard Mode becomes available which increases the possible rewards.',
         file: 'tooltips/inventory/kusava.webp',
         level: 0,
         maxLevel: 1,

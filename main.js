@@ -706,7 +706,7 @@ function spawnFallingNut() {
 function energyRoll(autoClicked = false) {
     let randInt = Math.floor(Math.random() * 1000);
     if (autoClicked === true) {
-        clickDelay -= 0.05;
+        clickDelay -= 0.075;
     } else {
         clickDelay--;
     }
@@ -929,11 +929,13 @@ function randomEventTimer(timerSeconds) {
 }
 
 // START A RANDOM EVENT
-function startRandomEvent() {
+function startRandomEvent(forceNum = 0) {
     if (stopSpawnEvents === true) {return};
     let eventPicture = document.createElement("div");
     let aranaraNumber = randomInteger(1, 4);
-    if (persistentValues.fellBossDefeat) {
+    if (forceNum != 0) {
+        aranaraNumber = forceNum;
+    } else if (persistentValues.fellBossDefeat) {
         aranaraNumber = randomInteger(1, 10); // 3RD SET ARE LOCKED TO FELL BOSS
     } else if (expeditionDict[4] != '1') {
         aranaraNumber = randomInteger(1, 7); // 2ND SET ARE LOCKED TO 4TH EXPEDITION UNLOCK
@@ -966,7 +968,7 @@ function startRandomEvent() {
 }
 
 function clickedEvent(aranaraNumber) {
-    let specialEvent = randomIntegerWrapper(luckRate*2, 200);
+    let specialEvent = randomIntegerWrapper(luckRate * 2, 200);
     eventElement.load();
     eventElement.play();
 
@@ -1012,7 +1014,7 @@ function startEvent(type, specialMode, hardMode = false) {
             clickEvent(specialMode);
             break;
         case 2:
-            reactionEvent();
+            reactionEvent(hardMode);
             break;
         case 3:
             boxFunction(specialMode);
@@ -1043,7 +1045,7 @@ function startEvent(type, specialMode, hardMode = false) {
 
 function chooseEvent(type, specialMode) {
     if (stopSpawnEvents === true) {return};
-    if (persistentValues.blackMarketDict && persistentValues.blackMarketDict.kusava.level === 1 && [4, 5, 7, 9].includes(type)) {
+    if ((persistentValues.blackMarketDict && persistentValues.blackMarketDict.kusava.level === 1 && CONSTANTS.ARANARA_HARD.includes(type)) || beta) {
         const aranaraImg = createDom('img', { src: `./assets/tutorial/aranara-${type}.webp`});
         const buttonContainer = createDom('div', {
             classList: ['flex-row', 'menu-container-two'],
@@ -1107,91 +1109,135 @@ function stopClickEvent() {
 }
 
 // EVENT 2 (REACTION TIME)
-var reactionReady = false;
-var reactionGame = false;
-function reactionEvent() {
+function reactionEvent(hardMode = false) {
     stopSpawnEvents = true;
-    reactionGame = true;
-    let eventBackdrop = document.createElement("div");
-    eventBackdrop.classList.add("cover-all","flex-column","event-dark");
+    const eventBackdrop = createDom("div", { 
+        classList: ["cover-all","flex-column","event-dark"],
+        reactionGame: false,
+        maxCount: hardMode ? 3 : 1,
+        currentCount: 0,
+    });
 
-    let reactionImage = document.createElement("div");
-    reactionImage.id = "reaction-image";
+    const eventDescription = createDom("p", {
+        classList: ["event-description"],
+        innerText: "Click the button just \n when the clock stops ticking!"
+    });
 
-    let eventDescription = document.createElement("p");
-    eventDescription.innerText = "Click the button just \n when the clock stops ticking!";
-    eventDescription.classList.add("event-description");
-    let reactionImageBottom = document.createElement("img");
-    reactionImageBottom.src = "./assets/event/clock-back.webp";
-    reactionImageBottom.id = "reaction-image-bot";
-    let reactionImageArrow = document.createElement("img");
-    reactionImageArrow.src = "./assets/event/clock-arrow.webp";
-    reactionImageArrow.id = "reaction-image-arrow";
-    let reactionImageTop = document.createElement("img");
-    reactionImageTop.src = "./assets/event/clock-top.webp";
-    reactionImageTop.classList.add("flex-column");
-    reactionImageTop.id = "reaction-image-top";
+    let currentCount = 0;
+    const randomTime = randomInteger(6000, 10500 - 1000 * eventBackdrop.maxCount);
+    const createContainer = () => {
+        const reactionImageArrow = createDom("img", {
+            src: "./assets/event/clock-arrow.webp",
+            id: "reaction-image-arrow",
+            ready: false,
+            style: {
+                animationDuration: (randomInteger(30, 60) / 10) + "s",
+            }
+        });
+    
+        const reactionButton = createDom("div", {
+            id: "reaction-button",
+            classList: ["background-image-cover", "flex-row"],
+            innerText: "Not yet...",
+            event: ["click", () => {
+                reactionImageArrow.style.animationPlayState = "paused";
+                reactionFunction(eventBackdrop, reactionImageArrow, reactionButton);
+            }]
+        });
+
+        const reactionImage = createDom("div", { 
+            id: "reaction-image",
+            child: [
+                createDom("img", {
+                    src: "./assets/event/clock-back.webp",
+                    id: "reaction-image-bot"
+                }),
+                reactionImageArrow,
+                createDom("img", {
+                    src: "./assets/event/clock-top.webp",
+                    classList: ["flex-column"],
+                    id: "reaction-image-top",
+                })]
+        });
+    
+        reactionImageArrow.onload = () => {
+            eventBackdrop.reactionGame = true;
+    
+            setTimeout(() => {
+                if (eventBackdrop.reactionGame === true) {
+                    reactionImageArrow.reactionReady = true;
+                    reactionImageArrow.style.animationPlayState = "paused";
+    
+                    reactionButton.innerText = "Now!";
+                    reactionButton.classList.add("glow");
+                    setTimeout(() => {
+                        if (eventBackdrop.reactionGame && reactionImageArrow.reactionReady) {
+                            reactionImageArrow.reactionReady = false;
+                            reactionButton.innerText = "Too Slow!";
+                            reactionFunction(eventBackdrop, reactionImageArrow, reactionButton);
+                        }
+                    }, hardMode ? 950 : 800);
+                }
+            }, randomTime + currentCount * randomInteger(600, 1000));
+            currentCount++;
+        }
+
+        return createDom('div', {
+            classList: ["flex-column", "reaction-div"],
+            child: [reactionImage, reactionButton],
+            style: {
+                width: 100 / eventBackdrop.maxCount + "%"
+            }
+        })
+    }
+
+    const reactionContainer = createDom('div', {
+        classList: ["flex-row", "reaction-container"],
+        child: Array.from({ length: eventBackdrop.maxCount }, () => createContainer())
+    });
 
     reactionStartElement.load();
     reactionStartElement.play();
 
-    let reactionButton = document.createElement("div");
-    reactionButton.id = "reaction-button";
-    reactionButton.classList.add("background-image-cover");
-    reactionButton.innerText = "Not yet...";
-    reactionButton.addEventListener("click",()=>{
-        reactionStartElement.pause();
-        reactionImageArrow.style.animationPlayState = "paused";
-        reactionFunction(eventBackdrop);
-        setTimeout(()=> {
-            eventBackdrop.remove();
-        },2000)
-    });
-
-    let randomTime = randomInteger(6000,9500);
-    setTimeout(() => {
-        if (reactionGame === true) {
-            reactionStartElement.pause();
-            reactionReady = true;
-            reactionButton.innerText = "Now!";
-            reactionButton.classList.add("glow");
-            reactionImageArrow.style.animationPlayState = "paused";
-            setTimeout(() => {
-                if (reactionGame == true) {
-                    reactionReady = false;
-                    reactionButton.innerText = "Too Slow!";
-                    reactionFunction(eventBackdrop);
-                }
-            }, 800 * randomInteger(90,110) / 100)
-        }
-    }, randomTime);
-    
-    reactionImage.append(reactionImageBottom,reactionImageArrow,reactionImageTop)
-    eventBackdrop.append(eventDescription,reactionImage,reactionButton);
+    eventBackdrop.append(eventDescription, reactionContainer);
     mainBody.append(eventBackdrop);
 }
 
-function reactionFunction(eventBackdrop) {
-    stopSpawnEvents = false;
-    if (reactionGame == false) {return}
-    let outcomeText;
-    let primogem = 0;
+function reactionFunction(eventBackdrop, reactionImageArrow, reactionButton) {
+    if (eventBackdrop.reactionGame == false) {return}
 
-    reactionStartElement.pause();
-    reactionCorrectElement.load();
-    if (reactionReady == false) {
-        persistentValues.aranaraLostValue++;
-        outcomeText = "You missed!";
-    } else if (reactionReady == true) {
+    reactionImageArrow.style.animationPlayState = "paused";
+    if (reactionImageArrow.reactionReady) {
+        reactionButton.innerText = "Success!";
+        reactionCorrectElement.load();
         reactionCorrectElement.play();
-        genericItemLoot();
-        primogem = randomInteger(40,60);
-        outcomeText = "You did it!";
+
+        if ((eventBackdrop.currentCount + 1) === eventBackdrop.maxCount) {
+            genericItemLoot();
+            reactionStop("You did it!", eventBackdrop, randomInteger(40, 60));
+        } else {
+            eventBackdrop.currentCount++;
+        }        
+    } else {
+        reactionButton.innerText = "You missed!";
+        persistentValues.aranaraLostValue++;
+        reactionStop("You missed!", eventBackdrop, 0);
     }
 
-    reactionReady = false;
-    reactionGame = false;
-    eventOutcome(outcomeText, eventBackdrop, "reaction", primogem);
+    reactionImageArrow.reactionReady = false;
+}
+
+function reactionStop(outcomeText, eventBackdrop, primogem) {
+    reactionStartElement.pause();
+    eventBackdrop.reactionGame = false;
+    stopSpawnEvents = false;
+
+    setTimeout(() => {
+        eventOutcome(outcomeText, eventBackdrop, "reaction", primogem);
+        if (hardMode) {
+            addTreeCore(randomInteger(1, 4), 0);
+        }
+    }, 400);
 }
 
 // EVENT 3 (7 BOXES)
@@ -1241,7 +1287,7 @@ function boxOpen(eventBackdrop,specialBox) {
     } else {
         let boxChance = randomInteger(1,101);
         if (saveValues.goldenTutorial && boxChance >= 90) {
-            outcomeNumber = randomInteger(5,15);
+            outcomeNumber = randomInteger(5, 15);
             boxOutcome.src = "./assets/icon/goldenNut.webp";
             outcomeText = `Oh! It had Golden Nuts!`;
         } else if (boxChance >= 60) {
@@ -1446,6 +1492,9 @@ function minesweeperEvent(hardMode = false) {
                     const endTimestamp = performance.now();
                     setTimeout(()=> {
                         currencyPopUp([["items", 0], ["primogem", randomPrimo]]);
+                        if (hardMode) {
+                            addTreeCore(randomInteger(3, 6), 20);
+                        }
                         if (endTimestamp - startTimestamp < 15 * 1000) {
                             challengeNotification(({category: 'specific', value: [2, 7]}));
                         }
@@ -1475,13 +1524,9 @@ function minesweeperEvent(hardMode = false) {
 let weaselCount = 0;
 let goldWeaselCount = 0;
 // EVENT 5 (WHACK-A-MOLE)
-function weaselEvent(specialWeasel) {
-    let hardMode = false;
-    if (persistentValues.blackMarketDict && persistentValues.blackMarketDict.kusava.level === 1) {
-        hardMode = true;
-    }
-
+function weaselEvent(specialWeasel, hardMode) {
     stopSpawnEvents = true;
+    
     const weaselElementMax = hardMode ? 27 : 18;
     let weaselElement = weaselElementMax;
     weaselCount = 0;
@@ -1490,6 +1535,7 @@ function weaselEvent(specialWeasel) {
     let eventBackdrop = document.createElement("div");
     eventBackdrop.classList.add("cover-all","event-dark","flex-row","event-dark-row","weasel-backdrop");
     eventBackdrop.style.flexWrap = "wrap";
+    eventBackdrop.hardMode = hardMode;
     let eventDescription = document.createElement("p");
     eventDescription.innerText = "Catch the glowing weasel!";
     eventDescription.classList.add("event-description");
@@ -1596,10 +1642,7 @@ function addWeasel(weaselBack,delay,specialWeasel,hardMode) {
                 weaselCountText.innerText = weaselCount;
             })
         } else {
-            let emptyWeasel = randomInteger(7, 11);
-            if (hardMode) {
-                emptyWeasel = randomInteger(7, 9);
-            }
+            let emptyWeasel = hardMode ? randomInteger(7, 9) : randomInteger(7, 11);
             
             if (emptyWeasel != 10 & emptyWeasel != 9) {
                 let springInterval = (randomInteger(15, 20) / 100);
@@ -1614,11 +1657,9 @@ function addWeasel(weaselBack,delay,specialWeasel,hardMode) {
 
     let fakeAmount = Math.floor(2000/(delay / (hardMode ? 3 : 1)) + 0.3);
     if (fakeAmount > 10) {
-        fakeAmount = 10;
-        if (hardMode) {
-            fakeAmount = Math.min(20, fakeAmount);
-        }
+        fakeAmount = hardMode ? Math.min(20, fakeAmount) : 10;
     }
+
     let combination = generateCombination(fakeAmount);
     for (let j = 0, len = combination.length; j < len; j++) {
         if ((combination[j] - 1) === realWeasel) {continue}
@@ -1626,11 +1667,7 @@ function addWeasel(weaselBack,delay,specialWeasel,hardMode) {
         let fakeWeasel = randomInteger(5, 7);
         if (specialWeasel) {fakeWeasel = randomInteger(4, 7)}
         if (hardMode) {
-            if (specialWeasel) {
-                fakeWeasel = 4;
-            } else {
-                fakeWeasel = currentWeaselSrc + 3;
-            }
+            fakeWeasel = specialWeasel ? 4 : (currentWeaselSrc + 3);
         }
 
         weaselImage.src = "./assets/event/weasel-"+fakeWeasel+".webp";
@@ -1944,6 +1981,9 @@ function simonEvent(hardMode) {
                     if (currentScore >= requiredAmount) {
                         let eventText = `You win!`;
                         eventOutcome(eventText, eventBackdrop, "simon", hexMode ? randomInteger(120, 160) : randomInteger(90, 130));
+                        if (hardMode) {
+                            addTreeCore(randomInteger(4, 6), 25);           
+                        }
                         return;
                     } else {
                         scoreCounter.innerText = `[${currentScore}]`;
@@ -2423,6 +2463,7 @@ function snakeEvent(hardMode) {
     stopSpawnEvents = true;
     let eventBackdrop = createDom('div', {
         classList: ["cover-all","flex-column","event-dark","minesweeper-backdrop"],
+        hardMode: hardMode,
         style: {
             columnGap: '1%',
             flexDirection: 'column'
@@ -2714,14 +2755,12 @@ function snakeEvent(hardMode) {
             currentTime = timestamp;
             deltaTime = currentTime - previousTime;
             if (deltaTime > interval) {
-                if (stopGame) {
-                    return;
-                }
+                if (stopGame) return;
 
-                let scoreMultiplier = Math.min(MOBILE ? 10 : 12, scoreCounter.score * (MOBILE ? 0.3 : 0.4));
-                if (hardMode) {
-                    scoreMultiplier = Math.min(MOBILE ? 10 : 12, scoreCounter.score * (MOBILE ? 0.45 : 0.6));
-                }
+                let scoreMultiplier = hardMode 
+                                    ? Math.min(MOBILE ? 10 : 12, scoreCounter.score * (MOBILE ? 0.45 : 0.6))
+                                    : Math.min(MOBILE ? 10 : 12, scoreCounter.score * (MOBILE ? 0.3 : 0.4));
+
                 canvas.brightness += 0.03 + 0.005 * (scoreMultiplier);
 
                 if (canvas.brightness > 1) {
@@ -2870,6 +2909,10 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
             genericItemLoot();
             newPop(1);
             amount = randomInteger(100,140);
+            
+            if (eventBackdrop.hardMode) {
+                addTreeCore(randomInteger(3, 6), 20);           
+            }
         } else if (weaselCount >= 7) {
             innerTextTemp = `\n You received a few items!`;
             genericItemLoot();
@@ -2903,15 +2946,19 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
     } else if (type === "snake") {
         let snakeScore = amount;
         if (snakeScore > 1000) {
+            if (eventBackdrop.hardMode) addTreeCore(randomInteger(5, 8), 20);    
             innerText += "You received the max reward!!";
             amount = randomInteger(220,300);
         } else if (snakeScore > 650) {
+            if (eventBackdrop.hardMode) addTreeCore(randomInteger(4, 7), 15);    
             innerText += "You received a high reward!";
             amount = randomInteger(140,220);
         } else if (snakeScore > 300) {
+            if (eventBackdrop.hardMode) addTreeCore(randomInteger(2, 5), 10);    
             innerText += "You received a medium reward!";
             amount = randomInteger(80,140);
         } else if (snakeScore > 150) {
+            if (eventBackdrop.hardMode) addTreeCore(randomInteger(1, 3), 5);    
             innerText += "You received a low reward!";
             amount = randomInteger(40,80);
         } else {
@@ -3549,9 +3596,24 @@ function generalSettings(settingsMenu) {
     if (persistentValues.allChallenges) { settingsBottomBadge.append(createMedal(3, choiceBox, mainBody, stopSpawnEvents))}
 
     const settingsBottomButtons = Settings.settingsBottomLinks();
+    const gameText = document.getElementById('vers-number');
+    gameText.innerText += ("\n" + document.getElementById('copyright-number').innerText);
+    document.getElementById('copyright-number').remove();
+
+    const creatorDiv = createDom('div', {
+        classList: ['creator-div', 'flex-row', 'clickable'],
+        child: [
+            createDom('img', { src: './assets/title/creator.jpg'}),
+            createDom('p', { innerText: 'Contact \n the dev!'})
+        ],
+        event: ['click', () => {
+            window.open("https://linktr.ee/sentrie", "_blank");
+        }]
+    })
+
     const settingsCredits = createDom('div', {
         class: ['flex-column', 'settings-bottom'],
-        child: [document.getElementById('copyright-number'), document.getElementById('vers-number')]
+        child: [gameText, creatorDiv]
     });
 
     settingsBottom.append(settingsBottomBadge, settingsBottomButtons);
@@ -7704,7 +7766,7 @@ function triggerFight() {
                     variant = '-osu';
                 }
             } else if (adventureVariables.skirmish) {
-                if (persistentValues.workshopBossDefeat || testing) {
+                if (persistentValues.workshopBossDefeat) {
                     variant = rollArray(['', '-osu', '-cytus']);
                 } else if (persistentValues.fellBossDefeat) {
                     variant = rollArray(['', '-osu']);
@@ -8175,7 +8237,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                                     battleVariables.quicktime -= brightnessIncrement * (speedUpFactor - 1);
                                     battleVariables.triggerConstants.burstTimeCheck();
                                 } else {
-                                    battleVariables.quicktime += brightnessIncrement * 0.4;
+                                    battleVariables.quicktime += brightnessIncrement * 0.15;
                                     canvas.brightness += brightnessIncrement * 0.25;
                                 }
                             }
@@ -11006,7 +11068,7 @@ function setShop(type) {
         id: 'shop-backdoor',
         class: ['shop-backdoor'],
         style: {
-            display: persistentValues.unusualBossDefeat || testing ? 'block' : 'none',
+            display: persistentValues.unusualBossDefeat || beta ? 'block' : 'none',
         }
     });
 
@@ -12926,7 +12988,7 @@ function newPop(type) {
 if (beta || testing) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            startRandomEvent();
+            startRandomEvent(2);
         } else if (e.key === 'g') {
             spawnSkirmish();
         } else if (e.key === 'h') {
@@ -12962,10 +13024,10 @@ if (testing) {
     tester.classList.add('test-warning');
     mainBody.append(tester); 
     
-    // setTimeout(()=>{
-    // let startButton = document.getElementById("start-button");
-    // if (startButton) startButton.click();
-    // }, 1200);
+    setTimeout(()=>{
+    let startButton = document.getElementById("start-button");
+    if (startButton) startButton.click();
+    }, 1200);
 }
 
 if (beta) {

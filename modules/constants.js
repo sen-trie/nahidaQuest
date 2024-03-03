@@ -1,7 +1,7 @@
-const VERSIONNUMBER = "B.1-02-002";
+const VERSIONNUMBER = "V.2-00-001";
 
 const changeFontSize = (fontSize) => {
-    document.documentElement.style.fontSize = `clamp(0.5rem, 1rem + ${0.25 + fontSize * 0.05}vw, 4rem)`;
+    document.documentElement.style.fontSize = `clamp(0.75rem, 0.75rem + ${fontSize * 0.125}vw, 4rem)`;
 }
 
 export const CONSTANTS = Object.freeze({
@@ -18,4 +18,5 @@ export const CONSTANTS = Object.freeze({
     FINALE_THRESHOLD_TWO : 0,
     MAX_LEADER: 5,
     COLOR_ARRAY: ["Red", "Green", "Blue"], // MUST BE USE WITH SPREAD (PREVENT PASS BY REFERENCE)
+    ARANARA_HARD: [2, 4, 5, 7, 9],
 });

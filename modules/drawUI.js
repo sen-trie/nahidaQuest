@@ -341,15 +341,15 @@ const patchDict = {
     <br><br><line>New Additions 💡: </line><br><br>
         </indent>
         1. Trees! (Extended Endgame) <br>
-        After getting enough Golden Cores, you can grow Trees for the purposes of stopping an outbreak. Also, the game now has an end objective as well!
+        After getting enough Golden Cores, you can grow Trees for the purposes of stopping an outbreak and growing additional late-game currency. Also, the game now has an end objective as well!
         </indent>
 
         <br><br> 2. Bosses (Extended Endgame) <br>
-        At certain thresholds, bosses will spawn on the world map. These bosses introduce unique combat mechanics and are needed to be defeated to progress.
+        At certain thresholds, bosses will spawn on the world map. These bosses introduce unique combat mechanics and need to be defeated to progress.
         </indent>
 
         <br><br> 3. Ascension <br>
-        After getting Golden Nuts, individual characters can be ascended using Tree rewards for a higher base power and better Golden Core amounts. New base power takes effect upon the next transcension.
+        After getting enough Golden Nuts, individual characters can be ascended using Tree rewards for a higher base power and better Golden Core amounts. New base power takes effect upon the next transcension.
         </indent>
 
         <br><br> 4. Commisions <br>
@@ -361,11 +361,11 @@ const patchDict = {
         </indent>
 
         <br><br> 6. New Aranara events <br>
-        Added 'Aranara Reveals', 'Aranara Says' and 'Aranara Snake'. Event spawns are indicated by a (¿).
+        Added 'Aranara Reveals', 'Aranara Says' and 'Aranara Snake'. Event spawns are indicated by a (¿). Unlocked after defeating a certain boss.
         </indent>
 
         <br><br> 7. Dori's Black Market <br>
-        After unlocking it, players can buy exclusive one-time purchases from Dori. These items can either be visual or functional.
+        Players can buy exclusive one-time purchases from Dori. These items can either be visual or functional. Unlocked after defeating a certain boss.
         </indent>
 
         <br><br> 8. New Characters <br>
@@ -387,6 +387,10 @@ const patchDict = {
 
         <br><br> 4. Information breakdown for characters and golden cores <br>
         When selecting a character, there is an additional button in the tooltips, which gives detailed stats. Similarly, at the transcend menu, the amount of golden cores now has a breakdown for the top 7 sources.
+        </indent>
+
+        <br><br> 5. Error visual indicator <br>
+        When the game runs into an error, a message should pop up at the corner - which is also recorded into the error box in the settings 'Console' tab. 
         </indent>
 
     <br><br>Please report any bugs and I hope you enjoy this dump of content! Many thanks. [img]

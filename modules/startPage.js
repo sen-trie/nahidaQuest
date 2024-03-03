@@ -10,10 +10,22 @@ let startScreen = document.getElementById("start-screen");
 let continueButton = document.getElementById("start-button");
 let newGameButton = document.getElementById("start-delete");
 
+console.log(`======== NAHIDAQUEST! ${CONSTANTS.VERSIONNUMBER} loaded ========`);
+if (window.location !== window.parent.location) {
+    console.log("======== iFrame version loaded ========");
+} 
+
+
 window.onerror = function(message, source, lineno, colno, error) {
     errorMesg(error);
     return false;
 }
+
+window.addEventListener("message", e => {
+	if (e.origin === "https://galaxy.click") {
+		console.log(e.data);
+	}
+});
 
 let isNewGame = (localStorage.getItem("settingsValues") === null) ? true : false; 
 let startAlreadyDelay = true;
@@ -45,8 +57,6 @@ const launchGame = () => {
     startAlreadyDelay = true;
 
     startGame(isNewGame);
-    console.log(`======== NAHIDAQUEST! ${CONSTANTS.VERSIONNUMBER} loaded ========`);
-    
     setTimeout(() => startScreen.remove(), 100);
 }
 
