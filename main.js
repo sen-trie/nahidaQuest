@@ -1214,20 +1214,20 @@ function reactionFunction(eventBackdrop, reactionImageArrow, reactionButton) {
 
         if ((eventBackdrop.currentCount + 1) === eventBackdrop.maxCount) {
             genericItemLoot();
-            reactionStop("You did it!", eventBackdrop, randomInteger(40, 60));
+            reactionStop("You did it!", eventBackdrop, randomInteger(40, 60), hardMode);
         } else {
             eventBackdrop.currentCount++;
         }        
     } else {
         reactionButton.innerText = "You missed!";
         persistentValues.aranaraLostValue++;
-        reactionStop("You missed!", eventBackdrop, 0);
+        reactionStop("You missed!", eventBackdrop, 0, hardMode);
     }
 
     reactionImageArrow.reactionReady = false;
 }
 
-function reactionStop(outcomeText, eventBackdrop, primogem) {
+function reactionStop(outcomeText, eventBackdrop, primogem, hardMode) {
     reactionStartElement.pause();
     eventBackdrop.reactionGame = false;
     stopSpawnEvents = false;
@@ -5622,7 +5622,7 @@ function createGuild() {
             rankClaim.available = false;
             rankClaim.classList.add("rank-button-claimed");
             if (rankClaim.classList.contains("rank-button-available")) {rankClaim.classList.remove("rank-button-available")}
-            advDict.rankDict[level] = false;
+            advDict.rankDict[level] = true;
 
             let itemArray = advInfo[level].Item;
             if (itemArray.length > 0) {
@@ -5938,7 +5938,8 @@ function createGuild() {
     const commFeedback = createDom('p', {class:['commision-footer', 'flex-column'], style: { display:'none' }, id:'comm-feedback', chosenComm: null})
 
     currentCommisions.append(currentCommisionsBack, commFeedback, enterCommision);
-    commisionMenu.append(commisionList, selectComission, currentCommisions);
+    //commisionMenu.append(commisionList, selectComission, currentCommisions);
+    commisionMenu.append(createDom('p', {innerText:'UNDER CONSTRUCTION'}));
 
     const guildArray = [rankMenu, bountyMenu, commisionMenu];
     const buttonArray = ["Adventure Rank", "Bounties", "Commisions"];
@@ -6156,6 +6157,8 @@ function completeBounty(bountyID,type,ele) {
 }
 
 function showCommisions() {
+    if (!beta) {return}
+
     const commisionList = document.getElementById('commision-list');
     while (commisionList.firstChild) {
         commisionList.firstChild.remove();
@@ -6197,7 +6200,7 @@ function showCommisions() {
         }
     });
 
-    if (commisionList.children.length < 3) {
+    if (commisionList.children.length < 1) {
         generateCommisions();
     }
 
@@ -6237,6 +6240,7 @@ function showCommisions() {
 }
 
 function focusNewComm(forceShowComm, item) {
+    if (!beta) {return}
     const commisionList = document.getElementById('commision-list');
     const selectComission = document.getElementById('select-comission');
     const commissionChar = document.getElementById('commission-char');
@@ -6263,10 +6267,10 @@ function focusNewComm(forceShowComm, item) {
 
         currentCommArray.forEach((commItem) => {
             commItem.style.display = 'flex';
-        })
+        });
         footerCommArray.forEach((commItem) => {
             commItem.style.display = 'none';
-        })
+        });
     } else {
         if (saveValues.currentCommisions[0] != undefined && saveValues.currentCommisions[1] != undefined && saveValues.currentCommisions[2] != undefined) {return};
         footFeedback.chosenComm = item;
@@ -6360,13 +6364,24 @@ function enterNewComm() {
     }
 
     const commId = footFeedback.chosenComm.id;
-    const id = commId.split('-')[1];
+    const id = parseInt(commId.split('-')[1]) - 1;
+
+    // console.log(deepCopy(footFeedback.chosenComm))
+
+    if (saveValues.baseCommisions[id] == undefined) {
+
+        
+        // console.log(saveValues.baseCommisions[id])
+        // console.log(saveValues.baseCommisions)
+        // console.log(id);
+    }
 
     saveValues.baseCommisions[id].progress = 'ongoing';
     saveValues.baseCommisions[id].endTime = getTime() + saveValues.baseCommisions[id].duration * 60 * (commisionInfo[heroLeader.hero].perk === 'Lightweight' ? 0.85 : 1)
     saveValues.baseCommisions[id].char = [heroLeader.hero, heroSupp.hero];
     saveValues.baseCommisions[id].perk = commisionInfo[heroLeader.hero].perk;
     saveValues.baseCommisions[id].priority = null;
+
 
     saveValues.commisionDict[heroLeader.hero].currentComm = commId;
     saveValues.commisionDict[heroSupp.hero].currentComm = commId;
@@ -6393,7 +6408,6 @@ function enterNewComm() {
     perkText.innerText = 'None Curently';
     focusNewComm(true, null);
 }
-
 
 function shuffle(array) {
     let currentIndex = array.length,  randomIndex;
@@ -7238,6 +7252,7 @@ function finishQuest(advType) {
         if (document.getElementById("world-quest-button")) {
             document.getElementById("world-quest-button").remove();
             notifPop("clearAll","quest");
+            Expedition.expedInfo("exped-7", expeditionDict, saveValues, persistentValues);
         } 
 
         if (res) {
@@ -10969,9 +10984,9 @@ function shopCheck() {
 // SHOP TIMER
 function shopTimerFunction() {
     if (shopTimerElement != null) {
-        let time_passed = Math.floor(getTime() - parseInt(storeInventory.storedTime));
-        shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-time_passed)+ " minutes";
-        if (time_passed >= SHOPCOOLDOWN) {
+        const timePassed = Math.floor(getTime() - parseInt(storeInventory.storedTime));
+        shopTimerElement.innerText = "Inventory resets in: " +Math.floor(SHOPCOOLDOWN-timePassed)+ " minutes";
+        if (timePassed >= SHOPCOOLDOWN) {
             refreshShop();
         }
     }

@@ -1,4 +1,4 @@
-const VERSIONNUMBER = "V.2-00-001";
+const VERSIONNUMBER = "V.2-00-002";
 
 const changeFontSize = (fontSize) => {
     document.documentElement.style.fontSize = `clamp(0.75rem, 0.75rem + ${fontSize * 0.125}vw, 4rem)`;
@@ -19,5 +19,5 @@ export const CONSTANTS = Object.freeze({
     MAX_LEADER: 5,
     COLOR_ARRAY: ["Red", "Green", "Blue"], // MUST BE USE WITH SPREAD (PREVENT PASS BY REFERENCE)
     ARANARA_HARD: [2, 4, 5, 7, 9],
-    IFRAME_TEXT: "If you are playing nahidaQuest! on another website, the font sizes may appear too large. Font sizes can be changed in the games settings, after launching the game.",
+    IFRAME_TEXT: "If you are playing nahidaQuest! on another website, the font sizes may appear too large. Font sizes can be changed under 'Advanced Settings', after launching the game.",
 });

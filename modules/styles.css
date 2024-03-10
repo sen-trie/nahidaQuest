@@ -3159,7 +3159,7 @@ table, button, label {
     text-shadow: unset;
     margin: 0.5rem;
     color: var(--dark-green);
-    font-size: 1rem;
+    font-size: 0.8rem;
 }
 .beta-warning {
     position: absolute;
