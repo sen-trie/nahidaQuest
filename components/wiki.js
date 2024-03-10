@@ -1,4 +1,5 @@
 import { upgradeInfo, InventoryDefault } from "../modules/dictData.js";
+import { getHighestKey } from "../modules/functions.js";
 
 let testing = (localStorage.getItem('tester') === 'true') ? true : false;
 if (testing) {
@@ -46,7 +47,7 @@ const togglePage = (id) => {
     }
 }
 
-for (let index = 1; index < 16; index++) {
+for (let index = 1; index < 17; index++) {
     const buttonElement = document.getElementById(`toggle-button-${index}`)
     buttonElement.addEventListener('click', () => {
         togglePage(index);
@@ -56,8 +57,23 @@ for (let index = 1; index < 16; index++) {
 const charTable = document.getElementById('table-char');
 const charProps = ['Name', 'Type', 'Ele', 'Nation'];
 createTable(charTable, upgradeInfo, '../assets/tooltips/hero/', 'Name', charProps);
+document.getElementById('charCount').innerText = Object.keys(upgradeInfo).length;
+const heroWishCount = getHighestKey(upgradeInfo) - 800 + 1;
+document.getElementById('normCount').innerText = Object.keys(upgradeInfo).length - heroWishCount;
+document.getElementById('wishCount').innerText = heroWishCount;
 
 // ITEMS
 const itemTable = document.getElementById('item-char');
 const itemProps = ['Name', 'Type', 'Star'];
 createTable(itemTable, InventoryDefault, '../assets/tooltips/inventory/', 'File', itemProps);
+
+const spoilerEle = document.querySelectorAll('.spoiler');
+spoilerEle.forEach((ele) => {
+    ele.addEventListener('click', () => {
+        if (ele.classList.contains('revealed')) {
+            ele.classList.remove('revealed');
+        } else {
+            ele.classList.add('revealed');
+        }
+    })
+})

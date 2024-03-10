@@ -15,7 +15,8 @@
 
 :root {
     --golden-ratio: 1.618;
-    --light-green: #AAD4A5;
+    --pale-green: hsl(107, 40%, 76%);
+    --light-green: #8dc487;
     --bright-green: #3D7250;
     --very-dark-green: #1c2f0e;
     --dark-grey: #363535;

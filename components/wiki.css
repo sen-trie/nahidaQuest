@@ -1,20 +1,181 @@
+:root {
+    --text-shadow-075:
+        #3C3C3C 0.151em 0 0, 
+        #3C3C3C 0.151em 0.048em 0, 
+        #3C3C3C 0.124em 0.094em 0, 
+        #3C3C3C 0.104em 0.112em 0, 
+        #3C3C3C 0.026em 0.147em 0, 
+        #3C3C3C -0.060em 0.149em 0, 
+        #3C3C3C -0.105em 0.109em 0, 
+        #3C3C3C -0.135em 0.068em 0, 
+        #3C3C3C -0.157em 0.020em 0, 
+        #3C3C3C -0.155em -0.028em 0, 
+        #3C3C3C -0.098em -0.070em 0, 
+        #3C3C3C -0.078em -0.098em 0,
+        #3C3C3C -0.060em -0.119em 0, 
+        #3C3C3C -0.012em -0.124em 0, 
+        #3C3C3C 0.040em -0.120em 0, 
+        #3C3C3C 0.078em -0.098em 0,
+        #3C3C3C 0.095em -0.076em 0, 
+        #3C3C3C 0.137em -0.039em 0;
+}
+
+* {
+    scrollbar-width: auto;
+    scrollbar-color: var(--pale-green) rgba(0, 0, 0, 0.3);
+}
+
+*::-webkit-scrollbar {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--pale-green);
+}
+
 main {
     height: calc(100% - 3.5rem);
     width: 100%;
     overflow-y: hidden;
 }
 
+section {
+    width: 100%;
+}
+
+section-head {
+    font-size: 1.4rem;
+    margin: 0.6rem 0;
+    align-self: flex-start;
+    background-color: rgba(0, 0, 0, 0.726);
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    max-width: 100%;
+}
+
+table {
+    display: block;
+    max-width: 100%;
+    max-height: 800px;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: fit-content;
+    position: relative;
+    border-collapse: collapse;
+    scrollbar-color: var(--very-dark-green) var(--light-green);
+}
+
+table::-webkit-scrollbar {
+    background-color: var(--light-green);
+}
+
+table::-webkit-scrollbar-thumb {
+    background-color: var(--very-dark-green);
+}
+
+thead {
+    position:sticky;
+    top: 0%;
+    background-color: aqua;
+    filter: drop-shadow(0 0 0.2rem black);
+}
+
+tr {
+    height: 1.6rem;
+}
+
+td {
+    height: inherit;
+}
+
+td img {
+    width: 100%;
+    height: 4rem;
+    margin-bottom: -3px;
+    object-fit: contain;
+}
+
+h1 {
+    font-size: 2em;
+    border-bottom: 2px solid var(--very-dark-green);
+    font-weight: 500;
+}
+
+h2 {
+    font-size: 1.5em;
+    border-bottom: 2px dotted var(--very-dark-green);
+    margin-bottom: 0.6rem;
+    font-weight: 500;
+}
+
+h3, li {
+    font-size: 1.1em;
+    font-weight: normal;
+}
+
+table, th, td {
+    border: 2px solid var(--very-dark-green);
+    border-collapse: collapse;
+}
+
+table {
+    border-width: 1px;
+}
+
+td, th {
+    padding: 6px 13px;
+}
+
+table tr:nth-child(n) {
+    background-color: var(--pale-green);
+}
+
+table tr:nth-child(2n) {
+    background-color: var(--light-green);
+}
+
 .wiki-side {
-    width: 30%;
+    position: relative;
+    width: 22rem;
+    padding: 1rem;
     height: 100%;
-    background-color: green;
+    white-space: nowrap;
+    max-height: 100%;
+    overflow-y: auto;
+    justify-content: flex-start;
+}
+
+.wiki-side::before {
+    content: '';
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: url(../assets/bg/bg.webp) center center/cover repeat;
+    filter: blur(1rem);
+    z-index: -1;
+    transform: translateY(-1rem);
 }
 
 .wiki-body {
-    width: 70%;
-    background-color: yellow;
+    width: calc(100% - 22rem);
     height: 100%;
     max-height: 100%;
+    color: var(--very-dark-green);
+    background: url(../assets/tutorial/tutorialScreen.webp) center center/cover no-repeat;
+}
+
+.text-block {
+    scrollbar-color: var(--bright-green) transparent;
+    padding: 4% 9%;
+}
+
+.text-block::-webkit-scrollbar {
+    background-color: transparent;
+}
+
+.text-block::-webkit-scrollbar-thumb {
+    background-color: var(--bright-green);
 }
 
 .wiki-body > div {
@@ -23,6 +184,55 @@ main {
     overflow-y: auto;
 }
 
-td img {
-    height: 1rem;
+.sidebar-button {
+    font-size: 1.2rem;
+    margin: 0.1rem 0;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 48 / 8;
+    padding: 6px 0;
+    background-color: var(--bright-brown);
+    background: url(../assets/tutorial/tut-button.webp) center center/contain no-repeat;
+    text-shadow: var(--text-shadow-075);
+    transition: 0.4s ease;
+    cursor: pointer;
+}
+
+.spoiler {
+    position: relative;
+    display: inline-block;
+    padding: 3px 5px;
+}
+
+.spoiler::after {
+    content: attr(data-spoiler);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    top: 0;
+    left: 0;
+    background-color: rgb(53, 53, 53);
+    transition: background-color 0.3s ease;
+    pointer-events: none;
+}
+
+.spoiler:hover::after {
+    background-color: #3131312f;
+}
+
+.spoiler.revealed::after {
+    background-color: #3131312f;
+}
+  
+
+.sidebar-button:hover {
+    filter: drop-shadow(0 0 0.5rem rgba(255, 255, 255, 0.582));
+    transform: scale(1.05);
+}
+
+.formula {
+    border-left: 6px solid var(--bright-green);
+    padding-left: 16px;
+    color: var(--bright-green);
 }
