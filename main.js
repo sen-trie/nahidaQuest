@@ -9526,7 +9526,8 @@ function skillUse() {
 
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         const mobDiv = adventureVideoChildren[i];
-        if (!mobDiv.querySelector('.health-bar')) {continue};
+        console.log(mobDiv)
+        if (!mobDiv.querySelector('.health-bar, .health-bar-scara')) {continue};
         const enemyImg = mobDiv.querySelector('.enemyImg');
         if (enemyImg.querySelector('.skill-mark')) { enemyImg.querySelector('.skill-mark').remove()};
 
@@ -9539,6 +9540,8 @@ function skillUse() {
                 }
             }
         });
+
+        
         enemyImg.appendChild(canvas);
     }
 }
@@ -9568,7 +9571,7 @@ function attackAll() {
 
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         const mobDiv = adventureVideoChildren[i];
-        if (!mobDiv.querySelector('.health-bar')) {continue};
+        if (!mobDiv.querySelector('.health-bar, .health-bar-scara')) {continue};
         const enemyImg = mobDiv.querySelector('.enemyImg');
         const decoy = mobDiv.classList.contains('decoy') ? true : false;
 

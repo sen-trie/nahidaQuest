@@ -98,8 +98,9 @@ td img {
 
 h1 {
     font-size: 2em;
-    border-bottom: 2px solid var(--very-dark-green);
+    border-bottom: 4px solid var(--very-dark-green);
     font-weight: 500;
+    padding-bottom: 2px;
 }
 
 h2 {
@@ -151,8 +152,8 @@ table tr:nth-child(2n) {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: url(../assets/bg/bg.webp) center center/cover repeat;
-    filter: blur(1rem);
+    background: url(../assets/bg/nutShop.webp) center center/cover repeat;
+    filter: blur(30px) contrast(70%);
     z-index: -1;
     transform: translateY(-1rem);
 }
