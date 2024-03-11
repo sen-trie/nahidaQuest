@@ -3833,15 +3833,7 @@ function settingsBox() {
         })
         
         exportBoxButton.addEventListener("click",() => {
-            const date = new Date();
-            let text = JSON.stringify(localStorage);
-            text = JSON.stringify(JSON.parse(text), null, 2)
-
-            let blob = new Blob([text], {type: "text/plain"});
-            let link = document.createElement("a");
-            link.download = `nq_save_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate()}_v${CONSTANTS.DBNUBMER}.txt`;
-            link.href = URL.createObjectURL(blob);
-            link.click();
+            CONSTANTS.DOWNLOADSAVE();
         })
 
         exportBox.append(exportBoxText, exportBoxButton);
@@ -4602,7 +4594,7 @@ const constNation = {
 function milestoneBuy(heroTooltip) {
     if (document.getElementById(`milestone-${heroTooltip}`).classList.contains("milestone-selected")) {document.getElementById(`milestone-${heroTooltip}`).classList.remove("milestone-selected")}
     const heroID = heroTooltip.split("-")[0];
-    const level = heroTooltip.split("-")[1];
+    const level = parseInt(heroTooltip.split("-")[1]);
     const cost = (4 * upgradeDict[heroID]["BaseCost"] * (COSTRATIO ** (level - 1)));
 
     const currentSelection = document.getElementById('upgrade-selection').currentValue;
@@ -4634,7 +4626,7 @@ function milestoneBuy(heroTooltip) {
     } else {
         // TRAVELER ONLY
         if (upgradeInfo[heroID].Ele === "Any") {
-            if (currentSelection === 'prefer-book' || saveValues.realScore < cost) {
+            if (currentSelection === 'prefer-book') {
                 weaselDecoy.load();
                 weaselDecoy.play();
                 return;
@@ -4645,7 +4637,7 @@ function milestoneBuy(heroTooltip) {
                     }
                 }
 
-                if (itemArray.length === 0) {
+                if (itemArray.length === 0 || saveValues.realScore < cost) {
                     weaselDecoy.load();
                     weaselDecoy.play();
                     return;
@@ -4664,39 +4656,50 @@ function milestoneBuy(heroTooltip) {
                 itemArray.push(elementItemID + elemItemID[heroElement] + 7 * itemStar);
             }
 
-            if (itemArray.length === 0 && currentSelection === 'prefer-gem') {
-                weaselDecoy.load();
-                weaselDecoy.play();
+            if (currentSelection === 'prefer-gem') {
+                if (itemArray.length === 0) {
+                    weaselDecoy.load();
+                    weaselDecoy.play();
+                } else {
+                    let inventoryCount = InventoryMap.get(itemArray[0]);
+                    inventoryCount--;
+                    InventoryMap.set(itemArray[0], inventoryCount);
+                    if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
+                    milestoneSuccess(false);
+                }
                 return;
-            } else if (itemArray.length >= 0 && currentSelection !== 'prefer-book') {
-                let inventoryCount = InventoryMap.get(itemArray[0]);
-                inventoryCount--;
-                InventoryMap.set(itemArray[0], inventoryCount);
+            } else {
+                if (currentSelection === 'prefer-none') {
+                    if (itemArray.length > 0) {
+                        let inventoryCount = InventoryMap.get(itemArray[0]);
+                        inventoryCount--;
+                        InventoryMap.set(itemArray[0], inventoryCount);
+                        if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
+                        milestoneSuccess(false);
+                        return;
+                    }
+                }
 
-                if (inventoryCount <= 0) {(document.getElementById(itemArray[0])).remove()}
-                milestoneSuccess(false);
-                return;
-            }
+                const nationArray = [];
+                const nationItem = nationItemID + constNation[heroNation] + 50 * (4 - itemStar);
+                let tempBook = InventoryMap.get(nationItem);
+                if (tempBook && tempBook > 0) {
+                    nationArray.push(nationItem);
+                }
 
-            itemArray = [];
-            const nationItem = nationItemID + constNation[heroNation] + 50 * (4 - itemStar);
-            let tempBook = InventoryMap.get(nationItem);
-            if (tempBook && tempBook > 0) {
-                itemArray.push(nationItem);
-            }
-
-            if (itemArray.length === 0 || saveValues.realScore < cost) {
-                weaselDecoy.load();
-                weaselDecoy.play();
-                return;
-            } else if (itemArray.length >= 0 && saveValues.realScore >= cost) {
-                reduceItem(itemArray[0]);
-                milestoneSuccess(true);
+                if (nationArray.length === 0 || saveValues.realScore < cost) {
+                    weaselDecoy.load();
+                    weaselDecoy.play();
+                    return;
+                } else if (nationArray.length >= 0 && saveValues.realScore >= cost) {
+                    reduceItem(nationArray[0]);
+                    milestoneSuccess(true);
+                }
             }
         }
     }
 
-    function milestoneSuccess(useGem) {
+    function milestoneSuccess(useGem = false) {
         let upgradeDictTemp = upgradeDict[heroID];
         let additionPower = Math.ceil(upgradeDictTemp["Factor"] * upgradeDictTemp.Purchased * buff);
         if (heroID != 0) {saveValues["dps"] += additionPower} else {saveValues["clickFactor"] += additionPower};
@@ -7252,11 +7255,19 @@ function finishQuest(advType) {
         if (document.getElementById("world-quest-button")) {
             document.getElementById("world-quest-button").remove();
             notifPop("clearAll","quest");
-            Expedition.expedInfo("exped-7", expeditionDict, saveValues, persistentValues);
         } 
 
         if (res) {
             res();
+        }
+
+        let advButton = document.getElementById("adventure-button");
+        adventureType = 0;
+        advButton.key = 0;
+        clearExped();
+        Expedition.expedInfo("exped-7", expeditionDict, saveValues, persistentValues);
+        if (advButton.classList.contains("expedition-selected")) {
+            advButton.classList.remove("expedition-selected");
         }
     }
 }
@@ -9526,7 +9537,6 @@ function skillUse() {
 
     for (let i = 0; i < adventureVideoChildren.length; i++) {
         const mobDiv = adventureVideoChildren[i];
-        console.log(mobDiv)
         if (!mobDiv.querySelector('.health-bar, .health-bar-scara')) {continue};
         const enemyImg = mobDiv.querySelector('.enemyImg');
         if (enemyImg.querySelector('.skill-mark')) { enemyImg.querySelector('.skill-mark').remove()};
@@ -9540,8 +9550,6 @@ function skillUse() {
                 }
             }
         });
-
-        
         enemyImg.appendChild(canvas);
     }
 }
@@ -13006,7 +13014,7 @@ function newPop(type) {
 if (beta || testing) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            startRandomEvent(2);
+            spawnWorldQuest();
         } else if (e.key === 'g') {
             spawnSkirmish();
         } else if (e.key === 'h') {
@@ -13042,10 +13050,10 @@ if (testing) {
     tester.classList.add('test-warning');
     mainBody.append(tester); 
     
-    setTimeout(()=>{
-    let startButton = document.getElementById("start-button");
-    if (startButton) startButton.click();
-    }, 1200);
+    // setTimeout(()=>{
+    // let startButton = document.getElementById("start-button");
+    // if (startButton) startButton.click();
+    // }, 1200);
 }
 
 if (beta) {

@@ -112,3 +112,8 @@ versionText.innerText = CONSTANTS.VERSIONNUMBER;
 
 let versionTextStart = document.getElementById("vers-number-start");
 versionTextStart.innerText = `[${CONSTANTS.VERSIONNUMBER}] \n ${CONSTANTS.COPYRIGHT}`;
+
+let downloadSave = document.getElementById('save-copy');
+downloadSave.addEventListener('click', () => {
+    CONSTANTS.DOWNLOADSAVE();
+})

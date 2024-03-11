@@ -4,13 +4,27 @@ const changeFontSize = (fontSize) => {
     document.documentElement.style.fontSize = `clamp(0.75rem, 0.75rem + ${fontSize * 0.125}vw, 4rem)`;
 }
 
+const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
+const downloadSave = () => {
+    const date = new Date();
+    let text = JSON.stringify(localStorage);
+    text = JSON.stringify(JSON.parse(text), null, 2)
+    
+    let blob = new Blob([text], {type: "text/plain"});
+    let link = document.createElement("a");
+    link.download = `nq_save_${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate()}_v${DBNUBMER}.txt`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+}
+
 export const CONSTANTS = Object.freeze({
     VERSIONNUMBER: VERSIONNUMBER,
     COPYRIGHT: `DISCLAIMER © HoYoverse.  
                 All rights reserved. This site is not affiliated 
                 with Hoyoverse, nor Genshin Impact.`,
-    DBNUBMER: (VERSIONNUMBER.split(".")[1]).replaceAll("-",""),
+    DBNUBMER: DBNUBMER,
     CHANGEFONTSIZE: changeFontSize,
+    DOWNLOADSAVE: downloadSave, 
     FELLBOSS_THRESHOLD: 65,
     UNUSUAL_THRESHOLD: 65,
     WORKSHOP_THRESHOLD: 75,

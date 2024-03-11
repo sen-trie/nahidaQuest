@@ -436,7 +436,7 @@ table, button, label {
 
 .link {
     position: absolute;
-    left: 1%;
+    right: 1%;
     bottom: 1%;
     padding: 0.2%;
     border-radius: 0.5em;
@@ -446,8 +446,7 @@ table, button, label {
 }
 
 .second-link {
-    left: unset;
-    right: 1%;
+    bottom: calc(1% + 2rem);
 }
 
 .second-link:visited,.link:visited { 
@@ -509,6 +508,11 @@ table, button, label {
     background-size: contain;
     background-repeat: no-repeat;
     background-color: transparent;
+}
+
+#save-copy {
+    right: unset;
+    left: 1%;
 }
 
 #loading {
