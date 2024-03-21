@@ -76,4 +76,20 @@ spoilerEle.forEach((ele) => {
             ele.classList.add('revealed');
         }
     })
+});
+
+const openEle = document.querySelectorAll('.open');
+openEle.forEach((openDiv) => {
+    const textDiv = openDiv.querySelector('div');
+    textDiv.style.display = 'none';
+    const button = openDiv.querySelector('.open-button');
+    button.addEventListener('click', () => {
+        if (textDiv.style.display === 'none') {
+            button.innerText = '[Hide ^]';
+            textDiv.style.display = 'block';
+        } else {
+            button.innerText = '[Expand v]'
+            textDiv.style.display = 'none';
+        }
+    });
 })

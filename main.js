@@ -1605,7 +1605,7 @@ function weaselEvent(specialWeasel, hardMode) {
 
 function addWeasel(weaselBack,delay,specialWeasel,hardMode) {
     let weaselDiv = weaselBack.children;
-    let realWeasel = randomInteger(0,18);
+    let realWeasel = hardMode ? randomInteger(0, 27) : randomInteger(0,18);
     let currentWeaselSrc = 0;
     let specialWeaselSpawns = false;
     if (specialWeasel) {specialWeaselSpawns = randomIntegerWrapper(luckRate + 45, 100)}

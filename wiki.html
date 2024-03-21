@@ -249,10 +249,6 @@
                         </thead>
                         <tbody id="item-char"></tbody>                      
                     </table>
-
-
-
-
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-4">
                     <h1>Expeditions</h1><br>
@@ -270,27 +266,48 @@
                         <br><br>
                         Successful plays reward items. After buying <div class="spoiler">Kusava from Dori's Black Market</div>, "Hard Mode" becomes available for some of them.
                     </h3><br>
-
                     <h2>Group I</h2>
                     <h3>These 3 minigames can appear from the beginning of the game, with their spawns indicated by a "?".</h3>
                     <br>
                     <ul>
                         <li>Empowered Nahida</li>
                         <div class="open">
-                            <p>[Expand v]</p>
-                            <h3>...</h3>
+                            <button class="open-button">[Expand v]</button>
+                            <div>
+                                This minigame is the simplest of the entire list - Clicking Nahida is substantially boosted, the energy rate during this period is also boosted.
+                                <br><br>
+                                There is also a secret event that can happen when luck is high enough - <div class="spoiler">The Wanderer becomes empowered instead</div>.
+                                However, this effect is purely visual. 
+                            </div>
                         </div>
                         <br>
                         <li>Aranara Clock</li>
                         <div class="open">
-                            <p>[Expand v]</p>
-                            <h3>...</h3>
+                            <button class="open-button">[Expand v]</button>
+                            <div>
+                                In this minigame, players are to click a button as soon as the clock stops ticking (which occurs after 6-9s).
+                                Players are given a leeway of 0.8s.
+                                <br><br>
+                                In hard mode, players are to time three clocks instead of just one. 
+                                After the first clock stops, subsequent ones stop 0.6s to 1s afterwards.
+                                To account for the higher number of clocks, players are given leeway of 1.0s.
+                            </div>
                         </div>
                         <br>
                         <li>Aranara Box</li>
                         <div class="open">
-                            <p>[Expand v]</p>
-                            <h3>...</h3>
+                            <button class="open-button">[Expand v]</button>
+                            <div>
+                                In this minigame, players simply choose a box out of 7 possible choices. There are 6 possible tiers of rewards.
+                                <ul>
+                                    <li>1. Golden Nuts (Only Possible after already obtaining Golden Nuts)</li>
+                                    <li>2. Primogems</li>
+                                    <li>3. Random 5-Star Gemstone (Increases Power for corresponding character)</li>
+                                    <li>4. Precious Gemstone (Increases Power for all characters)</li>
+                                    <li>5. Enemy (Nothing)</li>
+                                    <li>6. Strong Enemy (Lose 15-30% of current Energy)</li>
+                                </ul>
+                            </div>
                         </div>
                     </ul>
                     <br>
@@ -300,20 +317,45 @@
                     <ul>
                         <li>Aranara Sweeper</li>
                         <div class="open">
-                            <p>[Expand v]</p>
-                            <h3>...</h3>
+                            <button class="open-button">[Expand v]</button>
+                            <div>
+                                In this minigame, players get to play a stylized version of Minesweeper. To win, players have to reveal all tiles that
+                                don't contain whopperflowers (mines).
+                                <br><br>
+                                In normal mode, the board is of size 8x8 with approximately 6-10 whopperflowers. In hard mode, the board
+                                is of size 18x9 with approximately 28-30 whopperflowers.
+                            </div>
                         </div>
                         <br>
                         <li>Aranara Weasel</li>
                         <div class="open">
-                            <p>[Expand v]</p>
-                            <h3>...</h3>
+                            <button class="open-button">[Expand v]</button>
+                            <div>
+                                In this minigame, players are to catch weasel thieves as they spring out of their holes (similar to
+                                whack a mole). 
+                                <br><br>
+                                The minigame occurs in rounds where a set of weasels appear on a grid.
+                                For each round that spawns, only 1 real weasel thief can appear while everything
+                                else is either a normal weasel or a fake weasel thief. Clicking the fake weasel thief increases the 
+                                time taken for the next round to start. 
+                                <br><br>
+                                In normal mode, the board contains 18 cells with a game time of 25s. Additionally, the real weasel thief
+                                is always the brightest cell on the screen while fake thieves always appear darker.
+                                In hard mode, the board contains 27 cells with a game time of 40s. Additionally, the real weasel thief's
+                            </div>
                         </div>
                         <br>
                         <li>Aranara Rain</li>
                         <div class="open">
-                            <p>[Expand v]</p>
-                            <h3>...</h3>
+                            <button class="open-button">[Expand v]</button>
+                            <div>In this minigame, players are to catch nuts as they fall down the screen.
+                                <br><br>
+                                At the same time, other items like primogems and even Golden Nuts can appear. However, players
+                                have to avoid touching scarabs which can reduce the player's accumulation of nuts. The scarabs 
+                                tend to fall faster than the nuts and may even block them at times.
+                                <br><br>
+                                This minigame lasts about approximately 30s.
+                            </div>
                         </div>
                     </ul>
                     <br>
@@ -323,20 +365,44 @@
                     <ul>
                         <li>Aranara Says</li>
                         <div class="open">
-                            <p>[Expand v]</p>
-                            <h3>...</h3>
+                            <button class="open-button">[Expand v]</button>
+                            <div>In this minigame, players are to repeat a sequence as it gets progressively longer.
+                                <br><br>
+                                There can either be 4 possible buttons (arranged in a circle) or 6 possible buttons (arranged in a hexagon).
+                                There is no time limit for this minigame and the first sequence repeats until a button is pressed.
+                                <br><br>
+                                In normal mode, players need to reach a sequence length of 7 (circle) or 6 (hexagon). In hard mode,
+                                players need to reach a sequence length of 10 (circle) or 9 (hexagon).
+                            </div>
                         </div>
                         <br>
                         <li>Aranara Reveals</li>
                         <div class="open">
-                            <p>[Expand v]</p>
-                            <h3>...</h3>
+                            <button class="open-button">[Expand v]</button>
+                            <div>In this minigame, players are to reveal the Aranara's keys inside a grid before the Aranara find theirs.
+                                <br><br>
+                                Before the game starts, the player places their keys inside their grid. 
+                                The keys are of tile length 3,2 and 1 and it can be rotated while the grids is of size 5x5.
+                                <br><br>
+                                Beginning with the player, the player and the Aranara take turns marking cells.
+                                Cells with a key are marked with a cross while those without are marked with a circle.
+                                Whoever discovers all their opponents keys first wins. 
+                            </div>
                         </div>
                         <br>
                         <li>Aranara Snake</li>
                         <div class="open">
-                            <p>[Expand v]</p>
-                            <h3>...</h3>
+                            <button class="open-button">[Expand v]</button>
+                            <div>In this minigame, players are to collect as much fruit as they can while maneuvering a line
+                                of Aranara.
+                                <br><br>
+                                Players control the Aranara line using arrow controls, WASD or the available keypad.
+                                Initially, the line moves slowly but eventually ramps up and gets longer as more fruits are eaten.
+                                Additionally, players are also given an additional chance after the line collides with itself or the borders.
+                                <br><br>
+                                In normal mode, fruits cannot spawn on the edges of the map. In hard mode, fruits can spawn anywhere
+                                on the map (excluding inside the Aranara line) and the ramp up of speed after eating fruits is also higher.
+                            </div>
                         </div>
                     </ul>
                 </div>
@@ -347,7 +413,133 @@
                     BLAH BLAH
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-9">
-                    BLAH BLAH
+                    <h1>Bosses</h1><br>
+                    <h2>Overview</h2>
+                    <h3>As of nahidaQuest! 2.0, there are currently 4 bosses that must be beaten in order to progress. 
+                        These bosses are mobs that introduce unique mechanics not seen anywhere else. They spawn at every quarter interval
+                        of Leyline Energy. 
+                        <br><br>
+                        When they spawn, Leyline Energy cannot be decrease any further until they are defeated. 
+                        Notably, they also include different "phases" corresponding to their health percentage.
+                    </h3>
+                    <br>
+                    <h2>Boss 1:</h2>
+                    <div class="open">
+                        <button class="open-button">[Expand v]</button>
+                        <div>
+                            <h3>
+                                The Fellflower
+                            </h3>
+                            <br>
+                            <h3>
+                                Considering that the Fellflower is the first boss players will encounter, its mechanics do 
+                                not differ drastically from what players already know. 
+                                <br><br>
+                                In Phase I, the Fellflower is capable of "Double Attacking" by itself. The first
+                                ranged attack variant is introduced here - the "Rhythm" variant. Players have to click the circles at just the right time in order to pass. 
+                                The Fellflower can also spawn "Drain Circles", which if not broken by clicking, drain health and energy. 
+                                <br><br>
+                                In Phase II, the Fellflower gains an unbreakable shield as indicated by its health bar changing color.
+                                After rampaging for too long, the Fellflower becomes confused, triggering a "Aranara Rain" QTE.
+                                Players deal damage in this phase by clicking the ice orbs while avoiding the spikes.
+                                <br><br>
+                                Additionally, its ranged attack becomes harder and it spawns "Drain Circles" more aggressively.
+                            </h3>
+                            <h3>
+                                After defeating the Fellflower, players gain access to the third set of Aranara minigames: "Aranara Says", "Aranara Reveals" and "Aranara Snake".
+                                Additionally, the Fellflower's "Rhythm" ranged attack as well as "Drain Circles" can appear in Tree Defense and Skirmish battles. Finally, the second tier of Tree Seeds become available to collect.
+                            </h3>
+                        </div>
+                    </div>
+                    <br>
+                    <h2>Boss 2:</h2>
+                    <div class="open">
+                        <button class="open-button">[Expand v]</button>
+                        <div>
+                            <h3>
+                                The Unusual Hilichurl
+                            </h3>
+                            <br>
+                            <h3>
+                                The Unusual Hilichurl introduces a few mechanics that may seem unfamiliar such as its decoys in Phase I and summoning ability in Phase II.
+                                <br><br>
+                                In Phase I, the Unusual Hilichurl summons decoys of itself which all have a coordinated attack stance. However, only of one these attacks are real and can be parried.
+                                Parrying the fake ones punishes the players instead. Additionally, the ranged attack introduces additional beat variants - 
+                                Namely, the "Circle" beat which starts off slow but accelerates as well as the "Bullet" beat which starts off fast but has an indicator.
+                                <br><br>
+                                In Phase II, its decoys disappear but in exchange, the Unusual Hilichurl can summon other Mobs. 
+                                It is recommended to quickly take down these mobs using the "Burst Attack" before the sheer number becomes overwhelming. 
+                                Additionally, for ranged attacks, the third and final beat variant is introduced - the "Boomerang" which is fast initially but slows down after its rebound.
+                            </h3>
+                            <h3>
+                                After defeating the Unusual Hilichurl, players gain access to Dori's "Black Market" shop.
+                                Additionally, the Hilichurl's beat variants can appear in Tree Defense and Skirmish battles. Finally, the third tier of Tree Seeds become available to collect.
+                            </h3>
+                        </div>
+                    </div>
+                    <br>
+                    <h2>Boss 3:</h2>
+                    <div class="open">
+                        <button class="open-button">[Expand v]</button>
+                        <div>
+                            <h3>
+                                The Shouko no Kami
+                            </h3>
+                            <br>
+                            <h3>
+                                Technically speaking, the Shouko no Kami is the most unique boss in nahidaQuest!. Notably, most of its healthbar is within in Phase II, rather than Phase I.
+                                <br><br>
+                                In the relatively short Phase I, the base Shouko no Kami introduces its own "deflect" attack - After players counter, a QTE with a bar appears on the mob. 
+                                By timing when the needle is in the dark areas of the bar, a "Strong Counter" is performed which decreases the time to attack of a mob more than usual. 
+                                Missing the QTE, a "Weak Counter" is performed which decreases the time to attack of a mob less than usual. 
+                                <br><br>
+                                Additionally, a new ranged attack variant is introduced, where players have to avoid getting hit by the beat by navigating using the "Up" and "Down" buttons.
+                                <br><br>
+                                In Phase II, the Shouko no Kami's real form is revealed, with each of its four limbs having indepedent attacks. 
+                                Its base gains a shield and the main way of dealing damage in this phase is to take down its limbs.
+                                <br><br>
+                                After some time, the machine can enter "Setsuna Shoumetsu" mode. 
+                                In this mode, players must counter the attacks of its limbs as much as they can before the wind-up finishes. 
+                                Failing to counter the limbs attack adds to the Shouko no Kami's burst attack, which is unleased all at once after the wind-up is done.
+                                The burst attack also drains the player's energy so it is impossible to tank the subsequent damage if too many attacks fall through.
+                            </h3>
+                            <h3>
+                                After defeating the Shouko no Kami, players gain access to a new set of upgrades within the Tree of Dreams.
+                                Additionally, the "Spider" ranged attack variant can appear in Tree Defense and Skirmish battles.
+                            </h3>
+                        </div>
+                    </div>
+                    <br>
+                    <h2>Boss 4:</h2>
+                    <div class="open">
+                        <button class="open-button">[Expand v]</button>
+                        <div>
+                            <h3>
+                                The Doctor
+                            </h3>
+                            <br>
+                            <h3>
+                                As the final boss of the nahidaQuest!, the Doctor incorporates many of the mechanics seen in the previous bosses, posing as
+                                the most difficult challenge players face.
+                                <br><br>
+                                In Phase I, the Doctor has the ability to summon the Fellflower's "Drain Circles" as well as other minions. The Doctor and his minions have the ability 
+                                to "guard" and "double attack".
+                                The ranged attack in this phase is the regular variant.
+                                <br><br>
+                                In Phase II, the Doctor summons "Drain Circles" more frequently but stops summoning minions temporarily. The Doctor also gains the ability to "deflect" counters.
+                                The ranged attack in this phase is the "Rhythm" variant.
+                                <br><br>
+                                In Phase III, the Doctor stops summoning "Drain Circles" but starts summoning minions again. This time, a final mechanic is introduced where it can "mark" its servants. If this servant is not defeated in time,
+                                it gets "consumed" by the Doctor which regenerates its health.
+                                The ranged attack in this phase is the "Spider" variant. Additionally, when brought down to 1HP, the Doctor initiates a long and difficult ranged attack
+                                as its final attack. If players survive this final attack, the Doctor is defeated and the battle is over.
+                            </h3>
+                            <h3>
+                                After defeating the Doctor, players gain the ability to wish for Aranara minigames using the "Wish" function.
+                            </h3>
+                        </div>
+                    </div>
+                    <br>
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-10">
                     BLAH BLAH
@@ -361,20 +553,20 @@
                     <br>
                     <h2>Early Game</h2>
                     <div class="open">
-                        <p>[Expand v]</p>
-                        <h3>...</h3>
+                        <button class="open-button">[Expand v]</button>
+                        <div>...</div>
                     </div>
                     <br>
                     <h2>Mid Game</h2>
                     <div class="open">
-                        <p>[Expand v]</p>
-                        <h3>...</h3>
+                        <button class="open-button">[Expand v]</button>
+                        <div>...</div>
                     </div>
                     <br>
                     <h2>Late Game</h2>
                     <div class="open">
-                        <p>[Expand v]</p>
-                        <h3>...</h3>
+                        <button class="open-button">[Expand v]</button>
+                        <div>...</div>
                     </div>
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-13">
