@@ -77,7 +77,7 @@
                     </section-head>
                     <button class="sidebar-button" id="toggle-button-7">Dori's Shop</button>
                     <button class="sidebar-button" id="toggle-button-8">Tree of Dreams</button>
-                    <button class="sidebar-button" id="toggle-button-16">Challenges</button>
+                    <button class="sidebar-button" id="toggle-button-14">Challenges</button>
                     <button class="sidebar-button" id="toggle-button-9">Bosses</button>
                     <button class="sidebar-button" id="toggle-button-10">Palm Trees</button>
                     <button class="sidebar-button" id="toggle-button-11">Post-Endgame</button>
@@ -85,7 +85,6 @@
                 <section class="flex-column">
                     <section-head> Extra Info </section-head>
                     <button class="sidebar-button" id="toggle-button-13">Technical Details</button>
-                    <button class="sidebar-button" id="toggle-button-14">Art Details</button>
                 </section>
             </div>
             <div class="flex-column wiki-body">
@@ -407,10 +406,12 @@
                     </ul>
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-7">
-                    BLAH BLAH
+                    <h1>Dori's Shop</h1><br>
+                    <h2>Overview</h2>
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-8">
-                    BLAH BLAH
+                    <h1>Tree of Dreams</h1><br>
+                    <h2>Overview</h2>
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-9">
                     <h1>Bosses</h1><br>
@@ -492,16 +493,15 @@
                                 In the relatively short Phase I, the base Shouko no Kami introduces its own "deflect" attack - After players counter, a QTE with a bar appears on the mob. 
                                 By timing when the needle is in the dark areas of the bar, a "Strong Counter" is performed which decreases the time to attack of a mob more than usual. 
                                 Missing the QTE, a "Weak Counter" is performed which decreases the time to attack of a mob less than usual. 
-                                <br><br>
                                 Additionally, a new ranged attack variant is introduced, where players have to avoid getting hit by the beat by navigating using the "Up" and "Down" buttons.
                                 <br><br>
                                 In Phase II, the Shouko no Kami's real form is revealed, with each of its four limbs having indepedent attacks. 
                                 Its base gains a shield and the main way of dealing damage in this phase is to take down its limbs.
                                 <br><br>
-                                After some time, the machine can enter "Setsuna Shoumetsu" mode. 
+                                After some time, the Shouko no Kami can enter "Setsuna Shoumetsu" mode. 
                                 In this mode, players must counter the attacks of its limbs as much as they can before the wind-up finishes. 
                                 Failing to counter the limbs attack adds to the Shouko no Kami's burst attack, which is unleased all at once after the wind-up is done.
-                                The burst attack also drains the player's energy so it is impossible to tank the subsequent damage if too many attacks fall through.
+                                The burst attack also drains the player's energy so it is impossible to tank the subsequent damage if too many wind-up attacks fall through.
                             </h3>
                             <h3>
                                 After defeating the Shouko no Kami, players gain access to a new set of upgrades within the Tree of Dreams.
@@ -570,15 +570,106 @@
                     </div>
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-13">
-                    BLAH BLAH
+                    <h1>Technical Details</h1><br>
+                    <h2>Overview</h2>
+                    <h3>nahidaQuest! was built from scratch using vanilla Javascript, HTML & CSS. This encompasses all pages
+                        that are on nahidaquest.com, which include the game, this wiki as well as the main landing page. To decrease
+                        the size of the payload users need to download, practically all images served by this website is of '.webp' format,
+                        which has generally smaller filesizes than 'png' and 'jpg'. This means IE is not supported (sorry
+                        for the 0.1% of users stuck on that).
+                        <br>
+                        The only libraries that are being requested for the game are an Image Preloader and a "Panning and Zooming" library 
+                        , both of which are loaded by a CDN. The website files are hosted on a static Github Pages server which is
+                        rerouted through a Cloudflare DNS.
+                        <br>
+                        A significant portion of the assets were taken from the main game Genshin Impact or from GI web events.
+                        Exclusive assets made for nahidaQuest!, such as cutscenes and UI, were made through edited 
+                        in-game assets or made using Blender, a 3D computer graphics software tool set. To elaborate,
+                        I used Festivity's shaders, which is freely available on Github.
+                    </h3>
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-14">
-                    BLAH BLAH
+                    <h1>Challenges</h1><br>
+                    <h2>Overview</h2>
+                    <h3>nahidaQuest has 5 tiers of 10 challenges, with each tier having more difficult tasks. For completing a challenge,
+                        players receive a global NpS buff corresponding to the tier, (Tier * 5)%. Completing all challenges within a tier also rewards
+                        an additional buff (50)%.
+                    </h3>
+                    <br>
+                    <h2>Tier 1</h2>
+                    <ul>
+                        <li>Corps of Thousand: Transcend for over 5,000 Cores</li>
+                        <li>Breaking Impact: Possess 1000 primogems in one run</li>
+                        <li>Fungi On Seeds: Reach 2,500 energy in one run</li>
+                        <li>Rear of the Library: Possess 50 discounted levels (Discounted levels are obtained from XP books)</li>
+                        <li>Lucky Hits: Get a Crit on Big Nahida three times in a row (Players must unlock the prerequisite click crit within the Tree of Dreams first)</li>
+                        <li>Living on the Edge: Escape from the nest of a Jadeplume Terrorshroom (Random World Quest)</li>
+                        <li>Impulsive Shopper: Accept someone's fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal (Random World Quest)</li>
+                        <li>Bug in a Bottle: Catch 15 raining scarabs (Aranara Rain Minigame)</li>
+                        <li>The Commissioner: Catch 13 Weasel Thieves (Aranara Weasel Minigame)</li>
+                        <li>Green Bond: Harvest a fully-grown tree for the first time (Trees)</li>
+                    </ul>
+                    <br>
+                    <h2>Tier 2</h2>
+                    <ul>
+                        <li>Reborn from Another: Transcend for over 25,000 Cores</li>
+                        <li>Big Spender: Clear out Dori's regular shop</li>
+                        <li>Speed Mail: Wish for 10 characters in one run</li>
+                        <li>Onyx Rank: Reach level 20 Adventure Rank</li>
+                        <li>Barely a Scratch: Defeat the Abyss without losing any HP</li>
+                        <li>Until Til the End: Survive a Skirmish battle with at most one HP remaining</li>
+                        <li>Another Test Subject: During a battle, reach a counter combo of 20</li>
+                        <li>Sumeru Police Force: Clear out all Bounties in the Adventurer's Guild</li>
+                        <li>Subject Three: Defeat the Overgrown Whopperflower (Boss)</li>
+                        <li>A Nut From Space: Catch 60 raining nuts (Aranara Rain Minigame)</li>
+                    </ul>
+                    <br>
+                    <h2>Tier 3</h2>
+                    <ul>
+                        <li>The Myth of Vahumana: Transcend for over 50,000 Cores</li>
+                        <li>Let Sleeping Travellers Rest: Reach 1 billion NpS with the Traveller</li>
+                        <li>Business as Usual: Reach 7,500 energy in one run</li>
+                        <li>Gem Empire: Possess 4000 primogems in one run</li>
+                        <li>Surging Forth: Empower the Wanderer (Lucky event that can happen during Empowered Nahida event. Players
+                            must unlock prerequisite Lucky Chance within the Tree of Dreams)
+                        </li>
+                        <li>Chaos from the East: Defeat the Menace of the Mansion (Boss)</li>
+                        <li>Golden Ticket: Catch 16 Weasel Thieves (Aranara Weasel Minigame)</li>
+                        <li>Sumeru Sales Specialist: Reveal a field of Whopperflowers in under 15 seconds (Aranara Sweeper Minigame)</li>
+                        <li>Blessed Hamada: Harvest 15 fully-grown trees (Trees)</li>
+                        <li>Sylvan Samaritan: Offer 15 times to a tree in a single cycle (Trees)</li>
+                    </ul>
+                    <br>
+                    <h2>Tier 4</h2>
+                    <ul>
+                        <li>Weight of A Thousand Sumpter Beasts: Transcend for over 100,000 Cores</li>
+                        <li>At the Click of a Button: Click for over one billion Nuts</li>
+                        <li>House of Haravatat: Possess 200 discounted levels (Discounted levels are obtained from XP books)</li>
+                        <li>Song of Songs: Reach 15,000 energy in one run</li>
+                        <li>Grand Bazaar's Conquerer: Clear out Dori's special shop</li>
+                        <li>Follow Me!: Collect 1400 points while leading the Aranara (Aranara Snake Minigame)</li>
+                        <li>The Balladeer's Finale", 'desc': 'Defeat the Prodigal (Boss)</li>
+                        <li>Honorary Forest Ranger: Harvest 30 fully-grown trees (Trees)</li>
+                        <li>Rooted Philanthropist: Offer 25 times to a tree in a single cycle (Trees)</li>
+                        <li>Defender of Nature: During tree defense, do not let the tree get attacked once (Trees)</li>
+                    </ul>
+                    <br>
+                    <h2>Tier 5</h2>
+                    <ul>
+                        <li>Live and Let Live: Transcend for over 250,000 Cores</li>
+                        <li>Perspective of A God: Level up Nahida 700 times</li>
+                        <li>Team All-Stars: Ascend every character seven times</li>
+                        <li>Apex of Akasha: Stop the evil responsible for the Leyline Outbreak</li>
+                        <li>Stance of Impregnability: During a battle, reach a counter combo of 50</li>
+                        <li>Rule of Twelves: Within 10 selections, reveal all of Arakarman's keys (Aranara Keys Minigame)</li>
+                        <li>Leader of the Tribe: Collect 2000 points while leading the Aranara (Aranara Snake Minigame)</li>
+                        <li>THE GNOSIS IS REAL: Catch 12 Golden Weasel Thieves (Lucky event that can happen during Aranara Weasel Minigame. Players
+                            must unlock prerequisite Lucky Chance within the Tree of Dreams)</li>
+                        <li>'#teamtrees: Harvest 60 fully-grown trees (Trees)</li>
+                        <li>Aranara Thanks You: Offer 35 times to a tree in a single cycle</li>
+                    </ul>
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-15">
-                    BLAH BLAH
-                </div>
-                <div style="display: none;" class="text-block" id="text-block-16">
                     BLAH BLAH
                 </div>
             </div>

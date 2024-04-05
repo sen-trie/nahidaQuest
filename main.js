@@ -10608,7 +10608,7 @@ function challengePop(res) {
         challengePopUp = createDom('button', { class: ['challenge-pop-up'], id:'challenge-pop' });
         const challengePopText = createDom('p', { class: ['flex-row']});
         challengePopUp.textChild = challengePopText;
-        challengePopUp.append(challengePopText)
+        challengePopUp.append(challengePopText);
     }
 
     if (res.length === 1) {
