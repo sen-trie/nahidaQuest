@@ -110,6 +110,11 @@ h2 {
     font-weight: 500;
 }
 
+h2 > .spoiler {
+    font-size: inherit;
+    transform: translateY(-3px);
+}
+
 h3, li {
     font-size: 1.1em;
     font-weight: normal;
@@ -235,5 +240,9 @@ table tr:nth-child(2n) {
 .formula {
     border-left: 6px solid var(--bright-green);
     padding-left: 16px;
+    color: var(--bright-green);
+}
+
+.open-button {
     color: var(--bright-green);
 }

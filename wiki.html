@@ -54,20 +54,20 @@
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⠙⢿⣿⡟⠿⣿⡿⠇⠿⠟⠙⠛⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⠟⠀⠀⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ -->
         <header-component></header-component>
-        <main class="flex-row hide-tester">
+        <main class="flex-row">
             <div class="flex-column wiki-side">
                 <section class="flex-column">
                     <button class="sidebar-button" id="toggle-button-1">Getting Started</button>
-                    <button class="sidebar-button" id="toggle-button-12">Progression</button>
+                    <button class="sidebar-button" id="toggle-button-11">Progression</button>
                 </section>
                 <section class="flex-column">
                     <section-head>
                         Basic Features
                     </section-head>
-                    <button class="sidebar-button" id="toggle-button-2">Characters</button>
+                    <button class="sidebar-button" id="toggle-button-2">Characters</button> 
                     <button class="sidebar-button" id="toggle-button-3">Items</button>
                     <button class="sidebar-button" id="toggle-button-4">Expeditions</button>
-                    <button class="sidebar-button" id="toggle-button-15">Adventurer's Guild</button>
+                    <button class="sidebar-button" id="toggle-button-14">Adventurer's Guild</button>
                     <button class="sidebar-button" id="toggle-button-5">Achievements</button>
                     <button class="sidebar-button" id="toggle-button-6">Minigames</button>
                 </section>
@@ -77,14 +77,13 @@
                     </section-head>
                     <button class="sidebar-button" id="toggle-button-7">Dori's Shop</button>
                     <button class="sidebar-button" id="toggle-button-8">Tree of Dreams</button>
-                    <button class="sidebar-button" id="toggle-button-14">Challenges</button>
+                    <button class="sidebar-button" id="toggle-button-13">Challenges</button>
                     <button class="sidebar-button" id="toggle-button-9">Bosses</button>
                     <button class="sidebar-button" id="toggle-button-10">Palm Trees</button>
-                    <button class="sidebar-button" id="toggle-button-11">Post-Endgame</button>
                 </section>
                 <section class="flex-column">
                     <section-head> Extra Info </section-head>
-                    <button class="sidebar-button" id="toggle-button-13">Technical Details</button>
+                    <button class="sidebar-button" id="toggle-button-12">Technical Details</button>
                 </section>
             </div>
             <div class="flex-column wiki-body">
@@ -263,7 +262,7 @@
                     <h3>nahidaQuest! has a variety of "Aranara" minigames that can randomly spawn. They are indicated by floating bobbleheads that spawn every few minutes.
                         Currently, there are 9 minigames that can spawn - the first 3 can appear from the beginning of the game, while the other 6 can only spawn after certain conditions are met.
                         <br><br>
-                        Successful plays reward items. After buying <div class="spoiler">Kusava from Dori's Black Market</div>, "Hard Mode" becomes available for some of them.
+                        Successful plays reward items. After buying <div class="spoiler">Kusava</div> from <div class="spoiler">Dori's Black Market</div>, "Hard Mode" becomes available for some of them.
                     </h3><br>
                     <h2>Group I</h2>
                     <h3>These 3 minigames can appear from the beginning of the game, with their spawns indicated by a "?".</h3>
@@ -408,6 +407,167 @@
                 <div style="display: none;" class="text-block" id="text-block-7">
                     <h1>Dori's Shop</h1><br>
                     <h2>Overview</h2>
+                    <h3>After getting <div class="spoiler">600 Primogems</div>, players unlock Dori's shop where they can spend said currency. The shop
+                        stocks 10 items, which are refreshed every 15 minutes. Depending on the stage of the game, the shop can have better inventories.</h3>
+                    <br>
+                    <li>Initial Unlock</li>
+                    <div class="open">
+                        <button class="open-button">[Expand v]</button>
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item Slot</th>
+                                        <th>Possible Items</th>
+                                        <th>Star Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1 - 2</td>
+                                        <td>Talent</td>
+                                        <td>2 - 3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3 - 5</td>
+                                        <td>Gemstone <br>Note: Slot 5 becomes Wish Mail after unlocking said system</td>
+                                        <td>3 - 6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>Energy Potions</td>
+                                        <td>3 - 5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7 - 8</td>
+                                        <td>Weapon</td>
+                                        <td>5 - 6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>9 - 10</td>
+                                        <td>Gemstone</td>
+                                        <td>5 - 6</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <br>
+                    <li>After Unlocking Ascension</li>
+                    <div class="open">
+                        <button class="open-button">[Expand v]</button>
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item Slot</th>
+                                        <th>Possible Items</th>
+                                        <th>Star Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Talent Mega Bundle</td>
+                                        <td>5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Talent Share Bundle</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Gem Mega Bundle</td>
+                                        <td>5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>Gem Share Bundle</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>Supply Share Bundle</td>
+                                        <td>4</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>Energy Potions</td>
+                                        <td>4-5</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7 - 8</td>
+                                        <td>Weapon</td>
+                                        <td>5 - 6</td>
+                                    </tr>
+                                    <tr>
+                                        <td>9 - 10</td>
+                                        <td>Tree Seeds (Tier depends on the bosses defeated)</td>
+                                        <td>4 - 6</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <br>
+                    <h2>Black Market</h2>
+                    <h3>
+                        After beating <div class="spoiler">The Unusual Hilichurl</div>, players unlock Dori's exclusive Black Market which costs
+                        primogems and tree currency. The Black Market prices (not items) refreshes on the same timer that the regular shop resets on.
+                        <br><br>The Black Market stocks unique items that can affect the game, with certain items having more than one level to purchase (costs
+                        scale by 1.5x per level).
+                    </h3>
+                    <br>
+                    <ul>
+                    <h2>Black Market Items (Visual)</h2>
+                    <div class="open">
+                        <button class="open-button">[Expand v]</button>
+                        <div>
+                            <li>Big Nahida Cosmetics</li>
+                            <h3>Currently, there are 3 skins that visually affect how Big Nahida appears. They cost roughly 650 tree currency
+                                and 400 primogems.
+                            </h3>
+                            <br>
+                            <li>Theme Sets</li>
+                            <h3>Currently, there are 4 skins that visually affect many aspects of the game's UI. They cost roughly 2000 tree currency
+                                and 800 primogems.
+                            </h3>
+                        </div>
+                    </div>
+                    <br>
+                    <h2>Black Market Items (Functional)</h2>
+                    <div class="open">
+                        <button class="open-button">[Expand v]</button>
+                        <div>
+                            <li>NRE (Menu 30)</li>
+                            <h3>While equipped, the highest ranked food in the player's inventory is auto-consumed. It has only 1 level, costing
+                                roughly 1500 tree currency and 800 primogems.
+                            </h3>
+                            <br>
+                            <li>Spring Water</li>
+                            <h3>Whenever Nahida blesses trees, its effectiveness is increased by 20% per level of this item. It has up to 5 levels
+                                and has a starting cost of 2000 tree currency and 600 primogems.
+                            </h3>
+                            <br>
+                            <li>Kusava</li>
+                            <h3>For the following Aranara minigames, Hard Mode is unlocked which has the potential of higher rewards at the Cost
+                                of increased difficulty. It has only 1 level, costing roughly 4000 tree currency and 900 primogems.
+                                <ul>
+                                    <li>Aranara Clock</li>
+                                    <li>Aranara Sweeper</li>
+                                    <li>Aranara Weasel</li>
+                                    <li>Aranara Says</li>
+                                    <li>Aranara Snake</li>
+                                </ul>
+                            </h3>
+                            <br>
+                            <li>Material Collector</li>
+                            <h3>While equipped, auto clicks Big Nahida periodically. Auto clicks provide less energy than regular clicks.
+                                It has up to 3 levels (decreasing delay per click) and has a starting cost of 6000 tree currency and 1500 primogems.
+                            </h3>
+                        </div>
+                    </div>
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-8">
                     <h1>Tree of Dreams</h1><br>
@@ -424,14 +584,10 @@
                         Notably, they also include different "phases" corresponding to their health percentage.
                     </h3>
                     <br>
-                    <h2>Boss 1:</h2>
+                    <h2>Boss 1: <div class="spoiler">The Fellflower</div></h2>
                     <div class="open">
                         <button class="open-button">[Expand v]</button>
                         <div>
-                            <h3>
-                                The Fellflower
-                            </h3>
-                            <br>
                             <h3>
                                 Considering that the Fellflower is the first boss players will encounter, its mechanics do 
                                 not differ drastically from what players already know. 
@@ -445,22 +601,17 @@
                                 Players deal damage in this phase by clicking the ice orbs while avoiding the spikes.
                                 <br><br>
                                 Additionally, its ranged attack becomes harder and it spawns "Drain Circles" more aggressively.
-                            </h3>
-                            <h3>
+                                <br><br>
                                 After defeating the Fellflower, players gain access to the third set of Aranara minigames: "Aranara Says", "Aranara Reveals" and "Aranara Snake".
                                 Additionally, the Fellflower's "Rhythm" ranged attack as well as "Drain Circles" can appear in Tree Defense and Skirmish battles. Finally, the second tier of Tree Seeds become available to collect.
                             </h3>
                         </div>
                     </div>
                     <br>
-                    <h2>Boss 2:</h2>
+                    <h2>Boss 2: <div class="spoiler">The Unusual Hilichurl</div></h2>
                     <div class="open">
                         <button class="open-button">[Expand v]</button>
                         <div>
-                            <h3>
-                                The Unusual Hilichurl
-                            </h3>
-                            <br>
                             <h3>
                                 The Unusual Hilichurl introduces a few mechanics that may seem unfamiliar such as its decoys in Phase I and summoning ability in Phase II.
                                 <br><br>
@@ -471,22 +622,17 @@
                                 In Phase II, its decoys disappear but in exchange, the Unusual Hilichurl can summon other Mobs. 
                                 It is recommended to quickly take down these mobs using the "Burst Attack" before the sheer number becomes overwhelming. 
                                 Additionally, for ranged attacks, the third and final beat variant is introduced - the "Boomerang" which is fast initially but slows down after its rebound.
-                            </h3>
-                            <h3>
+                                <br><br>
                                 After defeating the Unusual Hilichurl, players gain access to Dori's "Black Market" shop.
                                 Additionally, the Hilichurl's beat variants can appear in Tree Defense and Skirmish battles. Finally, the third tier of Tree Seeds become available to collect.
                             </h3>
                         </div>
                     </div>
                     <br>
-                    <h2>Boss 3:</h2>
+                    <h2>Boss 3: <div class="spoiler">The Shouko no Kami</div></h2>
                     <div class="open">
                         <button class="open-button">[Expand v]</button>
                         <div>
-                            <h3>
-                                The Shouko no Kami
-                            </h3>
-                            <br>
                             <h3>
                                 Technically speaking, the Shouko no Kami is the most unique boss in nahidaQuest!. Notably, most of its healthbar is within in Phase II, rather than Phase I.
                                 <br><br>
@@ -502,22 +648,17 @@
                                 In this mode, players must counter the attacks of its limbs as much as they can before the wind-up finishes. 
                                 Failing to counter the limbs attack adds to the Shouko no Kami's burst attack, which is unleased all at once after the wind-up is done.
                                 The burst attack also drains the player's energy so it is impossible to tank the subsequent damage if too many wind-up attacks fall through.
-                            </h3>
-                            <h3>
+                                <br><br>
                                 After defeating the Shouko no Kami, players gain access to a new set of upgrades within the Tree of Dreams.
                                 Additionally, the "Spider" ranged attack variant can appear in Tree Defense and Skirmish battles.
                             </h3>
                         </div>
                     </div>
                     <br>
-                    <h2>Boss 4:</h2>
+                    <h2>Boss 4: <div class="spoiler">The Doctor</div></h2>
                     <div class="open">
                         <button class="open-button">[Expand v]</button>
                         <div>
-                            <h3>
-                                The Doctor
-                            </h3>
-                            <br>
                             <h3>
                                 As the final boss of the nahidaQuest!, the Doctor incorporates many of the mechanics seen in the previous bosses, posing as
                                 the most difficult challenge players face.
@@ -533,8 +674,7 @@
                                 it gets "consumed" by the Doctor which regenerates its health.
                                 The ranged attack in this phase is the "Spider" variant. Additionally, when brought down to 1HP, the Doctor initiates a long and difficult ranged attack
                                 as its final attack. If players survive this final attack, the Doctor is defeated and the battle is over.
-                            </h3>
-                            <h3>
+                                <br><br>
                                 After defeating the Doctor, players gain the ability to wish for Aranara minigames using the "Wish" function.
                             </h3>
                         </div>
@@ -545,31 +685,41 @@
                     BLAH BLAH
                 </div>
                 <div style="display: none;" class="text-block" id="text-block-11">
-                    BLAH BLAH
-                </div>
-                <div style="display: none;" class="text-block" id="text-block-12">
                     <h1>Progression</h1><br>
                     <h2>Overview</h2>
                     <br>
                     <h2>Early Game</h2>
                     <div class="open">
                         <button class="open-button">[Expand v]</button>
-                        <div>...</div>
+                        <div>Starting out, players get to explore the particular style of incremental nahidaQuest! is - with upgrading, wishes,
+                            and Aranara minigames. Players start off with their "Expeditions" with mechanics are that are not 
+                            meant to be challenging. Players also unlock small in-game systems like Wishing and Dori's shop. Eventually, players
+                            gain access to Golden Nuts (and Cores) as well as the "Transcend" system.
+                        </div>
                     </div>
                     <br>
                     <h2>Mid Game</h2>
                     <div class="open">
                         <button class="open-button">[Expand v]</button>
-                        <div>...</div>
+                        <div>By this point, players should have be familiar with Transcending as well as the Tree of Dreams. Players
+                            should prioritise unlocking permanent upgrades within the Tree of Dreams while also capping theirs
+                            Expedition level as soon as they can.
+                        </div>
                     </div>
                     <br>
                     <h2>Late Game</h2>
                     <div class="open">
                         <button class="open-button">[Expand v]</button>
-                        <div>...</div>
+                        <div>Players start to unlock Trees, the end-game content for nahidaQuest! Trees are tied
+                            to the progression of Boss events as well as Ascension, a late game system that allows characters
+                            to increase their base NpS, beyond upgrades. Players will also get familiar with "Skirmish" & 
+                            "Defense" battles which are battles that have additional mechanics. Furthermore, as players beat bosses, 
+                            players can unlock in-game systems (e.g. Tier 3 Aranara Minigames and the Black Market) while "Skirmish" & 
+                            "Defense" battles include the mechanics found in the bosses.
+                        </div>
                     </div>
                 </div>
-                <div style="display: none;" class="text-block" id="text-block-13">
+                <div style="display: none;" class="text-block" id="text-block-12">
                     <h1>Technical Details</h1><br>
                     <h2>Overview</h2>
                     <h3>nahidaQuest! was built from scratch using vanilla Javascript, HTML & CSS. This encompasses all pages
@@ -588,7 +738,7 @@
                         I used Festivity's shaders, which is freely available on Github.
                     </h3>
                 </div>
-                <div style="display: none;" class="text-block" id="text-block-14">
+                <div style="display: none;" class="text-block" id="text-block-13">
                     <h1>Challenges</h1><br>
                     <h2>Overview</h2>
                     <h3>nahidaQuest has 5 tiers of 10 challenges, with each tier having more difficult tasks. For completing a challenge,
@@ -669,7 +819,7 @@
                         <li>Aranara Thanks You: Offer 35 times to a tree in a single cycle</li>
                     </ul>
                 </div>
-                <div style="display: none;" class="text-block" id="text-block-15">
+                <div style="display: none;" class="text-block" id="text-block-14">
                     BLAH BLAH
                 </div>
             </div>

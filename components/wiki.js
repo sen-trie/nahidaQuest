@@ -1,11 +1,11 @@
 import { upgradeInfo, InventoryDefault } from "../modules/dictData.js";
 import { getHighestKey } from "../modules/functions.js";
 
-let testing = (localStorage.getItem('tester') === 'true') ? true : false;
-if (testing) {
-    const mainEle = document.querySelector('.hide-tester');
-    mainEle.classList.remove('hide-tester');
-}
+// let testing = (localStorage.getItem('tester') === 'true') ? true : false;
+// if (testing) {
+//     const mainEle = document.querySelector('.hide-tester');
+//     mainEle.classList.remove('hide-tester');
+// }
 
 const createTable = (parentEle, dict, dir, imageDir, itemProps) => {
     for (let key in dict) {
@@ -48,7 +48,8 @@ const togglePage = (id) => {
 }
 
 for (let index = 1; index < 17; index++) {
-    const buttonElement = document.getElementById(`toggle-button-${index}`)
+    const buttonElement = document.getElementById(`toggle-button-${index}`);
+    if (!buttonElement) {break}
     buttonElement.addEventListener('click', () => {
         togglePage(index);
     })
