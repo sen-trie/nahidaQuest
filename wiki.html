@@ -55,7 +55,7 @@
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⠟⠀⠀⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ -->
         <header-component></header-component>
         <main class="flex-row">
-            <div class="flex-column wiki-side">
+            <div class="flex-column wiki-side" id="wiki-side">
                 <section class="flex-column">
                     <button class="sidebar-button" id="toggle-button-1">Getting Started</button>
                     <button class="sidebar-button" id="toggle-button-11">Progression</button>
@@ -86,7 +86,8 @@
                     <button class="sidebar-button" id="toggle-button-12">Technical Details</button>
                 </section>
             </div>
-            <div class="flex-column wiki-body">
+            <div class="flex-column wiki-body" id="wiki-body">
+                <button id="close-sidebar" class="flex-column"><</button>
                 <div style="display: block;" class="text-block" id="text-block-1">
                     <h1>Getting Started</h1><br>
                     <h2>Basic Introduction</h2>
@@ -304,7 +305,7 @@
                     <ul>
                         <li>Empowered Nahida</li>
                         <div class="open">
-                            <button class="open-button">[Expand v]</button>
+                            <button class="open-button">[Expand]</button>
                             <div>
                                 This minigame is the simplest of the entire list - Clicking Nahida is substantially boosted, the energy rate during this period is also boosted.
                                 <br><br>
@@ -315,7 +316,7 @@
                         <br>
                         <li>Aranara Clock</li>
                         <div class="open">
-                            <button class="open-button">[Expand v]</button>
+                            <button class="open-button">[Expand]</button>
                             <div>
                                 In this minigame, players are to click a button as soon as the clock stops ticking (which occurs after 6-9s).
                                 Players are given a leeway of 0.8s.
@@ -328,7 +329,7 @@
                         <br>
                         <li>Aranara Box</li>
                         <div class="open">
-                            <button class="open-button">[Expand v]</button>
+                            <button class="open-button">[Expand]</button>
                             <div>
                                 In this minigame, players simply choose a box out of 7 possible choices. There are 6 possible tiers of rewards.
                                 <ul>
@@ -349,7 +350,7 @@
                     <ul>
                         <li>Aranara Sweeper</li>
                         <div class="open">
-                            <button class="open-button">[Expand v]</button>
+                            <button class="open-button">[Expand]</button>
                             <div>
                                 In this minigame, players get to play a stylized version of Minesweeper. To win, players have to reveal all tiles that
                                 don't contain whopperflowers (mines).
@@ -361,7 +362,7 @@
                         <br>
                         <li>Aranara Weasel</li>
                         <div class="open">
-                            <button class="open-button">[Expand v]</button>
+                            <button class="open-button">[Expand]</button>
                             <div>
                                 In this minigame, players are to catch weasel thieves as they spring out of their holes (similar to
                                 whack a mole). 
@@ -379,7 +380,7 @@
                         <br>
                         <li>Aranara Rain</li>
                         <div class="open">
-                            <button class="open-button">[Expand v]</button>
+                            <button class="open-button">[Expand]</button>
                             <div>In this minigame, players are to catch nuts as they fall down the screen.
                                 <br><br>
                                 At the same time, other items like primogems and even Golden Nuts can appear. However, players
@@ -397,7 +398,7 @@
                     <ul>
                         <li>Aranara Says</li>
                         <div class="open">
-                            <button class="open-button">[Expand v]</button>
+                            <button class="open-button">[Expand]</button>
                             <div>In this minigame, players are to repeat a sequence as it gets progressively longer.
                                 <br><br>
                                 There can either be 4 possible buttons (arranged in a circle) or 6 possible buttons (arranged in a hexagon).
@@ -410,7 +411,7 @@
                         <br>
                         <li>Aranara Reveals</li>
                         <div class="open">
-                            <button class="open-button">[Expand v]</button>
+                            <button class="open-button">[Expand]</button>
                             <div>In this minigame, players are to reveal the Aranara's keys inside a grid before the Aranara find theirs.
                                 <br><br>
                                 Before the game starts, the player places their keys inside their grid. 
@@ -424,7 +425,7 @@
                         <br>
                         <li>Aranara Snake</li>
                         <div class="open">
-                            <button class="open-button">[Expand v]</button>
+                            <button class="open-button">[Expand]</button>
                             <div>In this minigame, players are to collect as much fruit as they can while maneuvering a line
                                 of Aranara.
                                 <br><br>
@@ -446,7 +447,7 @@
                     <br>
                     <li>Initial Unlock</li>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>
                             <table>
                                 <thead>
@@ -489,7 +490,7 @@
                     <br>
                     <li>After Unlocking Ascension</li>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>
                             <table>
                                 <thead>
@@ -556,7 +557,7 @@
                     <ul>
                     <h2>Black Market Items (Visual)</h2>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>
                             <li>Big Nahida Cosmetics</li>
                             <h3>Currently, there are 3 skins that visually affect how Big Nahida appears. They cost roughly 650 tree currency
@@ -572,7 +573,7 @@
                     <br>
                     <h2>Black Market Items (Functional)</h2>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>
                             <li>NRE (Menu 30)</li>
                             <h3>While equipped, the highest ranked food in the player's inventory is auto-consumed. It has only 1 level, costing
@@ -620,7 +621,7 @@
                     <br>
                     <h2>Boss 1: <div class="spoiler">The Fellflower</div></h2>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>
                             <h3>
                                 Considering that the Fellflower is the first boss players will encounter, its mechanics do 
@@ -644,7 +645,7 @@
                     <br>
                     <h2>Boss 2: <div class="spoiler">The Unusual Hilichurl</div></h2>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>
                             <h3>
                                 The Unusual Hilichurl introduces a few mechanics that may seem unfamiliar such as its decoys in Phase I and summoning ability in Phase II.
@@ -665,7 +666,7 @@
                     <br>
                     <h2>Boss 3: <div class="spoiler">The Shouko no Kami</div></h2>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>
                             <h3>
                                 Technically speaking, the Shouko no Kami is the most unique boss in nahidaQuest!. Notably, most of its healthbar is within in Phase II, rather than Phase I.
@@ -691,7 +692,7 @@
                     <br>
                     <h2>Boss 4: <div class="spoiler">The Doctor</div></h2>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>
                             <h3>
                                 As the final boss of the nahidaQuest!, the Doctor incorporates many of the mechanics seen in the previous bosses, posing as
@@ -726,18 +727,20 @@
                     <br>
                     <h2>Early Game</h2>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>Starting out, players get to explore the particular style of incremental nahidaQuest! is - with upgrading, wishes,
-                            and Aranara minigames. Players start off with their "Expeditions" with mechanics are that are not 
-                            meant to be challenging. Players also unlock small in-game systems like Wishing and Dori's shop. Eventually, players
+                            and Aranara minigames. Players start off their "Expeditions" with mechanics and battles that are not 
+                            meant to be challenging. 
+                            <br><br>
+                            Soon, players also unlock small in-game systems like Wishing and Dori's shop. Eventually, players
                             gain access to Golden Nuts (and Cores) as well as the "Transcend" system.
                         </div>
                     </div>
                     <br>
                     <h2>Mid Game</h2>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
-                        <div>By this point, players should have be familiar with Transcending as well as the Tree of Dreams. Players
+                        <button class="open-button">[Expand]</button>
+                        <div>By this point, players should be familiar with Transcending as well as the Tree of Dreams. Players
                             should prioritise unlocking permanent upgrades within the Tree of Dreams while also capping theirs
                             Expedition level as soon as they can.
                         </div>
@@ -745,13 +748,14 @@
                     <br>
                     <h2>Late Game</h2>
                     <div class="open">
-                        <button class="open-button">[Expand v]</button>
+                        <button class="open-button">[Expand]</button>
                         <div>Players start to unlock Trees, the end-game content for nahidaQuest! Trees are tied
                             to the progression of Boss events as well as Ascension, a late game system that allows characters
-                            to increase their base NpS, beyond upgrades. Players will also get familiar with "Skirmish" & 
-                            "Defense" battles which are battles that have additional mechanics. Furthermore, as players beat bosses, 
-                            players can unlock in-game systems (e.g. Tier 3 Aranara Minigames and the Black Market) while "Skirmish" & 
-                            "Defense" battles include the mechanics found in the bosses.
+                            to permanently increase their base NpS, beyond upgrades. 
+                            <br><br>
+                            Players will also get familiar with battles that integrate boss mechanics. 
+                            Furthermore, as players beat bosses, players can unlock additional in-game systems 
+                            (e.g. Tier 3 Aranara Minigames, Black Market).
                         </div>
                     </div>
                 </div>

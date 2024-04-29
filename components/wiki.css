@@ -44,14 +44,15 @@ section {
 }
 
 section-head {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     margin: 0.6rem 0;
     align-self: flex-start;
     background-color: rgba(0, 0, 0, 0.726);
     color: white;
     border-radius: 0.5rem;
     padding: 0.6rem 1.2rem;
-    max-width: 100%;
+    width: 100%;
+    text-align: center;
 }
 
 table {
@@ -141,9 +142,13 @@ table tr:nth-child(2n) {
     background-color: var(--light-green);
 }
 
+button {
+    cursor: pointer;
+}
+
 .wiki-side {
     position: relative;
-    width: 22rem;
+    width: 18rem;
     padding: 1rem;
     height: 100%;
     white-space: nowrap;
@@ -164,11 +169,26 @@ table tr:nth-child(2n) {
 }
 
 .wiki-body {
-    width: calc(100% - 22rem);
+    position: relative;
+    width: calc(100% - 18rem);
     height: 100%;
     max-height: 100%;
     color: var(--very-dark-green);
     background: url(../assets/tutorial/tutorialScreen.webp) center center/cover no-repeat;
+}
+
+#close-sidebar {
+    position: absolute;
+    z-index: 99;
+    top: 50%;
+    left: 0.2rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 1.4rem;
+    transform: translateY(-50%);
+    background-color: var(--bright-green);
+    border: var(--very-dark-green) 0.1rem solid;
+    text-align: center;
 }
 
 .text-block {
@@ -191,7 +211,7 @@ table tr:nth-child(2n) {
 }
 
 .sidebar-button {
-    font-size: 1.2rem;
+    font-size: 1rem;
     margin: 0.1rem 0;
     width: 100%;
     height: auto;
@@ -245,4 +265,5 @@ table tr:nth-child(2n) {
 
 .open-button {
     color: var(--bright-green);
+    margin-bottom: 0.25rem;
 }

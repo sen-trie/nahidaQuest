@@ -86,11 +86,27 @@ openEle.forEach((openDiv) => {
     const button = openDiv.querySelector('.open-button');
     button.addEventListener('click', () => {
         if (textDiv.style.display === 'none') {
-            button.innerText = '[Hide ^]';
+            button.innerText = '[Hide]';
             textDiv.style.display = 'block';
         } else {
-            button.innerText = '[Expand v]'
+            button.innerText = '[Expand]'
             textDiv.style.display = 'none';
         }
     });
-})
+});
+
+const openPanelButton = document.getElementById('close-sidebar');
+const sidePanel = document.getElementById('wiki-side');
+const wikiBody = document.getElementById('wiki-body');
+sidePanel.style.display = 'flex';
+openPanelButton.addEventListener('click', () => {
+    if (sidePanel.style.display === 'flex') {
+        openPanelButton.innerText = '>';
+        sidePanel.style.display = 'none';
+        wikiBody.style.width = "100%";
+    } else {
+        openPanelButton.innerText = '<';
+        sidePanel.style.display = 'flex';
+        wikiBody.style.width = "calc(100% - 16rem)";
+    }
+});
