@@ -1,5 +1,6 @@
 import { upgradeInfo, InventoryDefault } from "../modules/dictData.js";
 import { getHighestKey } from "../modules/functions.js";
+import { permUpgrades } from "../modules/defaultData.js";
 
 // let testing = (localStorage.getItem('tester') === 'true') ? true : false;
 // if (testing) {
@@ -110,3 +111,23 @@ openPanelButton.addEventListener('click', () => {
         wikiBody.style.width = "calc(100% - 16rem)";
     }
 });
+
+const blessingTableOne = document.getElementById('blessing-1');
+const blessingTableTwo = document.getElementById('blessing-2');
+for (let i = 1; i < 20; i++) {
+    const tableRow = document.createElement('tr');
+    const tableName = document.createElement('td');
+    const tableDesc = document.createElement('td');
+    const tableCap = document.createElement('td');
+    
+    tableName.innerText = permUpgrades[i].Name;
+    tableDesc.innerText = permUpgrades[i].Description;
+    tableCap.innerText = permUpgrades[i].Cap ? `Yes (${permUpgrades[i].Max} Lvls)` : "No";
+    tableRow.append(tableName, tableDesc, tableCap);
+
+    if (i < 13) {
+        blessingTableOne.appendChild(tableRow);
+    } else {
+        blessingTableTwo.appendChild(tableRow);
+    }
+}
