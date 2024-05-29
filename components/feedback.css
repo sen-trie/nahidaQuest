@@ -204,4 +204,13 @@ input[type="file"] {
     label {
         font-size: 1rem;
     }
+
+    input {
+        width: 100%;
+        margin-bottom: 0.25rem;
+    }
+
+    .file-submit {
+        flex-direction: column;
+    }
 }

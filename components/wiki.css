@@ -43,7 +43,7 @@ section {
     width: 100%;
 }
 
-section-head {
+section-head, #mobile-close-sidebar {
     font-size: 1.1rem;
     margin: 0.6rem 0;
     align-self: flex-start;
@@ -266,4 +266,58 @@ button {
 .open-button {
     color: var(--bright-green);
     margin-bottom: 0.25rem;
+}
+
+#mobile-close-sidebar {
+    display: none;
+    background-color: var(--bright-green);
+    border: 0.2rem solid rgb(41, 41, 41);
+    box-sizing: border-box;
+    font-size: 1.3rem;
+}
+
+@media (max-width: 1000px) {
+    .wiki-side {
+        position: absolute;
+        left: 0;
+        z-index: 10;
+        overflow: unset;
+        overflow-y: auto;
+    }
+
+    .wiki-side::before {
+        filter: none;
+        width: inherit;
+    }
+
+    .wiki-body {
+        width: 100% !important;
+    }
+
+    #close-sidebar {
+        z-index: unset;
+    }
+
+    #mobile-close-sidebar {
+        display: flex;
+
+    }
+}
+
+@media (max-width: 768px) {
+    .text-block {
+        padding: 4% 4%;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    h2 {
+        font-size: 1.15rem;
+    }
+
+    h3 {
+        font-size: 1.00rem;
+    }
 }

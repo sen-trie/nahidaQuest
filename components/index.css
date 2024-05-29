@@ -154,6 +154,7 @@ divider {
 }
 
 .img-filter {
+    transform: scale(0.9);
     border-radius: 50%;
     height: inherit;
     object-fit: contain;
@@ -236,7 +237,7 @@ divider {
 }
 
 .tech-used > p {
-    font-size: 2rem;
+    font-size: 1.4rem;
     text-align: center;
     margin-right: 2rem;
 }
@@ -341,6 +342,7 @@ divider {
     }
 
     .tech-used {
+        margin: 0.5rem 0;
         gap: 0.5rem;
     }
 

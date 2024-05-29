@@ -249,9 +249,10 @@ blocker {
 }
 
 /* ---------MOBILE CSS--------- */
-@media only screen and (max-width: 1200px) {
+@media (max-width: 1200px) {
     header {
         justify-content: space-between;
+        padding: 0 1rem;
     }
 }
 
@@ -261,7 +262,7 @@ blocker {
     }
 }
 
-@media only screen and (max-width: 1000px) {
+@media (max-width: 1000px) {
     .burger {
         display: block;
     }
@@ -283,5 +284,4 @@ blocker {
     ::-webkit-scrollbar {
         width: 6px;
     }
-    
 }

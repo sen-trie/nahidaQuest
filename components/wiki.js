@@ -8,6 +8,11 @@ import { permUpgrades } from "../modules/defaultData.js";
 //     mainEle.classList.remove('hide-tester');
 // }
 
+const openPanelButton = document.getElementById('close-sidebar');
+const mobilePanelButton = document.getElementById('mobile-close-sidebar');
+const sidePanel = document.getElementById('wiki-side');
+const wikiBody = document.getElementById('wiki-body');
+
 const createTable = (parentEle, dict, dir, imageDir, itemProps) => {
     for (let key in dict) {
         const row = document.createElement('tr');
@@ -52,6 +57,7 @@ for (let index = 1; index < 17; index++) {
     const buttonElement = document.getElementById(`toggle-button-${index}`);
     if (!buttonElement) {break}
     buttonElement.addEventListener('click', () => {
+        togglePanel(true);
         togglePage(index);
     })
 }
@@ -96,12 +102,8 @@ openEle.forEach((openDiv) => {
     });
 });
 
-const openPanelButton = document.getElementById('close-sidebar');
-const sidePanel = document.getElementById('wiki-side');
-const wikiBody = document.getElementById('wiki-body');
-sidePanel.style.display = 'flex';
-openPanelButton.addEventListener('click', () => {
-    if (sidePanel.style.display === 'flex') {
+const togglePanel = (forceClose = false) => {
+    if (sidePanel.style.display === 'flex' || forceClose) {
         openPanelButton.innerText = '>';
         sidePanel.style.display = 'none';
         wikiBody.style.width = "100%";
@@ -110,6 +112,16 @@ openPanelButton.addEventListener('click', () => {
         sidePanel.style.display = 'flex';
         wikiBody.style.width = "calc(100% - 16rem)";
     }
+}
+
+sidePanel.style.display = 'none';
+wikiBody.style.width = "100%";
+openPanelButton.addEventListener('click', () => {
+    togglePanel();
+});
+
+mobilePanelButton.addEventListener('click', () => {
+    togglePanel();
 });
 
 const blessingTableOne = document.getElementById('blessing-1');

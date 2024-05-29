@@ -43,12 +43,19 @@ for (let i = 1; i < 9; i++) {
     videoElement.addEventListener('mouseout', () => {
         revertSize(i, i % 2 === 0 ? i - 1 : i + 1);
         hideBlock(i);
-    })
+    });
 
     videoElement.addEventListener('ended', () => {
         videoElement.currentTime = 0; 
         videoElement.play(); 
-      });
+    });
+}
+
+for (let i = 1; i < 5; i++) {
+    const titleElement = document.getElementById(`title-card-${i}`);    
+    titleElement.addEventListener('touchstart', () => {
+        revealBlock(i * 2 - 1);
+    });
 }
 
 patchNotes(document.getElementById('patch-notes'), false, true);
