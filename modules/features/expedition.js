@@ -330,5 +330,173 @@ const createBattleHalf = (MOBILE) => {
     return [adventureFight, adventureFightDodge, adventureFightSkill, adventureFightBurst];
 }
 
+const commisionDict = [
+    ['Resource Gathering', 'Assign Sumeru characters to roam the vast geography of Sumeru, gathering resources.'],
+    ['Mob Hunting', 'Assign Sumeru characters to hunt down monsters, collecting Expedition rewards.'],
+    ['Treasure Questing', 'Assign Sumeru characters to explore ruins scattered about, collecting various treasures.']
+];
 
-export { expedInfo, createTopHalf, createEncounterHalf, createBattleHalf, resetAdventure, sapEnergy, createExpedition }
+const buildImage = (commSave) => {
+    if (commSave.timeEnd === 0) {
+        return createDom('img', { src: './assets/icon/charPlus.webp' });
+    } else {
+        return [...commSave.char.map(char => {
+            createDom('img', { src: `./assets/tooltips/emoji/${char}.webp` });
+        })];
+    }
+};
+
+const buildItem = (key, commSave) => {
+    const commissionPic = createDom('div', {
+        classList: ['flex-row', 'commission-pic'],
+        child: [
+            buildImage(commSave)
+        ]
+    });
+
+    const timeLeft = commSave.timeEnd === 0 ? 'Start!' : 'Time Left: ';
+    
+    const commisionAdd = createDom('div', {
+        classList: ['flex-column', 'commission-add'],
+        child: [
+            createDom('p', { innerText: timeLeft }),
+            commissionPic,
+        ]
+    })
+
+    const commisionInfo = createDom('div', { 
+        classList: ['flex-column', 'commission-info'],
+        child: [
+            createDom('p', { innerText: commisionDict[key][0] }),
+            createDom('div', {
+                classList: ['flex-row', 'commission-desc'],
+                child: [
+                    createDom('img', { src: `./assets/expedbg/comm${key + 1}.webp` }),
+                    createDom('p', { innerText: commisionDict[key][1] }),
+                ]
+            })
+        ]
+    });
+
+    const commissionItem = createDom('div', { 
+        classList: ['flex-row', 'commission-item'],
+        id: `commission-${key}`,
+        child: [
+            commisionInfo,
+            commisionAdd,
+        ]
+    });
+    return commissionItem;
+}
+
+const buildSelect = (commisionMenu) => {
+    const selectCharDiv = createDom('div', {
+        class: ['flex-row', 'commission-select-div'],
+        innerText: '+'
+    });
+
+    const selectChar = createDom('div', {
+        class: ['flex-space', 'flex-column'],
+        id: 'commission-select-char',
+        child: [
+            createDom('p', { innerText: 'Select Characters' }),
+            selectCharDiv
+        ]
+    });
+
+    commisionMenu.addChar = (res) => {
+        selectCharDiv.innerHTML = '';
+        res.forEach(item => {
+            selectCharDiv.append(item);
+        });
+    };
+
+    const selectFoodDiv = createDom('div', {
+        class: ['flex-row'],
+        innerText: '+'
+    });
+
+    const selectFood = createDom('div', {
+        class: ['flex-space', 'flex-column'],
+        id: 'commission-select-food',
+        child: [
+            createDom('p', { innerText: 'Select Food' }),
+            selectFoodDiv
+        ]
+    });
+
+    commisionMenu.addFood = () => {
+        selectFood.innerHTML = '';
+    }
+
+    const selectInfo = createDom('p', {
+        class: ['flex-column'],
+        id: 'commission-select-info',
+        innerText: 'Duration: \n - '
+    });
+
+    
+
+    return createDom('div', {
+        class: ['flex-row', 'commission-select'],
+        child: [ selectChar, selectFood, selectInfo]
+    });
+}
+
+const COMM_TEXT = ` Certain characters are better at particular tasks. Some characters also prefer working with certain characters (E.g. Cyno and Tighnari pair great!).`
+const buildStart = (commisionMenu) => {
+    const commissionText = createDom('p');
+    const commissionImg = createDom('img');
+    const commissionDesc = createDom('p', { class: [ 'start-desc' ]});
+
+    const commisionBack = createDom('button', {
+        innerText: 'Back',
+    });
+
+    const commisionReset = createDom('button', {
+        innerText: 'Reset',
+    });
+
+    const commisionConfirm = createDom('button', {
+        innerText: 'Confirm',
+    });
+
+    const commissionButtonsDiv = createDom('div', {
+        class: ['flex-row', 'commissions-button'], 
+        child: [commisionBack, commisionReset, commisionConfirm]
+    });
+
+    const commisionStart = createDom('div', {
+        id: 'commission-start',
+        class: ['flex-column', 'cover-all'],
+        children: [
+            commissionText, commissionImg, commissionDesc, buildSelect(commisionMenu) ,commissionButtonsDiv
+        ]
+    });
+
+    commisionBack.addEventListener('click', () => {
+        commisionStart.style.display = 'none';
+    });
+
+    commisionMenu.activate = (num) => {
+        commisionStart.style.display = 'flex';
+        commissionText.innerText = commisionDict[num][0];
+        commissionImg.src = `./assets/expedbg/comm${num + 1}-long.webp`;
+        commissionDesc.innerText = commisionDict[num][1] + COMM_TEXT;
+    }
+
+    return commisionMenu.appendChild(commisionStart);
+}
+
+
+// TO DO
+// TEST FOR AUTO CONSUMING ITEMS
+const buildComm = (commisionMenu, saveValues) => {
+    for (let i = 0; i < commisionDict.length; i++) {
+        commisionMenu.appendChild(buildItem(i, saveValues.commDict[i]));
+        
+    }
+    return buildStart(commisionMenu);
+}
+
+export { expedInfo, createTopHalf, createEncounterHalf, createBattleHalf, resetAdventure, sapEnergy, createExpedition, buildComm }

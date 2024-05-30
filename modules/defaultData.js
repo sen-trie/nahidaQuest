@@ -1,46 +1,79 @@
 
-const commisionDict = {
+const charDict = {
     'Alhaitham':{
         currentComm: '',
+        restEnd: 0,
     },
     'Candace':{
         currentComm: '',
+        restEnd: 0,
     },
     'Collei':{
         currentComm: '',
+        restEnd: 0,
     },
     'Cyno':{
         currentComm: '',
+        restEnd: 0,
     },
     'Dehya':{
         currentComm: '',
+        restEnd: 0,
     },
     'Dori':{
         currentComm: '',
+        restEnd: 0,
     },
     'Faruzan':{
         currentComm: '',
+        restEnd: 0,
     },
     'Kaveh':{
         currentComm: '',
+        restEnd: 0,
     },
     'Layla':{
         currentComm: '',
+        restEnd: 0,
     },
     'Nahida':{
         currentComm: '',
-        affection: 50, 
+        restEnd: 0,
     },
     'Nilou':{
         currentComm: '',
+        restEnd: 0,
     },
     'Tighnari':{
         currentComm: '',
+        restEnd: 0,
     },
     'Wanderer':{
         currentComm: '',
+        restEnd: 0,
     },
-}
+};
+
+const commDict = [
+    {
+        timeEnd: 0,
+        lvl: 0,
+        power: 0,
+        char: [],
+    },
+    {
+        timeEnd: 0,
+        lvl: 0,
+        power: 0,
+        char: [],
+    },
+    {
+        timeEnd: 0,
+        lvl: 0,
+        power: 0,
+        char: [],
+    }
+];
 
 const treeObj = {
     level: 0,
@@ -75,9 +108,8 @@ const saveValuesDefault = {
     currentTime: 0,
     achievementCount: 0,
     treeObj: treeObj,
-    baseCommisions: [],
-    commisionDict: commisionDict,
-    currentCommisions: [],
+    charDict: charDict,
+    commDict: commDict, 
 }
 
 const persistentValuesDefault = {

@@ -1,7 +1,7 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
-import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionText,commisionInfo } from "./modules/dictData.js"
+import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionInfo } from "./modules/dictData.js"
 import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
-import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,popUpBox,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop,errorMesg } from "./modules/adjustUI.js"
+import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,choiceMax,popUpBox,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop,errorMesg } from "./modules/adjustUI.js"
 import { CONSTANTS } from "./modules/constants.js";
 import * as Settings from "./modules/features/settings.js";
 import * as Shop from "./modules/features/shop.js";
@@ -173,16 +173,6 @@ const moraleLore = [
     "Nahida feels [s]Sad[/s]... [mor]<br><br> Party deals 50% less DMG; recover party morale <br> by resting or eating food.",
 ]
 
-const extraInfoDict = {
-    'Scavenger': '[Scavenger]: The party found additional items!',
-    'Toughness': '[Toughness]: The party endured an attack!',
-    'Loss': '[Attacked]: The party was attacked and lost some items...',
-    'Keen-Eyed': '[Keen-Eyed]: One of your items have been upgraded!',
-    'Proficient': '[Proficient] Certain items have been prioritized!',
-    'Anti-Sync': "[Anti-Sync] It seems that the two of them didn't get along well...",
-    'Sync': '[Sync] The two of them got along pretty well!'
-}
-
 const blackMarketFunctions = {
     changeBigNahida: changeBigNahida,
     changeSkinCollection: changeSkinCollection,
@@ -191,7 +181,6 @@ const blackMarketFunctions = {
     autoClickNahida: autoClickNahida,
 };
 
-const possibleItems = ['Bow', 'Catalyst', 'Claymore', 'Polearm', 'Sword', 'Artifact', 'Food', 'DendroGeoAnemo', 'ElectroCryo', 'PyroHydro', 'Inazuma', 'Liyue', 'Mondstadt', 'Sumeru', 'Fontaine'];
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
 const specialText = ["Ah! It's Bongo-Head!","'Thank you for releasing Arapacati!'","Woah, a treasure-seeking Seelie!","Woah, a shikigami was trapped inside!"];
 const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
@@ -336,7 +325,7 @@ function timerEvents() {
         growTree('add');
         document.getElementById('bless-bar').updateCharge();
     }
-    checkCommisions();
+    // checkCommisions();
 }
 
 // TEMPORARY TIMER
@@ -384,10 +373,10 @@ function loadSaveData() {
         let saveValuesTemp = localStorage.getItem("saveValuesSave");
         saveValues = JSON.parse(saveValuesTemp);
         
-        // if (beta) {
-        //     delete saveValues.baseCommisions;
-        //     delete saveValues.currentCommisions;
-        // }
+        if (testing) {
+            delete saveValues.commDict
+            delete saveValues.commisionDict;
+        }
 
         updateObjectKeys(saveValues,saveValuesDefault);
     }
@@ -416,7 +405,7 @@ function loadSaveData() {
             }
         }
 
-        setTimeout(loadRow,1000);
+        setTimeout(loadRow, 1000);
     }
     // LOAD INVENTORY DATA
     Inventory = InventoryDefault;
@@ -1142,7 +1131,7 @@ function reactionEvent(hardMode = false) {
             innerText: "Not yet...",
             event: ["click", () => {
                 reactionImageArrow.style.animationPlayState = "paused";
-                reactionFunction(eventBackdrop, reactionImageArrow, reactionButton);
+                reactionFunction(eventBackdrop, reactionImageArrow, reactionButton, hardMode);
             }]
         });
 
@@ -1175,7 +1164,7 @@ function reactionEvent(hardMode = false) {
                         if (eventBackdrop.reactionGame && reactionImageArrow.reactionReady) {
                             reactionImageArrow.reactionReady = false;
                             reactionButton.innerText = "Too Slow!";
-                            reactionFunction(eventBackdrop, reactionImageArrow, reactionButton);
+                            reactionFunction(eventBackdrop, reactionImageArrow, reactionButton, hardMode);
                         }
                     }, hardMode ? 950 : 800);
                 }
@@ -1204,7 +1193,7 @@ function reactionEvent(hardMode = false) {
     mainBody.append(eventBackdrop);
 }
 
-function reactionFunction(eventBackdrop, reactionImageArrow, reactionButton) {
+function reactionFunction(eventBackdrop, reactionImageArrow, reactionButton, hardMode) {
     if (eventBackdrop.reactionGame == false) {return}
 
     reactionImageArrow.style.animationPlayState = "paused";
@@ -5529,7 +5518,7 @@ function createGuild() {
         }
     }
 
-    const bountyMenu = document.createElement("div");
+    const bountyMenu = createDom("div");
     bountyMenu.classList.add("flex-row","bounty-menu");
     bountyMenu.id = "bounty-menu";
     buildBounty(bountyMenu);
@@ -5650,300 +5639,7 @@ function createGuild() {
     const commisionMenu = document.createElement("div");
     commisionMenu.id = 'commision-menu';
     commisionMenu.classList.add('commision-menu', 'flex-column');
-
-    const commisionList = document.createElement('div');
-    commisionList.id = 'commision-list'
-    commisionList.classList.add('commision-list');
-
-    if (saveValues.baseCommisions.length === 0) {
-        generateCommisions();
-    }
-
-    const selectComission = document.createElement('div');
-    selectComission.classList.add('flex-column');
-    selectComission.style.display = 'none';
-    selectComission.id = 'select-comission';
-    const commissionSetting = document.createElement('div');
-    commissionSetting.classList.add('commision-setting', 'flex-row');
-
-    const commTitle = document.createElement('p');
-    const commItems = createDom('div', {
-        classList: ['select-commision-items', 'flex-column'],
-        id: 'select-comm-items'
-    })
-    const commRewards = document.createElement('div');
-    const commStars = document.createElement('img');
-    commItems.append(commRewards, commStars)
-
-    const commHeroes = document.createElement('div');
-    commHeroes.classList.add('comm-heroes');
-    const textArray = ['Leader', 'Support', 'Boon'];
-    textArray.forEach((text) => {
-        let barText = document.createElement('p');
-        barText.innerText = text
-        commHeroes.append(barText);
-    })
-
-    const heroContainer = createDom('div', {
-        hero: null,
-        id: 'select-hero-leader',
-        style:{ background: 'url(./assets/icon/charPlus.webp) no-repeat center center/contain' }
-    });
-
-    const suppContainer = createDom('div', {
-        hero: null,
-        id: 'select-hero-support',
-        style:{ background: 'url(./assets/icon/charPlus.webp) no-repeat center center/contain' }
-    });
-
-    heroContainer.addEventListener('click',() => {
-        selectHeroType = 'leader';
-        heroContainer.style.animation = 'tallyCount 0.5s ease-in-out infinite both';
-        suppContainer.style.animation = 'unset';
-        suppContainer.offsetWidth;
-    });
-
-    suppContainer.addEventListener('click',() => {
-        selectHeroType = 'support';
-        suppContainer.style.animation = 'tallyCount 0.5s ease-in-out infinite both';
-        heroContainer.style.animation = 'unset';
-        heroContainer.offsetWidth;
-    });
-    
-    const perkText = document.createElement('p');
-    perkText.id = 'comm-perk-test';
-    perkText.innerText = 'None Curently';
-    
-    commHeroes.append(heroContainer, suppContainer, perkText);
-    commissionSetting.append(commTitle, commItems, commHeroes);
-
-    const commissionChar = document.createElement('div');
-    commissionChar.id = 'commission-char';
-    commissionChar.classList.add('commision-char');
-    selectComission.append(commissionSetting, commissionChar);
-
-    const currentCommisions = document.createElement('div');
-    currentCommisions.classList.add('current-commision', 'flex-row');
-
-    for (let i = 0; i < 3; i++) {
-        const currentCommisionsCell = createDom('div', {
-            id: `commision-cell-${i}`,
-            class: ['current-commision-cell', 'flex-row'],
-            style: { display: 'flex' },
-        });
-
-        const currentCommisionsLeader = document.createElement('img');
-        const currentCommisionsSupport = document.createElement('img');
-        const currentCommisionsTime = createDom('button', { class:['current-commision-button'] });
-
-        currentCommisionsTime.ready = false;
-        currentCommisionsTime.addEventListener('click', () => {
-            if (currentCommisionsTime.ready === true) {
-                currentCommisionsTime.ready = false;
-                currentCommisionsLeader.style.display = 'none';
-                currentCommisionsSupport.style.display = 'none';
-                currentCommisionsTime.innerText = 'Available';
-                if (currentCommisionsTime.classList.contains('rank-button-available')) currentCommisionsTime.classList.remove('rank-button-available');
-
-                const commId = currentCommisionsTime.commId.split('/');
-                let commInfo;
-                
-                if (commId[1].includes('base')) {
-                    saveValues.currentCommisions.splice(saveValues.currentCommisions.indexOf(commId[1]), 1)
-                    commInfo = saveValues.baseCommisions[commId[1].split('-')[1]]
-                }
-
-                for (let key in saveValues.commisionDict) {
-                    if (saveValues.commisionDict[key].currentComm === commId[1]) {
-                        saveValues.commisionDict[key].currentComm = '';
-                    }
-                }
-
-                const lootContainer = createDom('div', { class:['notif-item'] });
-                let lootArray = [];
-                let markedItems = [];
-                let extraInfo = [];
-
-                let upgradeItem = null;
-                if (commInfo.perk === 'Keen-Eyed') {
-                    upgradeItem = rollArray(commInfo.possibleItems);
-                }
-
-                commInfo.possibleItems.forEach((item) => {
-                    let itemType;
-                    let minLevel = commInfo.rating - 2;
-                    let maxLevel = commInfo.rating;
-                    let specialType = null;
-
-                    if (Object.keys(constNation).includes(item)) {
-                        itemType = 'talent';
-                        minLevel = Math.min(minLevel, 2);
-                        maxLevel = Math.max(minLevel, 4);
-                    } else if (item === "PyroHydro" || item === "DendroGeoAnemo" || item === "ElectroCryo") {
-                        itemType = 'gem';
-                        minLevel = Math.min(minLevel, 3);
-                    } else if (['bow', 'catalyst', 'claymore', 'polearm', 'sword'].includes(item.toLowerCase())) {
-                        itemType = 'weapon';
-                        specialType = item.charAt(0).toUpperCase() + item.slice(1);
-                    } else {
-                        itemType = item;
-                    }
-
-                    let itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                    const itemId2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-
-                    let lossRoll = randomInteger(1, 15);
-                    // SYNC AND ANTI-SYNC
-                    if ((commInfo.char[0] === 'Nahida' || commInfo.char[1] === 'Nahida') && randomInteger(1, 5) === 1) {
-                        const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                        lootArray.push(itemId1);
-                        markedItems.push(itemId1);
-                        extraInfo.push('Sync');
-                    } else if (commInfo.char[1] === 'Wanderer' || commInfo.char[0] === 'Wanderer') {
-                        lossRoll -= 5;
-                        extraInfo.push('Anti-Sync');
-                    } else if (commisionInfo[commInfo.char[0]].charLikes.includes(commInfo.char[1]) && randomInteger(1, 5) === 1) {
-                        const itemId1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                        lootArray.push(itemId1);
-                        markedItems.push(itemId1);
-                        extraInfo.push('Sync');
-                    } else if (commisionInfo[commInfo.char[0]].charDislikes.includes(commInfo.char[1])) {
-                        lossRoll -= 5;
-                        extraInfo.push('Anti-Sync');
-                    }
-
-                    if (lossRoll < 3) {
-                        if (commInfo.perk === 'Toughness') {
-                            lossRoll = false;
-                            extraInfo.push('Toughness');
-                        } else {
-                            lossRoll = true;
-                            extraInfo.push('Loss');
-                        }
-                    } else {
-                        lossRoll = false;
-                    }
-
-                    if (!lossRoll) {
-                        lootArray.push(itemId2);
-                    }
-
-                    // LOSS ROLL
-                    if (randomInteger(1,3) === 1 && !lossRoll) {
-                        const itemId3 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                        lootArray.push(itemId3);
-                    }
-
-                    // KEEN-EYED PERK
-                    if (upgradeItem !== null && upgradeItem == item) {
-                        itemId1 = specialType ? inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, Math.min(minLevel + 2, 5), maxLevel, 'shop');
-                        markedItems.push(itemId1);
-                        extraInfo.push('Keen-Eyed');
-                    }
-                    
-                    if (commInfo.perk === 'Proficient') {
-                        if (commInfo.priority === item) {
-                            const itemIdPro1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                            const itemIdPro2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                            
-                            markedItems.push(itemIdPro1);
-                            markedItems.push(itemIdPro2);
-                            lootArray.push(itemIdPro1);
-                            lootArray.push(itemIdPro2);
-                            lootArray.push(itemId1);
-
-                            extraInfo.push('Proficient');
-                        }
-                    } else {
-                        lootArray.push(itemId1);
-                    }
-
-                    // SCAVENGER PERK
-                    if (commInfo.perk === 'Scavenger' && randomInteger(1, 4) === 1) {
-                        const itemId4 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                        const itemId5 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                        const itemId6 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                        lootArray.push(itemId4, itemId5, itemId6);
-                        markedItems.push(itemId4, itemId5, itemId6);
-                        extraInfo.push('Scavenger');
-                    }
-
-                    let itemIdBase1 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                    let itemIdBase2 = specialType ? inventoryDraw(itemType, minLevel, maxLevel, 'itemLoot', specialType) : inventoryDraw(itemType, minLevel, maxLevel, 'shop');
-                    lootArray.push(itemIdBase1, itemIdBase2);
-                });
-
-                const postTreeItems = compareTreeItems(lootArray);
-                lootArray = [];
-                for (let key in postTreeItems) {
-                    const itemFrame = inventoryFrame(document.createElement("div"), Inventory[postTreeItems[key][0]],itemFrameColors);
-
-                    if (postTreeItems[key][1]) {
-                        itemFrame.classList.add('extra-item-tree');
-                    } else if (markedItems.includes(postTreeItems[key][0])) {
-                        markedItems.splice(markedItems.indexOf(postTreeItems[key][0]), 1);
-                        itemFrame.classList.add('extra-item');
-                    }
-                    
-                    lootArray.push(postTreeItems[key][0])
-                    lootContainer.append(itemFrame);
-                }
-
-                const lootText = createDom('p', {
-                    style: {
-                        color: 'var(--dull-green)',
-                        marginBottom: '1em'
-                    }
-                });
-
-                for (let text in extraInfoDict) {
-                    if (extraInfo.includes(text)) {
-                        lootText.innerText = `${extraInfoDict[text]}\n`
-                    }
-                }
-
-                const lootDiv = createDom('div', {
-                    class: ['flex-column'],
-                    children: [lootContainer, lootText],
-                    style: {
-                        width: '100%'
-                    }
-                });
-
-                const addLoot = (lootArray) => {
-                    lootArray.forEach((item) => {
-                        inventoryAdd(item);
-                    });
-
-                    newPop(1);
-                    sortList("table2");
-                    saveValues.baseCommisions[commId[1].split('-')[1]].progress = true;
-                    notifPop("clear","comm",commId[1]);
-                }
-
-                persistentValues.commissionsCompletedValue++;
-                choiceBox(mainBody, {text: 'Loot obtained:'}, stopSpawnEvents, () => {addLoot(lootArray)}, null, lootDiv, ['notif-ele', 'commision-ele']);
-                document.getElementById('guild-button-comm').click();
-            }
-        })
-
-        currentCommisionsCell.leader = currentCommisionsLeader;
-        currentCommisionsCell.support = currentCommisionsSupport;
-        currentCommisionsCell.time = currentCommisionsTime;
-        
-        currentCommisionsCell.append(currentCommisionsLeader, currentCommisionsSupport, currentCommisionsTime);
-        currentCommisions.appendChild(currentCommisionsCell);
-    }
-
-    const currentCommisionsBack = createDom('button', { class:['commision-footer', 'flex-column'], innerText: 'Back', style: { display:'none' }})
-    currentCommisionsBack.addEventListener('click', () => {focusNewComm(true, null)});
-    const enterCommision = createDom('button', { class:['commision-footer', 'flex-column'], innerText: 'Confirm!', style: { display:'none' }})
-    enterCommision.addEventListener('click', () => {enterNewComm()});
-    const commFeedback = createDom('p', {class:['commision-footer', 'flex-column'], style: { display:'none' }, id:'comm-feedback', chosenComm: null})
-
-    currentCommisions.append(currentCommisionsBack, commFeedback, enterCommision);
-    //commisionMenu.append(commisionList, selectComission, currentCommisions);
-    commisionMenu.append(createDom('p', {innerText:'UNDER CONSTRUCTION'}));
+    Expedition.buildComm(commisionMenu, saveValues);
 
     const guildArray = [rankMenu, bountyMenu, commisionMenu];
     const buttonArray = ["Adventure Rank", "Bounties", "Commisions"];
@@ -5965,8 +5661,6 @@ function createGuild() {
                     guildTable.activeButton.classList.remove("guild-selected");
                 }
             }
-
-            if (i === 2) {focusNewComm(true, null)}
             menuButton.classList.add("guild-selected");
             guildTable.activeButton = menuButton;
         })
@@ -5979,9 +5673,64 @@ function createGuild() {
         guildTable.appendChild(guildArray[i]);
     }
     table3.appendChild(guildTable);
-
-    showCommisions();
+    buildComm(commisionMenu);
     return guildTable;
+}
+
+function createCommChar() {
+    let noCharacters = true;
+    const pickItems = createDom('div', {
+        classList: ['notif-item', 'comm-div-img'],
+    });
+
+    for (let key in upgradeDict) {
+        if (upgradeDict[key].Purchased <= 0) continue;
+        const heroName = upgradeInfo[key].Name;
+
+        if (commisionInfo[heroName] === undefined || saveValues.charDict[heroName].restEnd !== 0) continue;
+
+        const heroImg = createDom('img', {
+            itemName: heroName,
+            src: `./assets/tooltips/hero/${heroName}.webp`,
+            classList: ['comm-img'],
+        });
+        noCharacters = false;
+        pickItems.appendChild(heroImg);
+    }
+
+    if (noCharacters) {
+        return null;
+    }
+    return pickItems;
+}
+
+function buildComm(commisionMenu) {
+    for (let i = 0; i < 3; i++) {
+        const commItem = document.getElementById(`commission-${i}`);
+        commItem.addEventListener('click', () => {
+            if (saveValues.commDict[i].timeEnd === 0) {
+                commisionMenu.activate(i);
+            } else if (saveValues.commDict[i].timeEnd < getTime()) {
+                return;
+            } else {
+                return;
+            }
+        });
+    }
+
+    const commChar = document.getElementById(`commission-select-char`);
+    commChar.addEventListener('click', () => {
+        const pickItems = createCommChar();
+        if (pickItems === null) {
+            const noChar = createDom('img', { classList: ['no-char'], src: './assets/expedbg/exped-Nahida-loss.webp' })
+            choiceBox(mainBody, {text: 'There are no available Sumeru characters!'}, stopSpawnEvents, ()=>{}, null, noChar, ['notif-ele']);
+        } else {
+            choiceMax(mainBody, {text: 'Pick (max 4) characters:'}, stopSpawnEvents, 
+                      (res) => { commisionMenu.addChar(res) }, () => {}, pickItems, 
+                      ['notif-ele', 'pick-items', 'choice-ele'], false, 4);
+        }
+    });
+    const commFood = document.getElementById(`commission-select-food`);
 }
 
 function buildBounty(bountyMenu) {
@@ -6160,340 +5909,6 @@ function completeBounty(bountyID,type,ele) {
     button.appendChild(claim);
 }
 
-function showCommisions() {
-    if (!beta) {return}
-
-    const commisionList = document.getElementById('commision-list');
-    while (commisionList.firstChild) {
-        commisionList.firstChild.remove();
-    }
-
-    saveValues.baseCommisions.forEach((item) => {
-        if (item.progress == false) {
-            const newCommisionsCell = createDom('div', { class:['commision-cell', 'flex-row'], style:{ display: 'flex' }})
-            newCommisionsCell.addEventListener('click',() => {focusNewComm(false, item)})
-
-            if (saveValues.currentCommisions[0] != undefined && saveValues.currentCommisions[1] != undefined && saveValues.currentCommisions[2] != undefined) {
-                newCommisionsCell.classList.add('dim-filter');
-            };
-
-            const commText = createDom('div', { class:['flex-column', 'commision-text']});
-            const commTitle = document.createElement('p');
-
-            commTitle.innerText = item.title;
-            const newCommisionsTime = document.createElement('p');
-            newCommisionsTime.innerText = convertTo24HourFormat(item.duration);
-
-            const commItems = document.createElement('div');
-            commItems.classList.add('commision-items', 'flex-row');
-            
-            item.possibleItems.forEach((reward) => {
-                let itemPic = new Image();
-                itemPic.src = `./assets/expedbg/loot/${reward}.webp`;
-                commItems.appendChild(itemPic);
-            })
-
-            const commLevel = document.createElement('p');
-            commLevel.innerText = `Rank ${item.rank}`;
-            const itemStar = new Image();
-            itemStar.src = `./assets/frames/star-${item.rating}.webp`;
-
-            commText.append(commTitle, newCommisionsTime);
-            newCommisionsCell.append(commLevel, commText, commItems, itemStar);
-            commisionList.appendChild(newCommisionsCell);
-        }
-    });
-
-    if (commisionList.children.length < 1) {
-        generateCommisions();
-    }
-
-    for (let i = 0; i < 3; i++) {
-        let commCell = document.getElementById(`commision-cell-${i}`);
-        if (saveValues.currentCommisions[i] != undefined) {
-            let commId = saveValues.currentCommisions[i];
-            if (commId.split('-')[0] === 'base') {
-                let commInfo = saveValues.baseCommisions[commId.split('-')[1]];
-
-                commCell.leader.style.display = 'flex';
-                commCell.leader.src = `./assets/tooltips/emoji/${commInfo.char[0]}.webp`;
-                commCell.support.style.display = 'flex';
-                commCell.support.src = `./assets/tooltips/emoji/${commInfo.char[1]}.webp`;
-
-                let timeLeft = (commInfo.endTime - getTime()) / 60;
-                let ready = timeLeft <= 0;
-                commCell.time.ready = ready;
-                commCell.time.commId = `commision-cell-${i}/${commId}`;
-                commCell.time.innerText = ready ? 'Done!' : convertTo24HourFormat(timeLeft);
-
-                if (ready) {
-                    if (!commCell.time.classList.contains('rank-button-available')) commCell.time.classList.add('rank-button-available');
-                } else {
-                    if (commCell.time.classList.contains('rank-button-available')) commCell.time.classList.remove('rank-button-available');
-                }
-            }
-        } else {
-            commCell.leader.style.display = 'none'
-            commCell.support.style.display = 'none'
-            commCell.time.innerText = 'Available';
-            commCell.time.ready = false;
-            commCell.time.commId = null;
-            if (commCell.time.classList.contains('rank-button-available')) commCell.time.classList.remove('rank-button-available');
-        }
-    }
-}
-
-function focusNewComm(forceShowComm, item) {
-    if (!beta) {return}
-    const commisionList = document.getElementById('commision-list');
-    const selectComission = document.getElementById('select-comission');
-    const commissionChar = document.getElementById('commission-char');
-    while (commissionChar.firstChild) {
-        commissionChar.firstChild.remove();
-    }
-    
-    const selectComissionChildren = selectComission.firstChild.children;
-    while (selectComissionChildren[1].firstChild.firstChild) {
-        selectComissionChildren[1].firstChild.firstChild.remove();
-    }
-
-    const commisionMenu = document.getElementById('commision-menu');
-    let currentCommArray = commisionMenu.querySelectorAll('.current-commision-cell');
-    let footerCommArray = commisionMenu.querySelectorAll('.commision-footer');
-    const footFeedback = document.getElementById('comm-feedback');
-    footFeedback.innerText = '';
-
-    if (forceShowComm) {
-        footFeedback.chosenComm = null;
-        selectComission.style.display = 'none';
-        showCommisions();
-        commisionList.style.display = 'grid';
-
-        currentCommArray.forEach((commItem) => {
-            commItem.style.display = 'flex';
-        });
-        footerCommArray.forEach((commItem) => {
-            commItem.style.display = 'none';
-        });
-    } else {
-        if (saveValues.currentCommisions[0] != undefined && saveValues.currentCommisions[1] != undefined && saveValues.currentCommisions[2] != undefined) {return};
-        footFeedback.chosenComm = item;
-        commisionList.style.display = 'none';
-        selectComission.style.display = 'flex';
-        selectComissionChildren[0].innerHTML = `[Rank: ${item.rank}]
-                                                <hr style="height:10px; visibility:hidden;" />${item.title}
-                                                <br>${convertTo24HourFormat(item.duration)}`;
-
-        selectComissionChildren[1].lastChild.src = `./assets/frames/star-${item.rating}.webp`;
-        item.possibleItems.forEach((reward) => {
-            let itemPic = new Image();
-            itemPic.src = `./assets/expedbg/loot/${reward}.webp`;
-            itemPic.name = reward;
-            selectComissionChildren[1].firstChild.appendChild(itemPic);
-        })
-
-        const commisionKeys = Object.keys(saveValues.commisionDict)
-        for (let key in upgradeInfo) {
-            const name = upgradeInfo[key].Name;
-            if (commisionKeys.includes(name) && upgradeDict[key].Purchased >= 1) {
-                if (saveValues.commisionDict[name].currentComm !== '') {continue}
-
-                const charButton = createDom('button', { class:['flex-row','commision-button'] });
-                charButton.addEventListener('click', () => {selectCommHero(name)})
-
-                let charLeft = createDom('div', { class:['commision-picture', 'flex-row'] });
-                let charImg = createDom('img', { src: `./assets/tooltips/emoji/${name}.webp`});
-
-                let charText = createDom('p');
-                charText.innerHTML = `${name}<br><br> Boon: ${commisionInfo[name].perk}`
-
-                charLeft.append(charImg);
-                charButton.append(charLeft, charText);
-                commissionChar.append(charButton);
-            }
-        }
-
-        currentCommArray.forEach((commItem) => {
-            commItem.style.display = 'none';
-        });
-        footerCommArray.forEach((commItem) => {
-            commItem.style.display = 'flex';
-        });
-    }
-}
-
-function selectCommHero(name) {
-    if (selectHeroType !== null) {
-        const heroLeader = document.getElementById(`select-hero-leader`);
-        const heroSupp = document.getElementById(`select-hero-support`);
-        const perkText = document.getElementById('comm-perk-test');
-
-        const comparison = selectHeroType === 'leader' ? heroSupp : heroLeader;
-        const antiComparison = selectHeroType === 'leader' ? heroLeader : heroSupp;
-
-        if (comparison.hero === name) {
-            comparison.style.background = `url(./assets/icon/charPlus.webp) no-repeat center center/contain`;
-            comparison.hero = null;
-        }
-
-        antiComparison.style.background = `url(./assets/tooltips/emoji/${name}.webp) no-repeat center center/contain`;
-        antiComparison.style.animation = 'unset';
-        antiComparison.hero = name;
-        antiComparison.offsetWidth;
-
-        if (heroLeader.hero) {
-            let currentPerk = commisionInfo[heroLeader.hero].perk;
-            perkText.innerText = commisionInfo[currentPerk];
-        } else {
-            perkText.innerText = 'None Curently';
-        }
-        selectHeroType = null;
-    }
-}
-
-function enterNewComm() {
-    const heroLeader = document.getElementById(`select-hero-leader`);
-    const heroSupp = document.getElementById(`select-hero-support`);
-    const perkText = document.getElementById('comm-perk-test');
-    const footFeedback = document.getElementById('comm-feedback');
-
-    if (!heroLeader.hero) {
-        footFeedback.innerText = 'Please select a leader';
-        return;
-    } else if (!heroSupp.hero) {
-        footFeedback.innerText = 'Please select a support';
-        return;
-    } else if (!footFeedback.chosenComm) {
-        return;
-    }
-
-    const commId = footFeedback.chosenComm.id;
-    const id = parseInt(commId.split('-')[1]) - 1;
-
-    // console.log(deepCopy(footFeedback.chosenComm))
-
-    if (saveValues.baseCommisions[id] == undefined) {
-
-        
-        // console.log(saveValues.baseCommisions[id])
-        // console.log(saveValues.baseCommisions)
-        // console.log(id);
-    }
-
-    saveValues.baseCommisions[id].progress = 'ongoing';
-    saveValues.baseCommisions[id].endTime = getTime() + saveValues.baseCommisions[id].duration * 60 * (commisionInfo[heroLeader.hero].perk === 'Lightweight' ? 0.85 : 1)
-    saveValues.baseCommisions[id].char = [heroLeader.hero, heroSupp.hero];
-    saveValues.baseCommisions[id].perk = commisionInfo[heroLeader.hero].perk;
-    saveValues.baseCommisions[id].priority = null;
-
-
-    saveValues.commisionDict[heroLeader.hero].currentComm = commId;
-    saveValues.commisionDict[heroSupp.hero].currentComm = commId;
-    saveValues.currentCommisions.push(commId);
-
-    if (commisionInfo[heroLeader.hero].perk === 'C') {
-        const commItems = document.getElementById('select-comm-items').firstChild;
-        const pickItems = commItems.cloneNode(true);
-        pickItems.id = 'pick-items';
-
-        choiceBox(mainBody, {text: 'Pick one to prioritize:'}, stopSpawnEvents, (value) => {saveValues.baseCommisions[id].priority = value}, null, pickItems, ['notif-ele', 'pick-items']);
-    }
-
-    heroLeader.style.background = `url(./assets/icon/charPlus.webp) no-repeat center center/contain`;
-    heroLeader.style.animation = 'unset';
-    heroLeader.hero = null;
-    heroLeader.offsetWidth;
-
-    heroSupp.style.background = `url(./assets/icon/charPlus.webp) no-repeat center center/contain`;
-    heroSupp.style.animation = 'unset';
-    heroSupp.hero = null;
-    heroSupp.offsetWidth;
-
-    perkText.innerText = 'None Curently';
-    focusNewComm(true, null);
-}
-
-function shuffle(array) {
-    let currentIndex = array.length,  randomIndex;
-
-    while (currentIndex != 0) {
-  
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-  
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
-  
-    return array;
-}
-  
-function generateCommisions() {
-    const baseCommisions = [];
-    let textArray = [];
-
-    // CHECKS IF THERE ARE CURRENT COMMISSIONS
-    let currentCommisionsDict = {}
-    if (saveValues.baseCommisions.length > 1) {
-        for (let i = 0; i < saveValues.baseCommisions.length; i++) {
-            if (saveValues.baseCommisions[i].progress === 'ongoing') {
-                currentCommisionsDict[i] = saveValues.baseCommisions[i];
-            }
-        }
-    }
-
-    for (let i = 0; i < 10; i++) {
-        if (currentCommisionsDict[i] !== undefined) {
-            baseCommisions.push(saveValues.baseCommisions[i]);
-            continue;
-        }
-
-        let text = '';
-        while (textArray.includes(text) || text === '') {
-            text = rollArray(commisionText, 0);
-        }
-        textArray.push(text);
-
-        let rating = Math.floor(i / 3) + 3;
-        let shuffledItems = shuffle(possibleItems);
-        let possibleCommItems = [shuffledItems[0], shuffledItems[1]];
-        let extraItem = randomInteger(0,2);
-        if (extraItem === 1) {possibleCommItems.push(shuffledItems[2])}
-
-        const minLevel = 5 + rating * 2 + extraItem * 2 + randomInteger(0,2);
-        if (advDict.adventureRank < minLevel) { continue }
-        baseCommisions.push({
-            title: text,
-            rating: Math.min(rating, 5),
-            rank: minLevel,
-            duration: (Math.round(randomInteger(2, 6) / 2 * 10) / 10),
-            possibleItems: possibleCommItems,
-            priority: null,
-            char: [],
-            id: `base-${i}`,
-            progress: false,
-            endTime: null,
-        });
-    }
-
-    saveValues.baseCommisions = baseCommisions;
-}
-
-function checkCommisions() {
-    if (saveValues.currentCommisions && saveValues.currentCommisions.length > 0) {
-        saveValues.currentCommisions.forEach((item) => {
-            if (item.split('-')[0] === 'base') {
-                const baseId = item.split('-')[1];
-                const timeLeft = saveValues.baseCommisions[baseId].endTime - getTime();
-                if (timeLeft <= 0 && !document.getElementById('notif-comm-div')) {
-                    notifPop("add","comm", item);
-                    sidePop('/icon/comm.webp', 'Commission Complete');
-                }
-            }
-        })
-    }
-}
-
 function clearExped() {
     let guildTable = document.getElementById("guild-table");
     guildTable.close();
@@ -6513,7 +5928,6 @@ function clearExped() {
         }
     }
 }
-
 
 //------------------------------------------------ ADVENTURE & FIGHTS ----------------------------------------------------------//
 function createExpMap() {
@@ -13021,10 +12435,8 @@ if (beta || testing) {
         } else if (e.key === 'h') {
             document.getElementById("nut-shop-div").activateWorkshopCell();
         } else if (e.key === 'j') {
-            spawnBossQuest(1);
-            spawnBossQuest(2);
-            spawnBossQuest(3);
-            spawnBossQuest(4);
+            let guildTable = document.getElementById("guild-table");
+            guildTable.toggle();
         }
     });
 }
@@ -13037,7 +12449,7 @@ let disableQuicktime = false;
 if (localStorage.getItem('beta') === 'true') {
     beta = true;
 }
-if (localStorage.getItem('tester') === 'true'  || true) {
+if (localStorage.getItem('tester') === 'true') {
     testing = true;
 }
 
@@ -13045,16 +12457,31 @@ if (testing || beta) {
     if (document.getElementById('testerScreen')) document.getElementById('testerScreen').remove();
 } 
 
+function startingFunction() {
+    // PRESS A KEY
+    const event = new KeyboardEvent('keydown', {
+        key: 'j',
+    });
+    const event2 = new KeyboardEvent('keydown', {
+        key: '3',
+    });
+    document.dispatchEvent(event2);
+    document.dispatchEvent(event);
+}
+
 if (testing) {
     let tester = document.createElement('p');
     tester.innerText = 'TESTER';
     tester.classList.add('test-warning');
     mainBody.append(tester); 
     
-    // setTimeout(()=>{
-    // let startButton = document.getElementById("start-button");
-    // if (startButton) startButton.click();
-    // }, 1200);
+    setTimeout(()=>{
+        let startButton = document.getElementById("start-button");
+        if (startButton) startButton.click();
+        setTimeout(()=>{ 
+            startingFunction();
+        },1500);
+    }, 1200);
 }
 
 if (beta) {
@@ -13077,19 +12504,9 @@ if (beta) {
             if (startButton) startButton.click();
             setTimeout(()=>{ 
                 startingFunction();
-            },500);
+            },1500);
         }, 3500);
     }, 800);
-
-    function startingFunction() {
-        // PRESS A KEY
-        const event = new KeyboardEvent('keydown', {
-            key: '3',
-        });
-        // document.dispatchEvent(event);
-
-        // BETA FUNCTIONS
-    }
 }
 
 export { startGame }

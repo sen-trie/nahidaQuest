@@ -248,6 +248,95 @@ function choiceBox(mainBody, dialogObg, stopSpawnEvents = undefined, yesFunc, no
     }
 }
 
+// SELECT MULTIPLE OUT OF MAX
+function choiceMax(mainBody, dialogObg, stopSpawnEvents = undefined, yesFunc, noFunc, extraEle, classes, returnEle = false, maxNumber) {
+    if (stopSpawnEvents) {stopSpawnEvents = false}
+
+    const choiceEle = document.createElement('div');
+    choiceEle.choiceValue = [];
+    if (classes) {
+        classes.forEach((item) => {
+            choiceEle.classList.add(item);
+        })
+    }
+    
+    choiceEle.classList.add('flex-column');
+    const choiceDiv = document.createElement('div');
+    choiceDiv.classList.add('flex-column');
+    const text = document.createElement('p');
+    text.innerHTML = dialogObg.text;
+
+    const choiceContainer = document.createElement('div');
+    choiceContainer.classList.add('flex-row');
+
+    const yesButton = document.createElement('button');
+    yesButton.style.pointerEvents =  'none';
+    yesButton.style.filter =  'brightness(0.6)';
+
+    const choiceEleChildren = Array.from(extraEle.children);
+    choiceEleChildren.forEach((item) => {
+        item.addEventListener('click', () => {
+            const index = choiceEle.choiceValue.indexOf(item);
+            if (index !== -1) {
+                item.style.filter = 'brightness(0.2)';
+                choiceEle.choiceValue.splice(index, 1);
+            } else {
+                if (choiceEle.choiceValue.length === maxNumber) {
+                    choiceEle.choiceValue[0].style.filter = 'brightness(0.2)';
+                    choiceEle.choiceValue.shift();
+                }
+                choiceEle.choiceValue.push(item);
+                item.style.filter = 'unset';
+            }
+
+            if (choiceEle.choiceValue.length > 0) {
+                yesButton.style.pointerEvents = 'auto';
+                yesButton.style.filter = 'unset';
+            } else {
+                yesButton.style.pointerEvents = 'none';
+                yesButton.style.filter = 'brightness(0.6)';
+            }
+        });
+
+        item.style.filter = 'brightness(0.2)';
+    });
+
+    if (dialogObg.yes) {
+        yesButton.innerText = dialogObg.yes;
+    } else {
+        yesButton.innerText = noFunc === null ? 'Okay' : 'Confirm';
+    }
+
+    // YES FUNCTION IS ASYNC
+    yesButton.addEventListener('click',() => {
+        if (choiceEle.choiceValue.length === 0) return;
+        choiceEle.remove();
+        if (stopSpawnEvents) stopSpawnEvents = true;
+        if (yesFunc) yesFunc(choiceEle.choiceValue === null ? null : choiceEle.choiceValue);
+        return choiceEle.choiceValue;
+    });
+
+    const noButton = document.createElement('button');
+    noButton.innerText = dialogObg.no ? dialogObg.no : 'Cancel';
+    noButton.addEventListener('click',() => {
+        choiceEle.remove();
+        if (stopSpawnEvents) stopSpawnEvents = true;
+        if (noFunc) noFunc();
+    });
+
+    choiceContainer.append(yesButton);
+    if (noFunc !== null) {choiceContainer.append(noButton)}
+
+    choiceDiv.append(text, extraEle, choiceContainer);
+    choiceEle.append(choiceDiv);
+
+    if (returnEle) {
+        return choiceEle;
+    } else {
+        mainBody.append(choiceEle);
+    }
+}
+
 // ALL CHILD ELEMENTS NEED SUBTITLE PROP
 function slideBox(mainBody, childArray, stopSpawnEvents) {
     if (stopSpawnEvents) {stopSpawnEvents = false}
@@ -297,11 +386,11 @@ function slideBox(mainBody, childArray, stopSpawnEvents) {
     const exitButton = createDom('button', {
         innerText: 'Exit',
         class: ['box-button', 'exit-button']
-    })
+    });
     exitButton.addEventListener('click', () => {
         choiceEle.remove();
         if (stopSpawnEvents) stopSpawnEvents = true;
-    })
+    });
     buttonDiv.appendChild(exitButton);
 
     childEleArray[0].style.display = 'flex';
@@ -495,4 +584,4 @@ const errorMesg = (errMesg) => {
     setTimeout(() => {errorDiv.remove()}, 60 * 1000);
 }
 
-export { errorMesg,createButton,popUpBox,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal,sidePop };
+export { errorMesg,createButton,popUpBox,choiceMax,inventoryAddButton,expedButtonAdjust,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,slideBox,choiceBox,createProgressBar,createDom,createMedal,sidePop };
