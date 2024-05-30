@@ -230,6 +230,7 @@ var InventoryMap;
 var achievementMap;
 let advDict;
 let storeInventory;
+
 loadSaveData();
 postSaveData();
 loadingAnimation();
@@ -3603,11 +3604,11 @@ function generalSettings(settingsMenu) {
     const creatorDiv = createDom('div', {
         classList: ['creator-div', 'flex-row', 'clickable'],
         child: [
-            createDom('img', { src: './assets/title/creator.jpg'}),
+            createDom('img', { src: './assets/title/creator.webp'}),
             createDom('p', { innerText: 'Contact \n the dev!'})
         ],
         event: ['click', () => {
-            window.open("https://linktr.ee/sentrie", "_blank");
+            window.open("https://github.com/sen-trie/nahidaQuest", "_blank");
         }]
     })
 
@@ -6627,7 +6628,7 @@ function createExpMap() {
     mapZoomOut.classList.add('flex-column');
     mapZoom.append(mapZoomIn,mapZoomOut);
 
-    if (isNaN(settingsValues.defaultZoom)) {settingsValues.defaultZoom = 25}
+    if (isNaN(settingsValues.defaultZoom)) {settingsValues.defaultZoom = 0}
     mapZoom.value = settingsValues.defaultZoom;
 
     advImageDiv.append(advImage,dragIcon,charSelect,notifSelect,expedMesgDiv,charMenu,expedXP,mapZoom);
@@ -13036,7 +13037,7 @@ let disableQuicktime = false;
 if (localStorage.getItem('beta') === 'true') {
     beta = true;
 }
-if (localStorage.getItem('tester') === 'true') {
+if (localStorage.getItem('tester') === 'true'  || true) {
     testing = true;
 }
 

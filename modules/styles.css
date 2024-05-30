@@ -201,6 +201,13 @@ button {
         #3C3C3C 0.149em -0.185em 0, 
         #3C3C3C 0.196em -0.128em 0, 
         #3C3C3C 0.228em -0.0655em 0;
+    --font-h1: clamp(1.8rem, 1.5692rem + 1.238vw, 2.3rem);
+    --font-h1-5: clamp(1.6rem, 1.3692rem + 1.138vw, 2.15rem);
+    --font-h2: clamp(1.5rem, 1.0982rem + 1.1143vw, 2rem);
+    --font-h3: clamp(1.375rem, 1.1837rem + 0.8163vw, 1.6rem);
+    --font-h4: clamp(1rem, 1.1837rem + 0.8163vw, 1.3rem);
+    --font-h5: clamp(1rem, 0.9235rem + 0.3265vw, 1.25rem);
+    --font-h6: clamp(1rem, 0.9617rem + 0.1633vw, 1.125rem);
 }
 
 /* <-- STRETCHING HORIZONTALLY---> */
@@ -460,10 +467,15 @@ table, button, label {
     width: 100%;
 }
 
+.start-link {
+    height: 35%;
+    aspect-ratio: 5 / 2;
+}
+
 #start-image {
     position: relative;
     bottom: 5%;
-    width: 60%;
+    width: 100%;
     object-fit: contain;
 	-webkit-animation: pulsate-fwd 3s ease-in-out infinite both;
 	        animation: pulsate-fwd 3s ease-in-out infinite both;
@@ -3846,18 +3858,20 @@ body {
     height: 100%;
 }
 
+#game-wrapper, #game, #start-screen {
+    aspect-ratio: var(--aspect-ratio);
+}
+
 #game-wrapper {
     position: relative;
     width: 100%;
     height: unset;
-    aspect-ratio: var(--aspect-ratio);
     max-height: 100%;
 }
 
 #game, #start-screen {
     height: 100%;
     width: unset;
-    aspect-ratio: var(--aspect-ratio);
     max-width: 100%;
     border: var(--bright-light-green) 0.2rem solid;
 }

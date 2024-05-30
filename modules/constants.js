@@ -1,7 +1,8 @@
 const VERSIONNUMBER = "V.2-00-002";
 
 const changeFontSize = (fontSize) => {
-    document.documentElement.style.fontSize = `clamp(0.75rem, 0.75rem + ${fontSize * 0.125}vw, 4rem)`;
+    document.documentElement.style.fontSize = `clamp(0.75rem, 0.65rem + ${fontSize * 0.08}vw + ${fontSize * 0.08}vh, 2rem)`
+    //`clamp(0.75rem, 0.75rem + ${fontSize * 0.125}vw, 1rem)`;
 }
 
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
@@ -20,7 +21,7 @@ const downloadSave = () => {
 export const CONSTANTS = Object.freeze({
     VERSIONNUMBER: VERSIONNUMBER,
     COPYRIGHT: `DISCLAIMER © HoYoverse.  
-                All rights reserved. This site is not affiliated 
+                nahidaQuest! is not affiliated 
                 with Hoyoverse, nor Genshin Impact.`,
     DBNUBMER: DBNUBMER,
     CHANGEFONTSIZE: changeFontSize,

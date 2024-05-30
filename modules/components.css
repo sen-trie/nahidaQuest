@@ -3429,6 +3429,10 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
     flex-grow: 1;
 }
 
+#settings-tab-general {
+    overflow-y: auto;
+}
+
 #settings-tab-advanced {
     grid-template-rows: auto 1fr;
 }

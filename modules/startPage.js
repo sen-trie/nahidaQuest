@@ -54,6 +54,8 @@ if (!isNewGame) {
     } catch (err) {
         console.error('Error checking LocalStorage');
     }
+} else {
+    CONSTANTS.CHANGEFONTSIZE(5);
 }
 
 const launchGame = () => {
