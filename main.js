@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionInfo } from "./modules/dictData.js"
-import { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
+import { getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,choiceMax,popUpBox,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop,errorMesg } from "./modules/adjustUI.js"
 import { CONSTANTS } from "./modules/constants.js";
 import * as Settings from "./modules/features/settings.js";
@@ -325,7 +325,7 @@ function timerEvents() {
         growTree('add');
         document.getElementById('bless-bar').updateCharge();
     }
-    // checkCommisions();
+    document.getElementById('commision-menu').updateAllTime(getTime());
 }
 
 // TEMPORARY TIMER
@@ -348,14 +348,6 @@ function timerSave(timerSeconds) {
     }
 }
 
-// GET CURRENT TIME IN MINUTES SINCE 1900
-function getTime() {
-    let startOfYear = new Date('1900-01-01T00:00:00');
-    let now = new Date();
-    let minutesPassedNow = (now - startOfYear) / (1000 * 60);
-    return minutesPassedNow;
-}
-
 // LOAD SAVE DATA
 function loadSaveData() {
     // LOAD SETTINGS
@@ -373,10 +365,11 @@ function loadSaveData() {
         let saveValuesTemp = localStorage.getItem("saveValuesSave");
         saveValues = JSON.parse(saveValuesTemp);
         
-        if (testing) {
-            delete saveValues.commDict
-            delete saveValues.commisionDict;
-        }
+        // if (testing) {
+        //     delete saveValues.charDict
+        //     delete saveValues.commDict
+        //     delete saveValues.commisionDict;
+        // }
 
         updateObjectKeys(saveValues,saveValuesDefault);
     }
@@ -5687,8 +5680,9 @@ function createFoodChar() {
     InventoryMap.forEach((value, key) => {
         if (value > 0 && Inventory[key].Type === "Food") {
             noFood = false;
-            const foodImg = createDom('img', {
+            const foodImg = createDom('div', {
                 itemName: key,
+                itemStar: Inventory[key].Star,
                 id: `food-char-${key}`,
                 src: `./assets/tooltips/inventory/${Inventory[key].File}.webp`,
                 classList: ['comm-img'],
@@ -5756,11 +5750,53 @@ function buildComm(commisionMenu) {
         if (pickItems === null) {
             choiceBox(mainBody, {text: 'There is no available food!'}, stopSpawnEvents, ()=>{}, null, noChar, ['notif-ele']);
         } else {
-            choiceMax(mainBody, {text: 'Pick (max 4) food items:'}, stopSpawnEvents, 
+            choiceMax(mainBody, {text: 'Pick (max 8) food items:'}, stopSpawnEvents, 
                       (res) => { commisionMenu.addFood(res) }, () => {}, pickItems, 
-                      ['notif-ele', 'pick-items', 'choice-ele'], false, 4);
+                      ['notif-ele', 'pick-items', 'choice-ele'], false, 8);
         }
     });
+
+    const commConfirm = document.getElementById('commission-confirm');
+    commConfirm.addEventListener('click', () => {
+        const res = commisionMenu.confirmAdd();
+        if (res != null) {
+            const charAdd = Array.from(res[0]);
+            const foodAdd = Array.from(res[1]);
+
+            foodAdd.forEach((food) => {
+                if (InventoryMap.get(food.itemName) <= 0) {
+                    return choiceBox(mainBody, {text: `Food "${Inventory[food.itemName].Name}" is missing!`}, null, 
+                                                () => {}, null, null, ['choice-ele']);
+                }
+            });
+
+            charAdd.forEach((char) => {
+                if (saveValues.charDict[char.itemName].currentComm !== '') {
+                    return choiceBox(mainBody, {text: `"${char.itemName}" is not available!`}, null, 
+                                     () => {}, null, null, ['choice-ele']);
+                }
+            });
+
+            const commissionNum = commisionMenu.currentComm;
+            commisionMenu.clearAdd();
+            document.getElementById('commission-back').click();
+
+            const commTime = getTime() + commisionMenu.calculateHour(foodAdd) * 60;
+            foodAdd.forEach(food => reduceItem(food.itemName));
+            charAdd.forEach((char) => {
+                saveValues.charDict[char.itemName].currentComm = `comm-${commissionNum + 1}`;
+                saveValues.charDict[char.itemName].restEnd = commTime;
+            });
+
+            console.log(charAdd);
+            console.log(saveValues.charDict)
+
+            saveValues.commDict[commissionNum].timeEnd = commTime;
+            saveValues.commDict[commissionNum].char = charAdd.map((char) => char.itemName);
+            document.getElementById(`commission-${commissionNum}`)
+                    .updatePic(saveValues.commDict[commissionNum], commisionMenu.calculateHour(foodAdd));
+        }
+    })
 }
 
 function buildBounty(bountyMenu) {

@@ -1,6 +1,6 @@
 import { expeditionDictInfo, imgKey } from "../dictData.js";
 import { createDom } from "../adjustUI.js";
-import { universalStyleCheck } from "../functions.js";
+import { convertTo24HourFormat, getTime, universalStyleCheck } from "../functions.js";
 import { customTutorial } from "../drawUI.js";
 
 const recommendedLevel = [0,1,4,7,10,13,16,20];
@@ -338,31 +338,32 @@ const commisionDict = [
 
 const buildImage = (commSave) => {
     if (commSave.timeEnd === 0) {
-        return createDom('img', { src: './assets/icon/charPlus.webp' });
+        return [createDom('img', { src: './assets/icon/charPlus.webp' })];
     } else {
         return [...commSave.char.map(char => {
-            createDom('img', { src: `./assets/tooltips/emoji/${char}.webp` });
+            return createDom('img', { src: `./assets/tooltips/emoji/${char}.webp` });
         })];
     }
 };
 
 const buildItem = (key, commSave) => {
+    let commissionPicDiv = buildImage(commSave);
     const commissionPic = createDom('div', {
         classList: ['flex-row', 'commission-pic'],
-        child: [
-            buildImage(commSave)
-        ]
+        child: [...commissionPicDiv]
     });
 
-    const timeLeft = commSave.timeEnd === 0 ? 'Start!' : 'Time Left: ';
-    
+    const timeNum = commSave.timeEnd - getTime();
+
+    const timeLeft = createDom('p', { 
+        innerText: commSave.timeEnd === 0 
+                                    ? 'Start!'
+                                    : `Time: ${convertTo24HourFormat(timeNum / 60)}`
+        });
     const commisionAdd = createDom('div', {
         classList: ['flex-column', 'commission-add'],
-        child: [
-            createDom('p', { innerText: timeLeft }),
-            commissionPic,
-        ]
-    })
+        child: [ timeLeft, commissionPic ]
+    });
 
     const commisionInfo = createDom('div', { 
         classList: ['flex-column', 'commission-info'],
@@ -386,6 +387,20 @@ const buildItem = (key, commSave) => {
             commisionAdd,
         ]
     });
+
+    commissionItem.updatePic = (commSave, hoursLeft) => {
+        timeLeft.innerText = `Time: ${convertTo24HourFormat(hoursLeft)}`;
+        commissionPic.innerHTML = '';
+        commissionPic.append(...buildImage(commSave));
+    }
+
+    commissionItem.updateTime = (currentTime) => {
+        if (commSave.timeEnd === 0) {
+            timeLeft.innerText = 'Start!';
+        } else {
+            timeLeft.innerText = `Time: ${convertTo24HourFormat((commSave.timeEnd - currentTime) / 60)}`;
+        }
+    }
     return commissionItem;
 }
 
@@ -418,20 +433,28 @@ const buildSelect = (commisionMenu) => {
         ]
     });
 
+    commisionMenu.calculateHour = (foodItems, heroItems) => {
+        let foodCal = Array.from(foodItems).reduce((i, x) => i + parseInt(x.itemStar) * 0.3, 0);
+        foodCal *= (1 - (heroItems - 1) * 0.15);
+        return foodCal;
+    }
+
     commisionMenu.addChar = (res) => {
         selectCharDiv.innerHTML = '';
         res.forEach(item => {
             let newItem = item.cloneNode(true);
+            newItem.itemName = item.itemName;
             selectCharDiv.append(newItem);
         });
         commisionMenu.infoCheck();
     };
 
-
     commisionMenu.addFood = (res) => {
         selectFoodDiv.innerHTML = '';
         res.forEach(item => {
             let newItem = item.cloneNode(true);
+            newItem.itemName = item.itemName;
+            newItem.itemStar = item.itemStar;
             selectFoodDiv.append(newItem);
         });
         commisionMenu.infoCheck();
@@ -442,7 +465,11 @@ const buildSelect = (commisionMenu) => {
 
     commisionMenu.infoCheck = () => {
         if (selectFoodDiv.childElementCount > 0 && selectCharDiv.childElementCount > 0) {
-            infoText.innerText = 'Duration: 8h';
+            infoText.innerText = `Duration: ${
+                Math.round(commisionMenu.calculateHour(
+                                selectFoodDiv.children, 
+                                selectCharDiv.childElementCount) * 10) / 10
+                }h`;
         } else {
             infoText.innerText = 'Duration: -';
         }
@@ -451,6 +478,14 @@ const buildSelect = (commisionMenu) => {
     commisionMenu.clearAdd = () => {
         selectCharDiv.innerText = '+';
         selectFoodDiv.innerText = '+';
+        infoText.innerText = 'Duration: -';
+    }
+
+    commisionMenu.confirmAdd = () => {
+        if (selectFoodDiv.childElementCount > 0 && selectCharDiv.childElementCount > 0) {
+            return [selectCharDiv.children, selectFoodDiv.children];
+        }
+        return null;
     }
 
     const selectInfoDiv = createDom('div', {
@@ -468,7 +503,7 @@ const buildSelect = (commisionMenu) => {
     const buildSelectEle = createDom('div', {
         id: 'build-select',
         class: ['flex-row', 'commission-select'],
-        child: [ selectChar, selectFood, selectInfoDiv]
+        child: [ selectChar, selectFood, selectInfoDiv ]
     });
 
     buildSelectEle.changeComm = (commSaveValues) => {
@@ -485,6 +520,7 @@ const buildStart = (commisionMenu) => {
     const commissionDesc = createDom('p', { class: [ 'start-desc' ]});
 
     const commisionBack = createDom('button', {
+        id: 'commission-back',
         innerText: 'Back',
     });
 
@@ -493,6 +529,7 @@ const buildStart = (commisionMenu) => {
     });
 
     const commisionConfirm = createDom('button', {
+        id: 'commission-confirm',
         innerText: 'Confirm',
     });
 
@@ -511,6 +548,7 @@ const buildStart = (commisionMenu) => {
     });
 
     commisionBack.addEventListener('click', () => {
+        commisionMenu.currentComm = 0;
         commisionStart.style.display = 'none';
     });
 
@@ -519,6 +557,7 @@ const buildStart = (commisionMenu) => {
     });
 
     commisionMenu.activate = (num, saveValues) => {
+        commisionMenu.currentComm = num;
         document.getElementById('build-select').changeComm(saveValues.commDict[num]);
         commisionStart.style.display = 'flex';
         commissionText.innerText = commisionDict[num][0];
@@ -529,14 +568,21 @@ const buildStart = (commisionMenu) => {
     return commisionMenu.appendChild(commisionStart);
 }
 
-
-// TO DO
-// TEST FOR AUTO CONSUMING ITEMS
 const buildComm = (commisionMenu, saveValues) => {
+    commisionMenu.currentComm = 0;
+    commisionMenu.commRows = []; 
+
     for (let i = 0; i < commisionDict.length; i++) {
-        commisionMenu.appendChild(buildItem(i, saveValues.commDict[i]));
-        
+        const commRow = buildItem(i, saveValues.commDict[i]);
+        commisionMenu.commRows.push(commRow);
+        commisionMenu.appendChild(commRow);
     }
+
+    commisionMenu.updateAllTime = (currentTime) => {
+        commisionMenu.commRows.forEach(commRow => commRow.updateTime(currentTime));
+    };
+
+
     return buildStart(commisionMenu);
 }
 

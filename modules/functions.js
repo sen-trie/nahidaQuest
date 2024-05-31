@@ -368,4 +368,12 @@ function convertTo24HourFormat(hours) {
     return `${formattedHours}:${formattedMinutes}`;
 }
 
-export { audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };
+// GET CURRENT TIME IN MINUTES SINCE 1900
+function getTime() {
+    let startOfYear = new Date('1900-01-01T00:00:00');
+    let now = new Date();
+    let minutesPassedNow = (now - startOfYear) / (1000 * 60);
+    return minutesPassedNow;
+}
+
+export { getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };
