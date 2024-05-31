@@ -56,18 +56,21 @@ const charDict = {
 
 const commDict = [
     {
+        ele: 'Dendro',
         timeEnd: 0,
         lvl: 0,
         power: 0,
         char: [],
     },
     {
+        ele: 'Pyro',
         timeEnd: 0,
         lvl: 0,
         power: 0,
         char: [],
     },
     {
+        ele: 'Anemo',
         timeEnd: 0,
         lvl: 0,
         power: 0,

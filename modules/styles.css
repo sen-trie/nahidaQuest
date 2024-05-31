@@ -1935,11 +1935,15 @@ table, button, label {
 }
 
 .commission-select > div {
-    width: 40%;
+    width: 33%;
     height: 100%;
     padding: 1%;
     box-sizing: border-box;
     border-right: 0.2rem solid #2C3742;
+}
+
+.commission-select > div:last-of-type {
+    border-right: none;
 }
 
 .commission-select > p {
@@ -1971,6 +1975,10 @@ table, button, label {
     height: auto;
     width: 23%;
     aspect-ratio: 1;
+}
+
+.commission-select-info > p:last-of-type {
+    width: 100%;
 }
 /* 
 .commision-menu img {
@@ -3390,6 +3398,16 @@ table, button, label {
     filter: drop-shadow(0.2em 0.2em 0.2em black);
     animation: scaleIn 1s ease-in-out forwards;
     animation-delay: -0.7s;
+}
+
+.pick-items > div {
+    max-height: 70%;
+}
+
+.pick-items > div > div:first-of-type {
+    margin-top: 0.5rem;
+    max-height: 100%;
+    overflow-y: auto;
 }
 
 .choice-ele .comm-div-img {

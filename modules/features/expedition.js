@@ -404,15 +404,8 @@ const buildSelect = (commisionMenu) => {
         ]
     });
 
-    commisionMenu.addChar = (res) => {
-        selectCharDiv.innerHTML = '';
-        res.forEach(item => {
-            selectCharDiv.append(item);
-        });
-    };
-
     const selectFoodDiv = createDom('div', {
-        class: ['flex-row'],
+        class: ['flex-row', 'commission-select-div'],
         innerText: '+'
     });
 
@@ -425,22 +418,64 @@ const buildSelect = (commisionMenu) => {
         ]
     });
 
-    commisionMenu.addFood = () => {
-        selectFood.innerHTML = '';
+    commisionMenu.addChar = (res) => {
+        selectCharDiv.innerHTML = '';
+        res.forEach(item => {
+            let newItem = item.cloneNode(true);
+            selectCharDiv.append(newItem);
+        });
+        commisionMenu.infoCheck();
+    };
+
+
+    commisionMenu.addFood = (res) => {
+        selectFoodDiv.innerHTML = '';
+        res.forEach(item => {
+            let newItem = item.cloneNode(true);
+            selectFoodDiv.append(newItem);
+        });
+        commisionMenu.infoCheck();
+    };
+
+    const eleImage = createDom('img', { classList: ['comm-ele'] });
+    const infoText = createDom('p', { class: ['flex-column'], innerText: 'Duration: -'});
+
+    commisionMenu.infoCheck = () => {
+        if (selectFoodDiv.childElementCount > 0 && selectCharDiv.childElementCount > 0) {
+            infoText.innerText = 'Duration: 8h';
+        } else {
+            infoText.innerText = 'Duration: -';
+        }
     }
 
-    const selectInfo = createDom('p', {
-        class: ['flex-column'],
+    commisionMenu.clearAdd = () => {
+        selectCharDiv.innerText = '+';
+        selectFoodDiv.innerText = '+';
+    }
+
+    const selectInfoDiv = createDom('div', {
         id: 'commission-select-info',
-        innerText: 'Duration: \n - '
+        class: ['flex-row', 'commission-select-div'],
+        child: [
+            createDom('p', {
+                class: ['flex-column'],
+                innerText: 'Preferred:'
+            }),
+            eleImage, infoText
+        ]
     });
 
-    
-
-    return createDom('div', {
+    const buildSelectEle = createDom('div', {
+        id: 'build-select',
         class: ['flex-row', 'commission-select'],
-        child: [ selectChar, selectFood, selectInfo]
+        child: [ selectChar, selectFood, selectInfoDiv]
     });
+
+    buildSelectEle.changeComm = (commSaveValues) => {
+        eleImage.src = `./assets/tooltips/elements/nut-${commSaveValues.ele}.webp`;
+    }
+
+    return buildSelectEle;
 }
 
 const COMM_TEXT = ` Certain characters are better at particular tasks. Some characters also prefer working with certain characters (E.g. Cyno and Tighnari pair great!).`
@@ -470,7 +505,8 @@ const buildStart = (commisionMenu) => {
         id: 'commission-start',
         class: ['flex-column', 'cover-all'],
         children: [
-            commissionText, commissionImg, commissionDesc, buildSelect(commisionMenu) ,commissionButtonsDiv
+            commissionText, commissionImg, commissionDesc, 
+            buildSelect(commisionMenu), commissionButtonsDiv
         ]
     });
 
@@ -478,7 +514,12 @@ const buildStart = (commisionMenu) => {
         commisionStart.style.display = 'none';
     });
 
-    commisionMenu.activate = (num) => {
+    commisionReset.addEventListener('click', () => {
+        commisionMenu.clearAdd();
+    });
+
+    commisionMenu.activate = (num, saveValues) => {
+        document.getElementById('build-select').changeComm(saveValues.commDict[num]);
         commisionStart.style.display = 'flex';
         commissionText.innerText = commisionDict[num][0];
         commissionImg.src = `./assets/expedbg/comm${num + 1}-long.webp`;

@@ -129,7 +129,7 @@ function dimMultiplierButton(int,currentDimMultiplier) {
 }
 
 // CREATES A FRAME OF AN INVENTORY ITEM
-function inventoryFrame(ele, itemInfo, itemFrameColors) {
+function inventoryFrame(ele, itemInfo, itemFrameColors, stars = false) {
     ele.classList.add("flex-column","item-frame");
     ele.style.backgroundImage = `url(./assets/frames/background-${itemInfo.Star}.webp)`;
     ele.style.border = `0.15em solid ${itemFrameColors[itemInfo.Star-1]}`;

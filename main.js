@@ -5677,6 +5677,28 @@ function createGuild() {
     return guildTable;
 }
 
+function createFoodChar() {
+    let noFood = true;
+    const pickItems = createDom('div', {
+        classList: ['notif-item', 'comm-div-img'],
+    });
+
+    InventoryMap = new Map([...InventoryMap.entries()].sort());
+    InventoryMap.forEach((value, key) => {
+        if (value > 0 && Inventory[key].Type === "Food") {
+            noFood = false;
+            const foodImg = createDom('img', {
+                itemName: key,
+                id: `food-char-${key}`,
+                src: `./assets/tooltips/inventory/${Inventory[key].File}.webp`,
+                classList: ['comm-img'],
+            });
+            pickItems.appendChild(inventoryFrame(foodImg, Inventory[key], itemFrameColors));
+        }
+    });
+    return noFood ? null : pickItems;
+}
+
 function createCommChar() {
     let noCharacters = true;
     const pickItems = createDom('div', {
@@ -5687,8 +5709,8 @@ function createCommChar() {
         if (upgradeDict[key].Purchased <= 0) continue;
         const heroName = upgradeInfo[key].Name;
 
+        // ADD DIM FOR USED CHARACTERS
         if (commisionInfo[heroName] === undefined || saveValues.charDict[heroName].restEnd !== 0) continue;
-
         const heroImg = createDom('img', {
             itemName: heroName,
             src: `./assets/tooltips/hero/${heroName}.webp`,
@@ -5698,10 +5720,7 @@ function createCommChar() {
         pickItems.appendChild(heroImg);
     }
 
-    if (noCharacters) {
-        return null;
-    }
-    return pickItems;
+    return noCharacters ? null : pickItems;
 }
 
 function buildComm(commisionMenu) {
@@ -5709,7 +5728,7 @@ function buildComm(commisionMenu) {
         const commItem = document.getElementById(`commission-${i}`);
         commItem.addEventListener('click', () => {
             if (saveValues.commDict[i].timeEnd === 0) {
-                commisionMenu.activate(i);
+                commisionMenu.activate(i, saveValues);
             } else if (saveValues.commDict[i].timeEnd < getTime()) {
                 return;
             } else {
@@ -5718,11 +5737,11 @@ function buildComm(commisionMenu) {
         });
     }
 
+    const noChar = createDom('img', { classList: ['no-char'], src: './assets/expedbg/exped-Nahida-loss.webp' })
     const commChar = document.getElementById(`commission-select-char`);
     commChar.addEventListener('click', () => {
         const pickItems = createCommChar();
         if (pickItems === null) {
-            const noChar = createDom('img', { classList: ['no-char'], src: './assets/expedbg/exped-Nahida-loss.webp' })
             choiceBox(mainBody, {text: 'There are no available Sumeru characters!'}, stopSpawnEvents, ()=>{}, null, noChar, ['notif-ele']);
         } else {
             choiceMax(mainBody, {text: 'Pick (max 4) characters:'}, stopSpawnEvents, 
@@ -5730,7 +5749,18 @@ function buildComm(commisionMenu) {
                       ['notif-ele', 'pick-items', 'choice-ele'], false, 4);
         }
     });
+
     const commFood = document.getElementById(`commission-select-food`);
+    commFood.addEventListener('click', () => {
+        const pickItems = createFoodChar();
+        if (pickItems === null) {
+            choiceBox(mainBody, {text: 'There is no available food!'}, stopSpawnEvents, ()=>{}, null, noChar, ['notif-ele']);
+        } else {
+            choiceMax(mainBody, {text: 'Pick (max 4) food items:'}, stopSpawnEvents, 
+                      (res) => { commisionMenu.addFood(res) }, () => {}, pickItems, 
+                      ['notif-ele', 'pick-items', 'choice-ele'], false, 4);
+        }
+    });
 }
 
 function buildBounty(bountyMenu) {
@@ -12431,7 +12461,7 @@ if (beta || testing) {
         if (e.key === 'f') {
             spawnWorldQuest();
         } else if (e.key === 'g') {
-            spawnSkirmish();
+            genericItemLoot();
         } else if (e.key === 'h') {
             document.getElementById("nut-shop-div").activateWorkshopCell();
         } else if (e.key === 'j') {
