@@ -1439,12 +1439,12 @@
     border-radius: 0.2em;
 }
 
-.item-frame > :first-child {
+.item-frame > img:first-of-type {
     object-fit: cover;
     filter: drop-shadow(0 0 0.2em black);
 }
 
-.item-frame > :nth-child(2) {
+.item-frame > .frame-star {
     position: absolute;
     bottom: 0;
     height: 20%;
@@ -1468,10 +1468,16 @@
 .item-frame-text {
     position: absolute;
     color: white;
+    top: 0;
     right: 5%;
     font-size: 1.6rem;
     z-index: 10;
     text-shadow: var(--text-shadow-050);
+}
+
+.small-font {
+    top: 2%;
+    font-size: 1rem;
 }
 
 .extra-item-tree::after, .extra-item::after {

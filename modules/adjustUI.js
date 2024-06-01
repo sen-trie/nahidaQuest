@@ -129,7 +129,8 @@ function dimMultiplierButton(int,currentDimMultiplier) {
 }
 
 // CREATES A FRAME OF AN INVENTORY ITEM
-function inventoryFrame(ele, itemInfo, itemFrameColors, stars = false) {
+const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
+function inventoryFrame(ele, itemInfo, stars = false) {
     ele.classList.add("flex-column","item-frame");
     ele.style.backgroundImage = `url(./assets/frames/background-${itemInfo.Star}.webp)`;
     ele.style.border = `0.15em solid ${itemFrameColors[itemInfo.Star-1]}`;
@@ -138,6 +139,7 @@ function inventoryFrame(ele, itemInfo, itemFrameColors, stars = false) {
     lootImg.classList.add("cover-all");
     lootImg.src = `./assets/tooltips/inventory/${itemInfo.File}.webp`;
     let lootStar = new Image();
+    lootStar.classList.add("frame-star");
     lootStar.src = `./assets/frames/star-${itemInfo.Star}.webp`;
     ele.append(lootImg,lootStar);
 
@@ -177,7 +179,7 @@ function choiceBox(mainBody, dialogObg, stopSpawnEvents = undefined, yesFunc, no
 
     choiceEle.classList.add('flex-column');
     const choiceDiv = document.createElement('div');
-    choiceDiv.classList.add('flex-column');
+    choiceDiv.classList.add('flex-column', 'choice-div');
     const text = document.createElement('p');
     text.innerHTML = dialogObg.text;
 

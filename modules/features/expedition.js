@@ -1,6 +1,6 @@
-import { expeditionDictInfo, imgKey } from "../dictData.js";
+import { InventoryDefault, commisionInfo, expeditionDictInfo, imgKey, upgradeInfo } from "../dictData.js";
 import { createDom } from "../adjustUI.js";
-import { convertTo24HourFormat, getTime, universalStyleCheck } from "../functions.js";
+import { abbrNum, convertTo24HourFormat, getTime, randomInteger, rollArray, textReplacer, universalStyleCheck } from "../functions.js";
 import { customTutorial } from "../drawUI.js";
 
 const recommendedLevel = [0,1,4,7,10,13,16,20];
@@ -354,12 +354,12 @@ const buildItem = (key, commSave) => {
     });
 
     const timeNum = commSave.timeEnd - getTime();
-
     const timeLeft = createDom('p', { 
         innerText: commSave.timeEnd === 0 
                                     ? 'Start!'
                                     : `Time: ${convertTo24HourFormat(timeNum / 60)}`
         });
+
     const commisionAdd = createDom('div', {
         classList: ['flex-column', 'commission-add'],
         child: [ timeLeft, commissionPic ]
@@ -389,18 +389,29 @@ const buildItem = (key, commSave) => {
     });
 
     commissionItem.updatePic = (commSave, hoursLeft) => {
-        timeLeft.innerText = `Time: ${convertTo24HourFormat(hoursLeft)}`;
+        if (hoursLeft <= 0) {
+            timeLeft.innerText = `Start!`;
+            commSave.timeEnd = 0;
+        } else {
+            timeLeft.innerText = `Time: ${convertTo24HourFormat(hoursLeft)}`;
+        }
         commissionPic.innerHTML = '';
         commissionPic.append(...buildImage(commSave));
-    }
+    };
 
     commissionItem.updateTime = (currentTime) => {
         if (commSave.timeEnd === 0) {
             timeLeft.innerText = 'Start!';
         } else {
-            timeLeft.innerText = `Time: ${convertTo24HourFormat((commSave.timeEnd - currentTime) / 60)}`;
+            const timeDiff = commSave.timeEnd - currentTime;
+            if (timeDiff < 0) {
+                timeLeft.innerText = `Done!`;
+            } else {
+                timeLeft.innerText = `Time: ${convertTo24HourFormat(timeDiff / 60)}`;
+            }
+            
         }
-    }
+    };
     return commissionItem;
 }
 
@@ -433,9 +444,9 @@ const buildSelect = (commisionMenu) => {
         ]
     });
 
-    commisionMenu.calculateHour = (foodItems, heroItems) => {
+    commisionMenu.calculateHour = (foodItems, heroItemsLength) => {
         let foodCal = Array.from(foodItems).reduce((i, x) => i + parseInt(x.itemStar) * 0.3, 0);
-        foodCal *= (1 - (heroItems - 1) * 0.15);
+        foodCal *= (1 - (heroItemsLength - 1) * 0.15);
         return foodCal;
     }
 
@@ -586,4 +597,173 @@ const buildComm = (commisionMenu, saveValues) => {
     return buildStart(commisionMenu);
 }
 
-export { expedInfo, createTopHalf, createEncounterHalf, createBattleHalf, resetAdventure, sapEnergy, createExpedition, buildComm }
+const commTable = [
+    [
+        ['nuts', 15],
+        ['food', 1, 3, 10],
+        ['food', 3, 5, 15],
+        ['gem', 3, 6, 20],
+        ['gem', 3, 4, 15],
+        ['artifact', 1, 3, 25],
+        ['talent', 2, 2, 25],
+        ['potion', 3, 5, 20],
+    ],
+    [
+        ['nuts', 25],
+        ['food', 1, 3, 20],
+        ['weapon', 1, 3, 10],
+        ['weapon', 3, 6, 15],
+        ['weapon', 3, 6, 20],
+        ['artifact', 1, 3, 15],
+        ['artifact', 3, 5, 15],
+        ['artifact', 3, 5, 10],
+        ['xp', 2, 2, 50],
+        ['potion', 3, 3, 40],
+    ],
+    [
+        ['nuts', 20],
+        ['primogem', 25],
+        ['artifact', 1, 3, 20],
+        ['talent', 2, 4, 20],
+        ['talent', 2, 4, 15],
+        ['talent', 2, 3, 10],
+        ['weapon', 1, 3, 25],
+        ['gem', 3, 3, 25],
+        ['xp', 2, 4, 40],
+    ],
+]
+
+const genItems = (points, index, inventoryDraw, saveValues) => {
+    const lootDict = {}
+    while (points > 10) {
+        const typeRoll = rollArray(commTable[index]);
+        if (typeRoll[0] === 'nuts') {
+            lootDict.nuts ??= 0;
+            lootDict.nuts += saveValues.dps * 60 * 5;
+            points -= typeRoll[1];
+        } else if (typeRoll[0] === 'primogem') {
+            lootDict.primogem ??= 0;
+            lootDict.primogem += randomInteger(10, 20) * 15;
+            points -= typeRoll[1];
+        } else {
+            const itemRoll = inventoryDraw(typeRoll[0], typeRoll[1], typeRoll[2], 'shop');
+            lootDict[itemRoll] ??= 0; 
+            lootDict[itemRoll] += 1;
+            points -= typeRoll[3] * (1 + 0.5 * InventoryDefault[itemRoll].Star);
+        }
+    }
+    return lootDict;
+}
+
+// CHANGE TIME SPENT TO / 60 OUT OF TESTING
+const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame) => {
+    const itemDict = saveValues.commDict[index];
+    let power = 0;
+    let log = '';
+    const timeSpent = (itemDict.timeEnd - itemDict.timeStart) / 60;
+    itemDict.char.forEach((char) => {
+        const charDict = commisionInfo[char];
+        let charPower = 300;
+        for (let key in upgradeInfo) {
+            if (upgradeInfo[key].Name === char) {
+                if (upgradeInfo[key].Ele === itemDict.ele) {
+                    charPower *= 2;
+                }
+                break;
+            }
+        }
+
+        itemDict.char.forEach((charOther) => {
+            if (charOther != char) {
+                if (charDict.charLikes.includes(charOther)) {
+                    charPower *= 1.25;
+                } else if (charDict.charStrongLike.includes(charOther)) {
+                    charPower *= 1.5;
+                    log += `"${char}" pairs [green]really well[/s] with "${charOther}"!<br>`;
+                } else if (charDict.charStrongDislikes.includes(charOther)) {
+                    charPower *= 0.5;
+                    log += `"${char}" pairs [red]terribly[/s] with "${charOther}"...<br>`;
+                } else if (charDict.charDislikes.includes(charOther)) {
+                    charPower *= 0.75;
+                }
+            }
+        });
+        
+        if (charDict.power[index] >= 8) {
+            log += `"${char}" is [green]skilled[/s] at "${commisionDict[index][0]}"!<br>`;
+        } else if (charDict.power[index] <= 3) {
+            log += `"${char}" is [red]unskilled[/s] at "${commisionDict[index][0]}"...<br>`;
+        }
+
+        power += charPower;
+    });
+
+    if (timeSpent > Math.E) {
+        power *= Math.min(Math.log(timeSpent) * timeSpent, 1);
+    } else {
+        power *= timeSpent;
+    }
+
+    const lootRewards = genItems(power, index, inventoryDraw, saveValues);
+    const lootDiv = createDom('div', { class: [ 'flex-row', 'commission-reward-div' ]});
+    for (let key in lootRewards) {
+        let itemImg;
+        if (key === 'nuts') {
+            const itemAmount = createDom('p', {
+                classList: ['item-frame-text', 'small-font'],
+                innerText: lootRewards[key].toExponential(0),
+            });
+
+            itemImg = inventoryFrame(createDom('div', {
+                src: `./assets/icon/nut.webp`,
+                classList: ['comm-img'],
+                child: [itemAmount]
+            }), { Star: 1, File:'nut' });
+        } else if (key === 'primogem') {
+            const itemAmount = createDom('p', {
+                classList: ['item-frame-text', 'small-font'],
+                innerText: lootRewards[key],
+            });
+
+            itemImg = inventoryFrame(createDom('div', {
+                src: `./assets/icon/primogem.webp`,
+                classList: ['comm-img'],
+                child: [itemAmount]
+            }), { Star: 5, File:'primogem' });
+        } else {
+            const itemAmount = createDom('p', {
+                classList: ['item-frame-text'],
+                innerText: (lootRewards[key]),
+            });
+
+            itemImg = inventoryFrame(createDom('div', {
+                src: `./assets/tooltips/inventory/${InventoryDefault[key].File}.webp`,
+                classList: ['comm-img'],
+                child: [itemAmount]
+            }), InventoryDefault[key]);
+        }
+        itemImg.itemName = [key, lootRewards[key]];
+        lootDiv.appendChild(itemImg);
+    }
+
+    log = textReplacer({
+        '[green]':`<span style='color:#417428'>`,
+        '[red]':`<span style='color:#9E372D'>`,
+        '[/s]':`</span>`,
+    }, log);
+
+    const rewardDiv = createDom('div', {
+        classList: ['flex-column', 'commission-reward-container'],
+        children: [
+            lootDiv,
+            createDom('p', {
+                classList: ['commission-reward-info'],
+                innerHTML: log,
+            })
+        ]
+    });
+
+    return rewardDiv;
+}
+
+export { expedInfo, createTopHalf, generateCommRewards, createEncounterHalf, createBattleHalf, resetAdventure, sapEnergy, createExpedition, buildComm }

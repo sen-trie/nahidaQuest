@@ -183,7 +183,6 @@ const blackMarketFunctions = {
 
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
 const specialText = ["Ah! It's Bongo-Head!","'Thank you for releasing Arapacati!'","Woah, a treasure-seeking Seelie!","Woah, a shikigami was trapped inside!"];
-const itemFrameColors = ['#909090','#73ac9d','#94aee2','#b0a3db','#614934','#793233'];
 
 let demoContainer = document.getElementById("demo-container");
 let score = document.getElementById("score");
@@ -5369,6 +5368,7 @@ function inventoryDraw(itemType, min, max, type, itemClass){
         "xp": XPMAX,
         "gem": GEMMAX,
         "talent": NATIONMAX,
+        "potion": 4013,
     }
     let lowerInventoryType = {
         "weapon": 1001, 
@@ -5377,6 +5377,7 @@ function inventoryDraw(itemType, min, max, type, itemClass){
         "xp": 4001,
         "gem": 5001,
         "talent": 6001,
+        "potion": 4011,
     }
     let drawnItem = 0;
     while (true) {
@@ -5558,7 +5559,7 @@ function createGuild() {
             if (advInfo[i].Item.length > 0) {
                 for (let j = 0; j < advInfo[i].Item.length; j++) {
                     let rankInventoryRewards = document.createElement("div");
-                    rankInventoryRewards = inventoryFrame(rankInventoryRewards,Inventory[advInfo[i].Item[j]],itemFrameColors);
+                    rankInventoryRewards = inventoryFrame(rankInventoryRewards,Inventory[advInfo[i].Item[j]]);
                     rankLore.append(rankInventoryRewards);
                 }
                 rankLore.innerHTML += "<hr style='border-top: 0.2em solid #b9a47f;border-radius: 1em;margin-bottom: 2%;'>"
@@ -5687,7 +5688,7 @@ function createFoodChar() {
                 src: `./assets/tooltips/inventory/${Inventory[key].File}.webp`,
                 classList: ['comm-img'],
             });
-            pickItems.appendChild(inventoryFrame(foodImg, Inventory[key], itemFrameColors));
+            pickItems.appendChild(inventoryFrame(foodImg, Inventory[key]));
         }
     });
     return noFood ? null : pickItems;
@@ -5723,15 +5724,46 @@ function buildComm(commisionMenu) {
         commItem.addEventListener('click', () => {
             if (saveValues.commDict[i].timeEnd === 0) {
                 commisionMenu.activate(i, saveValues);
-            } else if (saveValues.commDict[i].timeEnd < getTime()) {
-                return;
-            } else {
+            } else if (saveValues.commDict[i].timeEnd - getTime() < 0) {
+                const commRewards = Expedition.generateCommRewards(saveValues, i, inventoryDraw, inventoryFrame);
+                const lootItems = Array.from(commRewards.children[0].children);
+                const addToLoot = () => {
+                    lootItems.forEach((item) => {
+                        const itemProp = item.itemName;
+                        if (itemProp[0] === 'nuts') {
+                            saveValues["realScore"] += itemProp[1];
+                        } else if (itemProp[0] === 'primogem') {
+                            currencyPopUp([["primogem", itemProp[1]]]);
+                        } else {
+                            for (let i = 0; i < itemProp[1]; i++) {
+                                inventoryAdd(itemProp[0]);
+                            }
+                        }
+                    });
+                    newPop(1);
+                    sortList("table2");
+                    currencyPopUp([["items", 0]]);
+                }
+                
+                choiceBox(mainBody, {text: 'Items obtained:'}, stopSpawnEvents, 
+                          ()=>{ addToLoot() }, null, commRewards, ['notif-ele']
+                );   
+                if (!testing) saveData(true);
+
+                saveValues.commDict[i].timeEnd = 0;
+                saveValues.commDict[i].char.forEach((char) => {
+                    saveValues.charDict[char].currentComm = ``;
+                    saveValues.charDict[char].restEnd = 0;
+                });
+                saveValues.commDict[i].char.length = 0;
+
+                document.getElementById(`commission-${i}`).updatePic(saveValues.commDict[i], 0);
                 return;
             }
         });
     }
 
-    const noChar = createDom('img', { classList: ['no-char'], src: './assets/expedbg/exped-Nahida-loss.webp' })
+    const noChar = createDom('img', { classList: ['no-char'], src: './assets/expedbg/exped-Nahida-loss.webp' });
     const commChar = document.getElementById(`commission-select-char`);
     commChar.addEventListener('click', () => {
         const pickItems = createCommChar();
@@ -5781,20 +5813,21 @@ function buildComm(commisionMenu) {
             commisionMenu.clearAdd();
             document.getElementById('commission-back').click();
 
-            const commTime = getTime() + commisionMenu.calculateHour(foodAdd) * 60;
+            const commTime = getTime() + commisionMenu.calculateHour(foodAdd, charAdd.length) * 60;
             foodAdd.forEach(food => reduceItem(food.itemName));
             charAdd.forEach((char) => {
                 saveValues.charDict[char.itemName].currentComm = `comm-${commissionNum + 1}`;
                 saveValues.charDict[char.itemName].restEnd = commTime;
             });
 
-            console.log(charAdd);
-            console.log(saveValues.charDict)
+            // console.log(charAdd);
+            // console.log(saveValues.charDict)
 
+            saveValues.commDict[commissionNum].timeStart = getTime();
             saveValues.commDict[commissionNum].timeEnd = commTime;
             saveValues.commDict[commissionNum].char = charAdd.map((char) => char.itemName);
             document.getElementById(`commission-${commissionNum}`)
-                    .updatePic(saveValues.commDict[commissionNum], commisionMenu.calculateHour(foodAdd));
+                    .updatePic(saveValues.commDict[commissionNum], commisionMenu.calculateHour(foodAdd, charAdd.length));
         }
     })
 }
@@ -6675,7 +6708,7 @@ function finishQuest(advType) {
                 itemNumber = inventoryDraw("gem", 3, 5, "shop");
             } else if (advType === 22) {
                 let maxStar = 5;
-                let item = rollArray(itemRoll,0)
+                let item = rollArray(itemRoll,0);
                 if (item === "weapon" || item === 'gem') {
                     maxStar = 6;
                 }
@@ -6683,7 +6716,7 @@ function finishQuest(advType) {
             }
 
             let offerItem = document.createElement("div");
-            offerItem = inventoryFrame(offerItem,Inventory[itemNumber],itemFrameColors);
+            offerItem = inventoryFrame(offerItem, Inventory[itemNumber]);
             offerCurrency.value += Math.round(Shop.calculateShopCost(Inventory[itemNumber].Star) * costDiscount / 5 * 0.30) * 5;
             inventoryOffer.appendChild(offerItem);
             lootArray[i] = itemNumber;
@@ -9332,7 +9365,7 @@ function winAdventure() {
         inventoryAdd(tempArray[key][0]);
 
         let lootDiv = document.createElement("div");
-        lootDiv = inventoryFrame(lootDiv, itemInfo, itemFrameColors);
+        lootDiv = inventoryFrame(lootDiv, itemInfo);
 
         if (tempArray[key][1] === true && (saveValues.treeObj.level > 0 && saveValues.treeObj.level < 5)) {
             let bonus = new Image();
@@ -11610,7 +11643,7 @@ function populateTreeItems() {
     const itemOfferArray = [];
     for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
         let itemContainer = document.createElement('div');
-        itemContainer = inventoryFrame(itemContainer, Inventory[saveValues.treeObj.offer[i]], itemFrameColors);
+        itemContainer = inventoryFrame(itemContainer, Inventory[saveValues.treeObj.offer[i]]);
         itemContainer.classList.add('dim-filter', 'clickable');
 
         let itemAmount = createDom('p', {
@@ -11845,7 +11878,7 @@ function destroyTree(finalPhase = false) {
             if (lootArray[i] !== 0) {
                 const rankInventoryReward = createDom('div', { class:['notif-item-number', 'flex-column']});
                 let rankInventoryRewardsImg = document.createElement('div');
-                rankInventoryRewardsImg = inventoryFrame(rankInventoryRewardsImg, { Star: 5, File: `solid${boxElement[i + 1]}` }, itemFrameColors);
+                rankInventoryRewardsImg = inventoryFrame(rankInventoryRewardsImg, { Star: 5, File: `solid${boxElement[i + 1]}` });
                 if (additionalPyroHydro > 1) {
                     if (boxElement[i + 1] === 'Hydro' || boxElement[i + 1] === 'Pyro') {
                         lootArray[i] = Math.round(lootArray[i] * additionalPyroHydro);
@@ -11879,7 +11912,7 @@ function destroyTree(finalPhase = false) {
         }
 
         choiceBox(mainBody, {text: 'Materials harvested:'}, stopSpawnEvents, ()=>{addLoot(lootArray)}, null, lootContainer, ['notif-ele']);
-        // saveData(true);
+        if (!testing) saveData(true);
         toggleDestroyButton();
     }, 100);
 }

@@ -1,34 +1,33 @@
-// ABBREVIATES NUMBERS TO SHORTER FORM
+const abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion",
+              " Undecill", " Duodecill", " Tredecill", " Quattuordecill", " Quindecill", " Sexdecill"," Septendecill", " Octodecill",
+              " Novemdecill", " Vigintill", " Unvigintill", " Duovigintill", " Trevigintill", " Quattuorvigintill", " Quinvigintill",
+              " Sexvigintill", " Septenvigintill"," Octovigintill", " Nonvigintill", " Trigintill", " Untrigintill", " Duotrigintill"
+];
+const abbrevShort = [""," M"," B"," T"," Qd"," Qt"," Sx"," Sp", " O", " N", " D", " Ud", " Dd", " Td", " Qa", " Qi", " Sxd", " Spd", " Od", " Nd", 
+                " V", " Uv", " Dv", " Tv", " Qtv", " Sv", " Spv", " Ov", " Nv", " Tn", " Ut", " Dt"];
+
+                // ABBREVIATES NUMBERS TO SHORTER FORM
 function abbrNum(number, digits = 1, short = false) {
     let decPlaces = Math.pow(10, 3);
-    let abbrev = [""," Million"," Billion"," Trillion"," Quadrillion"," Quintillion"," Sextillion"," Septillion", " Octillion", " Nonillion", " Decillion",
-                  " Undecill", " Duodecill", " Tredecill", " Quattuordecill", " Quindecill", " Sexdecill"," Septendecill", " Octodecill",
-                  " Novemdecill", " Vigintill", " Unvigintill", " Duovigintill", " Trevigintill", " Quattuorvigintill", " Quinvigintill",
-                  " Sexvigintill", " Septenvigintill"," Octovigintill", " Nonvigintill", " Trigintill", " Untrigintill", " Duotrigintill"
-    ];
-    let abbrevShort = [""," M"," B"," T"," Qd"," Qt"," Sx"," Sp", " O", " N", " D", " Ud", " Dd", " Td", " Qa", " Qi", " Sxd", " Spd", " Od", " Nd", 
-                    " V", " Uv", " Dv", " Tv", " Qtv", " Sv", " Spv", " Ov", " Nv", " Tn", " Ut", " Dt"];
-
     if (digits === 2) {
         decPlaces = Math.pow(10, 2);
     }
 
     if (number > 1e6) {
         for (let i = abbrev.length - 1; i >= 0; i--) {
-                let size = Math.pow(10, (i + 1) * 3);
-                if (size <= number) {
-                    number = Math.round((number * decPlaces) / size) / decPlaces;
-                    if (number == 1000 && i < abbrev.length - 1) {
-                            number = 1;
-                            i++;
-                    }
-                    if (short === true) {
-                        number += abbrevShort[i];
-                    } else {
-                        number += abbrev[i];
-                    }
-                    
-                    break;
+            let size = Math.pow(10, (i + 1) * 3);
+            if (size <= number) {
+                number = Math.round((number * decPlaces) / size) / decPlaces;
+                if (number == 1000 && i < abbrev.length - 1) {
+                        number = 1;
+                        i++;
+                }
+                if (short === true) {
+                    number += abbrevShort[i];
+                } else {
+                    number += abbrev[i];
+                }
+                break;
             }
         }
         return number;
