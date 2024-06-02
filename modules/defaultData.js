@@ -120,7 +120,7 @@ const persistentValuesDefault = {
     tutorialRanged: false,
     tutorialBasic: false,
     tutorialAscend: false,
-    upgrade: [null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    upgrade: [null],
     treeSeeds: [0, 0, 0],
     leylinePower: 100,
     harvestCount: 0,

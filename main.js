@@ -473,6 +473,8 @@ function loadSaveData() {
             let heroName = upgradeInfo[key].Name;
             persistentValues.ascendDict[heroName] = 0;
         }
+        const upgradeLength = Object.keys(permUpgrades).length;
+        persistentValues.upgrade = [...Array(upgradeLength).keys()].map(x => 0).unshift(null);
     } else {
         let persistentDictTemp = localStorage.getItem("persistentValues");
         if (persistentDictTemp == "undefined") {
@@ -524,7 +526,13 @@ function loadSaveData() {
                     }
                 }
                 persistentValues.upgrade = tempArray;
-            }  
+            }
+
+            const upgradeLength = Object.keys(permUpgrades).length;
+            if (persistentValues.upgrade.length != (upgradeLength + 1)) {
+                const lengthDiff = (upgradeLength + 1) - persistentValues.upgrade.length;
+                persistentValues.upgrade = persistentValues.upgrade.concat([...Array(lengthDiff).keys()].map(x => 0));
+            }
         }
     }
     // LOAD STORE DATA
@@ -739,7 +747,7 @@ function resetAnimationListener(elem) {
 }
 
 function calcPermEffect(id) {
-    return (persistentValues.upgrade[id]*permUpgrades[id].Effect / 100);
+    return (persistentValues.upgrade[id] * permUpgrades[id].Effect / 100);
 }
 
 // UPDATES VALUES WITH PERSISTENT VALUES
@@ -5551,7 +5559,7 @@ function createGuild() {
             rankButton.append(rankIco);
         } else {
             advDict.rankDict[i] = "unclaimed";
-            notifPop("add","rank",i);
+            notifPop("add", "rank", i);
         }
         
         rankButton.addEventListener("click",()=>{
@@ -5633,6 +5641,7 @@ function createGuild() {
     const commisionMenu = document.createElement("div");
     commisionMenu.id = 'commision-menu';
     commisionMenu.classList.add('commision-menu', 'flex-column');
+    commisionMenu.notif = notifPop;
     Expedition.buildComm(commisionMenu, saveValues);
 
     const guildArray = [rankMenu, bountyMenu, commisionMenu];
@@ -5725,7 +5734,8 @@ function buildComm(commisionMenu) {
             if (saveValues.commDict[i].timeEnd === 0) {
                 commisionMenu.activate(i, saveValues);
             } else if (saveValues.commDict[i].timeEnd - getTime() < 0) {
-                const commRewards = Expedition.generateCommRewards(saveValues, i, inventoryDraw, inventoryFrame);
+                commisionMenu.notif("clear", "comm", i);
+                const commRewards = Expedition.generateCommRewards(saveValues, i, inventoryDraw, inventoryFrame, getTreeItems());
                 const lootItems = Array.from(commRewards.children[0].children);
                 const addToLoot = () => {
                     lootItems.forEach((item) => {
@@ -5767,24 +5777,34 @@ function buildComm(commisionMenu) {
     const commChar = document.getElementById(`commission-select-char`);
     commChar.addEventListener('click', () => {
         const pickItems = createCommChar();
+        let maxChar = 1;
+        advDict.rankDict[19] ? maxChar++ : void(0);
+        advDict.rankDict[17] ? maxChar++ : void(0);
+        advDict.rankDict[13] ? maxChar++ : void(0);
+
         if (pickItems === null) {
             choiceBox(mainBody, {text: 'There are no available Sumeru characters!'}, stopSpawnEvents, ()=>{}, null, noChar, ['notif-ele']);
         } else {
-            choiceMax(mainBody, {text: 'Pick (max 4) characters:'}, stopSpawnEvents, 
+            choiceMax(mainBody, {text: `Pick (max ${maxChar}) characters:`}, stopSpawnEvents, 
                       (res) => { commisionMenu.addChar(res) }, () => {}, pickItems, 
-                      ['notif-ele', 'pick-items', 'choice-ele'], false, 4);
+                      ['notif-ele', 'pick-items', 'choice-ele'], false, maxChar);
         }
     });
 
     const commFood = document.getElementById(`commission-select-food`);
     commFood.addEventListener('click', () => {
         const pickItems = createFoodChar();
+        let maxChar = 1;
+        advDict.rankDict[19] ? maxChar++ : void(0);
+        advDict.rankDict[17] ? maxChar++ : void(0);
+        advDict.rankDict[13] ? maxChar++ : void(0);
+
         if (pickItems === null) {
             choiceBox(mainBody, {text: 'There is no available food!'}, stopSpawnEvents, ()=>{}, null, noChar, ['notif-ele']);
         } else {
-            choiceMax(mainBody, {text: 'Pick (max 8) food items:'}, stopSpawnEvents, 
+            choiceMax(mainBody, {text: `Pick (max ${maxChar}) food items:`}, stopSpawnEvents, 
                       (res) => { commisionMenu.addFood(res) }, () => {}, pickItems, 
-                      ['notif-ele', 'pick-items', 'choice-ele'], false, 8);
+                      ['notif-ele', 'pick-items', 'choice-ele'], false, maxChar);
         }
     });
 
@@ -5819,9 +5839,6 @@ function buildComm(commisionMenu) {
                 saveValues.charDict[char.itemName].currentComm = `comm-${commissionNum + 1}`;
                 saveValues.charDict[char.itemName].restEnd = commTime;
             });
-
-            // console.log(charAdd);
-            // console.log(saveValues.charDict)
 
             saveValues.commDict[commissionNum].timeStart = getTime();
             saveValues.commDict[commissionNum].timeEnd = commTime;
@@ -11693,7 +11710,7 @@ function offerItemFunction() {
     }
 
     treeMissingText.innerText = treeInnerValue;
-    if (treeInnerValue !== '' && !testing) {return}
+    if (treeInnerValue !== '') {return}
     saveValues.treeObj.offer[0] -= persistentValues.goldenCore;
     for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
         let itemNumber = saveValues.treeObj.offer[i];

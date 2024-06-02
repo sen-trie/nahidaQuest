@@ -3676,4 +3676,17 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
     background-color: var(--light-brown);
 }
 
+.light-green-scrollbar {
+    scrollbar-color: var(--bright-dark-green) transparent;
+}
+
+.light-green-scrollbar::-webkit-scrollbar {
+    background-color: transparent;
+}
+
+.light-green-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--bright-dark-green);
+}
+
+
 

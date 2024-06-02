@@ -346,7 +346,7 @@ const buildImage = (commSave) => {
     }
 };
 
-const buildItem = (key, commSave) => {
+const buildItem = (key, commSave, commisionMenu) => {
     let commissionPicDiv = buildImage(commSave);
     const commissionPic = createDom('div', {
         classList: ['flex-row', 'commission-pic'],
@@ -405,6 +405,7 @@ const buildItem = (key, commSave) => {
         } else {
             const timeDiff = commSave.timeEnd - currentTime;
             if (timeDiff < 0) {
+                commisionMenu.notif("add", "comm", key);
                 timeLeft.innerText = `Done!`;
             } else {
                 timeLeft.innerText = `Time: ${convertTo24HourFormat(timeDiff / 60)}`;
@@ -584,7 +585,7 @@ const buildComm = (commisionMenu, saveValues) => {
     commisionMenu.commRows = []; 
 
     for (let i = 0; i < commisionDict.length; i++) {
-        const commRow = buildItem(i, saveValues.commDict[i]);
+        const commRow = buildItem(i, saveValues.commDict[i], commisionMenu);
         commisionMenu.commRows.push(commRow);
         commisionMenu.appendChild(commRow);
     }
@@ -592,7 +593,6 @@ const buildComm = (commisionMenu, saveValues) => {
     commisionMenu.updateAllTime = (currentTime) => {
         commisionMenu.commRows.forEach(commRow => commRow.updateTime(currentTime));
     };
-
 
     return buildStart(commisionMenu);
 }
@@ -639,7 +639,7 @@ const genItems = (points, index, inventoryDraw, saveValues) => {
         const typeRoll = rollArray(commTable[index]);
         if (typeRoll[0] === 'nuts') {
             lootDict.nuts ??= 0;
-            lootDict.nuts += saveValues.dps * 60 * 5;
+            lootDict.nuts += saveValues.dps * 60 * 15;
             points -= typeRoll[1];
         } else if (typeRoll[0] === 'primogem') {
             lootDict.primogem ??= 0;
@@ -655,8 +655,7 @@ const genItems = (points, index, inventoryDraw, saveValues) => {
     return lootDict;
 }
 
-// CHANGE TIME SPENT TO / 60 OUT OF TESTING
-const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame) => {
+const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame, treeOffer) => {
     const itemDict = saveValues.commDict[index];
     let power = 0;
     let log = '';
@@ -705,7 +704,7 @@ const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame) =
     }
 
     const lootRewards = genItems(power, index, inventoryDraw, saveValues);
-    const lootDiv = createDom('div', { class: [ 'flex-row', 'commission-reward-div' ]});
+    const lootDiv = createDom('div', { class: [ 'flex-row', 'commission-reward-div', 'light-green-scrollbar' ]});
     for (let key in lootRewards) {
         let itemImg;
         if (key === 'nuts') {
@@ -731,16 +730,21 @@ const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame) =
                 child: [itemAmount]
             }), { Star: 5, File:'primogem' });
         } else {
-            const itemAmount = createDom('p', {
-                classList: ['item-frame-text'],
-                innerText: (lootRewards[key]),
-            });
-
             itemImg = inventoryFrame(createDom('div', {
                 src: `./assets/tooltips/inventory/${InventoryDefault[key].File}.webp`,
                 classList: ['comm-img'],
-                child: [itemAmount]
             }), InventoryDefault[key]);
+
+            if (Object.keys(treeOffer).includes(key)) {
+                let bonus = createDom('img', { classList: ['tree-bonus'], src:'./assets/expedbg/tree-item.webp' });
+                itemImg.append(bonus);
+            } else {
+                const itemAmount = createDom('p', {
+                    classList: ['item-frame-text'],
+                    innerText: (lootRewards[key]),
+                });
+                itemImg.append(itemAmount);
+            }
         }
         itemImg.itemName = [key, lootRewards[key]];
         lootDiv.appendChild(itemImg);
@@ -757,7 +761,7 @@ const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame) =
         children: [
             lootDiv,
             createDom('p', {
-                classList: ['commission-reward-info'],
+                classList: ['commission-reward-info', 'green-scrollbar'],
                 innerHTML: log,
             })
         ]
