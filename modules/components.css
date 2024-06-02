@@ -1199,6 +1199,17 @@
     width: 75%;
 }
 
+.screen-effect {
+    height: 100%;
+    width: auto;
+    pointer-events: none;
+}
+
+.explosion-effect {
+    object-fit: cover;
+    pointer-events: none;
+}
+
 .enemyImg {
     width: 100%;
     height: 90%;
