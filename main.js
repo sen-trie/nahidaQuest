@@ -363,13 +363,6 @@ function loadSaveData() {
     } else {
         let saveValuesTemp = localStorage.getItem("saveValuesSave");
         saveValues = JSON.parse(saveValuesTemp);
-        
-        // if (testing) {
-        //     delete saveValues.charDict
-        //     delete saveValues.commDict
-        //     delete saveValues.commisionDict;
-        // }
-
         updateObjectKeys(saveValues,saveValuesDefault);
     }
     // LOAD HEROES DATA
@@ -5635,13 +5628,37 @@ function createGuild() {
             rankIco.src = "./assets/icon/tick.webp";
             rankButton.append(rankIco);
             notifPop("clear","rank",level);
+
+            if (level === 9) {
+                document.getElementById('commision-menu').removeBlock();
+                setTimeout(() => {
+                    drawUI.customTutorial('commission', 3, 'Commission Unlocked!');
+                }, 3000);
+            }
         }
-    })
+    });
+
+    const commissionBlock = createDom('p', { 
+        classList: ['cover-all', 'flex-column'],
+        id: 'commission-blocker',
+        innerText: '[Locked. Come back later!]'
+    });
 
     const commisionMenu = document.createElement("div");
     commisionMenu.id = 'commision-menu';
     commisionMenu.classList.add('commision-menu', 'flex-column');
     commisionMenu.notif = notifPop;
+    
+    if (advDict.rankDict[9] !== true) {
+        commisionMenu.appendChild(commissionBlock);
+    }
+
+    commisionMenu.removeBlock = () => {
+        if (commisionMenu.contains(commissionBlock)) {
+            commisionMenu.removeChild(commissionBlock);
+        }
+    }
+
     Expedition.buildComm(commisionMenu, saveValues);
 
     const guildArray = [rankMenu, bountyMenu, commisionMenu];
@@ -5778,9 +5795,9 @@ function buildComm(commisionMenu) {
     commChar.addEventListener('click', () => {
         const pickItems = createCommChar();
         let maxChar = 1;
-        advDict.rankDict[19] ? maxChar++ : void(0);
-        advDict.rankDict[17] ? maxChar++ : void(0);
-        advDict.rankDict[13] ? maxChar++ : void(0);
+        advDict.rankDict[19] === true ? maxChar++ : void(0);
+        advDict.rankDict[17] === true ? maxChar++ : void(0);
+        advDict.rankDict[13] === true ? maxChar++ : void(0);
 
         if (pickItems === null) {
             choiceBox(mainBody, {text: 'There are no available Sumeru characters!'}, stopSpawnEvents, ()=>{}, null, noChar, ['notif-ele']);
@@ -5795,9 +5812,9 @@ function buildComm(commisionMenu) {
     commFood.addEventListener('click', () => {
         const pickItems = createFoodChar();
         let maxChar = 1;
-        advDict.rankDict[19] ? maxChar++ : void(0);
-        advDict.rankDict[17] ? maxChar++ : void(0);
-        advDict.rankDict[13] ? maxChar++ : void(0);
+        advDict.rankDict[19] === true ? maxChar++ : void(0);
+        advDict.rankDict[17] === true ? maxChar++ : void(0);
+        advDict.rankDict[13] === true ? maxChar++ : void(0);
 
         if (pickItems === null) {
             choiceBox(mainBody, {text: 'There is no available food!'}, stopSpawnEvents, ()=>{}, null, noChar, ['notif-ele']);
@@ -5812,22 +5829,27 @@ function buildComm(commisionMenu) {
     commConfirm.addEventListener('click', () => {
         const res = commisionMenu.confirmAdd();
         if (res != null) {
+            let cancelConfirm = false;
             const charAdd = Array.from(res[0]);
             const foodAdd = Array.from(res[1]);
 
             foodAdd.forEach((food) => {
                 if (InventoryMap.get(food.itemName) <= 0) {
-                    return choiceBox(mainBody, {text: `Food "${Inventory[food.itemName].Name}" is missing!`}, null, 
-                                                () => {}, null, null, ['choice-ele']);
+                    choiceBox(mainBody, {text: `Food "${Inventory[food.itemName].Name}" is missing!`}, null, 
+                                        () => {}, null, null, ['choice-ele']);
+                    cancelConfirm = true;
                 }
             });
 
             charAdd.forEach((char) => {
                 if (saveValues.charDict[char.itemName].currentComm !== '') {
-                    return choiceBox(mainBody, {text: `"${char.itemName}" is not available!`}, null, 
+                    choiceBox(mainBody, {text: `"${char.itemName}" is not available!`}, null, 
                                      () => {}, null, null, ['choice-ele']);
+                    cancelConfirm = true;
                 }
             });
+
+            if (cancelConfirm) return;
 
             const commissionNum = commisionMenu.currentComm;
             commisionMenu.clearAdd();
@@ -12241,7 +12263,7 @@ function leylineCreate(treeTable) {
     
     let text = `Absorb energy from the <span style='color:#A97803'>Leyline Outbreak</span> 
                 <br> at the cost of your tree's HP
-                <br> <span style='font-size: 0.6em'>Note: Older trees have better absorption.</span>`;
+                <br> <span style='font-size: 0.6em'>Note: Mature trees have better absorption.</span>`;
     const leylineText = createDom('p', { innerHTML: text, id:'leyline-text' });
     const leylineMissingText = createDom('p', { innerText: '', id:'leyline-missing-text' });
     const leylineEnergy = createDom('p', { innerHTML: `
