@@ -600,6 +600,7 @@ const buildComm = (commisionMenu, saveValues) => {
 const commTable = [
     [
         ['nuts', 15],
+        ['tree', 25],
         ['food', 1, 3, 10],
         ['food', 3, 5, 15],
         ['gem', 3, 6, 20],
@@ -607,6 +608,7 @@ const commTable = [
         ['artifact', 1, 3, 25],
         ['talent', 2, 2, 25],
         ['potion', 3, 5, 20],
+        
     ],
     [
         ['nuts', 25],
@@ -622,6 +624,7 @@ const commTable = [
     ],
     [
         ['nuts', 20],
+        ['tree', 35],
         ['primogem', 25],
         ['artifact', 1, 3, 20],
         ['talent', 2, 4, 20],
@@ -633,18 +636,26 @@ const commTable = [
     ],
 ]
 
-const genItems = (points, index, inventoryDraw, saveValues) => {
+const genItems = (points, index, inventoryDraw, nps, persistentValues) => {
     const lootDict = {}
     while (points > 10) {
         const typeRoll = rollArray(commTable[index]);
         if (typeRoll[0] === 'nuts') {
             lootDict.nuts ??= 0;
-            lootDict.nuts += saveValues.dps * 60 * 15;
+            lootDict.nuts += nps * 60 * 15;
             points -= typeRoll[1];
         } else if (typeRoll[0] === 'primogem') {
             lootDict.primogem ??= 0;
             lootDict.primogem += randomInteger(10, 20) * 15;
             points -= typeRoll[1];
+        } else if (typeRoll[0] === 'tree') {
+            if (persistentValues.tutorialAscend) {
+                lootDict.tree ??= 0;
+                lootDict.tree++;
+                points -= typeRoll[1];
+            } else {
+                continue;
+            }
         } else {
             const itemRoll = inventoryDraw(typeRoll[0], typeRoll[1], typeRoll[2], 'shop');
             lootDict[itemRoll] ??= 0; 
@@ -652,10 +663,12 @@ const genItems = (points, index, inventoryDraw, saveValues) => {
             points -= typeRoll[3] * (1 + 0.5 * InventoryDefault[itemRoll].Star);
         }
     }
+    lootDict.nuts ??= 0;
+    lootDict.nuts += nps * 60 * Math.max(1, points);
     return lootDict;
 }
 
-const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame, treeOffer) => {
+const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame, treeOffer, persistentValues) => {
     const itemDict = saveValues.commDict[index];
     let power = 0;
     let log = '';
@@ -703,7 +716,7 @@ const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame, t
         power *= timeSpent;
     }
 
-    const lootRewards = genItems(power, index, inventoryDraw, saveValues);
+    const lootRewards = genItems(power, index, inventoryDraw, itemDict.nuts, persistentValues);
     const lootDiv = createDom('div', { class: [ 'flex-row', 'commission-reward-div', 'light-green-scrollbar' ]});
     for (let key in lootRewards) {
         let itemImg;
@@ -729,13 +742,24 @@ const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame, t
                 classList: ['comm-img'],
                 child: [itemAmount]
             }), { Star: 5, File:'primogem' });
+        } else if (key === 'tree') {
+            const itemAmount = createDom('p', {
+                classList: ['item-frame-text', 'small-font'],
+                innerText: lootRewards[key],
+            });
+
+            itemImg = inventoryFrame(createDom('div', {
+                src: `./assets/icon/seed-1.webp`,
+                classList: ['comm-img'],
+                child: [itemAmount]
+            }), { Star: 6, File:'seed-1' });
         } else {
             itemImg = inventoryFrame(createDom('div', {
                 src: `./assets/tooltips/inventory/${InventoryDefault[key].File}.webp`,
                 classList: ['comm-img'],
             }), InventoryDefault[key]);
 
-            if (Object.keys(treeOffer).includes(key)) {
+            if (treeOffer && Object.keys(treeOffer).includes(key)) {
                 let bonus = createDom('img', { classList: ['tree-bonus'], src:'./assets/expedbg/tree-item.webp' });
                 itemImg.append(bonus);
             } else {

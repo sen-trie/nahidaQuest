@@ -1399,6 +1399,17 @@ const blackShopDict = {
         level: 0,
         maxLevel: 5,
     },
+    'stove': {
+        cost: 2000,
+        primoCost: 700,
+        type: 'prop',
+        subtype: 'stove',
+        title: "Adepti Seeker's Stove",
+        desc: 'A portable stove that can be quickly set up for cooking almost anywhere. Allows additional food to be carried on commissions.',
+        file: 'tooltips/inventory/stove.webp',
+        level: 0,
+        maxLevel: 4,
+    },
     'skinCollection1': {
         cost: 2000,
         primoCost: 800,

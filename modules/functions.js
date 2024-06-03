@@ -375,4 +375,9 @@ function getTime() {
     return minutesPassedNow;
 }
 
-export { getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };
+function removeID(_id ){ 
+    const e = document.getElementById(_id);
+    if (e !== null) e.remove();
+}
+
+export { removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };

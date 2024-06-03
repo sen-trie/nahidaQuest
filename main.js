@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionInfo } from "./modules/dictData.js"
-import { getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
+import { removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,choiceMax,popUpBox,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop,errorMesg } from "./modules/adjustUI.js"
 import { CONSTANTS } from "./modules/constants.js";
 import * as Settings from "./modules/features/settings.js";
@@ -3178,6 +3178,7 @@ function tutorial(idleAmount) {
                 // FOR GOLDEN CORE CHALLENGE
                 if (persistentValues.transitionCore !== undefined || persistentValues.transitionCore !== null) {
                     if (persistentValues.tutorialAscend === false && persistentValues.goldenCore > 1000) {
+                        drawUI.customTutorial('ascendTut', 13, 'Leyline Outbreak!');
                         persistentValues.tutorialAscend = true;
                         createChallenge();
                         createAscend();
@@ -5750,7 +5751,7 @@ function buildComm(commisionMenu) {
                 commisionMenu.activate(i, saveValues);
             } else if (saveValues.commDict[i].timeEnd - getTime() < 0) {
                 commisionMenu.notif("clear", "comm", i);
-                const commRewards = Expedition.generateCommRewards(saveValues, i, inventoryDraw, inventoryFrame, getTreeItems());
+                const commRewards = Expedition.generateCommRewards(saveValues, i, inventoryDraw, inventoryFrame, getTreeItems(), persistentValues);
                 const lootItems = Array.from(commRewards.children[0].children);
                 const addToLoot = () => {
                     lootItems.forEach((item) => {
@@ -5759,6 +5760,10 @@ function buildComm(commisionMenu) {
                             saveValues["realScore"] += itemProp[1];
                         } else if (itemProp[0] === 'primogem') {
                             currencyPopUp([["primogem", itemProp[1]]]);
+                        } else if (itemProp[0] === 'tree') {
+                            for (let i = 0; i < itemProp[1]; i++) {
+                                addTreeCore(randomInteger(4, 6), 0);
+                            }
                         } else {
                             for (let i = 0; i < itemProp[1]; i++) {
                                 inventoryAdd(itemProp[0]);
@@ -5775,6 +5780,7 @@ function buildComm(commisionMenu) {
                 );   
                 if (!testing) saveData(true);
 
+                saveValues.commDict[i].nuts = 0;
                 saveValues.commDict[i].timeEnd = 0;
                 saveValues.commDict[i].char.forEach((char) => {
                     saveValues.charDict[char].currentComm = ``;
@@ -5813,6 +5819,8 @@ function buildComm(commisionMenu) {
         advDict.rankDict[19] === true ? maxChar++ : void(0);
         advDict.rankDict[17] === true ? maxChar++ : void(0);
         advDict.rankDict[13] === true ? maxChar++ : void(0);
+
+        maxChar += maxChar * persistentValues.blackMarketDict.stove.level;
 
         if (pickItems === null) {
             choiceBox(mainBody, {text: 'There is no available food!'}, stopSpawnEvents, ()=>{}, null, noChar, ['notif-ele']);
@@ -5859,6 +5867,7 @@ function buildComm(commisionMenu) {
                 saveValues.charDict[char.itemName].restEnd = commTime;
             });
 
+            saveValues.commDict[commissionNum].nuts = saveValues.dps;
             saveValues.commDict[commissionNum].timeStart = getTime();
             saveValues.commDict[commissionNum].timeEnd = commTime;
             saveValues.commDict[commissionNum].char = charAdd.map((char) => char.itemName);
@@ -8946,8 +8955,8 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
 }
 
 function quitQuicktime(atkNumber = 1, maxBeat = null, correctBeat) {
-    document.getElementById('quicktime-overlay').remove();
-    document.getElementById('text-overlay').remove();
+    removeID('quicktime-overlay');
+    removeID('text-overlay');
     setTimeout(() => {battleVariables.quicktimeAttack = false}, 300);
 
     if (maxBeat !== null) {
@@ -9287,6 +9296,7 @@ function killMob(mobDiv, mobHealth) {
     } else {
         adventureVariables.currentEnemyAmount--;
         if (adventureVariables.currentEnemyAmount === 0) {
+            quitQuicktime(0, 0, 0);
             winAdventure();
         }
     }
@@ -9497,16 +9507,16 @@ function winAdventure() {
         exitAdventure();
         switch (tempSpecialty) {
             case 'FellBoss':
-                drawUI.customTutorial("flower", 2, 'Scene');
+                drawUI.customTutorial("flower", 2, 'Post-Boss');
                 break;
             case 'Unusual':
-                drawUI.customTutorial("unusual", 4, 'Scene');
+                drawUI.customTutorial("unusual", 4, 'Post-Boss');
                 break;
             case 'Workshop':
-                drawUI.customTutorial("workshop", 4, 'Scene');
+                drawUI.customTutorial("workshop", 4, 'Post-Boss');
                 break;
             case 'Finale':
-                drawUI.customTutorial("finale", 9, 'Scene', persistentValues);
+                drawUI.customTutorial("finale", 9, 'Finale', persistentValues);
                 break;
             default:
                 break;
@@ -10733,7 +10743,7 @@ function buyShop(id, shopCost, blackDict) {
         
         confirmButton.addEventListener("click", function() {
             confirmPurchase(shopCost, id, blackDict);
-        })
+        });
         shopId = id;
     }
 }
@@ -11239,8 +11249,8 @@ function createAscend() {
     ascend.innerText = '';
 
     let ascendText = document.createElement('p');
-    ascendText.innerText = "Mark characters for Ascension";
-    ascendText.id = 'ascend-text'
+    ascendText.innerText = "Ascension (Effective after transcending)";
+    ascendText.id = 'ascend-text';
 
     let elementContainer = document.createElement('div');
     elementContainer.classList.add('flex-row');
@@ -12078,7 +12088,7 @@ function growTree(type, amount = 0) {
     const treeProgressValue = document.getElementById('tree-progress-value');
     if (type === 'add') {
         if (saveValues.treeObj.level === 5 || saveValues.treeObj.defense === true) {return}
-        treeProgress.progress += treeProgressValue.rate + amount;
+        treeProgress.progress += treeProgressValue.rate + amount ;
         saveValues.treeObj.growth = treeProgress.progress;
         treeProgress.style.width = treeProgress.progress + '%';
 
@@ -12586,11 +12596,11 @@ function newPop(type) {
 if (beta || testing) {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'f') {
-            spawnWorldQuest();
+            addTreeCore(randomInteger(1, 3), 0);
         } else if (e.key === 'g') {
-            genericItemLoot();
+            drawUI.customTutorial('ascendTut', 13, 'Leyline Outbreak');
         } else if (e.key === 'h') {
-            document.getElementById("nut-shop-div").activateWorkshopCell();
+            document.getElementById('shop-backdoor').style.display = 'block';
         } else if (e.key === 'j') {
             let guildTable = document.getElementById("guild-table");
             guildTable.toggle();
@@ -12616,9 +12626,9 @@ if (testing || beta) {
 
 function startingFunction() {
     // PRESS A KEY
-    // const event = new KeyboardEvent('keydown', {
-    //     key: 'j',
-    // });
+    const event = new KeyboardEvent('keydown', {
+        key: 'h',
+    });
     // const event2 = new KeyboardEvent('keydown', {
     //     key: '3',
     // });

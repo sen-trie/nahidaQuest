@@ -10,7 +10,7 @@ const createBattleText = (text, timer, container) => {
     textBox.classList.add("flex-column","battle-text")
     textBox.src = `./assets/expedbg/${text}.webp`;
     setTimeout(()=>{textBox.remove()}, timer);
-    container.append(textBox);
+    if (container) container.append(textBox);
     return container;
 }
 
