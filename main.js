@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionInfo } from "./modules/dictData.js"
-import { removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
+import { createArray,removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,choiceMax,popUpBox,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop,errorMesg } from "./modules/adjustUI.js"
 import { CONSTANTS } from "./modules/constants.js";
 import * as Settings from "./modules/features/settings.js";
@@ -347,219 +347,79 @@ function timerSave(timerSeconds) {
 
 // LOAD SAVE DATA
 function loadSaveData() {
-    // LOAD SETTINGS
-    if (localStorage.getItem("settingsValues") == null) {
+    if (localStorage.getItem('save-0') === null) { 
         settingsValues = SettingsDefault;
-    } else {
-        let settingsTemp = localStorage.getItem("settingsValues");
-        settingsValues = JSON.parse(settingsTemp);
-        updateObjectKeys(settingsValues, SettingsDefault);
-    }
-    // LOAD VALUES DATA
-    if (localStorage.getItem("saveValuesSave") == null) {
         saveValues = saveValuesDefault;
-    } else {
-        let saveValuesTemp = localStorage.getItem("saveValuesSave");
-        saveValues = JSON.parse(saveValuesTemp);
-        updateObjectKeys(saveValues,saveValuesDefault);
-    }
-    // LOAD HEROES DATA
-    if (localStorage.getItem("upgradeDictSave") === null) {
-        let upgradeDictTemp = generateHeroPrices(upgradeDictDefault, NONWISHHEROMAX, upgradeInfo);
-        upgradeDict = upgradeDictTemp;
-    } else {
-        let upgradeDictTemp = localStorage.getItem("upgradeDictSave");
-        upgradeDict = JSON.parse(upgradeDictTemp);
-
-        // FOR SAVE DATA BELOW 0.4.431 (WORKAROUND TO PREVENT EXPONENTIAL ITEM GROWTH)
-        if (parseInt(saveValues.versNumber) < 44310) {
-            for (let key in upgradeDict) {
-                upgradeDict[key]["BaseFactor"] = upgradeDict[key]["Factor"];
-            }
-        }
-        // FOR SAVE DATA BELOW 1.00.005 (WORKAROUND TO PREVENT ITEM NAN BUG FOR WISH HEROES)
-        if (parseInt(saveValues.versNumber) < 100005) {
-            for (let key in upgradeDict) {
-                if (key > 799 || key == 0) {
-                    if (upgradeDict[key]["Factor"]) {
-                        upgradeDict[key]["BaseFactor"] = upgradeDict[key]["Factor"];
-                    }
-                } 
-            }
-        }
-
-        setTimeout(loadRow, 1000);
-    }
-    // LOAD INVENTORY DATA
-    Inventory = InventoryDefault;
-    if (localStorage.getItem("InventorySave") == null) {
+        saveValues.versNumber = CONSTANTS.VERSIONNUMBER
+        upgradeDict = generateHeroPrices(upgradeDictDefault, NONWISHHEROMAX, upgradeInfo);
         InventoryMap = new Map();
-    } else {
-        let InventoryTemp = localStorage.getItem("InventorySave");
-        InventoryMap = new Map(JSON.parse(InventoryTemp));
-        for (let [key, value] of InventoryMap.entries()) {
-            if (value === null || value < 0) { InventoryMap.delete(key) }
-        }
-
-        inventoryload();
-    }
-    // LOAD EXPEDITION DATA
-    if (localStorage.getItem("expeditionDictSave") == null) {
         expeditionDict = expeditionDictDefault;
-    } else {
-        let expeditionDictTemp = localStorage.getItem("expeditionDictSave");
-        expeditionDictTemp = JSON.parse(expeditionDictTemp);
-        // FOR SAVE DATA BELOW 0.3.000 TO REFRESH EXPEDITIONS
-        if (typeof(expeditionDictTemp[1]) != "string") {
-            expeditionDict = expeditionDictDefault;
-        } else {
-            expeditionDict = expeditionDictTemp;
-        }
-        updateObjectKeys(expeditionDict,expeditionDictDefault);
-    }
-    // LOAD ADVENTURE DATA
-    if (localStorage.getItem("advDictSave") == null) {
-        let rankTemp = [null, true];
-        for (let j = 0; j < 19; j++) {
-            rankTemp.push(false);
-        }
-
-        advDict = advDictDefault;
-        advDict.rankDict = rankTemp;
-    } else {
-        let advDictTemp = localStorage.getItem("advDictSave");
-        advDict = JSON.parse(advDictTemp);
-        updateObjectKeys(advDict,advDictDefault);
-        // FOR SAVE DATA BELOW 0.4.4281 TO REFRESH REWARDS
-        if (parseInt(saveValues.versNumber) < 44290) {
-            for (let key in advDict.rankDict) {
-                advDict.rankDict[key].Locked = true;
+        advDict = (() => {
+            let temp = advDictDefault;
+            temp.rankDict = createArray(19, false, [null, true]);
+            return temp;
+        })();
+        achievementMap = (() => {
+            let temp = new Map();
+            for (let key in achievementListDefault) {
+                temp.set(parseInt(key), false);
             }
-        }
-
-        // FOR SAVE DATA BELOW 2.0.001 TO CHANGE VALUES
-        if (parseInt(saveValues.versNumber) < 200001 && !Array.isArray(advDict.rankDict)) {
-            let rankTemp = [null];
-            for (let j = 0; j < 20; j++) {
-                rankTemp.push(advDict.rankDict[j + 1].Locked);
-            }
-            advDict.rankDict = rankTemp;
-        }
-    }
-    // LOAD ACHIEVEMENT DATA
-    achievementList = achievementListDefault;
-    if (localStorage.getItem("achievementListSave") == null) {
-        achievementMap = new Map();
-        for (let key in achievementListDefault) {
-            achievementMap.set(parseInt(key),false);
-        }
-    } else {
-        let achievementListTemp = localStorage.getItem("achievementListSave");
-        achievementMap = new Map(JSON.parse(achievementListTemp));
-    }
-    // LOAD PERSISTENT VALUES 
-    if (localStorage.getItem("persistentValues") == null) {
-        persistentValues = persistentValuesDefault;
-        for (let key in upgradeInfo) {
-            let heroName = upgradeInfo[key].Name;
-            persistentValues.ascendDict[heroName] = 0;
-        }
-        const upgradeLength = Object.keys(permUpgrades).length;
-        persistentValues.upgrade = [...Array(upgradeLength).keys()].map(x => 0).unshift(null);
-    } else {
-        let persistentDictTemp = localStorage.getItem("persistentValues");
-        if (persistentDictTemp == "undefined") {
-            persistentValues = persistentValuesDefault;
-        } else {
-            persistentValues = JSON.parse(persistentDictTemp);
-            updateObjectKeys(persistentValues, persistentValuesDefault);
-            Shop.updateBlackMarket(persistentValues.blackMarketDict);
-
+            return temp;
+        })();
+        persistentValues = (() => {
+            let temp = persistentValuesDefault;
             for (let key in upgradeInfo) {
                 let heroName = upgradeInfo[key].Name;
-                if (persistentValues.ascendDict[heroName] === undefined) {
-                    persistentValues.ascendDict[heroName] = 0;
-                }
+                temp.ascendDict[heroName] = 0;
             }
-
-            // FOR SAVE DATA BELOW 2.0.001 TO ADD NEW VALUES
-            // ALSO TO SIMPLIFY TREE UPGRADES
-            if (parseInt(saveValues.versNumber) < 200001) {
-                if (persistentValues.lifetimeClicksValue === 0) {
-                    persistentValues.lifetimeClicksValue = saveValues.clickCount;
-                }
-    
-                if (persistentValues.lifetimeLevelsValue === 0) {
-                    persistentValues.lifetimeLevelsValue = saveValues.heroesPurchased;
-                }
-    
-                if (persistentValues.lifetimeEnergyValue === 0) {
-                    persistentValues.lifetimeEnergyValue = saveValues.energy;
-                }
-    
-                if (persistentValues.lifetimePrimoValue === 0) {
-                    persistentValues.lifetimePrimoValue = saveValues.primogem;
-                }
-
-                let tempArray = [null];
-                for (let i = 1; i < getHighestKey(permUpgrades) + 1; i++) {
-                    let tempItem;
-                    if (persistentValues[`upgrade${i}`] && persistentValues[`upgrade${i}`].Purchased === undefined) {
-                        tempItem = persistentValues[`upgrade${i}`];
-                    } else if (persistentValues[`upgrade${i}`]) {
-                        tempItem = persistentValues[`upgrade${i}`].Purchased;
-                    }
-                    
-                    if (tempItem !== undefined) {
-                        tempArray.push(tempItem);
-                    } else {
-                        tempArray.push(0);
-                    }
-                }
-                persistentValues.upgrade = tempArray;
-            }
-
-            const upgradeLength = Object.keys(permUpgrades).length;
-            if (persistentValues.upgrade.length != (upgradeLength + 1)) {
-                const lengthDiff = (upgradeLength + 1) - persistentValues.upgrade.length;
-                persistentValues.upgrade = persistentValues.upgrade.concat([...Array(lengthDiff).keys()].map(x => 0));
-            }
-        }
-    }
-    // LOAD STORE DATA
-    if (localStorage.getItem("storeInventory") == null) {
+            temp.upgrade = createArray(Object.keys(permUpgrades).length, 0, [null]);
+            return temp;
+        })();
         storeInventory = storeInventoryDefault;
     } else {
-        // FOR SAVE DATA BELOW 0.3.411 TO FIX STORE BUG
-        if (parseInt(saveValues.versNumber) < 34112) {
-            storeInventory = storeInventoryDefault;
-        } else {
-            let localStoreTemp = localStorage.getItem("storeInventory");
-            storeInventory = JSON.parse(localStoreTemp);
-            if (storeInventory.active == true) {
-                setShop("load");
-            }
+        let loadedSave = JSON.parse(localStorage.getItem('save-0'));
+        settingsValues = loadedSave.settingsTemp;
+        saveValues = loadedSave.saveValuesTemp;
+        upgradeDict = loadedSave.upgradeDictTemp;
+        InventoryMap = new Map(loadedSave.InventoryTemp);
+        expeditionDict = loadedSave.expeditionDictTemp;
+        advDict = loadedSave.advDictTemp;
+        achievementMap = new Map(loadedSave.achievementListTemp);
+        persistentValues = loadedSave.persistentValues;
+        storeInventory = loadedSave.localStoreTemp;
+    }
+
+    Inventory = InventoryDefault;
+    achievementList = achievementListDefault;    
+    updateObjectKeys(settingsValues, SettingsDefault);
+    updateObjectKeys(saveValues, saveValuesDefault);
+    updateObjectKeys(expeditionDict, expeditionDictDefault);
+    updateObjectKeys(advDict, advDictDefault);
+    updateObjectKeys(persistentValues, persistentValuesDefault);
+    Shop.updateBlackMarket(persistentValues.blackMarketDict);
+
+    for (let key in upgradeInfo) {
+        let heroName = upgradeInfo[key].Name;
+        if (persistentValues.ascendDict[heroName] === undefined) {
+            persistentValues.ascendDict[heroName] = 0;
         }
     }
 
-    const newTime = getTime();
-    timePassedSinceLast = newTime - persistentValues.lastRecordedTime;
-    persistentValues.lastRecordedTime = newTime;
-    
-    if (persistentValues.tutorialAscend) {
-        createTreeMenu();
+    for (let [key, value] of InventoryMap.entries()) {
+        if (value === null || value < 0) { InventoryMap.delete(key) }
     }
 
-    if (persistentValues.challengeCheck === undefined) {
-        persistentValues.challengeCheck = challengeCheck('populate', challengeInfo);
-    } else {
-        persistentValues.challengeCheck = challengeCheck('checkKeys', persistentValues.challengeCheck, challengeInfo);
+    if (storeInventory.active == true) {
+        setShop("load");
     }
-    updateObjectKeys(saveValues.treeObj, saveValuesDefault.treeObj);
-    achievementListload();
-    specialValuesUpgrade(true);
-    if (saveValues.goldenTutorial === true) {
-        addNutStore();
+
+    setTimeout(loadRow, 1000);
+    inventoryload();
+
+    const upgradeLength = Object.keys(permUpgrades).length;
+    if (persistentValues.upgrade.length != (upgradeLength + 1)) {
+        const lengthDiff = (upgradeLength + 1) - persistentValues.upgrade.length;
+        persistentValues.upgrade = persistentValues.upgrade.concat([...Array(lengthDiff).keys()].map(x => 0));
     }
 }
 
@@ -825,6 +685,26 @@ function idleCheck(idleAmount = 0) {
 
 // POST-SETUP GAME CONFIG
 function postSaveData() {
+    const newTime = getTime();
+    timePassedSinceLast = newTime - persistentValues.lastRecordedTime;
+    persistentValues.lastRecordedTime = newTime;
+    
+    if (persistentValues.tutorialAscend) {
+        createTreeMenu();
+    }
+
+    if (persistentValues.challengeCheck === undefined) {
+        persistentValues.challengeCheck = challengeCheck('populate', challengeInfo);
+    } else {
+        persistentValues.challengeCheck = challengeCheck('checkKeys', persistentValues.challengeCheck, challengeInfo);
+    }
+    updateObjectKeys(saveValues.treeObj, saveValuesDefault.treeObj);
+    achievementListload();
+    specialValuesUpgrade(true);
+    if (saveValues.goldenTutorial === true) {
+        addNutStore();
+    }
+
     const leftHandCSS = document.getElementById('toggle-css');
     leftHandCSS.disabled = (settingsValues.leftHandMode ? undefined : 'disabled');
     CONSTANTS.CHANGEFONTSIZE(settingsValues.fontSizeLevel);
@@ -3220,20 +3100,18 @@ function saveData(skip = false) {
     }
 
     const localStorageDict = {
-        "settingsValues":settingsValues,
-        "saveValuesSave":saveValues,
-        "upgradeDictSave":upgradeDict,
-        "expeditionDictSave":expeditionDict,
-        "InventorySave":Array.from(InventoryMap),
-        "achievementListSave":Array.from(achievementMap),
+        "settingsTemp":settingsValues,
+        "saveValuesTemp":saveValues,
+        "upgradeDictTemp":upgradeDict,
+        "InventoryTemp": Array.from(InventoryMap),
+        "expeditionDictTemp":expeditionDict,
+        "advDictTemp":advDict,
+        "achievementListTemp": Array.from(achievementMap),
         "persistentValues":persistentValues,
-        "advDictSave":advDict,
-        "storeInventory":storeInventory,
+        "localStoreTemp":storeInventory,
     }
 
-    for (let key in localStorageDict) {
-        localStorage.setItem(key,JSON.stringify(localStorageDict[key]));
-    }
+    localStorage.setItem('save-0', JSON.stringify(localStorageDict));
 }
 
 //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
@@ -12618,7 +12496,7 @@ if (beta || testing) {
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
-let testing = false;
+let testing = true;
 let disableQuicktime = false;
 if (localStorage.getItem('beta') === 'true') {
     beta = true;

@@ -168,4 +168,3 @@ for (let key in commisionInfo) {
 
     commTable.append(tableRow);
 }
-console.log(commisionInfo)

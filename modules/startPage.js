@@ -21,7 +21,8 @@ window.addEventListener("message", e => {
 	}
 });
 
-let isNewGame = (localStorage.getItem("settingsValues") === null) ? true : false; 
+// TODO: CHANGE TO SAVE 0
+let isNewGame = (localStorage.getItem("save-0") === null) ? true : false; 
 let startAlreadyDelay = true;
 setTimeout(() => { startAlreadyDelay = false }, 500);
 
@@ -47,16 +48,16 @@ if (!isNewGame) {
         startScreen.append(createDom('img', { src: './assets/icon/scara-start.webp', id: 'start-idle-scara' }));
     }
 
-    try {
-        let settingsTemp = localStorage.getItem("settingsValues");
-        let settingsValues = JSON.parse(settingsTemp);
-        CONSTANTS.CHANGEFONTSIZE(settingsValues.fontSizeLevel);
-    } catch (err) {
-        console.error('Error checking LocalStorage');
-    }
-} else {
-    CONSTANTS.CHANGEFONTSIZE(5);
-}
+    // try {
+    //     let settingsTemp = localStorage.getItem("settingsValues");
+    //     let settingsValues = JSON.parse(settingsTemp);
+    //     CONSTANTS.CHANGEFONTSIZE(settingsValues.fontSizeLevel);
+    // } catch (err) {
+    //     console.error('Error checking LocalStorage');
+    // }
+} 
+
+CONSTANTS.CHANGEFONTSIZE(5);
 
 const launchGame = () => {
     if (startAlreadyDelay === true) return;

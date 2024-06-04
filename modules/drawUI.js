@@ -332,13 +332,7 @@ const patchDict = {
     "v.2-0":`
     Welcome to nahidaQuest 2.0! Please enjoy your stay!<br><br>
 
-    <line>Major Bugs Fixed 🐞: </line><br><br>
-        </indent>
-        1. Flashing white box<br>
-        Sometimes when switching browser tabs, there is a brief instance where a box is visible which quickly disappears.
-        </indent>
-
-    <br><br><line>New Additions 💡: </line><br><br>
+    <line>New Additions 💡: </line><br><br>
         </indent>
         1. Trees! (Extended Endgame) <br>
         After getting enough Golden Cores, you can grow Trees for the purposes of stopping an outbreak and growing additional late-game currency. Also, the game now has an end objective as well!

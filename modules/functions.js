@@ -148,7 +148,7 @@ function countdownText(foodCooldown, int) {
 }
 
 // CHECKS FOR MISSING KEYS BETWEEN OBJECTS
-function updateObjectKeys(savedObject,referenceObject) {
+function updateObjectKeys(savedObject, referenceObject) {
     for (let key in referenceObject) {
         if (!savedObject.hasOwnProperty(key)) {
             savedObject[key] = referenceObject[key];
@@ -375,9 +375,13 @@ function getTime() {
     return minutesPassedNow;
 }
 
-function removeID(_id ){ 
+function removeID(_id ) { 
     const e = document.getElementById(_id);
     if (e !== null) e.remove();
 }
 
-export { removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };
+function createArray(length, ele, startingArray = []) {
+    return [...startingArray, ...[...Array(length).keys()].map(x => ele)]
+}
+
+export { createArray,removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };
