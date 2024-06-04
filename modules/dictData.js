@@ -94,7 +94,7 @@ const sceneInfo = {
         Type: 'LuckCheck',
         Lore: ["Nahida encountered the [s]Dreadful Withering[/s] as she was exploring. <br><br>Its spread appears to have been localized to this area."],
         FailLore: "Oh no! The decay was too overwhelming and Nahida was forced to run away.",
-        SuccessLore: "With your efforts, Nahida was successful in clearing the decay!",
+        SuccessLore: "With her efforts, Nahida was successful in clearing the decay!",
     },
     2: {
         Scenes: 1,
@@ -169,7 +169,7 @@ const sceneInfo = {
         Scenes: 1,
         Type: 'LuckCheck',
         Lore: ["Deep underground, the [s]Jadeplume Terrorshroom[/s] is guarding something that will be useful to Nahida's journey. <br><br>If she's lucky, Nahida can snatch the item without it noticing."],
-        FailLore: "Unfortunately, the [s]Jadeplume Terrorshroom[/s] noticed Nahida's presence before you could get the item.",
+        FailLore: "Unfortunately, the [s]Jadeplume Terrorshroom[/s] noticed Nahida's presence before she could get the item.",
         SuccessLore: "With Nahida's reflexes, she was able to evade the [s]Jadeplume Terrorshroom's[/s] barrage as she swiped the item right underneath it."
     },
     16: {
@@ -208,7 +208,7 @@ const sceneInfo = {
     22: {
         Scenes: 1,
         Type: 'Trade',
-        Lore: ["[s]Dori[/s], the elusive merchant, approaches you with what she calls a [s]'fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal'[/s]. <br><br>Will you accept?"]
+        Lore: ["[s]Dori[/s], the elusive merchant, approaches Nahida with what she calls a [s]'fantastic, unbeatable, unmatched, mind-blowing, once-in-a-lifetime deal'[/s]. <br><br>Should Nahida accept?"]
     },
 }
 

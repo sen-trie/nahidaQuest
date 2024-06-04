@@ -3163,7 +3163,7 @@ function tutorial(idleAmount) {
         playButton.src = "./assets/tutorial/play-button.webp";
         playButton.id = 'play-button';
         playButton.classList.add("play-button");
-        playButton.addEventListener("click",()=>{
+        playButton.addEventListener("click",() => {
             overlay.style.display = 'none';
 
             clearInterval(timerLoad);
@@ -3171,13 +3171,15 @@ function tutorial(idleAmount) {
             currentBGM = playAudio();
             settingsVolume();
 
-            setTimeout(()=>{
+            setTimeout(() => {
                 if (document.getElementById('idle-nuts-div')) {document.getElementById('idle-nuts-div').remove()}
                 saveValues.realScore += idleAmount;
 
                 // FOR GOLDEN CORE CHALLENGE
-                if (persistentValues.transitionCore !== undefined || persistentValues.transitionCore !== null) {
-                    if (persistentValues.tutorialAscend === false && persistentValues.goldenCore > 1000) {
+                if (persistentValues.transitionCore !== undefined) {
+                    if (persistentValues.transitionCore !== null && 
+                            persistentValues.tutorialAscend === false && 
+                            persistentValues.goldenCore > 1000) {
                         drawUI.customTutorial('ascendTut', 13, 'Leyline Outbreak!');
                         persistentValues.tutorialAscend = true;
                         createChallenge();
@@ -3187,8 +3189,10 @@ function tutorial(idleAmount) {
 
                     challengeNotification(({category: 'core', value: persistentValues.transitionCore}));
                     delete persistentValues.transitionCore;
+                } else if (parseInt(saveValues.versNumber) < 200003 && persistentValues.tutorialAscend === true) {
+                    drawUI.customTutorial('ascendTut', 13, 'Leyline Outbreak');
                 }
-            },250)
+            }, 250);
         });
 
         tutorialDark.appendChild(playButton);
@@ -5780,6 +5784,7 @@ function buildComm(commisionMenu) {
                 );   
                 if (!testing) saveData(true);
 
+                saveValues.commDict[i].ele = rollArray(boxElement, 1);
                 saveValues.commDict[i].nuts = 0;
                 saveValues.commDict[i].timeEnd = 0;
                 saveValues.commDict[i].char.forEach((char) => {
@@ -9146,6 +9151,9 @@ function attackAll() {
         screenEffect.remove();
     }, 1100);
 
+    // TODO
+    currentATK *= 999
+
     setTimeout(() => {
         let cooldownTime;
         parryFailure.load();
@@ -9409,12 +9417,11 @@ function winAdventure() {
         lootCounter++;
     }
 
-
     let tempArray = compareTreeItems(Object.values(lootArray));
     lootArray = {};
 
-    // SKIRMISH
-    if (adventureVariables.advLevel === 13) {
+    // SKIRMISH TO DO
+    if (adventureVariables.advType === 13) {
         let treeSeedID;
         if (persistentValues.workshopBossDefeat) {
             treeSeedID = 4021;
@@ -11645,7 +11652,7 @@ function createTreeMenu() {
 
     let container = document.createElement('div');
     container.classList.add('flex-row');
-    let element = rollArray(boxElement,1);
+    let element = rollArray(boxElement, 1);
     container.style.background = `url(./assets/tooltips/elements/nut-${element.toLowerCase()}.webp) no-repeat center center/contain`;
     
     treeTable.append(palmText, optionsContainer);
@@ -12598,7 +12605,7 @@ if (beta || testing) {
         if (e.key === 'f') {
             addTreeCore(randomInteger(1, 3), 0);
         } else if (e.key === 'g') {
-            drawUI.customTutorial('ascendTut', 13, 'Leyline Outbreak');
+            spawnSkirmish();
         } else if (e.key === 'h') {
             document.getElementById('shop-backdoor').style.display = 'block';
         } else if (e.key === 'j') {
