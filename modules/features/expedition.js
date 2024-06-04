@@ -675,7 +675,7 @@ const generateCommRewards = (saveValues, index, inventoryDraw, inventoryFrame, t
     const timeSpent = (itemDict.timeEnd - itemDict.timeStart) / 60;
     itemDict.char.forEach((char) => {
         const charDict = commisionInfo[char];
-        let charPower = 300;
+        let charPower = 300 * (0.4 + 0.125 * charDict.power[index]);
         for (let key in upgradeInfo) {
             if (upgradeInfo[key].Name === char) {
                 if (upgradeInfo[key].Ele === itemDict.ele) {

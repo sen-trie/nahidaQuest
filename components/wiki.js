@@ -1,4 +1,4 @@
-import { upgradeInfo, InventoryDefault } from "../modules/dictData.js";
+import { upgradeInfo, InventoryDefault, commisionInfo } from "../modules/dictData.js";
 import { getHighestKey } from "../modules/functions.js";
 import { permUpgrades } from "../modules/defaultData.js";
 
@@ -143,3 +143,29 @@ for (let i = 1; i < 20; i++) {
         blessingTableTwo.appendChild(tableRow);
     }
 }
+
+const commTable = document.getElementById('comm-table');
+for (let key in commisionInfo) {
+    const tableRow = document.createElement('tr');
+    const tableName = document.createElement('td');
+    const tableLike = document.createElement('td');
+    const tableDislike = document.createElement('td');
+    const tableStrLike = document.createElement('td');
+    const tableStrDislike = document.createElement('td');
+    const tableProf = document.createElement('td');
+    
+    tableProf.innerText = commisionInfo[key].power.join(', ');
+    tableName.innerText = key;
+    tableLike.innerText = commisionInfo[key].charLikes.join(', ');
+    tableDislike.innerText = commisionInfo[key].charDislikes.join(', ');
+    tableStrLike.innerText = commisionInfo[key].charStrongLike.join(', ');
+    tableStrDislike.innerText = commisionInfo[key].charStrongDislikes.join(', ');
+    tableRow.append(tableName, tableStrLike, tableLike, tableDislike, tableStrDislike, tableProf);
+
+    [tableLike, tableDislike, tableStrLike, tableStrDislike].forEach((ele) => {
+        ele.innerText = ele.innerText === '' ? '-' : ele.innerText;
+    });
+
+    commTable.append(tableRow);
+}
+console.log(commisionInfo)
