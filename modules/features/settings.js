@@ -1,4 +1,5 @@
 import { createDom } from "../adjustUI.js"
+import { CONSTANTS } from "../constants.js";
 import { convertTo24HourFormat } from "../functions.js";
 
 const statsArray = {
@@ -113,4 +114,75 @@ const advancedStats = () => {
     return advancedStats;
 }
 
-export { volumeScrollerCreate, settingsBottomLinks, settingButton, advancedStats }
+const formatTime = (lastSave) => {
+    const startOfYear = new Date('1900-01-01T00:00:00');
+    const millisecondsPassedNow = lastSave * 60 * 1000;
+    const calculatedDate = new Date(startOfYear.getTime() + millisecondsPassedNow);
+    const formatTime = calculatedDate.toDateString() + "\n" + calculatedDate.toLocaleTimeString();
+    return formatTime;
+}
+
+const buildSaves = (localStorage) => {
+    const exportBoxText = createDom('div', {
+        class: ['settings-textarea', 'settings-export', 'green-scrollbar'],
+    });
+
+    for (let i = 0; i < 6; i++) {
+        const saveAvail = JSON.parse(localStorage.getItem(`save-${i}`));
+        const lastSave = saveAvail?.saveValuesTemp?.currentTime;
+
+        const saveText = createDom('p', {
+            innerText: `${i === 0 ? 'Autosave' : 'Save ' + i}
+                        Last Save: ${saveAvail == null ? '-' : formatTime(lastSave)}`
+        });
+
+        const uploadButton = createDom('img', {
+            src: './assets/settings/Upload.webp',
+            class: ['clickable'],
+            id: `settings-upload-${i}`
+        });
+        
+        uploadButton.checkSaved = () => {
+            return localStorage.getItem(`save-${i}`) != null;
+        }
+        
+        const downloadButton = createDom('img', {
+            src: './assets/settings/Download.webp',
+            class: ['clickable'],
+            event: ['click', () => {
+                if (uploadButton.checkSaved()) {
+                    CONSTANTS.DOWNLOADSAVE(i);
+                }
+            }]
+        });
+
+        uploadButton.progressText = () => {
+            saveText.innerText = `${i === 0 ? 'Autosave' : 'Save ' + i}
+                                  Saving...`
+        }
+
+        uploadButton.updateText = () => {
+            const saveAvail = JSON.parse(localStorage.getItem(`save-${i}`));
+            saveText.innerText = `${i === 0 ? 'Autosave' : 'Save ' + i}
+                                  Last Save: ${saveAvail == null ? '-' : formatTime(saveAvail.saveValuesTemp.currentTime)}`
+        }
+
+        const deleteButton = createDom('img', {
+            src: './assets/settings/Delete.webp',
+            class: ['clickable'],
+            id: `settings-del-${i}`
+        });
+
+        const saveDiv = createDom('div', {
+            class: ['flex-row', 'flex-space', 'settings-save-div'],
+            child: [ downloadButton, saveText, uploadButton ]
+        });
+
+        if (i !== 0) { saveDiv.appendChild(deleteButton) }
+        exportBoxText.appendChild(saveDiv);
+    }
+
+    return exportBoxText;
+}
+
+export { volumeScrollerCreate, settingsBottomLinks, settingButton, advancedStats, buildSaves }

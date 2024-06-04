@@ -6,10 +6,9 @@ const changeFontSize = (fontSize) => {
 }
 
 const DBNUBMER = (VERSIONNUMBER.split(".")[1]).replaceAll("-","");
-const downloadSave = () => {
+const downloadSave = (saveNum = 0) => {
     const date = new Date();
-    let text = JSON.stringify(localStorage);
-    text = JSON.stringify(JSON.parse(text), null, 2)
+    let text = localStorage.getItem(`save-${saveNum}`);
     
     let blob = new Blob([text], {type: "text/plain"});
     let link = document.createElement("a");

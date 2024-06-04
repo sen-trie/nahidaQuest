@@ -3080,7 +3080,7 @@ function tutorial(idleAmount) {
     }
 }
 
-function saveData(skip = false) {
+function saveData(skip = false, saveSlot = 0) {
     if (preventSave) {return};
     const currentTime = getTime();
 
@@ -3111,7 +3111,7 @@ function saveData(skip = false) {
         "localStoreTemp":storeInventory,
     }
 
-    localStorage.setItem('save-0', JSON.stringify(localStorageDict));
+    localStorage.setItem(`save-${saveSlot}`, JSON.stringify(localStorageDict));
 }
 
 //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
@@ -3405,7 +3405,7 @@ function generalSettings(settingsMenu) {
 
     let clearSetting = document.createElement("button");
     clearSetting.classList.add("setting-clear");
-    clearSetting.addEventListener("click",() => {choiceBox(mainBody, {text: 'Are you sure? Deleting your save cannot be undone!'}, null, 
+    clearSetting.addEventListener("click",() => {choiceBox(mainBody, {text: 'Are you sure? This will delete ALL of your saves. It cannot be undone!!'}, null, 
                                                 () => {clearLocalStorage()}, undefined, null, ['choice-ele']);
     });
 
@@ -3680,28 +3680,53 @@ function settingsBox() {
         });
 
         const exportBox = createDom('div', {
-            class: ['settings-box'],
+            class: ['export-box'],
+            child: [Settings.buildSaves(localStorage)],
             style: {
                 display: 'none'
             }
         });
 
-        const exportBoxText = createDom('textarea', {
-            class: ['settings-textarea'],
-            placeholder: "Save your game to export it!",
-        })
+        const uploadSave = (uploadButton, i) => {
+            uploadButton.progressText();
+            saveData(true, i);
+            setTimeout(() => {
+                uploadButton.updateText();
+            }, 500);
+        }
 
-        const exportBoxButton = createDom('button', {
-            class: ['settings-inner-button'],
-            innerText: 'Download Save'
-        })
-        
-        exportBoxButton.addEventListener("click",() => {
-            CONSTANTS.DOWNLOADSAVE();
-        })
+        const deleteSave = (uploadButton, i) => {
+            localStorage.removeItem(`save-${i}`);
+            uploadButton.updateText();
+        }
 
-        exportBox.append(exportBoxText, exportBoxButton);
+        setTimeout(() => {
+            for (let i = 0; i < 6; i++) {
+                const uploadButton = document.getElementById(`settings-upload-${i}`);
+                uploadButton.addEventListener('click', () => {
+                    if (uploadButton.checkSaved()) {
+                        choiceBox(mainBody, {text: 'Do you want to overwrite this save? <br> This action cannot be undone.'}, stopSpawnEvents, 
+                                  () => { uploadSave(uploadButton, i) }, undefined, null, ['choice-ele']
+                        );   
+                    } else {
+                        uploadSave(uploadButton, i);
+                    }
+                });
 
+                if (i === 0) continue;
+                const deleteButton = document.getElementById(`settings-del-${i}`);
+                deleteButton.addEventListener('click', () => {
+                    if (uploadButton.checkSaved()) {
+                        choiceBox(mainBody, {text: 'Do you want to delete this save? <br> This action cannot be undone.'}, stopSpawnEvents, 
+                                  () => { deleteSave(uploadButton, i) }, undefined, null, ['choice-ele']
+                        );   
+                    }
+                });
+            };
+        }, 100);
+
+
+        // TODO: FIX IMPORTS
         const importBox = createDom('div', {
             class: ['settings-box'],
             style: {
@@ -3755,8 +3780,8 @@ function settingsBox() {
                     console.error("Invalid save data.");
                 } else {
                     let clearPromise = new Promise(function(myResolve, myReject) {
-                        localStorage.clear();
-                        if (localStorage.length === 0) {
+                        localStorage.removeItem('save-0');
+                        if (localStorage.getItem('save-0') == null) {
                             myResolve(); 
                         } else {
                             myReject();
@@ -3765,9 +3790,7 @@ function settingsBox() {
                     
                     clearPromise.then(
                         function(value) {
-                            for (let key in localStorageTemp) {
-                                    localStorage.setItem(key, localStorageTemp[key]);
-                            }
+                            localStorage.setItem('save-0', JSON.stringify(localStorageTemp));
                             location.reload();
                         },
                         function(err) {console.error("Error clearing local data")}
@@ -3784,15 +3807,10 @@ function settingsBox() {
                 exportHeaderButton.classList.remove('inactive-tab');
                 importHeaderButton.classList.add('inactive-tab')
             }
-
             importBox.style.display = 'none';
             exportBox.style.display = 'block';
-            setTimeout(()=> {
-                exportBoxText.value = `I AM NOT RESPONSIBLE FOR ANY DAMAGES CAUSED BY EDITING SAVES. Beware! Directly changing 'realScore','rowCount' or adding non-integer values may result in the save file being corrupted!
-                                        \n---------------------------------
-                                        \n${JSON.stringify(localStorage)}\n\n`;
-            }, 300);
-        })
+            document.getElementById(`settings-upload-0`).updateText();
+        });
 
         importHeaderButton.addEventListener('click', () => {
             if (importHeaderButton.classList.contains('inactive-tab')) {
@@ -3802,7 +3820,7 @@ function settingsBox() {
 
             importBox.style.display = 'block';
             exportBox.style.display = 'none';
-        })
+        });
 
         settingsHeader.append(importHeaderButton, exportHeaderButton);
         saveSettingsMenu.append(settingsHeader, exportBox, importBox);
@@ -3861,12 +3879,12 @@ function settingsBox() {
             style: {
                 fontSize: '1rem'
             }
-        })
+        });
 
         const consoleBoxButton = createDom('button', {
             class: ['settings-inner-button'],
             innerText: 'Execute Command'
-        })
+        });
 
         consoleBoxButton.addEventListener("click",() => {
             let commandText = consoleBoxText.value.toLowerCase();
@@ -9028,9 +9046,6 @@ function attackAll() {
     setTimeout(() => {
         screenEffect.remove();
     }, 1100);
-
-    // TODO
-    currentATK *= 999
 
     setTimeout(() => {
         let cooldownTime;
