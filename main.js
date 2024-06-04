@@ -12241,7 +12241,7 @@ function blessCreate(treeTable) {
 
         growTree('add', randomInteger(15, 20) * additionalBless);
         const enemyRoll = randomInteger(0, 100);
-        if (enemyRoll < (20 - luckRate / 4) && !testing) {
+        if (enemyRoll < (20 - luckRate / 4)) {
             enemyBlock(false);
         }
 

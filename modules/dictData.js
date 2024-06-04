@@ -1454,6 +1454,17 @@ const blackShopDict = {
         level: 0,
         maxLevel: 1,
     },
+    'skinCollection5': {
+        cost: 2000,
+        primoCost: 800,
+        type: 'cosmetic',
+        subtype: 'skinCollection',
+        title: 'Mirage Theme Set',
+        desc: 'Unlocks a new theme for the UI!',
+        file: 'tooltips/inventory/skinCollection5.webp',
+        level: 0,
+        maxLevel: 1,
+    },
     'kusava': {
         cost: 4000,
         primoCost: 900,
