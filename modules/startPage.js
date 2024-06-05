@@ -2,6 +2,7 @@ import { randomInteger } from './functions.js';
 import { createDom,choiceBox,errorMesg } from './adjustUI.js';
 import { startGame } from '../main.js?v=10bf854c877336fb3e26fe317e80f6ba'
 import { CONSTANTS } from './constants.js';
+import { buildSaves } from './features/settings.js';
 
 //------------------------------------------------------------------------INITIAL SETUP------------------------------------------------------------------------//
 // START SCREEN
@@ -73,10 +74,8 @@ continueButton.addEventListener("click", () => {
 
 newGameButton.addEventListener("click", () => {
     if (!isNewGame) {
-        newGameButton.addEventListener("click", () => {
-            choiceBox(startScreen, {text: 'Are you sure? Deleting your save cannot be undone!'}, null, 
-                      () => {clearLocalStorage()}, undefined, null, ['choice-ele']);
-        });
+        choiceBox(startScreen, {text: 'Are you sure? Deleting your save cannot be undone!'}, null, 
+                    () => {clearLocalStorage()}, undefined, null, ['choice-ele']);
     } else if (isNewGame) {
         launchGame();
     }
@@ -107,16 +106,22 @@ let drawUI;
     mainBody.style.display = "block";
 })();
 
-let copyrightText = document.getElementById("copyright-number"); 
+const copyrightText = document.getElementById("copyright-number"); 
 copyrightText.innerText = CONSTANTS.COPYRIGHT;
 
-let versionText = document.getElementById("vers-number");
+const versionText = document.getElementById("vers-number");
 versionText.innerText = CONSTANTS.VERSIONNUMBER;
 
-let versionTextStart = document.getElementById("vers-number-start");
+const versionTextStart = document.getElementById("vers-number-start");
 versionTextStart.innerText = `[${CONSTANTS.VERSIONNUMBER}] \n ${CONSTANTS.COPYRIGHT}`;
 
-let downloadSave = document.getElementById('save-copy');
+const exportBox = createDom('div', {
+    class: ['export-box'],
+    child: [buildSaves(localStorage, false, launchGame)],
+});
+
+const downloadSave = document.getElementById('save-copy');
 downloadSave.addEventListener('click', () => {
-    CONSTANTS.DOWNLOADSAVE();
+    choiceBox(startScreen, {text: 'Save Manager', yes:'Exit'}, null, 
+              () => {}, null, exportBox, ['notif-ele', 'save-manager']);
 })

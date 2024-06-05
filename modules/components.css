@@ -3567,6 +3567,7 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
     font-size: 1rem;
     text-align: center;
     flex-grow: 1;
+    color: #1d2e18;
 }
 
 .settings-save-div > img {

@@ -3080,7 +3080,7 @@ function tutorial(idleAmount) {
     }
 }
 
-function saveData(skip = false, saveSlot = 0) {
+function saveData(skip = false, saveSlot = 0, customArray = []) {
     if (preventSave) {return};
     const currentTime = getTime();
 
@@ -3110,6 +3110,10 @@ function saveData(skip = false, saveSlot = 0) {
         "persistentValues":persistentValues,
         "localStoreTemp":storeInventory,
     }
+
+    customArray.forEach((item) => {
+        localStorageDict[item[0]] = item[1];
+    });
 
     localStorage.setItem(`save-${saveSlot}`, JSON.stringify(localStorageDict));
 }
@@ -3695,11 +3699,6 @@ function settingsBox() {
             }, 500);
         }
 
-        const deleteSave = (uploadButton, i) => {
-            localStorage.removeItem(`save-${i}`);
-            uploadButton.updateText();
-        }
-
         setTimeout(() => {
             for (let i = 0; i < 6; i++) {
                 const uploadButton = document.getElementById(`settings-upload-${i}`);
@@ -3710,16 +3709,6 @@ function settingsBox() {
                         );   
                     } else {
                         uploadSave(uploadButton, i);
-                    }
-                });
-
-                if (i === 0) continue;
-                const deleteButton = document.getElementById(`settings-del-${i}`);
-                deleteButton.addEventListener('click', () => {
-                    if (uploadButton.checkSaved()) {
-                        choiceBox(mainBody, {text: 'Do you want to delete this save? <br> This action cannot be undone.'}, stopSpawnEvents, 
-                                  () => { deleteSave(uploadButton, i) }, undefined, null, ['choice-ele']
-                        );   
                     }
                 });
             };
@@ -3893,19 +3882,19 @@ function settingsBox() {
                 toggleSettings(true);
             } else if (commandText === "ascend skip") {
                 persistentValues.tutorialAscend = true;
-                saveData();
+                saveData(true);
                 location.reload();
             } else if (commandText === "tester on") {
-                localStorage.setItem('tester', true);
+                saveData(true, 0, [['tester', true]]);
                 location.reload();
             } else if (commandText === "tester off") {
-                localStorage.setItem('tester', false);
+                saveData(true, 0, [['tester', false]]);
                 location.reload();
             } else if (commandText === "beta on") {
-                localStorage.setItem('beta', true);
+                saveData(true, 0, [['beta', true]]);
                 location.reload();
             } else if (commandText === "beta off") {
-                localStorage.setItem('beta', false);
+                saveData(true, 0, [['beta', false]]);
                 location.reload();
             } else if (commandText === "max level") {
                 document.getElementById('tab-2').click();
@@ -12511,13 +12500,16 @@ if (beta || testing) {
 
 // FOR TESTING PURPOSES ONLY
 let beta = false;
-let testing = true;
+let testing = false;
 let disableQuicktime = false;
-if (localStorage.getItem('beta') === 'true') {
-    beta = true;
-}
-if (localStorage.getItem('tester') === 'true') {
-    testing = true;
+if (localStorage.getItem('save-0')) {
+    const save = JSON.parse(localStorage.getItem('save-0'));
+    if (save.beta == true) {
+        beta = true;
+    }
+    if (save.tester == true) {
+        testing = true;
+    }
 }
 
 if (testing || beta) {
@@ -12537,17 +12529,12 @@ function startingFunction() {
 }
 
 if (testing) {
-    let tester = document.createElement('p');
-    tester.innerText = 'TESTER';
-    tester.classList.add('test-warning');
-    mainBody.append(tester); 
+    mainBody.append(createDom('p', { innerText: 'TESTER', classList:['test-warning'] })); 
     
     setTimeout(()=>{
         let startButton = document.getElementById("start-button");
         if (startButton) startButton.click();
-        setTimeout(()=>{ 
-            startingFunction();
-        },1500);
+        setTimeout(() => { startingFunction(); },1500);
     }, 1200);
 }
 

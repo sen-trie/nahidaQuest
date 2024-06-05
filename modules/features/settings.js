@@ -1,4 +1,4 @@
-import { createDom } from "../adjustUI.js"
+import { createDom, choiceBox } from "../adjustUI.js"
 import { CONSTANTS } from "../constants.js";
 import { convertTo24HourFormat } from "../functions.js";
 
@@ -122,7 +122,7 @@ const formatTime = (lastSave) => {
     return formatTime;
 }
 
-const buildSaves = (localStorage) => {
+const buildSaves = (localStorage, noUploads = true, launchGame) => {
     const exportBoxText = createDom('div', {
         class: ['settings-textarea', 'settings-export', 'green-scrollbar'],
     });
@@ -137,7 +137,7 @@ const buildSaves = (localStorage) => {
         });
 
         const uploadButton = createDom('img', {
-            src: './assets/settings/Upload.webp',
+            src: './assets/settings/Refresh.webp',
             class: ['clickable'],
             id: `settings-upload-${i}`
         });
@@ -167,18 +167,54 @@ const buildSaves = (localStorage) => {
                                   Last Save: ${saveAvail == null ? '-' : formatTime(saveAvail.saveValuesTemp.currentTime)}`
         }
 
+        const deleteSave = (uploadButton, i) => {
+            localStorage.removeItem(`save-${i}`);
+            uploadButton.updateText();
+        }
+
         const deleteButton = createDom('img', {
             src: './assets/settings/Delete.webp',
             class: ['clickable'],
-            id: `settings-del-${i}`
+            id: `settings-del-${i}`,
+            event: ['click', () => {
+                if (uploadButton.checkSaved()) {
+                    const currentTop = document.getElementById('game') ?? document.getElementById('start-screen');
+                    choiceBox(currentTop, {text: 'Do you want to delete this save? <br> This action cannot be undone.'}, undefined, 
+                              () => { deleteSave(uploadButton, i) }, undefined, null, ['choice-ele']
+                    );   
+                }
+            }]
+        });
+
+        const useButton = createDom('img', {
+            src: './assets/settings/Upload.webp',
+            class: ['clickable'],
+            event: ['click', () => {
+                if (uploadButton.checkSaved()) {
+                    const currentTop = document.getElementById('game') ?? document.getElementById('start-screen');
+                    choiceBox(currentTop, {text: 'Do you want to load this save? This will overwrite your autosave!'}, undefined, 
+                              () => { 
+                                localStorage.setItem(`save-0`, localStorage.getItem(`save-${i}`));
+                                launchGame();
+                             }, 
+                              undefined, null, ['choice-ele']
+                    );   
+                }
+            }]
         });
 
         const saveDiv = createDom('div', {
             class: ['flex-row', 'flex-space', 'settings-save-div'],
-            child: [ downloadButton, saveText, uploadButton ]
+            child: [ downloadButton, saveText ]
         });
 
-        if (i !== 0) { saveDiv.appendChild(deleteButton) }
+        if (noUploads) { 
+            saveDiv.appendChild(uploadButton);
+        } else {
+            saveDiv.appendChild(useButton);
+        }
+        if (i === 0) { deleteButton.classList.add('unclickable') }
+        saveDiv.appendChild(deleteButton)
         exportBoxText.appendChild(saveDiv);
     }
 

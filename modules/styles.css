@@ -674,6 +674,11 @@ table, button, label {
     transform: scale(1.05);
 }
 
+.unclickable {
+    opacity: 0;
+    pointer-events: none;
+}
+
 /*/////////////////////////////// TEMP BUFFS CSS ///////////////////////////////*/
 .temp-buff {
     position: relative;
@@ -3209,6 +3214,15 @@ table, button, label {
 
 .choice-ele > *, .notif-ele > *, .menu-ele > * {
     z-index: 10;
+}
+
+.save-manager > div {
+    max-height: 70%;
+}
+
+.choice-div > .export-box {
+    padding: 1rem 0;
+    box-sizing: border-box;
 }
 
 .choice-ele > div, .notif-ele > div {
