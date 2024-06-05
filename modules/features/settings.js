@@ -128,7 +128,10 @@ const buildSaves = (localStorage, noUploads = true, launchGame) => {
     });
 
     for (let i = 0; i < 6; i++) {
-        const saveAvail = JSON.parse(localStorage.getItem(`save-${i}`));
+        let saveAvail = null;
+        if (localStorage.getItem(`save-${i}`) != null) {
+            saveAvail = JSON.parse(window.atob(localStorage.getItem(`save-${i}`)));
+        };
         const lastSave = saveAvail?.saveValuesTemp?.currentTime;
 
         const saveText = createDom('p', {
@@ -162,7 +165,10 @@ const buildSaves = (localStorage, noUploads = true, launchGame) => {
         }
 
         uploadButton.updateText = () => {
-            const saveAvail = JSON.parse(localStorage.getItem(`save-${i}`));
+            let saveAvail = null;
+            if (localStorage.getItem(`save-${i}`) != null) {
+                saveAvail = JSON.parse(window.atob(localStorage.getItem(`save-${i}`)));
+            };
             saveText.innerText = `${i === 0 ? 'Autosave' : 'Save ' + i}
                                   Last Save: ${saveAvail == null ? '-' : formatTime(saveAvail.saveValuesTemp.currentTime)}`
         }

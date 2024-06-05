@@ -347,7 +347,7 @@ const patchDict = {
         </indent>
 
         <br><br> 4. Commisions <br>
-        Unlocked at a certain Adventure Rank. By sending out Sumeru characters, commissions reward items.
+        Unlocked at a certain Adventure Rank. By sending out Sumeru characters, commissions reward items. Level of rewards depend on the characters chosen and how well they pair with each other.
         </indent>
 
         <br><br> 5. Challenges <br>
@@ -368,22 +368,27 @@ const patchDict = {
 
     <br><br><line>Systems Rework 🌰: </line><br><br>
         </indent>
-        1. Removed portrait mode <br>
+        1. Flattened saves <br>
+        Saves are tidied up into single lines of text, allowing for multiple saves. Managing them is done under the new 'Save Manager' which can
+        be accessed under Settings > Saves > Export or at the Launch Page. However, this also means all previous saves are incompatible (Sorry!)
+        [(Technical) Each save is stored in localStorage with id 'save-(num)'].
+
+        <br><br>2. Removed portrait mode <br>
         I am sorry to any mobile users who make use of portait mode. Some of the content in this update heavily relies on a wide-aspect ratio (specifically combat) which would not work in a portrait mode. The overhead of maintaining two orientations was also becoming increasingly unmanageable, I hope you can understand. 
 
-        <br><br> 2. Settings menu rework <br>
+        <br><br> 3. Settings menu rework <br>
         Cleaned up the settings UI to accommodate additional options and to make it easier to navigate. Be sure to look through the 'Advanced' tab!
         </indent>
 
-        <br><br> 3. Upgrades rework <br>
+        <br><br> 4. Upgrades rework <br>
         You now have a choice between using gems or (nuts + talent materials) when choosing to upgrade above Lvl 50, except the Traveller who can only use gems.
         </indent>
 
-        <br><br> 4. Information breakdown for characters and golden cores <br>
+        <br><br> 5. Information breakdown for characters and golden cores <br>
         When selecting a character, there is an additional button in the tooltips, which gives detailed stats. Similarly, at the transcend menu, the amount of golden cores now has a breakdown for the top 7 sources.
         </indent>
 
-        <br><br> 5. Error visual indicator <br>
+        <br><br> 6. Error visual indicator <br>
         When the game runs into an error, a message should pop up at the corner - which is also recorded into the error box in the settings 'Console' tab. 
         </indent>
 

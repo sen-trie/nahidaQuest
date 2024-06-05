@@ -377,7 +377,7 @@ function loadSaveData() {
         })();
         storeInventory = storeInventoryDefault;
     } else {
-        let loadedSave = JSON.parse(localStorage.getItem('save-0'));
+        let loadedSave = JSON.parse(window.atob(localStorage.getItem('save-0')));
         settingsValues = loadedSave.settingsTemp;
         saveValues = loadedSave.saveValuesTemp;
         upgradeDict = loadedSave.upgradeDictTemp;
@@ -3115,7 +3115,7 @@ function saveData(skip = false, saveSlot = 0, customArray = []) {
         localStorageDict[item[0]] = item[1];
     });
 
-    localStorage.setItem(`save-${saveSlot}`, JSON.stringify(localStorageDict));
+    localStorage.setItem(`save-${saveSlot}`, window.btoa(JSON.stringify(localStorageDict)));
 }
 
 //------------------------------------------------------------------------ON-BAR BUTTONS------------------------------------------------------------------------//
@@ -12503,7 +12503,7 @@ let beta = false;
 let testing = false;
 let disableQuicktime = false;
 if (localStorage.getItem('save-0')) {
-    const save = JSON.parse(localStorage.getItem('save-0'));
+    const save = JSON.parse(window.atob(localStorage.getItem('save-0')));
     if (save.beta == true) {
         beta = true;
     }

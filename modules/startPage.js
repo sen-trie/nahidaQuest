@@ -1,6 +1,6 @@
 import { randomInteger } from './functions.js';
 import { createDom,choiceBox,errorMesg } from './adjustUI.js';
-import { startGame } from '../main.js?v=10bf854c877336fb3e26fe317e80f6ba'
+import { startGame } from '../main.js?v=3b3f57babfa956fd103bc8a06081db80'
 import { CONSTANTS } from './constants.js';
 import { buildSaves } from './features/settings.js';
 
@@ -74,7 +74,7 @@ continueButton.addEventListener("click", () => {
 
 newGameButton.addEventListener("click", () => {
     if (!isNewGame) {
-        choiceBox(startScreen, {text: 'Are you sure? Deleting your save cannot be undone!'}, null, 
+        choiceBox(startScreen, {text: 'Are you sure? This will delete your autosave. This action cannot be undone!'}, null, 
                     () => {clearLocalStorage()}, undefined, null, ['choice-ele']);
     } else if (isNewGame) {
         launchGame();
@@ -87,13 +87,13 @@ function clearLocalStorage() {
     currentlyClearing = true;
 
     let clearPromise = new Promise(function(myResolve, myReject) {
-        localStorage.clear();
-        localStorage.length === 0 ? myResolve() : myReject();
+        localStorage.removeItem('save-0');
+        localStorage.getItem('save-0') == null ? myResolve() : myReject();
     });
     
     clearPromise.then(
         (value) => {
-            setTimeout(location.reload(), 200);
+            setTimeout(launchGame(), 200);
         },
         function(error) {console.error("Error clearing local data")}
     ); 
