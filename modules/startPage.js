@@ -22,7 +22,6 @@ window.addEventListener("message", e => {
 	}
 });
 
-// TODO: CHANGE TO SAVE 0
 let isNewGame = (localStorage.getItem("save-0") === null) ? true : false; 
 let startAlreadyDelay = true;
 setTimeout(() => { startAlreadyDelay = false }, 500);

@@ -249,7 +249,6 @@ const regularQuicktime = (regularQuicktimeObject) => {
 
         beatImage.style.left = beatImage.inverseDirection ? `${beatImage.position}%` : `${100 - beatImage.position}%`;
         let leftPos = parseFloat(beatImage.style.left);
-
         if (leftPos <= 60 && leftPos > 35) {
             quicktimeBar.state = beatImage.color;
         } else if (leftPos < -15 || leftPos > 115) {
@@ -258,6 +257,7 @@ const regularQuicktime = (regularQuicktimeObject) => {
             createBattleText("miss", 2000, document.getElementById('quicktime-overlay'));
             outcomeCheck();
             return true;
+
         } else {
             quicktimeBar.state = "ready";
         }
@@ -347,6 +347,7 @@ const regularQuicktime = (regularQuicktimeObject) => {
     }
 
     function outcomeCheck() {
+        thresholdReached = false;
         if (quicktimeDict.currentBeat === quicktimeDict.maxBeat) {
             regularQuicktimeObject.textBox.innerHTML = `You successfully countered <span style='color:#A97803'>${quicktimeDict.correctBeat}
                                 </span> out of <span style='color:#A97803'>${quicktimeDict.maxBeat}</span> ranged attacks!`;

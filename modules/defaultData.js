@@ -153,8 +153,8 @@ const persistentValuesDefault = {
 }
 
 const SettingsDefault = {
-    bgmVolume:0.5,
-    sfxVolume:0.5,
+    bgmVolume:0.25,
+    sfxVolume:0.25,
     defaultZoom: 0,
     fontSizeLevel: 5, 
     combineFloatText:false,

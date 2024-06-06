@@ -1367,6 +1367,7 @@
 
 #inventory-offer > div {
     width: 33.3%;
+    flex-basis: unset;
 }
 
 #inventory-offer > img {

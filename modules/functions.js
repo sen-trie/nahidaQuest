@@ -51,6 +51,7 @@ function getHighestKey(obj) {
 
 // RANDOM NUMBER GENERATOR (DOES NOT INCLUDE MAX), OPTIONAL INCLUSIVE BOUNDS
 function randomInteger(min, max, bounds) {
+    if (max === undefined) { return console.error(`Missing max integer! ${min}`)}
     let numRoll = Math.floor(Math.random() * (max - min)) + min;
     if (bounds !== undefined) {
         while (numRoll > bounds[0] && numRoll < bounds[1]) {
@@ -74,7 +75,7 @@ function randomIntegerWrapper(compare, max = 100) {
 }
 
 // GENERATE BASE ATK AND COSTS OF NON-WISH HEROES (IF SAVE NOT FOUND)
-function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo) {
+function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo, persistentValues = null) {
     let initBaseCost = 50;
     let multiplierBaseCost = 3;
     let initATKCost = 1;
