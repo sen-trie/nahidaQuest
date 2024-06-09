@@ -33,5 +33,5 @@ export const CONSTANTS = Object.freeze({
     MAX_LEADER: 5,
     COLOR_ARRAY: ["Red", "Green", "Blue"], // MUST BE USE WITH SPREAD (PREVENT PASS BY REFERENCE)
     ARANARA_HARD: [2, 4, 5, 7, 9],
-    IFRAME_TEXT: "If you are playing nahidaQuest! on another website, the font sizes may appear too large. Font sizes can be changed under 'Advanced Settings', after launching the game.",
+    IFRAME_TEXT: "If this is your first time playing nahidaQuest!, the font sizes may not be correctly sized. Font sizes can be changed under 'Advanced Settings', after launching the game.",
 });

@@ -130,7 +130,13 @@ const buildSaves = (localStorage, noUploads = true, launchGame) => {
     for (let i = 0; i < 6; i++) {
         let saveAvail = null;
         if (localStorage.getItem(`save-${i}`) != null) {
-            saveAvail = JSON.parse(window.atob(localStorage.getItem(`save-${i}`)));
+            try {
+                saveAvail = JSON.parse(window.atob(localStorage.getItem(`save-${i}`)));
+            } catch {
+                console.error(i === 0 ? 'Invalid Autosave!' : 'Invalid Save ' + i + '!');
+                if (i === 0) choiceBox(document.getElementById('start-screen'), {text: "Warning"}, null, null, null, createDom('p', { id:'iframe-warn', innerText: 'Your autosave is corrupted!' }), ['notif-ele']);
+            }
+            
         };
         const lastSave = saveAvail?.saveValuesTemp?.currentTime;
 
@@ -186,7 +192,12 @@ const buildSaves = (localStorage, noUploads = true, launchGame) => {
                 if (uploadButton.checkSaved()) {
                     const currentTop = document.getElementById('game') ?? document.getElementById('start-screen');
                     choiceBox(currentTop, {text: 'Do you want to delete this save? <br> This action cannot be undone.'}, undefined, 
-                              () => { deleteSave(uploadButton, i) }, undefined, null, ['choice-ele']
+                              () => { 
+                                deleteSave(uploadButton, i);
+                                if (document.getElementById('start-screen') && i === 0) {
+                                    window.location.reload();
+                                }
+                             }, undefined, null, ['choice-ele']
                     );   
                 }
             }]
@@ -219,7 +230,6 @@ const buildSaves = (localStorage, noUploads = true, launchGame) => {
         } else {
             saveDiv.appendChild(useButton);
         }
-        if (i === 0) { deleteButton.classList.add('unclickable') }
         saveDiv.appendChild(deleteButton)
         exportBoxText.appendChild(saveDiv);
     }

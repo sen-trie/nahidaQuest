@@ -30,15 +30,21 @@ console.log(`======== NAHIDAQUEST! ${CONSTANTS.VERSIONNUMBER} loaded ========`);
 console.log(isNewGame ? `Save File Not Found` : `Save File Found`);
 if (window.location !== window.parent.location) {
     console.log("======== iFrame Version loaded ========");
-    if (isNewGame) {
+} 
+
+if (isNewGame) {
+    let noSaveLoaded = true;
+    for (let i = 1; i < 6; i++) {
+        if (localStorage.getItem(`save-${i}`) !== null) {
+            noSaveLoaded = false;
+        }
+    }
+    if (noSaveLoaded) {
         console.log(`Warning: ${CONSTANTS.IFRAME_TEXT}`);
         choiceBox(startScreen, {text: "Warning"}, null, null, null, createDom('p', { id:'iframe-warn', innerText: CONSTANTS.IFRAME_TEXT }), ['notif-ele']);
     }
-} 
-
-if (!isNewGame) {
+} else {
     continueButton.classList.remove("dim-filter");
-    
     let startChance = randomInteger(1, 14);
     if (startChance === 1) {
         startScreen.append(createDom('img', { src: './assets/icon/nahida-start.webp', id: 'start-idle-nahida' }));
@@ -47,14 +53,6 @@ if (!isNewGame) {
     } else if (startChance === 3) {
         startScreen.append(createDom('img', { src: './assets/icon/scara-start.webp', id: 'start-idle-scara' }));
     }
-
-    // try {
-    //     let settingsTemp = localStorage.getItem("settingsValues");
-    //     let settingsValues = JSON.parse(settingsTemp);
-    //     CONSTANTS.CHANGEFONTSIZE(settingsValues.fontSizeLevel);
-    // } catch (err) {
-    //     console.error('Error checking LocalStorage');
-    // }
 } 
 
 CONSTANTS.CHANGEFONTSIZE(5);

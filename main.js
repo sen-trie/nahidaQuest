@@ -3764,7 +3764,7 @@ function settingsBox() {
         importBoxButton.addEventListener("click", () => {
             let promptSave = importBoxText.value;
             if (promptSave != null) {
-                let localStorageTemp = tryParseJSONObject(promptSave);
+                let localStorageTemp = tryParseJSONObject(window.atob(promptSave));
                 preventSave = true;
                 if (localStorageTemp === false) {
                     alert("Invalid save data.")
@@ -3781,7 +3781,7 @@ function settingsBox() {
                     
                     clearPromise.then(
                         function(value) {
-                            localStorage.setItem('save-0', JSON.stringify(localStorageTemp));
+                            localStorage.setItem('save-0', (promptSave));
                             location.reload();
                         },
                         function(err) {console.error("Error clearing local data")}
@@ -4969,7 +4969,6 @@ function itemUse(itemUniqueId) {
         }
 
         heroSkipper(gemFunction, itemID);
-        clearTooltip();
     // ELEMENT GEMS
     } else if (itemID >= 5001 && itemID < GEMMAX){
         const gemFunction = (i, upgradeDictTemp, itemID) => {
@@ -4992,7 +4991,6 @@ function itemUse(itemUniqueId) {
         }
 
         heroSkipper(gemFunction, itemID);
-        clearTooltip();
     // NATION BOOKS
     } else if (itemID >= 6001 && itemID < NATIONMAX){
         const bookFunction = (i, upgradeDictTemp, itemID) => {
@@ -5015,10 +5013,8 @@ function itemUse(itemUniqueId) {
         }
 
         heroSkipper(bookFunction, itemID);
-        clearTooltip();
         return;
     }
-    clearTooltip();
 }
 
 // FOR BUFFS SPECIFIC TO NATION/WEAPON TYPE/ELEMENT
@@ -10449,6 +10445,7 @@ function reduceItem(localItemTooltip, usingTooltip = false) {
     persistentValues.itemsUsedValue++;
 
     if (usingTooltip && itemButton) {
+        // debugger;
         if (inventoryCount > 0) {
             changeTooltip(Inventory[localItemTooltip],"item", localItemTooltip);
         } else if (inventoryCount <= 0) {
@@ -12538,7 +12535,7 @@ if (beta || testing) {
         } else if (e.key === 'j') {
             spawnBossQuest(2)
         } else if (e.key === 'k') {
-            spawnBossQuest(3)
+            spawnWorldQuest();
         }
     });
 }
@@ -12547,13 +12544,15 @@ if (beta || testing) {
 // FOR TESTING PURPOSES ONLY
 let disableQuicktime = false;
 if (localStorage.getItem('save-0')) {
-    const save = JSON.parse(window.atob(localStorage.getItem('save-0')));
-    if (save.beta == true) {
-        beta = true;
-    }
-    if (save.tester == true) {
-        testing = true;
-    }
+    try {
+        const save = JSON.parse(window.atob(localStorage.getItem('save-0')));
+        if (save.beta == true) {
+            beta = true;
+        }
+        if (save.tester == true) {
+            testing = true;
+        }
+    } catch {}
 }
 
 // if (testing || beta) {
