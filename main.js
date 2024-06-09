@@ -3916,6 +3916,8 @@ function settingsBox() {
                 }
             } else if (commandText === "skip nuts") {
                 saveValues.realScore += 1e40;
+            } else if (commandText === "skip tree") {
+                growTree('add', Math.round(100));
             } else {
                 invalidCommand();
             }
@@ -9740,6 +9742,13 @@ function wish() {
                 upgradeDictTemp["BaseCost"] = Math.round(saveValues["dps"] * (65) * wishPower + 1);
                 upgradeDictTemp["BaseFactor"] = upgradeDictTemp["Factor"];
                 upgradeDictTemp["Contribution"] = 0;
+
+                const currentName = upgradeInfo[randomWishHero].Name;
+                let ascendFactor = 0;
+                if (persistentValues.ascendDict[currentName] !== undefined) ascendFactor = persistentValues.ascendDict[currentName];
+                upgradeDictTemp["BaseCost"] *= (1 + ascendFactor * 0.02);
+                upgradeDictTemp["Factor"] *= (1 + ascendFactor * 0.1);
+                upgradeDictTemp["BaseFactor"] = upgradeDictTemp["Factor"];
                 
                 wishMultiplier++;
                 saveValues["wishCounterSaved"]++;
@@ -11359,8 +11368,7 @@ function calculateGoldenCore(type) {
         goldenNutValue += Math.round(corePerHero);
         contributionDict[name] = Math.round(corePerHero);
     }
-
-    if (goldenNutValue < 100) {goldenNutValue = 0}
+    
     if (type === "formula") {
         return goldenNutValue;
     } else if (type === "highestAmount") {
@@ -11415,7 +11423,6 @@ function transcendFunction() {
                 return temp;
             })();
 
-            // TODO: FIX ASCEND TO WORK
             const localStorageDict = {
                 "settingsTemp":settingsValues,
                 "saveValuesTemp": newSaveValues,
@@ -12004,8 +12011,8 @@ function enemyBlock(removeBlocker = false, damage = null, maxHP) {
         let treeEnemyButton = createDom('button', { innerText: 'Defend!' });
         treeEnemyButton.addEventListener('click', () => {
             let advButton = document.getElementById("adventure-button");
-            advButton.key = 35;
             adventure('15-[1,2,3,4]');
+            advButton.key = 35;
         })
     
         enemyContainer.append(treeEnemyHeader, treeEnemyImg, treeEnemyText, treeEnemyButton);
@@ -12165,7 +12172,7 @@ function blessCreate(treeTable) {
 
         growTree('add', randomInteger(15, 20) * additionalBless);
         const enemyRoll = randomInteger(0, 100);
-        if (enemyRoll < (20 - luckRate / 4)) {
+        if (enemyRoll < (15 - luckRate / 4)) {
             enemyBlock(false);
         }
 

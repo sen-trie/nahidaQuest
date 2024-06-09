@@ -86,6 +86,7 @@ const imgKey = {
     32:{Left:"80",  Top:"35",   Level:14,   Wave:[2],               Heads:[26]           ,Loot:{Unusual:[6, "Shop \n Unlock"]}},
     33:{Left:"72",  Top:"28",   Level:14,   Wave:[3],               Heads:[27]           ,Loot:{Workshop:[6, "Blessings \n Unlock"]}},
     34:{Left:"50",  Top:"29",   Level:14,   Wave:[4],               Heads:[28]           ,Loot:{Finale:[6, "Mail \n Unlock"]}},
+    35:{Left:"1000",  Top:"1000",   Level:15,   Wave:[11,13,14],        Heads:[24]           ,Loot:{Seed:[6,"Tree \n Seeds"]}},
 }
 
 const sceneInfo = { 

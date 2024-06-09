@@ -83,14 +83,13 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo, persistent
 
     let currentHero = 1;
     let laggingKey = 0;
+    const ascendDict = persistentValues.ascendDict;
 
     for (let key in upgradeInfo) {
         const currentKey = parseInt(key);
-        if (currentKey === 0) {
-            continue;
-        } else {
+        if (currentKey !== 0) {
             upgradeDict[currentKey] = {Row: -1};
-            if (currentKey < NONWISHHEROMAX) {
+            if (currentKey < NONWISHHEROMAX) { // TODO DO ON WISH HEROES TOO
                 upgradeDict[currentKey].Purchased = -1;
 
                 let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero - 1) * 1.3)));
@@ -112,7 +111,18 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo, persistent
             }
         }
     }
-
+    for (let key in upgradeInfo) {
+        const currentKey = parseInt(key);
+        const currentName = upgradeInfo[key].Name;
+        if (currentKey < NONWISHHEROMAX) {
+            let ascendFactor = 0;
+            if (ascendDict[currentName] !== undefined) ascendFactor = ascendDict[currentName];
+            upgradeDict[currentKey]["BaseCost"] *= (1 + ascendFactor * 0.02);
+            upgradeDict[currentKey]["Level"] = Math.round(upgradeDict[currentKey]["BaseCost"] * 0.75);
+            upgradeDict[currentKey]["Factor"] *= (1 + ascendFactor * 0.1);
+            upgradeDict[currentKey]["BaseFactor"] = upgradeDict[currentKey]["Factor"];
+        }
+    }
     return upgradeDict;
 }
 
