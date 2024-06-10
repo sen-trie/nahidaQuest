@@ -89,7 +89,7 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo, persistent
         const currentKey = parseInt(key);
         if (currentKey !== 0) {
             upgradeDict[currentKey] = {Row: -1};
-            if (currentKey < NONWISHHEROMAX) { // TODO DO ON WISH HEROES TOO
+            if (currentKey < NONWISHHEROMAX) {
                 upgradeDict[currentKey].Purchased = -1;
 
                 let baseCost = Math.round(initBaseCost * (multiplierBaseCost ** ((currentHero - 1) * 1.3)));

@@ -298,6 +298,13 @@ const upgradeInfo = {
         Ele: "Dendro",
         Nation: "Sumeru"
     },
+    // 12: { TODO: ADD TO COMMISSIONS TOO!!
+    //     Name: "Sethos",
+    //     Lore: "Have you ever tried drawing in the sand? From up high, it makes for an incredible sight! But you need to pick somewhere less exposed to the wind.",
+    //     Type: "Bow",
+    //     Ele: "Electro",
+    //     Nation: "Sumeru"
+    // },
     50: {
         Name: "Venti",
         Lore: "My tummy is rumbling, but I can't get caught pilfering food again... Oh, it's you! Where are you heading? May I join?",
@@ -655,6 +662,20 @@ const upgradeInfo = {
         Ele: "Pyro",
         Nation: "Fontaine"
     },
+    207: {
+        Name: "Chiori",
+        Lore: "Take it from me — this one looks good on you. Hmm? You've never seen a style like this before? Aw, that's because you've never met a designer with taste before.",
+        Type: "Sword",
+        Ele: "Geo",
+        Nation: "Fontaine"
+    },
+    208: {
+        Name: "Clorinde",
+        Lore: "There's nothing like the flavor of freshly hunted meat cooked over the grill with a little salt to taste and a portion of sour fruits on the side. You should come hunting with me some time.",
+        Type: "Sword",
+        Ele: "Electro",
+        Nation: "Fontaine"
+    },
     // RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS// RMB TO UPDATE MAX CONSTANTS
     800: {
         Name: "Wanderer",
@@ -759,6 +780,13 @@ const upgradeInfo = {
         Lore: "Look at that scorching sun, it's like a blast furnace! You know what this means? It means we have to drop everything, right now, and make a run for the ice cream store!",
         Type: "Claymore",
         Ele: "Geo",
+        Nation: "Fontaine",
+    },
+    815: {
+        Name: "Arlecchino",
+        Lore: "I would advise you to keep your secrets close to your chest. Divulge them too easily, and you never know where the wind might carry them.",
+        Type: "Polearm",
+        Ele: "Pyro",
         Nation: "Fontaine",
     },
 }

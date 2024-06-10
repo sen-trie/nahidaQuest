@@ -3182,8 +3182,7 @@ table, button, label {
     color: purple;
     pointer-events: none;
 }
-/* 
-TODO */
+
 .test-warning {
     position: absolute;
     left: 50%;

@@ -1,6 +1,6 @@
 import { randomInteger } from './functions.js';
 import { createDom,choiceBox,errorMesg } from './adjustUI.js';
-import { startGame } from '../main.js?v=3b3f57babfa956fd103bc8a06081db80'
+import { startGame } from '../main.js?v=3badeee1678e8bbc0325d3e69e6cdba2'
 import { CONSTANTS } from './constants.js';
 import { buildSaves } from './features/settings.js';
 

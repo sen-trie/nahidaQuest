@@ -363,7 +363,7 @@ const patchDict = {
         </indent>
 
         <br><br> 8. New Characters <br>
-        Updated roster to include all characters up to version 4.4.
+        Updated roster to include all characters up to version 4.6.
         </indent>
 
     <br><br><line>Systems Rework 🌰: </line><br><br>

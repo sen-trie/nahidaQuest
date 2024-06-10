@@ -3666,12 +3666,21 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
 }
 
 .settings-badges {
+    width: calc(95% - 10rem);
     height: 100%;
     flex-grow: 1;
+    overflow-x: auto;
+    flex-direction: row;
+    margin-right: 1rem;
+    background-color: var(--bright-green);
+    padding: 1% 0;
+    box-sizing: border-box;
 }
 
 .medal-img {
-    height: 100%;
+    height: 95%;
+    margin-right: 2%;
+    width: auto;
     object-fit: contain;
     filter: drop-shadow(0 0 0.05em black);
     transition: 0.3s ease;

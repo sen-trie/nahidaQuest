@@ -197,7 +197,6 @@ const buildSaves = (localStorage, alreadyInGame = true, launchGame) => {
                                 if (document.getElementById('start-screen') && i === 0) {
                                     window.location.reload();
                                 }
-                                // TODO CHANGE TO REMOVE
                                 uploadButton.updateDiv();
                              }, undefined, null, ['choice-ele']
                     );   
@@ -211,7 +210,7 @@ const buildSaves = (localStorage, alreadyInGame = true, launchGame) => {
             event: ['click', () => {
                 if (uploadButton.checkSaved()) {
                     const currentTop = document.getElementById('game') ?? document.getElementById('start-screen');
-                    choiceBox(currentTop, {text: 'Do you want to load this save? This will overwrite your autosave!'}, undefined, 
+                    choiceBox(currentTop, {text: 'Do you want to load this save?  <br> This will overwrite your autosave!'}, undefined, 
                               () => { 
                                 localStorage.setItem(`save-0`, localStorage.getItem(`save-${i}`));
                                 launchGame();

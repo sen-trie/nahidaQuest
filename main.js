@@ -3091,8 +3091,7 @@ function saveData(skip = false, saveSlot = 0, customArray = []) {
     persistentValues.timeSpentValue += currentTime - persistentValues.lastRecordedTime;
     persistentValues.lastRecordedTime = getTime();
 
-    // TODO
-    if (!document.getElementById("currently-saving") && skip != true && !testing) {
+    if (!document.getElementById("currently-saving") && skip != true) {
         let saveCurrently = document.createElement("img");
         saveCurrently.src = "./assets/settings/saving.webp";
         saveCurrently.id = "currently-saving";
@@ -3413,7 +3412,7 @@ function generalSettings(settingsMenu) {
 
     let clearSetting = document.createElement("button");
     clearSetting.classList.add("setting-clear");
-    clearSetting.addEventListener("click",() => {choiceBox(mainBody, {text: 'Are you sure? This will delete ALL of your saves. It cannot be undone!!'}, null, 
+    clearSetting.addEventListener("click",() => {choiceBox(mainBody, {text: 'Are you sure? This will delete ALL of your saves.  <br> It cannot be undone!!'}, null, 
                                                 () => {clearLocalStorage()}, undefined, null, ['choice-ele']);
     });
 
@@ -3459,7 +3458,7 @@ function generalSettings(settingsMenu) {
     });
 
     const settingsBottomBadge = createDom('div', {
-        class: ['settings-badges'],
+        class: ['settings-badges', 'green-scrollbar'],
         id: 'badges-div'
     });
 
@@ -3900,6 +3899,8 @@ function settingsBox() {
             } else if (commandText === "beta off") {
                 saveData(true, 0, [['beta', false]]);
                 location.reload();
+            } else if (commandText === "all the mail") {
+                saveValues["mailCore"] += 30;
             } else if (commandText === "all the riches") {
                 currencyPopUp([["primogem", randomInteger(19999, 29999)]]);
             } else if (commandText === "all the energy") {
@@ -3917,6 +3918,8 @@ function settingsBox() {
                 }
             } else if (commandText === "skip nuts") {
                 saveValues.realScore += 1e40;
+            } else if (commandText === "skip nuts squared") {
+                saveValues.realScore += 1e100;
             } else if (commandText === "skip tree") {
                 growTree('add', Math.round(100));
             } else {
@@ -9715,9 +9718,11 @@ function wish() {
             let randomWishHero;
             if (upgradeDict[800].Purchased === -10) {
                 randomWishHero = 800;
-                unlockExpedition(5,expeditionDict);
-                clearExped();
-                newPop(2);
+                if (expeditionDict[5] != '0') {
+                    unlockExpedition(5, expeditionDict);
+                    clearExped();
+                    newPop(2);
+                }
             } else {
                 randomWishHero = randomInteger(WISHHEROMIN, WISHHEROMAX);
             }
@@ -11959,7 +11964,6 @@ function enemyBlock(removeBlocker = false, damage = null, maxHP) {
             let enemyContainerChildren = enemyContainer.children;
             let lostHP = Math.min(50,(50 * Math.round(damage / maxHP / 1.5)));
     
-            // TODO: add a funny picture or smth depending on amount of lost HP
             let endText = `You took ${damage} cumulative damage <br> The tree lost ` + (lostHP == 0 ? '0' : `<span style='color:#dd5548'>${lostHP}%</span>`) + ' of its HP.'
             enemyContainerChildren[2].innerHTML = endText;
             enemyContainerChildren[2].style.textAlign = 'center';
