@@ -1,6 +1,6 @@
 import { upgradeDictDefault,SettingsDefault,enemyInfo,expeditionDictDefault,saveValuesDefault,persistentValuesDefault,permUpgrades,advDictDefault,storeInventoryDefault } from "./modules/defaultData.js"
 import { blackShopDict,screenLoreDict,upgradeInfo,achievementListDefault,expeditionDictInfo,InventoryDefault,eventText,advInfo,charLoreObj,imgKey,adventureLoot,sceneInfo,challengeInfo,commisionInfo } from "./modules/dictData.js"
-import { createArray,removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
+import { tryParseJSONObject,createArray,removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy } from "./modules/functions.js"
 import { inventoryAddButton,dimMultiplierButton,floatText,multiplierButtonAdjust,inventoryFrame,choiceMax,popUpBox,slideBox,choiceBox,createProgressBar,createButton,createDom,createMedal,sidePop,errorMesg } from "./modules/adjustUI.js"
 import { CONSTANTS } from "./modules/constants.js";
 import * as Settings from "./modules/features/settings.js";
@@ -3700,6 +3700,7 @@ function settingsBox() {
             saveData(true, i);
             setTimeout(() => {
                 uploadButton.updateText();
+                uploadButton.updateDiv();
             }, 500);
         }
 
@@ -3726,7 +3727,7 @@ function settingsBox() {
         });
 
         const importBoxText = createDom('textarea', {
-            class: ['settings-textarea'],
+            class: ['settings-textarea', 'green-scrollbar'],
             placeholder: "Paste save data here.",
         });
 
@@ -3956,17 +3957,6 @@ function settingsBox() {
     }, 400);
 }
 
-function tryParseJSONObject(jsonString) {
-    try {
-        let o = JSON.parse(jsonString);
-        if (o && typeof o === "object") {
-            return o;
-        }
-    }
-    catch (e) { }
-    return false;
-};
-
 function createMultiplierButton() {
     multiplierButtonContainer = document.createElement("div");
     multiplierButtonContainer.classList.add("multiplier-button-container");
@@ -4188,7 +4178,6 @@ function loadRow() {
             upgradeDict[loadedHeroID]['Contribution'] = upgradeDict[loadedHeroID]['Factor'] * upgradeDictTemp["Purchased"];
             upgradeDict[loadedHeroID]['BaseFactor'] = upgradeDictTemp["Factor"];
             formatATK = upgradeDictTemp["Factor"];
-
         }
 
         if (upgradeDictTemp["Purchased"] > 0) {
@@ -9745,7 +9734,11 @@ function wish() {
 
                 const currentName = upgradeInfo[randomWishHero].Name;
                 let ascendFactor = 0;
-                if (persistentValues.ascendDict[currentName] !== undefined) ascendFactor = persistentValues.ascendDict[currentName];
+                if (persistentValues.ascendDict[currentName] !== undefined) {
+                    ascendFactor = persistentValues.ascendDict[currentName]
+                } else {
+                    persistentValues.ascendDict[currentName] = 0;
+                }
                 upgradeDictTemp["BaseCost"] *= (1 + ascendFactor * 0.02);
                 upgradeDictTemp["Factor"] *= (1 + ascendFactor * 0.1);
                 upgradeDictTemp["BaseFactor"] = upgradeDictTemp["Factor"];

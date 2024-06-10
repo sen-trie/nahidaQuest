@@ -3581,6 +3581,12 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
     transition: unset;
 }
 
+.import-save-pregame {
+    position: relative;
+    padding: 0;
+    height: 8rem;
+}
+
 .copyright-text  {
     position: absolute;
     left: 0;

@@ -1,6 +1,6 @@
 import { createDom, choiceBox } from "../adjustUI.js"
 import { CONSTANTS } from "../constants.js";
-import { convertTo24HourFormat } from "../functions.js";
+import { tryParseJSONObject,convertTo24HourFormat } from "../functions.js";
 
 const statsArray = {
     'timeSpentValue': 'Time Spent:', 
@@ -122,7 +122,7 @@ const formatTime = (lastSave) => {
     return formatTime;
 }
 
-const buildSaves = (localStorage, noUploads = true, launchGame) => {
+const buildSaves = (localStorage, alreadyInGame = true, launchGame) => {
     const exportBoxText = createDom('div', {
         class: ['settings-textarea', 'settings-export', 'green-scrollbar'],
     });
@@ -197,6 +197,8 @@ const buildSaves = (localStorage, noUploads = true, launchGame) => {
                                 if (document.getElementById('start-screen') && i === 0) {
                                     window.location.reload();
                                 }
+                                // TODO CHANGE TO REMOVE
+                                uploadButton.updateDiv();
                              }, undefined, null, ['choice-ele']
                     );   
                 }
@@ -225,13 +227,98 @@ const buildSaves = (localStorage, noUploads = true, launchGame) => {
             child: [ downloadButton, saveText ]
         });
 
-        if (noUploads) { 
+        if (alreadyInGame) { 
             saveDiv.appendChild(uploadButton);
         } else {
             saveDiv.appendChild(useButton);
         }
-        saveDiv.appendChild(deleteButton)
+        saveDiv.appendChild(deleteButton);
+
+        uploadButton.updateDiv = () => {
+            if (localStorage.getItem(`save-${i}`) != null) {
+                downloadButton.style.display = 'block';
+                useButton.style.display = 'block';
+                deleteButton.style.display = 'block';
+            } else {
+                downloadButton.style.display = 'none';
+                useButton.style.display = 'none';
+                deleteButton.style.display = 'none';
+            }
+        }
+        
+        uploadButton.updateDiv();
         exportBoxText.appendChild(saveDiv);
+    }
+
+    if (!alreadyInGame) {
+        const importBox = createDom('div', { class: [ 'import-save-pregame', 'settings-save-div' ]});
+        exportBoxText.prepend(importBox);
+
+        const importBoxText = createDom('textarea', {
+            class: ['settings-textarea', 'green-scrollbar'],
+            placeholder: "Paste save data here.",
+        });
+
+        const importBoxButton = createDom('button', {
+            class: ['settings-inner-button'],
+            innerText: 'Import Save'
+        });
+
+        const importFileButton = createDom('input', {
+            class: ['settings-inner-button', 'import-file'],
+            innerText: 'Upload File',
+            type: 'file',
+            accept: '.txt'
+        });
+
+        importFileButton.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file && file.type === "text/plain") {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const fileContent = event.target.result;
+                        importBoxText.value = fileContent;
+                    } catch {
+                        importBoxText.value = 'Invalid save data loaded.';
+                    }
+                };
+    
+                reader.readAsText(file);
+            } else {
+                importBoxText.value = 'Invalid save data loaded.';
+            }
+        });
+
+        importBoxButton.addEventListener("click", () => {
+            let promptSave = importBoxText.value;
+            if (promptSave != null) {
+                let localStorageTemp = tryParseJSONObject(window.atob(promptSave));
+                if (localStorageTemp === false) {
+                    alert("Invalid save data.")
+                    console.error("Invalid save data.");
+                } else {
+                    let clearPromise = new Promise(function(myResolve, myReject) {
+                        localStorage.removeItem('save-0');
+                        if (localStorage.getItem('save-0') == null) {
+                            myResolve(); 
+                        } else {
+                            myReject();
+                        }
+                    });
+                    
+                    clearPromise.then(
+                        function(value) {
+                            localStorage.setItem('save-0', (promptSave));
+                            location.reload();
+                        },
+                        function(err) {console.error("Error clearing local data")}
+                    ); 
+                }
+            }
+        });
+
+        importBox.append(importBoxText, importBoxButton, importFileButton);
     }
 
     return exportBoxText;

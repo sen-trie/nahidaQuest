@@ -3187,7 +3187,7 @@ TODO */
 .test-warning {
     position: absolute;
     left: 50%;
-    opacity: 0;
+    /* opacity: 0; */
     z-index: 99999999;
     background-color: purple;
     color: yellow;
@@ -3219,6 +3219,7 @@ TODO */
 
 .save-manager > div {
     max-height: 70%;
+    filter: none !important;
 }
 
 .choice-div > .export-box {

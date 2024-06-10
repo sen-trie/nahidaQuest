@@ -75,7 +75,7 @@ function randomIntegerWrapper(compare, max = 100) {
 }
 
 // GENERATE BASE ATK AND COSTS OF NON-WISH HEROES (IF SAVE NOT FOUND)
-function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo, persistentValues = null) {
+function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo, persistentValues = {}) {
     let initBaseCost = 50;
     let multiplierBaseCost = 3;
     let initATKCost = 1;
@@ -116,7 +116,7 @@ function generateHeroPrices(upgradeDict, NONWISHHEROMAX, upgradeInfo, persistent
         const currentName = upgradeInfo[key].Name;
         if (currentKey < NONWISHHEROMAX) {
             let ascendFactor = 0;
-            if (ascendDict[currentName] !== undefined) ascendFactor = ascendDict[currentName];
+            if (ascendDict && ascendDict[currentName] !== undefined) ascendFactor = ascendDict[currentName];
             upgradeDict[currentKey]["BaseCost"] *= (1 + ascendFactor * 0.02);
             upgradeDict[currentKey]["Level"] = Math.round(upgradeDict[currentKey]["BaseCost"] * 0.75);
             upgradeDict[currentKey]["Factor"] *= (1 + ascendFactor * 0.1);
@@ -395,4 +395,15 @@ function createArray(length, ele, startingArray = []) {
     return [...startingArray, ...[...Array(length).keys()].map(x => ele)]
 }
 
-export { createArray,removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };
+function tryParseJSONObject(jsonString) {
+    try {
+        let o = JSON.parse(jsonString);
+        if (o && typeof o === "object") {
+            return o;
+        }
+    }
+    catch (e) { }
+    return false;
+};
+
+export { tryParseJSONObject,createArray,removeID,getTime,audioPlay,abbrNum,randomInteger,sortList,generateHeroPrices,getHighestKey,countdownText,updateObjectKeys,randomIntegerWrapper,rollArray,textReplacer,universalStyleCheck,challengeCheck,createTreeItems,convertTo24HourFormat,deepCopy };
