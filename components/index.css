@@ -66,11 +66,34 @@ main {
     background: url(../assets/bg/tree-bg.webp) center center/cover no-repeat;
 }
 
+.trailer-block {
+    align-items: center;
+}
+
+/* .trailer-block::before {
+    background: url(../assets/bg/exped-bg.webp) center center/cover no-repeat;
+} */
+
+.trailer-block > .patch-title {
+    padding: 1rem 0;
+}
+
+iframe {
+    width: 50%;
+    height: auto;
+    aspect-ratio: 1920 / 1080;
+}
+
 .video-block {
     display: grid;
     column-gap: 1.5rem;
     row-gap: 3rem;
     grid-template-columns: repeat(2, 1fr);
+}
+
+.video-block > .patch-title {
+    grid-column: span 2;
+    padding-bottom: 0;
 }
 
 .card {
@@ -270,6 +293,13 @@ divider {
     background: var(--very-dark-green)
 }
 
+@media (max-width: 1200px) {
+    iframe {
+        width: 75%;
+    }
+}
+
+/*//////////////////////////// MOBILE /////////////////////////////////*/
 @media (max-width: 768px) {
     .card-img {
         aspect-ratio: 1.75;
@@ -282,6 +312,14 @@ divider {
     .video-block {
         grid-template-columns: repeat(1, 1fr);
         row-gap: 1rem; 
+    }
+
+    .video-block > .patch-title {
+        grid-column: span 1;
+    }
+
+    iframe {
+        width: 90%;
     }
 
     .game-title {
