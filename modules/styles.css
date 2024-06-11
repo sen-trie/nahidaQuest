@@ -5,14 +5,10 @@
     font-display: swap;
 }
 
-html, body {
-    height: 100%;
-    cursor: url(../assets/icon/cursor.webp), auto;
-}
-
 html {
+    width: 100vw;
     height: 100%;
-    width: 100%;
+    height: 100dvh;
     font-size: clamp(0.5rem, 1rem + 0.6vw, 2rem);
     display: flex;
     justify-content: center;
@@ -210,56 +206,6 @@ button {
     --font-h6: clamp(1rem, 0.9617rem + 0.1633vw, 1.125rem);
 }
 
-/* <-- STRETCHING HORIZONTALLY---> */
-@media (min-aspect-ratio: 28/9) {
-    body {
-        width: 50%;
-        height: 100%;
-        margin: 0;
-        border-left: 0.2em groove  #465E2B;
-        border-right: 0.2em groove  #465E2B;
-    }
-}
-
-@media (max-aspect-ratio: 28/9) {
-    body {
-        width: 68%;
-        height: 100%;
-        margin: 0;
-        border-left: 0.2em groove  #465E2B;
-        border-right: 0.2em groove  #465E2B;
-    }
-}
-
-@media (max-aspect-ratio: 24/9) {
-    body {
-        width: 80%;
-        height: 100%;
-        margin: 0;
-        border-left: 0.2em groove  #465E2B;
-        border-right: 0.2em groove  #465E2B;
-    }
-}
-
-@media (max-aspect-ratio: 22/9) {
-    body {
-        width: 90%;
-        height: 100%;
-        margin: 0;
-        border-left: 0.2em groove  #465E2B;
-        border-right: 0.2em groove  #465E2B;
-    }
-}
-
-@media (max-aspect-ratio: 19/9) {
-    body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        border: 0;
-    }
-}
-
 /*/////////////////////// GAME CSS ///////////////////////////////*/
 * {
     scrollbar-width: 0.9vw;
@@ -312,6 +258,8 @@ button {
 
 /*/////////////////////// MAIN BODY CSS ///////////////////////////////*/
 body {
+    width: 100%;
+    height: inherit;
     background-image: url(../assets/borderNew.webp);
     background-repeat: repeat;
     background-size: cover;
@@ -322,6 +270,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: url(../assets/icon/cursor.webp), auto;
+    
 }
 
 table, button, label {
@@ -3879,11 +3829,6 @@ table, button, label {
     }
 }
 
-body {
-    width: 100%;
-    height: 100%;
-}
-
 #game-wrapper, #game, #start-screen {
     aspect-ratio: var(--aspect-ratio);
 }
@@ -3896,18 +3841,20 @@ body {
 }
 
 #game, #start-screen {
+    left: 50%;
+    top: 50%;
+    position: absolute;
     height: 100%;
     width: unset;
     max-width: 100%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
     border: var(--bright-light-green) 0.2rem solid;
 }
-
+/* 
 #start-screen {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
+    opacity: 0;
+} */
 
 #testerScreen {
     position: absolute;

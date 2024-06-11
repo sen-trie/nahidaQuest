@@ -164,6 +164,7 @@ const SettingsDefault = {
     autoClickBig: false,
     wideCombatScreen: false,
     leftHandMode: false,
+    fullscreenOn: false,
 }
 
 const advDictDefault = {

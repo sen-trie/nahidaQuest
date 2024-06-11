@@ -237,6 +237,7 @@ refresh();
 saveValues["realScore"]++;
 saveValues["realScore"]--;
 
+
 createMultiplierButton();
 createExpMap();
 createExpedition();
@@ -721,6 +722,12 @@ function postSaveData() {
 
     if (persistentValues.collectionSkin !== 0) {
         changeSkinCollection('S' + persistentValues.collectionSkin);
+    }
+
+    if (settingsValues.fullscreenOn && settingsValues.fullscreenOn === true) {
+        if (document.fullscreenEnabled && !document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        }
     }
 
     const sidePopContainer = createDom('div', {
@@ -2936,9 +2943,10 @@ function eventOutcome(innerText, eventBackdrop, type, amount, amount2) {
 
 //--------------------------------------------------------------------------MAIN BODY----------------------------------------------------------------------//
 function loadingAnimation() {
-    var siteWidth = 1080;
-    var scale = screen.width / (siteWidth);
-    document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
+    // CAUSES MOBILE USERS TO ZOOM IN (NOT NEEDED ANYMORE)
+    // var siteWidth = 1080;
+    // var scale = screen.width / (siteWidth);
+    // document.querySelector('meta[name="viewport"]').setAttribute('content', 'width='+siteWidth+', initial-scale='+scale/1.85+', user-scalable=no');
 
     let loadingNumber = document.getElementById('loading-number');
     let value = parseInt(loadingNumber.loadingValue);
@@ -3404,7 +3412,7 @@ function generalSettings(settingsMenu) {
                 document.exitFullscreen();
             }
         }
-    })
+    });
 
     let saveSetting = document.createElement("button");
     saveSetting.classList.add("setting-save");
@@ -3504,7 +3512,8 @@ function advancedSettings() {
         {id: 'left-hand-mode',  default: 'leftHandMode', text: "Left Handed Mode"},
         {id: 'font-size-level',  default: 'fontSizeLevel', text: "Font Size (1-10)"},
         {id: 'reset-level',  default: 'resetLevel', text: "Reset Adv. Settings"},
-    ]
+        {id: 'fullscreen-on',  default: 'fullscreenOn', text: "Auto Fullscreen on Launch"},
+    ]; // TODO
 
     let advancedSettingsMenu = document.getElementById('settings-tab-advanced');
     let advancedSettingsGrid = createDom('div', { class: ['advanced-grid']});
@@ -3612,6 +3621,7 @@ function advancedSettings() {
             default:
                 prefer.addEventListener('change', () => {
                     settingsValues[advItem.default] = prefer.checked;
+                    console.log(settingsValues)
                 });
                 break;
         }
@@ -6104,7 +6114,7 @@ function createExpMap() {
         const mapPins = advImage.childNodes;
         for (let i = 0; i < mapPins.length; i++) {
             const mapPin = mapPins[i];
-            mapPin.style.transform = `scale(${Math.min(1 / zoomValue * (MOBILE ? 1.5 : 1), 4)})`;
+            mapPin.style.transform = `scale(${Math.min(1 / zoomValue * (MOBILE ? 0.75 : 1), 4)})`;
         }
     }
 
