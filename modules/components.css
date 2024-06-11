@@ -1077,6 +1077,10 @@
     border: 0.2em solid #3B425E;
 }
 
+.adventure-image * {
+    touch-action: none;
+  }
+
 .adventure-image::before {
     content: "";
     position: absolute;
@@ -1933,13 +1937,13 @@
 
 .settings-button-img-glow::after {
     position: absolute;
+    top: 0;
+    right: -50%;
     z-index: 1003;
     content: url(../assets/icon/new.webp);
     width: 100%;
-    object-fit: contain;
-    top:0;
-    right: -50%;
-    transform: scale(1.5);
+    height: auto;
+    aspect-ratio: 43 / 23;
 }
 
 .settings-button:hover {
@@ -3056,8 +3060,7 @@ img[src=""] {
     position: absolute;
     bottom: 0%;
     height: 10%;
-    width: auto;
-    max-width: 90%;
+    width: 95%;
     gap: 1%;
 }
 
@@ -3215,7 +3218,6 @@ img[src=""] {
     text-shadow: var(--text-shadow-075);
     background: transparent url("../assets/tutorial/nutPill.webp") center/contain no-repeat;
 }
-
 .slide-button-container {
     column-gap: 1rem;
 }

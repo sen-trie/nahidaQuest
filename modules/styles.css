@@ -1056,8 +1056,15 @@ table, button, label {
 .inventory-selected {
     border: 0.25rem inset var(--dark-brown);
     border-radius: 1rem;
-    transition: 0.2s ease;
     transform: scale(1.15);
+}
+
+/* SAFARI ONLY */
+@supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
+    .inventory-selected {
+        border: none;
+        filter: drop-shadow(0 0 0.1rem black)
+    }
 }
 
 .inventory-selected > .button-inv-frame {
@@ -1069,6 +1076,8 @@ table, button, label {
     aspect-ratio: 13/17;
     flex-basis: 15%;
     position: relative;
+    box-sizing: border-box;
+    transition: 0.2s ease;
 }
 
 .button-inv-frame {
@@ -2194,7 +2203,7 @@ table, button, label {
 }
 
 .table5-Image > div > img {
-    width: fit-content;
+    width: auto;
     height: 100%;
     position: relative;
     transition: 0.3s ease;
@@ -3172,6 +3181,7 @@ table, button, label {
 }
 
 .choice-div > .export-box {
+    height: calc(100% - 3rem);
     padding: 1rem 0;
     box-sizing: border-box;
 }
@@ -3203,6 +3213,66 @@ table, button, label {
     margin-top: unset;
     gap: 1%;
     overflow-x: auto;
+}
+
+.font-compare {
+    margin-top: 1rem;
+}
+
+.font-compare > p {
+    color: white;
+    background-color: var(--bright-green);
+    padding: 0.2rem;
+}
+
+.font-compare > img {
+    height: 22vh;
+}
+
+@media (width < 1200px) {
+    .font-compare > img {
+        height: 24vh;
+    }
+}
+
+@media (width < 992px) {
+    .font-compare > img {
+        height: 26vh;
+    }
+}
+
+@media (width < 768px) {
+    .font-compare > img {
+        height: 28vh;
+    }
+}
+
+@media (width < 600px) {
+    .font-compare > img {
+        height: 30vh;
+    }
+}
+
+.font-change {
+    margin: 1rem 0;
+    font-size: 1.6rem;
+    background-color: var(--bright-cyan);
+    border: 4px solid var(--bright-cyan);
+}
+
+.font-change + p {
+    color: var(--bright-dark-green);
+    margin-bottom: 1rem;
+}
+
+.font-change > p {
+    margin: 0 1rem;
+}
+
+.font-change > button {
+    width: auto;
+    height: 1.6rem;
+    aspect-ratio: 1;
 }
 
 .medal-backing {

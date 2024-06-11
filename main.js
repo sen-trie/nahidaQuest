@@ -710,6 +710,15 @@ function postSaveData() {
 
     const leftHandCSS = document.getElementById('toggle-css');
     leftHandCSS.disabled = (settingsValues.leftHandMode ? undefined : 'disabled');
+
+    if (firstGame) {
+        if (localStorage.getItem('fontSize') !== null) {
+            try {
+                settingsValues.fontSizeLevel = parseInt(localStorage.getItem('fontSize'));
+            } catch {}
+        }
+    }
+
     CONSTANTS.CHANGEFONTSIZE(settingsValues.fontSizeLevel);
     
     if (persistentValues.autoFood) {
@@ -3513,7 +3522,7 @@ function advancedSettings() {
         {id: 'font-size-level',  default: 'fontSizeLevel', text: "Font Size (1-10)"},
         {id: 'reset-level',  default: 'resetLevel', text: "Reset Adv. Settings"},
         {id: 'fullscreen-on',  default: 'fullscreenOn', text: "Auto Fullscreen on Launch"},
-    ]; // TODO
+    ]; 
 
     let advancedSettingsMenu = document.getElementById('settings-tab-advanced');
     let advancedSettingsGrid = createDom('div', { class: ['advanced-grid']});

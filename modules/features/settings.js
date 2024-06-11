@@ -152,7 +152,7 @@ const buildSaves = (localStorage, alreadyInGame = true, launchGame) => {
         });
         
         uploadButton.checkSaved = () => {
-            return localStorage.getItem(`save-${i}`) != null;
+            return (localStorage.getItem(`save-${i}`) != null);
         }
         
         const downloadButton = createDom('img', {
@@ -190,7 +190,7 @@ const buildSaves = (localStorage, alreadyInGame = true, launchGame) => {
             id: `settings-del-${i}`,
             event: ['click', () => {
                 if (uploadButton.checkSaved()) {
-                    const currentTop = document.getElementById('game') ?? document.getElementById('start-screen');
+                    const currentTop = document.getElementById('start-screen') ?? document.getElementById('game');
                     choiceBox(currentTop, {text: 'Do you want to delete this save? <br> This action cannot be undone.'}, undefined, 
                               () => { 
                                 deleteSave(uploadButton, i);
@@ -209,7 +209,7 @@ const buildSaves = (localStorage, alreadyInGame = true, launchGame) => {
             class: ['clickable'],
             event: ['click', () => {
                 if (uploadButton.checkSaved()) {
-                    const currentTop = document.getElementById('game') ?? document.getElementById('start-screen');
+                    const currentTop = document.getElementById('start-screen') ?? document.getElementById('game');
                     choiceBox(currentTop, {text: 'Do you want to load this save?  <br> This will overwrite your autosave!'}, undefined, 
                               () => { 
                                 localStorage.setItem(`save-0`, localStorage.getItem(`save-${i}`));
