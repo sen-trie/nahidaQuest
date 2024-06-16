@@ -70,9 +70,9 @@ const imgKey = {
     16:{Left:"88",  Top:"45",   Level:4,    Wave:[4,5],             Heads:[18,19]           ,Loot:{Artifact:[4,"4-Star \n Artifacts"],  Claymore:[4,"4-Star \n Claymore"],    DendroGeoAnemo:   [5,"5-Star \n Dendro / Geo / Anemo \n Gem"],    Level: [4,"4-Star \n Level \n Books"],           Food: [5,"5-Star \n Food \n Item"]}},
     17:{Left:"84",  Top:"86",   Level:5,    Wave:[1,2,3,4,5,6,7],   Heads:[15,16,17,18,20]  ,Loot:{Artifact:[5,"5-Star \n Artifacts"],  Weapon:[5,"5-Star \n Weapon"],        Talent:           [4,"4-Star \n Talent"],                         Gemstone: [5,"5-Star \n Gem"],                   Level: [4,"4-Star \n Level \n Books"],   Food: [5,"5-Star \n Food \n Item"]}},
     18:{Left:"53",  Top:"38",   Level:12,   Wave:[1,2,17]},
-    19:{Left:"80",  Top:"18",   Level:12,   Wave:[6,3,4]},
+    19:{Left:"80",  Top:"18",   Level:12,   Wave:[3,4]}, //Wave:[6,3,4]}
     20:{Left:"81",  Top:"27",   Level:12,   Wave:[7,18,21]},
-    21:{Left:"77",  Top:"53",   Level:12,   Wave:[5,6,22]},
+    21:{Left:"77",  Top:"53",   Level:12,   Wave:[5]}, //Wave:[5,6,22]}
     22:{Left:"43",  Top:"72",   Level:12,   Wave:[8,9,10,12]},
     23:{Left:"30",  Top:"37",   Level:12,   Wave:[11,13,14]},
     24:{Left:"55",  Top:"24",   Level:12,   Wave:[15,20]},

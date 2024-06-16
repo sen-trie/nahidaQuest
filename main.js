@@ -6564,7 +6564,12 @@ function drawWorldQuest(advType) {
 
     advType = advType.split("-")[1];
     advType = JSON.parse(advType).map(Number);
-    const questId = rollArray(advType, 0);
+    let questId = rollArray(advType, 0);
+
+    //TODO: FIX SHOP
+    while (questId === 22 || questId === 6) {
+        questId = rollArray(advType, 0);
+    }
 
     let adventureVideo = document.getElementById("adventure-video");
     adventureVideo.style.backgroundImage = `url(./assets/expedbg/choice/${questId}-1.webp`;
@@ -7152,6 +7157,7 @@ function triggerFight() {
     let adventureVideoChildren = adventureVideo.children;
 
     battleVariables = {
+        iframe: null,
         defenseMob: null,
         guardtime: null,
         doubleAtkCooldown: null,
@@ -7894,7 +7900,7 @@ function activateMob(mobDiv, position, adventureVideoChildrenLength) {
                     if (battleVariables.burstAttack !== null && mobDiv.classList.contains('megaboss')) {
                         battleVariables.triggerConstants.burstTimeEnd();
                     } else {
-                        if (evadeRoll <= evadeMax && !decoy) {
+                        if ((evadeRoll <= evadeMax && !decoy) || battleVariables.iframe === true) {
                             Battle.createBattleText("dodge", animationTime * 150 * 2, mobDiv);
                         } else {
                             if (canvas.burstMode) {
@@ -8993,6 +8999,11 @@ function quitQuicktime(atkNumber = 1, maxBeat = null, correctBeat) {
         Battle.comboHandler("reset");
         loseHP(Math.round(atkNumber * 10) / 10, "normal", 'quicktime');
     }
+
+    battleVariables.iframe = true;
+    setTimeout(() => {
+        battleVariables.iframe = false;
+    }, 1000);
 }
 
 
