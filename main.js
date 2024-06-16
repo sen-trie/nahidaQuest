@@ -4303,8 +4303,8 @@ function loadRow() {
         }
 
         let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
-        heroButtonContainer.addEventListener("contextmenu", selectHero);
-        heroButtonContainer.addEventListener('click', () => {
+        heroButtonContainer.addEventListener("click", selectHero);
+        heroButtonContainer.addEventListener('contextmenu', () => {
             selectHero();
             document.getElementById("tool-tip-button").click();
         });
@@ -4371,8 +4371,8 @@ function addNewRow(onlyOnce) {
             }
     
             let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
-            heroButtonContainer.addEventListener("contextmenu", selectHero);
-            heroButtonContainer.addEventListener('click', () => {
+            heroButtonContainer.addEventListener("click", selectHero);
+            heroButtonContainer.addEventListener('contextmenu', () => {
                 selectHero();
                 document.getElementById("tool-tip-button").click();
             });
@@ -4747,8 +4747,8 @@ function milestoneAdd(lowestKey,heroID) {
         milestoneButton.classList.add("milestone-selected");
     }
     
-    milestoneButton.addEventListener("contextmenu", milestoneBuy);
-    milestoneButton.addEventListener("click",() => {
+    milestoneButton.addEventListener("click", milestoneBuy);
+    milestoneButton.addEventListener("contextmenu",() => {
         milestoneBuy();
         document.getElementById('tool-tip-button').click();
         if (milestoneButton) {
@@ -4910,8 +4910,8 @@ function inventoryAdd(idNum, type) {
             itemTooltip = idNum;
         }
 
-        buttonInv.addEventListener('contextmenu', changeItem);
-        buttonInv.addEventListener('click', () => {
+        buttonInv.addEventListener('click', changeItem);
+        buttonInv.addEventListener('contextmenu', () => {
             changeItem();
             document.getElementById('tool-tip-button').click();
         });
@@ -5180,6 +5180,9 @@ function adventure(advType) {
             } else if (type >= 3 && type < 6 && persistentValues.tutorialRanged != true) {
                 drawUI.customTutorial("rangTut", 2, 'Expedition Tutorial', () => { drawAdventure(type, wave) });
                 persistentValues.tutorialRanged = true;
+            } else if ((type === 13 || type === 15) && persistentValues.tutorialSkirmish != true) {
+                drawUI.customTutorial("skirTut", 4, 'Skirmish Tutorial', () => { drawAdventure(type, wave) });
+                persistentValues.tutorialSkirmish = true;
             } else {
                 drawAdventure(type, wave);
             }
@@ -9943,28 +9946,40 @@ function achievementListload() {
 
     let table5Image = document.getElementById('table5-Image');
     let tabDiv = document.createElement('div');
-    tabDiv.classList.add('flex-row');
+    tabDiv.classList.add('flex-row', 'table5-tab');
     tabDiv.active;
 
-    let achievementTab = document.createElement('img');
-    achievementTab.src = './assets/achievement/achieve-tab1-clicked.webp';
-    let challengeTab = document.createElement('img');
-    challengeTab.src = './assets/achievement/achieve-tab2.webp';
+    let achievementTab = createDom('p', {
+        classList: ['tab-chosen', 'tab-unchosen', 'flex-column'],
+        innerText: 'Achievements',
+    });
 
-    achievementTab.addEventListener('click',()=>{
-        changeAchTab(achievementTab);
-    })
+    let challengeTab = createDom('p', {
+        classList: ['tab-unchosen', 'flex-column'],
+        innerText: 'Challenges',
+    });
 
-    challengeTab.addEventListener('click',()=>{
-        changeAchTab(challengeTab);
-    })
+    let tutorialTab = createDom('p', {
+        classList: ['tab-unchosen', 'flex-column'],
+        innerText: 'Tutorials',
+    });
+
+    [achievementTab, challengeTab, tutorialTab].forEach((tab) => {
+        tab.addEventListener('click',()=>{
+            changeAchTab(tab);
+        });
+    });
 
     table5.style.display = "flex";
 
     let challengeDiv = document.getElementById('challenge-div');
     challengeDiv.classList.add("flex-column");
     challengeDiv.innerText = "\n[Locked. Come back later!]";
-    challengeDiv.id = 'challenge-div';
+
+    // TODO: ANY SKIRMISH TUTORIAL
+
+    let tutorialDiv = document.getElementById('tutorial-div');
+    drawUI.buildTutorial(saveValues, persistentValues, advDict);
 
     if (!persistentValues.tutorialAscend) challengeDiv.style.color = '#343030';
     if (persistentValues.tutorialAscend) {
@@ -9973,24 +9988,30 @@ function achievementListload() {
     
     function changeAchTab(ele) {
         if (tabDiv.active !== ele) {
-            achievementTab.src = './assets/achievement/achieve-tab1.webp';
-            challengeTab.src = './assets/achievement/achieve-tab2.webp';
+            achievementTab.classList.remove('tab-chosen');
+            challengeTab.classList.remove('tab-chosen');
+            tutorialTab.classList.remove('tab-chosen');
             tabDiv.active = ele;
 
+            table5.style.display = "none";
+            challengeDiv.style.display = "none";
+            tutorialDiv.style.display = "none";
+
             if (ele === achievementTab) {
-                achievementTab.src = './assets/achievement/achieve-tab1-clicked.webp';
+                achievementTab.classList.add('tab-chosen');
                 table5.style.display = "flex";
-                challengeDiv.style.display = "none";
-            } else {
-                challengeTab.src = './assets/achievement/achieve-tab2-clicked.webp';
-                table5.style.display = "none";
+            } else if (ele === challengeTab) {
+                challengeTab.classList.add('tab-chosen');
                 challengeDiv.style.display = "flex";
+            } else {
+                tutorialTab.classList.add('tab-chosen');
+                tutorialDiv.style.display = "flex";
             }
         }
     }
 
     tabDiv.active = achievementTab;
-    tabDiv.append(achievementTab,challengeTab)
+    tabDiv.append(achievementTab, challengeTab, tutorialTab);
     table5Image.append(tabDiv);
 }
 
@@ -12659,7 +12680,7 @@ if (beta || testing) {
         } else if (e.key === 'j') {
             spawnBossQuest(2)
         } else if (e.key === 'k') {
-            spawnWorldQuest();
+            spawnSkirmish();
         }
     });
 }

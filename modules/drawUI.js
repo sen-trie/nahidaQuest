@@ -189,7 +189,10 @@ function drawMainBody() {
     let challengeDiv = document.createElement("div");
     challengeDiv.id = "challenge-div";
     challengeDiv.style.display = "none";
-    table5Container.append(table5Image,table5,challengeDiv);
+    let tutorialDiv = document.createElement("div");
+    tutorialDiv.id = "tutorial-div";
+    tutorialDiv.style.display = "none";
+    table5Container.append(table5Image,table5,challengeDiv,tutorialDiv);
     
     // TABLE 6
     let table6 = document.createElement("div");
@@ -303,6 +306,68 @@ function storeAchievement(achievementText,achievementDesc,achievementID) {
     achievementTextStored.classList.add("flex-column","achieve-stored-text");
     achievementStored.append(achievementTextStored,achievementImageContainer);
     return achievementStored;
+}
+
+const tutorialDict = {
+    "tut": ["Introduction", 5, "/bg/nahidaNew.webp"],
+    "advTut": ["Expedition", 6, "/expedbg/battle1.webp"],
+    "rangTut": ["Ranged Attack", 2, "/icon/warning.webp"],
+    "commission": ["Commissions", 3, "/expedbg/adv-10.webp"],
+    "goldenNut": ["Golden Nut Obtained", 4, "/icon/goldenNut.webp"],
+    "ascendTut": ["Ascension & Trees", 13, "/icon/tree.webp"],
+    "skirTut": ["Skirmish Tutorial", 4, "/expedbg/adv-13.webp"],
+    "flower": ["Fellboss \n Defeat", 2, "/expedbg/heads/25.webp"],
+    "unusual": ["Unusual Hilichurl \n Defeat", 4, "/expedbg/heads/26.webp"],
+    "workshop": ["Shouko no Kami \n Defeat", 4, "/expedbg/heads/27.webp"],
+    "finale": ["The Doctor \n Defeat", 9, "/expedbg/heads/28.webp"],
+}
+
+const buildTutorialButton = (dictKey) => {
+    let tutorialDiv = document.getElementById('tutorial-div');
+    if (document.getElementById(`old-tutorial-${dictKey}`)) {return}
+    const button = createDom('button', {
+        class: ['tutorial-direction-next', 'flex-row', 'old-tutorial-button'],
+        id: `old-tutorial-${dictKey}`,
+        child: [
+            createDom('p', { innerText: tutorialDict[dictKey][0]}),
+            createDom('img', { src: `./assets/${tutorialDict[dictKey][2]}` })
+        ]
+    });
+
+    button.addEventListener('click', () => {
+        customTutorial(
+            dictKey, 
+            tutorialDict[dictKey][1], 
+            tutorialDict[dictKey][0].replace(/(\r\n|\n|\r)/gm,""));
+    })
+
+    tutorialDiv.appendChild(button);
+}
+
+export function buildTutorial(saveValues, persistentValues, advDict) {
+    buildTutorialButton("tut");
+
+    const checkTut = {
+        "advTut": persistentValues.tutorialBasic,
+        "rangTut": persistentValues.tutorialRanged,
+        "commission": advDict.adventureRank >= 9,
+        "goldenNut": saveValues.goldenTutorial,
+        "ascendTut": persistentValues.tutorialAscend,
+        "skirTut": persistentValues.tutorialSkirmish,
+        "flower": persistentValues.fellBossDefeat,
+        "unusual": persistentValues.unusualBossDefeat,
+        "workshop": persistentValues.workshopBossDefeat,
+        "finale": persistentValues.finaleBossDefeat,
+    }
+
+    for (let key in checkTut) {
+        if (checkTut[key] === true) buildTutorialButton(key);
+    }
+
+    let tutorialDiv = document.getElementById('tutorial-div');
+    tutorialDiv.buildTut = (dictKey) => {
+        buildTutorialButton(dictKey);
+    }
 }
 
 function drawMailTable(table4) {
@@ -580,6 +645,9 @@ function customTutorial(tutorialFile, maxSlide, title, exitFunction) {
     }
     preloadTutorial.fetch(slideArray);
 
+    let tutorialDiv = document.getElementById('tutorial-div');
+    if (tutorialDiv) tutorialDiv.buildTut(tutorialFile);
+    
     let tutorialImage = document.createElement("img");
     tutorialImage.classList.add("tutorial-img");
     tutorialImage.src = `./assets/tutorial/${tutorialFile}-1.webp`;

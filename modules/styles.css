@@ -897,7 +897,7 @@ table, button, label {
     justify-content: space-evenly;
 }
 
-.tutorial-button-container > button {
+.tutorial-button-container > button, .old-tutorial-button {
     font-size: 1.1rem;
     max-width: 50%;
     height: 2.5rem;
@@ -2213,7 +2213,7 @@ table, button, label {
     transform: translateY(-12%);
 }
 
-.flex-container-ACHIEVEMENT {
+.flex-container-ACHIEVEMENT, #tutorial-div {
     position: absolute;
     width: 90%;
     height: 80%;
@@ -2295,10 +2295,14 @@ table, button, label {
     color: var(--very-dark-brown);
 }
 
-.tier-button {
+.tier-button{
     background-color: #1F2834;
     border: 0.2em solid #333D47;
     outline: 0.2em solid #1F2834;
+}
+
+.tier-button {
+    height: fit-content;
     width: 95%;
     padding: 1%;
     box-sizing: border-box;
@@ -2385,7 +2389,51 @@ table, button, label {
     box-sizing: border-box;
     text-align: center;
 }
- 
+
+.table5-tab > p {
+    height: 100%;
+    padding: 0 1rem;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+}
+
+.table5-tab > .tab-unchosen {
+    background-color: #E8E3D9;
+    color: #6B665C;
+    border: double .3rem #6B665C;
+}
+
+.table5-tab > .tab-chosen {
+    background-color: #222937;
+    color: #E2E7EF;
+    border: double .3rem #E2E7EF;
+}
+
+#tutorial-div {
+    font-size: 1.2rem;
+    padding: 2% 1%;
+    box-sizing: border-box;
+}
+
+.old-tutorial-button {
+    height: auto;
+    width: 49%;
+    aspect-ratio: 100 / 34;
+    justify-content: space-around;
+    background: url(../assets/tutorial/tutorialFrameShort.webp) center center / contain no-repeat;
+}
+
+.old-tutorial-button > p {
+    text-align: center;
+    width: 65%;
+}
+
+.old-tutorial-button > img {
+    width: 30%;
+    height: 70%;
+    object-fit: contain;
+    filter: drop-shadow(0.15rem 0.15rem 0.1rem black);
+}
 
 /*/////////////////////////////// TOOLTIP UI (TABLE6) CSS ///////////////////////////////*/
 #table6 {
