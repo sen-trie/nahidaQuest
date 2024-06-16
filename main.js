@@ -3944,6 +3944,12 @@ function settingsBox() {
             } else if (commandText === "beta off") {
                 saveData(true, 0, [['beta', false]]);
                 location.reload();
+            } else if (commandText === "dropbox") {
+                genericItemLoot();
+                genericItemLoot();
+                genericItemLoot();
+                genericItemLoot();
+                genericItemLoot();
             } else if (commandText === "all the mail") {
                 saveValues["mailCore"] += 30;
             } else if (commandText === "all the riches") {
@@ -3968,13 +3974,13 @@ function settingsBox() {
             } else if (commandText === "skip tree") {
                 growTree('add', Math.round(100));
             } else {
-                invalidCommand();
+                invalidCommand(commandText);
             }
         });
 
-        const invalidCommand = () => {
+        const invalidCommand = (commandText) => {
             alert("Invalid command.");
-            console.warn(`Invalid command: ${consoleBoxText.value}.`);
+            console.warn(`Invalid command: ${commandText}.`);
         }
         
         consoleBox.append(consoleBoxText, consoleBoxButton);
@@ -4023,6 +4029,34 @@ function createMultiplierButton() {
 
     multiplierButtonContainer.append(multiplierButton3, multiplierButton2, multiplierButton1);
     midDiv.appendChild(multiplierButtonContainer);
+
+    let currentKey = null;
+
+    document.addEventListener("keydown", function(event) {
+        if (currentKey !== null) return;
+        if (event.key === "Shift") {
+            currentKey = "Shift";
+            multiplierButton1.click();
+        } else if (event.key === "Alt") {
+            currentKey = "Alt";
+            multiplierButton2.click();
+        } else if (event.key === "Control") {
+            currentKey = "Control";
+            multiplierButton3.click();
+        }
+    });
+
+    document.addEventListener("keyup", function(event) {
+        if (event.key !== currentKey) return;
+        if (currentKey === "Shift") {
+            multiplierButton1.click();
+        } else if (currentKey === "Alt") {
+            multiplierButton2.click();
+        } else if (currentKey === "Control") {
+            multiplierButton3.click();
+        }
+        currentKey = null;
+    });
 }
 
 function updateMilestoneNumber() {
@@ -4078,7 +4112,7 @@ function createFilter() {
             }
         }
         clearTooltip();
-    })
+    });
 
     const heroOptions = ['Pyro','Hydro','Anemo','Electro','Dendro','Cryo','Geo','Sword','Claymore','Catalyst','Polearm','Bow','Sumeru','Mondstadt','Liyue','Inazuma', 'Fontaine'];
     const invOptions = ['Artifact','Food','Level','Gemstone','Talent','Sword','Claymore','Catalyst','Polearm','Bow'];
@@ -4248,8 +4282,7 @@ function loadRow() {
             }
         }
 
-        let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
-        heroButtonContainer.addEventListener("click", () => {
+        const selectHero = () => {
             changeTooltip(upgradeInfo[loadedHeroID], "hero", loadedHeroID);
             if (heroTooltip !== -1) {
                 if (upgradeDict[heroTooltip] != undefined) {
@@ -4267,6 +4300,13 @@ function loadRow() {
             }
             heroTooltip = loadedHeroID;
             heroButtonContainer.classList.add("active-hero");
+        }
+
+        let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
+        heroButtonContainer.addEventListener("contextmenu", selectHero);
+        heroButtonContainer.addEventListener('click', () => {
+            selectHero();
+            document.getElementById("tool-tip-button").click();
         });
 
         heroButtonContainer.innerText = heroTextLoad;
@@ -4310,11 +4350,8 @@ function addNewRow(onlyOnce) {
                 continue;
             }
 
-            let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
-            saveValues["rowCount"]++;
-
-            heroButtonContainer.addEventListener("click", () => {
-                changeTooltip(upgradeInfo[i], "hero",i);
+            const selectHero = () => {
+                changeTooltip(upgradeInfo[i], "hero", i);
                 if (heroTooltip !== -1) {
                     if (upgradeDict[heroTooltip] != undefined) {
                         heroTooltip = upgradeDict[heroTooltip].Row;
@@ -4331,7 +4368,16 @@ function addNewRow(onlyOnce) {
                 }
                 heroTooltip = i;
                 heroButtonContainer.classList.add("active-hero");
+            }
+    
+            let heroButtonContainer = drawUI.createHeroButtonContainer(heroID);
+            heroButtonContainer.addEventListener("contextmenu", selectHero);
+            heroButtonContainer.addEventListener('click', () => {
+                selectHero();
+                document.getElementById("tool-tip-button").click();
             });
+
+            saveValues["rowCount"]++;
             heroButtonContainer.innerText = heroText;
             if (milestoneOn) {heroButtonContainer.style.display = "none"}
             table1.appendChild(heroButtonContainer);
@@ -4687,7 +4733,8 @@ function milestoneAdd(lowestKey,heroID) {
     milestoneImg.src = `./assets/tooltips/milestone/${upgradeInfo[heroID].Name}.webp`;
 
     milestoneButton.append(milestoneImg);
-    milestoneButton.addEventListener("click",()=>{
+
+    const milestoneBuy = () => {
         if (document.getElementById(`milestone-${heroTooltip}`)) {
             let oldMilestoneButton = document.getElementById(`milestone-${heroTooltip}`);
             if (oldMilestoneButton.classList.contains("milestone-selected")) {
@@ -4698,7 +4745,18 @@ function milestoneAdd(lowestKey,heroID) {
         heroTooltip = heroID + "-" + lowestKey;
         changeTooltip(upgradeInfo[heroID],"milestone",lowestKey);
         milestoneButton.classList.add("milestone-selected");
-    })
+    }
+    
+    milestoneButton.addEventListener("contextmenu", milestoneBuy);
+    milestoneButton.addEventListener("click",() => {
+        milestoneBuy();
+        document.getElementById('tool-tip-button').click();
+        if (milestoneButton) {
+            milestoneBuy();
+        }
+    });
+
+
     table1.appendChild(milestoneButton);
     milestoneCount++;
     updateMilestoneNumber();
@@ -4838,7 +4896,8 @@ function inventoryAdd(idNum, type) {
     } else {
         buttonInv.classList.add("button-container");
         buttonInv.id = itemUniqueID;
-        buttonInv.addEventListener('click', function() {
+
+        const changeItem = () => {
             changeTooltip(Inventory[idNum], "item", idNum);
             if (itemTooltip === -1) {
                 buttonInv.classList.add("inventory-selected");
@@ -4849,6 +4908,12 @@ function inventoryAdd(idNum, type) {
             }
             
             itemTooltip = idNum;
+        }
+
+        buttonInv.addEventListener('contextmenu', changeItem);
+        buttonInv.addEventListener('click', () => {
+            changeItem();
+            document.getElementById('tool-tip-button').click();
         });
     }
 
@@ -10497,7 +10562,6 @@ function reduceItem(localItemTooltip, usingTooltip = false) {
     persistentValues.itemsUsedValue++;
 
     if (usingTooltip && itemButton) {
-        // debugger;
         if (inventoryCount > 0) {
             changeTooltip(Inventory[localItemTooltip],"item", localItemTooltip);
         } else if (inventoryCount <= 0) {

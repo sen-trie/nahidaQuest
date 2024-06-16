@@ -406,7 +406,7 @@ function createDom(elementType, attributes) {
     const element = document.createElement(elementType);
 
     if (element.draggable) {
-        element.draggable = true;
+        element.draggable = false;
     }
 
     if (attributes) {
