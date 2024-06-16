@@ -2,18 +2,26 @@ import { universalStyleCheck, abbrNum, rollArray, randomInteger } from "../funct
 import { createDom } from "../adjustUI.js";
 
 const boxElement = ["Any","Pyro","Hydro","Dendro","Electro","Anemo","Cryo","Geo"];
-const offerBox = (treeTable, optionsContainer, offerItemFunction, persistentValues) => {
+const offerBox = (treeTable, offerItemFunction, persistentValues) => {
     const treeOffer = createDom('div', {
         id: 'tree-offer-container',
         class: ['flex-column'],
-        style: { display: 'none' }
+        style: { display: 'flex' }
+    });
+    // TODO: UPDATE TREE CORES  AND ITEMS
+
+    const nutStoreCurrencyAmount = createDom('p', {
+        innerText: abbrNum(persistentValues["goldenCore"], 2, true)
     });
 
-    const nutStoreCurrency = document.createElement("div");
-    nutStoreCurrency.id = "tree-store-currency";
-    nutStoreCurrency.classList.add("flex-row");
-    nutStoreCurrency.innerText = abbrNum(persistentValues["goldenCore"], 2, true);
-    nutStoreCurrency.appendChild(createDom('img', { src: './assets/icon/core.webp' }));
+    const nutStoreCurrency = createDom("div", {
+        id: "tree-store-currency",
+        classList: ['flex-row'],
+        child: [
+            nutStoreCurrencyAmount,
+            createDom('img', { src: './assets/icon/core.webp' }),
+        ]
+    });
 
     const offerTitle = createDom('p', { innerHTML: 'Tree Offering' });
     const treeOfferText = document.createElement('p');
@@ -25,23 +33,22 @@ const offerBox = (treeTable, optionsContainer, offerItemFunction, persistentValu
     const treeItem = createDom('div', { id: 'tree-offer-items', class:['flex-row'] });
     const treeMissingText = createDom('p', { id: 'tree-missing-text' });
     const buttonContainer = createDom('div', { class: ['flex-row', 'tree-button-container'] });
-    const backButton = createDom('button', { innerText: 'Back', id: 'tree-offer-button', class:['fancy-button', 'clickable'] });
-
-    backButton.addEventListener('click', () => {
-        universalStyleCheck(optionsContainer, "display", "flex", "none");
-        universalStyleCheck(treeOffer, "display", "none", "flex");
-    });
 
     const offerButton = document.createElement('button');
     offerButton.innerText = 'Offer';
     offerButton.classList.add('fancy-button', 'clickable');
     offerButton.addEventListener('click', () => {
         offerItemFunction();
-    })
+    });
 
-    buttonContainer.append(backButton, offerButton);
+    treeTable.updateGoldenCore = () => {
+        nutStoreCurrencyAmount.innerText = abbrNum(persistentValues["goldenCore"], 2, true);
+    }
+
+    buttonContainer.append(offerButton);
     treeOffer.append(offerTitle, treeOfferText, treeItem, treeMissingText, buttonContainer, nutStoreCurrency);
     treeTable.append(treeOffer);
+    return treeOffer;
 }
 
 const treeBackButton = (backContainer) => {
@@ -74,19 +81,9 @@ const updateTreeValues = (turnZero = false, treeObj) => {
     }
 }
 
-const pickTree = () => {
-    const palmEnergy = document.getElementById('palm-text');
-    palmEnergy.innerText = 'How much are you planting?';
-
-    while (document.getElementById('options-container').firstChild) {document.getElementById('options-container').firstChild.remove()}
-    const seedContainer = createDom('div', { classList: ['flex-row'], id: 'seed-container' });
-    document.getElementById('tree-table').appendChild(seedContainer);
-}
-
-const createTreeSeedContainer = (index, persistentValues, seedAdded) => {
-    const seedContainer = document.getElementById('seed-container');
+const createTreeSeedContainer = (index, persistentValues, seedAdded, seedContainer) => {
     const seedColumnContainer = document.createElement('div');
-    seedColumnContainer.classList.add('seed-column')
+    seedColumnContainer.classList.add('seed-column');
     
     const seedImg = new Image();
     seedImg.src = `./assets/tooltips/inventory/seed-${index + 1}.webp`;
@@ -127,75 +124,59 @@ const createTreeSeedContainer = (index, persistentValues, seedAdded) => {
     seedContainer.append(seedColumnContainer);
 }
 
-const toggleOptionsContainer = (showOptions = true, showContainer = 'tree-offer-container') => {
-    if (showOptions) {
-        document.getElementById('options-container').style.display = 'flex';
-        document.getElementById('tree-offer-container').style.display = 'none';
-        document.getElementById('leyline-container').style.display = 'none';
-        document.getElementById('bless-container').style.display = 'none';
-    } else {
-        document.getElementById('options-container').style.display = 'none';
-        document.getElementById('tree-offer-container').style.display = 'none';
-        document.getElementById('leyline-container').style.display = 'none';
-        document.getElementById('bless-container').style.display = 'none';
-        document.getElementById(showContainer).style.display = 'flex';
+export const createSeedContainer = (treeTable, persistentValues, saveValues, growTree, toggleDestroyButton) => {
+    const seedContainer = createDom('div', { 
+        classList: ['flex-row'], 
+        id: 'seed-container',
+        child: [ createDom('p', { innerText: 'How much are you planting?' })],
+        style: { display: 'flex' }
+    });
+
+    let seedAdded = [0, 0, 0];
+    for (let i = 0; i < 3; i++) {
+        createTreeSeedContainer(i, persistentValues, seedAdded, seedContainer);
     }
-}
 
-const updateSeedContainer = (updateValueOnly = false, persistentValues, saveValues, growTree, treeOptions, toggleDestroyButton) => {
-    if (!document.getElementById('seed-container')) { return }
-    const seedContainer = document.getElementById('seed-container');
+    const plantButton = createDom('button', {
+        id: 'plant-tree-seed',
+        innerText: 'Plant!',
+        style: { transform: 'translateX(5%)' }
+    });
 
-    if (updateValueOnly) {
-        const containerChildren = Array.from(seedContainer.children);
+    plantButton.addEventListener('click', () => {
+        let seedValue = 0;
+        let seedNum = 1;
+        for (let i = 0; i < seedAdded.length; i++) {
+            seedValue += seedAdded[i] * (i + 1)**3;
+            seedNum *= Math.max(Math.log(((seedAdded[i] * (i + 1)) + 1)), 1);
+        }
+
+        if (seedValue > 0) {
+            saveValues.treeObj.growthRate = Math.round(seedNum * 100) / 100;
+            saveValues.treeObj.energy = 100 * seedValue;
+            seedContainer.style.display = 'none';
+            
+            for (let i = 0; i < 3; i++) {
+                persistentValues.treeSeeds[i] -= seedAdded[i];
+            }
+
+            growTree('level');
+            toggleDestroyButton();
+            treeTable.updateLevel();
+        }
+    });
+
+    seedContainer.append(plantButton);
+    treeTable.appendChild(seedContainer);
+
+    
+    treeTable.updateSeeds = () => {
+        const containerChildren = Array.from(seedContainer.querySelectorAll('.seed-column'));
         for (let i = 0; i < 3; i++) {
             containerChildren[i].updateValue();
         }
-    } else {
-        let seedAdded = [0, 0, 0];
-        for (let i = 0; i < 3; i++) {
-            createTreeSeedContainer(i, persistentValues, seedAdded);
-        }
-
-        const backButton = createDom('button', {
-            innerText: 'Back',
-            style: { transform: 'translateX(-105%)' }
-        });
-
-        backButton.addEventListener('click', () => {
-            updateTreeValues(true, saveValues.treeObj);
-            seedContainer.remove();
-            treeOptions(false, document.getElementById('options-container'));
-        });
-
-        const plantButton = createDom('button', {
-            innerText: 'Plant!',
-            style: { transform: 'translateX(5%)' }
-        });
-
-        plantButton.addEventListener('click', () => {
-            let seedValue = 0;
-            let seedNum = 1;
-            for (let i = 0; i < seedAdded.length; i++) {
-                seedValue += seedAdded[i] * (i + 1)**3;
-                seedNum *= Math.max(Math.log(((seedAdded[i] * (i + 1)) + 1)), 1);
-            }
-
-            if (seedValue > 0) {
-                saveValues.treeObj.growthRate = Math.round(seedNum * 100) / 100;
-                seedContainer.remove();
-
-                saveValues.treeObj.energy = 100 * seedValue;
-                growTree('level');
-                toggleDestroyButton();
-
-                for (let i = 0; i < 3; i++) {
-                    persistentValues.treeSeeds[i] -= seedAdded[i];
-                }
-            }
-        });
-        seedContainer.append(backButton, plantButton);
     }
+    return seedContainer;
 }
 
 const generateTreeExplosion = (amount = 1) => {
@@ -222,4 +203,4 @@ const generateTreeExplosion = (amount = 1) => {
     }
 }
 
-export { offerBox, updateTreeValues, pickTree, updateSeedContainer, generateTreeExplosion, treeBackButton, toggleOptionsContainer }
+export { offerBox, updateTreeValues, generateTreeExplosion, treeBackButton }

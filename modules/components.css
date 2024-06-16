@@ -2854,6 +2854,11 @@ input:checked + .slider:before {
     row-gap: 1.5%;
 }
 
+#tree-table { 
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
 #nut-store-currency, #tree-store-currency {
     position: absolute;
     left: 8%;

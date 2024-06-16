@@ -3968,6 +3968,8 @@ function settingsBox() {
                 } else {
                     invalidCommand();
                 }
+            } else if (commandText === "all the cores") {
+                persistentValues.goldenCore = 1e3;
             } else if (commandText === "skip nuts") {
                 saveValues.realScore += 1e40;
             } else if (commandText === "skip nuts squared") {
@@ -3978,6 +3980,8 @@ function settingsBox() {
                 invalidCommand(commandText);
             }
         });
+
+
 
         const invalidCommand = (commandText) => {
             alert("Invalid command.");
@@ -11182,7 +11186,9 @@ function addNutStore() {
     let nutStoreButton = createDom('button', {
         classList: ["nut-store-access"],
     });
+    
     nutStoreButton.addEventListener("click",() => {
+        updateCoreCounter();
         calculateGoldenCore();
         universalStyleCheck(nutStoreTable,"display","flex","none");
     })
@@ -11714,19 +11720,17 @@ function createTreeMenu() {
     const palmText = document.createElement('p');
     palmText.id = 'palm-text';
     palmText.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
-    const optionsContainer = document.createElement('div');
-    optionsContainer.id = 'options-container';
-    treeOptions(treeLevel === 0 ? false : true, optionsContainer)
+    treeTable.append(palmText);
 
     let container = document.createElement('div');
     container.classList.add('flex-row');
     let element = rollArray(boxElement, 1);
     container.style.background = `url(./assets/tooltips/elements/nut-${element.toLowerCase()}.webp) no-repeat center center/contain`;
     
-    treeTable.append(palmText, optionsContainer);
-    Tree.offerBox(treeTable, optionsContainer, offerItemFunction, persistentValues);
-    leylineCreate(treeTable, optionsContainer);
-    blessCreate(treeTable, optionsContainer);
+    const seedContainer = Tree.createSeedContainer(treeTable, persistentValues, saveValues, growTree, toggleDestroyButton);
+    const treeOffer = Tree.offerBox(treeTable, offerItemFunction, persistentValues);
+    const leylineDisplay = leylineCreate(treeTable);
+    const blessDisplay = blessCreate(treeTable);
 
     leftDiv.appendChild(treeSide);
     mainTable.appendChild(treeTable);
@@ -11734,17 +11738,36 @@ function createTreeMenu() {
     let nutStoreButton = document.createElement("button");
     nutStoreButton.classList.add("tree-access","nut-store-access");
     nutStoreButton.addEventListener("click", () => {
+        treeTable.updateSeeds();
+        treeTable.updateGoldenCore();
         universalStyleCheck(treeTable, "display", "none", "flex", true);
         universalStyleCheck(treeSide, "display", "none", "flex", true);
         universalStyleCheck(document.getElementById('nut-store-table'),"display","flex","none",true);
     })
     leftDiv.appendChild(nutStoreButton);
 
-    Tree.updateTreeValues(treeLevel === 0 ? true : false, saveValues.treeObj);
-    if (saveValues.treeObj.defense === true) {
-        enemyBlock(false);
-    } else if (treeLevel === 5) {
-        treeOptions(true, document.getElementById('options-container'));
+    treeTable.updateLevel = () => {
+        if (saveValues.treeObj.level === 0) {
+            [treeOffer, leylineDisplay, blessDisplay].forEach((ele) => {
+                ele.style.display = 'none';
+            });
+            seedContainer.style.display = 'flex';
+        } else {
+            [treeOffer, leylineDisplay, blessDisplay].forEach((ele) => {
+                ele.style.display = 'flex';
+            });
+            seedContainer.style.display = 'none';
+        }
+    }
+
+    treeTable.updateLevel();
+    if (treeLevel === 0) {
+        Tree.updateTreeValues(true, saveValues.treeObj);
+    } else {
+        Tree.updateTreeValues(false, saveValues.treeObj);
+        if (saveValues.treeObj.defense === true) {
+            enemyBlock(false);
+        } 
     }
 
     toggleDestroyButton();
@@ -11834,10 +11857,10 @@ function offerItemFunction() {
             treeInnerValue += `Missing item: '${Inventory[coreContainer.currentItem].Name}'\n`;
         }
     }
-
+    // TODO: FIX CLICK
     treeMissingText.innerText = treeInnerValue;
-    if (treeInnerValue !== '') {return}
-    saveValues.treeObj.offer[0] -= persistentValues.goldenCore;
+    if (treeInnerValue !== '' && !testing) {return}
+    persistentValues.goldenCore -= saveValues.treeObj.offer[0];
     for (let i = 1; i < saveValues.treeObj.offer.length; i++) {
         let itemNumber = saveValues.treeObj.offer[i];
         reduceItem(itemNumber);
@@ -11866,10 +11889,13 @@ function offerItemFunction() {
     const palmText = document.getElementById('palm-text');
     palmText.innerText = `Palm Energy: ${saveValues.treeObj.energy}`;
     rollTreeItems();
+
+    document.getElementById('tree-table').updateGoldenCore();
 }
 
 function treeOptions(planted, optionsContainer) {
-    while (optionsContainer.firstChild) { optionsContainer.firstChild.remove() }
+    return;
+    // while (optionsContainer.firstChild) { optionsContainer.firstChild.remove() }
     if (planted) {
         optionsContainer.classList.add('flex-row','options-container');
         optionsContainer.style.display = 'flex';
@@ -11966,13 +11992,11 @@ function destroyTree(finalPhase = false) {
     const treeProgress = document.getElementById('tree-progress');
     const treeImg = document.getElementById('tree-img');
     const treeContainer = document.getElementById('tree-container');
-    const optionsContainer = document.getElementById('options-container');
     const treeMissingText = document.getElementById('tree-missing-text');
 
     if (finalPhase) { Tree.generateTreeExplosion(15) }
     
     treeMissingText.innerText = '';
-    treeOptions(false, optionsContainer);
     Tree.updateTreeValues(true, saveValues.treeObj);
     treeImg.src = `./assets/tooltips/Empty.webp`;
 
@@ -11980,7 +12004,6 @@ function destroyTree(finalPhase = false) {
         enemyBlock(true);
     }
 
-    Tree.toggleOptionsContainer(true);
     setTimeout(()=>{
         mailElement.load();
         mailElement.play();
@@ -12013,6 +12036,8 @@ function destroyTree(finalPhase = false) {
         treeContainer.classList.remove(`tree-${saveValues.treeObj.level === 5 ? 4 : saveValues.treeObj.level}`);
         saveValues.treeObj.level = 0;
         saveValues.treeObj.defense = false;
+
+        document.getElementById("tree-table").updateLevel();
 
         const lootContainer = createDom('div', { class:['notif-item']});
         let lootArray = Array.from({ length: 7 }, () => randomInteger(Math.round(treeValue * 0.4), Math.round(treeValue * 0.7)));
@@ -12089,7 +12114,7 @@ function addTreeCore(number = 1, increaseOdds = 0, override = false) {
     }
 
     persistentValues.treeSeeds[rolledCore - 1] += number;
-    Tree.updateSeedContainer(true, persistentValues, saveValues, growTree, treeOptions);
+    if (document.getElementById('tree-table')) document.getElementById('tree-table').updateSeeds();
     sidePop(`/tooltips/inventory/seed-${rolledCore}.webp`, `${number}x Lvl. ${rolledCore} Seed`);
 }
 
@@ -12116,7 +12141,6 @@ function enemyBlock(removeBlocker = false, damage = null, maxHP) {
             enemyButtonNew.addEventListener('click', () => {
                 document.getElementById('tree-block').remove();
                 saveValues.treeObj.defense = false;
-                Tree.toggleOptionsContainer(false, 'bless-container');
     
                 let treeHealthText = document.getElementById('tree-health-text');
                 saveValues.treeObj.health = Math.max(saveValues.treeObj.health - lostHP, 1); ;
@@ -12127,7 +12151,6 @@ function enemyBlock(removeBlocker = false, damage = null, maxHP) {
             enemyContainerChildren[1].remove();
         }
     } else if (removeBlocker === false) {
-        Tree.toggleOptionsContainer(true);
         saveValues.treeObj.defense = true;
 
         let eventBackdrop = document.createElement('div');
@@ -12169,14 +12192,8 @@ function growTree(type, amount = 0) {
         if (treeProgress.progress > 100) {
             // REMOVE MAXED TREE
             if (saveValues.treeObj.level === 4) {
-                let treeOfferContainer = document.getElementById('tree-offer-container');
-                if (treeOfferContainer.style.display !== 'none') {
-                    document.getElementById('tree-offer-button').click();
-                }
                 saveValues.treeObj.level = 5;
-                treeOptions(true, document.getElementById('options-container'));
                 changeHarvestButton();
-                Tree.toggleOptionsContainer(true);
                 sidePop('/tree/harvest.webp', 'Tree has Matured!');
             } else {
                 treeProgress.progress = 0;
@@ -12188,8 +12205,6 @@ function growTree(type, amount = 0) {
         const treeContainer = document.getElementById('tree-container');
         // PLANT NEW TREE
         if (saveValues.treeObj.level === 0) {
-            treeOptions(true, document.getElementById('options-container'));
-            
             let treeHealthText = document.getElementById('tree-health-text');
             saveValues.treeObj.health = 100;
             treeHealthText.health = saveValues.treeObj.health;
@@ -12271,7 +12286,7 @@ function compareTreeItems(itemArray) {
 }
 
 function blessCreate(treeTable) {
-    const blessDisplay = createDom('div', { class:['flex-column'], id: 'bless-container', style: { display:'none' }});
+    const blessDisplay = createDom('div', { class:['flex-column'], id: 'bless-container', style: { display: 'flex' } });
     const blessContainer = createDom('p', { innerText:'Under Construction!'})
     blessDisplay.append(blessContainer);
 
@@ -12309,6 +12324,7 @@ function blessCreate(treeTable) {
         growTree('add', randomInteger(15, 20) * additionalBless);
         const enemyRoll = randomInteger(0, 100);
         if (enemyRoll < (15 - luckRate / 4)) {
+            if (!testing) saveData();
             enemyBlock(false);
         }
 
@@ -12346,14 +12362,15 @@ function blessCreate(treeTable) {
         }
     });
 
-    buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [Tree.treeBackButton(blessDisplay), blessButton] });
+    buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'], child: [blessButton] });
     
     blessDisplay.append(buttonContainer);
     treeTable.append(blessDisplay);
+    return blessDisplay;
 }
 
 function leylineCreate(treeTable) {
-    const leylineDisplay = createDom('div', {class:['flex-column'], id:'leyline-container', style:{ display:'none' }});
+    const leylineDisplay = createDom('div', {class:[ 'flex-column' ], id:'leyline-container', style: { display: 'flex' }});
     const leylineTitle = createDom('p', { innerHTML: 'Leyline Outbreak Energy Level' });
     const leylineBar = createProgressBar(
             { id: 'leyline-bar', class: ['leyline-progress', 'healthbar-container'] },
@@ -12425,10 +12442,11 @@ function leylineCreate(treeTable) {
     });
 
     const buttonContainer = createDom('div', { class:['flex-row', 'tree-button-container'] });
-    buttonContainer.append(Tree.treeBackButton(leylineDisplay), absorbButton);
+    buttonContainer.append(absorbButton);
     
     leylineDisplay.append(leylineTitle, leylineText, leylineBar, leylineEnergy, leylineMissingText, buttonContainer);
     treeTable.append(leylineDisplay);
+    return leylineDisplay;
 }
 
 function checkAbsorbThreshold() {

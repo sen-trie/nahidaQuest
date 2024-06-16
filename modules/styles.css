@@ -327,6 +327,7 @@ table, button, label {
 }
 
 .middle-area {
+    z-index: 25;
     width: 5%;
     height: 100%;
     left: 35%;
@@ -739,7 +740,7 @@ table, button, label {
 #flex-container-TAB {
     width: 100%;
     height: 10%;
-    z-index: 3;
+    z-index: 10;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -2660,16 +2661,6 @@ table, button, label {
     padding: 2%;
     box-sizing: border-box;
     row-gap: 2% !important;
-}
-
-#tree-table::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    z-index: -1;
-    filter: opacity(0.9);
     background: url(../assets/bg/tree-bg.webp) no-repeat center center/cover;
 }
 
@@ -2721,6 +2712,13 @@ table, button, label {
     position: relative;
     width: 100%;
     gap: 1%;
+    flex-wrap: wrap;
+}
+
+#seed-container > p {
+    width: 100%;
+    margin: 0.25em;
+    color: white !important;
 }
 
 .seed-column {
@@ -2754,10 +2752,7 @@ table, button, label {
 }
 
 #seed-container > button {
-    position: absolute;
-    top: 110%;
-    left: 50%;
-    transform: translate(-50%, 100%);
+    margin-top: 1%;
     background: transparent url(../assets/tutorial/exped-button.webp) center/contain no-repeat;
     height: auto;
     width: 33%;
@@ -2969,7 +2964,7 @@ table, button, label {
     transform: translateY(90%);
 }
 
-#tree-offer-container, #leyline-container, #bless-container {
+#tree-offer-container, #leyline-container, #bless-container, #seed-container {
     margin-top: 1em;
     position: relative;
     width: 100%;
@@ -3002,6 +2997,10 @@ table, button, label {
     position: absolute;
     top: 0;
     left: 0;
+}
+
+#tree-block::before {
+    position: fixed;
 }
 
 #tree-store-currency {
@@ -3136,7 +3135,10 @@ table, button, label {
     text-align: center;
 }
 
-#leyline-container > p:first-of-type, #bless-container > p:first-of-type, #tree-offer-container > p:first-of-type {
+#leyline-container > p:first-of-type, 
+#bless-container > p:first-of-type, 
+#tree-offer-container > p:first-of-type,
+#seed-container > p:first-of-type  {
     font-size: 1.2rem;
     color: #e39f2b;
 }
