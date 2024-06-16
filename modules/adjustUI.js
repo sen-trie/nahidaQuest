@@ -404,6 +404,11 @@ function slideBox(mainBody, childArray, stopSpawnEvents) {
 const cssProps = ['top', 'left', 'transform', 'right', 'background', 'display'];
 function createDom(elementType, attributes) {
     const element = document.createElement(elementType);
+
+    if (element.draggable) {
+        element.draggable = true;
+    }
+
     if (attributes) {
         for (const attr in attributes) {
             if (cssProps.includes(attr)) {
@@ -429,7 +434,7 @@ function createDom(elementType, attributes) {
             } else if (typeof attributes[attr] !== 'object' || attributes[attr] === null) {
                 element[attr] = attributes[attr];
             } else {
-                console.warn('Invalid Attribute: ', attr);
+                console.warn('Invalid Attribute: ', elementType, attributes);
             }
         }
     }
@@ -549,7 +554,7 @@ function createMedal(num, choiceBox, mainBody, stopSpawnEvents) {
     return nutMedal;
 }
 
-const sidePop = (imgSrc, text) => {
+const sidePop = (imgSrc, text, delay = 4000, clickable = false) => {
     const sidePopContainer = document.getElementById('side-pop-container');
     const sidePop = createDom('div', {
         class: ['flex-row', 'side-pop', 'side-pop-animation'],
@@ -559,14 +564,24 @@ const sidePop = (imgSrc, text) => {
         ]
     });
 
+    if (clickable) {
+        sidePop.style.pointerEvents = 'all';
+        sidePop.addEventListener('click', () => {
+            sidePop.remove();
+        });
+    }
+
     setTimeout(() => {
+        if (!sidePop) return;
         sidePop.style.animation = '';
         void sidePop.offsetWidth;
         sidePop.style.animation = 'fadeOut 2s ease-out';
         sidePop.addEventListener('animationend', () => {
-            sidePop.remove();
+            if (sidePop) {
+                sidePop.remove();
+            }
         }, { once: true });
-    }, 4000)
+    }, delay);
 
     sidePopContainer.append(sidePop);
 }

@@ -45,7 +45,7 @@ if (isNewGame) {
         const fontDivCompare = createDom('div', {
             class: ['flex-row', 'font-compare'],
             child: [
-                createDom('p', { innerText: 'Adjust this box \n until it is the same \n height as the image \n on the right. \n Align them using \n the top and \n bottom edges.' }),
+                createDom('p', { innerText: `Adjust this box \n until it's about the  \n same height as the \n image on the right. \n Align them using \n the top and \n bottom edges.` }),
                 createDom('img', { src: './assets/tooltips/hero/Dehya.webp' }),
             ]
         });
@@ -77,7 +77,12 @@ if (isNewGame) {
         const fontDiv = createDom('div', {
             class: ['flex-column'],
             child: [fontDivCompare, fontDivChange,
-                    createDom('p', { innerText: 'This can be further changed under Settings later.' })]
+                    createDom('p', { 
+                        innerText: 'The alignment does not have to be exact. \n This can be further changed under Settings later.',
+                        style: {
+                            textAlign: 'center'
+                        }
+                     })]
         })
         choiceBox(startScreen, {text: "Font Size Configuration"}, null, null, null, fontDiv, ['notif-ele']);
     }

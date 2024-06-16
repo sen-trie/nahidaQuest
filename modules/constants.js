@@ -1,4 +1,4 @@
-const VERSIONNUMBER = "V.2-00-003";
+const VERSIONNUMBER = "V.2-00-004";
 
 const changeFontSize = (fontSize) => {
     document.documentElement.style.fontSize = `clamp(0.75rem, 0.65rem + ${fontSize * 0.08}vw + ${fontSize * 0.08}vh, 2rem)`

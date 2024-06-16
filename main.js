@@ -237,7 +237,6 @@ refresh();
 saveValues["realScore"]++;
 saveValues["realScore"]--;
 
-
 createMultiplierButton();
 createExpMap();
 createExpedition();
@@ -353,7 +352,7 @@ function loadSaveData() {
     if (localStorage.getItem('save-0') === null) { 
         settingsValues = SettingsDefault;
         saveValues = saveValuesDefault;
-        saveValues.versNumber = CONSTANTS.VERSIONNUMBER
+        saveValues.versNumber = CONSTANTS.VERSIONNUMBER;
         upgradeDict = generateHeroPrices(upgradeDictDefault, NONWISHHEROMAX, upgradeInfo);
         InventoryMap = new Map();
         expeditionDict = expeditionDictDefault;
@@ -1223,9 +1222,9 @@ function minesweeperEvent(hardMode = false) {
     let mineInfo = document.createElement("div");
     mineInfo.id = "mine-info";
     mineInfo.classList.add("flex-column");
-    let mineInfoTop = new Image();
+    let mineInfoTop = createDom('img');
     mineInfoTop.src = "./assets/event/minesweeper-top.webp";
-    let mineInfoBot = new Image();
+    let mineInfoBot = createDom('img');
     mineInfoBot.src = "./assets/event/minesweeper-bot.webp";
     mineInfo.append(mineInfoTop,mineInfoBot);
     
@@ -1426,14 +1425,14 @@ function weaselEvent(specialWeasel, hardMode) {
     weaselBack.style.width = hardMode ? '80%' : '60%';
 
     while (weaselElement--) {
-            let weaselContainer = document.createElement("div");
-            weaselContainer.classList.add("weasel");
-            weaselContainer.style.width = `${(100 * 3 / weaselElementMax)}%`;
+        let weaselContainer = document.createElement("div");
+        weaselContainer.classList.add("weasel");
+        weaselContainer.style.width = `${(100 * 3 / weaselElementMax)}%`;
 
-            let weaselBackImage = document.createElement("img");
-            weaselBackImage.src = './assets/event/weasel-10.webp';
-            weaselContainer.append(weaselBackImage)
-            weaselBack.append(weaselContainer);
+        let weaselBackImage = document.createElement("img");
+        weaselBackImage.src = './assets/event/weasel-10.webp';
+        weaselContainer.append(weaselBackImage)
+        weaselBack.append(weaselContainer);
     }
 
     let delay = 2000;
@@ -1505,7 +1504,8 @@ function addWeasel(weaselBack,delay,specialWeasel,hardMode) {
             weaselImage.style["animation-duration"] = springInterval + "s";
             const brightness = hardMode ? randomInteger(85, 95) : 100;
             weaselImage.style.filter = `brightness(${brightness / 100})`;
-            weaselImage.addEventListener("click",() => {
+
+            const weaselFunc = () => {
                 mailElement.load();
                 mailElement.playbackRate = 1.35;
                 mailElement.play();
@@ -1519,7 +1519,11 @@ function addWeasel(weaselBack,delay,specialWeasel,hardMode) {
 
                 let weaselCountText = document.getElementById("visible-weasel-count");
                 weaselCountText.innerText = weaselCount;
-            })
+            };
+
+            weaselImage.addEventListener("click", weaselFunc);
+            weaselImage.addEventListener("mousedown", weaselFunc);
+            weaselImage.addEventListener("touchstart", weaselFunc);
         } else {
             let emptyWeasel = hardMode ? randomInteger(7, 9) : randomInteger(7, 11);
             
@@ -1555,14 +1559,19 @@ function addWeasel(weaselBack,delay,specialWeasel,hardMode) {
         let springInterval = (randomInteger(15,35) / 100);
         weaselImage.classList.add("spring");
         weaselImage.style["animation-duration"] = springInterval + "s";
-        weaselImage.addEventListener("click",()=> {
+
+        const weaselFunc = () => {
             let fakeWeaselAlert = document.getElementById("fake-weasel-alert");
             fakeWeaselAlert.style.animation = "none";
             setTimeout(() => { fakeWeaselAlert.style.animation = "fadeOutWeasel 3s linear forwards"}, 10);
             weaselDecoy.load();
             weaselDecoy.play();
             clearWeasel(weaselBack, delay, specialWeasel,hardMode);
-        })
+        };
+
+        weaselImage.addEventListener("click", weaselFunc);
+        weaselImage.addEventListener("mousedown", weaselFunc);
+        weaselImage.addEventListener("touchstart", weaselFunc);
     }
 }
 
@@ -1633,28 +1642,31 @@ function rainEvent() {
         let animation = `rain ${(randomInteger(8,12)/2)}s linear forwards`
         let type = randomInteger(1,101);
         var img = document.createElement("img");
+
+        let clickFunction;
+
         if (type >= 95 && saveValues.goldenTutorial) {
             img.src = "./assets/icon/goldenIcon.webp";
-            animation = `rain-rotate ${(randomInteger(6,10)/2)}s linear forwards`
-            img.addEventListener('click', () => {
+            animation = `rain-rotate ${(randomInteger(6,10)/2)}s linear forwards`;
+            clickFunction = () => {
                 reactionCorrectElement.load();
                 reactionCorrectElement.play();
                 img.remove();
 
                 tempGolden++;
                 nutCount++;
-            });
+            }
         } else if (type >= 85) {
             img.src = "./assets/icon/primogemLarge.webp"
-            animation = `rain-rotate ${(randomInteger(3,8)/2)}s linear forwards`
-            img.addEventListener('click', () => {
+            animation = `rain-rotate ${(randomInteger(3,8)/2)}s linear forwards`;
+            clickFunction = () => {
                 img.remove();
                 tempPrimogem += randomInteger(10,20);
                 rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier) + " Nuts | " + Math.round(tempPrimogem * additionalPrimo) + " Primos";
-            });
+            }
         } else if (type >= 65) {
             img.src = "./assets/icon/scarab.webp";
-            img.addEventListener('click', () => {
+            clickFunction = () => {
                 weaselDecoy.load();
                 weaselDecoy.play();
                 img.remove();
@@ -1666,17 +1678,22 @@ function rainEvent() {
                 scarabCount++;
 
                 rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + Math.round(tempPrimogem * additionalPrimo) + " Primos";
-            });
+            }
         } else {
             img.src = "./assets/icon/nut.webp";
-            img.addEventListener('click', () => {
+            clickFunction = () => {
                 img.remove();
                 tempScore++;
                 nutCount++;
 
                 rainTextDiv.innerText = abbrNum(tempScore * dpsMultiplier)+ " Nuts | " + tempPrimogem + " Primos";
-            });
+            }
         }
+
+        img.addEventListener('click', clickFunction);
+        img.addEventListener('mousedown', clickFunction);
+        img.addEventListener('touchstart', clickFunction);
+
         img.style.top = "-15%";
         img.style.left = `${randomInteger(5,95)}%`
         img.style.animation = animation;
@@ -1927,7 +1944,7 @@ function battleshipEvent() {
     keyContainer.append(rotateButton, confirmButton);
 
     for (let i = 0; i < 3; i++) {
-        let key = new Image();
+        let key = createDom('img');
         key.src = `./assets/event/key-${i+1}.webp`;
         key.disp = i + 1;
         key.horizontal;
@@ -2131,7 +2148,7 @@ function battleshipEvent() {
     
     const enemyKeys = [];
     for (let i = 0; i < 3; i++) {
-        let key = new Image();
+        let key = createDom('img');
         key.src = `./assets/event/key-${i+1}.webp`;
         key.classList.add('enemy-key');
         key.disp = i + 1;
@@ -2263,7 +2280,7 @@ function battleshipEvent() {
                 return;
             }
             
-            let cross = new Image();
+            let cross = createDom('img');
             cross.classList.add('battleship-cross');
             cross.src = source;
 
@@ -2289,7 +2306,7 @@ function battleshipEvent() {
                 return;
             }
             
-            let cross = new Image();
+            let cross = createDom('img');
             cross.classList.add('battleship-cross');
             cross.src = source;
 
@@ -2997,6 +3014,14 @@ function removeLoading(loadingNumber) {
 
         tutorial(idleAmount);
         if (testing && document.getElementById('play-button')) document.getElementById('play-button').click(); 
+        if (CONSTANTS.DBNUBMER - saveValues.versNumber > 0) {
+            sidePop('/icon/patchIco.webp', `Update: ${saveValues.versNumber} -> ${CONSTANTS.DBNUBMER}`, 10000, true);
+            if (CONSTANTS.DBNUBMER - saveValues.versNumber >= 1000) {
+                document.getElementById('setting-button').click()
+                document.getElementById('patch-notes-button').click();
+                document.querySelector('#patch-container > div').click();
+            }
+        }
     }, 200);
 }
 
@@ -3453,6 +3478,7 @@ function generalSettings(settingsMenu) {
 
     const patchNotesButton = createDom("button", {
         classList: ["patch-button", 'clickable', "flex-row"],
+        id: 'patch-notes-button',
         event: ["click", () => {
             patchNotesDiv.style.display = patchNotesDiv.style.display === 'none' ? 'flex' : 'none';
         }],
@@ -4657,7 +4683,7 @@ function milestoneAdd(lowestKey,heroID) {
         milestoneButton.style.border = "0.2em solid #777898";
     }
 
-    let milestoneImg = new Image();
+    let milestoneImg = createDom('img');
     milestoneImg.src = `./assets/tooltips/milestone/${upgradeInfo[heroID].Name}.webp`;
 
     milestoneButton.append(milestoneImg);
@@ -5435,18 +5461,18 @@ function createGuild() {
         rankButton.classList.add("rank-button","flex-column", 'clickable');
         rankButton.id = `rank-button-${i}`;
         let rankText = document.createElement("p");
-        let rankImg = new Image();
+        let rankImg = createDom('img');
         rankImg.src = "./assets/expedbg/rankImg.webp";
         rankText.innerText = i;
         rankButton.append(rankImg,rankText);
 
         if (advDict.adventureRank < i && advDict.rankDict[i] === false) {
-            let rankIco = new Image();
+            let rankIco = createDom('img');
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/lock.webp";
             rankButton.append(rankIco);
         } else if (advDict.rankDict[i] === true) {
-            let rankIco = new Image();
+            let rankIco = createDom('img');
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/tick.webp";
             rankButton.append(rankIco);
@@ -5523,7 +5549,7 @@ function createGuild() {
             sortList("table2");
 
             let rankButton = document.getElementById(`rank-button-${level}`);
-            let rankIco = new Image();
+            let rankIco = createDom('img');
             rankIco.classList.add("rank-ico");
             rankIco.src = "./assets/icon/tick.webp";
             rankButton.append(rankIco);
@@ -5839,7 +5865,7 @@ function resetBounty(bountyMenu,type) {
             let bountyStar = document.createElement("div");
             bountyStar.classList.add("flex-row");
             for (let j = 0; j < i; j++) {
-                let starImg = new Image();
+                let starImg = createDom('img');
                 starImg.src = "./assets/expedbg/bountyStar.webp";
                 bountyStar.appendChild(starImg);
             }
@@ -5862,7 +5888,7 @@ function resetBounty(bountyMenu,type) {
                 completeBounty(path,"load",bountyButton);
             } else if (bountyObject[path].Completed == "claimed") {
                 bountyImg.style.filter = "grayscale(0.9) brightness(0.1)";
-                let markImg = new Image();
+                let markImg = createDom('img');
                 markImg.src = "./assets/expedbg/bountyDone.webp"
                 bountyButton.appendChild(markImg);
                 bountyButton.style.backgroundColor = "rgb(152 132 91)";
@@ -5879,7 +5905,7 @@ function resetBounty(bountyMenu,type) {
             let bountyStar = document.createElement("div");
             bountyStar.classList.add("flex-row");
             for (let j = 0; j < i; j++) {
-                let starImg = new Image();
+                let starImg = createDom('img');
                 starImg.src = "./assets/expedbg/bountyStar.webp";
                 bountyStar.appendChild(starImg);
             }
@@ -5942,7 +5968,7 @@ function completeBounty(bountyID,type,ele) {
         bountyObject[bountyID].Completed = "claimed";
         claim.remove();
 
-        let markImg = new Image();
+        let markImg = createDom('img');
         markImg.src = "./assets/expedbg/bountyDone.webp"
         button.appendChild(markImg);
 
@@ -6038,7 +6064,7 @@ function createExpMap() {
     charMenu.classList.add("flex-column","char-menu");
     charMenu.style.display = "none";
     for (let k = 0; k < (CONSTANTS.MAX_LEADER + 1); k++) {
-        let charImg = new Image();
+        let charImg = createDom('img');
         charImg.src = `./assets/expedbg/leader-${k}.webp`;
         let charLore = document.createElement("p");
         charLore.classList.add("flex-column");
@@ -6072,7 +6098,7 @@ function createExpMap() {
         charMenu.append(charDiv);
     }
 
-    let dragIcon = new Image();
+    let dragIcon = createDom('img');
     dragIcon.classList.add("drag-icon");
     dragIcon.src = "./assets/expedbg/reset.webp";
 
@@ -6102,7 +6128,7 @@ function createExpMap() {
     let zoomValue = 0.3 + (2/100) * settingsValues.defaultZoom;
     mapInstance.zoom(zoomValue);
 
-    let img = new Image();
+    let img = createDom('img');
     img.src = "./assets/expedbg/adventureMap.webp";
     img.onload = function() {
         advImage.style.width = "unset";
@@ -6249,7 +6275,7 @@ function notifPop(type,icon,count) {
         let notifContainer = document.createElement("div");
         notifContainer.classList.add("flex-row","notif-div");
         notifContainer.id = `notif-${icon}-div`
-        let notifImg = new Image();
+        let notifImg = createDom('img');
         let notifText = document.createElement("p");
 
         if (icon === "bounty") {
@@ -6489,7 +6515,7 @@ function drawWorldQuest(advType) {
     adventureHeading.style.flexGrow = "1";
     adventureHeading.style.overflowY = "auto";
 
-    let preloadedImage = new Image();
+    let preloadedImage = createDom('img');
     preloadedImage.src = `./assets/expedbg/choice/${questId}-1.webp`;
     preloadedImage.onload = ()=> {
         adventureArea.style.display = 'flex';
@@ -6612,10 +6638,10 @@ function finishQuest(advType) {
         offerCurrency.value = 0;
         offerCurrency.id = "offer-amount";
 
-        let acceptButton = new Image();
+        let acceptButton = createDom('img');
         acceptButton.src = "./assets/icon/thumbsUp.webp";
         acceptButton.classList.add("dim-filter");
-        let rejectButton = new Image();
+        let rejectButton = createDom('img');
         rejectButton.classList.add("dim-filter");
         rejectButton.src = "./assets/icon/thumbsDown.webp";
 
@@ -6644,7 +6670,7 @@ function finishQuest(advType) {
         currencyAmount.classList.add("flex-row")
         currencyAmount.id = "currency-amount";
 
-        let primogem = new Image();
+        let primogem = createDom('img');
         primogem.src = "./assets/icon/primogemIcon.webp";
         currencyAmount.appendChild(primogem);
         
@@ -6974,7 +7000,7 @@ function drawAdventure(advType, wave) {
         adventureVideo.append(timerDefense);
     }
 
-    const preloadedImage = new Image();
+    const preloadedImage = createDom('img');
     preloadedImage.src = `./assets/expedbg/scene/${advType}-B-${bgRoll}.webp`;
     preloadedImage.onload = () => {
         adventureArea.style.display = 'flex';
@@ -7260,7 +7286,7 @@ function triggerFight() {
                 }
             }
 
-            let warningImg = new Image();
+            let warningImg = createDom('img');
             warningImg.id = "warning-quicktime";
             warningImg.src = `./assets/icon/warning${variant}.webp`;
             warningImg.classList.add("quicktime-warning");
@@ -8667,7 +8693,7 @@ function quicktimeEvent(waveQuicktime, advLevel, variant) {
         quicktimeBar.state = null;
         quicktimeBar.classList.add("flex-row","quicktime-block");
 
-        const quickImg = new Image();
+        const quickImg = createDom('img');
         quickImg.src = "./assets/expedbg/quicktime-block.webp";
         quickImg.classList.add("cover-all");
         quickImg.style.zIndex = 1;
@@ -9373,7 +9399,7 @@ function winAdventure() {
         lootDiv = inventoryFrame(lootDiv, itemInfo);
 
         if (tempArray[key][1] === true && (saveValues.treeObj.level > 0 && saveValues.treeObj.level < 5)) {
-            let bonus = new Image();
+            let bonus = createDom('img');
             bonus.classList.add('tree-bonus')
             bonus.src = "./assets/expedbg/tree-item.webp";
             lootDiv.append(bonus);
@@ -11250,7 +11276,7 @@ function createAscend() {
     ascendCurency.ele = null;
     ascendCurency.addEventListener('click', (() => {ascendChar(elementContainer.activeChar)}))
     let ascendNumber = document.createElement('p');
-    let ascendEle = new Image();
+    let ascendEle = createDom('img');
     ascendEle.src = '';
     ascendEle.classList.add('icon','primogem');
 
@@ -11274,7 +11300,7 @@ function createAscend() {
         for (let key in upgradeDict) {
             if (upgradeDict[key].Purchased > 0 && (upgradeInfo[key].Ele === ele || upgradeInfo[key].Ele === "Any")) {
                 charArray.push(upgradeInfo[key].Name);
-                let charImg = new Image();
+                let charImg = createDom('img');
                 charImg.classList.add('dim-filter');
                 charImg.src = `./assets/tooltips/hero/${upgradeInfo[key].Name}.webp`;
                 charImg.addEventListener('click',()=>{
@@ -11533,7 +11559,7 @@ function createTreeMenu() {
     treeSide.id = 'tree-side';
     treeSide.style.display = "none";
 
-    const sandImg = new Image();
+    const sandImg = createDom('img');
     sandImg.src = './assets/tree/sand.webp';
     sandImg.classList.add('tree-sand');
 
@@ -11546,7 +11572,7 @@ function createTreeMenu() {
     const treeContainer = document.createElement('div');
     treeContainer.classList.add('tree-container');
     treeContainer.id = 'tree-container';
-    const treeImg = new Image();
+    const treeImg = createDom('img');
     let treeLevel = saveValues.treeObj.level;
     treeImg.id = 'tree-img';
     treeImg.style.animation = 'unset';
@@ -11562,7 +11588,7 @@ function createTreeMenu() {
 
     const treeHealthContainer = document.createElement('div');
     treeHealthContainer.classList.add('tree-health');
-    const treeNut = new Image();
+    const treeNut = createDom('img');
     treeNut.src = './assets/icon/nut.webp';
     const treeHealthText = document.createElement('p');
     treeHealthText.id = 'tree-health-text';
@@ -11652,12 +11678,12 @@ function populateTreeItems() {
     coreContainer.id = 'core-container';
     coreContainer.currentItem = null;
 
-    const coreContainerImg = new Image();
+    const coreContainerImg = createDom('img');
     coreContainerImg.src = "./assets/icon/core.webp"
     const coreContainerText = document.createElement('p');
     coreContainerText.innerText = abbrNum(saveValues.treeObj.offer[0], 2, true);
 
-    const plusImage = new Image();
+    const plusImage = createDom('img');
     plusImage.src = './assets/icon/plus.webp';
 
     coreContainer.append(coreContainerImg, coreContainerText);
@@ -11756,7 +11782,7 @@ function treeOptions(planted, optionsContainer) {
         const optionsTextArray = ['Offer', 'Absorb', 'Bless'];
         for (let i = 0; i < 3; i++) {
             let treeButton = document.createElement('div');
-            let optionImg = new Image();
+            let optionImg = createDom('img');
             optionImg.src = `./assets/tree/option-${i}.webp`;
             let optionText = document.createElement('p');
             optionText.innerText = optionsTextArray[i];
@@ -12552,7 +12578,7 @@ if (beta || testing) {
         if (e.key === 'f') {
             addTreeCore(randomInteger(10, 30), 0);
         } else if (e.key === 'g') {
-            spawnSkirmish();
+            startRandomEvent(5);
         } else if (e.key === 'h') {
             document.getElementById('shop-backdoor').style.display = 'block';
         } else if (e.key === 'j') {
@@ -12595,7 +12621,7 @@ function startingFunction() {
 }
 
 if (testing) {
-    console.log('TESTING VERSION')
+    console.log('TESTING VERSION');
     mainBody.append(createDom('p', { innerText: 'TESTER', classList:['test-warning'] })); 
     
     setTimeout(()=>{
