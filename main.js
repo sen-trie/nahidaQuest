@@ -3656,7 +3656,6 @@ function advancedSettings() {
             default:
                 prefer.addEventListener('change', () => {
                     settingsValues[advItem.default] = prefer.checked;
-                    console.log(settingsValues)
                 });
                 break;
         }
@@ -3950,6 +3949,8 @@ function settingsBox() {
                 genericItemLoot();
                 genericItemLoot();
                 genericItemLoot();
+            } else if (commandText === "all the seeds") {
+                addTreeCore(10);
             } else if (commandText === "all the mail") {
                 saveValues["mailCore"] += 30;
             } else if (commandText === "all the riches") {
@@ -4030,33 +4031,16 @@ function createMultiplierButton() {
     multiplierButtonContainer.append(multiplierButton3, multiplierButton2, multiplierButton1);
     midDiv.appendChild(multiplierButtonContainer);
 
-    let currentKey = null;
-
-    document.addEventListener("keydown", function(event) {
-        if (currentKey !== null) return;
+    document.addEventListener('keyup', (event) => {
+        event.preventDefault();
         if (event.key === "Shift") {
-            currentKey = "Shift";
             multiplierButton1.click();
         } else if (event.key === "Alt") {
-            currentKey = "Alt";
             multiplierButton2.click();
         } else if (event.key === "Control") {
-            currentKey = "Control";
             multiplierButton3.click();
         }
-    });
-
-    document.addEventListener("keyup", function(event) {
-        if (event.key !== currentKey) return;
-        if (currentKey === "Shift") {
-            multiplierButton1.click();
-        } else if (currentKey === "Alt") {
-            multiplierButton2.click();
-        } else if (currentKey === "Control") {
-            multiplierButton3.click();
-        }
-        currentKey = null;
-    });
+    })
 }
 
 function updateMilestoneNumber() {
@@ -4875,8 +4859,10 @@ function inventoryAdd(idNum, type) {
             let newIcon = document.createElement("img");
             newIcon.classList.add("new-item");
             newIcon.src = "./assets/icon/new-item.webp";
+
             if (!document.getElementById(idNum)) {return}
             let updatedButton = document.getElementById(idNum);
+            updatedButton.updateNumber();
             updatedButton.appendChild(newIcon);
             updatedButton.addEventListener("click",()=>{newIcon.remove()})
             return;
@@ -4897,7 +4883,18 @@ function inventoryAdd(idNum, type) {
         buttonInv.classList.add("button-container");
         buttonInv.id = itemUniqueID;
 
+        const itemNumberText = createDom('p', {
+            classList: ['item-frame-text'],
+            innerText: InventoryMap.get(itemUniqueID),
+        });
+        
+        buttonInv.appendChild(itemNumberText);
+        buttonInv.updateNumber = () => {
+            itemNumberText.innerText = InventoryMap.get(itemUniqueID);
+        }
+
         const changeItem = () => {
+            buttonInv.updateNumber();
             changeTooltip(Inventory[idNum], "item", idNum);
             if (itemTooltip === -1) {
                 buttonInv.classList.add("inventory-selected");
@@ -4924,7 +4921,7 @@ function inventoryAdd(idNum, type) {
         buttonInv.appendChild(newIcon);
         buttonInv.addEventListener("click",()=>{newIcon.remove()})
     }
-
+    
     buttonInv = inventoryAddButton(buttonInv,Inventory[idNum]);
     table2.appendChild(buttonInv);
 }
@@ -10614,6 +10611,7 @@ function reduceItem(localItemTooltip, usingTooltip = false) {
             itemButton.remove();
         }
     }
+    if (itemButton) itemButton.updateNumber();
 }
 
 function tooltipFunction() {

@@ -1080,6 +1080,12 @@ table, button, label {
     transition: 0.2s ease;
 }
 
+.button-container > .item-frame-text {
+    right: unset;
+    left: 5%;
+    font-size: 1.2rem;
+}
+
 .button-inv-frame {
     position: absolute;
     top: 0;
@@ -2424,6 +2430,7 @@ table, button, label {
 }
 
 .old-tutorial-button > p {
+    padding: 0 1rem;
     text-align: center;
     width: 65%;
 }

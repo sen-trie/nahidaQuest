@@ -313,7 +313,7 @@ const tutorialDict = {
     "advTut": ["Expedition", 6, "/expedbg/battle1.webp"],
     "rangTut": ["Ranged Attack", 2, "/icon/warning.webp"],
     "commission": ["Commissions", 3, "/expedbg/adv-10.webp"],
-    "goldenNut": ["Golden Nut Obtained", 4, "/icon/goldenNut.webp"],
+    "goldenNut": ["Golden Nut", 4, "/icon/goldenNut.webp"],
     "ascendTut": ["Ascension & Trees", 13, "/icon/tree.webp"],
     "skirTut": ["Skirmish Tutorial", 4, "/expedbg/adv-13.webp"],
     "flower": ["Fellboss \n Defeat", 2, "/expedbg/heads/25.webp"],

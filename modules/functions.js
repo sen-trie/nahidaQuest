@@ -207,6 +207,10 @@ function textReplacer(dictReplace,originalText) {
 
 // TOGGLES CSS STYLE
 function universalStyleCheck(ele, styleCheck, paramOn, paramOff, forced) {
+    if (!ele) {
+        console.warn(`Missing: ${ele}, ${styleCheck}`)
+    }
+
     if (forced) {
         if (ele.style[styleCheck] !== paramOff) {
             ele.style[styleCheck] = paramOff;
