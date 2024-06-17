@@ -22,6 +22,11 @@ function inventoryAddButton(buttonInv, Item) {
 // ADDS FLOATING TEXT UPON CLICKING ON DEMO BUTTON
 function floatText(clickType, combineText, leftDiv, clickFactor, Xlocation, Ylocation, abbrNum, clickerEvent = null) {
     let clickCountAppear = document.createElement("div");
+    clickCountAppear.style.position = "absolute";
+    clickCountAppear.style.left = Xlocation + "%";
+    clickCountAppear.style.top = Ylocation + "%";
+    clickCountAppear.addEventListener('animationend', ()=>{if(clickCountAppear) clickCountAppear.remove()});
+
     let addDiv = true;
     if (clickType === "crit") {
         if (document.getElementById("crit-text")) {
@@ -74,17 +79,14 @@ function floatText(clickType, combineText, leftDiv, clickFactor, Xlocation, Yloc
         clickCountAppear.classList.add("floatingText", "energy-text");
         clickCountAppear.innerText = "+" + abbrNum(clickFactor,2,true);
         clickCountAppear.appendChild(createDom('img', { src: './assets/icon/energyIcon.webp'}));
+        debugger;
     }
 
     if (clickerEvent === "scara") {
         clickCountAppear.style.color = "#0c1327";
     }
 
-    clickCountAppear.style.position = "absolute";
-    clickCountAppear.style.left = Xlocation + "%";
-    clickCountAppear.style.top = Ylocation + "%";
-    clickCountAppear.addEventListener('animationend', ()=>{clickCountAppear.remove()});
-    if (!document.getElementById("float-text") && addDiv) {
+    if (clickType === "energy" || (!document.getElementById("float-text") && addDiv)) {
         leftDiv.appendChild(clickCountAppear);
     };
     return leftDiv;

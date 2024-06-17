@@ -128,7 +128,7 @@ const weaponBuffPercent =   [0, 1.1, 1.3, 1.7, 2.1, 2.7, 4.6];
 const artifactBuffPercent = [0, 1.05, 1.15, 1.35, 1.55, 1.85];
 const foodBuffPercent =     [0, 1.4, 2.0, 3.1, 4.4, 6.2];
 const nationBuffPercent =   [0, 0, 1.2, 1.5, 1.8];
-const energyBuffPercent =   [0, 0, 0, 1000, 2500, 5000]; // TODO: BUFF ENERGY
+const energyBuffPercent =   [0, 0, 0, 800, 2000, 4000];
 const elementBuffPercent =  [0, 0, 0, 1.6, 2.2, 3.0, 3.0];
 const buffLookUp = {
     "[wBuff]":weaponBuffPercent,
@@ -334,16 +334,12 @@ function timerEventsLoading() {
 }
 
 // SAVE DATA TIMER
-var savedTimes = 1;
-let saveTimeMin = 180 * savedTimes;
-function timerSave(timerSeconds) {
-    // SAVES DATA EVERY 3 MINUTES
-    if (timerSeconds > saveTimeMin) {
+let saveTimeMin = getTime() + 3;
+function timerSave() {
+    // SAVES DATA EVERY settingsValues.saveTime MINUTES
+    if (getTime() > saveTimeMin) {
         saveData();
         console.log("Saved!");
-
-        savedTimes++;
-        saveTimeMin = 180 * savedTimes;
     }
 }
 
@@ -546,12 +542,11 @@ function spawnFallingNut() {
 }
 
 function spawnEnergy() {
-    const start = Date.now();
     const img = createDom("img", {
         class: ['raining-image'],
         src: './assets/icon/stamina.webp',
         style: {
-            width: 'unset', //TODO: HIGHER AT UPPER POINTS
+            width: 'unset',
             height: '10%',
             top: "-10%",
             left: `${randomInteger(5,95)}%`,
@@ -564,8 +559,6 @@ function spawnEnergy() {
 
     const clickFunction = () => {
         if (img) {
-            const delta = Date.now() - start;
-            console.log(delta / 1000)
 
             const energyGain = randomInteger(lowerEnergyRate, upperEnergyRate);
             saveValues.energy += energyGain;
@@ -3166,6 +3159,7 @@ function tutorial(idleAmount) {
 function saveData(skip = false, saveSlot = 0, customArray = []) {
     if (preventSave) {return};
     const currentTime = getTime();
+    saveTimeMin = currentTime + settingsValues.saveTime;
 
     saveValues.currentTime = currentTime;
     saveValues.versNumber = CONSTANTS.DBNUBMER;
@@ -3584,9 +3578,10 @@ function advancedSettings() {
         {id: 'auto-preference',  default: 'autoClickBig', text: "Hold to Click 'Big Nahida'"},
         {id: 'wide-combat-preference',  default: 'wideCombatScreen', text: "Wide Battle Screen"},
         {id: 'left-hand-mode',  default: 'leftHandMode', text: "Left Handed Mode"},
-        {id: 'font-size-level',  default: 'fontSizeLevel', text: "Font Size (1-10)"},
-        {id: 'reset-level',  default: 'resetLevel', text: "Reset Adv. Settings"},
         {id: 'fullscreen-on',  default: 'fullscreenOn', text: "Auto Fullscreen on Launch"},
+        {id: 'font-size-level',  default: 'fontSizeLevel', text: "Font Size (1-10)"},
+        {id: 'save-time',  default: 'saveTime', text: "Save Interval (min)"},
+        {id: 'reset-level',  default: 'resetLevel', text: "Reset Adv. Settings"},
     ]; 
 
     let advancedSettingsMenu = document.getElementById('settings-tab-advanced');
@@ -3622,15 +3617,39 @@ function advancedSettings() {
             prefer.changeValue = (newValue) => {
                 if (isNaN(newValue)) {
                     prefer.value = 5;
-                } else {
-                    newValue = Math.min(Math.max(newValue, 1), 10);
-                    prefer.value = Math.round(newValue * 10) / 10;
+                    } else {
+                        newValue = Math.min(Math.max(newValue, 1), 10);
+                        prefer.value = Math.round(newValue * 10) / 10;
                 }
 
                 settingsValues.fontSizeLevel = Number(newValue);
                 CONSTANTS.CHANGEFONTSIZE(Number(newValue));
             }
+                
+            prefer.addEventListener('change', () => {prefer.changeValue()});
+            prefer.value = settingsValues[advItem.default];
+            prefer.type = 'text';
+            prefer.id = advItem.id;
 
+            const addButton = createDom('button', { classList:['flex-row', 'font-add'], innerText: '+'});
+            const minusButton = createDom('button', { classList:['flex-row', 'font-add'], innerText: '-'});
+            addButton.addEventListener('click', () => {prefer.changeValue(Number(prefer.value) + 1)});
+            minusButton.addEventListener('click', () => {prefer.changeValue(Number(prefer.value) - 1)});
+
+            preferLabel.append(preferText, addButton, prefer, minusButton);
+        } else if (advItem.id === 'save-time') {
+            prefer.classList.add('font-setting-input', 'flex-row');
+            prefer.changeValue = (newValue) => {
+                if (isNaN(newValue)) {
+                    prefer.value = 3;
+                } else {
+                    newValue = Math.min(Math.max(newValue, 1), 10);
+                    prefer.value = Math.round(newValue * 10) / 10;
+                }
+                settingsValues.saveTime = Number(newValue);
+            }
+
+            prefer.addEventListener('change', () => {prefer.changeValue()});
             prefer.value = settingsValues[advItem.default];
             prefer.type = 'text';
             prefer.id = advItem.id;

@@ -158,6 +158,7 @@ const SettingsDefault = {
     sfxVolume:0.25,
     defaultZoom: 0,
     fontSizeLevel: 5, 
+    saveTime: 3,
     combineFloatText:false,
     preferOldPic: false,
     showFallingNuts: false, //INVERSED

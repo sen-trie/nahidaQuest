@@ -3408,7 +3408,7 @@ input:checked + .slider {
     background-color: var(--dark-green);
 }
 
-#font-size-level {
+.switch > .font-setting-input {
     opacity: 1;
     font: inherit;
     width: 2rem;
@@ -3419,7 +3419,7 @@ input:checked + .slider {
 }
 
 @media (width >= 400px) {
-    #font-size-level {
+    .switch > .font-setting-input {
         margin: 0 2%;
     }
 }
