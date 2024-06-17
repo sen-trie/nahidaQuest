@@ -10,7 +10,7 @@ __Strongly__ recommended to use desktop/landscape orientation for optimal play
 ### Website Preview 
 ![image](https://github.com/bobbaID/nahidaQuest/assets/122269172/198329ed-1b24-4185-be03-272742d869a8)
 ----
-## Developed by myself, bobbaID.
+## Developed by myself.
 
 Assets (characters, SFX, etc..) taken from Genshin Impact are copyrighted miHoYo. Artwork from artists are credited along with links [here](https://nahidaquest.com/credits).
 
