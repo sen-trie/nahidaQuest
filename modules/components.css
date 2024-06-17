@@ -162,6 +162,7 @@
     width: 10%;
     aspect-ratio: 1;
     z-index: 101;
+    object-fit: contain;
     pointer-events: auto;
 }
 

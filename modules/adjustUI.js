@@ -20,7 +20,7 @@ function inventoryAddButton(buttonInv, Item) {
 }
 
 // ADDS FLOATING TEXT UPON CLICKING ON DEMO BUTTON
-function floatText(clickType,combineText,leftDiv,clickFactor,Xlocation,Ylocation,abbrNum,clickerEvent) {
+function floatText(clickType, combineText, leftDiv, clickFactor, Xlocation, Ylocation, abbrNum, clickerEvent = null) {
     let clickCountAppear = document.createElement("div");
     let addDiv = true;
     if (clickType === "crit") {
@@ -46,7 +46,7 @@ function floatText(clickType,combineText,leftDiv,clickFactor,Xlocation,Ylocation
             clickCountAppear.nutValue = clickFactor;
             clickCountAppear.innerText = "+" + abbrNum(clickFactor,2,true);
         }
-    } if (clickType === "normal") {
+    } else if (clickType === "normal") {
         if (combineText) {
             if (document.getElementById("float-text")) {
                 let oldNumberText = document.getElementById("float-text");
@@ -70,6 +70,10 @@ function floatText(clickType,combineText,leftDiv,clickFactor,Xlocation,Ylocation
             clickCountAppear.classList.add("floatingText");
             clickCountAppear.innerText = "+" + abbrNum(clickFactor,2,true);
         }
+    } else if (clickType === "energy") {
+        clickCountAppear.classList.add("floatingText", "energy-text");
+        clickCountAppear.innerText = "+" + abbrNum(clickFactor,2,true);
+        clickCountAppear.appendChild(createDom('img', { src: './assets/icon/energyIcon.webp'}));
     }
 
     if (clickerEvent === "scara") {

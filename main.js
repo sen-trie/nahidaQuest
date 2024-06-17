@@ -101,8 +101,8 @@ suffixPreload.forEach((color) => {
 // SPECIAL UPGRADE VARIABLES
 const PERM_UPGRADES_CUTOFF = 14;
 let wishPower = 0;
-let upperEnergyRate = 35;
-let lowerEnergyRate = 15;
+let upperEnergyRate;
+let lowerEnergyRate;
 let specialClick = 1;
 let costDiscount = 1;
 let clickCritRate = 0;
@@ -128,7 +128,7 @@ const weaponBuffPercent =   [0, 1.1, 1.3, 1.7, 2.1, 2.7, 4.6];
 const artifactBuffPercent = [0, 1.05, 1.15, 1.35, 1.55, 1.85];
 const foodBuffPercent =     [0, 1.4, 2.0, 3.1, 4.4, 6.2];
 const nationBuffPercent =   [0, 0, 1.2, 1.5, 1.8];
-const energyBuffPercent =   [0, 0, 0, 200, 500, 1000];
+const energyBuffPercent =   [0, 0, 0, 1000, 2500, 5000]; // TODO: BUFF ENERGY
 const elementBuffPercent =  [0, 0, 0, 1.6, 2.2, 3.0, 3.0];
 const buffLookUp = {
     "[wBuff]":weaponBuffPercent,
@@ -545,6 +545,44 @@ function spawnFallingNut() {
     leftDiv.appendChild(img);
 }
 
+function spawnEnergy() {
+    const start = Date.now();
+    const img = createDom("img", {
+        class: ['raining-image'],
+        src: './assets/icon/stamina.webp',
+        style: {
+            width: 'unset', //TODO: HIGHER AT UPPER POINTS
+            height: '10%',
+            top: "-10%",
+            left: `${randomInteger(5,95)}%`,
+            animation: `rain-rotate ${(randomInteger(7,10)/2)}s linear forwards`,
+        },
+        event: ['animationend', () => {
+            if (img) img.remove();
+        }]
+    });
+
+    const clickFunction = () => {
+        if (img) {
+            const delta = Date.now() - start;
+            console.log(delta / 1000)
+
+            const energyGain = randomInteger(lowerEnergyRate, upperEnergyRate);
+            saveValues.energy += energyGain;
+            persistentValues.lifetimeEnergyValue += energyGain;
+    
+            floatText("energy",false,leftDiv,energyGain,randomInteger(30,70),randomInteger(70,90),abbrNum);
+            challengeNotification(({category: 'energy', value: saveValues.energy}));
+            img.remove();
+        }
+    }
+
+    img.addEventListener('mousedown', clickFunction, { once: true });
+    img.addEventListener('click', clickFunction, { once: true });
+    img.addEventListener('touchstart', clickFunction, { once: true });
+    leftDiv.appendChild(img);
+}
+
 // ROLL FOR ENERGY
 function energyRoll(autoClicked = false) {
     let randInt = Math.floor(Math.random() * 1000);
@@ -556,12 +594,8 @@ function energyRoll(autoClicked = false) {
     
     if (clickDelay < 1){
         if (randInt < ENERGYCHANCE) {
-            const energyGain = randomInteger(lowerEnergyRate, upperEnergyRate)
-            saveValues.energy += energyGain;
-            persistentValues.lifetimeEnergyValue += energyGain;
-
-            challengeNotification(({category: 'energy', value: saveValues.energy}))
-            clickDelay = 20;
+            spawnEnergy();
+            clickDelay = 40;
         }
     }
 }
@@ -612,8 +646,8 @@ function specialValuesUpgrade(loading = false, valueUpdate) {
     } else if (loading == false) {
         switch (valueUpdate) {
             case 1:
-                upperEnergyRate = Math.ceil(35 * (10 + persistentValues.upgrade[1]) / 10);
-                lowerEnergyRate = Math.ceil(upperEnergyRate * 0.42);
+                upperEnergyRate = Math.ceil(200 * (100 + persistentValues.upgrade[1] * 2.5) / 100);
+                lowerEnergyRate = Math.ceil(upperEnergyRate * 0.65);
                 break;
             case 2:
                 specialClick = (1 + calcPermEffect(valueUpdate)).toFixed(3);
@@ -3015,8 +3049,13 @@ function removeLoading(loadingNumber) {
         tutorial(idleAmount);
         if (testing && document.getElementById('play-button')) document.getElementById('play-button').click(); 
         if (CONSTANTS.DBNUBMER - saveValues.versNumber > 0) {
-            sidePop('/icon/patchIco.webp', `Update: ${saveValues.versNumber} -> ${CONSTANTS.DBNUBMER}`, 10000, true);
-            if (CONSTANTS.DBNUBMER - saveValues.versNumber >= 1000) {
+            let string = saveValues.versNumber.toString().split("").reverse().join("");
+            string = string.slice(0, 3) + '-' + string.slice(3);
+            string = string.slice(0, 6) + '-' + string.slice(6);
+            string = string.split("").reverse().join("");
+
+            sidePop('/icon/patchIco.webp', `Update: V.${string} -> ${CONSTANTS.VERSIONNUMBER}`, 10000, true);
+            if (CONSTANTS.DBNUBMER - saveValues.versNumber >= 900) {
                 document.getElementById('setting-button').click()
                 document.getElementById('patch-notes-button').click();
                 document.querySelector('#patch-container > div').click();
@@ -6677,7 +6716,7 @@ function finishQuest(advType) {
         quitQuest();
         gainXP("variable");
         if (advType === 17 || advType === 3) {
-            let energyRoll = randomInteger(150, 250);
+            let energyRoll = randomInteger(750, 1550);
             saveValues.energy += energyRoll;
             persistentValues.lifetimeEnergyValue += energyRoll;
 

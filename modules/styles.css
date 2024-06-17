@@ -721,6 +721,22 @@ table, button, label {
     aspect-ratio: 1;
 }
 
+.energy-text {
+    z-index: 15;
+    color: white;
+    text-shadow: var(--text-shadow-050);
+    font-size: 1.4rem;
+    animation: fadeOutOpacity 3.0s cubic-bezier(.02,.97,.91,.14) forwards;
+}
+
+.energy-text > img {
+    height: 1.4rem;
+    width: auto;
+    object-fit: contain;
+    transform: translate(25%, 15%);
+    filter: drop-shadow(0 0 1rem black);
+}
+
 .screen-tips {
     max-width: 94%;
     height: auto;
