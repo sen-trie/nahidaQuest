@@ -394,6 +394,74 @@ function drawMailTable(table4) {
 }
 
 const patchDict = {
+    "v.2-1":`
+    Note: If you have any suggestions / bug reports, you can report it under "https://github.com/sen-trie/nahidaQuest".
+
+    <br><br><line>Major Bugs Fixed 🐞: </line><br><br>
+        </indent>
+        1. Aranara Events<br>
+        The Aranara Events 'Aranara Weasel' & 'Aranara Rain' have been made 'sensitive', to account for network lag. In essence,
+        the event activates when the mouse is pressed down (or tapped) rather than when the mouse is clicked.
+        </indent>
+
+        <br><br> 2. Shop World Quest<br>
+        I have removed this particular World Quest for now, as I am unable to replicate this bug. If you can accurately replicate this,
+        PLEASE write about it on Github along with an attached save!
+        </indent>
+
+    <br><br><line>New Additions 💡: </line><br><br>
+        </indent>
+        1. Tutorial Archive <br>
+        Alongside 'Achievements' and 'Challenges', a tutorial archive have been added - Players can freely access all previous tutorials
+        that have seen in the fourth tab (Also added a tutorial for skirmish - Oops, I forgot to make one!).
+         </indent>
+
+        <br><br> 2. Settings Save <br>
+        Under 'Advanced Settings', players can adjust how often autosaves occur (Default: 3min).
+        </indent>
+
+        <br><br> 3. Inventory Item Numbers <br>
+        Quantity of items in players' inventory are now labelled.
+        </indent>
+
+        <br><br> 4. Right-click functionality <br>
+        Right click has been given multiple functions (on mobile, this would be holding). LMB has been unchanged.
+        <br>-Character Levelling: RMB to immediately buy levels
+        <br>-Character Upgrades: RMB to immediately upgrade
+        <br>-Inventory: RMB an item to immediately use it
+        </indent>
+
+        <br><br> 5. Keybind functionality <br>
+        In the same vein, toggle functionality has been added to the following keys:
+        <br>-Shift: Purchase 10x Levels
+        <br>-Alt: Purchase 25x Levels
+        <br>-CTRL: Purchase 100x Levels
+        </indent>
+
+
+    <br><br><line>Systems Rework 🌰: </line><br><br>
+        </indent>
+        1. Tree UI rework <br>
+        Tree UI has been 'flattened', tree tabs have been completely removed. All tree functionality ('Planting', 'Offering, 'Harvesting', 'Bless') can be accessed on the same screen.
+        </indent>
+
+        <br><br> 2. Energy rework <br>
+        Instead of randomly getting energy on clicking Big Nahida, an energy block will spawn from the top of the screen, which when clicked
+        on gives energy. Energy potions have also been buffed significantly:
+        <br>-3-Star: 200 -> 800
+        <br>-4-Star: 500 -> 2000
+        <br>-5-Star: 1000 -> 4000
+        </indent>
+
+        <br><br> 3. Expedition QOL <br>
+        Players get 1 second of invincibility after exiting a QTE - evident by the enemies missing their attack (Does not apply to 
+        non-regular attacks like magic circles).
+        </indent>
+
+    <br><br>Please report any bugs and stay tuned for more fixes! If you have complaints, please elaborate on what exactly is the problem, 
+    or how I can fix it - as I cannot work with vague comments. Many thanks. [img]
+    `,
+
     "v.2-0":`
     Welcome to nahidaQuest 2.0! Please enjoy your stay!<br><br>
 
